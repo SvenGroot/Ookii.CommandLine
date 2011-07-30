@@ -58,6 +58,7 @@ namespace Ookii.CommandLine
             : base(message)
         {
             _argumentName = argumentName;
+            _category = category;
         }
 
         /// <summary>
@@ -90,7 +91,7 @@ namespace Ookii.CommandLine
             : base(message, inner)
         {
             _argumentName = argumentName;
-            category = _category;
+            _category = category;
         }
 
         /// <summary>
