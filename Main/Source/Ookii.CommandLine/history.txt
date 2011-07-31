@@ -1,0 +1,226 @@
+This project was transfered to codeplex from an internal Subversion repository. This file contains the log of that repository.
+Do not add new log entries to this file.
+
+------------------------------------------------------------------------
+r40 | sgroot | 2011-07-30 20:57:14 +0900 (Sat, 30 Jul 2011) | 2 lines
+
+Specify error category in CommandLineException so it's easier for a consumer to display a custom message if desired, rather than the default one.
+
+------------------------------------------------------------------------
+r39 | sgroot | 2011-07-30 20:38:44 +0900 (Sat, 30 Jul 2011) | 2 lines
+
+If the following argument after an argument name without a value separator looks like an argument name, it's not considered the value of the argument.
+
+------------------------------------------------------------------------
+r38 | sgroot | 2011-07-30 20:32:49 +0900 (Sat, 30 Jul 2011) | 2 lines
+
+Accept negative numbers as values rather than argument names.
+
+------------------------------------------------------------------------
+r37 | sgroot | 2011-07-30 18:34:07 +0900 (Sat, 30 Jul 2011) | 2 lines
+
+Fixed: positional array argument no longer considered for positional values if it was given a named value first.
+
+------------------------------------------------------------------------
+r36 | sgroot | 2011-06-29 13:07:34 +0900 (Wed, 29 Jun 2011) | 2 lines
+
+XML doc fixes
+
+------------------------------------------------------------------------
+r35 | sgroot | 2011-06-28 01:32:14 +0900 (Tue, 28 Jun 2011) | 2 lines
+
+Fixed: code analysis warning about virtual call in LineWrappingTextWriter ctor
+
+------------------------------------------------------------------------
+r34 | sgroot | 2011-06-27 16:27:38 +0900 (Mon, 27 Jun 2011) | 3 lines
+
+- Added Culture property to control argument parsing
+- Added unit tests for parsing
+
+------------------------------------------------------------------------
+r33 | sgroot | 2011-06-27 14:28:22 +0900 (Mon, 27 Jun 2011) | 5 lines
+
+- Some unit tests for CommandLineParser
+- Fixed: CommandLineArgument.Description should return "" instead of null (same behavior as CommandLineParser.Description)
+- Fixed: CommandLineArgument.IsSwitch should return true for bool?
+- Fixed: Positional property arguments got added to the _positionalArguments array twice.
+
+------------------------------------------------------------------------
+r32 | sgroot | 2011-06-27 13:16:57 +0900 (Mon, 27 Jun 2011) | 2 lines
+
+Improved LineWrappingTextWriter unit tests
+
+------------------------------------------------------------------------
+r31 | sgroot | 2011-06-26 20:10:04 +0900 (Sun, 26 Jun 2011) | 2 lines
+
+Organized usings
+
+------------------------------------------------------------------------
+r30 | sgroot | 2011-06-26 20:09:43 +0900 (Sun, 26 Jun 2011) | 3 lines
+
+- Numerous comment updates
+- Some refactoring (particularly in LineWrappingTextWriter).
+
+------------------------------------------------------------------------
+r29 | sgroot | 2011-06-26 16:53:19 +0900 (Sun, 26 Jun 2011) | 3 lines
+
+- Refactoring and minor changes after code review of CommandLineArgument.cs.
+- Fixed: array argument value not available in ArgumentParsed event.
+
+------------------------------------------------------------------------
+r28 | sgroot | 2011-06-26 15:42:21 +0900 (Sun, 26 Jun 2011) | 5 lines
+
+- All arguments can be supplied by name
+- Reworked CommandLineParser class XML comments to reflect changed behavior
+- Various refactoring
+- Renamed NamedArgumentSwitch to ArgumentNamePrefix
+
+------------------------------------------------------------------------
+r27 | sgroot | 2011-06-25 23:47:54 +0900 (Sat, 25 Jun 2011) | 3 lines
+
+Revised ToString output for CommandLineArgument (used by WriteUsage via internal overload)
+Removed named required and named positional arguments from the sample
+
+------------------------------------------------------------------------
+r26 | sgroot | 2011-06-25 23:19:09 +0900 (Sat, 25 Jun 2011) | 2 lines
+
+Support for named positional arguments.
+
+------------------------------------------------------------------------
+r25 | sgroot | 2011-06-25 22:00:25 +0900 (Sat, 25 Jun 2011) | 2 lines
+
+- Named arguments can be required.
+
+------------------------------------------------------------------------
+r24 | sgroot | 2011-06-25 20:31:33 +0900 (Sat, 25 Jun 2011) | 2 lines
+
+Support for multiple named argument switches.
+
+------------------------------------------------------------------------
+r23 | sgroot | 2011-06-25 19:35:17 +0900 (Sat, 25 Jun 2011) | 2 lines
+
+Improved documentation on the ShellCommand class.
+
+------------------------------------------------------------------------
+r22 | sgroot | 2011-06-23 19:46:05 +0900 (Thu, 23 Jun 2011) | 2 lines
+
+Fixed: options not passed in CreateShellCommand overload
+
+------------------------------------------------------------------------
+r21 | sgroot | 2011-06-23 18:05:08 +0900 (Thu, 23 Jun 2011) | 3 lines
+
+- Added RunShellCommand helper methods
+- Changed ExitStatus to ExitCode to conform to Environment.ExitCode
+
+------------------------------------------------------------------------
+r20 | sgroot | 2011-06-23 16:12:27 +0900 (Thu, 23 Jun 2011) | 2 lines
+
+Fixed code analysis warnings.
+
+------------------------------------------------------------------------
+r19 | sgroot | 2011-06-23 16:08:52 +0900 (Thu, 23 Jun 2011) | 2 lines
+
+Improved method for providing options for usage formatting and creating shell commands.
+
+------------------------------------------------------------------------
+r18 | sgroot | 2011-06-23 14:29:24 +0900 (Thu, 23 Jun 2011) | 4 lines
+
+- Added ArgumentNameAttribute
+- Updated VB sample
+- Added preliminary readme with reminder to mention breaking changes
+
+------------------------------------------------------------------------
+r17 | sgroot | 2011-06-23 14:09:05 +0900 (Thu, 23 Jun 2011) | 4 lines
+
+- Added NamedCommandLineArgumentAttribute ctor that allows the use of the property name as the argument name.
+- Default value description for a named argument is now the type, not the property name.
+- Allow custom value description.
+
+------------------------------------------------------------------------
+r16 | sgroot | 2011-06-23 13:07:12 +0900 (Thu, 23 Jun 2011) | 3 lines
+
+- Allows the use of whitespace for the value separator.
+- Checks for duplicate arguments.
+
+------------------------------------------------------------------------
+r15 | sgroot | 2011-06-14 17:07:40 +0900 (Tue, 14 Jun 2011) | 2 lines
+
+Removed unused resources, fixed a few resource values.
+
+------------------------------------------------------------------------
+r14 | sgroot | 2011-05-30 22:34:07 +0900 (Mon, 30 May 2011) | 2 lines
+
+Deleted superfluous app.config files
+
+------------------------------------------------------------------------
+r13 | sgroot | 2011-05-30 22:33:02 +0900 (Mon, 30 May 2011) | 3 lines
+
+- Added ShellCommandSampleVB
+- Shell command samples are strongly signed
+
+------------------------------------------------------------------------
+r12 | sgroot | 2011-05-30 21:28:02 +0900 (Mon, 30 May 2011) | 3 lines
+
+- CommandLineParser.Parse throws if the number of arguments is incorrect.
+- Added explanatory comments to the samples.
+
+------------------------------------------------------------------------
+r11 | sgroot | 2011-05-30 19:25:30 +0900 (Mon, 30 May 2011) | 2 lines
+
+Fixed ShellCommand C# sample's version number.
+
+------------------------------------------------------------------------
+r10 | sgroot | 2011-05-30 19:23:50 +0900 (Mon, 30 May 2011) | 4 lines
+
+- Updated ShellCommand
+- Got rid of old StringHelper
+- Added ShellCommand C# sample
+
+------------------------------------------------------------------------
+r9 | sgroot | 2011-05-30 16:05:43 +0900 (Mon, 30 May 2011) | 2 lines
+
+CommandLineParser uses new LineWrappingTextWriter to print usage information to the console.
+
+------------------------------------------------------------------------
+r8 | sgroot | 2011-05-30 14:34:47 +0900 (Mon, 30 May 2011) | 3 lines
+
+- Added LineWrappingTextWriter
+- Added Id header to all source files.
+
+------------------------------------------------------------------------
+r7 | sgroot | 2011-05-30 01:01:06 +0900 (Mon, 30 May 2011) | 4 lines
+
+- CommandLineParser is not generic anymore
+- CommandLineArgument base class now has Value property
+- Added ShellCommand support
+
+------------------------------------------------------------------------
+r6 | sgroot | 2011-05-29 23:20:09 +0900 (Sun, 29 May 2011) | 2 lines
+
+Changed back to .Net 2.0 for wider applicability.
+
+------------------------------------------------------------------------
+r5 | sgroot | 2011-05-29 23:06:35 +0900 (Sun, 29 May 2011) | 2 lines
+
+Updated to .Net 4.0
+
+------------------------------------------------------------------------
+r4 | sgroot | 2009-09-06 13:38:13 +0900 (Sun, 06 Sep 2009) | 2 lines
+
+Fixed: parser didn't validate array rank for array arguments.
+
+------------------------------------------------------------------------
+r3 | sgroot | 2009-09-06 13:33:30 +0900 (Sun, 06 Sep 2009) | 2 lines
+
+Added support for array arguments.
+
+------------------------------------------------------------------------
+r2 | sgroot | 2009-09-06 12:25:43 +0900 (Sun, 06 Sep 2009) | 2 lines
+
+Initial check-in
+
+------------------------------------------------------------------------
+r1 | sgroot | 2009-09-06 12:25:32 +0900 (Sun, 06 Sep 2009) | 1 line
+
+Add solution to svn
+------------------------------------------------------------------------
