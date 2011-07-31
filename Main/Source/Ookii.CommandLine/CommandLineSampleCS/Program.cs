@@ -12,7 +12,7 @@ namespace CommandLineSampleCS
         {
             // Create a command line parser for the type that defines this sample's command line arguments
             CommandLineParser parser = new CommandLineParser(typeof(CommandLineArguments));
-            // The ArgumentParsed event is used by this sample to stop processing after the /? argument is received.
+            // The ArgumentParsed event is used by this sample to stop processing after the -? argument is received.
             parser.ArgumentParsed += new EventHandler<ArgumentParsedEventArgs>(CommandLineParser_ArgumentParsed);
 
             try
@@ -23,7 +23,7 @@ namespace CommandLineSampleCS
                 if( arguments == null )
                 {
                     // null means that parsing was cancelled by our ArgumentParsed event handler,
-                    // which indicates the /? argument was supplied, so we should print usage.
+                    // which indicates the -? argument was supplied, so we should print usage.
                     parser.WriteUsageToConsole();
                 }
                 else
@@ -34,7 +34,8 @@ namespace CommandLineSampleCS
                         // Print the full command line as received by the application
                         writer.WriteLine("The command line was: {0}", Environment.CommandLine);
                         writer.WriteLine();
-                        // Print a summary of all the properties on the sample's CommandLineArguments class, which defines the parameters of our application
+                        // This application doesn't do anything useful, it's just a sample of using CommandLineParser after all. We use reflection to print
+                        // the values of all the properties of the sample's CommandLineArguments class, which correspond to the sample's command line arguments.
                         writer.WriteLine("The following arguments were provided:");
                         PropertyInfo[] properties = typeof(CommandLineArguments).GetProperties();
                         foreach( PropertyInfo property in properties )
@@ -80,9 +81,9 @@ namespace CommandLineSampleCS
 
         private static void CommandLineParser_ArgumentParsed(object sender, ArgumentParsedEventArgs e)
         {
-            // When we receive the /? argument, we immediately cancel processing. That way, CommandLineParser<T>.Parse will
+            // When we receive the -? argument, we immediately cancel processing. That way, CommandLineParser<T>.Parse will
             // return null, and the Main method will display usage, even if the correct number of positional arguments was supplied.
-            // Try it: just call the sample with "CommandLineSampleCS.exe foo bar /?", which will print usage even though both the source and destination
+            // Try it: just call the sample with "CommandLineSampleCS.exe foo bar -?", which will print usage even though both the source and destination
             // arguments are supplied.
             if( e.Argument.ArgumentName == "?" )
                 e.Cancel = true;

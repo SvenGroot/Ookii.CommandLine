@@ -8,7 +8,7 @@ Public Module Program
     ' Create a command line parser for the type that defines this sample's command line arguments.
     ' The parser is a field here with the WithEvents keyword to more easily handle the CommandLineParser.ArgumentParsed event;
     ' of course, you can also use the AddHandler keyword to handle that event.
-    ' The ArgumentParsed event is used by this sample to stop processing after the /? argument is received.
+    ' The ArgumentParsed event is used by this sample to stop processing after the -? argument is received.
     Private WithEvents _parser As New CommandLineParser(GetType(CommandLineArguments))
 
     Public Sub Main(ByVal args() As String)
@@ -18,7 +18,7 @@ Public Module Program
 
             If arguments Is Nothing Then
                 ' Nothing means that parsing was cancelled by our ArgumentParsed event handler,
-                ' which indicates the /? argument was supplied, so we should print usage.
+                ' which indicates the -? argument was supplied, so we should print usage.
                 _parser.WriteUsageToConsole()
             Else
                 ' We use the LineWrappingTextWriter to neatly wrap console output.
@@ -26,7 +26,8 @@ Public Module Program
                     ' Print the full command line as received by the application
                     writer.WriteLine("The command line was: {0}", Environment.CommandLine)
                     writer.WriteLine()
-                    ' Print a summary of all the properties on the sample's CommandLineArguments class, which defines the parameters of our application
+                    ' This application doesn't do anything useful, it's just a sample of using CommandLineParser after all. We use reflection to print
+                    ' the values of all the properties of the sample's CommandLineArguments class, which correspond to the sample's command line arguments.
                     writer.WriteLine("The following arguments were provided:")
 
                     Dim properties() As PropertyInfo = GetType(CommandLineArguments).GetProperties()
@@ -66,9 +67,9 @@ Public Module Program
     End Sub
 
     Private Sub _parser_ArgumentParsed(ByVal sender As Object, ByVal e As Ookii.CommandLine.ArgumentParsedEventArgs) Handles _parser.ArgumentParsed
-        ' When we receive the /? argument, we immediately cancel processing. That way, CommandLineParser(Of T).Parse will
+        ' When we receive the -? argument, we immediately cancel processing. That way, CommandLineParser(Of T).Parse will
         ' return Nothing, and the Main method will display usage, even if the correct number of positional arguments was supplied.
-        ' Try it: just call the sample with "CommandLineSampleVB.exe foo bar /?", which will print usage even though both the source and destination
+        ' Try it: just call the sample with "CommandLineSampleVB.exe foo bar -?", which will print usage even though both the source and destination
         ' arguments are supplied.
         If e.Argument.ArgumentName = "?" Then
             e.Cancel = True
