@@ -1,6 +1,4 @@
-﻿// $Id: CommandLineArgumentException.cs 40 2011-07-30 11:57:14Z sgroot $
-//
-using System;
+﻿using System;
 using System.Security.Permissions;
 
 namespace Ookii.CommandLine

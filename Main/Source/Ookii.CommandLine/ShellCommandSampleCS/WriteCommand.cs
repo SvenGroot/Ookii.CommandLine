@@ -1,6 +1,4 @@
-﻿// $Id: WriteCommand.cs 28 2011-06-26 06:42:21Z sgroot $
-//
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 using Ookii.CommandLine;

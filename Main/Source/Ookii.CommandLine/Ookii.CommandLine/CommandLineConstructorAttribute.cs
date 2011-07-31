@@ -1,6 +1,4 @@
-﻿// $Id: CommandLineConstructorAttribute.cs 8 2011-05-30 05:34:47Z sgroot $
-//
-using System;
+﻿using System;
 
 namespace Ookii.CommandLine
 {

@@ -1,6 +1,4 @@
-﻿// $Id: LineWrappingTextWriterTest.cs 32 2011-06-27 04:16:57Z sgroot $
-//
-using Ookii.CommandLine;
+﻿using Ookii.CommandLine;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.IO;

@@ -1,6 +1,4 @@
-﻿// $Id: ShellCommand.cs 30 2011-06-26 11:09:43Z sgroot $
-//
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;

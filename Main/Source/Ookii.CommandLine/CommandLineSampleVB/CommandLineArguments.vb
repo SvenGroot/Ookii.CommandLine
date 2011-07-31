@@ -1,6 +1,4 @@
-﻿' $Id: CommandLineArguments.vb 28 2011-06-26 06:42:21Z sgroot $
-'
-Imports System.ComponentModel
+﻿Imports System.ComponentModel
 Imports Ookii.CommandLine
 
 ''' <summary>

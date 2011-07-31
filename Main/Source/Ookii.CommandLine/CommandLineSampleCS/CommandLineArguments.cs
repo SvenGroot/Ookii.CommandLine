@@ -1,6 +1,4 @@
-﻿// $Id: CommandLineArguments.cs 28 2011-06-26 06:42:21Z sgroot $
-//
-using System;
+﻿using System;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
 using Ookii.CommandLine;

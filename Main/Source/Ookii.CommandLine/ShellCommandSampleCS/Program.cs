@@ -1,6 +1,4 @@
-﻿// $Id: Program.cs 21 2011-06-23 09:05:08Z sgroot $
-//
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 using Ookii.CommandLine;

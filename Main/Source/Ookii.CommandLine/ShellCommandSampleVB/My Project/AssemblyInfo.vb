@@ -1,6 +1,4 @@
-﻿' $Id: AssemblyInfo.vb 13 2011-05-30 13:33:02Z sgroot $
-'
-Imports System
+﻿Imports System
 Imports System.Reflection
 Imports System.Runtime.InteropServices
 
