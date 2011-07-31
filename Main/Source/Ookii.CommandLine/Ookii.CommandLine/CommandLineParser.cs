@@ -558,7 +558,7 @@ namespace Ookii.CommandLine
                     lineWriter = new LineWrappingTextWriter(writer, maximumLineLength, false);
                 }
 
-                if( !string.IsNullOrEmpty(Description) )
+                if( options.IncludeApplicationDescription && !string.IsNullOrEmpty(Description) )
                 {
                     lineWriter.WriteLine(Description);
                     lineWriter.WriteLine();
