@@ -1,6 +1,4 @@
-﻿// $Id: ShellCommandAttribute.cs 30 2011-06-26 11:09:43Z sgroot $
-//
-using System;
+﻿using System;
 
 namespace Ookii.CommandLine
 {

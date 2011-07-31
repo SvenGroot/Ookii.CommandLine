@@ -1,6 +1,4 @@
-﻿' $Id: Program.vb 29 2011-06-26 07:53:19Z sgroot $
-'
-Imports System.Reflection
+﻿Imports System.Reflection
 Imports Ookii.CommandLine
 
 Public Module Program

@@ -1,6 +1,4 @@
-﻿// $Id: AssemblyInfo.cs 11 2011-05-30 10:25:30Z sgroot $
-//
-using System.Reflection;
+﻿using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 

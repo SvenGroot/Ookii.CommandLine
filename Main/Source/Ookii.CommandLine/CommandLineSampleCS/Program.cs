@@ -1,6 +1,4 @@
-﻿// $Id: Program.cs 29 2011-06-26 07:53:19Z sgroot $
-//
-using System;
+﻿using System;
 using System.Reflection;
 using Ookii.CommandLine;
 

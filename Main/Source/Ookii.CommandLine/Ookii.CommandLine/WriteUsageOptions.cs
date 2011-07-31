@@ -1,6 +1,4 @@
-﻿// $Id: WriteUsageOptions.cs 31 2011-06-26 11:10:04Z sgroot $
-//
-using System;
+﻿using System;
 
 namespace Ookii.CommandLine
 {

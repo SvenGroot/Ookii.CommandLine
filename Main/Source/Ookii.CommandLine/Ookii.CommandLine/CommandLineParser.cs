@@ -1,6 +1,4 @@
-﻿// $Id: CommandLineParser.cs 40 2011-07-30 11:57:14Z sgroot $
-//
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;

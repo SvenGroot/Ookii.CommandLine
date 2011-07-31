@@ -1,6 +1,4 @@
-﻿// $Id: LineWrappingTextWriter.cs 35 2011-06-27 16:32:14Z sgroot $
-//
-using System;
+﻿using System;
 using System.IO;
 using System.Text;
 

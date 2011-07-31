@@ -1,6 +1,4 @@
-﻿' $Id: ReadCommand.vb 28 2011-06-26 06:42:21Z sgroot $
-'
-Imports Ookii.CommandLine
+﻿Imports Ookii.CommandLine
 Imports System.ComponentModel
 Imports System.IO
 Imports System.Text
