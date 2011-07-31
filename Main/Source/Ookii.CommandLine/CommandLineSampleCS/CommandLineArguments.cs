@@ -20,7 +20,7 @@ namespace CommandLineSampleCS
             // The parameters to the constructor become the positional arguments for the command line application. These can be specified by position as well a name.
             // Because the third parameter is an optional parameter, the corresponding command line argument is also optional, and its default value will be supplied if it is omitted.
             // The Description attribute for each parameter will be used when printing command line usage help.
-            // The third parameter uses a custom value description so it will be shown as "[/index] <Number>" in the usage, rather than "[/index] <Int32>"
+            // The third parameter uses a custom value description so it will be shown as "[-index] <Number>" in the usage, rather than "[-index] <Int32>"
             if( source == null )
                 throw new ArgumentNullException("source");
             if( destination == null )
