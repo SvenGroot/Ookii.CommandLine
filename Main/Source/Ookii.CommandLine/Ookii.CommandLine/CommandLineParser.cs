@@ -406,7 +406,7 @@ namespace Ookii.CommandLine
             {
                 // The Windows platforms are the first 4 values of the PlatformID enum, and WinCE is the last one.
                 // We allocate a new array each time, because we don't want this to be changed.
-                return Environment.OSVersion.Platform <= PlatformID.WinCE ? new[] { "/", "-" } : new[] { "-" };
+                return Environment.OSVersion.Platform <= PlatformID.WinCE ? new[] { "-", "/" } : new[] { "-" };
             }
         }
 
