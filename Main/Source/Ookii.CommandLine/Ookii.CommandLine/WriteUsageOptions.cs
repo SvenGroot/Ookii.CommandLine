@@ -23,19 +23,30 @@ namespace Ookii.CommandLine
             UseWhiteSpaceValueSeparator = true;
             Indent = 3;
             ArgumentDescriptionIndent = 16;
+            IncludeApplicationDescription = true;
         }
 
         /// <summary>
-        /// Gets or sets the prefix to use on the first line of the usage text; typically this contains the executable name.
+        /// Gets or sets a value indicating whether the value of the <see cref="CommandLineParser.Description"/> property
+        /// is written before the syntax.
         /// </summary>
         /// <value>
-        /// The prefix to use on the first line of the usage text; typically this contains the executable name. The default value
+        ///   <see langword="true"/> if the value of the <see cref="CommandLineParser.Description"/> property
+        ///   is written before the syntax; otherwise, <see langword="false"/>. The default value is <see langword="true"/>.
+        /// </value>
+        public bool IncludeApplicationDescription { get; set; }
+
+        /// <summary>
+        /// Gets or sets the prefix to use for the argument syntax; typically this contains the executable name.
+        /// </summary>
+        /// <value>
+        /// The prefix to use  for the argument syntax; typically this contains the executable name. The default value
         /// is "Usage: " followed by the file name of the application's entry point assembly.
         /// </value>
         /// <remarks>
         /// <para>
-        ///   The usage prefix is written before the command line syntax of the usage help, and is followed by a single-line list
-        ///   of all the arguments.
+        ///   The usage prefix is written before the command line syntax of the usage help, and is followed by the syntax
+        ///   of the individual arguments.
         /// </para>
         /// </remarks>
         public string UsagePrefix
