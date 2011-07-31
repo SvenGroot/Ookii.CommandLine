@@ -53,7 +53,7 @@ namespace Ookii.CommandLine
         /// <remarks>
         /// <para>
         ///   The value description of an argument is used in the command line syntax in the usage help. For example,
-        ///   the usage for an argument might look like "/sample &lt;String&gt;". In this example, "String" is the
+        ///   the usage for an argument might look like "-sample &lt;String&gt;". In this example, "String" is the
         ///   value description, and that it is surrounded by angle brackets is the default value of the <see cref="ValueDescriptionFormat"/>
         ///   property.
         /// </para>
@@ -94,8 +94,8 @@ namespace Ookii.CommandLine
         /// <remarks>
         /// <para>
         ///   This format string is used for optional parameters in the command line syntax. For example, using the default value, an
-        ///   optional parameter would be formatted as "[/sample &lt;String&gt;]". The format string is also used for positional arguments,
-        ///   in which case the argument name is optional. For example, an optional positional argument would be formatted as "[[/sample] &lt;String&gt;]"
+        ///   optional parameter would be formatted as "[-sample &lt;String&gt;]". The format string is also used for positional arguments,
+        ///   in which case the argument name is optional. For example, an optional positional argument would be formatted as "[[-sample] &lt;String&gt;]"
         ///   using the default value.
         /// </para>
         /// <para>
@@ -118,7 +118,7 @@ namespace Ookii.CommandLine
         /// <para>
         ///   An argument that has an array type can be specified multiple times. This suffix is appended to the command line syntax for
         ///   the command to indicate that it can be repeated. For example, using the default options, an optional array argument would
-        ///   be formatted as "[/sample &lt;String&gt;...]"
+        ///   be formatted as "[-sample &lt;String&gt;...]"
         /// </para>
         /// </remarks>
         public string ArraySuffix
@@ -180,9 +180,9 @@ namespace Ookii.CommandLine
         /// </value>
         /// <remarks>
         /// <para>
-        ///   If this property is <see langword="true"/>, an argument would be formatted in the command line syntax as "/name &lt;Value&gt;" (using
+        ///   If this property is <see langword="true"/>, an argument would be formatted in the command line syntax as "-name &lt;Value&gt;" (using
         ///   default formatting), with a white space character separating the argument name and value description. If this property is <see langword="false"/>,
-        ///   it would be formatted as "/name:&lt;Value&gt;", using a colon as the separator.
+        ///   it would be formatted as "-name:&lt;Value&gt;", using a colon as the separator.
         /// </para>
         /// <para>
         ///   The command line syntax will only use a white space character as the value separator if both the <see cref="CommandLineParser.AllowWhiteSpaceValueSeparator"/> property

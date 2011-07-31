@@ -103,7 +103,7 @@ namespace Ookii.CommandLine
         /// </para>
         /// <para>
         ///   The value description is used when printing usage. For example, the usage for an argument named Sample with
-        ///   a value description of String would look like "/Sample &lt;String&gt;".
+        ///   a value description of String would look like "-Sample &lt;String&gt;".
         /// </para>
         /// <note>
         ///   This is not the long description used to describe the purpose of the argument. That should be specified

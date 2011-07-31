@@ -46,13 +46,13 @@ namespace Ookii.CommandLine
     /// <para>
     ///   The name of the argument must be followed by its value. The value can be either in the next argument (separated from the name
     ///   by white space), or separated by a colon (:). For example, to assign the value "foo" to the argument "sample", you can use
-    ///   either <c>/sample foo</c> or <c>/sample:foo</c>.
+    ///   either <c>-sample foo</c> or <c>-sample:foo</c>.
     /// </para>
     /// <para>
     ///   If an argument has a type of <see cref="Boolean"/> (and is not a positional argument as described below), it is a switch argument, and doesn't require a value. Its value is determined
     ///   by its presence on the command line; if it is absent the value is <see langword="false"/>; if it is present the value is
     ///   <see langword="true"/>. For example, to set a switch argument named "verbose" to true, you can simply use the command line
-    ///   <c>/verbose</c>. You can still explicitly specify the value of a switch argument, for example <c>/verbose:true</c>.
+    ///   <c>-verbose</c>. You can still explicitly specify the value of a switch argument, for example <c>-verbose:true</c>.
     ///   Note that you cannot use white space to separate a switch argument name and value; you must use a colon.
     /// </para>
     /// <para>
@@ -67,11 +67,11 @@ namespace Ookii.CommandLine
     /// <para>
     ///   For example, if you have two arguments named "foo" and "bar" which have positions 0 and 1 respectively, you could
     ///   specify their values using <c>value1 value2</c>, which assigns "value1" to "foo" and "value2" to "bar".
-    ///   However, you could also use <c>/bar value2 /foo value1</c> to achieve the same effect.
+    ///   However, you could also use <c>-bar value2 -foo value1</c> to achieve the same effect.
     /// </para>
     /// <para>
     ///   If a positional argument was already specified by name, it is no longer considered as a target for positional argument values.
-    ///   In the previous example, if the command line <c>/foo value1 value2</c> is used, "value2" is the first positional argument value,
+    ///   In the previous example, if the command line <c>-foo value1 value2</c> is used, "value2" is the first positional argument value,
     ///   but is assigned to "bar", the second positional argument, because "foo" had already been assigned a value by name.
     /// </para>
     /// <para>
@@ -86,7 +86,7 @@ namespace Ookii.CommandLine
     /// </para>
     /// <para>
     ///   If an argument has an array type, it can be specified more than once, and the value for each time is it specified
-    ///   is added to the array. Given an array argument named "sample", the command line <c>/sample 1 /sample 2 /sample 3</c>
+    ///   is added to the array. Given an array argument named "sample", the command line <c>-sample 1 -sample 2 -sample 3</c>
     ///   would set the value of "sample" to an array holding the values 1, 2 and 3. A required array argument must have at
     ///   least one value. A positional array argument must be the last positional argument.
     /// </para>
@@ -136,7 +136,7 @@ namespace Ookii.CommandLine
         /// <remarks>
         /// <para>
         ///   If the event handler sets the <see cref="CancelEventArgs.Cancel"/> property to <see langword="true"/>, command line processing will stop immediately,
-        ///   and the <see cref="CommandLineParser.Parse(string[],int)"/> method will return <see langword="null"/>. You can use this for instance to implement a "/help"
+        ///   and the <see cref="CommandLineParser.Parse(string[],int)"/> method will return <see langword="null"/>. You can use this for instance to implement a "-help"
         ///   argument that will display usage and quit regardless of the other command line arguments.
         /// </para>
         /// </remarks>        
@@ -360,19 +360,19 @@ namespace Ookii.CommandLine
         /// <remarks>
         /// <para>
         ///   If the <see cref="AllowWhiteSpaceValueSeparator"/> property is <see langword="true"/>, the value of an argument can be separated from its name either
-        ///   by using a colon (:) or by using white space. Given a named argument named "sample", the command lines <c>/sample:value</c> and <c>/sample value</c>
+        ///   by using a colon (:) or by using white space. Given a named argument named "sample", the command lines <c>-sample:value</c> and <c>-sample value</c>
         ///   are both valid and will assign the value "value" to the argument.
         /// </para>
         /// <para>
         ///   If the <see cref="AllowWhiteSpaceValueSeparator"/> property is <see langword="false"/>, only the colon (:) is allowed to separate the value from the name.
-        ///   The command line <c>/sample:value</c> still assigns the value "value" to the argument, but for the command line "/sample value" the argument 
+        ///   The command line <c>-sample:value</c> still assigns the value "value" to the argument, but for the command line "-sample value" the argument 
         ///   is considered not to have a value (which is only valid if <see cref="CommandLineArgument.IsSwitch"/> is <see langword="true"/>), and
         ///   "value" is considered to be the value for the next positional argument.
         /// </para>
         /// <para>
         ///   For switch arguments (<see cref="CommandLineArgument.IsSwitch"/> is <see langword="true"/>), only the colon (:) is allowed to
         ///   specify an explicit value regardless of the value of the <see cref="AllowWhiteSpaceValueSeparator"/> property. Given a switch argument named "switch" 
-        ///   the command line <c>/switch false</c> is interpreted to mean that the value of "switch" is <see langword="true"/> and the value of the
+        ///   the command line <c>-switch false</c> is interpreted to mean that the value of "switch" is <see langword="true"/> and the value of the
         ///   next positional argument is "false", even if the <see cref="AllowWhiteSpaceValueSeparator"/> property is <see langword="true"/>.
         /// </para>
         /// </remarks>
