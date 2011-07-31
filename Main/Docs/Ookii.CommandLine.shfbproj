@@ -22,7 +22,8 @@
     <HelpFileFormat>HtmlHelp1, Website</HelpFileFormat>
     <DocumentationSources>
       <DocumentationSource sourceFile="..\Source\Ookii.CommandLine\Ookii.CommandLine\bin\Release\Ookii.CommandLine.dll" />
-<DocumentationSource sourceFile="..\Source\Ookii.CommandLine\Ookii.CommandLine\bin\Release\Ookii.CommandLine.XML" /></DocumentationSources>
+      <DocumentationSource sourceFile="..\Source\Ookii.CommandLine\Ookii.CommandLine\bin\Release\Ookii.CommandLine.XML" />
+    </DocumentationSources>
     <NamespaceSummaries>
       <NamespaceSummaryItem name="Ookii.CommandLine" isDocumented="True" xmlns="">&lt;para&gt;
   The &lt;see cref="N:Ookii.CommandLine"/&gt; namespace contains types to aid with defining a set of accepted command line arguments, parsing those arguments, and generating usage information for them.
@@ -60,6 +61,9 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|Win32' ">
   </PropertyGroup>
+  <ItemGroup>
+    <Content Include="User Guide.html" />
+  </ItemGroup>
   <!-- Import the SHFB build targets -->
   <Import Project="$(SHFBROOT)\SandcastleHelpFileBuilder.targets" />
 </Project>
