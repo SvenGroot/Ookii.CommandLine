@@ -21,8 +21,8 @@
     <FrameworkVersion>.NET 2.0.50727</FrameworkVersion>
     <HelpFileFormat>HtmlHelp1, Website</HelpFileFormat>
     <DocumentationSources>
-      <DocumentationSource sourceFile="..\Ookii.CommandLine\bin\Release\Ookii.CommandLine.dll" xmlns="" />
-<DocumentationSource sourceFile="..\Ookii.CommandLine\bin\Release\Ookii.CommandLine.xml" xmlns="" /></DocumentationSources>
+      <DocumentationSource sourceFile="..\Source\Ookii.CommandLine\Ookii.CommandLine\bin\Release\Ookii.CommandLine.dll" />
+<DocumentationSource sourceFile="..\Source\Ookii.CommandLine\Ookii.CommandLine\bin\Release\Ookii.CommandLine.XML" /></DocumentationSources>
     <NamespaceSummaries>
       <NamespaceSummaryItem name="Ookii.CommandLine" isDocumented="True" xmlns="">&lt;para&gt;
   The &lt;see cref="N:Ookii.CommandLine"/&gt; namespace contains types to aid with defining a set of accepted command line arguments, parsing those arguments, and generating usage information for them.
