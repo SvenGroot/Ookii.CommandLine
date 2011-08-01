@@ -14,6 +14,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		AssemblyInfoCommon.cs = AssemblyInfoCommon.cs
 		AssemblyInfoCommon.cs.template = AssemblyInfoCommon.cs.template
 		Create-AssemblyInfoCommon.ps1 = Create-AssemblyInfoCommon.ps1
+		Create-Release.ps1 = Create-Release.ps1
 		history.txt = history.txt
 		Local.testsettings = Local.testsettings
 		Ookii.CommandLine.vsmdi = Ookii.CommandLine.vsmdi
