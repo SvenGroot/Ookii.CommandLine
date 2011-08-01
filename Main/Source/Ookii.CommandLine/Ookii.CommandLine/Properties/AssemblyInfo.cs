@@ -8,9 +8,6 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("Ookii.CommandLine")]
 [assembly: AssemblyDescription("Command line parser for .Net")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Ookii.org")]
-[assembly: AssemblyProduct("Ookii.CommandLine")]
-[assembly: AssemblyCopyright("Copyright © Sven Groot (Ookii.org) 2011")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 [assembly: CLSCompliant(true)]
@@ -24,15 +21,3 @@ using System.Runtime.InteropServices;
 // The following GUID is for the ID of the typelib if this project is exposed to COM
 [assembly: Guid("8f1476b6-1c84-4ec1-9cda-b80c4cc3fde7")]
 
-// Version information for an assembly consists of the following four values:
-//
-//      Major Version
-//      Minor Version 
-//      Build Number
-//      Revision
-//
-// You can specify all the values or you can default the Build and Revision Numbers 
-// by using the '*' as shown below:
-// [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("2.0.0.0")]
-[assembly: AssemblyFileVersion("2.0.0.0")]

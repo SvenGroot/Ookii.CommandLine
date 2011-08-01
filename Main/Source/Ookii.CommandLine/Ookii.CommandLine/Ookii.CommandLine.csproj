@@ -70,6 +70,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\AssemblyInfoCommon.cs">
+      <Link>Properties\AssemblyInfoCommon.cs</Link>
+    </Compile>
     <Compile Include="ArgumentNameAttribute.cs" />
     <Compile Include="ArgumentParsedEventArgs.cs" />
     <Compile Include="CommandLineArgument.cs" />
@@ -119,6 +122,9 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\TraceAndTestImpact.testsettings">
+      <Link>TraceAndTestImpact.testsettings</Link>
+    </None>
     <None Include="ookii.snk" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
@@ -132,5 +138,8 @@
   <PropertyGroup>
     <PostBuildEvent>
     </PostBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PreBuildEvent>PowerShell.exe -NoProfile -Command "&amp;'$(SolutionDir)Create-AssemblyInfoCommon.ps1' '$(DevEnvDir)tf.exe' '$(ConfigurationName)'"</PreBuildEvent>
   </PropertyGroup>
 </Project>
