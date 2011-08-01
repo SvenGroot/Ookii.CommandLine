@@ -1,0 +1,17 @@
+// AssemblyInfoCommon.cs is generated from AssemblyInfoCommon.cs.template using the Create-AssemblyInfoCommon.ps1 PowerShell script
+// AssemblyInfoCommon.cs should NOT be added to source control
+using System.Reflection;
+
+[assembly: AssemblyCompany("Ookii.org")]
+[assembly: AssemblyProduct("Ookii.CommandLine")]
+[assembly: AssemblyCopyright("Copyright © Sven Groot (Ookii.org) 2011")]
+
+// Version information for an assembly consists of the following four values:
+//
+//      Major Version
+//      Minor Version 
+//      Build Number
+//      Revision
+//
+[assembly: AssemblyVersion("2.0.0.0")]
+[assembly: AssemblyFileVersion("2.0.$BUILD.$REVISION")]

@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ookii.CommandLine.Tests", "
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{412AEB8D-40EF-4637-AD7D-CD71AD6ACB96}"
 	ProjectSection(SolutionItems) = preProject
+		AssemblyInfoCommon.cs.template = AssemblyInfoCommon.cs.template
+		Create-AssemblyInfoCommon.ps1 = Create-AssemblyInfoCommon.ps1
 		history.txt = history.txt
 		Local.testsettings = Local.testsettings
 		Ookii.CommandLine.vsmdi = Ookii.CommandLine.vsmdi
