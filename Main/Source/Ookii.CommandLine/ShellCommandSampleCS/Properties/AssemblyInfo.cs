@@ -6,11 +6,8 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("ShellCommandSampleCS")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("Shell command sample for Ookii.CommandLine")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Ookii.org")]
-[assembly: AssemblyProduct("Ookii.CommandLine")]
-[assembly: AssemblyCopyright("Copyright © Sven Groot 2011")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -21,16 +18,3 @@ using System.Runtime.InteropServices;
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
 [assembly: Guid("823da4a8-7a8e-4193-9d26-8f996346fd39")]
-
-// Version information for an assembly consists of the following four values:
-//
-//      Major Version
-//      Minor Version 
-//      Build Number
-//      Revision
-//
-// You can specify all the values or you can default the Build and Revision Numbers 
-// by using the '*' as shown below:
-// [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("2.0.0.0")]
-[assembly: AssemblyFileVersion("2.0.0.0")]
