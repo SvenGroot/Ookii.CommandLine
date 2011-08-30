@@ -30,14 +30,17 @@ namespace Ookii.CommandLine
         private readonly string _description;
         private readonly object _defaultValue;
         private readonly bool _isRequired;
+        private readonly string _memberName;
         private List<object> _arrayValues;
         private object _value;
 
-        private CommandLineArgument(CommandLineParser parser, PropertyInfo property, string argumentName, Type argumentType, int? position, bool isRequired, object defaultValue, string description, string valueDescription)
+        private CommandLineArgument(CommandLineParser parser, PropertyInfo property, string memberName, string argumentName, Type argumentType, int? position, bool isRequired, object defaultValue, string description, string valueDescription)
         {
             // If this method throws anything other than a NotSupportedException, it constitutes a bug in the Ookii.CommandLine library.
             if( parser == null )
                 throw new ArgumentNullException("parser");
+            if( memberName == null )
+                throw new ArgumentNullException("memberName");
             if( argumentName == null )
                 throw new ArgumentNullException("argumentName");
             if( argumentType == null )
@@ -49,6 +52,7 @@ namespace Ookii.CommandLine
 
             _parser = parser;
             _property = property;
+            _memberName = memberName;
             _argumentName = argumentName;
             _argumentType = argumentType;
             _description = description;
@@ -68,6 +72,17 @@ namespace Ookii.CommandLine
 
             if( _converter == null || !_converter.CanConvertFrom(typeof(string)) )
                 throw new NotSupportedException(string.Format(System.Globalization.CultureInfo.CurrentCulture, Properties.Resources.NoTypeConverterFormat, argumentName, argumentType));
+        }
+
+        /// <summary>
+        /// Gets the name of the property or constructor parameter that defined this command line argument.
+        /// </summary>
+        /// <value>
+        /// The name of the property or constructor parameter that defined this command line argument.
+        /// </value>
+        public string MemberName
+        {
+            get { return _memberName; }
         }
 
         /// <summary>
@@ -410,7 +425,7 @@ namespace Ookii.CommandLine
             ValueDescriptionAttribute valueDescriptionAttribute = (ValueDescriptionAttribute)Attribute.GetCustomAttribute(parameter, typeof(ValueDescriptionAttribute));
             string valueDescription = valueDescriptionAttribute == null ? null : valueDescriptionAttribute.ValueDescription;
 
-            return new CommandLineArgument(parser, null, argumentName, parameter.ParameterType, parameter.Position, !parameter.IsOptional, defaultValue, description, valueDescription);
+            return new CommandLineArgument(parser, null, parameter.Name, argumentName, parameter.ParameterType, parameter.Position, !parameter.IsOptional, defaultValue, description, valueDescription);
         }
 
         internal static CommandLineArgument Create(CommandLineParser parser, PropertyInfo property)
@@ -427,8 +442,9 @@ namespace Ookii.CommandLine
             DescriptionAttribute descriptionAttribute = (DescriptionAttribute)Attribute.GetCustomAttribute(property, typeof(DescriptionAttribute));
             string description = descriptionAttribute == null ? null : descriptionAttribute.Description;
             string valueDescription = attribute.ValueDescription; // If null, the ctor will sort it out.
+            int? position = attribute.Position < 0 ? null : (int?)attribute.Position;
 
-            return new CommandLineArgument(parser, property, argumentName, property.PropertyType, attribute.Position < 0 ? null : (int?)attribute.Position, attribute.IsRequired, defaultValue, description, valueDescription);
+            return new CommandLineArgument(parser, property, property.Name, argumentName, property.PropertyType, position, attribute.IsRequired, defaultValue, description, valueDescription);
         }
 
         internal void ApplyPropertyValue(object target)
