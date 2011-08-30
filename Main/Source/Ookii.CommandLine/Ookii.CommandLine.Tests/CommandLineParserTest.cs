@@ -170,19 +170,21 @@ namespace Ookii.CommandLine.Tests
             Assert.AreEqual(argumentsType, target.ArgumentsType);
             Assert.AreEqual("Test arguments description.", target.Description);
             Assert.AreEqual(12, target.Arguments.Count);
-            IEnumerator<CommandLineArgument> args = target.Arguments.GetEnumerator();
-            TestArgument(args, "arg1", typeof(string), 0, true, null, "Arg1 description.", "String", false);
-            TestArgument(args, "Arg10", typeof(bool[]), null, false, null, "", "Boolean", true);
-            TestArgument(args, "Arg11", typeof(bool?), null, false, null, "", "Boolean", true);
-            TestArgument(args, "Arg3", typeof(string), null, false, null, "", "String", false);
-            TestArgument(args, "Arg5", typeof(float), 3, false, null, "Arg5 description.", "Single", false);
-            TestArgument(args, "Arg6", typeof(string), null, true, null, "Arg6 description.", "String", false);
-            TestArgument(args, "Arg7", typeof(bool), null, false, null, "", "Boolean", true);
-            TestArgument(args, "Arg8", typeof(DayOfWeek[]), 5, false, null, "", "DayOfWeek", false);
-            TestArgument(args, "Arg9", typeof(int?), null, false, null, "", "Int32", false);
-            TestArgument(args, "notSwitch", typeof(bool), 2, false, false, "", "Boolean", false);
-            TestArgument(args, "other", typeof(int), 1, false, 42, "Arg2 description.", "Number", false);
-            TestArgument(args, "other2", typeof(int), 4, false, 47, "Arg4 description.", "Number", false);
+            using( IEnumerator<CommandLineArgument> args = target.Arguments.GetEnumerator() )
+            {
+                TestArgument(args, "arg1", "arg1", typeof(string), 0, true, null, "Arg1 description.", "String", false);
+                TestArgument(args, "Arg10", "Arg10", typeof(bool[]), null, false, null, "", "Boolean", true);
+                TestArgument(args, "Arg11", "Arg11", typeof(bool?), null, false, null, "", "Boolean", true);
+                TestArgument(args, "Arg3", "Arg3", typeof(string), null, false, null, "", "String", false);
+                TestArgument(args, "Arg5", "Arg5", typeof(float), 3, false, null, "Arg5 description.", "Single", false);
+                TestArgument(args, "Arg6", "Arg6", typeof(string), null, true, null, "Arg6 description.", "String", false);
+                TestArgument(args, "Arg7", "Arg7", typeof(bool), null, false, null, "", "Boolean", true);
+                TestArgument(args, "Arg8", "Arg8", typeof(DayOfWeek[]), 5, false, null, "", "DayOfWeek", false);
+                TestArgument(args, "Arg9", "Arg9", typeof(int?), null, false, null, "", "Int32", false);
+                TestArgument(args, "notSwitch", "notSwitch", typeof(bool), 2, false, false, "", "Boolean", false);
+                TestArgument(args, "other", "arg2", typeof(int), 1, false, 42, "Arg2 description.", "Number", false);
+                TestArgument(args, "other2", "Arg4", typeof(int), 4, false, 47, "Arg4 description.", "Number", false);
+            }
         }
 
         [TestMethod]
@@ -198,7 +200,7 @@ namespace Ookii.CommandLine.Tests
             Assert.AreEqual("", target.Description);
             Assert.AreEqual(1, target.Arguments.Count);
             IEnumerator<CommandLineArgument> args = target.Arguments.GetEnumerator();
-            TestArgument(args, "arg1", typeof(string), 0, true, null, "", "String", false);
+            TestArgument(args, "arg1", "arg1", typeof(string), 0, true, null, "", "String", false);
 
         }
 
@@ -226,10 +228,11 @@ namespace Ookii.CommandLine.Tests
             TestParse(target, "val1 2 true /arg3 val3 -other2:4 5.5 /arg6 val6 /arg7 /arg8 Monday /arg8 Tuesday /arg9 9 /arg10 /arg10 /arg10:false /arg11:false", "val1", 2, true, "val3", 4, 5.5f, "val6", true, new[] { DayOfWeek.Monday, DayOfWeek.Tuesday }, 9, new[] { true, true, false }, false);
         }
 
-        private static void TestArgument(IEnumerator<CommandLineArgument> arguments, string name, Type type, int? position, bool isRequired, object defaultValue, string description, string valueDescription, bool isSwitch)
+        private static void TestArgument(IEnumerator<CommandLineArgument> arguments, string name, string memberName, Type type, int? position, bool isRequired, object defaultValue, string description, string valueDescription, bool isSwitch)
         {
             arguments.MoveNext();
             CommandLineArgument argument = arguments.Current;
+            Assert.AreEqual(memberName, argument.MemberName);
             Assert.AreEqual(name, argument.ArgumentName);
             Assert.AreEqual(type, argument.ArgumentType);
             Assert.AreEqual(position, argument.Position);
