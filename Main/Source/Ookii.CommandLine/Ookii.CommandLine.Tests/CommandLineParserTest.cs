@@ -55,7 +55,8 @@ namespace Ookii.CommandLine.Tests
             [CommandLineArgument()]
             public string Arg3 { get; set; }
 
-            [CommandLineArgument("other2", DefaultValue = 47, ValueDescription = "Number", Position = 1), System.ComponentModel.Description("Arg4 description.")]
+            // Default value is intentionally a string to test default value conversion.
+            [CommandLineArgument("other2", DefaultValue = "47", ValueDescription = "Number", Position = 1), System.ComponentModel.Description("Arg4 description.")]
             public int Arg4 { get; set; }
 
             [CommandLineArgument(Position = 0), System.ComponentModel.Description("Arg5 description.")]

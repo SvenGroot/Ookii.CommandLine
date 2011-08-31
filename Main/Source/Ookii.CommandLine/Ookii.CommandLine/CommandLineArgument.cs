@@ -28,9 +28,9 @@ namespace Ookii.CommandLine
         private readonly string _argumentName;
         private readonly Type _argumentType;
         private readonly string _description;
-        private readonly object _defaultValue;
         private readonly bool _isRequired;
         private readonly string _memberName;
+        private readonly object _defaultValue;
         private List<object> _arrayValues;
         private object _value;
 
@@ -45,10 +45,10 @@ namespace Ookii.CommandLine
                 throw new ArgumentNullException("argumentName");
             if( argumentType == null )
                 throw new ArgumentNullException("argumentType");
-            if( defaultValue != null && defaultValue.GetType() != argumentType )
-                throw new NotSupportedException(string.Format(System.Globalization.CultureInfo.CurrentCulture, Properties.Resources.IncorrectDefaultValueTypeFormat, argumentName));
             if( argumentName.Length == 0 )
                 throw new NotSupportedException(Properties.Resources.EmptyArgumentName);
+            if( argumentType.IsArray && argumentType.GetArrayRank() != 1 )
+                throw new ArgumentException(Properties.Resources.InvalidArrayRank, "argumentType");
 
             _parser = parser;
             _property = property;
@@ -60,18 +60,8 @@ namespace Ookii.CommandLine
             _isRequired = isRequired;
             Position = position;
             _valueDescription = valueDescription ?? GetFriendlyTypeName(argumentType.IsArray ? argumentType.GetElementType() : argumentType);
-
-            if( argumentType.IsArray )
-            {
-                if( argumentType.GetArrayRank() != 1 )
-                    throw new ArgumentException(Properties.Resources.InvalidArrayRank, "argumentType");
-                _converter = TypeDescriptor.GetConverter(argumentType.GetElementType());
-            }
-            else
-                _converter = TypeDescriptor.GetConverter(argumentType);
-
-            if( _converter == null || !_converter.CanConvertFrom(typeof(string)) )
-                throw new NotSupportedException(string.Format(System.Globalization.CultureInfo.CurrentCulture, Properties.Resources.NoTypeConverterFormat, argumentName, argumentType));
+            _converter = CreateConverter();
+            _defaultValue = DetermineDefaultValue(defaultValue);
         }
 
         /// <summary>
@@ -493,6 +483,32 @@ namespace Ookii.CommandLine
             }
             else
                 return type.Name;
-        }    
+        }
+
+        private TypeConverter CreateConverter()
+        {
+            TypeConverter converter;
+            if( _argumentType.IsArray )
+                converter = TypeDescriptor.GetConverter(_argumentType.GetElementType());
+            else
+                converter = TypeDescriptor.GetConverter(_argumentType);
+
+            if( converter == null || !converter.CanConvertFrom(typeof(string)) )
+                throw new NotSupportedException(string.Format(System.Globalization.CultureInfo.CurrentCulture, Properties.Resources.NoTypeConverterFormat, _argumentName, _argumentType));
+
+            return converter;
+        }
+
+        private object DetermineDefaultValue(object defaultValue)
+        {
+            if( defaultValue == null || _argumentType.IsAssignableFrom(defaultValue.GetType()) )
+                return defaultValue;
+            else
+            {
+                if( !_converter.CanConvertFrom(defaultValue.GetType()) )
+                    throw new NotSupportedException(string.Format(System.Globalization.CultureInfo.CurrentCulture, Properties.Resources.IncorrectDefaultValueTypeFormat, _argumentName));
+                return _converter.ConvertFrom(defaultValue);
+            }
+        }
     }
 }
