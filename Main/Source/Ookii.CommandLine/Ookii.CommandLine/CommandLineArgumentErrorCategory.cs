@@ -43,6 +43,10 @@ namespace Ookii.CommandLine
         /// <summary>
         /// Not all required arguments were supplied.
         /// </summary>
-        MissingRequiredArgument
+        MissingRequiredArgument,
+        /// <summary>
+        /// Invalid value for a dictionary argument; typically the result of a duplicate key.
+        /// </summary>
+        InvalidDictionaryValue
     }
 }

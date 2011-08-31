@@ -243,6 +243,15 @@ namespace Ookii.CommandLine.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The value &apos;{0}&apos; provided for argument &apos;{1}&apos; was invalid: {2}.
+        /// </summary>
+        internal static string InvalidDictionaryValueFormat {
+            get {
+                return ResourceManager.GetString("InvalidDictionaryValueFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The command line constructor cannot have non-optional arguments after an optional argument..
         /// </summary>
         internal static string InvalidOptionalArgumentOrder {
@@ -297,6 +306,15 @@ namespace Ookii.CommandLine.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to An key/value pair must contain a &apos;=&apos; character..
+        /// </summary>
+        internal static string NoKeyValuePairSeparator {
+            get {
+                return ResourceManager.GetString("NoKeyValuePairSeparator", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The command line arguments type has more than one constructor, none of which has the CommandLineConstructorAttribute attribute..
         /// </summary>
         internal static string NoMarkedConstructor {
@@ -307,6 +325,15 @@ namespace Ookii.CommandLine.Properties {
         
         /// <summary>
         ///   Looks up a localized string similar to The argument &apos;{0}&apos; has type &apos;{1}&apos; that for which no type converter exists that can convert from a string..
+        /// </summary>
+        internal static string NoTypeConverterForArgumentFormat {
+            get {
+                return ResourceManager.GetString("NoTypeConverterForArgumentFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No type converter that can convert to and from a string exists for type &apos;{0}&apos;..
         /// </summary>
         internal static string NoTypeConverterFormat {
             get {
@@ -342,11 +369,11 @@ namespace Ookii.CommandLine.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The type must be the generic type definition of a generic interface..
+        ///   Looks up a localized string similar to The type must be a generic type definition..
         /// </summary>
-        internal static string TypeNotGenericInterface {
+        internal static string TypeNotGenericDefinition {
             get {
-                return ResourceManager.GetString("TypeNotGenericInterface", resourceCulture);
+                return ResourceManager.GetString("TypeNotGenericDefinition", resourceCulture);
             }
         }
         
