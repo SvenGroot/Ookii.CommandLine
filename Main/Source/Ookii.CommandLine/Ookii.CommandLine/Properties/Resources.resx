@@ -202,7 +202,7 @@
   <data name="NoMarkedConstructor" xml:space="preserve">
     <value>The command line arguments type has more than one constructor, none of which has the CommandLineConstructorAttribute attribute.</value>
   </data>
-  <data name="NoTypeConverterFormat" xml:space="preserve">
+  <data name="NoTypeConverterForArgumentFormat" xml:space="preserve">
     <value>The argument '{0}' has type '{1}' that for which no type converter exists that can convert from a string.</value>
   </data>
   <data name="TooManyArguments" xml:space="preserve">
@@ -220,7 +220,16 @@
   <data name="PropertyIsReadOnlyFormat" xml:space="preserve">
     <value>The property defining the argument '{0}' doesn't have a public set accessor.</value>
   </data>
-  <data name="TypeNotGenericInterface" xml:space="preserve">
-    <value>The type must be the generic type definition of a generic interface.</value>
+  <data name="TypeNotGenericDefinition" xml:space="preserve">
+    <value>The type must be a generic type definition.</value>
+  </data>
+  <data name="InvalidDictionaryValueFormat" xml:space="preserve">
+    <value>The value '{0}' provided for argument '{1}' was invalid: {2}</value>
+  </data>
+  <data name="NoKeyValuePairSeparator" xml:space="preserve">
+    <value>An key/value pair must contain a '=' character.</value>
+  </data>
+  <data name="NoTypeConverterFormat" xml:space="preserve">
+    <value>No type converter that can convert to and from a string exists for type '{0}'.</value>
   </data>
 </root>

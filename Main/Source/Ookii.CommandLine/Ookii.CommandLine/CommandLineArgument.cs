@@ -21,6 +21,40 @@ namespace Ookii.CommandLine
     /// <threadsafety static="true" instance="false"/>
     public sealed class CommandLineArgument
     {
+        #region Nested types
+
+        private interface IDictionaryHelper
+        {
+            object Dictionary { get; }
+            void Add(object keyValuePair);
+            void ApplyValues(object dictionary);
+        }
+
+        private class DictionaryHelper<TKey, TValue> : IDictionaryHelper
+        {
+            private readonly Dictionary<TKey, TValue> _dictionary = new Dictionary<TKey, TValue>();
+
+            public object Dictionary
+            {
+                get { return _dictionary; }
+            }
+
+            public void Add(object keyValuePair)
+            {
+                KeyValuePair<TKey, TValue> pair = (KeyValuePair<TKey, TValue>)keyValuePair;
+                _dictionary.Add(pair.Key, pair.Value);
+            }
+
+            public void ApplyValues(object dictionaryObject)
+            {
+                IDictionary<TKey, TValue> dictionary = (IDictionary<TKey, TValue>)dictionaryObject;
+                foreach( var pair in _dictionary )
+                    dictionary.Add(pair.Key, pair.Value);
+            }
+        }
+
+        #endregion
+
         private readonly CommandLineParser _parser;
         private readonly TypeConverter _converter;
         private readonly PropertyInfo _property;
@@ -33,6 +67,7 @@ namespace Ookii.CommandLine
         private readonly string _memberName;
         private readonly object _defaultValue;
         private readonly bool _isMultiValue;
+        private readonly bool _isDictionary;
         private List<object> _arrayValues;
         private object _value;
 
@@ -61,7 +96,16 @@ namespace Ookii.CommandLine
             _isRequired = isRequired;
             Position = position;
 
-            if( _argumentType.IsArray )
+            Type converterType = null;
+            if( argumentType.IsGenericType && argumentType.GetGenericTypeDefinition() == typeof(Dictionary<,>) )
+            {
+                _isMultiValue = true;
+                _isDictionary = true;
+                _elementType = typeof(KeyValuePair<,>).MakeGenericType(argumentType.GetGenericArguments());
+                if( converterType == null )
+                    converterType = typeof(KeyValuePairConverter<,>).MakeGenericType(argumentType.GetGenericArguments());
+            }
+            else if( _argumentType.IsArray )
             {
                 if( argumentType.GetArrayRank() != 1 )
                     throw new NotSupportedException(Properties.Resources.InvalidArrayRank);
@@ -72,19 +116,33 @@ namespace Ookii.CommandLine
             }
             else if( _property != null && _property.GetSetMethod() == null ) // Don't use CanWrite because that returns true for properties with a private set accessor.
             {
-                Type collectionType = TypeHelper.FindGenericInterface(argumentType, typeof(ICollection<>));
-                if( collectionType == null )
-                    throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.PropertyIsReadOnlyFormat, _argumentName));
-                else
+                Type dictionaryType = TypeHelper.FindGenericInterface(_argumentType, typeof(IDictionary<,>));
+                if( dictionaryType != null )
                 {
                     _isMultiValue = true;
-                    _elementType = collectionType.GetGenericArguments()[0];
+                    _isDictionary = true;
+                    _elementType = typeof(KeyValuePair<,>).MakeGenericType(dictionaryType.GetGenericArguments());
+                    if( converterType == null )
+                        converterType = typeof(KeyValuePairConverter<,>).MakeGenericType(dictionaryType.GetGenericArguments());
+                }
+                else
+                {
+                    Type collectionType = TypeHelper.FindGenericInterface(argumentType, typeof(ICollection<>));
+                    if( collectionType == null )
+                    {
+                        throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.PropertyIsReadOnlyFormat, _argumentName));
+                    }
+                    else
+                    {
+                        _isMultiValue = true;
+                        _elementType = collectionType.GetGenericArguments()[0];
+                    }
                 }
             }
 
             _valueDescription = valueDescription ?? GetFriendlyTypeName(_elementType);
 
-            _converter = CreateConverter();
+            _converter = CreateConverter(converterType);
             _defaultValue = DetermineDefaultValue(defaultValue);
 
         }
@@ -263,12 +321,32 @@ namespace Ookii.CommandLine
         /// </para>
         /// <para>
         ///   An argument is a multi-value argument if its <see cref="ArgumentType"/> is an array or the argument was defined by a read-only property whose type
-        ///   implements the <see cref="ICollection{T}"/> generic interface.
+        ///   implements the <see cref="ICollection{T}"/> generic interface, or when the <see cref="IsDictionary"/> property is <see langword="true"/>.
         /// </para>
         /// </remarks>
         public bool IsMultiValue
         {
             get { return _isMultiValue; }
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether this argument is a dictionary argument.
+        /// </summary>
+        /// <value>
+        /// 	<see langword="true"/> if this argument is a dictionary argument.; otherwise, <see langword="false"/>.
+        /// </value>
+        /// <remarks>
+        /// <para>
+        ///   A dictionary argument is an argument whose values have the form "key=value", which get added to a dictionary based on the key.
+        /// </para>
+        /// <para>
+        ///   An argument is a dictionary argument when its <see cref="ArgumentType"/> is <see cref="Dictionary{TKey,TValue}"/>, or it was defined by
+        ///   a read-only property whose type implements the <see cref="IDictionary{TKey,TValue}"/> property.
+        /// </para>
+        /// </remarks>
+        public bool IsDictionary
+        {
+            get { return _isDictionary; }
         }
 
         /// <summary>
@@ -296,6 +374,10 @@ namespace Ookii.CommandLine
         ///   return an array with all the values, even if the argument type is a collection type rather than
         ///   an array.
         /// </para>
+        /// <para>
+        ///   If the <see cref="IsDictionary"/> property is <see langword="true"/>, the <see cref="Value"/> property will
+        ///   return a <see cref="Dictionary{TKey, TValue}"/> with all the values, even if the argument type is a different type.
+        /// </para>
         /// </remarks>
         public object Value
         {
@@ -304,6 +386,8 @@ namespace Ookii.CommandLine
                 // If this property is accessed from the CommandLineParser.ArgumentParsed event handler and this is
                 // an array property, we need to convert our temporary list of values to an array. SetValue will set
                 // _value back to null again if another value is added so we never return a stale array.
+                if( HasValue && _isDictionary )
+                    return ((IDictionaryHelper)_value).Dictionary;
                 if( HasValue && _value == null && (_arrayValues != null || _defaultValue != null) )
                     ConvertValueIfArray();
                 return _value;
@@ -428,7 +512,11 @@ namespace Ookii.CommandLine
             else
                 convertedValue = ConvertToArgumentType(culture, value);
 
-            if( IsMultiValue )
+            if( IsDictionary )
+            {
+                SetDictionaryValue(value, convertedValue);
+            }
+            else if( IsMultiValue )
             {
                 if( !HasValue )
                 {
@@ -509,7 +597,14 @@ namespace Ookii.CommandLine
             // Do nothing for parameter-based values
             if( _property != null )
             {
-                if( _isMultiValue && !ArgumentType.IsArray )
+                if( _isDictionary && _property != null && _property.GetSetMethod() == null )
+                {
+                    System.Collections.IDictionary dictionary = (System.Collections.IDictionary)_property.GetValue(target, null);
+                    dictionary.Clear();
+                    if( HasValue )
+                        ((IDictionaryHelper)_value).ApplyValues(dictionary);
+                }
+                else if( !_isDictionary && _isMultiValue && !ArgumentType.IsArray )
                 {
                     GetType().GetMethod("ApplyCollectionPropertyValue", BindingFlags.Instance | BindingFlags.NonPublic)
                         .MakeGenericMethod(ElementType)
@@ -558,14 +653,19 @@ namespace Ookii.CommandLine
                 return type.Name;
         }
 
-        private TypeConverter CreateConverter()
+        private TypeConverter CreateConverter(Type converterType)
         {
-            TypeConverter converter = TypeDescriptor.GetConverter(_elementType);
+            if( converterType != null )
+                return (TypeConverter)Activator.CreateInstance(converterType);
+            else
+            {
+                TypeConverter converter = TypeDescriptor.GetConverter(_elementType);
 
-            if( converter == null || !converter.CanConvertFrom(typeof(string)) )
-                throw new NotSupportedException(string.Format(System.Globalization.CultureInfo.CurrentCulture, Properties.Resources.NoTypeConverterFormat, _argumentName, _elementType));
+                if( converter == null || !converter.CanConvertFrom(typeof(string)) )
+                    throw new NotSupportedException(string.Format(System.Globalization.CultureInfo.CurrentCulture, Properties.Resources.NoTypeConverterForArgumentFormat, _argumentName, _elementType));
 
-            return converter;
+                return converter;
+            }
         }
 
         private object DetermineDefaultValue(object defaultValue)
@@ -592,5 +692,24 @@ namespace Ookii.CommandLine
             else if( _defaultValue != null )
                 collection.Add((T)_defaultValue);
         }
+
+        private void SetDictionaryValue(string value, object convertedValue)
+        {
+            if( !HasValue )
+            {
+                Debug.Assert(_value == null);
+                // _elementType is KeyValuePair<TKey, TValue>, so we use that to get the generic arguments for the dictionary.
+                _value = Activator.CreateInstance(typeof(DictionaryHelper<,>).MakeGenericType(_elementType.GetGenericArguments()));
+                HasValue = true;
+            }
+            try
+            {
+                ((IDictionaryHelper)_value).Add(convertedValue);
+            }
+            catch( ArgumentException ex )
+            {
+                throw new CommandLineArgumentException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.InvalidDictionaryValueFormat, value, ArgumentName, ex.Message), CommandLineArgumentErrorCategory.InvalidDictionaryValue, ex);
+            }
+        }    
     }
 }

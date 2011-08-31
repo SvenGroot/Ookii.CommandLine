@@ -81,6 +81,7 @@
     <Compile Include="CommandLineParser.cs" />
     <Compile Include="CommandLineArgumentException.cs" />
     <Compile Include="CreateShellCommandOptions.cs" />
+    <Compile Include="KeyValuePairConverter.cs" />
     <Compile Include="LineWrappingTextWriter.cs" />
     <Compile Include="CommandLineArgumentAttribute.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

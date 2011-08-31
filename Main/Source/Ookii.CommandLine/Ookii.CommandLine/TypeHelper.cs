@@ -20,7 +20,10 @@ namespace Ookii.CommandLine
             if( interfaceType == null )
                 throw new ArgumentNullException("interfaceType");
             if( !(interfaceType.IsInterface && interfaceType.IsGenericTypeDefinition) )
-                throw new ArgumentException(Properties.Resources.TypeNotGenericInterface, "interfaceType");
+                throw new ArgumentException(Properties.Resources.TypeNotGenericDefinition, "interfaceType");
+
+            if( type.IsInterface && type.IsGenericType && type.GetGenericTypeDefinition() == interfaceType )
+                return type;
 
             foreach( Type t in type.GetInterfaces() )
             {
