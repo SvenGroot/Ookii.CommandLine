@@ -89,7 +89,10 @@ namespace Ookii.CommandLine
         /// </value>
         /// <remarks>
         /// <para>
-        ///   The <see cref="DefaultValue"/> property will not be used if the <see cref="IsRequired"/> propety is <see langword="true"/>.
+        ///   The <see cref="DefaultValue"/> property will not be used if the <see cref="IsRequired"/> property is <see langword="true"/>.
+        /// </para>
+        /// <para>
+        ///   The <see cref="DefaultValue"/> is ignored for multi-value and dictionary arguments.
         /// </para>
         /// </remarks>
         public object DefaultValue { get; set; }
