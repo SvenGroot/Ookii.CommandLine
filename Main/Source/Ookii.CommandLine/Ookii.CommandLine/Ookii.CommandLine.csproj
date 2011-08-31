@@ -91,7 +91,7 @@
     </Compile>
     <Compile Include="ShellCommand.cs" />
     <Compile Include="ShellCommandAttribute.cs" />
-    <Compile Include="TypeExtensions.cs" />
+    <Compile Include="TypeHelper.cs" />
     <Compile Include="ValueDescriptionAttribute.cs" />
     <Compile Include="WriteUsageOptions.cs" />
   </ItemGroup>
