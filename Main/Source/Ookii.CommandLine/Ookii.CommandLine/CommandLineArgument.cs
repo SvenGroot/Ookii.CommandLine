@@ -27,10 +27,12 @@ namespace Ookii.CommandLine
         private readonly string _valueDescription;
         private readonly string _argumentName;
         private readonly Type _argumentType;
+        private readonly Type _elementType;
         private readonly string _description;
         private readonly bool _isRequired;
         private readonly string _memberName;
         private readonly object _defaultValue;
+        private readonly bool _isMultiValue;
         private List<object> _arrayValues;
         private object _value;
 
@@ -47,21 +49,44 @@ namespace Ookii.CommandLine
                 throw new ArgumentNullException("argumentType");
             if( argumentName.Length == 0 )
                 throw new NotSupportedException(Properties.Resources.EmptyArgumentName);
-            if( argumentType.IsArray && argumentType.GetArrayRank() != 1 )
-                throw new ArgumentException(Properties.Resources.InvalidArrayRank, "argumentType");
 
             _parser = parser;
             _property = property;
             _memberName = memberName;
             _argumentName = argumentName;
             _argumentType = argumentType;
+            _elementType = argumentType;
             _description = description;
             _defaultValue = defaultValue;
             _isRequired = isRequired;
             Position = position;
-            _valueDescription = valueDescription ?? GetFriendlyTypeName(argumentType.IsArray ? argumentType.GetElementType() : argumentType);
+
+            if( _argumentType.IsArray )
+            {
+                if( argumentType.GetArrayRank() != 1 )
+                    throw new NotSupportedException(Properties.Resources.InvalidArrayRank);
+                _isMultiValue = true;
+                _elementType = _argumentType.GetElementType();
+                if( _property != null && _property.GetSetMethod() == null )
+                    throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.PropertyIsReadOnlyFormat, _argumentName));
+            }
+            else if( _property != null && _property.GetSetMethod() == null ) // Don't use CanWrite because that returns true for properties with a private set accessor.
+            {
+                Type collectionType = TypeHelper.FindGenericInterface(argumentType, typeof(ICollection<>));
+                if( collectionType == null )
+                    throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.PropertyIsReadOnlyFormat, _argumentName));
+                else
+                {
+                    _isMultiValue = true;
+                    _elementType = collectionType.GetGenericArguments()[0];
+                }
+            }
+
+            _valueDescription = valueDescription ?? GetFriendlyTypeName(_elementType);
+
             _converter = CreateConverter();
             _defaultValue = DetermineDefaultValue(defaultValue);
+
         }
 
         /// <summary>
@@ -101,6 +126,17 @@ namespace Ookii.CommandLine
         public Type ArgumentType
         {
             get { return _argumentType; }
+        }
+
+        /// <summary>
+        /// Gets the element type of the argument.
+        /// </summary>
+        /// <value>
+        /// If the <see cref="IsMultiValue"/> property is <see langword="true"/>, the <see cref="Type"/> of each individual value; otherwise, the same value as <see cref="ArgumentType"/>.
+        /// </value>
+        public Type ElementType
+        {
+            get { return _elementType; }
         }
 
         /// <summary>
@@ -207,12 +243,32 @@ namespace Ookii.CommandLine
         ///   <see langword="false"/> depending on whether the argument is present on the command line.
         /// </para>
         /// <para>
-        ///   A argument is a switch argument when it is not positional, and its <see cref="CommandLineArgument.ArgumentType"/> is either <see cref="Boolean"/>, a nullable <see cref="Boolean"/> or an array of <see cref="Boolean"/>.
+        ///   A argument is a switch argument when it is not positional, and its <see cref="CommandLineArgument.ElementType"/> is either <see cref="Boolean"/> or a nullable <see cref="Boolean"/>.
         /// </para>
         /// </remarks>
         public bool IsSwitch
         {
-            get { return Position == null && (ArgumentType == typeof(bool) || ArgumentType == typeof(bool?) || ArgumentType == typeof(bool[])); }
+            get { return Position == null && (ElementType == typeof(bool) || ElementType == typeof(bool?)); }
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether this argument is a multi-value argument.
+        /// </summary>
+        /// <value>
+        /// 	<see langword="true"/> if the argument is a multi-value argument; otherwise, <see langword="false"/>.
+        /// </value>
+        /// <remarks>
+        /// <para>
+        ///   A multi-value argument can accept multiple values by having the argument supplied more than once.
+        /// </para>
+        /// <para>
+        ///   An argument is a multi-value argument if its <see cref="ArgumentType"/> is an array or the argument was defined by a read-only property whose type
+        ///   implements the <see cref="ICollection{T}"/> generic interface.
+        /// </para>
+        /// </remarks>
+        public bool IsMultiValue
+        {
+            get { return _isMultiValue; }
         }
 
         /// <summary>
@@ -235,6 +291,11 @@ namespace Ookii.CommandLine
         ///   If an optional argument was not supplied, the <see cref="Value"/> property will equal
         ///   the <see cref="DefaultValue"/> property, and <see cref="HasValue"/> will be <see langword="false"/>.
         /// </para>
+        /// <para>
+        ///   If the <see cref="IsMultiValue"/> property is <see langword="true"/>, the <see cref="Value"/> property will
+        ///   return an array with all the values, even if the argument type is a collection type rather than
+        ///   an array.
+        /// </para>
         /// </remarks>
         public object Value
         {
@@ -243,8 +304,8 @@ namespace Ookii.CommandLine
                 // If this property is accessed from the CommandLineParser.ArgumentParsed event handler and this is
                 // an array property, we need to convert our temporary list of values to an array. SetValue will set
                 // _value back to null again if another value is added so we never return a stale array.
-                if( HasValue && _value == null && _arrayValues != null )
-                    ConvertValueIfArray(false);
+                if( HasValue && _value == null && (_arrayValues != null || _defaultValue != null) )
+                    ConvertValueIfArray();
                 return _value;
             }
         }
@@ -346,7 +407,7 @@ namespace Ookii.CommandLine
                 string argumentValue = string.Format(CultureInfo.CurrentCulture, options.ValueDescriptionFormat, ValueDescription);
                 argument = argumentName + separator + argumentValue;
             }
-            if( ArgumentType.IsArray )
+            if( IsMultiValue )
                 argument += options.ArraySuffix;
             if( IsRequired )
                 return argument;
@@ -367,7 +428,7 @@ namespace Ookii.CommandLine
             else
                 convertedValue = ConvertToArgumentType(culture, value);
 
-            if( ArgumentType.IsArray )
+            if( IsMultiValue )
             {
                 if( !HasValue )
                 {
@@ -387,17 +448,20 @@ namespace Ookii.CommandLine
                 throw new CommandLineArgumentException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.DuplicateArgumentFormat, ArgumentName), ArgumentName, CommandLineArgumentErrorCategory.DuplicateArgument);
         }
 
-        internal void ConvertValueIfArray(bool clearValues)
+        private void ConvertValueIfArray()
         {
-            // This is called after parsing is complete to convert the temporary list of values into an array of the correct type.
-            if( ArgumentType.IsArray && HasValue )
+            // This is called by the Value property to convert the temporary list of values into an array of the correct type.
+            if( IsMultiValue && (HasValue || _defaultValue != null) )
             {
                 Array values = Array.CreateInstance(ArgumentType.GetElementType(), _arrayValues.Count);
-                for( int x = 0; x < _arrayValues.Count; ++x )
-                    values.SetValue(_arrayValues[x], x);
+                if( HasValue )
+                {
+                    for( int x = 0; x < _arrayValues.Count; ++x )
+                        values.SetValue(_arrayValues[x], x);
+                }
+                else
+                    values.SetValue(_defaultValue, 0);
                 _value = values;
-                if( clearValues )
-                    _arrayValues = null;
             }
         }
 
@@ -444,7 +508,16 @@ namespace Ookii.CommandLine
 
             // Do nothing for parameter-based values
             if( _property != null )
-                _property.SetValue(target, Value, null);
+            {
+                if( _isMultiValue && !ArgumentType.IsArray )
+                {
+                    GetType().GetMethod("ApplyCollectionPropertyValue", BindingFlags.Instance | BindingFlags.NonPublic)
+                        .MakeGenericMethod(ElementType)
+                        .Invoke(this, new object[] { target });
+                }
+                else
+                    _property.SetValue(target, Value, null);
+            }
         }
 
         internal void Reset()
@@ -487,14 +560,10 @@ namespace Ookii.CommandLine
 
         private TypeConverter CreateConverter()
         {
-            TypeConverter converter;
-            if( _argumentType.IsArray )
-                converter = TypeDescriptor.GetConverter(_argumentType.GetElementType());
-            else
-                converter = TypeDescriptor.GetConverter(_argumentType);
+            TypeConverter converter = TypeDescriptor.GetConverter(_elementType);
 
             if( converter == null || !converter.CanConvertFrom(typeof(string)) )
-                throw new NotSupportedException(string.Format(System.Globalization.CultureInfo.CurrentCulture, Properties.Resources.NoTypeConverterFormat, _argumentName, _argumentType));
+                throw new NotSupportedException(string.Format(System.Globalization.CultureInfo.CurrentCulture, Properties.Resources.NoTypeConverterFormat, _argumentName, _elementType));
 
             return converter;
         }
@@ -509,6 +578,19 @@ namespace Ookii.CommandLine
                     throw new NotSupportedException(string.Format(System.Globalization.CultureInfo.CurrentCulture, Properties.Resources.IncorrectDefaultValueTypeFormat, _argumentName));
                 return _converter.ConvertFrom(defaultValue);
             }
+        }
+
+        private void ApplyCollectionPropertyValue<T>(object target)
+        {
+            ICollection<T> collection = (ICollection<T>)_property.GetValue(target, null);
+            collection.Clear();
+            if( HasValue )
+            {
+                foreach( object value in _arrayValues )
+                    collection.Add((T)value);
+            }
+            else if( _defaultValue != null )
+                collection.Add((T)_defaultValue);
         }
     }
 }

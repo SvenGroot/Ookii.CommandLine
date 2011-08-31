@@ -14,6 +14,7 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Collections.ObjectModel;
 
 namespace Ookii.CommandLine.Tests
 {
@@ -35,6 +36,8 @@ namespace Ookii.CommandLine.Tests
         [System.ComponentModel.Description("Test arguments description.")]
         class TestArguments
         {
+            private readonly Collection<int> _arg12 = new Collection<int>();
+
             private TestArguments(string notAnArg)
             {
             }
@@ -79,6 +82,12 @@ namespace Ookii.CommandLine.Tests
 
             [CommandLineArgument]
             public bool? Arg11 { get; set; }
+
+            [CommandLineArgument]
+            public Collection<int> Arg12
+            {
+                get { return _arg12; }
+            }
 
             public string NotAnArg { get; set; }
 
@@ -170,21 +179,22 @@ namespace Ookii.CommandLine.Tests
             CollectionAssert.AreEqual(CommandLineParser.DefaultArgumentNamePrefixes.ToArray(), target.ArgumentNamePrefixes);
             Assert.AreEqual(argumentsType, target.ArgumentsType);
             Assert.AreEqual("Test arguments description.", target.Description);
-            Assert.AreEqual(12, target.Arguments.Count);
+            Assert.AreEqual(13, target.Arguments.Count);
             using( IEnumerator<CommandLineArgument> args = target.Arguments.GetEnumerator() )
             {
-                TestArgument(args, "arg1", "arg1", typeof(string), 0, true, null, "Arg1 description.", "String", false);
-                TestArgument(args, "Arg10", "Arg10", typeof(bool[]), null, false, null, "", "Boolean", true);
-                TestArgument(args, "Arg11", "Arg11", typeof(bool?), null, false, null, "", "Boolean", true);
-                TestArgument(args, "Arg3", "Arg3", typeof(string), null, false, null, "", "String", false);
-                TestArgument(args, "Arg5", "Arg5", typeof(float), 3, false, null, "Arg5 description.", "Single", false);
-                TestArgument(args, "Arg6", "Arg6", typeof(string), null, true, null, "Arg6 description.", "String", false);
-                TestArgument(args, "Arg7", "Arg7", typeof(bool), null, false, null, "", "Boolean", true);
-                TestArgument(args, "Arg8", "Arg8", typeof(DayOfWeek[]), 5, false, null, "", "DayOfWeek", false);
-                TestArgument(args, "Arg9", "Arg9", typeof(int?), null, false, null, "", "Int32", false);
-                TestArgument(args, "notSwitch", "notSwitch", typeof(bool), 2, false, false, "", "Boolean", false);
-                TestArgument(args, "other", "arg2", typeof(int), 1, false, 42, "Arg2 description.", "Number", false);
-                TestArgument(args, "other2", "Arg4", typeof(int), 4, false, 47, "Arg4 description.", "Number", false);
+                TestArgument(args, "arg1", "arg1", typeof(string), null, 0, true, null, "Arg1 description.", "String", false, false);
+                TestArgument(args, "Arg10", "Arg10", typeof(bool[]), typeof(bool), null, false, null, "", "Boolean", true, true);
+                TestArgument(args, "Arg11", "Arg11", typeof(bool?), null, null, false, null, "", "Boolean", true, false);
+                TestArgument(args, "Arg12", "Arg12", typeof(Collection<int>), typeof(int), null, false, null, "", "Int32", false, true);
+                TestArgument(args, "Arg3", "Arg3", typeof(string), null, null, false, null, "", "String", false, false);
+                TestArgument(args, "Arg5", "Arg5", typeof(float), null, 3, false, null, "Arg5 description.", "Single", false, false);
+                TestArgument(args, "Arg6", "Arg6", typeof(string), null, null, true, null, "Arg6 description.", "String", false, false);
+                TestArgument(args, "Arg7", "Arg7", typeof(bool), null, null, false, null, "", "Boolean", true, false);
+                TestArgument(args, "Arg8", "Arg8", typeof(DayOfWeek[]), typeof(DayOfWeek), 5, false, null, "", "DayOfWeek", false, true);
+                TestArgument(args, "Arg9", "Arg9", typeof(int?), null, null, false, null, "", "Int32", false, false);
+                TestArgument(args, "notSwitch", "notSwitch", typeof(bool), null, 2, false, false, "", "Boolean", false, false);
+                TestArgument(args, "other", "arg2", typeof(int), null, 1, false, 42, "Arg2 description.", "Number", false, false);
+                TestArgument(args, "other2", "Arg4", typeof(int), null, 4, false, 47, "Arg4 description.", "Number", false, false);
             }
         }
 
@@ -201,7 +211,7 @@ namespace Ookii.CommandLine.Tests
             Assert.AreEqual("", target.Description);
             Assert.AreEqual(1, target.Arguments.Count);
             IEnumerator<CommandLineArgument> args = target.Arguments.GetEnumerator();
-            TestArgument(args, "arg1", "arg1", typeof(string), 0, true, null, "", "String", false);
+            TestArgument(args, "arg1", "arg1", typeof(string), null, 0, true, null, "", "String", false, false);
 
         }
 
@@ -229,17 +239,22 @@ namespace Ookii.CommandLine.Tests
             TestParse(target, "val1 2 true /arg3 val3 -other2:4 5.5 /arg6 val6 /arg7 /arg8 Monday /arg8 Tuesday /arg9 9 /arg10 /arg10 /arg10:false /arg11:false", "val1", 2, true, "val3", 4, 5.5f, "val6", true, new[] { DayOfWeek.Monday, DayOfWeek.Tuesday }, 9, new[] { true, true, false }, false);
         }
 
-        private static void TestArgument(IEnumerator<CommandLineArgument> arguments, string name, string memberName, Type type, int? position, bool isRequired, object defaultValue, string description, string valueDescription, bool isSwitch)
+        private static void TestArgument(IEnumerator<CommandLineArgument> arguments, string name, string memberName, Type type, Type elementType, int? position, bool isRequired, object defaultValue, string description, string valueDescription, bool isSwitch, bool isMultiValue)
         {
             arguments.MoveNext();
             CommandLineArgument argument = arguments.Current;
             Assert.AreEqual(memberName, argument.MemberName);
             Assert.AreEqual(name, argument.ArgumentName);
             Assert.AreEqual(type, argument.ArgumentType);
+            if( elementType == null )
+                Assert.AreEqual(argument.ArgumentType, argument.ElementType);
+            else
+                Assert.AreEqual(elementType, argument.ElementType);
             Assert.AreEqual(position, argument.Position);
             Assert.AreEqual(isRequired, argument.IsRequired);
             Assert.AreEqual(description, argument.Description);
             Assert.AreEqual(valueDescription, argument.ValueDescription);
+            Assert.AreEqual(isMultiValue, argument.IsMultiValue);
             Assert.AreEqual(isSwitch, argument.IsSwitch);
             Assert.AreEqual(defaultValue, argument.DefaultValue);
             Assert.AreEqual(null, argument.Value);

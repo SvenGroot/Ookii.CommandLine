@@ -217,4 +217,10 @@
   <data name="ValueMustBeNonNegative" xml:space="preserve">
     <value>The value must be zero or larger.</value>
   </data>
+  <data name="PropertyIsReadOnlyFormat" xml:space="preserve">
+    <value>The property defining the argument '{0}' doesn't have a public set accessor.</value>
+  </data>
+  <data name="TypeNotGenericInterface" xml:space="preserve">
+    <value>The type must be the generic type definition of a generic interface.</value>
+  </data>
 </root>

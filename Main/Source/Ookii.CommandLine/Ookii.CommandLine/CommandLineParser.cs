@@ -649,10 +649,10 @@ namespace Ookii.CommandLine
                 else
                 {
                     // If this is an array argument is must be the last argument.
-                    if( !_positionalArguments[positionalArgumentIndex].ArgumentType.IsArray )
+                    if( !_positionalArguments[positionalArgumentIndex].IsMultiValue )
                     {
                         // Skip named positional arguments that have already been specified by name.
-                        while( positionalArgumentIndex < _positionalArguments.Count && !_positionalArguments[positionalArgumentIndex].ArgumentType.IsArray && _positionalArguments[positionalArgumentIndex].HasValue )
+                        while( positionalArgumentIndex < _positionalArguments.Count && !_positionalArguments[positionalArgumentIndex].IsMultiValue && _positionalArguments[positionalArgumentIndex].HasValue )
                         {
                             ++positionalArgumentIndex;
                         }
@@ -673,8 +673,6 @@ namespace Ookii.CommandLine
             {
                 if( argument.IsRequired && !argument.HasValue )
                     throw new CommandLineArgumentException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.MissingRequiredArgumentFormat, argument.ArgumentName), argument.ArgumentName, CommandLineArgumentErrorCategory.MissingRequiredArgument);
-
-                argument.ConvertValueIfArray(true);
             }
 
             object[] positionalArgumentValues = new object[_constructorArgumentCount];
@@ -787,7 +785,7 @@ namespace Ookii.CommandLine
             if( !argument.IsRequired )
                 hasOptionalArgument = true;
 
-            if( argument.ArgumentType.IsArray )
+            if( argument.IsMultiValue )
                 hasArrayArgument = true;
 
             _positionalArguments.Add(argument);

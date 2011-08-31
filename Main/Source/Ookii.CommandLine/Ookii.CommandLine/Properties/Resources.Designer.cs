@@ -315,6 +315,15 @@ namespace Ookii.CommandLine.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The property defining the argument &apos;{0}&apos; doesn&apos;t have a public set accessor..
+        /// </summary>
+        internal static string PropertyIsReadOnlyFormat {
+            get {
+                return ResourceManager.GetString("PropertyIsReadOnlyFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Too many arguments were supplied..
         /// </summary>
         internal static string TooManyArguments {
@@ -329,6 +338,15 @@ namespace Ookii.CommandLine.Properties {
         internal static string TypeIsNotShellCommandFormat {
             get {
                 return ResourceManager.GetString("TypeIsNotShellCommandFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The type must be the generic type definition of a generic interface..
+        /// </summary>
+        internal static string TypeNotGenericInterface {
+            get {
+                return ResourceManager.GetString("TypeNotGenericInterface", resourceCulture);
             }
         }
         
