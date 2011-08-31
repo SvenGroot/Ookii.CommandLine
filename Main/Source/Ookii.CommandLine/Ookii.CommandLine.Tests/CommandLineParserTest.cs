@@ -84,7 +84,7 @@ namespace Ookii.CommandLine.Tests
             [CommandLineArgument]
             public bool? Arg11 { get; set; }
 
-            [CommandLineArgument(DefaultValue=42)]
+            [CommandLineArgument(DefaultValue=42)] // Default value is ignored for collection types.
             public Collection<int> Arg12
             {
                 get { return _arg12; }
@@ -290,8 +290,9 @@ namespace Ookii.CommandLine.Tests
             CollectionAssert.AreEqual(arg10, result.Arg10);
             Assert.AreEqual(arg11, result.Arg11);
             if( arg12 == null )
-                arg12 = new[] { 42 };
-            CollectionAssert.AreEqual(arg12, result.Arg12);
+                Assert.AreEqual(0, result.Arg12.Count);
+            else
+                CollectionAssert.AreEqual(arg12, result.Arg12);
             CollectionAssert.AreEqual(arg13, result.Arg13);
             if( arg14 == null )
                 Assert.AreEqual(0, result.Arg14.Count);

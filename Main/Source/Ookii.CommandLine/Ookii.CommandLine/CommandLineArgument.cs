@@ -23,6 +23,35 @@ namespace Ookii.CommandLine
     {
         #region Nested types
 
+        private interface ICollectionHelper
+        {
+            Array Values { get; }
+            void Add(object value);
+            void ApplyValues(object collection);
+        }
+
+        private class CollectionHelper<T> : ICollectionHelper
+        {
+            private List<T> _values = new List<T>();
+
+            public Array Values
+            {
+                get { return _values.ToArray(); }
+            }
+
+            public void Add(object value)
+            {
+                _values.Add((T)value);
+            }
+
+            public void ApplyValues(object collectionObject)
+            {
+                ICollection<T> collection = (ICollection<T>)collectionObject;
+                foreach( T value in _values )
+                    collection.Add(value);
+            }
+        }
+
         private interface IDictionaryHelper
         {
             object Dictionary { get; }
@@ -68,7 +97,6 @@ namespace Ookii.CommandLine
         private readonly object _defaultValue;
         private readonly bool _isMultiValue;
         private readonly bool _isDictionary;
-        private List<object> _arrayValues;
         private object _value;
 
         private CommandLineArgument(CommandLineParser parser, PropertyInfo property, string memberName, string argumentName, Type argumentType, int? position, bool isRequired, object defaultValue, string description, string valueDescription)
@@ -388,9 +416,10 @@ namespace Ookii.CommandLine
                 // _value back to null again if another value is added so we never return a stale array.
                 if( HasValue && _isDictionary )
                     return ((IDictionaryHelper)_value).Dictionary;
-                if( HasValue && _value == null && (_arrayValues != null || _defaultValue != null) )
-                    ConvertValueIfArray();
-                return _value;
+                else if( HasValue && _isMultiValue )
+                    return ((ICollectionHelper)_value).Values;
+                else
+                    return _value;
             }
         }
 
@@ -518,14 +547,7 @@ namespace Ookii.CommandLine
             }
             else if( IsMultiValue )
             {
-                if( !HasValue )
-                {
-                    Debug.Assert(_arrayValues == null);
-                    _arrayValues = new List<object>();
-                    HasValue = true;
-                }
-                _arrayValues.Add(convertedValue);
-                _value = null; // Set to null so that if the CommandLineParser.ArgumentParsed event handler accesses Value, it gets an up-to-date array.
+                SetCollectionValue(convertedValue);
             }
             else if( !HasValue || _parser.AllowDuplicateArguments )
             {
@@ -534,23 +556,6 @@ namespace Ookii.CommandLine
             }
             else
                 throw new CommandLineArgumentException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.DuplicateArgumentFormat, ArgumentName), ArgumentName, CommandLineArgumentErrorCategory.DuplicateArgument);
-        }
-
-        private void ConvertValueIfArray()
-        {
-            // This is called by the Value property to convert the temporary list of values into an array of the correct type.
-            if( IsMultiValue && (HasValue || _defaultValue != null) )
-            {
-                Array values = Array.CreateInstance(ArgumentType.GetElementType(), _arrayValues.Count);
-                if( HasValue )
-                {
-                    for( int x = 0; x < _arrayValues.Count; ++x )
-                        values.SetValue(_arrayValues[x], x);
-                }
-                else
-                    values.SetValue(_defaultValue, 0);
-                _value = values;
-            }
         }
 
         internal static CommandLineArgument Create(CommandLineParser parser, ParameterInfo parameter)
@@ -606,9 +611,15 @@ namespace Ookii.CommandLine
                 }
                 else if( !_isDictionary && _isMultiValue && !ArgumentType.IsArray )
                 {
-                    GetType().GetMethod("ApplyCollectionPropertyValue", BindingFlags.Instance | BindingFlags.NonPublic)
-                        .MakeGenericMethod(ElementType)
-                        .Invoke(this, new object[] { target });
+                    object collection = _property.GetValue(target, null);
+                    System.Collections.IList list = collection as System.Collections.IList;
+                    if( list != null )
+                        list.Clear();
+                    else
+                        typeof(ICollection<>).MakeGenericType(ElementType).GetMethod("Clear").Invoke(collection, null);
+
+                    if( HasValue )
+                        ((ICollectionHelper)_value).ApplyValues(collection);
                 }
                 else
                     _property.SetValue(target, Value, null);
@@ -619,7 +630,6 @@ namespace Ookii.CommandLine
         {
             _value = IsMultiValue ? null : DefaultValue;
             HasValue = false;
-            _arrayValues = null;
         }
 
         private static string GetFriendlyTypeName(Type type)
@@ -680,19 +690,6 @@ namespace Ookii.CommandLine
             }
         }
 
-        private void ApplyCollectionPropertyValue<T>(object target)
-        {
-            ICollection<T> collection = (ICollection<T>)_property.GetValue(target, null);
-            collection.Clear();
-            if( HasValue )
-            {
-                foreach( object value in _arrayValues )
-                    collection.Add((T)value);
-            }
-            else if( _defaultValue != null )
-                collection.Add((T)_defaultValue);
-        }
-
         private void SetDictionaryValue(string value, object convertedValue)
         {
             if( !HasValue )
@@ -710,6 +707,17 @@ namespace Ookii.CommandLine
             {
                 throw new CommandLineArgumentException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.InvalidDictionaryValueFormat, value, ArgumentName, ex.Message), CommandLineArgumentErrorCategory.InvalidDictionaryValue, ex);
             }
+        }
+
+        private void SetCollectionValue(object convertedValue)
+        {
+            if( !HasValue )
+            {
+                Debug.Assert(_value == null);
+                _value = Activator.CreateInstance(typeof(CollectionHelper<>).MakeGenericType(ElementType));
+                HasValue = true;
+            }
+            ((ICollectionHelper)_value).Add(convertedValue);
         }    
     }
 }
