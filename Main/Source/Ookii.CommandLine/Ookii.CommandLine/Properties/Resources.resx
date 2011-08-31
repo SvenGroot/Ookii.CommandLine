@@ -167,7 +167,7 @@
     <value>An argument name prefix may not be null or an empty string.</value>
   </data>
   <data name="IncorrectDefaultValueTypeFormat" xml:space="preserve">
-    <value>The default value for argument '{0}' does not have the same type as the argument.</value>
+    <value>The type of the default value for argument '{0}' is not compatible with the type of the argument.</value>
   </data>
   <data name="IndentOutOfRange" xml:space="preserve">
     <value>The indent must be greater than or equal to zero, and less than the maximum line length.</value>
