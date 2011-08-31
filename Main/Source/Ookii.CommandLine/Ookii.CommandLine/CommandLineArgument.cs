@@ -522,7 +522,7 @@ namespace Ookii.CommandLine
 
         internal void Reset()
         {
-            _value = DefaultValue;
+            _value = IsMultiValue ? null : DefaultValue;
             HasValue = false;
             _arrayValues = null;
         }
@@ -570,7 +570,7 @@ namespace Ookii.CommandLine
 
         private object DetermineDefaultValue(object defaultValue)
         {
-            if( defaultValue == null || _argumentType.IsAssignableFrom(defaultValue.GetType()) )
+            if( defaultValue == null || _elementType.IsAssignableFrom(defaultValue.GetType()) )
                 return defaultValue;
             else
             {

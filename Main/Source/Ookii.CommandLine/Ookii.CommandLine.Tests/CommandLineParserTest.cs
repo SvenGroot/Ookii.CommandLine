@@ -83,7 +83,7 @@ namespace Ookii.CommandLine.Tests
             [CommandLineArgument]
             public bool? Arg11 { get; set; }
 
-            [CommandLineArgument]
+            [CommandLineArgument(DefaultValue=42)]
             public Collection<int> Arg12
             {
                 get { return _arg12; }
@@ -185,7 +185,7 @@ namespace Ookii.CommandLine.Tests
                 TestArgument(args, "arg1", "arg1", typeof(string), null, 0, true, null, "Arg1 description.", "String", false, false);
                 TestArgument(args, "Arg10", "Arg10", typeof(bool[]), typeof(bool), null, false, null, "", "Boolean", true, true);
                 TestArgument(args, "Arg11", "Arg11", typeof(bool?), null, null, false, null, "", "Boolean", true, false);
-                TestArgument(args, "Arg12", "Arg12", typeof(Collection<int>), typeof(int), null, false, null, "", "Int32", false, true);
+                TestArgument(args, "Arg12", "Arg12", typeof(Collection<int>), typeof(int), null, false, 42, "", "Int32", false, true);
                 TestArgument(args, "Arg3", "Arg3", typeof(string), null, null, false, null, "", "String", false, false);
                 TestArgument(args, "Arg5", "Arg5", typeof(float), null, 3, false, null, "Arg5 description.", "Single", false, false);
                 TestArgument(args, "Arg6", "Arg6", typeof(string), null, null, true, null, "Arg6 description.", "String", false, false);
@@ -236,7 +236,7 @@ namespace Ookii.CommandLine.Tests
             // Some position arguments using names, out of order (also uses : and - for one of them to mix things up)
             TestParse(target, "/other 2 val1 -arg5:5.5 true 4 /arg6 arg6", "val1", 2, true, arg4: 4, arg5: 5.5f, arg6: "arg6");
             // All arguments
-            TestParse(target, "val1 2 true /arg3 val3 -other2:4 5.5 /arg6 val6 /arg7 /arg8 Monday /arg8 Tuesday /arg9 9 /arg10 /arg10 /arg10:false /arg11:false", "val1", 2, true, "val3", 4, 5.5f, "val6", true, new[] { DayOfWeek.Monday, DayOfWeek.Tuesday }, 9, new[] { true, true, false }, false);
+            TestParse(target, "val1 2 true /arg3 val3 -other2:4 5.5 /arg6 val6 /arg7 /arg8 Monday /arg8 Tuesday /arg9 9 /arg10 /arg10 /arg10:false /arg11:false /arg12 12 /arg12 13", "val1", 2, true, "val3", 4, 5.5f, "val6", true, new[] { DayOfWeek.Monday, DayOfWeek.Tuesday }, 9, new[] { true, true, false }, false, new[] { 12, 13 });
         }
 
         private static void TestArgument(IEnumerator<CommandLineArgument> arguments, string name, string memberName, Type type, Type elementType, int? position, bool isRequired, object defaultValue, string description, string valueDescription, bool isSwitch, bool isMultiValue)
@@ -261,7 +261,7 @@ namespace Ookii.CommandLine.Tests
             Assert.AreEqual(false, argument.HasValue);
         }
 
-        private static void TestParse(CommandLineParser target, string commandLine, string arg1 = null, int arg2 = 42, bool notSwitch = false, string arg3 = null, int arg4 = 47, float arg5 = 0.0f, string arg6 = null, bool arg7 = false, DayOfWeek[] arg8 = null, int? arg9 = null, bool[] arg10 = null, bool? arg11 = null)
+        private static void TestParse(CommandLineParser target, string commandLine, string arg1 = null, int arg2 = 42, bool notSwitch = false, string arg3 = null, int arg4 = 47, float arg5 = 0.0f, string arg6 = null, bool arg7 = false, DayOfWeek[] arg8 = null, int? arg9 = null, bool[] arg10 = null, bool? arg11 = null, int[] arg12 = null)
         {
             string[] args = commandLine.Split(' '); // not using quoted arguments in the tests, so this is fine.
             TestArguments result = (TestArguments)target.Parse(args);
@@ -276,7 +276,9 @@ namespace Ookii.CommandLine.Tests
             Assert.AreEqual(arg9, result.Arg9);
             CollectionAssert.AreEqual(arg10, result.Arg10);
             Assert.AreEqual(arg11, result.Arg11);
-
+            if( arg12 == null )
+                arg12 = new[] { 42 };
+            CollectionAssert.AreEqual(arg12, result.Arg12);
         }
     }
 }
