@@ -251,6 +251,42 @@ namespace Ookii.CommandLine.Tests
             TestParse(target, "val1 2 true /arg3 val3 -other2:4 5.5 /arg6 val6 /arg7 /arg8 Monday /arg8 Tuesday /arg9 9 /arg10 /arg10 /arg10:false /arg11:false /arg12 12 /arg12 13 /arg13 foo=13 /arg13 bar=14 /arg14 hello=1 /arg14 bye=2", "val1", 2, true, "val3", 4, 5.5f, "val6", true, new[] { DayOfWeek.Monday, DayOfWeek.Tuesday }, 9, new[] { true, true, false }, false, new[] { 12, 13 }, new Dictionary<string,int>() { { "foo", 13 }, { "bar", 14 } }, new Dictionary<string,int>() { { "hello", 1 }, { "bye", 2 } });
         }
 
+        [TestMethod]
+        public void ParseTestEmptyArguments()
+        {
+            Type argumentsType = typeof(EmptyArguments);
+            CommandLineParser target = new CommandLineParser(argumentsType, new[] { "/", "-" }) { Culture = CultureInfo.InvariantCulture };
+
+            // This test was added because version 2.0 threw an IndexOutOfRangeException when you tried to specify a positional argument when there were no positional arguments defined.
+            try
+            {
+                target.Parse(new[] { "Foo", "Bar" });
+                Assert.Fail("Expected CommandLineArgumentException.");
+            }
+            catch( CommandLineArgumentException ex )
+            {
+                Assert.AreEqual(CommandLineArgumentErrorCategory.TooManyArguments, ex.Category);
+            }
+        }
+
+        [TestMethod]
+        public void ParseTestTooManyArguments()
+        {
+            Type argumentsType = typeof(MultipleConstructorsArguments);
+            CommandLineParser target = new CommandLineParser(argumentsType, new[] { "/", "-" }) { Culture = CultureInfo.InvariantCulture };
+
+            try
+            {
+                // Only accepts one positional argument.
+                target.Parse(new[] { "Foo", "Bar" });
+                Assert.Fail("Expected CommandLineArgumentException.");
+            }
+            catch( CommandLineArgumentException ex )
+            {
+                Assert.AreEqual(CommandLineArgumentErrorCategory.TooManyArguments, ex.Category);
+            }
+        }
+
         private static void TestArgument(IEnumerator<CommandLineArgument> arguments, string name, string memberName, Type type, Type elementType, int? position, bool isRequired, object defaultValue, string description, string valueDescription, bool isSwitch, bool isMultiValue, bool isDictionary = false)
         {
             arguments.MoveNext();

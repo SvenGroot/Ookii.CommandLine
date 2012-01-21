@@ -649,7 +649,7 @@ namespace Ookii.CommandLine
                 else
                 {
                     // If this is an array argument is must be the last argument.
-                    if( !_positionalArguments[positionalArgumentIndex].IsMultiValue )
+                    if( positionalArgumentIndex < _positionalArguments.Count && !_positionalArguments[positionalArgumentIndex].IsMultiValue )
                     {
                         // Skip named positional arguments that have already been specified by name.
                         while( positionalArgumentIndex < _positionalArguments.Count && !_positionalArguments[positionalArgumentIndex].IsMultiValue && _positionalArguments[positionalArgumentIndex].HasValue )
