@@ -352,6 +352,7 @@ namespace Ookii.CommandLine
         ///   implements the <see cref="ICollection{T}"/> generic interface, or when the <see cref="IsDictionary"/> property is <see langword="true"/>.
         /// </para>
         /// </remarks>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Multi")]
         public bool IsMultiValue
         {
             get { return _isMultiValue; }
