@@ -679,7 +679,8 @@ namespace Ookii.CommandLine
             for( int x = 0; x < _constructorArgumentCount; ++x )
                 positionalArgumentValues[x] = _positionalArguments[x].Value;
 
-            object commandLineArguments = _commandLineConstructor.Invoke(positionalArgumentValues);
+            
+            object commandLineArguments = CreateArgumentsTypeInstance(positionalArgumentValues);
             foreach( CommandLineArgument argument in _arguments.Values )
             {
                 // Apply property argument values (this does nothing for constructor arguments).
@@ -926,6 +927,18 @@ namespace Ookii.CommandLine
             {
                 if( argument.Position == null && !argument.IsRequired )
                     yield return argument;
+            }
+        }
+
+        private object CreateArgumentsTypeInstance(object[] constructorArgumentValues)
+        {
+            try
+            {
+                return _commandLineConstructor.Invoke(constructorArgumentValues);
+            }
+            catch( TargetInvocationException ex )
+            {
+                throw new CommandLineArgumentException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.CreateArgumentsTypeErrorFormat, ex.InnerException.Message), CommandLineArgumentErrorCategory.CreateArgumentsTypeError, ex.InnerException);
             }
         }
     }

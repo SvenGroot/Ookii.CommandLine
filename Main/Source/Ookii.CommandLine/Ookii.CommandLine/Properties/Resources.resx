@@ -232,4 +232,10 @@
   <data name="NoTypeConverterFormat" xml:space="preserve">
     <value>No type converter that can convert to and from a string exists for type '{0}'.</value>
   </data>
+  <data name="CreateArgumentsTypeErrorFormat" xml:space="preserve">
+    <value>An error occurred creating an instance of the arguments type: {0}</value>
+  </data>
+  <data name="SetValueErrorFormat" xml:space="preserve">
+    <value>An error occurred setting the value of argument '{0}': {1}</value>
+  </data>
 </root>

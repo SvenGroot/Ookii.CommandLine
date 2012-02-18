@@ -110,10 +110,29 @@ namespace Ookii.CommandLine.Tests
 
         class MultipleConstructorsArguments
         {
+            private int _throwingArgument;
+
             public MultipleConstructorsArguments() { }
             public MultipleConstructorsArguments(string notArg1, int notArg2) { }
             [CommandLineConstructor]
-            public MultipleConstructorsArguments(string arg1) { }
+            public MultipleConstructorsArguments(string arg1) 
+            {
+                if( arg1 == "invalid" )
+                    throw new ArgumentException("Invalid argument value.", "arg1");
+            }
+
+            [CommandLineArgument]
+            public int ThrowingArgument
+            {
+                get { return _throwingArgument; }
+                set 
+                {
+                    if( value < 0 )
+                        throw new ArgumentOutOfRangeException("value");
+                    _throwingArgument = value; 
+                }
+            }
+            
         }
 
         #endregion
@@ -129,37 +148,6 @@ namespace Ookii.CommandLine.Tests
             get { return testContextInstance; }
             set { testContextInstance = value; }
         }
-
-        #region Additional test attributes
-        // 
-        //You can use the following additional attributes as you write your tests:
-        //
-        //Use ClassInitialize to run code before running the first test in the class
-        //[ClassInitialize()]
-        //public static void MyClassInitialize(TestContext testContext)
-        //{
-        //}
-        //
-        //Use ClassCleanup to run code after all tests in a class have run
-        //[ClassCleanup()]
-        //public static void MyClassCleanup()
-        //{
-        //}
-        //
-        //Use TestInitialize to run code before running each test
-        //[TestInitialize()]
-        //public void MyTestInitialize()
-        //{
-        //}
-        //
-        //Use TestCleanup to run code after each test has run
-        //[TestCleanup()]
-        //public void MyTestCleanup()
-        //{
-        //}
-        //
-        #endregion
-
 
         /// <summary>
         ///A test for CommandLineParser Constructor
@@ -221,10 +209,10 @@ namespace Ookii.CommandLine.Tests
             CollectionAssert.AreEqual(CommandLineParser.DefaultArgumentNamePrefixes.ToArray(), target.ArgumentNamePrefixes);
             Assert.AreEqual(argumentsType, target.ArgumentsType);
             Assert.AreEqual("", target.Description);
-            Assert.AreEqual(1, target.Arguments.Count);
+            Assert.AreEqual(2, target.Arguments.Count); // Constructor argument + one property argument.
             IEnumerator<CommandLineArgument> args = target.Arguments.GetEnumerator();
             TestArgument(args, "arg1", "arg1", typeof(string), null, 0, true, null, "", "String", false, false);
-
+            TestArgument(args, "ThrowingArgument", "ThrowingArgument", typeof(int), null, null, false, null, "", "Int32", false, false);
         }
 
         [TestMethod]
@@ -284,6 +272,44 @@ namespace Ookii.CommandLine.Tests
             catch( CommandLineArgumentException ex )
             {
                 Assert.AreEqual(CommandLineArgumentErrorCategory.TooManyArguments, ex.Category);
+            }
+        }
+
+        [TestMethod]
+        public void ParseTestPropertySetterThrows()
+        {
+            Type argumentsType = typeof(MultipleConstructorsArguments);
+            CommandLineParser target = new CommandLineParser(argumentsType, new[] { "/", "-" }) { Culture = CultureInfo.InvariantCulture };
+
+            try
+            {
+                target.Parse(new[] { "Foo", "-ThrowingArgument", "-5" });
+                Assert.Fail("Expected CommandLineArgumentException.");
+            }
+            catch( CommandLineArgumentException ex )
+            {
+                Assert.AreEqual(CommandLineArgumentErrorCategory.ApplyValueError, ex.Category);
+                Assert.AreEqual("ThrowingArgument", ex.ArgumentName);
+                Assert.IsInstanceOfType(ex.InnerException, typeof(ArgumentOutOfRangeException));
+            }
+        }
+
+        [TestMethod]
+        public void ParseTestConstructorThrows()
+        {
+            Type argumentsType = typeof(MultipleConstructorsArguments);
+            CommandLineParser target = new CommandLineParser(argumentsType, new[] { "/", "-" }) { Culture = CultureInfo.InvariantCulture };
+
+            try
+            {
+                target.Parse(new[] { "invalid" });
+                Assert.Fail("Expected CommandLineArgumentException.");
+            }
+            catch( CommandLineArgumentException ex )
+            {
+                Assert.AreEqual(CommandLineArgumentErrorCategory.CreateArgumentsTypeError, ex.Category);
+                Assert.IsNull(ex.ArgumentName);
+                Assert.IsInstanceOfType(ex.InnerException, typeof(ArgumentException));
             }
         }
 

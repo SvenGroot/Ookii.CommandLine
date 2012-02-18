@@ -47,6 +47,14 @@ namespace Ookii.CommandLine
         /// <summary>
         /// Invalid value for a dictionary argument; typically the result of a duplicate key.
         /// </summary>
-        InvalidDictionaryValue
+        InvalidDictionaryValue,
+        /// <summary>
+        /// An error occurred creating an instance of the arguments type (e.g. the constructor threw an exception).
+        /// </summary>
+        CreateArgumentsTypeError,
+        /// <summary>
+        /// An error occurred applying the value of the argument (e.g. the property set accessor threw an exception).
+        /// </summary>
+        ApplyValueError,
     }
 }
