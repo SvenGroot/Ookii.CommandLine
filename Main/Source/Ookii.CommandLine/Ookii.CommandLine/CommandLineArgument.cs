@@ -603,27 +603,34 @@ namespace Ookii.CommandLine
             // Do nothing for parameter-based values
             if( _property != null )
             {
-                if( _isDictionary && _property != null && _property.GetSetMethod() == null )
+                try
                 {
-                    System.Collections.IDictionary dictionary = (System.Collections.IDictionary)_property.GetValue(target, null);
-                    dictionary.Clear();
-                    if( HasValue )
-                        ((IDictionaryHelper)_value).ApplyValues(dictionary);
-                }
-                else if( !_isDictionary && _isMultiValue && !ArgumentType.IsArray )
-                {
-                    object collection = _property.GetValue(target, null);
-                    System.Collections.IList list = collection as System.Collections.IList;
-                    if( list != null )
-                        list.Clear();
-                    else
-                        typeof(ICollection<>).MakeGenericType(ElementType).GetMethod("Clear").Invoke(collection, null);
+                    if( _isDictionary && _property != null && _property.GetSetMethod() == null )
+                    {
+                        System.Collections.IDictionary dictionary = (System.Collections.IDictionary)_property.GetValue(target, null);
+                        dictionary.Clear();
+                        if( HasValue )
+                            ((IDictionaryHelper)_value).ApplyValues(dictionary);
+                    }
+                    else if( !_isDictionary && _isMultiValue && !ArgumentType.IsArray )
+                    {
+                        object collection = _property.GetValue(target, null);
+                        System.Collections.IList list = collection as System.Collections.IList;
+                        if( list != null )
+                            list.Clear();
+                        else
+                            typeof(ICollection<>).MakeGenericType(ElementType).GetMethod("Clear").Invoke(collection, null);
 
-                    if( HasValue )
-                        ((ICollectionHelper)_value).ApplyValues(collection);
+                        if( HasValue )
+                            ((ICollectionHelper)_value).ApplyValues(collection);
+                    }
+                    else if( HasValue || Value != null ) // Don't set the value of an unspecified argument with a null default value.
+                        _property.SetValue(target, Value, null);
                 }
-                else
-                    _property.SetValue(target, Value, null);
+                catch( TargetInvocationException ex )
+                {
+                    throw new CommandLineArgumentException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.SetValueErrorFormat, ArgumentName, ex.InnerException.Message), ArgumentName, CommandLineArgumentErrorCategory.ApplyValueError, ex.InnerException);
+                }
             }
         }
 
