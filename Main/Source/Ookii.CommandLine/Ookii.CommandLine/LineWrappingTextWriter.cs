@@ -229,7 +229,7 @@ namespace Ookii.CommandLine
         /// <returns>A <see cref="LineWrappingTextWriter"/> that writes to the standard output stream.</returns>
         public static LineWrappingTextWriter ForConsoleOut()
         {
-            return new LineWrappingTextWriter(Console.Out, Console.WindowWidth - 1, false);
+            return new LineWrappingTextWriter(Console.Out, GetLineLengthForConsole(), false);
         }
 
         /// <summary>
@@ -238,7 +238,7 @@ namespace Ookii.CommandLine
         /// <returns>A <see cref="LineWrappingTextWriter"/> that writes to the standard error stream.</returns>
         public static LineWrappingTextWriter ForConsoleError()
         {
-            return new LineWrappingTextWriter(Console.Error, Console.WindowWidth - 1, false);
+            return new LineWrappingTextWriter(Console.Error, GetLineLengthForConsole(), false);
         }
 
         /// <summary>
@@ -503,6 +503,17 @@ namespace Ookii.CommandLine
                 _currentLineLength = 0; // No indent necessary, just reset to 0.
             _isLineEmpty = true; // This line contains no content, only indentation.
         }
-    
+
+        private static int GetLineLengthForConsole()
+        {
+            try
+            {
+                return Console.WindowWidth - 1;
+            }
+            catch( IOException )
+            {
+                return 0;
+            }
+        }
     }
 }
