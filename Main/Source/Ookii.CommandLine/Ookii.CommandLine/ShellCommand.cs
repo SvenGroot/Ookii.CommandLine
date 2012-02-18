@@ -268,7 +268,7 @@ namespace Ookii.CommandLine
             if( !IsShellCommand(commandType) )
                 throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.TypeIsNotShellCommandFormat, commandType.FullName));
 
-            return ((ShellCommandAttribute)Attribute.GetCustomAttribute(commandType, typeof(ShellCommandAttribute))).CommandName;
+            return ((ShellCommandAttribute)Attribute.GetCustomAttribute(commandType, typeof(ShellCommandAttribute))).CommandName ?? commandType.Name;
         }
 
         /// <summary>
@@ -345,11 +345,9 @@ namespace Ookii.CommandLine
             Type[] types = assembly.GetTypes();
             foreach( Type type in types )
             {
-                if( IsShellCommand(type) )
+                if( IsShellCommand(type) && commandNameComparer.Equals(GetShellCommandName(type), commandName) )
                 {
-                    ShellCommandAttribute attribute = (ShellCommandAttribute)Attribute.GetCustomAttribute(type, typeof(ShellCommandAttribute));
-                    if( attribute != null && commandNameComparer.Equals(attribute.CommandName, commandName) )
-                        return type;
+                    return type;
                 }
             }
 
@@ -469,17 +467,23 @@ namespace Ookii.CommandLine
                 {
                     disposeOut = true;
                     output = LineWrappingTextWriter.ForConsoleOut();
+                    options.Out = output;
                 }
                 if( error == null )
                 {
                     disposeError = true;
                     error = LineWrappingTextWriter.ForConsoleError();
+                    options.Error = error;
                 }
 
                 Type commandType = commandName == null ? null : GetShellCommand(assembly, commandName, options.CommandNameComparer);
                 if( commandType == null )
                 {
                     WriteShellCommandListUsage(output, assembly, options);
+                }
+                else if( CommandUsesCustomArgumentParsing(commandType) )
+                {
+                    return (ShellCommand)Activator.CreateInstance(commandType, args, index, options);
                 }
                 else
                 {
@@ -719,6 +723,11 @@ namespace Ookii.CommandLine
             if( lineWriter != null )
                 lineWriter.Indent = lineWriter.MaximumLineLength < CommandLineParser.MaximumLineWidthForIndent ? 0 : options.CommandDescriptionIndent;
             WriteAssemblyCommandList(output, assembly, options.CommandDescriptionFormat);
+        }
+
+        private static bool CommandUsesCustomArgumentParsing(Type commandType)
+        {
+            return ((ShellCommandAttribute)Attribute.GetCustomAttribute(commandType, typeof(ShellCommandAttribute))).CustomArgumentParsing;
         }
     }
 }

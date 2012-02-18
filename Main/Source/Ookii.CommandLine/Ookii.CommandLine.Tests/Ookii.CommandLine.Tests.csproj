@@ -57,6 +57,7 @@
     <Compile Include="CommandLineParserTest.cs" />
     <Compile Include="LineWrappingTextWriterTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ShellCommandTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Ookii.CommandLine\Ookii.CommandLine.csproj">
