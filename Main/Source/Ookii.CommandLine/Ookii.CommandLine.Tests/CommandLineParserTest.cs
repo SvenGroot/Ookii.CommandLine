@@ -135,6 +135,14 @@ namespace Ookii.CommandLine.Tests
             
         }
 
+        class DictionaryArguments
+        {
+            [CommandLineArgument]
+            public Dictionary<string, int> NoDuplicateKeys { get; set; }
+            [CommandLineArgument, AllowDuplicateDictionaryKeys]
+            public Dictionary<string, int> DuplicateKeys { get; set; }
+        }
+
         #endregion
 
         private TestContext testContextInstance;
@@ -184,8 +192,8 @@ namespace Ookii.CommandLine.Tests
                 TestArgument(args, "Arg10", "Arg10", typeof(bool[]), typeof(bool), null, false, null, "", "Boolean", true, true);
                 TestArgument(args, "Arg11", "Arg11", typeof(bool?), null, null, false, null, "", "Boolean", true, false);
                 TestArgument(args, "Arg12", "Arg12", typeof(Collection<int>), typeof(int), null, false, 42, "", "Int32", false, true);
-                TestArgument(args, "Arg13", "Arg13", typeof(Dictionary<string, int>), typeof(KeyValuePair<string, int>), null, false, null, "", "KeyValuePair<String, Int32>", false, true, true);
-                TestArgument(args, "Arg14", "Arg14", typeof(IDictionary<string, int>), typeof(KeyValuePair<string, int>), null, false, null, "", "KeyValuePair<String, Int32>", false, true, true);
+                TestArgument(args, "Arg13", "Arg13", typeof(Dictionary<string, int>), typeof(KeyValuePair<string, int>), null, false, null, "", "String=Int32", false, true, true);
+                TestArgument(args, "Arg14", "Arg14", typeof(IDictionary<string, int>), typeof(KeyValuePair<string, int>), null, false, null, "", "String=Int32", false, true, true);
                 TestArgument(args, "Arg3", "Arg3", typeof(string), null, null, false, null, "", "String", false, false);
                 TestArgument(args, "Arg5", "Arg5", typeof(float), null, 3, false, null, "Arg5 description.", "Single", false, false);
                 TestArgument(args, "Arg6", "Arg6", typeof(string), null, null, true, null, "Arg6 description.", "String", false, false);
@@ -309,6 +317,29 @@ namespace Ookii.CommandLine.Tests
             {
                 Assert.AreEqual(CommandLineArgumentErrorCategory.CreateArgumentsTypeError, ex.Category);
                 Assert.IsNull(ex.ArgumentName);
+                Assert.IsInstanceOfType(ex.InnerException, typeof(ArgumentException));
+            }
+        }
+
+        [TestMethod]
+        public void ParseTestDuplicateDictionaryKeys()
+        {
+            Type argumentsType = typeof(DictionaryArguments);
+            CommandLineParser target = new CommandLineParser(argumentsType, new[] { "/", "-" }) { Culture = CultureInfo.InvariantCulture };
+
+            DictionaryArguments args = (DictionaryArguments)target.Parse(new[] { "-DuplicateKeys", "Foo=1", "-DuplicateKeys", "Bar=2", "-DuplicateKeys", "Foo=3" });
+            Assert.IsNotNull(args);
+            Assert.AreEqual(2, args.DuplicateKeys.Count);
+            Assert.AreEqual(3, args.DuplicateKeys["Foo"]);
+            Assert.AreEqual(2, args.DuplicateKeys["Bar"]);
+            try
+            {
+                target.Parse(new[] { "-NoDuplicateKeys", "Foo=1", "-NoDuplicateKeys", "Bar=2", "-NoDuplicateKeys", "Foo=3" });
+            }
+            catch( CommandLineArgumentException ex )
+            {
+                Assert.AreEqual(CommandLineArgumentErrorCategory.InvalidDictionaryValue, ex.Category);
+                Assert.AreEqual("NoDuplicateKeys", ex.ArgumentName);
                 Assert.IsInstanceOfType(ex.InnerException, typeof(ArgumentException));
             }
         }

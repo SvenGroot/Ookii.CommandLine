@@ -62,6 +62,12 @@ namespace Ookii.CommandLine
         private class DictionaryHelper<TKey, TValue> : IDictionaryHelper
         {
             private readonly Dictionary<TKey, TValue> _dictionary = new Dictionary<TKey, TValue>();
+            private readonly bool _allowDuplicateKeys;
+
+            public DictionaryHelper(bool allowDuplicateKeys)
+            {
+                _allowDuplicateKeys = allowDuplicateKeys;
+            }
 
             public object Dictionary
             {
@@ -71,7 +77,10 @@ namespace Ookii.CommandLine
             public void Add(object keyValuePair)
             {
                 KeyValuePair<TKey, TValue> pair = (KeyValuePair<TKey, TValue>)keyValuePair;
-                _dictionary.Add(pair.Key, pair.Value);
+                if( _allowDuplicateKeys )
+                    _dictionary[pair.Key] = pair.Value;
+                else
+                    _dictionary.Add(pair.Key, pair.Value);
             }
 
             public void ApplyValues(object dictionaryObject)
@@ -97,9 +106,10 @@ namespace Ookii.CommandLine
         private readonly object _defaultValue;
         private readonly bool _isMultiValue;
         private readonly bool _isDictionary;
+        private readonly bool _allowDuplicateDictionaryKeys;
         private object _value;
 
-        private CommandLineArgument(CommandLineParser parser, PropertyInfo property, string memberName, string argumentName, Type argumentType, int? position, bool isRequired, object defaultValue, string description, string valueDescription)
+        private CommandLineArgument(CommandLineParser parser, PropertyInfo property, string memberName, string argumentName, Type argumentType, int? position, bool isRequired, object defaultValue, string description, string valueDescription, bool allowDuplicateDictionaryKeys)
         {
             // If this method throws anything other than a NotSupportedException, it constitutes a bug in the Ookii.CommandLine library.
             if( parser == null )
@@ -129,7 +139,10 @@ namespace Ookii.CommandLine
             {
                 _isMultiValue = true;
                 _isDictionary = true;
-                _elementType = typeof(KeyValuePair<,>).MakeGenericType(argumentType.GetGenericArguments());
+                _allowDuplicateDictionaryKeys = allowDuplicateDictionaryKeys;
+                Type[] genericArguments = argumentType.GetGenericArguments();
+                _elementType = typeof(KeyValuePair<,>).MakeGenericType(genericArguments);
+                _valueDescription = valueDescription ?? string.Format(CultureInfo.CurrentCulture, "{0}={1}", GetFriendlyTypeName(genericArguments[0]), GetFriendlyTypeName(genericArguments[1]));
                 if( converterType == null )
                     converterType = typeof(KeyValuePairConverter<,>).MakeGenericType(argumentType.GetGenericArguments());
             }
@@ -149,7 +162,10 @@ namespace Ookii.CommandLine
                 {
                     _isMultiValue = true;
                     _isDictionary = true;
-                    _elementType = typeof(KeyValuePair<,>).MakeGenericType(dictionaryType.GetGenericArguments());
+                    _allowDuplicateDictionaryKeys = allowDuplicateDictionaryKeys;
+                    Type[] genericArguments = dictionaryType.GetGenericArguments();
+                    _elementType = typeof(KeyValuePair<,>).MakeGenericType(genericArguments);
+                    _valueDescription = valueDescription ?? string.Format(CultureInfo.CurrentCulture, "{0}={1}", GetFriendlyTypeName(genericArguments[0]), GetFriendlyTypeName(genericArguments[1]));
                     if( converterType == null )
                         converterType = typeof(KeyValuePairConverter<,>).MakeGenericType(dictionaryType.GetGenericArguments());
                 }
@@ -168,7 +184,8 @@ namespace Ookii.CommandLine
                 }
             }
 
-            _valueDescription = valueDescription ?? GetFriendlyTypeName(_elementType);
+            if( _valueDescription == null )
+                _valueDescription = valueDescription ?? GetFriendlyTypeName(_elementType);
 
             _converter = CreateConverter(converterType);
             _defaultValue = DetermineDefaultValue(defaultValue);
@@ -572,8 +589,9 @@ namespace Ookii.CommandLine
             object defaultValue = ((parameter.Attributes & ParameterAttributes.HasDefault) == ParameterAttributes.HasDefault) ? parameter.DefaultValue : null;
             ValueDescriptionAttribute valueDescriptionAttribute = (ValueDescriptionAttribute)Attribute.GetCustomAttribute(parameter, typeof(ValueDescriptionAttribute));
             string valueDescription = valueDescriptionAttribute == null ? null : valueDescriptionAttribute.ValueDescription;
+            bool allowDuplicateDictionarykeys = Attribute.IsDefined(parameter, typeof(AllowDuplicateDictionaryKeysAttribute));
 
-            return new CommandLineArgument(parser, null, parameter.Name, argumentName, parameter.ParameterType, parameter.Position, !parameter.IsOptional, defaultValue, description, valueDescription);
+            return new CommandLineArgument(parser, null, parameter.Name, argumentName, parameter.ParameterType, parameter.Position, !parameter.IsOptional, defaultValue, description, valueDescription, allowDuplicateDictionarykeys);
         }
 
         internal static CommandLineArgument Create(CommandLineParser parser, PropertyInfo property)
@@ -591,8 +609,9 @@ namespace Ookii.CommandLine
             string description = descriptionAttribute == null ? null : descriptionAttribute.Description;
             string valueDescription = attribute.ValueDescription; // If null, the ctor will sort it out.
             int? position = attribute.Position < 0 ? null : (int?)attribute.Position;
+            bool allowDuplicateDictionarykeys = Attribute.IsDefined(property, typeof(AllowDuplicateDictionaryKeysAttribute));
 
-            return new CommandLineArgument(parser, property, property.Name, argumentName, property.PropertyType, position, attribute.IsRequired, defaultValue, description, valueDescription);
+            return new CommandLineArgument(parser, property, property.Name, argumentName, property.PropertyType, position, attribute.IsRequired, defaultValue, description, valueDescription, allowDuplicateDictionarykeys);
         }
 
         internal void ApplyPropertyValue(object target)
@@ -704,7 +723,7 @@ namespace Ookii.CommandLine
             {
                 Debug.Assert(_value == null);
                 // _elementType is KeyValuePair<TKey, TValue>, so we use that to get the generic arguments for the dictionary.
-                _value = Activator.CreateInstance(typeof(DictionaryHelper<,>).MakeGenericType(_elementType.GetGenericArguments()));
+                _value = Activator.CreateInstance(typeof(DictionaryHelper<,>).MakeGenericType(_elementType.GetGenericArguments()), new object[] { _allowDuplicateDictionaryKeys });
                 HasValue = true;
             }
             try
@@ -713,7 +732,7 @@ namespace Ookii.CommandLine
             }
             catch( ArgumentException ex )
             {
-                throw new CommandLineArgumentException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.InvalidDictionaryValueFormat, value, ArgumentName, ex.Message), CommandLineArgumentErrorCategory.InvalidDictionaryValue, ex);
+                throw new CommandLineArgumentException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.InvalidDictionaryValueFormat, value, ArgumentName, ex.Message), ArgumentName, CommandLineArgumentErrorCategory.InvalidDictionaryValue, ex);
             }
         }
 

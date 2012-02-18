@@ -73,6 +73,7 @@
     <Compile Include="..\AssemblyInfoCommon.cs">
       <Link>Properties\AssemblyInfoCommon.cs</Link>
     </Compile>
+    <Compile Include="AllowDuplicateDictionaryKeysAttribute.cs" />
     <Compile Include="ArgumentNameAttribute.cs" />
     <Compile Include="ArgumentParsedEventArgs.cs" />
     <Compile Include="CommandLineArgument.cs" />
@@ -124,9 +125,6 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\TraceAndTestImpact.testsettings">
-      <Link>TraceAndTestImpact.testsettings</Link>
-    </None>
     <None Include="ookii.snk" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
