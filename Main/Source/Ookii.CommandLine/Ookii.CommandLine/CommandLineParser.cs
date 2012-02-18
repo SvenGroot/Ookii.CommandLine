@@ -886,7 +886,10 @@ namespace Ookii.CommandLine
                 if( !string.IsNullOrEmpty(argument.Description) )
                 {
                     writer.ResetIndent();
-                    writer.WriteLine(options.ArgumentDescriptionFormat, argument.ArgumentName, argument.Description);
+                    string valueDescription = string.Format(CultureInfo.CurrentCulture, options.ValueDescriptionFormat, argument.ValueDescription);
+                    if( argument.IsSwitch )
+                        valueDescription = string.Format(CultureInfo.CurrentCulture, options.OptionalArgumentFormat, valueDescription);
+                    writer.WriteLine(options.ArgumentDescriptionFormat, argument.ArgumentName, argument.Description, valueDescription, _argumentNamePrefixes[0]);
                 }
             }
         }

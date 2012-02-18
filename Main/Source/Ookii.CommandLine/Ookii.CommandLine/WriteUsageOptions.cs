@@ -160,7 +160,13 @@ namespace Ookii.CommandLine
         /// </para>
         /// <para>
         ///   This format string should have two placeholders, which are used for the command name and its description. If the format string ends in
-        ///   a line break, the command descriptions will be separated by a blank line (this is the default).
+        ///   a line break, the command descriptions will be separated by a blank line (this is the default). It can have two additional placeholders,
+        ///   which are used for the value description (formatted according to the <see cref="ValueDescriptionFormat"/>), and the primary argument
+        ///   name prefix.
+        /// </para>
+        /// <para>
+        ///   For example, you can create argument descriptions in the style of the PowerShell Get-Help commandlet by setting this property
+        ///   to "    {3}{0} {2}\n{1}\n" and setting <see cref="ArgumentDescriptionIndent"/> to 8.
         /// </para>
         /// </remarks>
         public string ArgumentDescriptionFormat
