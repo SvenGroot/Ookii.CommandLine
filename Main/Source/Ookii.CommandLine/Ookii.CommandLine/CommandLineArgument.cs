@@ -109,7 +109,7 @@ namespace Ookii.CommandLine
         private readonly bool _allowDuplicateDictionaryKeys;
         private object _value;
 
-        private CommandLineArgument(CommandLineParser parser, PropertyInfo property, string memberName, string argumentName, Type argumentType, int? position, bool isRequired, object defaultValue, string description, string valueDescription, bool allowDuplicateDictionaryKeys)
+        private CommandLineArgument(CommandLineParser parser, PropertyInfo property, string memberName, string argumentName, Type argumentType, Type converterType, int? position, bool isRequired, object defaultValue, string description, string valueDescription, bool allowDuplicateDictionaryKeys)
         {
             // If this method throws anything other than a NotSupportedException, it constitutes a bug in the Ookii.CommandLine library.
             if( parser == null )
@@ -134,7 +134,6 @@ namespace Ookii.CommandLine
             _isRequired = isRequired;
             Position = position;
 
-            Type converterType = null;
             if( argumentType.IsGenericType && argumentType.GetGenericTypeDefinition() == typeof(Dictionary<,>) )
             {
                 _isMultiValue = true;
@@ -590,8 +589,16 @@ namespace Ookii.CommandLine
             ValueDescriptionAttribute valueDescriptionAttribute = (ValueDescriptionAttribute)Attribute.GetCustomAttribute(parameter, typeof(ValueDescriptionAttribute));
             string valueDescription = valueDescriptionAttribute == null ? null : valueDescriptionAttribute.ValueDescription;
             bool allowDuplicateDictionarykeys = Attribute.IsDefined(parameter, typeof(AllowDuplicateDictionaryKeysAttribute));
+            Type converterType = GetCustomConverterType(parameter);  
 
-            return new CommandLineArgument(parser, null, parameter.Name, argumentName, parameter.ParameterType, parameter.Position, !parameter.IsOptional, defaultValue, description, valueDescription, allowDuplicateDictionarykeys);
+            return new CommandLineArgument(parser, null, parameter.Name, argumentName, parameter.ParameterType, converterType, parameter.Position, !parameter.IsOptional, defaultValue, description, valueDescription, allowDuplicateDictionarykeys);
+        }
+
+        private static Type GetCustomConverterType(ParameterInfo parameter)
+        {
+            TypeConverterAttribute typeConverterAttribute = (TypeConverterAttribute)Attribute.GetCustomAttribute(parameter, typeof(TypeConverterAttribute));
+            Type converterType = typeConverterAttribute == null ? null : Type.GetType(typeConverterAttribute.ConverterTypeName, true);
+            return converterType;
         }
 
         internal static CommandLineArgument Create(CommandLineParser parser, PropertyInfo property)
@@ -610,8 +617,10 @@ namespace Ookii.CommandLine
             string valueDescription = attribute.ValueDescription; // If null, the ctor will sort it out.
             int? position = attribute.Position < 0 ? null : (int?)attribute.Position;
             bool allowDuplicateDictionarykeys = Attribute.IsDefined(property, typeof(AllowDuplicateDictionaryKeysAttribute));
+            TypeConverterAttribute typeConverterAttribute = (TypeConverterAttribute)Attribute.GetCustomAttribute(property, typeof(TypeConverterAttribute));
+            Type converterType = typeConverterAttribute == null ? null : Type.GetType(typeConverterAttribute.ConverterTypeName, true);
 
-            return new CommandLineArgument(parser, property, property.Name, argumentName, property.PropertyType, position, attribute.IsRequired, defaultValue, description, valueDescription, allowDuplicateDictionarykeys);
+            return new CommandLineArgument(parser, property, property.Name, argumentName, property.PropertyType, converterType, position, attribute.IsRequired, defaultValue, description, valueDescription, allowDuplicateDictionarykeys);
         }
 
         internal void ApplyPropertyValue(object target)
@@ -692,17 +701,11 @@ namespace Ookii.CommandLine
 
         private TypeConverter CreateConverter(Type converterType)
         {
-            if( converterType != null )
-                return (TypeConverter)Activator.CreateInstance(converterType);
-            else
-            {
-                TypeConverter converter = TypeDescriptor.GetConverter(_elementType);
+            TypeConverter converter = converterType == null ? TypeDescriptor.GetConverter(_elementType) : (TypeConverter)Activator.CreateInstance(converterType);
+            if( converter == null || !converter.CanConvertFrom(typeof(string)) )
+                throw new NotSupportedException(string.Format(System.Globalization.CultureInfo.CurrentCulture, Properties.Resources.NoTypeConverterForArgumentFormat, _argumentName, _elementType));
 
-                if( converter == null || !converter.CanConvertFrom(typeof(string)) )
-                    throw new NotSupportedException(string.Format(System.Globalization.CultureInfo.CurrentCulture, Properties.Resources.NoTypeConverterForArgumentFormat, _argumentName, _elementType));
-
-                return converter;
-            }
+            return converter;
         }
 
         private object DetermineDefaultValue(object defaultValue)
