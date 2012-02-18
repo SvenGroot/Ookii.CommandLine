@@ -107,6 +107,7 @@ namespace Ookii.CommandLine
                     result.Add(type);
             }
 
+            result.Sort((x, y) => StringComparer.OrdinalIgnoreCase.Compare(GetShellCommandName(x), GetShellCommandName(y)));
             return result.ToArray();
         }
 
