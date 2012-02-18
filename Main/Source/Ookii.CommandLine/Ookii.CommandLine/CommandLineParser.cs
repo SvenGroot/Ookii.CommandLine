@@ -87,7 +87,8 @@ namespace Ookii.CommandLine
     /// <para>
     ///   If an argument has a type other than <see cref="String"/>, the <see cref="CommandLineParser"/> class will use the
     ///   <see cref="TypeDescriptor"/> class to get a <see cref="TypeConverter"/> for that type to convert the supplied string value
-    ///   to the correct type.
+    ///   to the correct type. You can also use the <see cref="TypeConverterAttribute"/> on the property or constructor parameter
+    ///   that defines the attribute to specify a custom type converter.
     /// </para>
     /// <para>
     ///   If an argument has an array type, it can be specified more than once, and the value for each time is it specified
