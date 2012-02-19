@@ -27,7 +27,7 @@ namespace Ookii.CommandLine
         {
             UseWhiteSpaceValueSeparator = true;
             Indent = 3;
-            ArgumentDescriptionIndent = 16;
+            ArgumentDescriptionIndent = 8;
             IncludeApplicationDescription = true;
         }
 
@@ -147,26 +147,21 @@ namespace Ookii.CommandLine
         /// Gets or sets the format string to use for the description of an argument.
         /// </summary>
         /// <value>
-        /// The format string to use for the description of an argument; the default value is "{0,13} : {1}\n" (note that it contains a line break).
+        /// The format string to use for the description of an argument; the default value is "&#160;&#160;&#160;&#160;{3}{0} {2}\n{1}\n" (note that it contains line breaks).
         /// </value>
         /// <remarks>
         /// <para>
         ///   This format string is used for the detailed descriptions of the arguments, which is written after
-        ///   the command line syntax. For example, using the default format a command description would be written as "       sample : description\n".
+        ///   the command line syntax.
         /// </para>
         /// <para>
         ///   The <see cref="ArgumentDescriptionIndent"/> property should be set to something appropriate for this format. For example, in
-        ///   the default format, the description starts at an index of 16 characters, so subsequent lines should be indented by 16 characters.
+        ///   the default format, the description is indented by 8 characters.
         /// </para>
         /// <para>
-        ///   This format string should have two placeholders, which are used for the command name and its description. If the format string ends in
-        ///   a line break, the command descriptions will be separated by a blank line (this is the default). It can have two additional placeholders,
-        ///   which are used for the value description (formatted according to the <see cref="ValueDescriptionFormat"/>), and the primary argument
-        ///   name prefix.
-        /// </para>
-        /// <para>
-        ///   For example, you can create argument descriptions in the style of the PowerShell Get-Help commandlet by setting this property
-        ///   to "    {3}{0} {2}\n{1}\n" and setting <see cref="ArgumentDescriptionIndent"/> to 8.
+        ///   This format string can have four placeholders, which are used for the command name, its description, the value description 
+        ///   (formatted according to the <see cref="ValueDescriptionFormat"/>), and the primary argument name prefix. If the format string ends in
+        ///   a line break, the command descriptions will be separated by a blank line (this is the default).
         /// </para>
         /// </remarks>
         public string ArgumentDescriptionFormat
@@ -179,7 +174,7 @@ namespace Ookii.CommandLine
         /// Gets or sets the number of characters by which to indent the all but the first line of argument descriptions.
         /// </summary>
         /// <value>
-        /// The number of characters by which to indent the all but the first line of argument descriptions. The default value is 16.
+        /// The number of characters by which to indent the all but the first line of argument descriptions. The default value is 8.
         /// </value>
         /// <remarks>
         /// <para>

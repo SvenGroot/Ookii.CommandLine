@@ -36,8 +36,8 @@
 &lt;/para&gt;</NamespaceSummaryItem>
     </NamespaceSummaries>
     <CopyrightHref>http://www.ookii.org</CopyrightHref>
-    <CopyrightText>Copyright &amp;#169%3b Sven Groot %28Ookii.org%29 2011</CopyrightText>
-    <HelpTitle>Ookii.CommandLine 2.0 documentation</HelpTitle>
+    <CopyrightText>Copyright &amp;#169%3b Sven Groot %28Ookii.org%29 2012</CopyrightText>
+    <HelpTitle>Ookii.CommandLine 2.1 documentation</HelpTitle>
     <NamingMethod>MemberName</NamingMethod>
     <PresentationStyle>hana</PresentationStyle>
     <SyntaxFilters>CSharp, VisualBasic, VisualBasicUsage, CPlusPlus</SyntaxFilters>

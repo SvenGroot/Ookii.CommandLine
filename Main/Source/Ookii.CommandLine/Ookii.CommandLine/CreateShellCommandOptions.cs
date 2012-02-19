@@ -27,7 +27,7 @@ namespace Ookii.CommandLine
         {
             AllowWhiteSpaceValueSeparator = true;
             UsageOptions = new WriteUsageOptions();
-            CommandDescriptionIndent = 16;
+            CommandDescriptionIndent = 8;
             ArgumentNameComparer = StringComparer.OrdinalIgnoreCase;
             CommandNameComparer = StringComparer.OrdinalIgnoreCase;
         }
@@ -124,11 +124,16 @@ namespace Ookii.CommandLine
         /// Gets or sets the format string used to format a command's name and description.
         /// </summary>
         /// <value>
-        /// The format string used to format a command's name and description. The default value is "{0,13} : {1}".
+        /// The format string used to format a command's name and description. The default value is "&#160;&#160;&#160;&#160;{0}\n{1}\n".
         /// </value>
         /// <remarks>
         /// <para>
-        ///   This format string should have two placeholders, which are used for command's name and description respectively.
+        ///   This format string should have two placeholders, which are used for command's name and description respectively. If the
+        ///   format ends in a line break, the commands will be separated by a blank line (this is the default).
+        /// </para>
+        /// <para>
+        ///   If you change the description format, you should also change the value of the <see cref="CommandDescriptionIndent"/>
+        ///   to an appropriate value. The default format uses an indentation of 8 characters.
         /// </para>
         /// </remarks>
         public string CommandDescriptionFormat
@@ -142,7 +147,7 @@ namespace Ookii.CommandLine
         /// Gets or sets the number of characters by which to indent the all but the first line of command descriptions.
         /// </summary>
         /// <value>
-        /// The number of characters by which to indent the all but the first line of command descriptions. The default value is 16.
+        /// The number of characters by which to indent the all but the first line of command descriptions. The default value is 8.
         /// </value>
         /// <remarks>
         /// <para>

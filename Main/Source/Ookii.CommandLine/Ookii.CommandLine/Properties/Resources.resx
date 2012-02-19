@@ -124,7 +124,8 @@
     <value>A positional array argument must be the last positional argument.</value>
   </data>
   <data name="DefaultArgumentDescriptionFormat" xml:space="preserve">
-    <value>{0,13} : {1}
+    <value>    {3}{0} {2}
+{1}
 </value>
     <comment>Note this contains a newline at the end of the format. If you change this format, you may also need to change the indent used in the code.</comment>
   </data>
@@ -135,7 +136,8 @@
     <value>The following commands are available:</value>
   </data>
   <data name="DefaultCommandFormat" xml:space="preserve">
-    <value>{0,13} : {1}
+    <value>    {0}
+{1}
 </value>
     <comment>Note this contains a newline at the end of the format. If you change this format, you may also need to change the indent used in the code.</comment>
   </data>

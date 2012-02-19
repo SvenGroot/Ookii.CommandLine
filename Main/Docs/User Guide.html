@@ -322,7 +322,11 @@
     <p>The parameters of the public constructor for the class that defines the arguments will be used to define some of the arguments. These arguments will be positional arguments, and required if the parameter is a required parameter.</p>
     <p>Every constructor parameter creates a positional argument with its position matching the position of the constructor parameter. The type of the constructor parameter is the type of the argument, and by default the name of the constructor parameter is used of as the argument name, but this can be overridden using the <code>ArgumentNameAttribute</code> attribute.</p>
     <p>For example, consider a class with the following constructor:</p>
-    <pre>$lang: C#; ArgumentName$<br />public MyArguments(string arg1,<br />                   int arg2,<br />                   [ArgumentName("CustomName")] float arg3 = 0f)<br />{<br />}</pre>
+    <pre class="code"><span class="keyword">public</span> MyArguments(<span class="keyword">string</span> arg1,
+                   <span class="keyword">int</span> arg2,
+                   [<span class="type">ArgumentName</span>(<span class="string">"CustomName"</span>)] <span class="keyword">float</span> arg3 = 0f)
+{
+}</pre>
     <p>This constructor defines the following arguments: a required positional argument of type <code>string</code> with the name “arg1”, a required positional argument of type <code>int</code> with the name “arg3”, and an optional positional argument of type <code>float</code> with the name “CustomName” and a default value of 0.</p>
     <p>If you are not using the C# 4.0 compiler, you can apply the <code>System.Runtime.InteropServices.OptionalAttribute</code> attribute and the <code>System.Runtime.InteropServices.DefaultParameterValueAttribute</code> to the parameter to define an optional argument. In Visual Basic, you can use the usual syntax for optional parameters (for an example, see the source code of the Visual Basic sample application included with the library).</p>
     <p>If the type of a constructor parameter is an array, this defines a multi-value positional argument.</p>
@@ -338,7 +342,16 @@
     <p>To define a dictionary argument, you can use either a read-write property of type <code>Dictionary&lt;TKey, TValue&gt;</code> (e.g. <code>Dictionary&lt;string, int&gt;</code>) or a read-only property of any type implementing <code>IDictionary&lt;TKey, TValue&gt;</code>.</p>
     <p>If the type of an argument is a Boolean, a nullable Boolean, or an array of Booleans, this defines a switch argument unless the argument is positional.</p>
     <p>Consider the following properties:</p>
-    <pre>$lang: C#; CommandLineArgument$<br />[CommandLineArgument(DefaultValue = "default")]<br />public string SomeArgument { get; set; }<br /><br />[CommandLineArgument("OtherName", Position = 0)]<br />public int OtherArgument { get; set; }<br /><br />[CommandLineArgument]<br />public bool Switch { get; set; }<br /><br />public string NotAnArgument { get; set; }</pre>
+    <pre class="code">[<span class="type">CommandLineArgument</span>(DefaultValue = <span class="string">"default"</span>)]
+<span class="keyword">public</span> <span class="keyword">string</span> SomeArgument { <span class="keyword">get</span>; <span class="keyword">set</span>; }
+
+[<span class="type">CommandLineArgument</span>(<span class="string">"OtherName"</span>, Position = 0)]
+<span class="keyword">public</span> <span class="keyword">int</span> OtherArgument { <span class="keyword">get</span>; <span class="keyword">set</span>; }
+
+[<span class="type">CommandLineArgument</span>]
+<span class="keyword">public</span> <span class="keyword">bool</span> Switch { <span class="keyword">get</span>; <span class="keyword">set</span>; }
+
+<span class="keyword">public</span> <span class="keyword">string</span> NotAnArgument { <span class="keyword">get</span>; <span class="keyword">set</span>; }</pre>
     <p>The first property defines an optional non-positional argument of type string with the name “SomeArgument” and the default value “default”.</p>
     <p>The second property defines an optional positional argument of type int with the name “OtherName”. The argument will be the first positional argument after the arguments defined by constructor parameters.</p>
     <p>The third property defines a switch argument, because its type is a Boolean. Switch arguments can be supplied without a value; they will be true if present and false is not.</p>
@@ -349,7 +362,20 @@
     <p>If argument parsing is successful, the <code>CommandLineParser.Parse</code> method will create a new instance of the class defining the arguments, passing the values parsed from the command line to the constructor parameters (if any). It will then set the value of each property to the value of the corresponding argument. This is not done in any particular order, so do not write code that makes assumptions about this. Finally, it will return this instance.</p>
     <p>If argument parsing fails, the <code>CommandLineParser.Parse</code> method will throw a <code>CommandLineArgumentException</code> exception. Argument parsing can fail because not all required arguments were specified, an argument name was supplied without a value for an argument that’s not a switch, an unknown argument name was supplied, a non-multi-value argument was specified more than once, too many positional argument values were supplied, or argument value conversion failed for one of the arguments. Check the <code>CommandLineParser.Category</code> property to determine the cause of the exception.</p>
     <p>A typical usage sample for the <code>CommandLineParser</code> class is as follows:</p>
-    <pre>$lang: C#; CommandLineParser MyArguments CommandLineArgumentException Console$<br />static void Main(string[] args)<br />{<br />    CommandLineParser parser = new CommandLineParser(typeof(MyArguments));<br />    try<br />    {<br />        MyArguments arguments = (MyArguments)parser.Parse(args);<br />        RunApplication(arguments);<br />    }<br />    catch( CommandLineArgumentException ex )<br />    {<br />        Console.WriteLine(ex.Message);<br />        parser.WriteUsageToConsole();<br />    }<br />}</pre>
+    <pre class="code"><span class="keyword">static</span> <span class="keyword">void</span> Main(<span class="keyword">string</span>[] args)
+{
+    <span class="type">CommandLineParser</span> parser = <span class="keyword">new</span> <span class="type">CommandLineParser</span>(<span class="keyword">typeof</span>(<span class="type">MyArguments</span>));
+    <span class="keyword">try</span>
+    {
+        <span class="type">MyArguments</span> arguments = (<span class="type">MyArguments</span>)parser.Parse(args);
+        RunApplication(arguments);
+    }
+    <span class="keyword">catch</span>( <span class="type">CommandLineArgumentException</span> ex )
+    {
+        <span class="type">Console</span>.WriteLine(ex.Message);
+        parser.WriteUsageToConsole();
+    }
+}</pre>
     <p>This sample tries to parse the arguments, and if it fails prints the error message and usage help to the console.</p>
     <p>The <code>CommandLineParser</code> class provides several ways to customize the parsing behavior; check the class library documentation for more details.</p>
     <h2>Generating usage help</h2>
@@ -357,12 +383,15 @@
     <p>Creating this kind of usage help text is tedious, and you must make sure it is kept up to date whenever you change the arguments to your application. For this reason, Ookii.CommandLine can generate this usage help text automatically. The generated usage help can be customized by adding descriptions to the arguments.</p>
     <p>Usage help can be generated using the <code>CommandLineParser.WriteUsage</code> method. The output can be customized using the <code>WriteUsageOptions</code> class. The <code>CommandLineParser.WriteUsageToConsole</code> method provides a convenient way to write the usage help to the standard output stream, properly word-wrapping the text at the console width.</p>
     <p>The following example shows the usage help generated for the sample application included with the Ookii.CommandLine library:</p>
-    <pre>Sample command line application. The application parses the command<br />line and prints the results, but otherwise does nothing, and none<br />of the arguments are actually used for anything.<br /><br />Usage: CommandLineSampleCS.exe [-source] &lt;String&gt; <br />   [-destination] &lt;String&gt; [[-index] &lt;Number&gt;] [[-id] &lt;String&gt;] [-?]<br />   [-Count &lt;Number&gt;] [-Date &lt;DateTime&gt;] [-v] [-val &lt;String&gt;...]<br /><br />       source : The source data.<br /><br />  destination : The destination data.<br /><br />        index : The operation's index. This argument is optional, <br />                and the default value is 1.<br /><br />           id : Sets the operation ID. The default value is <br />                "default".<br /><br />            ? : Displays this help message.<br /><br />        Count : Provides the count for something to the application.<br />                This argument is required.<br /><br />         Date : Provides a date to the application; the format to <br />                use depends on your regional settings.<br /><br />            v : Print verbose information; this is an example of a<br />                switch argument.<br /><br />          val : This is an example of an array argument, which can <br />                be repeated multiple times to set more than one <br />                value.</pre>
+    <pre>Sample command line application. The application parses the command<br />line and prints the results, but otherwise does nothing, and none<br />of the arguments are actually used for anything.<br /><br />Usage: CommandLineSampleCS.exe [-source] &lt;String&gt; <br />   [-destination] &lt;String&gt; [[-index] &lt;Number&gt;] [[-id] &lt;String&gt;] [-?]<br />   [-Count &lt;Number&gt;] [-Date &lt;DateTime&gt;] [-v] [-val &lt;String&gt;...]<br /><br />    -source &lt;String&gt;<br />        The source data.<br /><br />    -destination &lt;String&gt;<br />        The destination data.<br /><br />    -index &lt;Number&gt;<br />        The operation's index. This argument is optional, and the<br />        default value is 1.<br /><br />    -id &lt;String&gt;<br />        Sets the operation ID. The default value is "default".<br /><br />    -? [&lt;Boolean&gt;]<br />        Displays this help message.<br /><br />    -Count &lt;Number&gt;<br />        Provides the count for something to the application. This<br />        argument is required.<br /><br />    -Date &lt;DateTime&gt;<br />        Provides a date to the application; the format to use<br />        depends on your regional settings.<br /><br />    -v [&lt;Boolean&gt;]<br />        Print verbose information; this is an example of a switch<br />        argument.<br />    -val &lt;String&gt;<br />        This is an example of an array argument, which can be<br />        repeated multiple times to set more than one value.</pre>
     <p>The usage help consists of three components: the application description, the argument syntax, and the argument descriptions.</p>
     <h3>Application description</h3>
     <p>The first part of the usage help is a description of your application. This is a short description that explains what your application does and how it can be used. It can be any text you like, though it’s recommended to keep it short.</p>
     <p>The description is specified by specifying the <code>System.ComponentModel.DescriptionAttribute</code> to the class that defines the command line arguments, as in the following example:</p>
-    <pre>$lang: C#; Description MyArguments$<br />[Description("This is the application description that is included in the usage help.")]<br />class MyArguments<br />{<br />}</pre>
+    <pre class="code">[<span class="type">Description</span>(<span class="string">"This is the application description that is included in the usage help."</span>)]
+<span class="keyword">class</span> <span class="type">MyArguments</span>
+{
+}</pre>
     <p>If this attribute is not specified, no description is included in the usage help. The description can also be omitted by setting the <code>WriteUsageOptions.IncludeApplicationDescription</code> property to false.</p>
     <h3>Argument syntax</h3>
     <p>The argument syntax indicates how your application can be invoked from the command line. The argument syntax typically starts with the name of your application, and is followed by all the arguments, indicating their name and type. There is an indication of which arguments are required or optional, and whether they allow multiple values. For positional arguments, the order is indicated as well.</p>
