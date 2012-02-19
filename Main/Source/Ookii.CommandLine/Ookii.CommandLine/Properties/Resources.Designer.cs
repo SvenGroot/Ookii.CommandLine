@@ -97,7 +97,8 @@ namespace Ookii.CommandLine.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to {0,13} : {1}
+        ///   Looks up a localized string similar to     {3}{0} {2}
+        ///{1}
         ///.
         /// </summary>
         internal static string DefaultArgumentDescriptionFormat {
@@ -125,7 +126,8 @@ namespace Ookii.CommandLine.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to {0,13} : {1}
+        ///   Looks up a localized string similar to     {0}
+        ///{1}
         ///.
         /// </summary>
         internal static string DefaultCommandFormat {

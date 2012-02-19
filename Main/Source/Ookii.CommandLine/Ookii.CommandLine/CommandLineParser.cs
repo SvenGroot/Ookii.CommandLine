@@ -43,7 +43,7 @@ namespace Ookii.CommandLine
     ///   supported via <a href="http://www.mono-project.com">Mono</a>).
     /// </para>
     /// <note>
-    ///   Although almost any argument name is allowed as long as it isn't empty and doesn't contain the <see cref="NameValueSeparator"/>,
+    ///   Although almost any argument name is allowed as long as it isn't empty and doesn't contain a colon (:),
     ///   certain argument names may not be advisable. Particularly, avoid argument names that start with a number, as they it will
     ///   not be possible to specify them by name if the argument name prefix is a single dash; arguments starting with a single dash
     ///   followed by a digit are always considered values during parsing, even if there is an argument with that name.
