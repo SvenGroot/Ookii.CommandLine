@@ -6,8 +6,6 @@
 // and all copyright notices must remain intact in all applications,
 // documentation, and source files.
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Ookii.CommandLine
 {

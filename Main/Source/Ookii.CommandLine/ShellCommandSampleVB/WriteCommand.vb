@@ -1,4 +1,4 @@
-﻿' Copyright (c) Sven Groot (Ookii.org) 2011
+﻿' Copyright (c) Sven Groot (Ookii.org) 2012
 '
 ' This code is published under the Microsoft Public License (Ms-PL).  A copy
 ' of the license should be distributed with the code.  It can also be found
@@ -6,9 +6,9 @@
 ' and all copyright notices must remain intact in all applications,
 ' documentation, and source files.
 Imports System.ComponentModel
-Imports Ookii.CommandLine
 Imports System.IO
 Imports System.Text
+Imports Ookii.CommandLine
 
 ''' <summary>
 ''' This is a sample ShellCommand that can be invoked by specifying "write" as the first argument to the sample application.

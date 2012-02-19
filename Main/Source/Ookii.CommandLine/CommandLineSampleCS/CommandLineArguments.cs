@@ -7,7 +7,6 @@
 // documentation, and source files.
 using System;
 using System.ComponentModel;
-using System.Runtime.InteropServices;
 using Ookii.CommandLine;
 
 namespace CommandLineSampleCS
