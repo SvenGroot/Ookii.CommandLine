@@ -244,6 +244,7 @@
     <ul>
       <li>Added support for dictionary arguments; these are special multi-value arguments whose values take the form key=value.</li>
       <li>Multi-value arguments can be specified using a read-only property of any collection type (in addition to the previous array support).</li>
+      <li>Multi-value properties can optionally use a separator character to allow multiple values to be specified without specifying the argument multiple times.</li>
       <li>Added support for specifying a custom type converter for individual arguments.</li>
       <li>When specifying the default value for an argument defined by a property you can now use any type that can be converted to the argument’s type using its type converter. This makes it possible to define default values for arguments with a type for which there are no literals.</li>
       <li>A CommandLineArgumentException is thrown when the argument type’s constructor or a property setter throws an exception (instead of a TargetInvocationException).</li>
@@ -286,6 +287,11 @@
     <pre>-ArgumentName Value1 –ArgumentName Value2 –ArgumentName Value3</pre>
     <p>In this case, the value of the argument named “ArgumentName” will be a list holding all three values.</p>
     <p>The type of a multi-value argument must be an array type, for example <code>string[]</code> or <code>int[]</code> in C#, or any type implementing <code>ICollection&lt;T&gt;</code> when the argument is defined by a read-only property.</p>
+    <p>It’s possible to specify a separator for multi-value arguments using the <code>MultiValueSeparatorAttribute</code> attribute. This makes it possible to specify multiple values for the argument while the argument itself is specified only once. For example, if the separator is set to a comma, you can specify the values as follows:</p>
+    <pre>-ArgumentName Value1,Value2,Value3</pre>
+    <p>In this case, the value of the argument named “ArgumentName” will be a list with the three values “Value1”, “Value2” and “Value3”.</p>
+    <p>
+      <strong>Note:</strong> if you specify a separator for a multi-value argument, it is <em>not</em> possible to have an argument value containing the separator. There is no way to escape the separator. Therefore, make sure you pick a separator that will never be used in the argument values, and be extra careful with culture-sensitive argument types (for example, if you use a comma as the separator for a multi-value argument of floating point numbers, cultures that use a comma as the decimal separator will not be able to specify values properly).</p>
     <p>If an argument is not a multi-value argument, it is an error to supply it more than once, unless duplicate arguments are allowed in which case only the last value is used.</p>
     <p>If a multi-value argument is positional, it must be the last positional argument. All remaining positional argument values will be considered values for the multi-value argument.</p>
     <p>If a multi-value argument is required, it means it must have at least one value.</p>

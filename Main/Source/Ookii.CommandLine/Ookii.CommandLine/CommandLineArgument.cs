@@ -107,9 +107,10 @@ namespace Ookii.CommandLine
         private readonly bool _isMultiValue;
         private readonly bool _isDictionary;
         private readonly bool _allowDuplicateDictionaryKeys;
+        private readonly string _multiValueSeparator;
         private object _value;
 
-        private CommandLineArgument(CommandLineParser parser, PropertyInfo property, string memberName, string argumentName, Type argumentType, Type converterType, int? position, bool isRequired, object defaultValue, string description, string valueDescription, bool allowDuplicateDictionaryKeys)
+        private CommandLineArgument(CommandLineParser parser, PropertyInfo property, string memberName, string argumentName, Type argumentType, Type converterType, int? position, bool isRequired, object defaultValue, string description, string valueDescription, string multiValueSeparator, bool allowDuplicateDictionaryKeys)
         {
             // If this method throws anything other than a NotSupportedException, it constitutes a bug in the Ookii.CommandLine library.
             if( parser == null )
@@ -132,6 +133,7 @@ namespace Ookii.CommandLine
             _description = description;
             _defaultValue = defaultValue;
             _isRequired = isRequired;
+            _multiValueSeparator = multiValueSeparator;
             Position = position;
 
             if( argumentType.IsGenericType && argumentType.GetGenericTypeDefinition() == typeof(Dictionary<,>) )
@@ -375,10 +377,27 @@ namespace Ookii.CommandLine
         }
 
         /// <summary>
+        /// Gets the separator for the values if this argument is a multi-value argument
+        /// </summary>
+        /// <value>
+        /// The separator for multi-value arguments, or <see langword="null"/> if no separator is used.
+        /// </value>
+        /// <remarks>
+        /// <para>
+        ///   This property is only meaningful if the <see cref="IsMultiValue"/> property is <see langword="true"/>.
+        /// </para>
+        /// </remarks>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Multi")]
+        public string MultiValueSeparator
+        {
+            get { return _multiValueSeparator; }
+        }
+
+        /// <summary>
         /// Gets a value indicating whether this argument is a dictionary argument.
         /// </summary>
         /// <value>
-        /// 	<see langword="true"/> if this argument is a dictionary argument.; otherwise, <see langword="false"/>.
+        /// 	<see langword="true"/> if this argument is a dictionary argument; otherwise, <see langword="false"/>.
         /// </value>
         /// <remarks>
         /// <para>
@@ -392,6 +411,22 @@ namespace Ookii.CommandLine
         public bool IsDictionary
         {
             get { return _isDictionary; }
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether this argument, if it is a dictionary argument, allows duplicate keys.
+        /// </summary>
+        /// <value>
+        /// 	<see langword="true"/> if this argument allows duplicate keys; otherwise, <see langword="false"/>.
+        /// </value>
+        /// <remarks>
+        /// <para>
+        ///   This property is only meaningful if the <see cref="IsDictionary"/> property is <see langword="true"/>.
+        /// </para>
+        /// </remarks>
+        public bool AllowsDuplicateDictionaryKeys
+        {
+            get { return _allowDuplicateDictionaryKeys; }
         }
 
         /// <summary>
@@ -547,32 +582,14 @@ namespace Ookii.CommandLine
 
         internal void SetValue(CultureInfo culture, string value)
         {
-            object convertedValue;
-            if( value == null )
+            if( value != null && IsMultiValue && _multiValueSeparator != null )
             {
-                if( IsSwitch )
-                    convertedValue = true;
-                else
-                    throw new CommandLineArgumentException(string.Format(System.Globalization.CultureInfo.CurrentCulture, Properties.Resources.MissingValueForNamedArgumentFormat, ArgumentName), ArgumentName, CommandLineArgumentErrorCategory.MissingNamedArgumentValue);
+                string[] values = value.Split(new[] { _multiValueSeparator }, StringSplitOptions.None);
+                foreach( string separateValue in values )
+                    SetValueCore(culture, separateValue);
             }
             else
-                convertedValue = ConvertToArgumentType(culture, value);
-
-            if( IsDictionary )
-            {
-                SetDictionaryValue(value, convertedValue);
-            }
-            else if( IsMultiValue )
-            {
-                SetCollectionValue(convertedValue);
-            }
-            else if( !HasValue || _parser.AllowDuplicateArguments )
-            {
-                _value = convertedValue;
-                HasValue = true;
-            }
-            else
-                throw new CommandLineArgumentException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.DuplicateArgumentFormat, ArgumentName), ArgumentName, CommandLineArgumentErrorCategory.DuplicateArgument);
+                SetValueCore(culture, value);
         }
 
         internal static CommandLineArgument Create(CommandLineParser parser, ParameterInfo parameter)
@@ -589,16 +606,11 @@ namespace Ookii.CommandLine
             ValueDescriptionAttribute valueDescriptionAttribute = (ValueDescriptionAttribute)Attribute.GetCustomAttribute(parameter, typeof(ValueDescriptionAttribute));
             string valueDescription = valueDescriptionAttribute == null ? null : valueDescriptionAttribute.ValueDescription;
             bool allowDuplicateDictionarykeys = Attribute.IsDefined(parameter, typeof(AllowDuplicateDictionaryKeysAttribute));
-            Type converterType = GetCustomConverterType(parameter);  
-
-            return new CommandLineArgument(parser, null, parameter.Name, argumentName, parameter.ParameterType, converterType, parameter.Position, !parameter.IsOptional, defaultValue, description, valueDescription, allowDuplicateDictionarykeys);
-        }
-
-        private static Type GetCustomConverterType(ParameterInfo parameter)
-        {
             TypeConverterAttribute typeConverterAttribute = (TypeConverterAttribute)Attribute.GetCustomAttribute(parameter, typeof(TypeConverterAttribute));
             Type converterType = typeConverterAttribute == null ? null : Type.GetType(typeConverterAttribute.ConverterTypeName, true);
-            return converterType;
+            string multiValueSeparator = GetMultiValueSeparator((MultiValueSeparatorAttribute)Attribute.GetCustomAttribute(parameter, typeof(MultiValueSeparatorAttribute)));
+
+            return new CommandLineArgument(parser, null, parameter.Name, argumentName, parameter.ParameterType, converterType, parameter.Position, !parameter.IsOptional, defaultValue, description, valueDescription, multiValueSeparator, allowDuplicateDictionarykeys);
         }
 
         internal static CommandLineArgument Create(CommandLineParser parser, PropertyInfo property)
@@ -619,8 +631,9 @@ namespace Ookii.CommandLine
             bool allowDuplicateDictionarykeys = Attribute.IsDefined(property, typeof(AllowDuplicateDictionaryKeysAttribute));
             TypeConverterAttribute typeConverterAttribute = (TypeConverterAttribute)Attribute.GetCustomAttribute(property, typeof(TypeConverterAttribute));
             Type converterType = typeConverterAttribute == null ? null : Type.GetType(typeConverterAttribute.ConverterTypeName, true);
+            string multiValueSeparator = GetMultiValueSeparator((MultiValueSeparatorAttribute)Attribute.GetCustomAttribute(property, typeof(MultiValueSeparatorAttribute)));
 
-            return new CommandLineArgument(parser, property, property.Name, argumentName, property.PropertyType, converterType, position, attribute.IsRequired, defaultValue, description, valueDescription, allowDuplicateDictionarykeys);
+            return new CommandLineArgument(parser, property, property.Name, argumentName, property.PropertyType, converterType, position, attribute.IsRequired, defaultValue, description, valueDescription, multiValueSeparator, allowDuplicateDictionarykeys);
         }
 
         internal void ApplyPropertyValue(object target)
@@ -666,6 +679,44 @@ namespace Ookii.CommandLine
         {
             _value = IsMultiValue ? null : DefaultValue;
             HasValue = false;
+        }
+
+        private void SetValueCore(CultureInfo culture, string value)
+        {
+            object convertedValue;
+            if( value == null )
+            {
+                if( IsSwitch )
+                    convertedValue = true;
+                else
+                    throw new CommandLineArgumentException(string.Format(System.Globalization.CultureInfo.CurrentCulture, Properties.Resources.MissingValueForNamedArgumentFormat, ArgumentName), ArgumentName, CommandLineArgumentErrorCategory.MissingNamedArgumentValue);
+            }
+            else
+                convertedValue = ConvertToArgumentType(culture, value);
+
+            if( IsDictionary )
+            {
+                SetDictionaryValue(value, convertedValue);
+            }
+            else if( IsMultiValue )
+            {
+                SetCollectionValue(convertedValue);
+            }
+            else if( !HasValue || _parser.AllowDuplicateArguments )
+            {
+                _value = convertedValue;
+                HasValue = true;
+            }
+            else
+                throw new CommandLineArgumentException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.DuplicateArgumentFormat, ArgumentName), ArgumentName, CommandLineArgumentErrorCategory.DuplicateArgument);
+        }
+
+        private static string GetMultiValueSeparator(MultiValueSeparatorAttribute attribute)
+        {
+            if( attribute == null || string.IsNullOrEmpty(attribute.Separator) )
+                return null;
+            else
+                return attribute.Separator;
         }
 
         private static string GetFriendlyTypeName(Type type)

@@ -147,6 +147,14 @@ namespace Ookii.CommandLine.Tests
             public Dictionary<string, int> DuplicateKeys { get; set; }
         }
 
+        class MultiValueSeparatorArguments
+        {
+            [CommandLineArgument]
+            public string[] NoSeparator { get; set; }
+            [CommandLineArgument, MultiValueSeparator(",")]
+            public string[] Separator { get; set; }
+        }
+
         #endregion
 
         private TestContext testContextInstance;
@@ -347,6 +355,18 @@ namespace Ookii.CommandLine.Tests
                 Assert.AreEqual("NoDuplicateKeys", ex.ArgumentName);
                 Assert.IsInstanceOfType(ex.InnerException, typeof(ArgumentException));
             }
+        }
+
+        [TestMethod]
+        public void ParseTestMultiValueSeparator()
+        {
+            Type argumentsType = typeof(MultiValueSeparatorArguments);
+            CommandLineParser target = new CommandLineParser(argumentsType, new[] { "/", "-" }) { Culture = CultureInfo.InvariantCulture };
+
+            MultiValueSeparatorArguments args = (MultiValueSeparatorArguments)target.Parse(new[] { "-NoSeparator", "Value1,Value2", "-NoSeparator", "Value3", "-Separator", "Value1,Value2", "-Separator", "Value3" });
+            Assert.IsNotNull(args);
+            CollectionAssert.AreEqual(new[] { "Value1,Value2", "Value3" }, args.NoSeparator);
+            CollectionAssert.AreEqual(new[] { "Value1", "Value2", "Value3" }, args.Separator);
         }
 
         private static void TestArgument(IEnumerator<CommandLineArgument> arguments, string name, string memberName, Type type, Type elementType, int? position, bool isRequired, object defaultValue, string description, string valueDescription, bool isSwitch, bool isMultiValue, bool isDictionary = false)
