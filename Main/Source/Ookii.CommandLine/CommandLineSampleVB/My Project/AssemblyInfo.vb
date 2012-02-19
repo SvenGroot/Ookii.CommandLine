@@ -1,4 +1,4 @@
-﻿' Copyright (c) Sven Groot (Ookii.org) 2011
+﻿' Copyright (c) Sven Groot (Ookii.org) 2012
 '
 ' This code is published under the Microsoft Public License (Ms-PL).  A copy
 ' of the license should be distributed with the code.  It can also be found
@@ -19,7 +19,7 @@ Imports System.Runtime.InteropServices
 <Assembly: AssemblyDescription("")> 
 <Assembly: AssemblyCompany("Ookii.org")> 
 <Assembly: AssemblyProduct("Ookii.CommandLine")> 
-<Assembly: AssemblyCopyright("Copyright © Sven Groot (Ookii.org) 2011")> 
+<Assembly: AssemblyCopyright("Copyright © Sven Groot (Ookii.org) 2012")> 
 <Assembly: AssemblyTrademark("")> 
 
 <Assembly: ComVisible(False)>

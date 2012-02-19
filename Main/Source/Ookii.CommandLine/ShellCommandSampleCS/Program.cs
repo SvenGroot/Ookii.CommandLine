@@ -5,12 +5,8 @@
 // at http://ookiicommandline.codeplex.com. This notice, the author's name,
 // and all copyright notices must remain intact in all applications,
 // documentation, and source files.
-using System;
-using System.Collections.Generic;
-using System.Text;
-using Ookii.CommandLine;
 using System.Reflection;
-using System.IO;
+using Ookii.CommandLine;
 
 namespace ShellCommandSampleCS
 {

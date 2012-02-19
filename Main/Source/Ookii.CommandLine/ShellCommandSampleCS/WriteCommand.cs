@@ -7,10 +7,10 @@
 // documentation, and source files.
 using System;
 using System.Collections.Generic;
-using System.Text;
-using Ookii.CommandLine;
 using System.ComponentModel;
 using System.IO;
+using System.Text;
+using Ookii.CommandLine;
 
 namespace ShellCommandSampleCS
 {
