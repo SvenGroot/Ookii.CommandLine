@@ -222,16 +222,16 @@
           </style>
   </head>
   <body>
-    <h1>Ookii.CommandLine 2.1</h1>
+    <h1>Ookii.CommandLine 2.2</h1>
     <p class="author">User Guide</p>
-    <p>Copyright © Sven Groot (Ookii.org) 2012<br />For license information see license.txt</p>
+    <p>Copyright © Sven Groot (Ookii.org) 2013<br />For license information see license.txt</p>
     <h2>Introduction</h2>
     <p>Ookii.CommandLine is a library that helps you to parse command line arguments for your applications. It allows you to easily define a set of accepted arguments, and then parse the command line supplied to your application for those arguments. In addition, it allows you to generate usage help from the arguments that you defined which you can display to the user.</p>
     <p>Ookii.CommandLine can be used with any kind of .Net application, whether Console, Windows Forms, or WPF. Although a limited subset of functionality—particularly related around generating usage help text—is geared primarily towards console applications that are invoked from the command prompt, the main command line parsing functionality is usable in any application that needs to process command line arguments.</p>
     <p>To define a set of command line arguments, you create a class that will hold their values. The constructor parameters and properties of that class determine the set of arguments that are accepted. For each argument you can customize things like the argument name and whether or not an argument is required, and you can specify descriptions used to customize the usage help.</p>
     <p>Two samples are provided with the library, one for basic command line parsing and one for shell commands. Both have a C# and Visual Basic version so you can see how to use the Ookii.CommandLine library in your own code. Besides the source code, they are also included as binaries so you can experience how the argument parsing works by trying them out.</p>
     <h2>System requirements</h2>
-    <p>Ookii.CommandLine 2.1 is a class library for use in your own applications. It can be used with applications targeting at least one of the following environments:</p>
+    <p>Ookii.CommandLine 2.2 is a class library for use in your own applications. It can be used with applications targeting at least one of the following environments:</p>
     <ul>
       <li>
         <a href="http://msdn.microsoft.com/netframework">Microsoft .Net Framework</a> 2.0 or later</li>
@@ -239,7 +239,11 @@
         <a href="http://www.mono-project.com/">Mono</a> 2.6 or later, using the .Net 2.0 or .Net 4.0 profile</li>
     </ul>
     <p>To view and edit the source code of Ookii.CommandLine or the included sample applications, you must use <a href="http://msdn.microsoft.com/vstudio">Microsoft Visual Studio 2010</a>. Because Ookii.CommandLine targets .Net 2.0, you can use the library with Visual Studio 2005 or later or any other development environment that targets .Net 2.0.</p>
-    <h2>What’s new in Ookii.CommandLine 2.1</h2>
+    <h2>What’s new in Ookii.CommandLine 2.2</h2>
+    <p>Ookii.CommandLine 2.2 offers the following improvements over version 2.1:</p>
+    <ul>
+      <li>Added support for alternative names (aliases) for command line arguments.</li>
+    </ul>
     <p>Ookii.CommandLine 2.1 offers the following improvements over version 2.0:</p>
     <ul>
       <li>Added support for dictionary arguments; these are special multi-value arguments whose values take the form key=value.</li>
@@ -272,6 +276,7 @@
     <pre>-ArgumentName ArgumentValue</pre>
     <p>The argument name is preceded by the <em>argument name prefix</em>. This prefix is configurable, but Ookii.CommandLine defaults to accepting a forward slash (<code>/</code>) and a dash (<code>-</code>) on Windows, and only a dash (<code>-</code>) on other platforms (other platforms are supported through Mono).</p>
     <p>The argument value follows the name, separated either by a space or a colon (<code>:</code>). Not all arguments require values; those that do not are called <em>switch arguments</em> and have a value determined by their presence or absence on the command line.</p>
+    <p>An argument can have one or more aliases: alternative names that can also be used to specify the command name. For example, a parameter named “Verbose” might use the alias “v” as a shorter to type alternative.</p>
     <h3>Positional arguments</h3>
     <p>An argument can be <em>positional</em>, which means that its value can be specified either by name as indicated above, or by position. In this case the name of the argument is not required, and the argument’s value can be supplied by specifying it in the correct position in relation to other positional arguments.</p>
     <p>If an argument value is encountered without being preceded by a name, it is matched to the positional argument at the current position. For example, take the following command line arguments:</p>
@@ -281,7 +286,7 @@
     <h3>Required arguments</h3>
     <p>A command line argument that is required must be present on all invocations of the application. If a required argument is not present, the <code>CommandLineParser</code> class will throw an exception during parsing.</p>
     <p>Any argument can be made required. Usually it is recommended for any required argument to also be a positional argument, but this is not necessary.</p>
-    <p>For positional arguments, required arguments must always come before optional arguments; it is an error to define a required argument after an optional argument.</p>
+    <p>For positional arguments, required arguments must always come before optional arguments; it is an error to define a required positional argument after an optional positional argument.</p>
     <h3>Arguments with multiple values</h3>
     <p>Some arguments can take multiple values; these are <em>multi-value arguments</em>, also known as <em>array arguments</em>. These arguments can be supplied multiple times, and each value is added to the set of values. For example, consider the following command line arguments:</p>
     <pre>-ArgumentName Value1 –ArgumentName Value2 –ArgumentName Value3</pre>
@@ -317,27 +322,13 @@
     <p>The culture used for argument value conversions is specified the <code>CommandLineParser.Culture</code> property, which defaults to the current culture. If you wish your argument parsing to be independent of the user’s culture, set this property to <code>System.Globalization.CultureInfo.InvariantCulture</code>.</p>
     <h2>Defining command line arguments</h2>
     <p>In order to use Ookii.CommandLine, you must create a class that defines the arguments accepted by your application. This type will specify the names, types and attributes (required, positional) of each argument.</p>
-    <p>There are two ways to define arguments: using constructor parameters for the class, or using the properties of the class.</p>
-    <h3>Using constructor parameters</h3>
-    <p>The parameters of the public constructor for the class that defines the arguments will be used to define some of the arguments. These arguments will be positional arguments, and required if the parameter is a required parameter.</p>
-    <p>Every constructor parameter creates a positional argument with its position matching the position of the constructor parameter. The type of the constructor parameter is the type of the argument, and by default the name of the constructor parameter is used of as the argument name, but this can be overridden using the <code>ArgumentNameAttribute</code> attribute.</p>
-    <p>For example, consider a class with the following constructor:</p>
-    <pre class="code"><span class="keyword">public</span> MyArguments(<span class="keyword">string</span> arg1,
-                   <span class="keyword">int</span> arg2,
-                   [<span class="type">ArgumentName</span>(<span class="string">"CustomName"</span>)] <span class="keyword">float</span> arg3 = 0f)
-{
-}</pre>
-    <p>This constructor defines the following arguments: a required positional argument of type <code>string</code> with the name “arg1”, a required positional argument of type <code>int</code> with the name “arg3”, and an optional positional argument of type <code>float</code> with the name “CustomName” and a default value of 0.</p>
-    <p>If you are not using the C# 4.0 compiler, you can apply the <code>System.Runtime.InteropServices.OptionalAttribute</code> attribute and the <code>System.Runtime.InteropServices.DefaultParameterValueAttribute</code> to the parameter to define an optional argument. In Visual Basic, you can use the usual syntax for optional parameters (for an example, see the source code of the Visual Basic sample application included with the library).</p>
-    <p>If the type of a constructor parameter is an array, this defines a multi-value positional argument.</p>
-    <p>If your type has more than one constructor, you must mark one of them using the <code>CommandLineConstructorAttribute</code> attribute. You don’t need to use this attribute if you have only one constructor.</p>
-    <p>If you don’t wish to define arguments using the constructor, simply use a constructor without any parameters (or don’t define an explicit constructor).</p>
+    <p>There are two ways to define arguments: using the properties of the class, or using constructor parameters for the class.</p>
     <h3>Using properties</h3>
-    <p>The second way to define arguments is by using properties. A property defines an argument only when it has the <code>CommandLineArgumentAttribute</code> attribute applied to it. The property must have a getter and setter, except for multi-value and dictionary arguments which can be defined by read-only properties under certain conditions.</p>
+    <p>The preferred way to define arguments is by using properties. A property defines an argument only when it has the <code>CommandLineArgumentAttribute</code> attribute applied to it. The property must have a getter and setter, except for multi-value and dictionary arguments which can be defined by read-only properties under certain conditions.</p>
     <p>The type of the argument is the type of the property, and the name of the argument matches the property name by default, but this can be overridden using the <code>CommandLineArgumentAttribute</code> constructor.</p>
     <p>An argument defined by a property is by default optional and not positional. Its default value can be set using the <code>CommandLineArgumentAttribute.DefaultValue</code> property.</p>
     <p>To create a required argument, set the <code>CommandLineArgumentAttribute.IsRequired</code> property to true.</p>
-    <p>To create a positional argument, set the <code>CommandLineArgumentAttribute.Position</code> property to a non-negative number. This property determines the relative ordering of the positional arguments only, not their actual position, so it’s fine if you skip numbers. Positional arguments defined by properties come after arguments defined by constructor parameters, so if there are three constructor parameters, the property with the lowest position value will be the fourth positional argument. Remember that you cannot have required positional arguments after optional ones, and that a multi-value positional argument must be the last positional argument. If your properties violate these rules, the <code>CommandLineParser</code> class’s constructor will throw an exception.</p>
+    <p>To create a positional argument, set the <code>CommandLineArgumentAttribute.Position</code> property to a non-negative number. This property determines the relative ordering of the positional arguments only, not their actual position, so it’s fine if you skip numbers. Positional arguments defined by properties come after arguments defined by constructor parameters, so for example if there are three constructor parameters, the property with the lowest position value will be the fourth positional argument. Remember that you cannot have required positional arguments after optional ones, and that a multi-value positional argument must be the last positional argument. If your properties violate these rules, the <code>CommandLineParser</code> class’s constructor will throw an exception.</p>
     <p>To define a multi-value argument, you can use either a read-write property of an array type (e.g. <code>int[]</code>) or a read-only property of any type implementing <code>ICollection&lt;T&gt;</code> (e.g. <code>List&lt;int&gt;</code>).</p>
     <p>To define a dictionary argument, you can use either a read-write property of type <code>Dictionary&lt;TKey, TValue&gt;</code> (e.g. <code>Dictionary&lt;string, int&gt;</code>) or a read-only property of any type implementing <code>IDictionary&lt;TKey, TValue&gt;</code>.</p>
     <p>If the type of an argument is a Boolean, a nullable Boolean, or an array of Booleans, this defines a switch argument unless the argument is positional.</p>
@@ -353,9 +344,29 @@
 
 <span class="keyword">public</span> <span class="keyword">string</span> NotAnArgument { <span class="keyword">get</span>; <span class="keyword">set</span>; }</pre>
     <p>The first property defines an optional non-positional argument of type string with the name “SomeArgument” and the default value “default”.</p>
-    <p>The second property defines an optional positional argument of type int with the name “OtherName”. The argument will be the first positional argument after the arguments defined by constructor parameters.</p>
+    <p>The second property defines an optional positional argument of type int with the name “OtherName”. The argument will be the first positional argument (after the arguments defined by constructor parameters, if there are any).</p>
     <p>The third property defines a switch argument, because its type is a Boolean. Switch arguments can be supplied without a value; they will be true if present and false is not.</p>
     <p>The fourth property does not define an argument, because it doesn’t have the <code>CommandLineArgumentAttribute</code> applied.</p>
+    <h3>Using constructor parameters</h3>
+    <p>An alternative way to define positional parameters is using a constructor. The parameters of the public constructor for the class that defines the arguments will be used to define arguments. These arguments will be positional arguments, and required if the parameter is a required parameter.</p>
+    <p>Every constructor parameter creates a positional argument with its position matching the position of the constructor parameter. The type of the constructor parameter is the type of the argument, and by default the name of the constructor parameter is used of as the argument name, but this can be overridden using the <code>ArgumentNameAttribute</code> attribute.</p>
+    <p>For example, consider a class with the following constructor:</p>
+    <pre class="code"><span class="keyword">public</span> MyArguments(<span class="keyword">string</span> arg1,
+                   <span class="keyword">int</span> arg2,
+                   [<span class="type">ArgumentName</span>(<span class="string">"CustomName"</span>)] <span class="keyword">float</span> arg3 = 0f)
+{
+}</pre>
+    <p>This constructor defines the following arguments: a required positional argument of type <code>string</code> with the name “arg1”, a required positional argument of type <code>int</code> with the name “arg3”, and an optional positional argument of type <code>float</code> with the name “CustomName” and a default value of 0.</p>
+    <p>If you are not using the C# 4.0 compiler, you can apply the <code>System.Runtime.InteropServices.OptionalAttribute</code> attribute and the <code>System.Runtime.InteropServices.DefaultParameterValueAttribute</code> to the parameter to define an optional argument. In Visual Basic, you can use the usual syntax for optional parameters (for an example, see the source code of the Visual Basic sample application included with the library).</p>
+    <p>If the type of a constructor parameter is an array, this defines a multi-value positional argument.</p>
+    <p>If your type has more than one constructor, you must mark one of them using the <code>CommandLineConstructorAttribute</code> attribute. You don’t need to use this attribute if you have only one constructor.</p>
+    <p>If you don’t wish to define arguments using the constructor, simply use a constructor without any parameters (or don’t define an explicit constructor).</p>
+    <h3>Defining aliases</h3>
+    <p>An alias is an alternative name that can be used to specify a command line argument. Aliases can be added to a command line argument by applying the <code>AliasAttribute</code> to the property or constructor parameter that defines the argument.</p>
+    <p>For example, the following code defines a switch argument that can be specified using either the name “Verbose” or the alias “v”:</p>
+    <pre class="code">[<span class="type">CommandLineArgument</span>, <span class="type">Alias</span>(<span class="string">"v"</span>)]
+<span class="keyword">public</span> <span class="keyword">bool</span> Verbose { <span class="keyword">get</span>; <span class="keyword">set</span>; }</pre>
+    <p>To specify more than one alias for an argument, simply apply the <code>AliasAttribute</code> multiple times.</p>
     <h2>Parsing command line arguments</h2>
     <p>When you have defined the command line arguments, you can now parse the command line to determine the argument values.</p>
     <p>In order to do this, you first must create an instance of the <code>CommandLineParser</code> class, passing the type of the class that defines the parameters to the constructor. Then call the <code>CommandLineParser.Parse</code> method, passing the arguments your application received.</p>
@@ -406,6 +417,7 @@
     <p>The final part of the usage help is a description for all the arguments. A list is written to the output of all arguments, followed by their description.</p>
     <p>The description of an argument can be specified using the <code>System.ComponentModel.DescriptionAttribute</code> attribute. Apply this attribute to the constructor parameter or property defining the argument.</p>
     <p>The exact format of the argument descriptions can be customized using the <code>WriteUsageOptions</code> class. You can specify a format string that controls how the argument name and description are laid out, and the amount of indentation to use for additional lines of the description.</p>
+    <p>Note that the default value and aliases of an argument are not included in the argument syntax or description. If you wish to advertise these to the user, you must mention them in the argument’s description yourself.</p>
     <h2>Shell commands</h2>
     <p>Ookii.CommandLine provides the ability to create an application that has more than one function by using shell commands.</p>
     <p>Shell commands can be used to create shell utilities that perform more than one operation, where each operation has its own set of command line arguments. For example, a utility might be used to modify or query different configuration parameters of a system. Depending on whether it's a query or a modification, and which configuration parameter is used, the arguments to such a utility might differ. Rather than provide different executables for each operation, it is often more convenient to combine related operations in a single utility.</p>

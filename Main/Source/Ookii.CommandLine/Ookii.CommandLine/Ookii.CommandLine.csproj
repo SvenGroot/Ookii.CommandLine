@@ -71,6 +71,7 @@
     <Compile Include="..\AssemblyInfoCommon.cs">
       <Link>Properties\AssemblyInfoCommon.cs</Link>
     </Compile>
+    <Compile Include="AliasAttribute.cs" />
     <Compile Include="AllowDuplicateDictionaryKeysAttribute.cs" />
     <Compile Include="ArgumentNameAttribute.cs" />
     <Compile Include="ArgumentParsedEventArgs.cs" />

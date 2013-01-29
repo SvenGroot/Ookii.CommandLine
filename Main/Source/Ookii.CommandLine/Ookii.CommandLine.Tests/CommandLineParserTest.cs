@@ -67,9 +67,12 @@ namespace Ookii.CommandLine.Tests
             [CommandLineArgument(Position = 0), System.ComponentModel.Description("Arg5 description.")]
             public float Arg5 { get; set; }
 
+            [Alias("Alias1")]
+            [Alias("Alias2")]
             [CommandLineArgument(IsRequired = true), System.ComponentModel.Description("Arg6 description.")]
             public string Arg6 { get; set; }
 
+            [Alias("Alias3")]
             [CommandLineArgument()]
             public bool Arg7 { get; set; }
 
@@ -201,6 +204,12 @@ namespace Ookii.CommandLine.Tests
             using( IEnumerator<CommandLineArgument> args = target.Arguments.GetEnumerator() )
             {
                 TestArgument(args, "arg1", "arg1", typeof(string), null, 0, true, null, "Arg1 description.", "String", false, false);
+                TestArgument(args, "other", "arg2", typeof(int), null, 1, false, 42, "Arg2 description.", "Number", false, false);
+                TestArgument(args, "notSwitch", "notSwitch", typeof(bool), null, 2, false, false, "", "Boolean", false, false);
+                TestArgument(args, "Arg5", "Arg5", typeof(float), null, 3, false, null, "Arg5 description.", "Single", false, false);
+                TestArgument(args, "other2", "Arg4", typeof(int), null, 4, false, 47, "Arg4 description.", "Number", false, false);
+                TestArgument(args, "Arg8", "Arg8", typeof(DayOfWeek[]), typeof(DayOfWeek), 5, false, null, "", "DayOfWeek", false, true);
+                TestArgument(args, "Arg6", "Arg6", typeof(string), null, null, true, null, "Arg6 description.", "String", false, false, false, "Alias1", "Alias2");
                 TestArgument(args, "Arg10", "Arg10", typeof(bool[]), typeof(bool), null, false, null, "", "Boolean", true, true);
                 TestArgument(args, "Arg11", "Arg11", typeof(bool?), null, null, false, null, "", "Boolean", true, false);
                 TestArgument(args, "Arg12", "Arg12", typeof(Collection<int>), typeof(int), null, false, 42, "", "Int32", false, true);
@@ -208,14 +217,8 @@ namespace Ookii.CommandLine.Tests
                 TestArgument(args, "Arg14", "Arg14", typeof(IDictionary<string, int>), typeof(KeyValuePair<string, int>), null, false, null, "", "String=Int32", false, true, true);
                 TestArgument(args, "Arg15", "Arg15", typeof(KeyValuePair<string, int>), typeof(KeyValuePair<string, int>), null, false, null, "", "KeyValuePair<String, Int32>", false, false, false);
                 TestArgument(args, "Arg3", "Arg3", typeof(string), null, null, false, null, "", "String", false, false);
-                TestArgument(args, "Arg5", "Arg5", typeof(float), null, 3, false, null, "Arg5 description.", "Single", false, false);
-                TestArgument(args, "Arg6", "Arg6", typeof(string), null, null, true, null, "Arg6 description.", "String", false, false);
-                TestArgument(args, "Arg7", "Arg7", typeof(bool), null, null, false, null, "", "Boolean", true, false);
-                TestArgument(args, "Arg8", "Arg8", typeof(DayOfWeek[]), typeof(DayOfWeek), 5, false, null, "", "DayOfWeek", false, true);
+                TestArgument(args, "Arg7", "Arg7", typeof(bool), null, null, false, null, "", "Boolean", true, false, false, "Alias3");
                 TestArgument(args, "Arg9", "Arg9", typeof(int?), null, null, false, null, "", "Int32", false, false);
-                TestArgument(args, "notSwitch", "notSwitch", typeof(bool), null, 2, false, false, "", "Boolean", false, false);
-                TestArgument(args, "other", "arg2", typeof(int), null, 1, false, 42, "Arg2 description.", "Number", false, false);
-                TestArgument(args, "other2", "Arg4", typeof(int), null, 4, false, 47, "Arg4 description.", "Number", false, false);
             }
         }
 
@@ -258,6 +261,8 @@ namespace Ookii.CommandLine.Tests
             TestParse(target, "/other 2 val1 -arg5:5.5 true 4 /arg6 arg6", "val1", 2, true, arg4: 4, arg5: 5.5f, arg6: "arg6");
             // All arguments
             TestParse(target, "val1 2 true /arg3 val3 -other2:4 5.5 /arg6 val6 /arg7 /arg8 Monday /arg8 Tuesday /arg9 9 /arg10 /arg10 /arg10:false /arg11:false /arg12 12 /arg12 13 /arg13 foo=13 /arg13 bar=14 /arg14 hello=1 /arg14 bye=2 /arg15 something=5", "val1", 2, true, "val3", 4, 5.5f, "val6", true, new[] { DayOfWeek.Monday, DayOfWeek.Tuesday }, 9, new[] { true, true, false }, false, new[] { 12, 13 }, new Dictionary<string,int>() { { "foo", 13 }, { "bar", 14 } }, new Dictionary<string,int>() { { "hello", 1 }, { "bye", 2 } }, new KeyValuePair<string,int>("something", 5));
+            // Using aliases
+            TestParse(target, "val1 2 /alias1 valalias6 /alias3", "val1", 2, arg6: "valalias6", arg7: true);
         }
 
         [TestMethod]
@@ -369,7 +374,7 @@ namespace Ookii.CommandLine.Tests
             CollectionAssert.AreEqual(new[] { "Value1", "Value2", "Value3" }, args.Separator);
         }
 
-        private static void TestArgument(IEnumerator<CommandLineArgument> arguments, string name, string memberName, Type type, Type elementType, int? position, bool isRequired, object defaultValue, string description, string valueDescription, bool isSwitch, bool isMultiValue, bool isDictionary = false)
+        private static void TestArgument(IEnumerator<CommandLineArgument> arguments, string name, string memberName, Type type, Type elementType, int? position, bool isRequired, object defaultValue, string description, string valueDescription, bool isSwitch, bool isMultiValue, bool isDictionary = false, params string[] aliases)
         {
             arguments.MoveNext();
             CommandLineArgument argument = arguments.Current;
@@ -390,6 +395,13 @@ namespace Ookii.CommandLine.Tests
             Assert.AreEqual(defaultValue, argument.DefaultValue);
             Assert.AreEqual(null, argument.Value);
             Assert.AreEqual(false, argument.HasValue);
+            if( aliases == null || aliases.Length == 0 )
+                Assert.IsNull(argument.Aliases);
+            else
+            {
+                Assert.IsNotNull(argument.Aliases);
+                CollectionAssert.AreEqual(aliases.ToArray(), argument.Aliases.ToArray());
+            }
         }
 
         private static void TestParse(CommandLineParser target, string commandLine, string arg1 = null, int arg2 = 42, bool notSwitch = false, string arg3 = null, int arg4 = 47, float arg5 = 0.0f, string arg6 = null, bool arg7 = false, DayOfWeek[] arg8 = null, int? arg9 = null, bool[] arg10 = null, bool? arg11 = null, int[] arg12 = null, Dictionary<string, int> arg13 = null, Dictionary<string, int> arg14 = null, KeyValuePair<string, int>? arg15 = null)
