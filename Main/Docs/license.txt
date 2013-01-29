@@ -1,6 +1,6 @@
 License for Ookii.CommandLine
 
-Copyright (c) Sven Groot (Ookii.org) 2012
+Copyright (c) Sven Groot (Ookii.org) 2013
 
 Microsoft Public License (Ms-PL)
 

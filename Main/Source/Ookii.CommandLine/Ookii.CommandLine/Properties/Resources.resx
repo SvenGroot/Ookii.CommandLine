@@ -240,4 +240,7 @@
   <data name="SetValueErrorFormat" xml:space="preserve">
     <value>An error occurred setting the value of argument '{0}': {1}</value>
   </data>
+  <data name="EmptyAliasFormat" xml:space="preserve">
+    <value>The argument '{0}' cannot have an empty alias.</value>
+  </data>
 </root>

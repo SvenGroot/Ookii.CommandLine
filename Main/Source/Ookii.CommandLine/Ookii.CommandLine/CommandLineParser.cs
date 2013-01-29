@@ -123,14 +123,66 @@ namespace Ookii.CommandLine
     /// <threadsafety static="true" instance="false"/>
     public class CommandLineParser
     {
+        #region Nested types
+
+        private sealed class CommandLineArgumentComparer : IComparer<CommandLineArgument>
+        {
+            private readonly IComparer<string> _stringComparer;
+
+            public CommandLineArgumentComparer(IComparer<string> stringComparer)
+            {
+                _stringComparer = stringComparer;
+            }
+
+            public int Compare(CommandLineArgument x, CommandLineArgument y)
+            {
+                if( x == null )
+                {
+                    if( y == null )
+                        return 0;
+                    else
+                        return -1;
+                }
+                else if( y == null )
+                    return 1;
+
+                // Positional arguments come before non-positional ones, and must be sorted by position
+                if( x.Position != null )
+                {
+                    if( y.Position != null )
+                        return x.Position.Value.CompareTo(y.Position.Value);
+                    else
+                        return -1;
+                }
+                else if( y.Position != null )
+                    return 1;
+
+                // Non-positional required arguments come before optional arguments
+                if( x.IsRequired )
+                {
+                    if( !y.IsRequired )
+                        return -1;
+                    // If both are required, sort by name
+                }
+                else if( y.IsRequired )
+                    return 1;
+
+                // Sort the rest by name
+                return _stringComparer.Compare(x.ArgumentName, y.ArgumentName);
+            }
+        }
+
+        #endregion
+
         internal const char NameValueSeparator = ':';
         internal const int MaximumLineWidthForIndent = 30; // Don't apply indentation to console output if the line width is less than this.
 
         private readonly Type _argumentsType;
-        private readonly List<CommandLineArgument> _positionalArguments;
-        private readonly SortedList<string, CommandLineArgument> _arguments;
+        private readonly List<CommandLineArgument> _arguments = new List<CommandLineArgument>();
+        private readonly SortedList<string, CommandLineArgument> _argumentsByName;
         private readonly ConstructorInfo _commandLineConstructor;
         private readonly int _constructorArgumentCount;
+        private readonly int _positionalArgumentCount;
         private readonly string[] _argumentNamePrefixes;
         private ReadOnlyCollection<CommandLineArgument> _argumentsReadOnlyWrapper;
         private ReadOnlyCollection<string> _argumentNamePrefixesReadOnlyWrapper;
@@ -145,7 +197,10 @@ namespace Ookii.CommandLine
         ///   and the <see cref="CommandLineParser.Parse(string[],int)"/> method will return <see langword="null"/>. You can use this for instance to implement a "-help"
         ///   argument that will display usage and quit regardless of the other command line arguments.
         /// </para>
-        /// </remarks>        
+        /// <para>
+        ///   This event is invoked after the <see cref="CommandLineArgument.Value"/> and <see cref="CommandLineArgument.UsedArgumentName"/> properties have been set.
+        /// </para>
+        /// </remarks>
         public event EventHandler<ArgumentParsedEventArgs> ArgumentParsed;
 
         /// <summary>
@@ -231,18 +286,17 @@ namespace Ookii.CommandLine
 
             _argumentNamePrefixes = DetermineArgumentNamePrefixes(argumentNamePrefixes);
 
-            _arguments = new SortedList<string, CommandLineArgument>(argumentNameComparer ?? StringComparer.OrdinalIgnoreCase);
+            _argumentsByName = new SortedList<string, CommandLineArgument>(argumentNameComparer ?? StringComparer.OrdinalIgnoreCase);
 
             _argumentsType = argumentsType;
             _commandLineConstructor = GetCommandLineConstructor();
 
-            _positionalArguments = new List<CommandLineArgument>(_commandLineConstructor.GetParameters().Length);
-            bool hasOptionalArgument;
-            bool hasArrayArgument;
-            DetermineConstructorArguments(out hasOptionalArgument, out hasArrayArgument);
-            _constructorArgumentCount = _positionalArguments.Count; // Named positional arguments added by DetermineNamedParameters are not constructor arguments.
+            DetermineConstructorArguments();
+            _constructorArgumentCount = _arguments.Count; // Named positional arguments added by DeterminePropertyParameters are not constructor arguments.
 
-            DeterminePropertyArguments(hasOptionalArgument, hasArrayArgument);
+            _positionalArgumentCount = _constructorArgumentCount + DeterminePropertyArguments();
+
+            VerifyPositionalArgumentRules();
 
             AllowWhiteSpaceValueSeparator = true;
         }
@@ -400,7 +454,7 @@ namespace Ookii.CommandLine
         {
             get
             {
-                return _argumentsReadOnlyWrapper ?? (_argumentsReadOnlyWrapper = new ReadOnlyCollection<CommandLineArgument>(_arguments.Values));
+                return _argumentsReadOnlyWrapper ?? (_argumentsReadOnlyWrapper = _arguments.AsReadOnly());
             }
         }
 
@@ -630,7 +684,7 @@ namespace Ookii.CommandLine
                 throw new ArgumentOutOfRangeException("index");
 
             // Reset all arguments to their default value.
-            foreach( CommandLineArgument argument in _arguments.Values )
+            foreach( CommandLineArgument argument in _arguments )
                 argument.Reset();
  
             int positionalArgumentIndex = 0;
@@ -650,39 +704,39 @@ namespace Ookii.CommandLine
                 else
                 {
                     // If this is an array argument is must be the last argument.
-                    if( positionalArgumentIndex < _positionalArguments.Count && !_positionalArguments[positionalArgumentIndex].IsMultiValue )
+                    if( positionalArgumentIndex < _positionalArgumentCount && !_arguments[positionalArgumentIndex].IsMultiValue )
                     {
                         // Skip named positional arguments that have already been specified by name.
-                        while( positionalArgumentIndex < _positionalArguments.Count && !_positionalArguments[positionalArgumentIndex].IsMultiValue && _positionalArguments[positionalArgumentIndex].HasValue )
+                        while( positionalArgumentIndex < _positionalArgumentCount && !_arguments[positionalArgumentIndex].IsMultiValue && _arguments[positionalArgumentIndex].HasValue )
                         {
                             ++positionalArgumentIndex;
                         }
                     }
 
-                    if( positionalArgumentIndex >= _positionalArguments.Count )
+                    if( positionalArgumentIndex >= _positionalArgumentCount )
                         throw new CommandLineArgumentException(Properties.Resources.TooManyArguments, CommandLineArgumentErrorCategory.TooManyArguments);
 
                     // ParseArgumentValue returns true if parsing was cancelled by the ArgumentParsed event handler.
-                    if( ParseArgumentValue(_positionalArguments[positionalArgumentIndex], arg) )
+                    if( ParseArgumentValue(_arguments[positionalArgumentIndex], arg) )
                         return null;
                 }
             }
 
             // Check required arguments and convert array arguments. This is done in usage order so the first missing positional argument is reported, rather
-            // than the missing positional argument that is first alphabetically.
-            foreach( CommandLineArgument argument in OrderArgumentsForUsage() )
+            // than the missing argument that is first alphabetically.
+            foreach( CommandLineArgument argument in _arguments )
             {
                 if( argument.IsRequired && !argument.HasValue )
                     throw new CommandLineArgumentException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.MissingRequiredArgumentFormat, argument.ArgumentName), argument.ArgumentName, CommandLineArgumentErrorCategory.MissingRequiredArgument);
             }
 
-            object[] positionalArgumentValues = new object[_constructorArgumentCount];
+            object[] constructorArgumentValues = new object[_constructorArgumentCount];
             for( int x = 0; x < _constructorArgumentCount; ++x )
-                positionalArgumentValues[x] = _positionalArguments[x].Value;
+                constructorArgumentValues[x] = _arguments[x].Value;
 
             
-            object commandLineArguments = CreateArgumentsTypeInstance(positionalArgumentValues);
-            foreach( CommandLineArgument argument in _arguments.Values )
+            object commandLineArguments = CreateArgumentsTypeInstance(constructorArgumentValues);
+            foreach( CommandLineArgument argument in _arguments )
             {
                 // Apply property argument values (this does nothing for constructor arguments).
                 argument.ApplyPropertyValue(commandLineArguments);
@@ -719,22 +773,19 @@ namespace Ookii.CommandLine
             }
         }
 
-        private void DetermineConstructorArguments(out bool hasOptionalArgument, out bool hasArrayArgument)
+        private void DetermineConstructorArguments()
         {
             ParameterInfo[] parameters = _commandLineConstructor.GetParameters();
-            hasOptionalArgument = false;
-            hasArrayArgument = false;
             foreach( ParameterInfo parameter in parameters )
             {
                 CommandLineArgument argument = CommandLineArgument.Create(this, parameter);
                 AddNamedArgument(argument);
-                AddPositionalArgument(argument, ref hasArrayArgument, ref hasOptionalArgument);
             }
         }
 
-        private void DeterminePropertyArguments(bool hasOptionalArgument, bool hasArrayArgument)
+        private int DeterminePropertyArguments()
         {
-            List<CommandLineArgument> additionalPositionalArguments = null;
+            int additionalPositionalArgumentCount = 0;
 
             PropertyInfo[] properties = _argumentsType.GetProperties(BindingFlags.Public | BindingFlags.Instance);
             foreach( PropertyInfo prop in properties )
@@ -745,52 +796,55 @@ namespace Ookii.CommandLine
                     AddNamedArgument(argument);
                     if( argument.Position != null )
                     {
-                        if( additionalPositionalArguments == null )
-                            additionalPositionalArguments = new List<CommandLineArgument>();
-                        additionalPositionalArguments.Add(argument);
+                        ++additionalPositionalArgumentCount;
                     }
                 }
             }
 
-            if( additionalPositionalArguments != null )
+            if( _arguments.Count > _constructorArgumentCount )
             {
-                additionalPositionalArguments.Sort((x, y) => x.Position.Value.CompareTo(y.Position.Value));
-                int lastPosition = -1;
-                for( int x = 0; x < additionalPositionalArguments.Count; ++x )
-                {
-                    CommandLineArgument argument = additionalPositionalArguments[x];
-
-                    if( x > 0 && argument.Position.Value == lastPosition )
-                        throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.DuplicateArgumentPositionFormat, argument.ArgumentName, additionalPositionalArguments[x - 1].ArgumentName));
-
-                    lastPosition = argument.Position.Value;
-                    argument.Position = _positionalArguments.Count;
-                    AddPositionalArgument(argument, ref hasArrayArgument, ref hasOptionalArgument);
-                }
+                // Sort the added arguments in usage order (positional first, then required non-positional arguments, then the rest by name
+                _arguments.Sort(_constructorArgumentCount, _arguments.Count - _constructorArgumentCount, new CommandLineArgumentComparer(_argumentsByName.Comparer));
             }
+
+            return additionalPositionalArgumentCount;
         }
 
         private void AddNamedArgument(CommandLineArgument argument)
         {
             if( argument.ArgumentName.IndexOf(NameValueSeparator) >= 0 )
                 throw new NotSupportedException(string.Format(System.Globalization.CultureInfo.CurrentCulture, Properties.Resources.ArgumentNameContainsSeparatorFormat, argument.ArgumentName));
-            _arguments.Add(argument.ArgumentName, argument);
+            _argumentsByName.Add(argument.ArgumentName, argument);
+            if( argument.Aliases != null )
+            {
+                foreach( string alias in argument.Aliases )
+                    _argumentsByName.Add(alias, argument);
+            }
+            _arguments.Add(argument);
         }
 
-        private void AddPositionalArgument(CommandLineArgument argument, ref bool hasArrayArgument, ref bool hasOptionalArgument)
+        private void VerifyPositionalArgumentRules()
         {
-            if( hasArrayArgument )
-                throw new NotSupportedException(Properties.Resources.ArrayNotLastArgument);
-            if( argument.IsRequired && hasOptionalArgument )
-                throw new NotSupportedException(Properties.Resources.InvalidOptionalArgumentOrder);
-            
-            if( !argument.IsRequired )
-                hasOptionalArgument = true;
+            bool hasOptionalArgument = false;
+            bool hasArrayArgument = false;
 
-            if( argument.IsMultiValue )
-                hasArrayArgument = true;
+            for( int x = 0; x < _positionalArgumentCount; ++x )
+            {
+                CommandLineArgument argument = _arguments[x];
 
-            _positionalArguments.Add(argument);
+                if( hasArrayArgument )
+                    throw new NotSupportedException(Properties.Resources.ArrayNotLastArgument);
+                if( argument.IsRequired && hasOptionalArgument )
+                    throw new NotSupportedException(Properties.Resources.InvalidOptionalArgumentOrder);
+
+                if( !argument.IsRequired )
+                    hasOptionalArgument = true;
+
+                if( argument.IsMultiValue )
+                    hasArrayArgument = true;
+
+                argument.Position = x;
+            }
         }
 
         private bool ParseArgumentValue(CommandLineArgument argument, string value)
@@ -820,7 +874,7 @@ namespace Ookii.CommandLine
                 argumentName = arg.Substring(prefix.Length);
 
             CommandLineArgument argument;
-            if( _arguments.TryGetValue(argumentName, out argument) )
+            if( _argumentsByName.TryGetValue(argumentName, out argument) )
             {
                 if( argumentValue == null && !argument.IsSwitch && AllowWhiteSpaceValueSeparator && ++index < args.Length && CheckArgumentNamePrefix(args[index]) == null )
                 {
@@ -828,6 +882,7 @@ namespace Ookii.CommandLine
                     argumentValue = args[index];
                 }
                 // ParseArgumentValue returns true if parsing was cancelled by the ArgumentParsed event handler.
+                argument.UsedArgumentName = argumentName;
                 return ParseArgumentValue(argument, argumentValue) ? -1 : index;
             }
             else
@@ -880,7 +935,7 @@ namespace Ookii.CommandLine
             writer.ResetIndent();
             writer.Indent = writer.MaximumLineLength < MaximumLineWidthForIndent ? 0 : options.ArgumentDescriptionIndent;
 
-            foreach( CommandLineArgument argument in OrderArgumentsForUsage() )
+            foreach( CommandLineArgument argument in _arguments )
             {
                 // Omit arguments that don't have a description.
                 if( !string.IsNullOrEmpty(argument.Description) )
@@ -901,7 +956,7 @@ namespace Ookii.CommandLine
 
             writer.Write(options.UsagePrefix);
 
-            foreach( CommandLineArgument argument in OrderArgumentsForUsage() )
+            foreach( CommandLineArgument argument in _arguments )
             {
                 writer.Write(" ");
                 writer.Write(argument.ToString(options));
@@ -909,29 +964,6 @@ namespace Ookii.CommandLine
 
             writer.WriteLine(); // End syntax line
             writer.WriteLine(); // Blank line
-        }
-
-        private IEnumerable<CommandLineArgument> OrderArgumentsForUsage()
-        {
-            // First the positional arguments
-            foreach( CommandLineArgument argument in _positionalArguments )
-            {
-                yield return argument;
-            }
-
-            // Then required non-positional arguments.
-            foreach( CommandLineArgument argument in _arguments.Values )
-            {
-                if( argument.Position == null && argument.IsRequired )
-                    yield return argument;
-            }
-
-            // Then the optional ones
-            foreach( CommandLineArgument argument in _arguments.Values )
-            {
-                if( argument.Position == null && !argument.IsRequired )
-                    yield return argument;
-            }
         }
 
         private object CreateArgumentsTypeInstance(object[] constructorArgumentValues)

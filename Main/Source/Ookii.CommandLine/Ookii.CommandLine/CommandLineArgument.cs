@@ -98,6 +98,7 @@ namespace Ookii.CommandLine
         private readonly PropertyInfo _property;
         private readonly string _valueDescription;
         private readonly string _argumentName;
+        private readonly IList<string> _aliases;
         private readonly Type _argumentType;
         private readonly Type _elementType;
         private readonly string _description;
@@ -110,7 +111,7 @@ namespace Ookii.CommandLine
         private readonly string _multiValueSeparator;
         private object _value;
 
-        private CommandLineArgument(CommandLineParser parser, PropertyInfo property, string memberName, string argumentName, Type argumentType, Type converterType, int? position, bool isRequired, object defaultValue, string description, string valueDescription, string multiValueSeparator, bool allowDuplicateDictionaryKeys)
+        private CommandLineArgument(CommandLineParser parser, PropertyInfo property, string memberName, string argumentName, IList<string> aliases, Type argumentType, Type converterType, int? position, bool isRequired, object defaultValue, string description, string valueDescription, string multiValueSeparator, bool allowDuplicateDictionaryKeys)
         {
             // If this method throws anything other than a NotSupportedException, it constitutes a bug in the Ookii.CommandLine library.
             if( parser == null )
@@ -128,6 +129,7 @@ namespace Ookii.CommandLine
             _property = property;
             _memberName = memberName;
             _argumentName = argumentName;
+            _aliases = aliases;
             _argumentType = argumentType;
             _elementType = argumentType;
             _description = description;
@@ -219,6 +221,17 @@ namespace Ookii.CommandLine
         public string ArgumentName
         {
             get { return _argumentName; }
+        }
+
+        /// <summary>
+        /// Gets the alternative names for this command line argument.
+        /// </summary>
+        /// <value>
+        /// A list of alternative names for this command line argument, or <see langword="null"/> if none were specified.
+        /// </value>
+        public IList<string> Aliases
+        {
+            get { return _aliases; }
         }
 
         /// <summary>
@@ -501,6 +514,19 @@ namespace Ookii.CommandLine
         public bool HasValue { get; internal set; }
 
         /// <summary>
+        /// Gets the name or alias that was used on the command line to specify this argument.
+        /// </summary>
+        /// <value>
+        /// The name or alias that was used on the command line to specify this argument, or <see langword="null"/> if this argument was specified by position or not specified.
+        /// </value>
+        /// <remarks>
+        /// <para>
+        ///   If the argument names are case-insensitive, the value of this property uses the casing as specified on the command line, not the original casing of the argument name or alias.
+        /// </para>
+        /// </remarks>
+        public string UsedArgumentName { get; internal set; }
+
+        /// <summary>
         /// Converts the specified string to the argument type, as specified in the <see cref="ArgumentType"/> property.
         /// </summary>
         /// <param name="culture">The culture to use to convert the argument.</param>
@@ -609,8 +635,9 @@ namespace Ookii.CommandLine
             TypeConverterAttribute typeConverterAttribute = (TypeConverterAttribute)Attribute.GetCustomAttribute(parameter, typeof(TypeConverterAttribute));
             Type converterType = typeConverterAttribute == null ? null : Type.GetType(typeConverterAttribute.ConverterTypeName, true);
             string multiValueSeparator = GetMultiValueSeparator((MultiValueSeparatorAttribute)Attribute.GetCustomAttribute(parameter, typeof(MultiValueSeparatorAttribute)));
+            IList<string> aliases = GetAliases(Attribute.GetCustomAttributes(parameter, typeof(AliasAttribute)), argumentName);
 
-            return new CommandLineArgument(parser, null, parameter.Name, argumentName, parameter.ParameterType, converterType, parameter.Position, !parameter.IsOptional, defaultValue, description, valueDescription, multiValueSeparator, allowDuplicateDictionarykeys);
+            return new CommandLineArgument(parser, null, parameter.Name, argumentName, aliases, parameter.ParameterType, converterType, parameter.Position, !parameter.IsOptional, defaultValue, description, valueDescription, multiValueSeparator, allowDuplicateDictionarykeys);
         }
 
         internal static CommandLineArgument Create(CommandLineParser parser, PropertyInfo property)
@@ -632,8 +659,9 @@ namespace Ookii.CommandLine
             TypeConverterAttribute typeConverterAttribute = (TypeConverterAttribute)Attribute.GetCustomAttribute(property, typeof(TypeConverterAttribute));
             Type converterType = typeConverterAttribute == null ? null : Type.GetType(typeConverterAttribute.ConverterTypeName, true);
             string multiValueSeparator = GetMultiValueSeparator((MultiValueSeparatorAttribute)Attribute.GetCustomAttribute(property, typeof(MultiValueSeparatorAttribute)));
+            IList<string> aliases = GetAliases(Attribute.GetCustomAttributes(property, typeof(AliasAttribute)), argumentName);
 
-            return new CommandLineArgument(parser, property, property.Name, argumentName, property.PropertyType, converterType, position, attribute.IsRequired, defaultValue, description, valueDescription, multiValueSeparator, allowDuplicateDictionarykeys);
+            return new CommandLineArgument(parser, property, property.Name, argumentName, aliases, property.PropertyType, converterType, position, attribute.IsRequired, defaultValue, description, valueDescription, multiValueSeparator, allowDuplicateDictionarykeys);
         }
 
         internal void ApplyPropertyValue(object target)
@@ -679,6 +707,7 @@ namespace Ookii.CommandLine
         {
             _value = IsMultiValue ? null : DefaultValue;
             HasValue = false;
+            UsedArgumentName = null;
         }
 
         private void SetValueCore(CultureInfo culture, string value)
@@ -799,6 +828,22 @@ namespace Ookii.CommandLine
                 HasValue = true;
             }
             ((ICollectionHelper)_value).Add(convertedValue);
-        }    
+        }
+
+        private static IList<string> GetAliases(Attribute[] aliasAttributes, string argumentName)
+        {
+            if( aliasAttributes == null || aliasAttributes.Length == 0 )
+                return null;
+
+            string[] aliases = new string[aliasAttributes.Length];
+            for( int x = 0; x < aliasAttributes.Length; ++x )
+            {
+                aliases[x] = ((AliasAttribute)aliasAttributes[x]).Alias;
+                if( string.IsNullOrEmpty(aliases[x]) )
+                    throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.EmptyAliasFormat, argumentName));                    
+            }
+
+            return aliases;
+        }
     }
 }
