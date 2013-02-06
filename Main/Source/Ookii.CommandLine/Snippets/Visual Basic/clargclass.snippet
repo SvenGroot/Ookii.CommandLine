@@ -1,0 +1,62 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+      <Title>clargclass</Title>
+      <Author>Sven Groot (Ookii.org)</Author>
+      <Description>
+        Snippet for creating a command line arguments class for use with Ookii.CommandLine.
+      </Description>
+      <HelpUrl>
+        http://ookiicommandline.codeplex.com
+      </HelpUrl>
+      <Shortcut>clargclass</Shortcut>
+    </Header>
+    <Snippet>
+      <Declarations>
+        <Literal Editable="true">
+          <ID>Name</ID>
+          <ToolTip>Class name</ToolTip>
+          <Default>ProgramArguments</Default>
+          <Function>
+          </Function>
+        </Literal>
+      </Declarations>
+      <References>
+        <Reference>
+          <Assembly>Ookii.CommandLine.dll</Assembly>
+          <Url>http://ookiicommandline.codeplex.com</Url>
+        </Reference>
+      </References>
+      <Imports>
+        <Import>
+          <Namespace>Ookii.CommandLine</Namespace>
+        </Import>
+      </Imports>
+      <Code Language="VB">
+        <![CDATA[Class $Name$
+    ' <CommandLineArgument(Position:=0, IsRequired:=True)>
+    ' Public Property SampleArgument As String
+
+    Public Shared Function Create(ByVal args() As String) As $Name$
+        Dim parser As New CommandLineParser(GetType($Name$))
+        Try
+            Return DirectCast(parser.Parse(args), $Name$)
+        Catch ex As CommandLineArgumentException
+            ' Replace with more appropriate method to display errors if this is not a console application.
+            Using writer As LineWrappingTextWriter = LineWrappingTextWriter.ForConsoleError()
+                writer.WriteLine(ex.Message)
+                writer.WriteLine()
+            End Using
+            parser.WriteUsageToConsole()
+            Return Nothing
+        End Try
+    End Function
+End Class]]>
+      </Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>
