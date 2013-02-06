@@ -244,6 +244,7 @@
     <ul>
       <li>Added support for alternative names (aliases) for command line arguments.</li>
       <li>An argument’s aliases and default value can be included in the argument description when generating usage.</li>
+      <li>Added code snippets.</li>
     </ul>
     <p>Ookii.CommandLine 2.1 offers the following improvements over version 2.0:</p>
     <ul>
@@ -313,7 +314,7 @@
     <p>A switch argument’s value can be specified explicitly, as in the following example:</p>
     <pre>-switch:true</pre>
     <p>You must use a colon to specify an explicit value for a switch argument; you cannot use white space to separate the name and the value.</p>
-    <p>If you use a nullable Boolean type (<code>bool</code><code>?</code> In C#) as the type of the argument, it will be null if omitted, true if supplied, and false only if explicitly set to false using <code>-switch:false</code>.</p>
+    <p>If you use a nullable Boolean type (<code>bool?</code> In C#) as the type of the argument, it will be null if omitted, true if supplied, and false only if explicitly set to false using <code>-switch:false</code>.</p>
     <p>If the type of the argument is an array of Boolean values, it will act as a multi-value argument and a switch. A value of true (or the explicit value if one is given) gets added to the array for every time that the argument is supplied.</p>
     <h3>Argument value conversion</h3>
     <p>Ookii.CommandLine allows you to define arguments with any .Net type, including types such as <code>System.String</code>, <code>System.Int32</code>, <code>System.DateTime</code>, and many more. Any type can be used; the only requirement is that it is possible to convert a string value to that type.</p>
