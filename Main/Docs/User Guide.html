@@ -243,6 +243,7 @@
     <p>Ookii.CommandLine 2.2 offers the following improvements over version 2.1:</p>
     <ul>
       <li>Added support for alternative names (aliases) for command line arguments.</li>
+      <li>An argument’s aliases and default value can be included in the argument description when generating usage.</li>
     </ul>
     <p>Ookii.CommandLine 2.1 offers the following improvements over version 2.0:</p>
     <ul>
@@ -417,7 +418,7 @@
     <p>The final part of the usage help is a description for all the arguments. A list is written to the output of all arguments, followed by their description.</p>
     <p>The description of an argument can be specified using the <code>System.ComponentModel.DescriptionAttribute</code> attribute. Apply this attribute to the constructor parameter or property defining the argument.</p>
     <p>The exact format of the argument descriptions can be customized using the <code>WriteUsageOptions</code> class. You can specify a format string that controls how the argument name and description are laid out, and the amount of indentation to use for additional lines of the description.</p>
-    <p>Note that the default value and aliases of an argument are not included in the argument syntax or description. If you wish to advertise these to the user, you must mention them in the argument’s description yourself.</p>
+    <p>By default, the default value and aliases of an argument are not included in the argument syntax or description. If you wish to advertise these to the user, you can add them in the argument’s description itself, or set the <code>WriteUsageOptions.IncludeDefaultValueInDescription</code> and <code>WriteUsageOptions.IncludeAliasInDescription</code> properties to true.</p>
     <h2>Shell commands</h2>
     <p>Ookii.CommandLine provides the ability to create an application that has more than one function by using shell commands.</p>
     <p>Shell commands can be used to create shell utilities that perform more than one operation, where each operation has its own set of command line arguments. For example, a utility might be used to modify or query different configuration parameters of a system. Depending on whether it's a query or a modification, and which configuration parameter is used, the arguments to such a utility might differ. Rather than provide different executables for each operation, it is often more convenient to combine related operations in a single utility.</p>

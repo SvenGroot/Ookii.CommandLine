@@ -1,4 +1,4 @@
-﻿// Copyright (c) Sven Groot (Ookii.org) 2012
+﻿// Copyright (c) Sven Groot (Ookii.org) 2013
 //
 // This code is published under the Microsoft Public License (Ms-PL).  A copy
 // of the license should be distributed with the code.  It can also be found
@@ -16,7 +16,10 @@ namespace ShellCommandSampleCS
         {
             // Create a shell command based on the arguments. The CreateShellCommand method will catch any command line errors
             // and print error details and usage information on the console, so we don't have to worry about that here.
-            ShellCommand command = ShellCommand.CreateShellCommand(Assembly.GetExecutingAssembly(), args, 0);
+            CreateShellCommandOptions options = new CreateShellCommandOptions();
+            options.UsageOptions.IncludeDefaultValueInDescription = true;
+            options.UsageOptions.IncludeAliasInDescription = true;
+            ShellCommand command = ShellCommand.CreateShellCommand(Assembly.GetExecutingAssembly(), args, 0, options);
             if( command != null )
             {
                 // The command line arguments were successfully parsed, so run the command.

@@ -1,4 +1,4 @@
-﻿' Copyright (c) Sven Groot (Ookii.org) 2012
+﻿' Copyright (c) Sven Groot (Ookii.org) 2013
 '
 ' This code is published under the Microsoft Public License (Ms-PL).  A copy
 ' of the license should be distributed with the code.  It can also be found
@@ -20,21 +20,14 @@ Imports Ookii.CommandLine
 Public Class ReadCommand
     Inherits ShellCommand
 
-    Private ReadOnly _fileName As String
-
-    Public Sub New(<Description("The name of the file to read.")> ByVal fileName As String)
-        ' The constructor parameters are the positionl command line arguments for the shell command. This command
-        ' has only a single argument.
-        If fileName Is Nothing Then _
-            Throw New ArgumentNullException("fileName")
-
-        _fileName = fileName
-    End Sub
+    ' A positional argument to specify the file name.
+    <CommandLineArgument(Position:=0, Isrequired:=True), Description("The name of the file to read.")>
+    Public Property FileName As String
 
     ' A named argument to specify the encoding.
     ' Because Encoding doesn't have a TypeConverter, we simple accept the name of the encoding as a string and
     ' instantiate the Encoding class ourselves in the run method.
-    <CommandLineArgument("encoding", DefaultValue:="utf-8"), Description("The encoding to use to read the file. The default value is utf-8.")>
+    <CommandLineArgument("Encoding", DefaultValue:="utf-8"), Description("The encoding to use to read the file.")>
     Public Property EncodingName As String
 
     Public Overrides Sub Run()

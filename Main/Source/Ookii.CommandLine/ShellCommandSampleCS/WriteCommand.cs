@@ -1,4 +1,4 @@
-﻿// Copyright (c) Sven Groot (Ookii.org) 2012
+﻿// Copyright (c) Sven Groot (Ookii.org) 2013
 //
 // This code is published under the Microsoft Public License (Ms-PL).  A copy
 // of the license should be distributed with the code.  It can also be found
@@ -23,34 +23,27 @@ namespace ShellCommandSampleCS
     [ShellCommand("write"), Description("Writes lines to a file, wrapping them to the specified width.")]
     class WriteCommand : ShellCommand
     {
-        private string _fileName;
-        private string[] _lines;
+        // Positional argument to specify the file name
+        [CommandLineArgument(Position = 0, IsRequired = true), Description("The name of the file to write to.")]
+        public string FileName { get; set; }
 
-        public WriteCommand([Description("The name of the file to write to.")] string fileName,
-                            [Description("The lines of text to write from the file; if no lines are specified, this application will read from standard input instead.")] string[] lines = null)
-        {
-            // The constructor parameters are the positionl command line arguments for the shell command. This command
-            // has a single required argument, and an optional argument that can have multiple values.
-            if( fileName == null )
-                throw new ArgumentNullException("fileName");
-
-            _fileName = fileName;
-            _lines = lines;
-        }
+        // Positional multi-value argument to specify the text to write
+        [CommandLineArgument(Position = 1), Description("The lines of text to write to the file; if no lines are specified, this application will read from standard input instead.")]
+        public string[] Lines { get; set; }
 
         // A named argument to specify the encoding.
         // Because Encoding doesn't have a TypeConverter, we simple accept the name of the encoding as a string and
         // instantiate the Encoding class ourselves in the run method.
-        [CommandLineArgument("encoding", DefaultValue = "utf-8"), Description("The encoding to use to write the file. The default value is utf-8.")]
+        [CommandLineArgument("Encoding", DefaultValue = "utf-8"), Description("The encoding to use to write the file.")]
         public string EncodingName { get; set; }
 
         // A named argument that specifies the maximum line length of the output
-        [CommandLineArgument("length", DefaultValue = 79), Description("The maximum length of the lines in the file, or zero to have no limit. The default value is 79.")]
+        [CommandLineArgument(DefaultValue = 79), Alias("Length"), Description("The maximum length of the lines in the file, or zero to have no limit.")]
         public int MaximumLineLength { get; set; }
 
         // A named argument switch that indicates it's okay to overwrite files.
-        [CommandLineArgument("overwrite", DefaultValue = false), Description("When this option is specified, the file will be overwritten if it already exists.")]
-        public bool OverwriteFile { get; set; }
+        [CommandLineArgument, Description("When this option is specified, the file will be overwritten if it already exists.")]
+        public bool Overwrite { get; set; }
 
         public override void Run()
         {
@@ -58,7 +51,7 @@ namespace ShellCommandSampleCS
             try
             {
                 // Check if we're allowed to overwrite the file.
-                if( !OverwriteFile && File.Exists(_fileName) )
+                if( !Overwrite && File.Exists(FileName) )
                 {
                     // The Main method will return the exit status to the operating system. The numbers are made up for the sample, they don't mean anything.
                     // Usually, 0 means success, and any other value indicates an error.
@@ -68,7 +61,7 @@ namespace ShellCommandSampleCS
                 else
                 {
                     // We use a LineWrappingTextWriter to neatly wrap the output.
-                    using( StreamWriter writer = new StreamWriter(_fileName, false, Encoding.GetEncoding(EncodingName)) )
+                    using( StreamWriter writer = new StreamWriter(FileName, false, Encoding.GetEncoding(EncodingName)) )
                     using( LineWrappingTextWriter lineWriter = new LineWrappingTextWriter(writer, MaximumLineLength, true) )
                     {
                         // Write the specified content to the file
@@ -99,10 +92,10 @@ namespace ShellCommandSampleCS
         private IEnumerable<string> GetLines()
         {
             // Some magic to choose between the specified lines or standard input.
-            if( _lines == null || _lines.Length == 0 )
+            if( Lines == null || Lines.Length == 0 )
                 return EnumerateStandardInput();
             else
-                return _lines;
+                return Lines;
         }
 
         private static IEnumerable<string> EnumerateStandardInput()
