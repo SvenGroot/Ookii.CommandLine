@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+  <metadata>
+    <id>Ookii.CommandLine.Sample</id>
+    <version>2.2</version>
+    <authors>Sven Groot (Ookii.org)</authors>
+    <owners>Sven Groot (Ookii.org)</owners>
+    <licenseUrl>http://ookiicommandline.codeplex.com/license</licenseUrl>
+    <projectUrl>http://ookiicommandline.codeplex.com/</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>A sample for Ookii.CommandLine demonstrating how to define and parse arguments. The sample is provided for C# and Visual Basic.</description>
+    <copyright>Copyright © Sven Groot (Ookii.org) 2013</copyright>
+    <tags>command line arguments parsing parser parse argument args console sample</tags>
+    <dependencies>
+      <dependency id="Ookii.CommandLine" version="2.2" />
+    </dependencies>
+    <references />
+  </metadata>
+</package>
