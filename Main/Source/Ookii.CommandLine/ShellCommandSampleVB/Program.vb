@@ -1,4 +1,4 @@
-﻿' Copyright (c) Sven Groot (Ookii.org) 2012
+﻿' Copyright (c) Sven Groot (Ookii.org) 2013
 '
 ' This code is published under the Microsoft Public License (Ms-PL).  A copy
 ' of the license should be distributed with the code.  It can also be found
@@ -13,7 +13,10 @@ Public Module Program
     Public Function Main(ByVal args() As String) As Integer
         ' Create a shell command based on the arguments. The CreateShellCommand method will catch any command line errors
         ' and print error details and usage information on the console, so we don't have to worry about that here.
-        Dim command As ShellCommand = ShellCommand.CreateShellCommand(Assembly.GetExecutingAssembly(), args, 0)
+        Dim options As New CreateShellCommandOptions
+        options.UsageOptions.IncludeDefaultValueInDescription = True
+        options.UsageOptions.IncludeAliasInDescription = True
+        Dim command As ShellCommand = ShellCommand.CreateShellCommand(Assembly.GetExecutingAssembly(), args, 0, options)
 
         If command IsNot Nothing Then
             ' The command line arguments were successfully parsed, so run the command.

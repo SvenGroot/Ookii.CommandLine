@@ -22,21 +22,14 @@ namespace ShellCommandSampleCS
     [ShellCommand("read"), Description("Reads and displays data from a file using the specified encoding, wrapping the text to fit the console.")]
     class ReadCommand : ShellCommand
     {
-        private readonly string _fileName;
-
-        public ReadCommand([Description("The name of the file to read.")] string fileName)
-        {
-            // The constructor parameters are the positionl command line arguments for the shell command. This command
-            // has only a single argument.
-            if( fileName == null )
-                throw new ArgumentNullException("fileName");
-            _fileName = fileName;
-        }
+        // Positional argument to specify the file name
+        [CommandLineArgument(Position = 0, IsRequired = true), Description("The name of the file to read.")]
+        public string FileName { get; set; }
 
         // A named argument to specify the encoding.
         // Because Encoding doesn't have a TypeConverter, we simple accept the name of the encoding as a string and
         // instantiate the Encoding class ourselves in the run method.
-        [CommandLineArgument("encoding", DefaultValue="utf-8"), Description("The encoding to use to read the file. The default value is utf-8.")]
+        [CommandLineArgument("Encoding", DefaultValue="utf-8"), Description("The encoding to use to read the file.")]
         public string EncodingName { get; set; }
 
         public override void Run()
@@ -46,7 +39,7 @@ namespace ShellCommandSampleCS
             {
                 // We use a LineWrappingTextWriter to neatly wrap console output
                 using( LineWrappingTextWriter writer = LineWrappingTextWriter.ForConsoleOut() )
-                using( StreamReader reader = new StreamReader(_fileName, Encoding.GetEncoding(EncodingName)) )
+                using( StreamReader reader = new StreamReader(FileName, Encoding.GetEncoding(EncodingName)) )
                 {
                     // Write the contents of the file to the console
                     string line;

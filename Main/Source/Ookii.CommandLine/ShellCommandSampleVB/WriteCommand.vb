@@ -1,4 +1,4 @@
-﻿' Copyright (c) Sven Groot (Ookii.org) 2012
+﻿' Copyright (c) Sven Groot (Ookii.org) 2013
 '
 ' This code is published under the Microsoft Public License (Ms-PL).  A copy
 ' of the license should be distributed with the code.  It can also be found
@@ -20,49 +20,43 @@ Imports Ookii.CommandLine
 Public Class WriteCommand
     Inherits ShellCommand
 
-    Private ReadOnly _fileName As String
-    Private ReadOnly _lines() As String
+    ' A positional argument to specify the file name
+    <CommandLineArgument(Position:=0, IsRequired:=True), Description("The name of the file to write to.")>
+    Public Property FileName As String
 
-    Public Sub New(<Description("The name of the file to write to.")> ByVal fileName As String,
-                   <Description("The lines of text to write from the file; if no lines are specified, this application will read from standard input instead.")> Optional ByVal lines() As String = Nothing)
-        ' The constructor parameters are the positionl command line arguments for the shell command. This command
-        ' has a single required argument, and an optional argument that can have multiple values.
-        If fileName Is Nothing Then _
-            Throw New ArgumentNullException("fileName")
-
-        _fileName = fileName
-        _lines = lines
-    End Sub
+    ' A positional multi-value argument to specify the text to write
+    <CommandLineArgument(Position:=1), Description("The lines of text to write from the file; if no lines are specified, this application will read from standard input instead.")>
+    Public Property Lines As String()
 
     ' A named argument to specify the encoding.
     ' Because Encoding doesn't have a TypeConverter, we simple accept the name of the encoding as a string and
     ' instantiate the Encoding class ourselves in the run method.
-    <CommandLineArgument("encoding", DefaultValue:="utf-8"), Description("The encoding to use to write the file. The default value is utf-8.")>
+    <CommandLineArgument("Encoding", DefaultValue:="utf-8"), Description("The encoding to use to write the file.")>
     Public Property EncodingName As String
 
     ' A named argument that specifies the maximum line length of the output
-    <CommandLineArgument("length", DefaultValue:=79), Description("The maximum length of the lines in the file, or zero to have no limit. The default value is 79.")>
+    <CommandLineArgument(DefaultValue:=79), [Alias]("Length"), Description("The maximum length of the lines in the file, or zero to have no limit.")>
     Public Property MaximumLineLength As Integer
 
     ' A named argument switch that indicates it's okay to overwrite files.
-    <CommandLineArgument("overwrite", DefaultValue:=False), Description("When this option is specified, the file will be overwritten if it already exists.")>
-    Public Property OverwriteFile As Boolean
+    <CommandLineArgument, Description("When this option is specified, the file will be overwritten if it already exists.")>
+    Public Property Overwrite As Boolean
 
     Public Overrides Sub Run()
         ' This method is invoked after all command line arguments have been parsed
         Try
             ' Check if we're allowed to overwrite the file.
-            If Not OverwriteFile AndAlso File.Exists(_fileName) Then
+            If Not Overwrite AndAlso File.Exists(FileName) Then
                 ' The Main method will return the exit status to the operating system. The numbers are made up for the sample, they don't mean anything.
                 ' Usually, 0 means success, and any other value indicates an error.
                 Program.WriteErrorMessage("File already exists.")
                 ExitCode = 3
             Else
                 ' We use a LineWrappingTextWriter to neatly wrap the output.
-                Using writer As StreamWriter = New StreamWriter(_fileName, False, Encoding.GetEncoding(EncodingName)),
-                      lineWriter As LineWrappingTextWriter = New LineWrappingTextWriter(writer, MaximumLineLength, True)
+                Using writer As New StreamWriter(FileName, False, Encoding.GetEncoding(EncodingName)),
+                      lineWriter As New LineWrappingTextWriter(writer, MaximumLineLength, True)
                     ' Write the specified content to the file
-                    If _lines Is Nothing OrElse _lines.Length = 0 Then
+                    If Lines Is Nothing OrElse Lines.Length = 0 Then
                         ' Read from standard input. You can pipe a file to the input, or use it interactively (in that case, press CTRL-Z to send an EOF character and stop writing).
                         Dim line As String
                         Do
@@ -73,7 +67,7 @@ Public Class WriteCommand
                         Loop Until line Is Nothing
                     Else
                         ' Write the specified lines
-                        For Each line As String In _lines
+                        For Each line As String In Lines
                             lineWriter.WriteLine(line)
                         Next
                     End If

@@ -12,6 +12,7 @@ using System.ComponentModel;
 using System.Globalization;
 using System.IO;
 using System.Reflection;
+using System.Text;
 
 namespace Ookii.CommandLine
 {
@@ -944,8 +945,28 @@ namespace Ookii.CommandLine
                     string valueDescription = string.Format(CultureInfo.CurrentCulture, options.ValueDescriptionFormat, argument.ValueDescription);
                     if( argument.IsSwitch )
                         valueDescription = string.Format(CultureInfo.CurrentCulture, options.OptionalArgumentFormat, valueDescription);
-                    writer.WriteLine(options.ArgumentDescriptionFormat, argument.ArgumentName, argument.Description, valueDescription, _argumentNamePrefixes[0]);
+                    string defaultValue = options.IncludeDefaultValueInDescription && argument.DefaultValue != null ? string.Format(Culture, options.DefaultValueFormat, argument.DefaultValue) : string.Empty;
+                    string alias = FormatAliasesForDescription(options, argument);
+                    writer.WriteLine(options.ArgumentDescriptionFormat, argument.ArgumentName, argument.Description, valueDescription, _argumentNamePrefixes[0], defaultValue, alias);
                 }
+            }
+        }
+
+        private string FormatAliasesForDescription(WriteUsageOptions options, CommandLineArgument argument)
+        {
+            if( !options.IncludeAliasInDescription || argument.Aliases == null || argument.Aliases.Count == 0 )
+                return string.Empty;
+            else
+            {
+                StringBuilder result = new StringBuilder();
+                foreach( string alias in argument.Aliases )
+                {
+                    if( result.Length > 0 )
+                        result.Append(", ");
+                    result.Append(_argumentNamePrefixes[0]);
+                    result.Append(alias);
+                }
+                return string.Format(Culture, argument.Aliases.Count == 1 ? options.AliasFormat : options.AliasesFormat, result);
             }
         }
 

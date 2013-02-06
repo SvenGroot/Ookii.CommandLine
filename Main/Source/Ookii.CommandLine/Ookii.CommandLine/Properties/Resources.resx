@@ -125,7 +125,7 @@
   </data>
   <data name="DefaultArgumentDescriptionFormat" xml:space="preserve">
     <value>    {3}{0} {2}
-{1}
+{1}{4}{5}
 </value>
     <comment>Note this contains a newline at the end of the format. If you change this format, you may also need to change the indent used in the code.</comment>
   </data>
@@ -242,5 +242,14 @@
   </data>
   <data name="EmptyAliasFormat" xml:space="preserve">
     <value>The argument '{0}' cannot have an empty alias.</value>
+  </data>
+  <data name="DefaultAliasesFormat" xml:space="preserve">
+    <value> Aliases: {0}.</value>
+  </data>
+  <data name="DefaultAliasFormat" xml:space="preserve">
+    <value> Alias: {0}.</value>
+  </data>
+  <data name="DefaultDefaultValueFormat" xml:space="preserve">
+    <value> Default value: {0}.</value>
   </data>
 </root>
