@@ -1,0 +1,75 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+      <Title>clargdict</Title>
+      <Author>Sven Groot (Ookii.org)</Author>
+      <Description>
+        Snippet for creating a dictionary command line argument for use with Ookii.CommandLine.
+      </Description>
+      <HelpUrl>
+        http://ookiicommandline.codeplex.com
+      </HelpUrl>
+      <Shortcut>clargdict</Shortcut>
+    </Header>
+    <Snippet>
+      <Declarations>
+        <Literal Editable="true">
+          <ID>FieldName</ID>
+          <ToolTip>Field name</ToolTip>
+          <Default>_myArgument</Default>
+          <Function>
+          </Function>
+        </Literal>
+        <Literal Editable="true">
+          <ID>Name</ID>
+          <ToolTip>Property and argument name</ToolTip>
+          <Default>MyArgument</Default>
+          <Function>
+          </Function>
+        </Literal>
+        <Literal Editable="true">
+          <ID>KeyType</ID>
+          <ToolTip>Dictionary key type</ToolTip>
+          <Default>String</Default>
+          <Function>
+          </Function>
+        </Literal>
+        <Literal Editable="true">
+          <ID>ValueType</ID>
+          <ToolTip>Dictionary value type</ToolTip>
+          <Default>Integer</Default>
+          <Function>
+          </Function>
+        </Literal>
+      </Declarations>
+      <References>
+        <Reference>
+          <Assembly>Ookii.CommandLine.dll</Assembly>
+          <Url>http://ookiicommandline.codeplex.com</Url>
+        </Reference>
+      </References>
+      <Imports>
+        <Import>
+          <Namespace>System.Collections.Generic</Namespace>
+        </Import>
+        <Import>
+          <Namespace>Ookii.CommandLine</Namespace>
+        </Import>
+      </Imports>
+      <Code Language="VB">
+        <![CDATA[Private Readonly $FieldName$ As New Dictionary(Of $KeyType$, $ValueType$)
+
+<CommandLineArgument>
+Public ReadOnly Property $Name$ As IDictionary(Of $KeyType$, $ValueType$)
+    Get
+        Return $FieldName$
+    End Get
+End Property]]>
+      </Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>
