@@ -310,7 +310,7 @@ namespace Ookii.CommandLine
         /// </value>
         public static string DefaultUsagePrefix
         {
-            get { return string.Format(CultureInfo.CurrentCulture, Properties.Resources.DefaultUsagePrefixFormat, Path.GetFileName(Assembly.GetEntryAssembly().Location)); }
+            get { return string.Format(CultureInfo.CurrentCulture, Properties.Resources.DefaultUsagePrefixFormat, Path.GetFileName((Assembly.GetEntryAssembly() ?? Assembly.GetCallingAssembly()).Location)); }
         }
 
         /// <summary>
@@ -387,7 +387,7 @@ namespace Ookii.CommandLine
             get { return _culture ?? CultureInfo.CurrentCulture; }
             set { _culture = value; }
         }
-        
+
 
         /// <summary>
         /// Gets or sets a value indicating whether duplicate arguments are allowed.
@@ -426,13 +426,13 @@ namespace Ookii.CommandLine
         /// </para>
         /// <para>
         ///   If the <see cref="AllowWhiteSpaceValueSeparator"/> property is <see langword="false"/>, only the colon (:) is allowed to separate the value from the name.
-        ///   The command line <c>-sample:value</c> still assigns the value "value" to the argument, but for the command line "-sample value" the argument 
+        ///   The command line <c>-sample:value</c> still assigns the value "value" to the argument, but for the command line "-sample value" the argument
         ///   is considered not to have a value (which is only valid if <see cref="CommandLineArgument.IsSwitch"/> is <see langword="true"/>), and
         ///   "value" is considered to be the value for the next positional argument.
         /// </para>
         /// <para>
         ///   For switch arguments (<see cref="CommandLineArgument.IsSwitch"/> is <see langword="true"/>), only the colon (:) is allowed to
-        ///   specify an explicit value regardless of the value of the <see cref="AllowWhiteSpaceValueSeparator"/> property. Given a switch argument named "switch" 
+        ///   specify an explicit value regardless of the value of the <see cref="AllowWhiteSpaceValueSeparator"/> property. Given a switch argument named "switch"
         ///   the command line <c>-switch false</c> is interpreted to mean that the value of "switch" is <see langword="true"/> and the value of the
         ///   next positional argument is "false", even if the <see cref="AllowWhiteSpaceValueSeparator"/> property is <see langword="true"/>.
         /// </para>
@@ -498,7 +498,7 @@ namespace Ookii.CommandLine
         {
             WriteUsage(Console.Out, Console.WindowWidth - 1);
         }
-        
+
         /// <summary>
         /// Writes command line usage help to the standard output stream using the specified options.
         /// </summary>
@@ -507,7 +507,7 @@ namespace Ookii.CommandLine
         ///   <paramref name="options"/> is <see langword="null"/>.
         /// </exception>
         /// <exception cref="ArgumentOutOfRangeException">
-        ///   <see cref="WriteUsageOptions.Indent"/> is less than zero or greater than or equal to <see cref="Console.WindowWidth"/> - 1, or 
+        ///   <see cref="WriteUsageOptions.Indent"/> is less than zero or greater than or equal to <see cref="Console.WindowWidth"/> - 1, or
         ///   <see cref="WriteUsageOptions.ArgumentDescriptionIndent"/> is less than zero or greater than or equal to <see cref="Console.WindowWidth"/> - 1.
         /// </exception>
         /// <remarks>
@@ -531,13 +531,13 @@ namespace Ookii.CommandLine
         {
             WriteUsage(Console.Out, Console.WindowWidth - 1, options);
         }
-        
+
         /// <summary>
         /// Writes command line usage help to the specified <see cref="TextWriter"/> using the default options.
         /// </summary>
         /// <param name="writer">The <see cref="TextWriter"/> to write the usage to.</param>
         /// <param name="maximumLineLength">
-        ///   The maximum line length of lines in the usage text; if <paramref name="writer"/> is an instance 
+        ///   The maximum line length of lines in the usage text; if <paramref name="writer"/> is an instance
         ///   of <see cref="LineWrappingTextWriter"/>, this parameter is ignored. A value less than 1 or larger than 65536 is interpreted as infinite line length.
         /// </param>
         /// <exception cref="ArgumentNullException">
@@ -573,7 +573,7 @@ namespace Ookii.CommandLine
         /// </summary>
         /// <param name="writer">The <see cref="TextWriter"/> to write the usage to.</param>
         /// <param name="maximumLineLength">
-        ///   The maximum line length of lines in the usage text; if <paramref name="writer"/> is an instance 
+        ///   The maximum line length of lines in the usage text; if <paramref name="writer"/> is an instance
         ///   of <see cref="LineWrappingTextWriter"/>, this parameter is ignored. A value less than 1 or larger than 65536 is interpreted as infinite line length.
         /// </param>
         /// <param name="options">The options to use for formatting the usage.</param>
@@ -581,7 +581,7 @@ namespace Ookii.CommandLine
         ///   <paramref name="writer"/> or <paramref name="options"/> is <see langword="null"/>.
         /// </exception>
         /// <exception cref="ArgumentOutOfRangeException">
-        ///   <see cref="WriteUsageOptions.Indent"/> is less than zero or greater than or equal to <paramref name="maximumLineLength"/>, or 
+        ///   <see cref="WriteUsageOptions.Indent"/> is less than zero or greater than or equal to <paramref name="maximumLineLength"/>, or
         ///   <see cref="WriteUsageOptions.ArgumentDescriptionIndent"/> is less than zero or greater than or equal to <paramref name="maximumLineLength"/>.
         /// </exception>
         /// <remarks>
@@ -656,7 +656,7 @@ namespace Ookii.CommandLine
         {
             return Parse(args, 0);
         }
-        
+
         /// <summary>
         /// Parses the specified command line arguments, starting at the specified index.
         /// </summary>
@@ -687,7 +687,7 @@ namespace Ookii.CommandLine
             // Reset all arguments to their default value.
             foreach( CommandLineArgument argument in _arguments )
                 argument.Reset();
- 
+
             int positionalArgumentIndex = 0;
 
             for( int x = index; x < args.Length; ++x )
@@ -735,7 +735,7 @@ namespace Ookii.CommandLine
             for( int x = 0; x < _constructorArgumentCount; ++x )
                 constructorArgumentValues[x] = _arguments[x].Value;
 
-            
+
             object commandLineArguments = CreateArgumentsTypeInstance(constructorArgumentValues);
             foreach( CommandLineArgument argument in _arguments )
             {
@@ -903,7 +903,7 @@ namespace Ookii.CommandLine
             }
             return null;
         }
-        
+
         private ConstructorInfo GetCommandLineConstructor()
         {
             ConstructorInfo[] ctors = _argumentsType.GetConstructors();

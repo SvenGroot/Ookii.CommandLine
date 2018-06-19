@@ -313,7 +313,7 @@ namespace Ookii.CommandLine
         ///   This property is used only when generating usage information using <see cref="CommandLineParser.WriteUsage(System.IO.TextWriter,int,WriteUsageOptions)"/>.
         /// </para>
         /// <para>
-        ///   To set the description of an argument, apply the <see cref="System.ComponentModel.DescriptionAttribute"/> attribute to the constructor parameter 
+        ///   To set the description of an argument, apply the <see cref="System.ComponentModel.DescriptionAttribute"/> attribute to the constructor parameter
         ///   or the property that defines the argument.
         /// </para>
         /// </remarks>
@@ -347,7 +347,7 @@ namespace Ookii.CommandLine
         {
             get { return _valueDescription; }
         }
-        
+
         /// <summary>
         /// Gets a value indicating whether this argument is a switch argument.
         /// </summary>
@@ -591,8 +591,15 @@ namespace Ookii.CommandLine
             if( Position != null )
                 argumentName = string.Format(CultureInfo.CurrentCulture, options.OptionalArgumentFormat, argumentName); // for positional parameters, the name itself is optional
 
+            if (options.IncludeAliasInCommandLine && Aliases != null)
+            {
+                foreach(var alias in Aliases)
+                    argumentName = argumentName + "|" + _parser.ArgumentNamePrefixes[0] + alias;
+            }
+
             string argument = argumentName;
-            if( !IsSwitch )
+
+            if ( !IsSwitch )
             {
                 char separator = (_parser.AllowWhiteSpaceValueSeparator && options.UseWhiteSpaceValueSeparator) ? ' ' : CommandLineParser.NameValueSeparator;
                 string argumentValue = string.Format(CultureInfo.CurrentCulture, options.ValueDescriptionFormat, ValueDescription);
@@ -840,7 +847,7 @@ namespace Ookii.CommandLine
             {
                 aliases[x] = ((AliasAttribute)aliasAttributes[x]).Alias;
                 if( string.IsNullOrEmpty(aliases[x]) )
-                    throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.EmptyAliasFormat, argumentName));                    
+                    throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.EmptyAliasFormat, argumentName));
             }
 
             return aliases;

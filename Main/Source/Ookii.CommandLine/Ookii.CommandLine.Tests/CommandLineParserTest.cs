@@ -16,11 +16,13 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.IO;
+using System.Text;
 
 namespace Ookii.CommandLine.Tests
 {
-    
-    
+
+
     /// <summary>
     ///This is a test class for CommandLineParserTest and is intended
     ///to contain all CommandLineParserTest Unit Tests
@@ -98,7 +100,7 @@ namespace Ookii.CommandLine.Tests
             public Dictionary<string, int> Arg13 { get; set; }
 
             [CommandLineArgument]
-            public IDictionary<string, int> Arg14 
+            public IDictionary<string, int> Arg14
             {
                 get { return _arg14; }
             }
@@ -122,7 +124,7 @@ namespace Ookii.CommandLine.Tests
             public MultipleConstructorsArguments() { }
             public MultipleConstructorsArguments(string notArg1, int notArg2) { }
             [CommandLineConstructor]
-            public MultipleConstructorsArguments(string arg1) 
+            public MultipleConstructorsArguments(string arg1)
             {
                 if( arg1 == "invalid" )
                     throw new ArgumentException("Invalid argument value.", "arg1");
@@ -132,14 +134,14 @@ namespace Ookii.CommandLine.Tests
             public int ThrowingArgument
             {
                 get { return _throwingArgument; }
-                set 
+                set
                 {
                     if( value < 0 )
                         throw new ArgumentOutOfRangeException("value");
-                    _throwingArgument = value; 
+                    _throwingArgument = value;
                 }
             }
-            
+
         }
 
         class DictionaryArguments
@@ -372,6 +374,58 @@ namespace Ookii.CommandLine.Tests
             Assert.IsNotNull(args);
             CollectionAssert.AreEqual(new[] { "Value1,Value2", "Value3" }, args.NoSeparator);
             CollectionAssert.AreEqual(new[] { "Value1", "Value2", "Value3" }, args.Separator);
+        }
+
+        [TestMethod]
+        public void WriteUsage_Test_AliasesInCommandLine()
+        {
+            var argumentsType = typeof(TestArguments);
+            var parser = new CommandLineParser(argumentsType);
+
+            var sb = new StringBuilder();
+            using (var tw = new StringWriter(sb))
+            {
+                parser.WriteUsage(
+                    tw,
+                    int.MaxValue,
+                    new WriteUsageOptions
+                    {
+                        IncludeAliasInDescription = true,
+                        IncludeDefaultValueInDescription = true,
+                        IncludeAliasInCommandLine = true
+                    });
+            }
+
+            var usage = sb.ToString();
+
+            Assert.IsTrue(usage.Contains("-Arg6"));
+            Assert.IsTrue(usage.Contains("-Arg6|-Alias1|-Alias2"));
+        }
+
+        [TestMethod]
+        public void WriteUsage_Test_AliasesInCommandLine_Disabled()
+        {
+            var argumentsType = typeof(TestArguments);
+            var parser = new CommandLineParser(argumentsType);
+
+            var sb = new StringBuilder();
+            using (var tw = new StringWriter(sb))
+            {
+                parser.WriteUsage(
+                    tw,
+                    int.MaxValue,
+                    new WriteUsageOptions
+                    {
+                        IncludeAliasInDescription = true,
+                        IncludeDefaultValueInDescription = true,
+                        IncludeAliasInCommandLine = false
+                    });
+            }
+
+            var usage = sb.ToString();
+
+            Assert.IsTrue(usage.Contains("-Arg6"));
+            Assert.IsFalse(usage.Contains("-Arg6|-Alias1|-Alias2"));
         }
 
         private static void TestArgument(IEnumerator<CommandLineArgument> arguments, string name, string memberName, Type type, Type elementType, int? position, bool isRequired, object defaultValue, string description, string valueDescription, bool isSwitch, bool isMultiValue, bool isDictionary = false, params string[] aliases)
