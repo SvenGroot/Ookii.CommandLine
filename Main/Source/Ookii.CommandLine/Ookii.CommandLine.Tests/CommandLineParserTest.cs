@@ -117,6 +117,18 @@ namespace Ookii.CommandLine.Tests
             public static string NotAnArg3 { get; set; }
         }
 
+        enum TestStatus
+        {
+            Enabled,
+            Disabled
+        }
+
+        class TestArgumentsEnum
+        {
+            [CommandLineArgument(IsRequired = true)]
+            public TestStatus Status { get; set; }
+        }
+
         class MultipleConstructorsArguments
         {
             private int _throwingArgument;
@@ -426,6 +438,61 @@ namespace Ookii.CommandLine.Tests
 
             Assert.IsTrue(usage.Contains("-Arg6"));
             Assert.IsFalse(usage.Contains("-Arg6|-Alias1|-Alias2"));
+        }
+
+        [TestMethod]
+        public void WriteUsage_Test_EnumValuesInCommandLine()
+        {
+            var argumentsType = typeof(TestArgumentsEnum);
+            var parser = new CommandLineParser(argumentsType);
+
+            var sb = new StringBuilder();
+            using (var tw = new StringWriter(sb))
+            {
+                parser.WriteUsage(
+                    tw,
+                    int.MaxValue,
+                    new WriteUsageOptions
+                    {
+                        IncludeAliasInDescription = true,
+                        IncludeDefaultValueInDescription = true,
+                        IncludeAliasInCommandLine = true,
+                        IncludeEnumValueListInCommandLine = true
+                    });
+            }
+
+            var usage = sb.ToString();
+
+            Assert.IsTrue(usage.Contains("-Status"));
+            Assert.IsTrue(usage.Contains("-Status <Enabled,Disabled>"));
+        }
+
+        [TestMethod]
+        public void WriteUsage_Test_EnumValuesInCommandLine_Disabled()
+        {
+            var argumentsType = typeof(TestArgumentsEnum);
+            var parser = new CommandLineParser(argumentsType);
+
+            var sb = new StringBuilder();
+            using (var tw = new StringWriter(sb))
+            {
+                parser.WriteUsage(
+                    tw,
+                    int.MaxValue,
+                    new WriteUsageOptions
+                    {
+                        IncludeAliasInDescription = true,
+                        IncludeDefaultValueInDescription = true,
+                        IncludeAliasInCommandLine = false,
+                        IncludeEnumValueListInCommandLine = false
+                    });
+            }
+
+            var usage = sb.ToString();
+
+            Assert.IsTrue(usage.Contains("-Status"));
+            Assert.IsFalse(usage.Contains("-Status <Enabled,Disabled>"));
+            Assert.IsTrue(usage.Contains("-Status <TestStatus>"));
         }
 
         private static void TestArgument(IEnumerator<CommandLineArgument> arguments, string name, string memberName, Type type, Type elementType, int? position, bool isRequired, object defaultValue, string description, string valueDescription, bool isSwitch, bool isMultiValue, bool isDictionary = false, params string[] aliases)

@@ -34,6 +34,7 @@ namespace Ookii.CommandLine
             ArgumentDescriptionIndent = 8;
             IncludeApplicationDescription = true;
             IncludeAliasInCommandLine = false;
+            IncludeEnumValueListInCommandLine = false;
         }
 
         /// <summary>
@@ -263,6 +264,14 @@ namespace Ookii.CommandLine
         ///   <c>true</c> if the alias or aliases of an argument should be included in the command line description; otherwise, <c>false</c>.
         /// </value>
         public bool IncludeAliasInCommandLine { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether to include enum value list in command line usage text.
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if enum value list is to be included in command line; otherwise, <c>false</c>.
+        /// </value>
+        public bool IncludeEnumValueListInCommandLine { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether the default value of an argument should be included in the argument description.

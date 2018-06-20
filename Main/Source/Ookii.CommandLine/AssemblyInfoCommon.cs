@@ -22,4 +22,4 @@ using System.Reflection;
 //      Revision
 //
 [assembly: AssemblyVersion("2.2.0.0")]
-[assembly: AssemblyFileVersion("2.2.00619.0")]
+[assembly: AssemblyFileVersion("2.2.00620.0")]

@@ -943,7 +943,9 @@ namespace Ookii.CommandLine
                 {
                     writer.ResetIndent();
                     string valueDescription = string.Format(CultureInfo.CurrentCulture, options.ValueDescriptionFormat, argument.ValueDescription);
-                    if( argument.IsSwitch )
+                    if (argument.ArgumentType.IsEnum)
+                        valueDescription = string.Format(CultureInfo.CurrentCulture, options.ValueDescriptionFormat, string.Join(",", Enum.GetNames(argument.ArgumentType)));
+                    if ( argument.IsSwitch )
                         valueDescription = string.Format(CultureInfo.CurrentCulture, options.OptionalArgumentFormat, valueDescription);
                     string defaultValue = options.IncludeDefaultValueInDescription && argument.DefaultValue != null ? string.Format(Culture, options.DefaultValueFormat, argument.DefaultValue) : string.Empty;
                     string alias = FormatAliasesForDescription(options, argument);

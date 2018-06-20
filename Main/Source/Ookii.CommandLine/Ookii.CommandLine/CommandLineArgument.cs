@@ -603,6 +603,8 @@ namespace Ookii.CommandLine
             {
                 char separator = (_parser.AllowWhiteSpaceValueSeparator && options.UseWhiteSpaceValueSeparator) ? ' ' : CommandLineParser.NameValueSeparator;
                 string argumentValue = string.Format(CultureInfo.CurrentCulture, options.ValueDescriptionFormat, ValueDescription);
+                if (ArgumentType.IsEnum && options.IncludeEnumValueListInCommandLine)
+                    argumentValue = string.Format(CultureInfo.CurrentCulture, options.ValueDescriptionFormat, string.Join(",", Enum.GetNames(ArgumentType)));
                 argument = argumentName + separator + argumentValue;
             }
             if( IsMultiValue )
