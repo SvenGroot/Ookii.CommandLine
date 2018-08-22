@@ -1,145 +1,30 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>9.0.30729</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{8F0E16C7-D6AC-43B0-B31F-37EDDB84C03A}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Ookii.CommandLine</RootNamespace>
-    <AssemblyName>Ookii.CommandLine</AssemblyName>
-    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <SignAssembly>true</SignAssembly>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <Description>Ookii.CommandLine is a powerful command line parsing library for .Net applications. It allows you to easily define a set of accepted arguments, and then parse the command line supplied to your application for those arguments. In addition, it allows you to generate usage help from the arguments that you defined which you can display to the user.
+You simply create a custom class whose properties and constructor parameters define the arguments, and Ookii.CommandLine will parse the application's arguments and create an instance of that class with all the values. Arguments can be optional or required, positional or named, and accept single or multiple values, and much more.
+Argument parsing is done using parsing rules that are very similar to how Microsoft Windows PowerShell parses command line arguments.</Description>
+    <AssemblyVersion>3.0.0.0</AssemblyVersion>
+    <Company>Sven Groot (Ookii.org)</Company>
+    <Product>Ookii.CommandLine</Product>
+    <Copyright>Copyright © Sven Groot (Ookii.org) 2013</Copyright>
+    <FileVersion>2.0.0.0</FileVersion>
+    <Version>3.0.0</Version>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <AssemblyOriginatorKeyFile>ookii.snk</AssemblyOriginatorKeyFile>
-    <FileUpgradeFlags>
-    </FileUpgradeFlags>
-    <UpgradeBackupLocation>
-    </UpgradeBackupLocation>
-    <OldToolsVersion>3.5</OldToolsVersion>
-    <PublishUrl>publish\</PublishUrl>
-    <Install>true</Install>
-    <InstallFrom>Disk</InstallFrom>
-    <UpdateEnabled>false</UpdateEnabled>
-    <UpdateMode>Foreground</UpdateMode>
-    <UpdateInterval>7</UpdateInterval>
-    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
-    <UpdatePeriodically>false</UpdatePeriodically>
-    <UpdateRequired>false</UpdateRequired>
-    <MapFileExtensions>true</MapFileExtensions>
-    <ApplicationRevision>0</ApplicationRevision>
-    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
-    <IsWebBootstrapper>false</IsWebBootstrapper>
-    <UseApplicationTrust>false</UseApplicationTrust>
-    <BootstrapperEnabled>true</BootstrapperEnabled>
-    <TargetFrameworkProfile>
-    </TargetFrameworkProfile>
-    <SccProjectName>SAK</SccProjectName>
-    <SccLocalPath>SAK</SccLocalPath>
-    <SccAuxPath>SAK</SccAuxPath>
-    <SccProvider>SAK</SccProvider>
+    <SignAssembly>true</SignAssembly>
+    <PackageProjectUrl>https://github.com/SvenGroot/ookii.commandline</PackageProjectUrl>
+    <PackageLicenseUrl>https://github.com/SvenGroot/ookii.commandline/blob/master/license.md</PackageLicenseUrl>
+    <PackageTags>command line arguments parsing parser parse argument args console</PackageTags>
+    <Authors>Sven Groot (Ookii.org)</Authors>
+    <RepositoryUrl>https://github.com/SvenGroot/ookii.commandline</RepositoryUrl>
+    <PackageReleaseNotes>NetStandard 2.0 version</PackageReleaseNotes>
+    <IncludeSymbols>true</IncludeSymbols>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <RunCodeAnalysis>false</RunCodeAnalysis>
-    <DocumentationFile>bin\Debug\Ookii.CommandLine.XML</DocumentationFile>
-    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DocumentationFile>C:\Users\thieu\GitHub\ookii.commandline\Main\Source\Ookii.CommandLine\Ookii.CommandLine\Ookii.CommandLine.xml</DocumentationFile>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <RunCodeAnalysis>true</RunCodeAnalysis>
-    <DocumentationFile>bin\Release\Ookii.CommandLine.XML</DocumentationFile>
-    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
-  <ItemGroup>
-    <Reference Include="System" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="..\AssemblyInfoCommon.cs">
-      <Link>Properties\AssemblyInfoCommon.cs</Link>
-    </Compile>
-    <Compile Include="AliasAttribute.cs" />
-    <Compile Include="AllowDuplicateDictionaryKeysAttribute.cs" />
-    <Compile Include="ArgumentNameAttribute.cs" />
-    <Compile Include="ArgumentParsedEventArgs.cs" />
-    <Compile Include="CommandLineArgument.cs" />
-    <Compile Include="CommandLineArgumentErrorCategory.cs" />
-    <Compile Include="CommandLineConstructorAttribute.cs" />
-    <Compile Include="CommandLineParser.cs" />
-    <Compile Include="CommandLineArgumentException.cs" />
-    <Compile Include="CreateShellCommandOptions.cs" />
-    <Compile Include="KeyValuePairConverter.cs" />
-    <Compile Include="LineWrappingTextWriter.cs" />
-    <Compile Include="CommandLineArgumentAttribute.cs" />
-    <Compile Include="MultiValueSeparatorAttribute.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-    <Compile Include="ShellCommand.cs" />
-    <Compile Include="ShellCommandAttribute.cs" />
-    <Compile Include="TypeHelper.cs" />
-    <Compile Include="ValueDescriptionAttribute.cs" />
-    <Compile Include="WriteUsageOptions.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <CodeAnalysisDictionary Include="CodeAnalysisDictionary.xml" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
-    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
-      <Visible>False</Visible>
-      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
-      <Install>false</Install>
-    </BootstrapperPackage>
-    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
-      <Visible>False</Visible>
-      <ProductName>.NET Framework 3.5 SP1</ProductName>
-      <Install>true</Install>
-    </BootstrapperPackage>
-    <BootstrapperPackage Include="Microsoft.Windows.Installer.3.1">
-      <Visible>False</Visible>
-      <ProductName>Windows Installer 3.1</ProductName>
-      <Install>true</Install>
-    </BootstrapperPackage>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="ookii.snk" />
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
-  <PropertyGroup>
-    <PostBuildEvent>
-    </PostBuildEvent>
-  </PropertyGroup>
-  <PropertyGroup>
-    <PreBuildEvent>PowerShell.exe -NoProfile -Command "&amp;'$(SolutionDir)Create-AssemblyInfoCommon.ps1' '$(DevEnvDir)tf.exe' '$(ConfigurationName)'"</PreBuildEvent>
-  </PropertyGroup>
+
 </Project>

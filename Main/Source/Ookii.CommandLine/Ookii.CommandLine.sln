@@ -1,7 +1,9 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ookii.CommandLine", "Ookii.CommandLine\Ookii.CommandLine.csproj", "{8F0E16C7-D6AC-43B0-B31F-37EDDB84C03A}"
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28010.2003
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ookii.CommandLine", "Ookii.CommandLine\Ookii.CommandLine.csproj", "{8F0E16C7-D6AC-43B0-B31F-37EDDB84C03A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommandLineSampleCS", "CommandLineSampleCS\CommandLineSampleCS.csproj", "{EEE4AF9C-C7C5-485B-9B8F-8035E7E428B7}"
 EndProject
@@ -25,33 +27,6 @@ EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "ShellCommandSampleVB", "ShellCommandSampleVB\ShellCommandSampleVB.vbproj", "{4F896C58-081C-4178-BFBC-B0A3EB7F429D}"
 EndProject
 Global
-	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 7
-		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
-		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs31
-		SccLocalPath0 = .
-		SccProjectUniqueName1 = CommandLineSampleCS\\CommandLineSampleCS.csproj
-		SccProjectName1 = CommandLineSampleCS
-		SccLocalPath1 = CommandLineSampleCS
-		SccProjectUniqueName2 = CommandLineSampleVB\\CommandLineSampleVB.vbproj
-		SccProjectName2 = CommandLineSampleVB
-		SccLocalPath2 = CommandLineSampleVB
-		SccProjectUniqueName3 = Ookii.CommandLine.Tests\\Ookii.CommandLine.Tests.csproj
-		SccProjectName3 = Ookii.CommandLine.Tests
-		SccLocalPath3 = Ookii.CommandLine.Tests
-		SccProjectUniqueName4 = Ookii.CommandLine\\Ookii.CommandLine.csproj
-		SccProjectName4 = Ookii.CommandLine
-		SccLocalPath4 = Ookii.CommandLine
-		SccProjectUniqueName5 = ShellCommandSampleCS\\ShellCommandSampleCS.csproj
-		SccProjectName5 = ShellCommandSampleCS
-		SccLocalPath5 = ShellCommandSampleCS
-		SccProjectUniqueName6 = ShellCommandSampleVB\\ShellCommandSampleVB.vbproj
-		SccProjectName6 = ShellCommandSampleVB
-		SccLocalPath6 = ShellCommandSampleVB
-	EndGlobalSection
-	GlobalSection(TestCaseManagementSettings) = postSolution
-		CategoryFile = Ookii.CommandLine.vsmdi
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
@@ -84,5 +59,11 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {207573B6-FB3B-4CDA-903D-A4ED4F74121F}
+	EndGlobalSection
+	GlobalSection(TestCaseManagementSettings) = postSolution
+		CategoryFile = Ookii.CommandLine.vsmdi
 	EndGlobalSection
 EndGlobal
