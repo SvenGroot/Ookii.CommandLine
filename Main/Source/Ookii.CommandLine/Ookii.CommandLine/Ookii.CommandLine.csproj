@@ -140,6 +140,6 @@
     </PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
-    <PreBuildEvent>PowerShell.exe -NoProfile -Command "&amp;'$(SolutionDir)Create-AssemblyInfoCommon.ps1' '$(DevEnvDir)tf.exe' '$(ConfigurationName)'"</PreBuildEvent>
+    <PreBuildEvent>PowerShell.exe -Command "&amp;'$(SolutionDir)Create-AssemblyInfoCommon.ps1' '$(DevEnvDir)tf.exe' '$(ConfigurationName)'"</PreBuildEvent>
   </PropertyGroup>
 </Project>
