@@ -33,6 +33,8 @@ namespace Ookii.CommandLine
             Indent = 3;
             ArgumentDescriptionIndent = 8;
             IncludeApplicationDescription = true;
+            IncludeAliasInCommandLine = false;
+            IncludeEnumValueListInCommandLine = false;
         }
 
         /// <summary>
@@ -175,7 +177,7 @@ namespace Ookii.CommandLine
         ///   the default format, the description is indented by 8 characters.
         /// </para>
         /// <para>
-        ///   This format string can have four placeholders, which are used for the argument name, the description, the value description 
+        ///   This format string can have four placeholders, which are used for the argument name, the description, the value description
         ///   (formatted according to the <see cref="ValueDescriptionFormat"/>), the primary argument name prefix, the default value, and
         ///   the aliases. If the format string ends in a line break, the command descriptions will be separated by a blank line (this is the default).
         /// </para>
@@ -254,6 +256,22 @@ namespace Ookii.CommandLine
         /// </para>
         /// </remarks>
         public bool IncludeAliasInDescription { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the alias or aliases of an argument should be included in the command line description
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if the alias or aliases of an argument should be included in the command line description; otherwise, <c>false</c>.
+        /// </value>
+        public bool IncludeAliasInCommandLine { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether to include enum value list in command line usage text.
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if enum value list is to be included in command line; otherwise, <c>false</c>.
+        /// </value>
+        public bool IncludeEnumValueListInCommandLine { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether the default value of an argument should be included in the argument description.
