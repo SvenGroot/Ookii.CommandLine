@@ -11,29 +11,34 @@ using Ookii.CommandLine;
 
 namespace CommandLineSampleCS
 {
+
+    enum Command { Unassigned, Add, Delete, Update};
     /// <summary>
     /// Class that defines the sample's command line arguments.
     /// </summary>
     [Description("Sample command line application. The application parses the command line and prints the results, but otherwise does nothing and none of the arguments are actually used for anything.")]
     class ProgramArguments
     {
+        [CommandLineArgument(Position = 0, IsRequired = true), Description("The command to execute.")]
+        public Command Command { get; set; }
+
         // This property defines a required positional argument called "Source". It can be set by name as e.g. "-Source value", or by position
         // by specifying "value" as the first positional argument. Note that by default command line argument names are case insensitive, so
         // this argument can also be specified as e.g. "-source value".
         // On Windows, the default command name prefixes are "/" and "-", so the argument can also be specified as e.g. "/Source value". On Unix
         // (using Mono), only "-" is accepted by default.
-        [CommandLineArgument(Position = 0, IsRequired = true), Description("The source data.")]
+        [CommandLineArgument(Position = 1, IsRequired = true), Description("The source data.")]
         public string Source { get; set; }
 
         // This property defines a required positional argument called "Destination". It can be set by name as e.g. "-Destination value", or by position
         // by specifying "value" as the second positional argument.
-        [CommandLineArgument(Position = 1, IsRequired = true), Description("The destination data.")]
+        [CommandLineArgument(Position = 2, IsRequired = true), Description("The destination data.")]
         public string Destination { get; set; }
 
         // This property defines a optional positional argument called "Index". It can be set by name as e.g. "-Index 5", or by position
         // by specifying e.g. "5" as the third positional argument. If the argument is not specified, this property
         // will be set to the default value 1.
-        [CommandLineArgument(Position = 2, DefaultValue = 1), Description("The operation's index.")]
+        [CommandLineArgument(Position = 3, DefaultValue = 1), Description("The operation's index.")]
         public int Index { get; set; }
 
         // This property defines an argument named "Date". This argument is not positional, so it can be supplied only by name, for example as "-Date 2013-01-31".
@@ -76,10 +81,66 @@ namespace CommandLineSampleCS
         // For this argument, we handle the CommandLineParser.ArgumentParsed event to cancel
         // command line processing when this argument is supplied. That way, we can print usage regardless of what other arguments are
         // present. For more details, see the CommandLineParser.ArgumentParser event handler in Program.cs
-        [CommandLineArgument, Alias("?"), Description("Displays this help message.")]
+        [CommandLineHelpArgument, Alias("?"), Description("Displays this help message.")]
         public bool Help { get; set; }
 
         public static ProgramArguments Create(string[] args)
+        {
+            // Using a static creation function for a command line arguments class is not required, but it's a convenient
+            // way to place all command-line related functionality in one place. To parse the arguments (eg. from the Main method)
+            // you then only need to call this function.
+            CommandLineParser parser = new CommandLineParser(typeof(ProgramArguments));
+            ProgramArguments result = null;
+            bool showFullHelp = false;
+            try
+            {
+                // The Parse function returns null only when the ArgumentParsed event handler cancelled parsing.
+                result = (ProgramArguments)parser.Parse(args);
+                showFullHelp = result.Help;
+                if (result.Help)
+                {
+                    showFullHelp = false;
+                    switch (result.Command)
+                    {
+                        case Command.Add:
+                            Console.WriteLine("Help specific to Add command here.");
+                            break;
+                        case Command.Delete:
+                            Console.WriteLine("Help specific to Delete command here.");
+                            break;
+                        case Command.Update:
+                            Console.WriteLine("Help specific to Update command here.");
+                            break;
+
+                        default:
+                            showFullHelp = true;
+                            break;
+                    }
+
+                }
+            }
+            catch( CommandLineArgumentException ex )
+            {
+                // We use the LineWrappingTextWriter to neatly wrap console output.
+                using( LineWrappingTextWriter writer = LineWrappingTextWriter.ForConsoleError() )
+                {
+                    // Tell the user what went wrong.
+                    writer.WriteLine(ex.Message);
+                    writer.WriteLine();
+                }
+            }
+
+            if (showFullHelp)
+            {
+                // If we got here, we should print usage information to the console.
+                // By default, aliases and default values are not included in the usage descriptions; for this sample, I do want to include them.
+                WriteUsageOptions options = new WriteUsageOptions() { IncludeDefaultValueInDescription = true, IncludeAliasInDescription = true };
+                // WriteUsageToConsole automatically uses a LineWrappingTextWriter to properly word-wrap the text.
+                parser.WriteUsageToConsole(options);
+            }
+            return result;
+        }
+        public static ProgramArguments Create_old(string[] args)
         {
             // Using a static creation function for a command line arguments class is not required, but it's a convenient
             // way to place all command-line related functionality in one place. To parse the arguments (eg. from the Main method)
@@ -91,13 +152,13 @@ namespace CommandLineSampleCS
             {
                 // The Parse function returns null only when the ArgumentParsed event handler cancelled parsing.
                 ProgramArguments result = (ProgramArguments)parser.Parse(args);
-                if( result != null )
+                if (result != null)
                     return result;
             }
-            catch( CommandLineArgumentException ex )
+            catch (CommandLineArgumentException ex)
             {
                 // We use the LineWrappingTextWriter to neatly wrap console output.
-                using( LineWrappingTextWriter writer = LineWrappingTextWriter.ForConsoleError() )
+                using (LineWrappingTextWriter writer = LineWrappingTextWriter.ForConsoleError())
                 {
                     // Tell the user what went wrong.
                     writer.WriteLine(ex.Message);

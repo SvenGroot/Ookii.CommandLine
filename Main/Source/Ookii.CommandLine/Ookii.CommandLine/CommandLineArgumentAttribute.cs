@@ -14,7 +14,7 @@ namespace Ookii.CommandLine
     /// </summary>
     /// <threadsafety static="true" instance="false"/>
     [AttributeUsage(AttributeTargets.Property)]
-    public sealed class CommandLineArgumentAttribute : Attribute
+    public class CommandLineArgumentAttribute : Attribute
     {
         private readonly string _argumentName;
 
@@ -122,5 +122,10 @@ namespace Ookii.CommandLine
         /// </note>
         /// </remarks>
         public string ValueDescription { get; set; }
+    }
+
+    [AttributeUsage(AttributeTargets.Property )]
+    public class CommandLineHelpArgumentAttribute : CommandLineArgumentAttribute
+    {
     }
 }

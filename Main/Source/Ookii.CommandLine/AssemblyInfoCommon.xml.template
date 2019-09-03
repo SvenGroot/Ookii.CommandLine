@@ -1,0 +1,24 @@
+<Project xmlns = "http://schemas.microsoft.com/developer/msbuild/2003">
+<!--
+	Copyright (c) (Ookii.org) 2019
+	
+	 This code is published under the Microsoft Public License (Ms-PL).  A copy
+	 of the license should be distributed with the code.  It can also be found
+	 at https://github.com/SvenGroot/ookii.commandline. This notice, the author's name,
+	 and all copyright notices must remain intact in all applications,
+	 documentation, and source files.
+
+	 AssemblyInfoCommon.cs is generated from AssemblyInfoCommon.cs.template using the Create-AssemblyInfoCommon.ps1 PowerShell script
+	 AssemblyInfoCommon.cs should NOT be added to source control
+
+-->
+
+<PropertyGroup>
+<AssemblyVersion>3.0.0.0</AssemblyVersion>
+<Company>Sven Groot(Ookii.org) </Company >
+<Product>Ookii.CommandLine</Product>
+<Copyright>Copyright © Ookii.org 2019 </Copyright>
+<FileVersion>3.0.$BUILD.$REVISION</FileVersion>
+<Version>3.0.0.0</Version>
+</PropertyGroup>
+</Project>

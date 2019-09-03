@@ -115,6 +115,10 @@ namespace Ookii.CommandLine.Tests
 
             [CommandLineArgument()]
             public static string NotAnArg3 { get; set; }
+
+            [CommandLineHelpArgument, Alias("?"), Alias("help")]
+            public bool HelpArg1 { get; set; }
+
         }
 
         enum TestStatus
@@ -214,7 +218,7 @@ namespace Ookii.CommandLine.Tests
             CollectionAssert.AreEqual(CommandLineParser.DefaultArgumentNamePrefixes.ToArray(), target.ArgumentNamePrefixes);
             Assert.AreEqual(argumentsType, target.ArgumentsType);
             Assert.AreEqual("Test arguments description.", target.Description);
-            Assert.AreEqual(16, target.Arguments.Count);
+            Assert.AreEqual(17, target.Arguments.Count);
             using( IEnumerator<CommandLineArgument> args = target.Arguments.GetEnumerator() )
             {
                 TestArgument(args, "arg1", "arg1", typeof(string), null, 0, true, null, "Arg1 description.", "String", false, false);
@@ -233,6 +237,7 @@ namespace Ookii.CommandLine.Tests
                 TestArgument(args, "Arg3", "Arg3", typeof(string), null, null, false, null, "", "String", false, false);
                 TestArgument(args, "Arg7", "Arg7", typeof(bool), null, null, false, null, "", "Boolean", true, false, false, "Alias3");
                 TestArgument(args, "Arg9", "Arg9", typeof(int?), null, null, false, null, "", "Int32", false, false);
+                TestArgument(args, "HelpArg1", "HelpArg1", typeof(bool), null, null, false, null, "", "Boolean", true, false,false, "?", "help");
             }
         }
 
@@ -277,6 +282,10 @@ namespace Ookii.CommandLine.Tests
             TestParse(target, "val1 2 true /arg3 val3 -other2:4 5.5 /arg6 val6 /arg7 /arg8 Monday /arg8 Tuesday /arg9 9 /arg10 /arg10 /arg10:false /arg11:false /arg12 12 /arg12 13 /arg13 foo=13 /arg13 bar=14 /arg14 hello=1 /arg14 bye=2 /arg15 something=5", "val1", 2, true, "val3", 4, 5.5f, "val6", true, new[] { DayOfWeek.Monday, DayOfWeek.Tuesday }, 9, new[] { true, true, false }, false, new[] { 12, 13 }, new Dictionary<string,int>() { { "foo", 13 }, { "bar", 14 } }, new Dictionary<string,int>() { { "hello", 1 }, { "bye", 2 } }, new KeyValuePair<string,int>("something", 5));
             // Using aliases
             TestParse(target, "val1 2 /alias1 valalias6 /alias3", "val1", 2, arg6: "valalias6", arg7: true);
+
+            TestParse(target, "-?", helpArg:true);
+            TestParse(target, "Add -help", "Add", helpArg: true);
+            TestParse(target, "Add  2 -helpArg1", "Add", 2, helpArg: true);
         }
 
         [TestMethod]
@@ -525,9 +534,12 @@ namespace Ookii.CommandLine.Tests
             }
         }
 
-        private static void TestParse(CommandLineParser target, string commandLine, string arg1 = null, int arg2 = 42, bool notSwitch = false, string arg3 = null, int arg4 = 47, float arg5 = 0.0f, string arg6 = null, bool arg7 = false, DayOfWeek[] arg8 = null, int? arg9 = null, bool[] arg10 = null, bool? arg11 = null, int[] arg12 = null, Dictionary<string, int> arg13 = null, Dictionary<string, int> arg14 = null, KeyValuePair<string, int>? arg15 = null)
+        private static void TestParse(CommandLineParser target, string commandLine, string arg1 = null, int arg2 = 42, bool notSwitch = false, string arg3 = null,
+                                                        int arg4 = 47, float arg5 = 0.0f, string arg6 = null, bool arg7 = false, DayOfWeek[] arg8 = null, int? arg9 = null,
+                                                        bool[] arg10 = null, bool? arg11 = null, int[] arg12 = null, Dictionary<string, int> arg13 = null,
+                                                        Dictionary<string, int> arg14 = null, KeyValuePair<string, int>? arg15 = null, bool helpArg = false)
         {
-            string[] args = commandLine.Split(' '); // not using quoted arguments in the tests, so this is fine.
+            string[] args = commandLine.Split(new char[]{ ' '},StringSplitOptions.RemoveEmptyEntries); // not using quoted arguments in the tests, so this is fine.
             TestArguments result = (TestArguments)target.Parse(args);
             Assert.AreEqual(arg1, result.Arg1);
             Assert.AreEqual(arg2, result.Arg2);
@@ -553,6 +565,8 @@ namespace Ookii.CommandLine.Tests
                 Assert.AreEqual(default(KeyValuePair<string, int>), result.Arg15);
             else
                 Assert.AreEqual(arg15.Value, result.Arg15);
+
+            Assert.AreEqual(helpArg, result.HelpArg1);
         }
     }
 }

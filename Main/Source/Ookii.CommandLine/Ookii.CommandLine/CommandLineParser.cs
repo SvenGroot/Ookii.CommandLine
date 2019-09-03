@@ -13,6 +13,7 @@ using System.Globalization;
 using System.IO;
 using System.Reflection;
 using System.Text;
+using System.Linq;
 
 namespace Ookii.CommandLine
 {
@@ -725,11 +726,12 @@ namespace Ookii.CommandLine
 
             // Check required arguments and convert array arguments. This is done in usage order so the first missing positional argument is reported, rather
             // than the missing argument that is first alphabetically.
-            foreach( CommandLineArgument argument in _arguments )
-            {
-                if( argument.IsRequired && !argument.HasValue )
-                    throw new CommandLineArgumentException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.MissingRequiredArgumentFormat, argument.ArgumentName), argument.ArgumentName, CommandLineArgumentErrorCategory.MissingRequiredArgument);
-            }
+            if (_arguments.All(arg => !arg.IsHelp ||  !((arg.Value as bool?) ?? false)))
+                foreach( CommandLineArgument argument in _arguments )
+                {
+                    if( argument.IsRequired && !argument.HasValue )
+                        throw new CommandLineArgumentException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.MissingRequiredArgumentFormat, argument.ArgumentName), argument.ArgumentName, CommandLineArgumentErrorCategory.MissingRequiredArgument);
+                }
 
             object[] constructorArgumentValues = new object[_constructorArgumentCount];
             for( int x = 0; x < _constructorArgumentCount; ++x )

@@ -12,7 +12,7 @@ using System.Reflection;
 
 [assembly: AssemblyCompany("Ookii.org")]
 [assembly: AssemblyProduct("Ookii.CommandLine")]
-[assembly: AssemblyCopyright("Copyright © Sven Groot (Ookii.org) 2013")]
+[assembly: AssemblyCopyright("Copyright ©  (Ookii.org) 2013-2019")]
 
 // Version information for an assembly consists of the following four values:
 //
@@ -22,4 +22,4 @@ using System.Reflection;
 //      Revision
 //
 [assembly: AssemblyVersion("3.0.0.0")]
-[assembly: AssemblyFileVersion("3.0.10502.0")]
+[assembly: AssemblyFileVersion("3.0.$BUILD.$REVISION")]

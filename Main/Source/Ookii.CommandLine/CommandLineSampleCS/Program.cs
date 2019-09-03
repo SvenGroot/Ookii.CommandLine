@@ -30,6 +30,7 @@ namespace CommandLineSampleCS
                     writer.WriteLine();
                     // Print the values of the arguments, using reflection to get all the property values
                     writer.WriteLine("The following argument values were provided:");
+                    writer.WriteLine("Command: {0}", arguments.Command);
                     writer.WriteLine("Source: {0}", arguments.Source ?? "(null)");
                     writer.WriteLine("Destination: {0}", arguments.Destination ?? "(null)");
                     writer.WriteLine("Index: {0}", arguments.Index);

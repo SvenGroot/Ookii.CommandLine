@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28010.2003
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28729.10
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ookii.CommandLine", "Ookii.CommandLine\Ookii.CommandLine.csproj", "{8F0E16C7-D6AC-43B0-B31F-37EDDB84C03A}"
 EndProject
@@ -14,7 +14,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{412AEB8D-40EF-4637-AD7D-CD71AD6ACB96}"
 	ProjectSection(SolutionItems) = preProject
 		AssemblyInfoCommon.cs = AssemblyInfoCommon.cs
-		AssemblyInfoCommon.cs.template = AssemblyInfoCommon.cs.template
+		AssemblyInfoCommon.cs .template = AssemblyInfoCommon.cs .template
+		AssemblyInfoCommon.xml.template = AssemblyInfoCommon.xml.template
 		Create-AssemblyInfoCommon.ps1 = Create-AssemblyInfoCommon.ps1
 		Create-Release.ps1 = Create-Release.ps1
 		history.txt = history.txt
