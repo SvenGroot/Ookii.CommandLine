@@ -56,7 +56,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Ookii.CommandLine\Ookii.CommandLine.csproj">
-      <Project>{8F0E16C7-D6AC-43B0-B31F-37EDDB84C03A}</Project>
+      <Project>{f129ab74-89c1-4813-a846-c52d5a96f51d}</Project>
       <Name>Ookii.CommandLine</Name>
     </ProjectReference>
   </ItemGroup>

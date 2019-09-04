@@ -139,12 +139,6 @@
     <None Include="ookii.snk" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Ookii.CommandLine\Ookii.CommandLine.csproj">
-      <Project>{8F0E16C7-D6AC-43B0-B31F-37EDDB84C03A}</Project>
-      <Name>Ookii.CommandLine</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
       <Visible>False</Visible>
       <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
@@ -160,6 +154,12 @@
       <ProductName>Windows Installer 3.1</ProductName>
       <Install>true</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Ookii.CommandLine\Ookii.CommandLine.csproj">
+      <Project>{f129ab74-89c1-4813-a846-c52d5a96f51d}</Project>
+      <Name>Ookii.CommandLine</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

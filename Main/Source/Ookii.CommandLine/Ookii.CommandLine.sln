@@ -1,8 +1,8 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ookii.CommandLine", "Ookii.CommandLine\Ookii.CommandLine.csproj", "{8F0E16C7-D6AC-43B0-B31F-37EDDB84C03A}"
-EndProject
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29215.179
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommandLineSampleCS", "CommandLineSampleCS\CommandLineSampleCS.csproj", "{EEE4AF9C-C7C5-485B-9B8F-8035E7E428B7}"
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "CommandLineSampleVB", "CommandLineSampleVB\CommandLineSampleVB.vbproj", "{E921A68B-3562-4F20-8B50-5BE8D8E2CD31}"
@@ -24,43 +24,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShellCommandSampleCS", "She
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "ShellCommandSampleVB", "ShellCommandSampleVB\ShellCommandSampleVB.vbproj", "{4F896C58-081C-4178-BFBC-B0A3EB7F429D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ookii.CommandLine", "Ookii.CommandLine\Ookii.CommandLine.csproj", "{F129AB74-89C1-4813-A846-C52D5A96F51D}"
+EndProject
 Global
-	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 7
-		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
-		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs31
-		SccLocalPath0 = .
-		SccProjectUniqueName1 = CommandLineSampleCS\\CommandLineSampleCS.csproj
-		SccProjectName1 = CommandLineSampleCS
-		SccLocalPath1 = CommandLineSampleCS
-		SccProjectUniqueName2 = CommandLineSampleVB\\CommandLineSampleVB.vbproj
-		SccProjectName2 = CommandLineSampleVB
-		SccLocalPath2 = CommandLineSampleVB
-		SccProjectUniqueName3 = Ookii.CommandLine.Tests\\Ookii.CommandLine.Tests.csproj
-		SccProjectName3 = Ookii.CommandLine.Tests
-		SccLocalPath3 = Ookii.CommandLine.Tests
-		SccProjectUniqueName4 = Ookii.CommandLine\\Ookii.CommandLine.csproj
-		SccProjectName4 = Ookii.CommandLine
-		SccLocalPath4 = Ookii.CommandLine
-		SccProjectUniqueName5 = ShellCommandSampleCS\\ShellCommandSampleCS.csproj
-		SccProjectName5 = ShellCommandSampleCS
-		SccLocalPath5 = ShellCommandSampleCS
-		SccProjectUniqueName6 = ShellCommandSampleVB\\ShellCommandSampleVB.vbproj
-		SccProjectName6 = ShellCommandSampleVB
-		SccLocalPath6 = ShellCommandSampleVB
-	EndGlobalSection
-	GlobalSection(TestCaseManagementSettings) = postSolution
-		CategoryFile = Ookii.CommandLine.vsmdi
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{8F0E16C7-D6AC-43B0-B31F-37EDDB84C03A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8F0E16C7-D6AC-43B0-B31F-37EDDB84C03A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8F0E16C7-D6AC-43B0-B31F-37EDDB84C03A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8F0E16C7-D6AC-43B0-B31F-37EDDB84C03A}.Release|Any CPU.Build.0 = Release|Any CPU
 		{EEE4AF9C-C7C5-485B-9B8F-8035E7E428B7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{EEE4AF9C-C7C5-485B-9B8F-8035E7E428B7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EEE4AF9C-C7C5-485B-9B8F-8035E7E428B7}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -81,8 +52,18 @@ Global
 		{4F896C58-081C-4178-BFBC-B0A3EB7F429D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4F896C58-081C-4178-BFBC-B0A3EB7F429D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4F896C58-081C-4178-BFBC-B0A3EB7F429D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F129AB74-89C1-4813-A846-C52D5A96F51D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F129AB74-89C1-4813-A846-C52D5A96F51D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F129AB74-89C1-4813-A846-C52D5A96F51D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F129AB74-89C1-4813-A846-C52D5A96F51D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {6E22AD53-E031-474F-8AC7-B247C4311820}
+	EndGlobalSection
+	GlobalSection(TestCaseManagementSettings) = postSolution
+		CategoryFile = Ookii.CommandLine.vsmdi
 	EndGlobalSection
 EndGlobal
