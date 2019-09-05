@@ -21,8 +21,8 @@
     <FrameworkVersion>.NET Framework 2.0</FrameworkVersion>
     <HelpFileFormat>HtmlHelp1, Website</HelpFileFormat>
     <DocumentationSources>
-      <DocumentationSource sourceFile="..\Source\Ookii.CommandLine\Ookii.CommandLine\bin\Release\net20\Ookii.CommandLine.dll" />
-      <DocumentationSource sourceFile="..\Source\Ookii.CommandLine\Ookii.CommandLine\bin\Release\net20\Ookii.CommandLine.xml" />
+      <DocumentationSource sourceFile="..\src\Ookii.CommandLine\bin\Release\net20\Ookii.CommandLine.dll" />
+      <DocumentationSource sourceFile="..\src\Ookii.CommandLine\bin\Release\net20\Ookii.CommandLine.xml" />
     </DocumentationSources>
     <NamespaceSummaries>
       <NamespaceSummaryItem name="Ookii.CommandLine" isDocumented="True" xmlns="">&lt;para&gt;
