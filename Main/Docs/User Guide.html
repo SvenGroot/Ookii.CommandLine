@@ -1,10 +1,9 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
-<html xml:lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html>
+<html lang="en">
   <head>
-    <meta http-equiv="Content-Type" content="application/xhtml+xml;charset=utf-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <title>Ookii.CommandLine 2.1 user guide</title>
-    <style type="text/css">
+    <meta charset="utf-8" />
+    <title>Ookii.CommandLine user guide</title>
+    <style>
               body
               {
                   font-family: Calibri, "Trebuchet MS", Verdana, Arial, sans-serif;
@@ -222,24 +221,30 @@
           </style>
   </head>
   <body>
-    <h1>Ookii.CommandLine 2.2</h1>
+    <h1>Ookii.CommandLine 2.3</h1>
     <p class="author">User Guide</p>
-    <p>Copyright © Sven Groot (Ookii.org) 2013<br />For license information see license.txt</p>
+    <p>Copyright © Sven Groot (Ookii.org)<br />
+    For license information see license.txt<br />
+    <a href="https://github.com/SvenGroot/ookii.commandline">Project home page</a></p>
     <h2>Introduction</h2>
     <p>Ookii.CommandLine is a library that helps you to parse command line arguments for your applications. It allows you to easily define a set of accepted arguments, and then parse the command line supplied to your application for those arguments. In addition, it allows you to generate usage help from the arguments that you defined which you can display to the user.</p>
     <p>Ookii.CommandLine can be used with any kind of .Net application, whether Console, Windows Forms, or WPF. Although a limited subset of functionality—particularly related around generating usage help text—is geared primarily towards console applications that are invoked from the command prompt, the main command line parsing functionality is usable in any application that needs to process command line arguments.</p>
     <p>To define a set of command line arguments, you create a class that will hold their values. The constructor parameters and properties of that class determine the set of arguments that are accepted. For each argument you can customize things like the argument name and whether or not an argument is required, and you can specify descriptions used to customize the usage help.</p>
     <p>Two samples are provided with the library, one for basic command line parsing and one for shell commands. Both have a C# and Visual Basic version so you can see how to use the Ookii.CommandLine library in your own code. Besides the source code, they are also included as binaries so you can experience how the argument parsing works by trying them out.</p>
     <h2>System requirements</h2>
-    <p>Ookii.CommandLine 2.2 is a class library for use in your own applications. It can be used with applications targeting at least one of the following environments:</p>
+    <p>Ookii.CommandLine is a class library for use in your own applications for <a href="https://dotnet.microsoft.com/">Microsoft .Net</a>. It can be used with applications targeting at least one of the following environments:</p>
     <ul>
-      <li>
-        <a href="http://msdn.microsoft.com/netframework">Microsoft .Net Framework</a> 2.0 or later</li>
+      <li>Microsoft .Net Framework 2.0 or later</li>
+      <li>Microsoft .Net Standard 2.0 (including .Net Core)</li>
       <li>
         <a href="http://www.mono-project.com/">Mono</a> 2.6 or later, using the .Net 2.0 or .Net 4.0 profile</li>
     </ul>
-    <p>To view and edit the source code of Ookii.CommandLine or the included sample applications, you must use <a href="http://msdn.microsoft.com/vstudio">Microsoft Visual Studio 2010</a>. Because Ookii.CommandLine targets .Net 2.0, you can use the library with Visual Studio 2005 or later or any other development environment that targets .Net 2.0.</p>
-    <h2>What’s new in Ookii.CommandLine 2.2</h2>
+    <p>To view and edit the source code of Ookii.CommandLine or the included sample applications, it is recommended to use the latest version of <a href="https://visualstudio.microsoft.com/">Microsoft Visual Studio</a>. Library documentation is generated using <a href="https://github.com/EWSoftware/SHFB">Sandcastle Help File Builder</a>.</p>
+    <h2>What’s new in Ookii.CommandLine</h2>
+    <p>Ookii.CommandLine 2.3 offers the following improvements over version 2.1:</p>
+    <ul>
+      <li>Ookii.CommandLine now comes in both a .Net Framework 2.0 and .Net Standard 2.0 version.</li>
+    </ul>
     <p>Ookii.CommandLine 2.2 offers the following improvements over version 2.1:</p>
     <ul>
       <li>Added support for alternative names (aliases) for command line arguments.</li>
@@ -425,7 +430,7 @@
     <p>Shell commands can be used to create shell utilities that perform more than one operation, where each operation has its own set of command line arguments. For example, a utility might be used to modify or query different configuration parameters of a system. Depending on whether it's a query or a modification, and which configuration parameter is used, the arguments to such a utility might differ. Rather than provide different executables for each operation, it is often more convenient to combine related operations in a single utility.</p>
     <p>Think for example of the Windows <code>net</code> command, which provides many different operations through the same command. Shell commands allow you to easily create such an application.</p>
     <p>For a program using shell commands, typically the first command line argument will be the name of the operation and identifies which shell command to use, while the remaining arguments are arguments to the command. The <code>ShellCommand</code> class aids you in creating utilities that follow this pattern. </p>
-    <p />
+    <p></p>
     <h3>Defining shell commands</h3>
     <p>A shell command is created by deriving a type from the <code>ShellCommand</code> class, specifying the <code>ShellCommandAttribute</code> on that type to specify the name of the command, and implementing the <code>ShellCommand.Run</code> method for that type.</p>
     <p>The class inheriting the <code>ShellCommand</code> class defines the arguments for the command. This class will be used with the <code>CommandLineParser</code> class to parse the arguments for the command.</p>
@@ -440,6 +445,5 @@
     <h2>Line wrapping text writer</h2>
     <p>The Ookii.CommandLine library includes a utility class, the <code>LineWrappingTextWriter</code> class, which it uses for properly word-wrapping usage help when writing it to the console, but which can also be used in your own code.</p>
     <p>The <code>LineWrappingTextWriter</code> class allows you to write text to another <code>TextWriter</code> class, wrapping that text at the specified line length, and optionally indenting subsequent lines.</p>
-    <p />
   </body>
 </html>
