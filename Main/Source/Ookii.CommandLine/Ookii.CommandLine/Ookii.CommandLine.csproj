@@ -16,8 +16,7 @@
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>ookii.snk</AssemblyOriginatorKeyFile>
     <DelaySign>false</DelaySign>
-    <Description>Ookii.CommandLine is a powerful command line parsing library for .Net applications. It allows you to easily define required, optional,
- positional and named arguments, parse the command line, and generate usage information.</Description>
+    <Description>Ookii.CommandLine is a powerful command line parsing library for .Net applications. It allows you to easily define required, optional, positional and named arguments, parse the command line, and generate usage information.</Description>
     <PackageTags>command line arguments parsing parser parse argument args console</PackageTags>
     <PackageReleaseNotes>2.3: Added package for .Net Standard 2.0.</PackageReleaseNotes>
   </PropertyGroup>
