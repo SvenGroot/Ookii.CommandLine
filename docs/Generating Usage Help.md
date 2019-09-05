@@ -58,12 +58,12 @@ The first part of the usage help is a description of your application. This is a
 
 The description is specified by specifying the `System.ComponentModel.DescriptionAttribute` to the class that defines the command line arguments, as in the following example:
 
-{code: C#}
+```csharp
 [Description("This is the application description that is included in the usage help.")]
 class MyArguments
 {
 }
-{code: C#}
+```
 
 If this attribute is not specified, no description is included in the usage help. The description can also be omitted by setting the `WriteUsageOptions.IncludeApplicationDescription` property to false.
 
