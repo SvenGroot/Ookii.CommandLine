@@ -10,7 +10,7 @@ Several code snippets are provided to make working with Ookii.CommandLine even e
 
 All snippets are provided for C# and Visual Basic. To use them, either run the `Install-Snippets.ps1` script with PowerShell, or manually copy the snippet files to the "Visual Studio \<version>\Code Snippets\Visual C#\My Code Snippets" or "Visual Studio \<version>\Code Snippets\Visual Basic\My Code Snippets" folder located in your My Documents folder. Alternatively, use the snippet manager inside Visual Studio to import the snippet files.
 
-The Install-Snippets.ps1 script will install the snippets for Visual Studio 2005 2008, 2010, 2012, 2013, 2015, 2017 and 2019 if the snippet folders for those versions exist.
+The Install-Snippets.ps1 script will install the snippets for Visual Studio 2005 through 2019 if the snippet folders for those versions exist.
 
 To uninstall, simply remove the files from those folders.
 
