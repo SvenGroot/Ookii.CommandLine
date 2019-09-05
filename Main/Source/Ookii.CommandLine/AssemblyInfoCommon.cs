@@ -9,7 +9,7 @@ using System.Reflection;
 
 [assembly: AssemblyCompany("Ookii.org")]
 [assembly: AssemblyProduct("Ookii.CommandLine")]
-[assembly: AssemblyCopyright("Copyright � Sven Groot (Ookii.org)")]
+[assembly: AssemblyCopyright("Copyright © Sven Groot (Ookii.org)")]
 
 // Version information for an assembly consists of the following four values:
 //
