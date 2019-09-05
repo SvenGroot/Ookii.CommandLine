@@ -11,7 +11,7 @@ If argument parsing fails, the `CommandLineParser.Parse` method will throw a `Co
 A typical usage sample for the `CommandLineParser` class is as follows:
 
 ```csharp
-static void Main(string[]() args)
+static void Main(string[] args)
 {
     CommandLineParser parser = new CommandLineParser(typeof(MyArguments));
     try

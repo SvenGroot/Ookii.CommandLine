@@ -20,7 +20,7 @@ To view and edit the source code of Ookii.CommandLine or the included sample app
 
 ## Contents
 
-* [What's New in Ookii.CommandLine 2.2](What's%20New%20in%20Ookii.CommandLine.md)
+* [What's New in Ookii.CommandLine](What's%20New%20in%20Ookii.CommandLine.md)
 * [Command Line Arguments in Ookii.CommandLine](Command%20Line%20Arguments%20in%20Ookii.CommandLine.md)
   * [Defining Command Line Arguments](Defining%20Command%20Line%20Arguments.md)
   * [Parsing Command Line Arguments](Parsing%20Command%20Line%20Arguments.md)

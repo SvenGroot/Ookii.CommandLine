@@ -1,6 +1,6 @@
 # Command line arguments
 
-Command line arguments are passed to your application when it is started, and are typically accessed through the parameter of the `static void Main(string[]() args)` method (`Shared Sub Main(ByVal args() As String)` in Visual Basic). This provides with the arguments as an array of strings, which is not terribly useful. What Ookii.CommandLine allows you to do is to convert that array of strings into a strongly typed set of named values, which are stored in the properties of the class that was used to define the arguments.
+Command line arguments are passed to your application when it is started, and are typically accessed through the parameter of the `static void Main(string[] args)` method (`Shared Sub Main(ByVal args() As String)` in Visual Basic). This provides with the arguments as an array of strings, which is not terribly useful. What Ookii.CommandLine allows you to do is to convert that array of strings into a strongly typed set of named values, which are stored in the properties of the class that was used to define the arguments.
 
 The method used to extract values from the array of string arguments is determined by the command line argument parsing rules. Ookii.CommandLine uses parsing rules that are very similar to how Microsoft PowerShell parses arguments for cmdlets, so if you have used PowerShell these rules will be familiar with you.
 
@@ -42,7 +42,7 @@ Some arguments can take multiple values; these are _multi-value arguments_, also
 
 In this case, the value of the argument named “ArgumentName” will be a list holding all three values.
 
-The type of a multi-value argument must be an array type, for example `string[]()()` or `int[]()()` in C#, or any type implementing `ICollection<T>` when the argument is defined by a read-only property.
+The type of a multi-value argument must be an array type, for example `string[]` or `int[]` in C#, or any type implementing `ICollection<T>` when the argument is defined by a read-only property.
 
 It’s possible to specify a separator for multi-value arguments using the `MultiValueSeparatorAttribute` attribute. This makes it possible to specify multiple values for the argument while the argument itself is specified only once. For example, if the separator is set to a comma, you can specify the values as follows:
 
@@ -92,7 +92,7 @@ Ookii.CommandLine allows you to define arguments with any .Net type, including t
 
 The .Net Framework provides a very flexible method for converting one type to another through the `System.ComponentModel.TypeConverter` class. You can use any type that has a type converter than can convert from a string for a command line argument. Most built-in types in .Net Framework have such a type converter. You can also use your own types by creating a type converter for that type.
 
-It is possible to override the default conversion by specifying a custom type converter using the `System.ComponentModel.TypeConverterAttribute`. When this attribute is applied to a constructor parameter or property that defines an argument, the specified type converter will be used for conversion instead. Note that for multi-value, dictionary and nullable value-type arguments the converter must be for the element type (e.g. if the argument is a multi-value argument of type `int[]()`, the type converter must be able to convert to `int`). For a dictionary argument the element type is `KeyValuePair<TKey, TValue>`, and the type converter is responsible for parsing the key and value from the argument value.
+It is possible to override the default conversion by specifying a custom type converter using the `System.ComponentModel.TypeConverterAttribute`. When this attribute is applied to a constructor parameter or property that defines an argument, the specified type converter will be used for conversion instead. Note that for multi-value, dictionary and nullable value-type arguments the converter must be for the element type (e.g. if the argument is a multi-value argument of type `int[]`, the type converter must be able to convert to `int`). For a dictionary argument the element type is `KeyValuePair<TKey, TValue>`, and the type converter is responsible for parsing the key and value from the argument value.
 
 For many types, the conversion can be culture dependent. For example, converting numbers or dates depends on the culture which defines the accepted formats and how they’re interpreted; some cultures might use a period as the decimal separators, while others use a comma.
 

@@ -16,7 +16,7 @@ To create a required argument, set the `CommandLineArgumentAttribute.IsRequired`
 
 To create a positional argument, set the `CommandLineArgumentAttribute.Position` property to a non-negative number. This property determines the relative ordering of the positional arguments only, not their actual position, so it’s fine if you skip numbers. Positional arguments defined by properties come after arguments defined by constructor parameters, so for example if there are three constructor parameters, the property with the lowest position value will be the fourth positional argument. Remember that you cannot have required positional arguments after optional ones, and that a multi-value positional argument must be the last positional argument. If your properties violate these rules, the `CommandLineParser` class’s constructor will throw an exception.
 
-To define a multi-value argument, you can use either a read-write property of an array type (e.g. `int[]()`) or a read-only property of any type implementing `ICollection<T>` (e.g. `List<int>`).
+To define a multi-value argument, you can use either a read-write property of an array type (e.g. `int[]`) or a read-only property of any type implementing `ICollection<T>` (e.g. `List<int>`).
 
 To define a dictionary argument, you can use either a read-write property of type `Dictionary<TKey, TValue>` (e.g. `Dictionary<string, int>`) or a read-only property of any type implementing `IDictionary<TKey, TValue>`.
 
