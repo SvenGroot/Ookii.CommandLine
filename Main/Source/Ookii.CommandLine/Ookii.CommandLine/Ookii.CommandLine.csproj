@@ -22,9 +22,13 @@
     <PackageReleaseNotes>2.3: Added package for .Net Standard 2.0.</PackageReleaseNotes>
   </PropertyGroup>
 
-  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
-    <Exec Command="%25windir%25\SysNative\WindowsPowerShell\v1.0\PowerShell.exe -NoProfile -Command &quot;&amp;'$(SolutionDir)Create-AssemblyInfoCommon.ps1' '$(DevEnvDir)tf.exe' '$(ConfigurationName)'&quot;" />
-  </Target>
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net20|AnyCPU'">
+    <DocumentationFile>C:\Users\svgroot\Source\Repos\ookii.commandline\Main\Source\Ookii.CommandLine\Ookii.CommandLine\Ookii.CommandLine.xml</DocumentationFile>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net20|AnyCPU'">
+    <DocumentationFile>C:\Users\svgroot\Source\Repos\ookii.commandline\Main\Source\Ookii.CommandLine\Ookii.CommandLine\Ookii.CommandLine.xml</DocumentationFile>
+  </PropertyGroup>
 
   <ItemGroup>
     <None Include="..\..\..\..\license.md">
