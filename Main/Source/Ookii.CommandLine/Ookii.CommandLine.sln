@@ -12,8 +12,6 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{412AEB8D-40EF-4637-AD7D-CD71AD6ACB96}"
 	ProjectSection(SolutionItems) = preProject
 		AssemblyInfoCommon.cs = AssemblyInfoCommon.cs
-		AssemblyInfoCommon.cs.template = AssemblyInfoCommon.cs.template
-		Create-AssemblyInfoCommon.ps1 = Create-AssemblyInfoCommon.ps1
 		Create-Release.ps1 = Create-Release.ps1
 		history.txt = history.txt
 		Local.testsettings = Local.testsettings
@@ -24,7 +22,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShellCommandSampleCS", "She
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "ShellCommandSampleVB", "ShellCommandSampleVB\ShellCommandSampleVB.vbproj", "{4F896C58-081C-4178-BFBC-B0A3EB7F429D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ookii.CommandLine", "Ookii.CommandLine\Ookii.CommandLine.csproj", "{F129AB74-89C1-4813-A846-C52D5A96F51D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ookii.CommandLine", "Ookii.CommandLine\Ookii.CommandLine.csproj", "{F129AB74-89C1-4813-A846-C52D5A96F51D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
