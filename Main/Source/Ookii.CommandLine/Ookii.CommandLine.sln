@@ -1,10 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28010.2003
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29215.179
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ookii.CommandLine", "Ookii.CommandLine\Ookii.CommandLine.csproj", "{8F0E16C7-D6AC-43B0-B31F-37EDDB84C03A}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommandLineSampleCS", "CommandLineSampleCS\CommandLineSampleCS.csproj", "{EEE4AF9C-C7C5-485B-9B8F-8035E7E428B7}"
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "CommandLineSampleVB", "CommandLineSampleVB\CommandLineSampleVB.vbproj", "{E921A68B-3562-4F20-8B50-5BE8D8E2CD31}"
@@ -26,16 +24,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShellCommandSampleCS", "She
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "ShellCommandSampleVB", "ShellCommandSampleVB\ShellCommandSampleVB.vbproj", "{4F896C58-081C-4178-BFBC-B0A3EB7F429D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ookii.CommandLine", "Ookii.CommandLine\Ookii.CommandLine.csproj", "{F129AB74-89C1-4813-A846-C52D5A96F51D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{8F0E16C7-D6AC-43B0-B31F-37EDDB84C03A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8F0E16C7-D6AC-43B0-B31F-37EDDB84C03A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8F0E16C7-D6AC-43B0-B31F-37EDDB84C03A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8F0E16C7-D6AC-43B0-B31F-37EDDB84C03A}.Release|Any CPU.Build.0 = Release|Any CPU
 		{EEE4AF9C-C7C5-485B-9B8F-8035E7E428B7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{EEE4AF9C-C7C5-485B-9B8F-8035E7E428B7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EEE4AF9C-C7C5-485B-9B8F-8035E7E428B7}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -56,12 +52,16 @@ Global
 		{4F896C58-081C-4178-BFBC-B0A3EB7F429D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4F896C58-081C-4178-BFBC-B0A3EB7F429D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4F896C58-081C-4178-BFBC-B0A3EB7F429D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F129AB74-89C1-4813-A846-C52D5A96F51D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F129AB74-89C1-4813-A846-C52D5A96F51D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F129AB74-89C1-4813-A846-C52D5A96F51D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F129AB74-89C1-4813-A846-C52D5A96F51D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {207573B6-FB3B-4CDA-903D-A4ED4F74121F}
+		SolutionGuid = {6E22AD53-E031-474F-8AC7-B247C4311820}
 	EndGlobalSection
 	GlobalSection(TestCaseManagementSettings) = postSolution
 		CategoryFile = Ookii.CommandLine.vsmdi
