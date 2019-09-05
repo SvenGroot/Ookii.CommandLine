@@ -1,4 +1,14 @@
-# What’s new in Ookii.CommandLine 2.1
+# What’s new in Ookii.CommandLine
+
+Ookii.CommandLine 2.3 offers the following improvements over version 2.2:
+
+* Ookii.CommandLine now comes in both a .Net Framework 2.0 and .Net Standard 2.0 version.
+
+Ookii.CommandLine 2.2 offers the following improvements over version 2.1:
+
+* Added support for alternative names (aliases) for command line arguments.
+* An argument’s aliases and default value can be included in the argument description when generating usage.
+* Added code snippets.
 
 Ookii.CommandLine 2.1 offers the following improvements over version 2.0:
 
@@ -16,12 +26,12 @@ Ookii.CommandLine 2.1 offers the following improvements over version 2.0:
 Ookii.CommandLine 2.0 offers the following improvements compared to Ookii.CommandLine 1.0:
 
 * Improved argument parsing:
-	* All arguments can be specified by name.
-	* Support for using whitespace to separate an argument name from its value.
-	* Support for multiple argument name prefixes.
-	* Support for using a custom StringComparer for argument name matching (to allow case sensitive or insensitive matching).
-	* Support for use a custom CultureInfo for argument value conversion.
-	* Non-positional arguments can be required arguments.
+  * All arguments can be specified by name.
+  * Support for using whitespace to separate an argument name from its value.
+  * Support for multiple argument name prefixes.
+  * Support for using a custom StringComparer for argument name matching (to allow case sensitive or insensitive matching).
+  * Support for use a custom CultureInfo for argument value conversion.
+  * Non-positional arguments can be required arguments.
 * Properties can be used to define positional arguments.
 * More customizable generation of usage help text.
 * The new shell commands functionality lets you easily create shell utilities with multiple operations that each uses its own command line arguments.

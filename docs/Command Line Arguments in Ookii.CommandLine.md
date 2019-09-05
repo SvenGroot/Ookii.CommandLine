@@ -1,6 +1,6 @@
 # Command line arguments
 
-Command line arguments are passed to your application when it is started, and are typically accessed through the parameter of the `static void Main(string[]() args)` method (`Shared Sub Main(ByVal args() As String`) in Visual Basic). This provides with the arguments as an array of strings, which is not terribly useful. What Ookii.CommandLine allows you to do is to convert that array of strings into a strongly typed set of named values, which are stored in the properties of the class that was used to define the arguments.
+Command line arguments are passed to your application when it is started, and are typically accessed through the parameter of the `static void Main(string[]() args)` method (`Shared Sub Main(ByVal args() As String)` in Visual Basic). This provides with the arguments as an array of strings, which is not terribly useful. What Ookii.CommandLine allows you to do is to convert that array of strings into a strongly typed set of named values, which are stored in the properties of the class that was used to define the arguments.
 
 The method used to extract values from the array of string arguments is determined by the command line argument parsing rules. Ookii.CommandLine uses parsing rules that are very similar to how Microsoft PowerShell parses arguments for cmdlets, so if you have used PowerShell these rules will be familiar with you.
 
@@ -8,7 +8,7 @@ Command line arguments follow the name of your application on the command prompt
 
     -ArgumentName ArgumentValue
 
-The argument name is preceded by the _argument name prefix_. This prefix is configurable, but Ookii.CommandLine defaults to accepting a forward slash (`/`) and a dash (`-`) on Windows, and only a dash (`-`) on other platforms (other platforms are supported through Mono).
+The argument name is preceded by the _argument name prefix_. This prefix is configurable, but Ookii.CommandLine defaults to accepting a forward slash (`/`) and a dash (`-`) on Windows, and only a dash (`-`) on other platforms (other platforms are supported through .Net Core and Mono).
 
 The argument value follows the name, separated either by a space or a colon (`:`). Not all arguments require values; those that do not are called _switch arguments_ and have a value determined by their presence or absence on the command line.
 

@@ -8,23 +8,24 @@ To define a set of command line arguments, you create a class that will hold the
 
 Two samples are provided with the library, one for basic command line parsing and one for shell commands. Both have a C# and Visual Basic version so you can see how to use the Ookii.CommandLine library in your own code. Besides the source code, they are also included as binaries so you can experience how the argument parsing works by trying them out.
 
-# System requirements
+## System requirements
 
-Ookii.CommandLine 2.1 is a class library for use in your own applications. It can be used with applications targeting at least one of the following environments:
+Ookii.CommandLine is a class library for use in your own applications for [Microsoft .Net](https://dotnet.microsoft.com/). It can be used with applications targeting at least one of the following environments:
 
-* [Microsoft .Net Framework](http://msdn.microsoft.com/netframework) 2.0 or later
+* Microsoft .Net Framework 2.0 or later
+* Microsoft .Net Standard 2.0
 * [Mono](http://www.mono-project.com/) 2.6 or later, using the .Net 2.0 or .Net 4.0 profile
 
-To view and edit the source code of Ookii.CommandLine or the included sample applications, you must use [Microsoft Visual Studio 2010](http://msdn.microsoft.com/vstudio). Because Ookii.CommandLine targets .Net 2.0, you can use the library with Visual Studio 2005 or later or any other development environment that targets .Net 2.0.
+To view and edit the source code of Ookii.CommandLine or the included sample applications, it is recommended to use the latest version of [Microsoft Visual Studio](https://visualstudio.microsoft.com/). Library documentation is generated using [Sandcastle Help File Builder](https://github.com/EWSoftware/SHFB).
 
-# Contents
+## Contents
 
-* [What's New in Ookii.CommandLine 2.2](What's-New-in-Ookii.CommandLine-2.2)
-* [Command Line Arguments in Ookii.CommandLine](Command-Line-Arguments-in-Ookii.CommandLine)
-	* [Defining Command Line Arguments](Defining-Command-Line-Arguments)
-	* [Parsing Command Line Arguments](Parsing-Command-Line-Arguments)
-	* [Generating Usage Help](Generating-Usage-Help)
-* [Shell Commands](Shell-Commands)
-* [Line Wrapping Text Writer](Line-Wrapping-Text-Writer)
-* [Code Snippets](Code-Snippets)
-* [Class Library Documentation](http://www.ookii.org/link.ashx?id=CommandLineDoc)
+* [What's New in Ookii.CommandLine 2.2](What's%20New%20in%20Ookii.CommandLine.md)
+* [Command Line Arguments in Ookii.CommandLine](Command%20Line%20Arguments%20in%20Ookii.CommandLine.md)
+  * [Defining Command Line Arguments](Defining%20Command%20Line%20Arguments.md)
+  * [Parsing Command Line Arguments](Parsing%20Command%20Line%20Arguments.md)
+  * [Generating Usage Help](Generating%20Usage%20Help.md)
+* [Shell Commands](Shell%20Commands.md)
+* [Line Wrapping Text Writer](Line%20Wrapping%20Text%20Writer.md)
+* [Code Snippets](Code%20Snippets.md)
+* [Class Library Documentation](http://www.ookii.org/link.ashx?id=CommandLineDoc.md)
