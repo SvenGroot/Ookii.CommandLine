@@ -22,15 +22,15 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net20|AnyCPU'">
-    <DocumentationFile>C:\Users\svgroot\Source\Repos\ookii.commandline\Main\Source\Ookii.CommandLine\Ookii.CommandLine\Ookii.CommandLine.xml</DocumentationFile>
+    <DocumentationFile>Ookii.CommandLine.xml</DocumentationFile>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net20|AnyCPU'">
-    <DocumentationFile>C:\Users\svgroot\Source\Repos\ookii.commandline\Main\Source\Ookii.CommandLine\Ookii.CommandLine\Ookii.CommandLine.xml</DocumentationFile>
+    <DocumentationFile>Ookii.CommandLine.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="..\..\..\..\license.md">
+    <None Include="..\..\license.md">
       <Pack>True</Pack>
       <PackagePath></PackagePath>
     </None>
