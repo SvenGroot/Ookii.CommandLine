@@ -158,6 +158,14 @@ namespace Ookii.CommandLine.Tests
             public string[] Separator { get; set; }
         }
 
+        class SimpleArguments
+        {
+            [CommandLineArgument]
+            public string Argument1 { get; set; }
+            [CommandLineArgument]
+            public string Argument2 { get; set; }
+        }
+
         #endregion
 
         private TestContext testContextInstance;
@@ -372,6 +380,42 @@ namespace Ookii.CommandLine.Tests
             Assert.IsNotNull(args);
             CollectionAssert.AreEqual(new[] { "Value1,Value2", "Value3" }, args.NoSeparator);
             CollectionAssert.AreEqual(new[] { "Value1", "Value2", "Value3" }, args.Separator);
+        }
+
+        [TestMethod]
+        public void ParseTestNameValueSeparator()
+        {
+            Type argumentsType = typeof(SimpleArguments);
+            CommandLineParser target = new CommandLineParser(argumentsType, new[] { "/", "-" }) { Culture = CultureInfo.InvariantCulture };
+            Assert.AreEqual(CommandLineParser.DefaultNameValueSeparator, target.NameValueSeparator);
+            SimpleArguments args =  (SimpleArguments)target.Parse(new[] { "-Argument1:test", "-Argument2:foo:bar" });
+            Assert.IsNotNull(args);
+            Assert.AreEqual("test", args.Argument1);
+            Assert.AreEqual("foo:bar", args.Argument2);
+            try
+            {
+                args = (SimpleArguments)target.Parse(new[] { "-Argument1=test" });
+                Assert.Fail("Exception expected");
+            }
+            catch (CommandLineArgumentException ex)
+            {
+                Assert.AreEqual(CommandLineArgumentErrorCategory.UnknownArgument, ex.Category);
+            }
+
+            target.NameValueSeparator = '=';
+            args = (SimpleArguments)target.Parse(new[] { "-Argument1=test", "-Argument2=foo=bar" });
+            Assert.IsNotNull(args);
+            Assert.AreEqual("test", args.Argument1);
+            Assert.AreEqual("foo=bar", args.Argument2);
+            try
+            {
+                args = (SimpleArguments)target.Parse(new[] { "-Argument1:test" });
+                Assert.Fail("Exception expected");
+            }
+            catch (CommandLineArgumentException ex)
+            {
+                Assert.AreEqual(CommandLineArgumentErrorCategory.UnknownArgument, ex.Category);
+            }
         }
 
         private static void TestArgument(IEnumerator<CommandLineArgument> arguments, string name, string memberName, Type type, Type elementType, int? position, bool isRequired, object defaultValue, string description, string valueDescription, bool isSwitch, bool isMultiValue, bool isDictionary = false, params string[] aliases)

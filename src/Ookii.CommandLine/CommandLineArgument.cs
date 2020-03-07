@@ -594,7 +594,7 @@ namespace Ookii.CommandLine
             string argument = argumentName;
             if( !IsSwitch )
             {
-                char separator = (_parser.AllowWhiteSpaceValueSeparator && options.UseWhiteSpaceValueSeparator) ? ' ' : CommandLineParser.NameValueSeparator;
+                char separator = (_parser.AllowWhiteSpaceValueSeparator && options.UseWhiteSpaceValueSeparator) ? ' ' : _parser.NameValueSeparator;
                 string argumentValue = string.Format(CultureInfo.CurrentCulture, options.ValueDescriptionFormat, ValueDescription);
                 argument = argumentName + separator + argumentValue;
             }

@@ -5,10 +5,10 @@
     <Authors>Sven Groot</Authors>
     <Company>Ookii.org</Company>
     <Copyright>Copyright © Sven Groot (Ookii.org)</Copyright>
-    <Version>2.3.0</Version>
+    <Version>2.4.0</Version>
     <PackageLicenseFile>license.md</PackageLicenseFile>
-    <AssemblyVersion>2.3.0.0</AssemblyVersion>
-    <FileVersion>2.3.0.0</FileVersion>
+    <AssemblyVersion>2.4.0.0</AssemblyVersion>
+    <FileVersion>2.4.0.0</FileVersion>
     <PackageProjectUrl>https://github.com/SvenGroot/ookii.commandline</PackageProjectUrl>
     <RepositoryUrl>https://github.com/SvenGroot/ookii.commandline</RepositoryUrl>
     <RepositoryType>git</RepositoryType>

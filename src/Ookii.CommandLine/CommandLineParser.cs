@@ -44,22 +44,24 @@ namespace Ookii.CommandLine
     ///   supported via <a href="http://www.mono-project.com">Mono</a>).
     /// </para>
     /// <note>
-    ///   Although almost any argument name is allowed as long as it isn't empty and doesn't contain a colon (:),
-    ///   certain argument names may not be advisable. Particularly, avoid argument names that start with a number, as they it will
-    ///   not be possible to specify them by name if the argument name prefix is a single dash; arguments starting with a single dash
-    ///   followed by a digit are always considered values during parsing, even if there is an argument with that name.
+    ///   Although almost any argument name is allowed as long as it isn't empty and doesn't contain the character
+    ///   specified in the <see cref="NameValueSeparator"/> property, certain argument names may not be advisable.
+    ///   Particularly, avoid argument names that start with a number, as they it will not be possible to specify
+    ///   them by name if the argument name prefix is a single dash; arguments starting with a single dash followed
+    ///   by a digit are always considered values during parsing, even if there is an argument with that name.
     /// </note>
     /// <para>
     ///   The name of the argument must be followed by its value. The value can be either in the next argument (separated from the name
-    ///   by white space), or separated by a colon (:). For example, to assign the value "foo" to the argument "sample", you can use
-    ///   either <c>-sample foo</c> or <c>-sample:foo</c>.
+    ///   by white space), or separated by  the character specified in the <see cref="NameValueSeparator"/> property. For example,
+    ///   to assign the value "foo" to the argument "sample", you can use either <c>-sample foo</c> or <c>-sample:foo</c>.
     /// </para>
     /// <para>
     ///   If an argument has a type of <see cref="Boolean"/> (and is not a positional argument as described below), it is a switch argument, and doesn't require a value. Its value is determined
     ///   by its presence on the command line; if it is absent the value is <see langword="false"/>; if it is present the value is
     ///   <see langword="true"/>. For example, to set a switch argument named "verbose" to true, you can simply use the command line
     ///   <c>-verbose</c>. You can still explicitly specify the value of a switch argument, for example <c>-verbose:true</c>.
-    ///   Note that you cannot use white space to separate a switch argument name and value; you must use a colon.
+    ///   Note that you cannot use white space to separate a switch argument name and value; you must use the character
+    ///   specified in the <see cref="NameValueSeparator"/> property.
     /// </para>
     /// <para>
     ///   If the type of the argument is <see cref="Nullable{T}"/> of <see cref="Boolean"/>, its value will be <see langword="null"/> if it is not supplied, <see langword="true"/> if it is supplied without
@@ -175,7 +177,6 @@ namespace Ookii.CommandLine
 
         #endregion
 
-        internal const char NameValueSeparator = ':';
         internal const int MaximumLineWidthForIndent = 30; // Don't apply indentation to console output if the line width is less than this.
 
         private readonly Type _argumentsType;
@@ -188,6 +189,17 @@ namespace Ookii.CommandLine
         private ReadOnlyCollection<CommandLineArgument> _argumentsReadOnlyWrapper;
         private ReadOnlyCollection<string> _argumentNamePrefixesReadOnlyWrapper;
         private CultureInfo _culture;
+
+        /// <summary>
+        /// Gets the default character used to separate the name and the value of an argument.
+        /// </summary>
+        /// <value>
+        /// The default character used to separate the name and the value of an argument, which is ':'.
+        /// </value>
+        /// <remarks>
+        /// This constant is used as the default value of the <see cref="NameValueSeparator"/> property.
+        /// </remarks>
+        public const char DefaultNameValueSeparator = ':';
 
         /// <summary>
         /// Event raised when an argument is parsed from the command line.
@@ -415,29 +427,64 @@ namespace Ookii.CommandLine
         /// Gets or sets a value indicating whether the value of arguments may be separated from the name by white space.
         /// </summary>
         /// <value>
-        ///   <see langword="true"/> if white space is allowed to separate an argument name and its value; <see langword="false"/> if only the colon (:) is allowed.
+        ///   <see langword="true"/> if white space is allowed to separate an argument name and its value; <see langword="false"/> if only the character
+        ///   specified in the <see cref="NameValueSeparator"/> property is allowed.
         ///   The default value is <see langword="true"/>.
         /// </value>
         /// <remarks>
         /// <para>
-        ///   If the <see cref="AllowWhiteSpaceValueSeparator"/> property is <see langword="true"/>, the value of an argument can be separated from its name either
-        ///   by using a colon (:) or by using white space. Given a named argument named "sample", the command lines <c>-sample:value</c> and <c>-sample value</c>
+        ///   If the <see cref="AllowWhiteSpaceValueSeparator"/> property is <see langword="true"/>,
+        ///   the value of an argument can be separated from its name either by using  the character
+        ///   specified in the <see cref="NameValueSeparator"/> property or by using white space.
+        ///   Given a named argument named "sample", the command lines <c>-sample:value</c> and <c>-sample value</c>
         ///   are both valid and will assign the value "value" to the argument.
         /// </para>
         /// <para>
-        ///   If the <see cref="AllowWhiteSpaceValueSeparator"/> property is <see langword="false"/>, only the colon (:) is allowed to separate the value from the name.
+        ///   If the <see cref="AllowWhiteSpaceValueSeparator"/> property is <see langword="false"/>, only the character
+        ///   specified in the <see cref="NameValueSeparator"/> property is allowed to separate the value from the name.
         ///   The command line <c>-sample:value</c> still assigns the value "value" to the argument, but for the command line "-sample value" the argument 
         ///   is considered not to have a value (which is only valid if <see cref="CommandLineArgument.IsSwitch"/> is <see langword="true"/>), and
         ///   "value" is considered to be the value for the next positional argument.
         /// </para>
         /// <para>
-        ///   For switch arguments (<see cref="CommandLineArgument.IsSwitch"/> is <see langword="true"/>), only the colon (:) is allowed to
-        ///   specify an explicit value regardless of the value of the <see cref="AllowWhiteSpaceValueSeparator"/> property. Given a switch argument named "switch" 
-        ///   the command line <c>-switch false</c> is interpreted to mean that the value of "switch" is <see langword="true"/> and the value of the
-        ///   next positional argument is "false", even if the <see cref="AllowWhiteSpaceValueSeparator"/> property is <see langword="true"/>.
+        ///   For switch arguments (<see cref="CommandLineArgument.IsSwitch"/> is <see langword="true"/>),
+        ///   only  the character specified in the <see cref="NameValueSeparator"/> property is allowed
+        ///   to specify an explicit value regardless of the value of the <see cref="AllowWhiteSpaceValueSeparator"/>
+        ///   property. Given a switch argument named "switch"  the command line <c>-switch false</c>
+        ///   is interpreted to mean that the value of "switch" is <see langword="true"/> and the value of the
+        ///   next positional argument is "false", even if the <see cref="AllowWhiteSpaceValueSeparator"/>
+        ///   property is <see langword="true"/>.
         /// </para>
         /// </remarks>
         public bool AllowWhiteSpaceValueSeparator { get; set; }
+
+        /// <summary>
+        /// Gets or sets the character used to separate the name and the value of an argument.
+        /// </summary>
+        /// <value>
+        ///   The character used to separate the name and the value of an argument. The default value is the
+        ///   <see cref="DefaultNameValueSeparator"/> constant, a colon (:).
+        /// </value>
+        /// <remarks>
+        /// <para>
+        ///   This character is used to separate the name and the value if both are provided as
+        ///   a single argument to the application, e.g. <c>-sample:value</c> if the default value is used.
+        /// </para>
+        /// <note>
+        ///   The character chosen here cannot be used in the name of any parameter. Therefore,
+        ///   it's usually best to choose a non-alphanumeric value such as the colon or equals sign.
+        ///   The character can appear in argument values (e.g. <c>-sample:foo:bar</c> is fine, in which
+        ///   case the value is "foo:bar").
+        /// </note>
+        /// <note>
+        ///   Do not pick a whitespace character as the separator. Doing this only works if the
+        ///   whitespace character is part of the argument, which usually means it needs to be
+        ///   quoted or escaped when invoking your application. Instead, use the
+        ///   <see cref="AllowWhiteSpaceValueSeparator"/> property to control whether whitespace
+        ///   is allowed as a separator.
+        /// </note>
+        /// </remarks>
+        public char NameValueSeparator { get; set; } = DefaultNameValueSeparator;
 
         /// <summary>
         /// Gets the arguments supported by this <see cref="CommandLineParser"/> instance.
@@ -864,12 +911,12 @@ namespace Ookii.CommandLine
 
             string arg = args[index];
             // Extract the argument name
-            // We don't use Split because if there's more than one colon we want to ignore the others.
-            int colonIndex = arg.IndexOf(NameValueSeparator);
-            if( colonIndex >= 0 )
+            // We don't use Split because if there's more than one separator we want to ignore the others.
+            int separatorIndex = arg.IndexOf(NameValueSeparator);
+            if( separatorIndex >= 0 )
             {
-                argumentName = arg.Substring(prefix.Length, colonIndex - prefix.Length);
-                argumentValue = arg.Substring(colonIndex + 1);
+                argumentName = arg.Substring(prefix.Length, separatorIndex - prefix.Length);
+                argumentValue = arg.Substring(separatorIndex + 1);
             }
             else
                 argumentName = arg.Substring(prefix.Length);
