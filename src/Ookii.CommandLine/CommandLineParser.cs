@@ -322,7 +322,7 @@ namespace Ookii.CommandLine
         /// </value>
         public static string DefaultUsagePrefix
         {
-            get { return string.Format(CultureInfo.CurrentCulture, Properties.Resources.DefaultUsagePrefixFormat, Path.GetFileName(Assembly.GetEntryAssembly().Location)); }
+            get { return string.Format(CultureInfo.CurrentCulture, Properties.Resources.DefaultUsagePrefixFormat, Path.GetFileName(Assembly.GetEntryAssembly()?.Location)); }
         }
 
         /// <summary>
@@ -684,6 +684,63 @@ namespace Ookii.CommandLine
         }
 
         /// <summary>
+        /// Gets command line usage help using the default options and no line wrapping.
+        /// </summary>
+        /// <remarks>
+        ///   <para>
+        ///     The usage help consists of first the <see cref="Description"/>, followed by the usage syntax, followed by a description of all the arguments.
+        ///   </para>
+        ///   <para>
+        ///     You can add descriptions to the usage text by applying the <see cref="DescriptionAttribute"/> attribute to your command line arguments type,
+        ///     and the constructor parameters and properties defining command line arguments.
+        ///   </para>
+        ///   <para>
+        ///     This method indents additional lines for the usage syntax and argument descriptions.
+        ///   </para>
+        /// </remarks>
+        public string GetUsage()
+        {
+            return GetUsage(0, new WriteUsageOptions());
+        }
+
+        /// <summary>
+        /// Gets command line usage help.
+        /// </summary>
+        /// <param name="maximumLineLength">
+        ///   The maximum line length of lines in the usage text; . A value less than 1 or larger
+        ///   than 65536 is interpreted as infinite line length.
+        /// </param>
+        /// <param name="options">The options to use for formatting the usage.</param>
+        /// <exception cref="ArgumentNullException">
+        ///   <paramref name="options"/> is <see langword="null"/>.
+        /// </exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        ///   <see cref="WriteUsageOptions.Indent"/> is less than zero or greater than or equal to <paramref name="maximumLineLength"/>, or 
+        ///   <see cref="WriteUsageOptions.ArgumentDescriptionIndent"/> is less than zero or greater than or equal to <paramref name="maximumLineLength"/>.
+        /// </exception>
+        /// <remarks>
+        ///   <para>
+        ///     The usage help consists of first the <see cref="Description"/>, followed by the usage syntax, followed by a description of all the arguments.
+        ///   </para>
+        ///   <para>
+        ///     You can add descriptions to the usage text by applying the <see cref="DescriptionAttribute"/> attribute to your command line arguments type,
+        ///     and the constructor parameters and properties defining command line arguments.
+        ///   </para>
+        ///   <para>
+        ///     Line wrapping at word boundaries is applied to the output, wrapping at the specified line length.
+        ///   </para>
+        ///   <para>
+        ///     This method indents additional lines for the usage syntax and argument descriptions, unless the maximum line length is less than 30.
+        ///   </para>
+        /// </remarks>
+        public string GetUsage(int maximumLineLength, WriteUsageOptions options)
+        {
+            var writer = new StringWriter();
+            WriteUsage(writer, maximumLineLength, options);
+            return writer.ToString();
+        }
+
+        /// <summary>
         /// Parses the specified command line arguments.
         /// </summary>
         /// <param name="args">The command line arguments.</param>
@@ -981,7 +1038,7 @@ namespace Ookii.CommandLine
         private void WriteArgumentDescriptions(LineWrappingTextWriter writer, WriteUsageOptions options)
         {
             writer.ResetIndent();
-            writer.Indent = writer.MaximumLineLength < MaximumLineWidthForIndent ? 0 : options.ArgumentDescriptionIndent;
+            writer.Indent = writer.MaximumLineLength > 0 && writer.MaximumLineLength < MaximumLineWidthForIndent ? 0 : options.ArgumentDescriptionIndent;
 
             foreach( CommandLineArgument argument in _arguments )
             {
@@ -1020,7 +1077,7 @@ namespace Ookii.CommandLine
         private void WriteUsageSyntax(LineWrappingTextWriter writer, WriteUsageOptions options)
         {
             writer.ResetIndent();
-            writer.Indent = writer.MaximumLineLength < MaximumLineWidthForIndent ? 0 : options.Indent;
+            writer.Indent = writer.MaximumLineLength > 0 && writer.MaximumLineLength < MaximumLineWidthForIndent ? 0 : options.Indent;
 
             writer.Write(options.UsagePrefix);
 

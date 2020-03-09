@@ -16,6 +16,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 
 namespace Ookii.CommandLine.Tests
 {
@@ -418,6 +419,15 @@ namespace Ookii.CommandLine.Tests
             }
         }
 
+        [TestMethod]
+        public void TestWriteUsage()
+        {
+            Type argumentsType = typeof(TestArguments);
+            CommandLineParser target = new CommandLineParser(argumentsType, new[] { "/", "-" }) { Culture = CultureInfo.InvariantCulture };
+            string actual = target.GetUsage();
+            Assert.AreEqual(_expectedDefaultUsage, actual);
+        }
+
         private static void TestArgument(IEnumerator<CommandLineArgument> arguments, string name, string memberName, Type type, Type elementType, int? position, bool isRequired, object defaultValue, string description, string valueDescription, bool isSwitch, bool isMultiValue, bool isDictionary = false, params string[] aliases)
         {
             arguments.MoveNext();
@@ -477,5 +487,27 @@ namespace Ookii.CommandLine.Tests
             else
                 Assert.AreEqual(arg15.Value, result.Arg15);
         }
+
+        #region Expected usage
+
+        private const string _expectedDefaultUsage = @"Usage:  [/arg1] <String> [[/other] <Number>] [[/notSwitch] <Boolean>] [[/Arg5] <Single>] [[/other2] <Number>] [[/Arg8] <DayOfWeek>...] /Arg6 <String> [/Arg10...] [/Arg11] [/Arg12 <Int32>...] [/Arg13 <String=Int32>...] [/Arg14 <String=Int32>...] [/Arg15 <KeyValuePair<String, Int32>>] [/Arg3 <String>] [/Arg7] [/Arg9 <Int32>]
+
+    /arg1 <String>
+        Arg1 description.
+
+    /other <Number>
+        Arg2 description.
+
+    /Arg5 <Single>
+        Arg5 description.
+
+    /other2 <Number>
+        Arg4 description.
+
+    /Arg6 <String>
+        Arg6 description.";
+
+        #endregion
+
     }
 }
