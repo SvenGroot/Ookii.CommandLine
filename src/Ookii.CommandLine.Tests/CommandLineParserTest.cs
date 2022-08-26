@@ -490,7 +490,9 @@ namespace Ookii.CommandLine.Tests
 
         #region Expected usage
 
-        private const string _expectedDefaultUsage = @"Usage:  [/arg1] <String> [[/other] <Number>] [[/notSwitch] <Boolean>] [[/Arg5] <Single>] [[/other2] <Number>] [[/Arg8] <DayOfWeek>...] /Arg6 <String> [/Arg10...] [/Arg11] [/Arg12 <Int32>...] [/Arg13 <String=Int32>...] [/Arg14 <String=Int32>...] [/Arg15 <KeyValuePair<String, Int32>>] [/Arg3 <String>] [/Arg7] [/Arg9 <Int32>]
+        private const string _expectedDefaultUsage = @"Test arguments description.
+
+Usage:  [/arg1] <String> [[/other] <Number>] [[/notSwitch] <Boolean>] [[/Arg5] <Single>] [[/other2] <Number>] [[/Arg8] <DayOfWeek>...] /Arg6 <String> [/Arg10...] [/Arg11] [/Arg12 <Int32>...] [/Arg13 <String=Int32>...] [/Arg14 <String=Int32>...] [/Arg15 <KeyValuePair<String, Int32>>] [/Arg3 <String>] [/Arg7] [/Arg9 <Int32>]
 
     /arg1 <String>
         Arg1 description.
@@ -505,7 +507,9 @@ namespace Ookii.CommandLine.Tests
         Arg4 description.
 
     /Arg6 <String>
-        Arg6 description.";
+        Arg6 description.
+
+";
 
         #endregion
 

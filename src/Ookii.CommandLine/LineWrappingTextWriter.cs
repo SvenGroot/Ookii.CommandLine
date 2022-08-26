@@ -6,6 +6,7 @@
 // and all copyright notices must remain intact in all applications,
 // documentation, and source files.
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
 
@@ -73,6 +74,8 @@ namespace Ookii.CommandLine
                 get { return _stringValue == null ? _charArrayValue[index] : _stringValue[index]; }
             }
 
+            public char[] Characters => _charArrayValue ?? _stringValue.ToCharArray();
+
             public int IndexOfLineBreak(int index, int count)
             {
                 if( _stringValue == null )
@@ -87,6 +90,16 @@ namespace Ookii.CommandLine
                 }
                 else
                     return _stringValue.IndexOfAny(_lineBreakCharacters, index, count);
+            }
+
+            public int SkipLineBreak(int index, int end)
+            {
+                Debug.Assert(index < end);
+                Debug.Assert(this[index] == '\r' || this[index] == '\n');
+                if (this[index] == '\r' && index + 1 < end && this[index + 1] == '\n')
+                    return index + 2; // Windows line ending
+                else
+                    return index + 1;
             }
 
             public void WriteLine(TextWriter writer, char[] tempStorage, int index, int count)
@@ -112,6 +125,8 @@ namespace Ookii.CommandLine
 
         #endregion
 
+        private const char IndentChar = ' ';
+
         private readonly TextWriter _baseWriter;
         private readonly bool _disposeBaseWriter;
         private readonly int _maximumLineLength;
@@ -120,6 +135,9 @@ namespace Ookii.CommandLine
         private bool _isLineEmpty = true;
         private static readonly char[] _lineBreakCharacters = { '\r', '\n' };
         private int _indent;
+
+        // Used for indenting when there is no maximum line length.
+        private bool _indentNextWrite = false;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="LineWrappingTextWriter"/> class.
@@ -304,15 +322,10 @@ namespace Ookii.CommandLine
         /// </exception>
         public override void Write(string value)
         {
-            if( _maximumLineLength > 0 )
+            if( value != null )
             {
-                if( value != null )
-                {
-                    WriteCore(new StringBuffer(value), 0, value.Length);
-                }
+                WriteCore(new StringBuffer(value), 0, value.Length);
             }
-            else
-                _baseWriter.Write(value);
         }
 
         /// <summary>
@@ -347,10 +360,7 @@ namespace Ookii.CommandLine
             if( (buffer.Length - index) < count )
                 throw new ArgumentException(Properties.Resources.IndexCountOutOfRange);
 
-            if( _maximumLineLength > 0 )
-                WriteCore(new StringBuffer(buffer), index, count);
-            else
-                _baseWriter.Write(buffer, index, count);
+            WriteCore(new StringBuffer(buffer), index, count);
         }
 
         /// <summary>
@@ -392,6 +402,13 @@ namespace Ookii.CommandLine
                 }
                 _currentLineLength = 0;
             }
+            else
+            {
+                if (!_indentNextWrite && _currentLineLength > 0)
+                    _baseWriter.WriteLine();
+
+                _indentNextWrite = false;
+            }
         }
 
         /// <summary>
@@ -408,8 +425,75 @@ namespace Ookii.CommandLine
             }
         }
 
+        private void WriteNoMaximum(StringBuffer buffer, int index, int count)
+        {
+            Debug.Assert(_maximumLineLength == 0);
+
+            int pos = index;
+            int end = index + count;
+            while (pos < end)
+            {
+                // Since there is no maximum line length, look for hard line breaks only.
+                int lineEnd = buffer.IndexOfLineBreak(pos, end - pos);
+                if (lineEnd < 0)
+                {
+                    WriteIndentDirectIfNeeded();
+
+                    // No line break, just write the whole thing.
+                    _baseWriter.Write(buffer.Characters, pos, end - pos);
+                    _currentLineLength += end - pos;
+                    pos = end;
+                }
+                else
+                {
+                    if (lineEnd > pos)
+                    {
+                        WriteIndentDirectIfNeeded();
+                        _baseWriter.WriteLine(buffer.Characters, pos, lineEnd - pos);
+                        _currentLineLength += lineEnd - pos;
+                    }
+                    else
+                    {
+                        // Don't write indent if this is the start of a line but this line is empty,
+                        // but do set the line length so the next line won't indent.
+                        if (_indentNextWrite)
+                            _currentLineLength = 0;
+
+                        _baseWriter.WriteLine();
+                    }
+
+                    pos = buffer.SkipLineBreak(lineEnd, end);
+                    _indentNextWrite = true;
+                }
+            }
+        }
+
+        private void WriteIndentDirectIfNeeded()
+        {
+            // Write the indentation if necessary.
+            if (_indentNextWrite)
+            {
+                // When this is called, _currentLineLength is actually the length of the last line.
+                // We don't indent if the last line was empty.
+                if (_currentLineLength > 0)
+                {
+                    for (int x = 0; x < _indent; ++x)
+                        _baseWriter.Write(IndentChar);
+                }
+
+                _indentNextWrite = false;
+                _currentLineLength = 0;
+            }
+        }
+
         private void WriteCore(StringBuffer buffer, int index, int count)
         {
+            if (_maximumLineLength < 1)
+            {
+                WriteNoMaximum(buffer, index, count);
+                return;
+            }
+
             // Arguments have already been checked by caller.
             int pos = index;
             int end = index + count;
@@ -442,10 +526,7 @@ namespace Ookii.CommandLine
 
                 if( lineEnd < end )
                 {
-                    if( buffer[lineEnd] == '\r' && lineEnd + 1 < end && buffer[lineEnd + 1] == '\n' )
-                        pos = lineEnd + 2; // Windows line ending
-                    else
-                        pos = lineEnd + 1;
+                    pos = buffer.SkipLineBreak(lineEnd, end);
                 }
             }
         }
@@ -473,7 +554,7 @@ namespace Ookii.CommandLine
                 int newLineLength = _currentLineLength - (index + 1);
                 Array.Copy(_currentLine, index + 1, _currentLine, _indent, newLineLength);
                 for( int x = 0; x < _indent; ++x )
-                    _currentLine[x] = ' ';
+                    _currentLine[x] = IndentChar;
                 _currentLineLength = newLineLength + _indent;
                 _baseWriter.WriteLine();
                 // We didn't process any characters from the string, so return start.
@@ -496,7 +577,7 @@ namespace Ookii.CommandLine
             {
                 // Line needs to be indented, so fill the indent length with white space.
                 for( int x = 0; x < _indent; ++x )
-                    _currentLine[x] = ' ';
+                    _currentLine[x] = IndentChar;
                 _currentLineLength = _indent;
             }
             else

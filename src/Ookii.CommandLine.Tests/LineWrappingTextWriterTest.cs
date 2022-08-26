@@ -343,6 +343,33 @@ namespace Ookii.CommandLine.Tests
         }
 
         /// <summary>
+        ///A test for Write
+        ///</summary>
+        [TestMethod()]
+        public void IndentStringNoMaximumTest()
+        {
+            TextWriter baseWriter = new StringWriter();
+            int maximumLineLength = 0;
+            bool disposeBaseWriter = true;
+            LineWrappingTextWriter target = new LineWrappingTextWriter(baseWriter, maximumLineLength, disposeBaseWriter) { Indent = 10 };
+            target.WriteLine(); // Writing an empty line should not cause the second line to be indented
+            string value = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam dolor est, porttitor eget posuere in, hendrerit\nin tortor. Nulla adipiscing turpis id nibh\r\negestas eu facilisis lorem condimentum volutpat.";
+            target.Write(value);
+            target.ResetIndent(); // Should add a new line
+
+            target.WriteLine("Not indented.");
+            target.WriteLine();
+            target.WriteLine("Not indented either.");
+            target.WriteLine("Indented.");
+            target.ResetIndent();
+            target.WriteLine("Not indented again.");
+            target.ResetIndent(); // Should not add an additional new line
+
+            string result = baseWriter.ToString();
+            Assert.AreEqual("\r\nLorem ipsum dolor sit amet, consectetur adipiscing elit. Nam dolor est, porttitor eget posuere in, hendrerit\r\n          in tortor. Nulla adipiscing turpis id nibh\r\n          egestas eu facilisis lorem condimentum volutpat.\r\nNot indented.\r\n\r\nNot indented either.\r\n          Indented.\r\nNot indented again.\r\n", result);
+        }
+
+        /// <summary>
         ///A test for LineWrappingTextWriter Constructor
         ///</summary>
         [TestMethod()]
