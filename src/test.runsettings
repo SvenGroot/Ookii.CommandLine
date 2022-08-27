@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <RunSettings>
     <RunConfiguration>
-        <TargetFrameworkVersion>net48</TargetFrameworkVersion>
+        <TargetFrameworkVersion>net60</TargetFrameworkVersion>
+        <TargetPlatform>X64</TargetPlatform>
     </RunConfiguration>
 </RunSettings>

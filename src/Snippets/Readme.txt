@@ -23,7 +23,6 @@ located in your My Documents folder. Alternatively, use the snippet manager
 inside Visual Studio to import the snippet files.
 
 The Install-Snippets.ps1 script will install the snippets for Visual Studio 2005,
-Visual Studio 2008, Visual Studio 2010 and Visual Studio 2012, if the snippet
-folders for those versions exist.
+and newer, if the snippet folders for those versions exist.
 
 To uninstall, simply remove the files from those folders.

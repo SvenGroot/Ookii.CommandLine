@@ -424,7 +424,12 @@ namespace Ookii.CommandLine.Tests
         {
             Type argumentsType = typeof(TestArguments);
             CommandLineParser target = new CommandLineParser(argumentsType, new[] { "/", "-" }) { Culture = CultureInfo.InvariantCulture };
-            string actual = target.GetUsage();
+            var options = new WriteUsageOptions()
+            {
+                UsagePrefix = "Usage: test"
+            };
+
+            string actual = target.GetUsage(0, options);
             Assert.AreEqual(_expectedDefaultUsage, actual);
         }
 
@@ -492,7 +497,7 @@ namespace Ookii.CommandLine.Tests
 
         private const string _expectedDefaultUsage = @"Test arguments description.
 
-Usage:  [/arg1] <String> [[/other] <Number>] [[/notSwitch] <Boolean>] [[/Arg5] <Single>] [[/other2] <Number>] [[/Arg8] <DayOfWeek>...] /Arg6 <String> [/Arg10...] [/Arg11] [/Arg12 <Int32>...] [/Arg13 <String=Int32>...] [/Arg14 <String=Int32>...] [/Arg15 <KeyValuePair<String, Int32>>] [/Arg3 <String>] [/Arg7] [/Arg9 <Int32>]
+Usage: test [/arg1] <String> [[/other] <Number>] [[/notSwitch] <Boolean>] [[/Arg5] <Single>] [[/other2] <Number>] [[/Arg8] <DayOfWeek>...] /Arg6 <String> [/Arg10...] [/Arg11] [/Arg12 <Int32>...] [/Arg13 <String=Int32>...] [/Arg14 <String=Int32>...] [/Arg15 <KeyValuePair<String, Int32>>] [/Arg3 <String>] [/Arg7] [/Arg9 <Int32>]
 
     /arg1 <String>
         Arg1 description.
