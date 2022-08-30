@@ -15,7 +15,7 @@ namespace Ookii.CommandLine
     [AttributeUsage(AttributeTargets.Class)]
     public sealed class ShellCommandAttribute : Attribute
     {
-        private readonly string _commandName;
+        private readonly string? _commandName;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ShellCommandAttribute"/> class using the target's type name as the command name.
@@ -42,7 +42,7 @@ namespace Ookii.CommandLine
         /// <value>
         /// The name of the command.
         /// </value>
-        public string CommandName
+        public string? CommandName
         {
             get { return _commandName; }
         }

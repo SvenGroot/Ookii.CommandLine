@@ -137,7 +137,7 @@ namespace Ookii.CommandLine
                 _stringComparer = stringComparer;
             }
 
-            public int Compare(CommandLineArgument x, CommandLineArgument y)
+            public int Compare(CommandLineArgument? x, CommandLineArgument? y)
             {
                 if( x == null )
                 {
@@ -186,9 +186,9 @@ namespace Ookii.CommandLine
         private readonly int _constructorArgumentCount;
         private readonly int _positionalArgumentCount;
         private readonly string[] _argumentNamePrefixes;
-        private ReadOnlyCollection<CommandLineArgument> _argumentsReadOnlyWrapper;
-        private ReadOnlyCollection<string> _argumentNamePrefixesReadOnlyWrapper;
-        private CultureInfo _culture;
+        private ReadOnlyCollection<CommandLineArgument>? _argumentsReadOnlyWrapper;
+        private ReadOnlyCollection<string>? _argumentNamePrefixesReadOnlyWrapper;
+        private CultureInfo? _culture;
 
         /// <summary>
         /// Gets the default character used to separate the name and the value of an argument.
@@ -214,7 +214,7 @@ namespace Ookii.CommandLine
         ///   This event is invoked after the <see cref="CommandLineArgument.Value"/> and <see cref="CommandLineArgument.UsedArgumentName"/> properties have been set.
         /// </para>
         /// </remarks>
-        public event EventHandler<ArgumentParsedEventArgs> ArgumentParsed;
+        public event EventHandler<ArgumentParsedEventArgs>? ArgumentParsed;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CommandLineParser"/> class using the specified arguments type, the default argument name prefixes,
@@ -264,7 +264,7 @@ namespace Ookii.CommandLine
         ///   This constructor uses the <see cref="StringComparer.OrdinalIgnoreCase"/> comparer for argument names.
         /// </para>
         /// </remarks>
-        public CommandLineParser(Type argumentsType, IEnumerable<string> argumentNamePrefixes)
+        public CommandLineParser(Type argumentsType, IEnumerable<string>? argumentNamePrefixes)
             : this(argumentsType, argumentNamePrefixes, null)
         {
         }
@@ -292,7 +292,7 @@ namespace Ookii.CommandLine
         ///   If you specify multiple argument name prefixes, the first one will be used when generating usage information using the <see cref="WriteUsage(TextWriter,int,WriteUsageOptions)"/> method.
         /// </para>
         /// </remarks>
-        public CommandLineParser(Type argumentsType, IEnumerable<string> argumentNamePrefixes, IComparer<string> argumentNameComparer)
+        public CommandLineParser(Type argumentsType, IEnumerable<string>? argumentNamePrefixes, IComparer<string>? argumentNameComparer)
         {
             if( argumentsType == null )
                 throw new ArgumentNullException("argumentsType");
@@ -382,8 +382,8 @@ namespace Ookii.CommandLine
         {
             get
             {
-                DescriptionAttribute description = (DescriptionAttribute)Attribute.GetCustomAttribute(_argumentsType, typeof(DescriptionAttribute));
-                return description == null ? string.Empty : description.Description;
+                var description = (DescriptionAttribute?)Attribute.GetCustomAttribute(_argumentsType, typeof(DescriptionAttribute));
+                return description?.Description ?? string.Empty;
             }
         }
 
@@ -651,12 +651,12 @@ namespace Ookii.CommandLine
         public void WriteUsage(TextWriter writer, int maximumLineLength, WriteUsageOptions options)
         {
             if( writer == null )
-                throw new ArgumentNullException("writer");
+                throw new ArgumentNullException(nameof(writer));
             if( options == null )
-                throw new ArgumentNullException("options");
+                throw new ArgumentNullException(nameof(options));
 
             bool disposeWriter = false;
-            LineWrappingTextWriter lineWriter = null;
+            LineWrappingTextWriter? lineWriter = null;
             try
             {
                 lineWriter = writer as LineWrappingTextWriter;
@@ -756,7 +756,7 @@ namespace Ookii.CommandLine
         ///   no value was supplied for a named argument, an argument was supplied more than once and <see cref="AllowDuplicateArguments"/>
         ///   is <see langword="false"/>, or one of the argument values could not be converted to the argument's type.
         /// </exception>
-        public object Parse(string[] args)
+        public object? Parse(string[] args)
         {
             return Parse(args, 0);
         }
@@ -781,7 +781,7 @@ namespace Ookii.CommandLine
         ///   no value was supplied for a named argument, an argument was supplied more than once and <see cref="AllowDuplicateArguments"/>
         ///   is <see langword="false"/>, or one of the argument values could not be converted to the argument's type.
         /// </exception>
-        public object Parse(string[] args, int index)
+        public object? Parse(string[] args, int index)
         {
             if( args == null )
                 throw new ArgumentNullException("args");
@@ -797,7 +797,7 @@ namespace Ookii.CommandLine
             for( int x = index; x < args.Length; ++x )
             {
                 string arg = args[x];
-                string argumentNamePrefix = CheckArgumentNamePrefix(arg);
+                var argumentNamePrefix = CheckArgumentNamePrefix(arg);
                 if( argumentNamePrefix != null )
                 {
                     // If white space was the value separator, this function returns the index of argument containing the value for the named argument.
@@ -835,7 +835,7 @@ namespace Ookii.CommandLine
                     throw new CommandLineArgumentException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.MissingRequiredArgumentFormat, argument.ArgumentName), argument.ArgumentName, CommandLineArgumentErrorCategory.MissingRequiredArgument);
             }
 
-            object[] constructorArgumentValues = new object[_constructorArgumentCount];
+            object?[] constructorArgumentValues = new object[_constructorArgumentCount];
             for( int x = 0; x < _constructorArgumentCount; ++x )
                 constructorArgumentValues[x] = _arguments[x].Value;
 
@@ -855,12 +855,12 @@ namespace Ookii.CommandLine
         /// <param name="e">The data for the event.</param>
         protected virtual void OnArgumentParsed(ArgumentParsedEventArgs e)
         {
-            EventHandler<ArgumentParsedEventArgs> handler = ArgumentParsed;
+            EventHandler<ArgumentParsedEventArgs>? handler = ArgumentParsed;
             if( handler != null )
                 handler(this, e);
         }
 
-        private static string[] DetermineArgumentNamePrefixes(IEnumerable<string> namedArgumentPrefixes)
+        private static string[] DetermineArgumentNamePrefixes(IEnumerable<string>? namedArgumentPrefixes)
         {
             if( namedArgumentPrefixes == null )
                 return DefaultArgumentNamePrefixesCore;
@@ -952,7 +952,7 @@ namespace Ookii.CommandLine
             }
         }
 
-        private bool ParseArgumentValue(CommandLineArgument argument, string value)
+        private bool ParseArgumentValue(CommandLineArgument argument, string? value)
         {
             argument.SetValue(Culture, value);
 
@@ -963,8 +963,8 @@ namespace Ookii.CommandLine
 
         private int ParseNamedArgument(string[] args, int index, string prefix)
         {
-            string argumentName = null;
-            string argumentValue = null;
+            string argumentName;
+            string? argumentValue = null;
 
             string arg = args[index];
             // Extract the argument name
@@ -978,7 +978,7 @@ namespace Ookii.CommandLine
             else
                 argumentName = arg.Substring(prefix.Length);
 
-            CommandLineArgument argument;
+            CommandLineArgument? argument;
             if( _argumentsByName.TryGetValue(argumentName, out argument) )
             {
                 if( argumentValue == null && !argument.IsSwitch && AllowWhiteSpaceValueSeparator && ++index < args.Length && CheckArgumentNamePrefix(args[index]) == null )
@@ -994,7 +994,7 @@ namespace Ookii.CommandLine
                 throw new CommandLineArgumentException(string.Format(System.Globalization.CultureInfo.CurrentCulture, Properties.Resources.UnknownArgumentFormat, argumentName), argumentName, CommandLineArgumentErrorCategory.UnknownArgument);
         }
 
-        private string CheckArgumentNamePrefix(string argument)
+        private string? CheckArgumentNamePrefix(string argument)
         {
             // Even if '-' is the argument name prefix, we consider an argument starting with dash followed by a digit as a value, because it could be a negative number.
             if( argument.Length >= 2 && argument[0] == '-' && char.IsDigit(argument, 1) )
@@ -1011,7 +1011,7 @@ namespace Ookii.CommandLine
         private ConstructorInfo GetCommandLineConstructor()
         {
             ConstructorInfo[] ctors = _argumentsType.GetConstructors();
-            ConstructorInfo ctor = null;
+            ConstructorInfo? ctor = null;
             if( ctors.Length < 1 )
                 throw new NotSupportedException(Properties.Resources.NoConstructor);
             else if( ctors.Length > 1 )
@@ -1091,7 +1091,7 @@ namespace Ookii.CommandLine
             writer.WriteLine(); // Blank line
         }
 
-        private object CreateArgumentsTypeInstance(object[] constructorArgumentValues)
+        private object CreateArgumentsTypeInstance(object?[] constructorArgumentValues)
         {
             try
             {
@@ -1099,7 +1099,7 @@ namespace Ookii.CommandLine
             }
             catch( TargetInvocationException ex )
             {
-                throw new CommandLineArgumentException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.CreateArgumentsTypeErrorFormat, ex.InnerException.Message), CommandLineArgumentErrorCategory.CreateArgumentsTypeError, ex.InnerException);
+                throw new CommandLineArgumentException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.CreateArgumentsTypeErrorFormat, ex.InnerException?.Message), CommandLineArgumentErrorCategory.CreateArgumentsTypeError, ex.InnerException);
             }
         }
     }

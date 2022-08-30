@@ -28,7 +28,7 @@ namespace Ookii.CommandLine
     [Serializable]
     public class CommandLineArgumentException : Exception
     {
-        private readonly string _argumentName;
+        private readonly string? _argumentName;
         private readonly CommandLineArgumentErrorCategory _category;
 
         /// <summary>
@@ -40,14 +40,14 @@ namespace Ookii.CommandLine
         /// Initializes a new instance of the <see cref="CommandLineArgumentException"/> class with a specified error message.
         /// </summary>
         /// <param name="message">The message that describes the error.</param>
-        public CommandLineArgumentException(string message) : base(message) { }
+        public CommandLineArgumentException(string? message) : base(message) { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CommandLineArgumentException"/> class with a specified error message.
         /// </summary>
         /// <param name="message">The message that describes the error.</param>
         /// <param name="category">The category of this error.</param>
-        public CommandLineArgumentException(string message, CommandLineArgumentErrorCategory category) 
+        public CommandLineArgumentException(string? message, CommandLineArgumentErrorCategory category) 
             : base(message) 
         {
             _category = category;
@@ -59,7 +59,7 @@ namespace Ookii.CommandLine
         /// <param name="message">The message that describes the error.</param>
         /// <param name="argumentName">The name of the argument that was invalid.</param>
         /// <param name="category">The category of this error.</param>
-        public CommandLineArgumentException(string message, string argumentName, CommandLineArgumentErrorCategory category)
+        public CommandLineArgumentException(string? message, string? argumentName, CommandLineArgumentErrorCategory category)
             : base(message)
         {
             _argumentName = argumentName;
@@ -71,7 +71,7 @@ namespace Ookii.CommandLine
         /// </summary>
         /// <param name="message">The error message that explains the reason for the <see cref="CommandLineArgumentException"/>.</param>
         /// <param name="inner">The <see cref="Exception"/> that is the cause of the current <see cref="CommandLineArgumentException"/>, or a <see langword="null"/> if no inner <see cref="Exception"/> is specified.</param>
-        public CommandLineArgumentException(string message, Exception inner) : base(message, inner) { }
+        public CommandLineArgumentException(string? message, Exception? inner) : base(message, inner) { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CommandLineArgumentException"/> class with a specified error message and a reference to the inner <see cref="Exception"/> that is the cause of this <see cref="CommandLineArgumentException"/>. 
@@ -79,7 +79,7 @@ namespace Ookii.CommandLine
         /// <param name="message">The error message that explains the reason for the <see cref="CommandLineArgumentException"/>.</param>
         /// <param name="inner">The <see cref="Exception"/> that is the cause of the current <see cref="CommandLineArgumentException"/>, or a <see langword="null"/> if no inner <see cref="Exception"/> is specified.</param>
         /// <param name="category">The category of this error.</param>
-        public CommandLineArgumentException(string message, CommandLineArgumentErrorCategory category, Exception inner)
+        public CommandLineArgumentException(string? message, CommandLineArgumentErrorCategory category, Exception? inner)
             : base(message, inner)
         {
             _category = category;
@@ -92,7 +92,7 @@ namespace Ookii.CommandLine
         /// <param name="argumentName">The name of the argument that was invalid.</param>
         /// <param name="category">The category of this error.</param>
         /// <param name="inner">The <see cref="Exception"/> that is the cause of the current <see cref="CommandLineArgumentException"/>, or a <see langword="null"/> if no inner <see cref="Exception"/> is specified.</param>
-        public CommandLineArgumentException(string message, string argumentName, CommandLineArgumentErrorCategory category, Exception inner)
+        public CommandLineArgumentException(string? message, string? argumentName, CommandLineArgumentErrorCategory category, Exception? inner)
             : base(message, inner)
         {
             _argumentName = argumentName;
@@ -108,7 +108,7 @@ namespace Ookii.CommandLine
             : base(info, context) 
         {
             _argumentName = info.GetString("ArgumentName");
-            _category = (CommandLineArgumentErrorCategory)info.GetValue("GetValue", typeof(CommandLineArgumentErrorCategory));
+            _category = (CommandLineArgumentErrorCategory?)info.GetValue("Category", typeof(CommandLineArgumentErrorCategory)) ?? CommandLineArgumentErrorCategory.Unspecified;
         }
 
         /// <summary>
@@ -117,7 +117,7 @@ namespace Ookii.CommandLine
         /// <value>
         /// The name of the invalid argument, or <see langword="null"/> if the error does not refer to a specific argument.
         /// </value>
-        public string ArgumentName
+        public string? ArgumentName
         {
             get { return _argumentName; }
         }
@@ -139,7 +139,9 @@ namespace Ookii.CommandLine
         /// <param name="info">The object that holds the serialized object data.</param>
         /// <param name="context">The contextual information about the source or destination.</param>
         /// <exception cref="ArgumentNullException"><paramref name="info"/> is <see langword="null"/>.</exception>
+#if !NET6_0_OR_GREATER
         [SecurityPermission(SecurityAction.LinkDemand, Flags=SecurityPermissionFlag.SerializationFormatter)]
+#endif
         public override void GetObjectData(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context)
         {
             if( info == null )

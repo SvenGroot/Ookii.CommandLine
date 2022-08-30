@@ -16,7 +16,7 @@ namespace Ookii.CommandLine
     [AttributeUsage(AttributeTargets.Property)]
     public sealed class CommandLineArgumentAttribute : Attribute
     {
-        private readonly string _argumentName;
+        private readonly string? _argumentName;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CommandLineArgumentAttribute"/> class using the property name as the argument name.
@@ -30,7 +30,7 @@ namespace Ookii.CommandLine
         /// Initializes a new instance of the <see cref="CommandLineArgumentAttribute"/> class using the specified argument name.
         /// </summary>
         /// <param name="argumentName">The name of the argument, or <see langword="null"/> to indicate the property name should be used.</param>
-        public CommandLineArgumentAttribute(string argumentName)
+        public CommandLineArgumentAttribute(string? argumentName)
         {
             Position = -1;
             _argumentName = argumentName;
@@ -42,7 +42,7 @@ namespace Ookii.CommandLine
         /// <value>
         /// The name of the command switch used to set the argument, or <see langword="null"/> if the property name should be used.
         /// </value>
-        public string ArgumentName
+        public string? ArgumentName
         {
             get { return _argumentName; }
         }
@@ -98,7 +98,7 @@ namespace Ookii.CommandLine
         ///   property to <see langword="true"/>.
         /// </para>
         /// </remarks>
-        public object DefaultValue { get; set; }
+        public object? DefaultValue { get; set; }
 
         /// <summary>
         /// Gets or sets the description of the property's value to use when printing usage information.
@@ -121,6 +121,6 @@ namespace Ookii.CommandLine
         ///   using the <see cref="System.ComponentModel.DescriptionAttribute"/> attribute.
         /// </note>
         /// </remarks>
-        public string ValueDescription { get; set; }
+        public string? ValueDescription { get; set; }
     }
 }

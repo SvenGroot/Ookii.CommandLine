@@ -168,7 +168,7 @@ namespace Ookii.CommandLine
         /// </remarks>
         public static void WriteAssemblyCommandList(TextWriter writer, Assembly assembly)
         {
-            LineWrappingTextWriter lineWriter = writer as LineWrappingTextWriter;
+            var lineWriter = writer as LineWrappingTextWriter;
             if( lineWriter != null )
                 lineWriter.Indent = lineWriter.MaximumLineLength < CommandLineParser.MaximumLineWidthForIndent ? 0 : 16;
 
@@ -210,12 +210,12 @@ namespace Ookii.CommandLine
             if( commandFormat == null )
                 throw new ArgumentNullException("commandFormat");
 
-            LineWrappingTextWriter lineWriter = writer as LineWrappingTextWriter;
+            var lineWriter = writer as LineWrappingTextWriter;
             Type[] commandTypes = GetShellCommands(assembly);
             foreach( Type commandType in commandTypes )
             {
                 string name = GetShellCommandName(commandType);
-                string description = GetShellCommandDescription(commandType);
+                string? description = GetShellCommandDescription(commandType);
 
                 if( lineWriter != null )
                     lineWriter.ResetIndent();
@@ -269,7 +269,7 @@ namespace Ookii.CommandLine
             if( !IsShellCommand(commandType) )
                 throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.TypeIsNotShellCommandFormat, commandType.FullName));
 
-            return ((ShellCommandAttribute)Attribute.GetCustomAttribute(commandType, typeof(ShellCommandAttribute))).CommandName ?? commandType.Name;
+            return TypeHelper.GetAttribute<ShellCommandAttribute>(commandType)?.CommandName ?? commandType.Name;
         }
 
         /// <summary>
@@ -285,18 +285,18 @@ namespace Ookii.CommandLine
         /// </exception>
         /// <remarks>
         /// <para>
-        ///   A shell command's description is specified using the <see cref="DescriptionAttribute"/> attribute.
+        ///   A shell command's description if specified using the <see cref="DescriptionAttribute"/> attribute, or
+        ///   <see langword="null"/> if none is specified.
         /// </para>
         /// </remarks>
-        public static string GetShellCommandDescription(Type commandType)
+        public static string? GetShellCommandDescription(Type commandType)
         {
             if( commandType == null )
                 throw new ArgumentNullException("commandType");
             if( !IsShellCommand(commandType) )
                 throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.TypeIsNotShellCommandFormat, commandType.FullName));
 
-            DescriptionAttribute attribute = ((DescriptionAttribute)Attribute.GetCustomAttribute(commandType, typeof(DescriptionAttribute)));
-            return attribute != null ? attribute.Description : null;
+            return TypeHelper.GetAttribute<DescriptionAttribute>(commandType)?.Description;
         }
         
         /// <summary>
@@ -313,7 +313,7 @@ namespace Ookii.CommandLine
         ///   This method uses <see cref="StringComparer.OrdinalIgnoreCase"/> to compare command names.
         /// </para>
         /// </remarks>
-        public static Type GetShellCommand(Assembly assembly, string commandName)
+        public static Type? GetShellCommand(Assembly assembly, string commandName)
         {
             return GetShellCommand(assembly, commandName, null);
         }
@@ -333,7 +333,7 @@ namespace Ookii.CommandLine
         ///   This method uses <see cref="StringComparer.OrdinalIgnoreCase"/> to compare command names if <paramref name="commandNameComparer"/> is <see langword="null"/>.
         /// </para>
         /// </remarks>
-        public static Type GetShellCommand(Assembly assembly, string commandName, IEqualityComparer<string> commandNameComparer)
+        public static Type? GetShellCommand(Assembly assembly, string commandName, IEqualityComparer<string>? commandNameComparer)
         {
             if( assembly == null )
                 throw new ArgumentNullException("assembly");
@@ -381,7 +381,7 @@ namespace Ookii.CommandLine
         ///   This method indents additional lines for the usage syntax, argument descriptions and command descriptions, unless the <see cref="Console.WindowWidth"/> property is less than 31.
         /// </para>
         /// </remarks>
-        public static ShellCommand CreateShellCommand(Assembly assembly, string commandName, string[] args, int index)
+        public static ShellCommand? CreateShellCommand(Assembly assembly, string? commandName, string[] args, int index)
         {
             return CreateShellCommand(assembly, commandName, args, index, new CreateShellCommandOptions());
         }
@@ -411,7 +411,7 @@ namespace Ookii.CommandLine
         ///   This method indents additional lines for the usage syntax, argument descriptions and command descriptions, unless the <see cref="Console.WindowWidth"/> property is less than 31.
         /// </para>
         /// </remarks>
-        public static ShellCommand CreateShellCommand(Assembly assembly, string[] args, int index)
+        public static ShellCommand? CreateShellCommand(Assembly assembly, string[] args, int index)
         {
             return CreateShellCommand(assembly, args, index, new CreateShellCommandOptions());
         }
@@ -447,7 +447,7 @@ namespace Ookii.CommandLine
         ///   to the values specified by the <see cref="CreateShellCommandOptions"/>, unless the <see cref="LineWrappingTextWriter.MaximumLineLength"/> property is less than 30.
         /// </para>
         /// </remarks>
-        public static ShellCommand CreateShellCommand(Assembly assembly, string commandName, string[] args, int index, CreateShellCommandOptions options)
+        public static ShellCommand? CreateShellCommand(Assembly assembly, string? commandName, string[] args, int index, CreateShellCommandOptions options)
         {
             if( assembly == null )
                 throw new ArgumentNullException("assembly");
@@ -460,8 +460,8 @@ namespace Ookii.CommandLine
 
             bool disposeOut = false;
             bool disposeError = false;
-            TextWriter output = options.Out;
-            TextWriter error = options.Error;
+            var output = options.Out;
+            var error = options.Error;
             try
             {
                 if( output == null )
@@ -477,14 +477,14 @@ namespace Ookii.CommandLine
                     options.Error = error;
                 }
 
-                Type commandType = commandName == null ? null : GetShellCommand(assembly, commandName, options.CommandNameComparer);
+                var commandType = commandName == null ? null : GetShellCommand(assembly, commandName, options.CommandNameComparer);
                 if( commandType == null )
                 {
                     WriteShellCommandListUsage(output, assembly, options);
                 }
                 else if( CommandUsesCustomArgumentParsing(commandType) )
                 {
-                    return (ShellCommand)Activator.CreateInstance(commandType, args, index, options);
+                    return (ShellCommand?)Activator.CreateInstance(commandType, args, index, options);
                 }
                 else
                 {
@@ -493,10 +493,10 @@ namespace Ookii.CommandLine
                         AllowDuplicateArguments = options.AllowDuplicateArguments,
                         AllowWhiteSpaceValueSeparator = options.AllowWhiteSpaceValueSeparator,
                     };
-                    ShellCommand command = null;
+                    ShellCommand? command = null;
                     try
                     {
-                        command = (ShellCommand)parser.Parse(args, index);
+                        command = (ShellCommand?)parser.Parse(args, index);
                     }
                     catch( CommandLineArgumentException ex )
                     {
@@ -556,7 +556,7 @@ namespace Ookii.CommandLine
         ///   to the values specified by the <see cref="CreateShellCommandOptions"/>, unless the <see cref="LineWrappingTextWriter.MaximumLineLength"/> property is less than 30.
         /// </para>
         /// </remarks>
-        public static ShellCommand CreateShellCommand(Assembly assembly, string[] args, int index, CreateShellCommandOptions options)
+        public static ShellCommand? CreateShellCommand(Assembly assembly, string[] args, int index, CreateShellCommandOptions options)
         {
             if( assembly == null )
                 throw new ArgumentNullException("assembly");
@@ -631,7 +631,7 @@ namespace Ookii.CommandLine
         /// </remarks>
         public static int RunShellCommand(Assembly assembly, string[] args, int index, CreateShellCommandOptions options)
         {
-            ShellCommand command = CreateShellCommand(assembly, args, index, options);
+            var command = CreateShellCommand(assembly, args, index, options);
             if( command != null )
             {
                 command.Run();
@@ -667,7 +667,7 @@ namespace Ookii.CommandLine
         ///   This method indents additional lines for the usage syntax, argument descriptions and command descriptions, unless the <see cref="Console.WindowWidth"/> property is less than 31.
         /// </para>
         /// </remarks>
-        public static int RunShellCommand(Assembly assembly, string commandName, string[] args, int index)
+        public static int RunShellCommand(Assembly assembly, string? commandName, string[] args, int index)
         {
             return RunShellCommand(assembly, commandName, args, index, new CreateShellCommandOptions());
         }
@@ -702,9 +702,9 @@ namespace Ookii.CommandLine
         ///   to the values specified by the <see cref="CreateShellCommandOptions"/>, unless the <see cref="LineWrappingTextWriter.MaximumLineLength"/> property is less than 30.
         /// </para>
         /// </remarks>
-        public static int RunShellCommand(Assembly assembly, string commandName, string[] args, int index, CreateShellCommandOptions options)
+        public static int RunShellCommand(Assembly assembly, string? commandName, string[] args, int index, CreateShellCommandOptions options)
         {
-            ShellCommand command = CreateShellCommand(assembly, commandName, args, index, options);
+            var command = CreateShellCommand(assembly, commandName, args, index, options);
             if( command != null )
             {
                 command.Run();
@@ -720,7 +720,7 @@ namespace Ookii.CommandLine
             output.WriteLine();
             output.WriteLine(options.AvailableCommandsHeader);
             output.WriteLine();
-            LineWrappingTextWriter lineWriter = output as LineWrappingTextWriter;
+            var lineWriter = output as LineWrappingTextWriter;
             if( lineWriter != null )
                 lineWriter.Indent = lineWriter.MaximumLineLength < CommandLineParser.MaximumLineWidthForIndent ? 0 : options.CommandDescriptionIndent;
             WriteAssemblyCommandList(output, assembly, options.CommandDescriptionFormat);
@@ -728,7 +728,7 @@ namespace Ookii.CommandLine
 
         private static bool CommandUsesCustomArgumentParsing(Type commandType)
         {
-            return ((ShellCommandAttribute)Attribute.GetCustomAttribute(commandType, typeof(ShellCommandAttribute))).CustomArgumentParsing;
+            return TypeHelper.GetAttribute<ShellCommandAttribute>(commandType)?.CustomArgumentParsing ?? false;
         }
     }
 }

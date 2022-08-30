@@ -6,12 +6,13 @@
 // and all copyright notices must remain intact in all applications,
 // documentation, and source files.
 using System;
+using System.Reflection;
 
 namespace Ookii.CommandLine
 {
     static class TypeHelper
     {
-        public static Type FindGenericInterface(Type type, Type interfaceType)
+        public static Type? FindGenericInterface(Type type, Type interfaceType)
         {
             if( type == null )
                 throw new ArgumentNullException("type");
@@ -31,5 +32,24 @@ namespace Ookii.CommandLine
 
             return null;
         }
+
+        public static T? GetAttribute<T>(ParameterInfo element)
+            where T: Attribute
+        {
+            return (T?)Attribute.GetCustomAttribute(element, typeof(T));
+        }
+
+        public static T? GetAttribute<T>(PropertyInfo element)
+            where T : Attribute
+        {
+            return (T?)Attribute.GetCustomAttribute(element, typeof(T));
+        }
+
+        public static T? GetAttribute<T>(Type element)
+            where T : Attribute
+        {
+            return (T?)Attribute.GetCustomAttribute(element, typeof(T));
+        }
+
     }
 }

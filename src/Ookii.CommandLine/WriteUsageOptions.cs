@@ -14,14 +14,14 @@ namespace Ookii.CommandLine
     /// </summary>
     public sealed class WriteUsageOptions
     {
-        private string _usagePrefix;
-        private string _valueDescriptionFormat;
-        private string _optionalArgumentFormat;
-        private string _arraySuffix;
-        private string _argumentDescriptionFormat;
-        private string _aliasFormat;
-        private string _aliasesFormat;
-        private string _defaultValueFormat;
+        private string? _usagePrefix;
+        private string? _valueDescriptionFormat;
+        private string? _optionalArgumentFormat;
+        private string? _arraySuffix;
+        private string? _argumentDescriptionFormat;
+        private string? _aliasFormat;
+        private string? _aliasesFormat;
+        private string? _defaultValueFormat;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="WriteUsageOptions"/> class.

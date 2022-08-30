@@ -54,8 +54,8 @@ namespace Ookii.CommandLine
         // We want to use the same code for either Write(char[]) and Write(string), without allocating a new char[] or string for either, so we provide this helper to access one or the other
         private struct StringBuffer
         {
-            private readonly string _stringValue;
-            private readonly char[] _charArrayValue;
+            private readonly string? _stringValue;
+            private readonly char[]? _charArrayValue;
 
             public StringBuffer(string stringValue)
             {
@@ -71,10 +71,10 @@ namespace Ookii.CommandLine
 
             public char this[int index]
             {
-                get { return _stringValue == null ? _charArrayValue[index] : _stringValue[index]; }
+                get { return _stringValue == null ? _charArrayValue![index] : _stringValue[index]; }
             }
 
-            public char[] Characters => _charArrayValue ?? _stringValue.ToCharArray();
+            public char[] Characters => _charArrayValue ?? _stringValue!.ToCharArray();
 
             public int IndexOfLineBreak(int index, int count)
             {
@@ -83,7 +83,7 @@ namespace Ookii.CommandLine
                     int end = index + count;
                     for( int x = index; x < end; ++x )
                     {
-                        if( _charArrayValue[x] == '\r' || _charArrayValue[x] == '\n' )
+                        if( _charArrayValue![x] == '\r' || _charArrayValue[x] == '\n' )
                             return x;
                     }
                     return -1;
@@ -105,7 +105,7 @@ namespace Ookii.CommandLine
             public void WriteLine(TextWriter writer, char[] tempStorage, int index, int count)
             {
                 if( _stringValue == null )
-                    writer.WriteLine(_charArrayValue, index, count);
+                    writer.WriteLine(_charArrayValue!, index, count);
                 else
                 {
                     // Use temp storage to avoid allocating a new string with substring
@@ -117,7 +117,7 @@ namespace Ookii.CommandLine
             public void CopyTo(int sourceIndex, char[] destination, int destinationIndex, int count)
             {
                 if( _stringValue == null )
-                    Array.Copy(_charArrayValue, sourceIndex, destination, destinationIndex, count);
+                    Array.Copy(_charArrayValue!, sourceIndex, destination, destinationIndex, count);
                 else
                     _stringValue.CopyTo(sourceIndex, destination, destinationIndex, count);
             }
@@ -130,7 +130,7 @@ namespace Ookii.CommandLine
         private readonly TextWriter _baseWriter;
         private readonly bool _disposeBaseWriter;
         private readonly int _maximumLineLength;
-        private readonly char[] _currentLine;
+        private readonly char[]? _currentLine;
         private int _currentLineLength;
         private bool _isLineEmpty = true;
         private static readonly char[] _lineBreakCharacters = { '\r', '\n' };
@@ -166,10 +166,10 @@ namespace Ookii.CommandLine
         /// </para>
         /// </remarks>
         public LineWrappingTextWriter(TextWriter baseWriter, int maximumLineLength, bool disposeBaseWriter)
-            : base(baseWriter == null ? null : baseWriter.FormatProvider)
+            : base(baseWriter?.FormatProvider)
         {
             if( baseWriter == null )
-                throw new ArgumentNullException("baseWriter");
+                throw new ArgumentNullException(nameof(baseWriter));
 
             _baseWriter = baseWriter;
             base.NewLine = baseWriter.NewLine;
@@ -270,7 +270,7 @@ namespace Ookii.CommandLine
         ///   of the <see cref="BaseWriter"/>.
         /// </remarks>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
-        public static LineWrappingTextWriter ForStringWriter(int maximumLineLength, IFormatProvider formatProvider)
+        public static LineWrappingTextWriter ForStringWriter(int maximumLineLength, IFormatProvider? formatProvider)
         {
             return new LineWrappingTextWriter(new StringWriter(formatProvider), maximumLineLength, true);
         }
@@ -320,7 +320,7 @@ namespace Ookii.CommandLine
         /// <exception cref="IOException">
         ///   An I/O error occurs.
         /// </exception>
-        public override void Write(string value)
+        public override void Write(string? value)
         {
             if( value != null )
             {
@@ -352,11 +352,11 @@ namespace Ookii.CommandLine
         public override void Write(char[] buffer, int index, int count)
         {
             if( buffer == null )
-                throw new ArgumentNullException("buffer");
+                throw new ArgumentNullException(nameof(buffer));
             if( index < 0 )
-                throw new ArgumentOutOfRangeException("index", Properties.Resources.ValueMustBeNonNegative);
+                throw new ArgumentOutOfRangeException(nameof(index), Properties.Resources.ValueMustBeNonNegative);
             if( count < 0 )
-                throw new ArgumentOutOfRangeException("count", Properties.Resources.ValueMustBeNonNegative);
+                throw new ArgumentOutOfRangeException(nameof(count), Properties.Resources.ValueMustBeNonNegative);
             if( (buffer.Length - index) < count )
                 throw new ArgumentException(Properties.Resources.IndexCountOutOfRange);
 
@@ -370,7 +370,7 @@ namespace Ookii.CommandLine
         {
             if( _maximumLineLength > 0 && (_currentLineLength > _indent || !_isLineEmpty) )
             {
-                _baseWriter.WriteLine(_currentLine, 0, _currentLineLength);
+                _baseWriter.WriteLine(_currentLine!, 0, _currentLineLength);
                 ClearCurrentLine(_currentLineLength);
             }
             base.Flush();
@@ -398,7 +398,7 @@ namespace Ookii.CommandLine
             {
                 if( _currentLineLength > _indent || !_isLineEmpty )
                 {
-                    _baseWriter.WriteLine(_currentLine, 0, _currentLineLength);
+                    _baseWriter.WriteLine(_currentLine!, 0, _currentLineLength);
                 }
                 _currentLineLength = 0;
             }
@@ -510,14 +510,14 @@ namespace Ookii.CommandLine
                         pos = BreakLine(buffer, pos);
                     else if( lineEnd < end ) // Line does fit, and we found a hard line break before the end of the string
                     {
-                        _baseWriter.Write(_currentLine, 0, _currentLineLength);
-                        buffer.WriteLine(_baseWriter, _currentLine, pos, lineLength);
+                        _baseWriter.Write(_currentLine!, 0, _currentLineLength);
+                        buffer.WriteLine(_baseWriter, _currentLine!, pos, lineLength);
                         pos = lineEnd;
                         ClearCurrentLine(_currentLineLength + lineLength);
                     }
                     else // The entire remainder of the string fits into the buffer
                     {
-                        buffer.CopyTo(pos, _currentLine, _currentLineLength, lineLength);
+                        buffer.CopyTo(pos, _currentLine!, _currentLineLength, lineLength);
                         _isLineEmpty = false;
                         _currentLineLength += lineLength;
                         pos = lineEnd;
@@ -538,7 +538,7 @@ namespace Ookii.CommandLine
             int index;
             for( index = _maximumLineLength - 1; index >= _indent; --index )
             {
-                char ch = index < _currentLineLength ? _currentLine[index] : buffer[start + index - _currentLineLength];
+                char ch = index < _currentLineLength ? _currentLine![index] : buffer[start + index - _currentLineLength];
                 if( Char.IsWhiteSpace(ch) )
                 {
                     break;
@@ -547,14 +547,14 @@ namespace Ookii.CommandLine
             if( index < _indent )
                 index = _maximumLineLength; // No nice place to wrap found
 
-            _baseWriter.Write(_currentLine, 0, Math.Min(index, _currentLineLength));
+            _baseWriter.Write(_currentLine!, 0, Math.Min(index, _currentLineLength));
             if( index < _currentLineLength )
             {
                 // We wrapped inside the current line, so we need to copy the remainder of that line to the beginning of the current line buffer
                 int newLineLength = _currentLineLength - (index + 1);
-                Array.Copy(_currentLine, index + 1, _currentLine, _indent, newLineLength);
+                Array.Copy(_currentLine!, index + 1, _currentLine!, _indent, newLineLength);
                 for( int x = 0; x < _indent; ++x )
-                    _currentLine[x] = IndentChar;
+                    _currentLine![x] = IndentChar;
                 _currentLineLength = newLineLength + _indent;
                 _baseWriter.WriteLine();
                 // We didn't process any characters from the string, so return start.
@@ -564,7 +564,7 @@ namespace Ookii.CommandLine
             {
                 // Our wrap position was inside the string buffer. We already wrote the entire current line, now write the string buffer up until that wrap position.
                 int count = index - _currentLineLength;
-                buffer.WriteLine(_baseWriter, _currentLine, start, count);
+                buffer.WriteLine(_baseWriter, _currentLine!, start, count);
                 ClearCurrentLine(_currentLineLength + count);
                 // If we found a white space character to wrap on, skip it.
                 return index < _maximumLineLength ? start + count + 1 : start + count;
@@ -577,7 +577,7 @@ namespace Ookii.CommandLine
             {
                 // Line needs to be indented, so fill the indent length with white space.
                 for( int x = 0; x < _indent; ++x )
-                    _currentLine[x] = IndentChar;
+                    _currentLine![x] = IndentChar;
                 _currentLineLength = _indent;
             }
             else

@@ -112,10 +112,10 @@
     <value>2.0</value>
   </resheader>
   <resheader name="reader">
-    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <resheader name="writer">
-    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="ArgumentConversionErrorFormat" xml:space="preserve">
     <value>The value '{0}' provided for argument '{1}' could not be interpreted as a '{2}'.</value>
@@ -251,5 +251,8 @@
   </data>
   <data name="DefaultDefaultValueFormat" xml:space="preserve">
     <value> Default value: {0}.</value>
+  </data>
+  <data name="NullArgumentValueFormat" xml:space="preserve">
+    <value>The argument '{0}' cannot be null.</value>
   </data>
 </root>

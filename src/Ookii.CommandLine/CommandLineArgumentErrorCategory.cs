@@ -53,5 +53,10 @@ namespace Ookii.CommandLine
         /// An error occurred applying the value of the argument (e.g. the property set accessor threw an exception).
         /// </summary>
         ApplyValueError,
+        /// <summary>
+        /// An argument value was <see langword="null"/> after conversion from a string, and the argument type is a value
+        /// type or (in .Net 6.0 and later) a non-nullable reference type.
+        /// </summary>
+        NullArgumentValue,
     }
 }

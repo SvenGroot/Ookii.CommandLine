@@ -35,7 +35,7 @@ namespace Ookii.CommandLine
         /// <returns>
         /// <see langword="true"/> if this converter can perform the conversion; otherwise, <see langword="false"/>.
         /// </returns>
-        public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
+        public override bool CanConvertFrom(ITypeDescriptorContext? context, Type sourceType)
         {
             if( sourceType == typeof(string) )
                 return true;
@@ -51,7 +51,7 @@ namespace Ookii.CommandLine
         /// <returns>
         /// <see langword="true"/> if this converter can perform the conversion; otherwise, <see langword="false"/>.
         /// </returns>
-        public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)
+        public override bool CanConvertTo(ITypeDescriptorContext? context, Type? destinationType)
         {
             if( destinationType == typeof(string) )
                 return true;
@@ -71,9 +71,9 @@ namespace Ookii.CommandLine
         /// <exception cref="T:System.NotSupportedException">
         /// The conversion cannot be performed.
         /// </exception>
-        public override object ConvertFrom(ITypeDescriptorContext context, System.Globalization.CultureInfo culture, object value)
+        public override object? ConvertFrom(ITypeDescriptorContext? context, System.Globalization.CultureInfo? culture, object value)
         {
-            string stringValue = value as string;
+            var stringValue = value as string;
             if( stringValue != null )
             {
                 int index = stringValue.IndexOf('=');
@@ -81,7 +81,7 @@ namespace Ookii.CommandLine
                     throw new FormatException(Properties.Resources.NoKeyValuePairSeparator);
                 string key = stringValue.Substring(0, index);
                 string valueForKey = stringValue.Substring(index + 1);
-                return new KeyValuePair<TKey, TValue>((TKey)_keyConverter.ConvertFromString(context, culture, key), (TValue)_valueConverter.ConvertFromString(context, culture, valueForKey));
+                return new KeyValuePair<TKey, TValue?>((TKey)_keyConverter.ConvertFromString(context, culture, key)!, (TValue?)_valueConverter.ConvertFromString(context, culture, valueForKey));
             }
 
             return base.ConvertFrom(context, culture, value);
@@ -103,10 +103,12 @@ namespace Ookii.CommandLine
         /// <exception cref="T:System.NotSupportedException">
         /// The conversion cannot be performed.
         ///   </exception>
-        public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
+        public override object? ConvertTo(ITypeDescriptorContext? context, CultureInfo? culture, object? value, Type destinationType)
         {
             if( destinationType == null )
-                throw new ArgumentNullException("destinationType");
+                throw new ArgumentNullException(nameof(destinationType));
+            if (value == null)
+                throw new ArgumentNullException(nameof(value));
 
             KeyValuePair<TKey, TValue> pair = (KeyValuePair<TKey, TValue>)value;
             if( destinationType == typeof(string) )

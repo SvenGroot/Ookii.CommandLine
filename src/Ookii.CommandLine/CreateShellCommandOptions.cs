@@ -16,9 +16,9 @@ namespace Ookii.CommandLine
     /// </summary>
     public sealed class CreateShellCommandOptions
     {
-        private string _commandUsageFormat;
-        private string _commandDescriptionFormat;
-        private string _availableCommandsHeader;
+        private string? _commandUsageFormat;
+        private string? _commandDescriptionFormat;
+        private string? _availableCommandsHeader;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CreateShellCommandOptions"/> class.
@@ -47,7 +47,7 @@ namespace Ookii.CommandLine
         /// The named argument switches, or <see langword="null"/> to indicate the default prefixes for
         /// the current platform must be used. The default value is <see langword="null"/>.
         /// </value>
-        public IEnumerable<string> ArgumentNamePrefixes { get; set; }
+        public IEnumerable<string>? ArgumentNamePrefixes { get; set; }
 
         /// <summary>
         /// Gets or set the <see cref="IComparer{T}"/> to use to compare argument names.
@@ -64,7 +64,7 @@ namespace Ookii.CommandLine
         /// The <see cref="TextWriter"/> used to print usage information, or <see langword="null"/>
         /// to print to the standard output stream. The default value is <see langword="null"/>.
         /// </value>
-        public TextWriter Out { get; set; }
+        public TextWriter? Out { get; set; }
 
         /// <summary>
         /// Gets or sets the <see cref="TextWriter"/> used to print error information.
@@ -73,7 +73,7 @@ namespace Ookii.CommandLine
         /// The <see cref="TextWriter"/> used to print error information, or <see langword="null"/>
         /// to print to the standard output stream. The default value is <see langword="null"/>.
         /// </value>
-        public TextWriter Error { get; set; }
+        public TextWriter? Error { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether duplicate arguments are allowed.
