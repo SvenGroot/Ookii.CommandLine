@@ -23,11 +23,7 @@
     <PackageReleaseNotes>2.3: Added package for .Net Standard 2.0.</PackageReleaseNotes>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net20|AnyCPU'">
-    <DocumentationFile>Ookii.CommandLine.xml</DocumentationFile>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net20|AnyCPU'">
+  <PropertyGroup>
     <DocumentationFile>Ookii.CommandLine.xml</DocumentationFile>
   </PropertyGroup>
 
