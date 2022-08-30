@@ -175,7 +175,7 @@ namespace Ookii.CommandLine.Tests
             // matter since it'll only be used to test null values.
             [CommandLineArgument]
             [TypeConverter(typeof(NullReturningStringConverter))]
-            public Dictionary<string, string?> InvalidDictionary { get; set; }
+            public Dictionary<string, string?>? InvalidDictionary { get; set; }
         }
 
         #endregion
