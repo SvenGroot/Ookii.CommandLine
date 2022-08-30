@@ -57,7 +57,7 @@ namespace Ookii.CommandLine
         private interface IDictionaryHelper
         {
             object Dictionary { get; }
-            void Add(string argumentName, object? keyValuePair);
+            void Add(string argumentName, object keyValuePair);
             void ApplyValues(object dictionary);
         }
 
@@ -80,11 +80,15 @@ namespace Ookii.CommandLine
                 get { return _dictionary; }
             }
 
-            public void Add(string argumentName, object? keyValuePair)
+            public void Add(string argumentName, object keyValuePair)
             {
-                var pair = (KeyValuePair<TKey, TValue>)keyValuePair!;
-                if (!_allowNullValues && pair.Value == null)
-                    throw new CommandLineArgumentException(String.Format(CultureInfo.CurrentCulture, Properties.Resources.NullArgumentValueFormat, argumentName), CommandLineArgumentErrorCategory.NullArgumentValue);
+                var pair = (KeyValuePair<TKey, TValue>)keyValuePair;
+
+                // With the KeyValuePairConverter, these should already be checked, but it's still
+                // checked here to deal with custom converters.
+                if (pair.Key == null || (!_allowNullValues && pair.Value == null))
+                    throw new CommandLineArgumentException(String.Format(CultureInfo.CurrentCulture, Properties.Resources.NullArgumentValueFormat, argumentName), argumentName, CommandLineArgumentErrorCategory.NullArgumentValue);
+
                 if (_allowDuplicateKeys)
                     _dictionary[pair.Key] = pair.Value;
                 else
@@ -117,8 +121,8 @@ namespace Ookii.CommandLine
         private readonly bool _isDictionary;
         private readonly bool _allowDuplicateDictionaryKeys;
         private readonly string? _multiValueSeparator;
-        private object? _value;
         private readonly bool _allowNull;
+        private object? _value;
 
         private struct ArgumentInfo
         {
@@ -130,6 +134,8 @@ namespace Ookii.CommandLine
             public IList<string>? Aliases { get; set; }
             public Type ArgumentType { get; set; }
             public Type? ConverterType { get; set; }
+            public Type? KeyConverterType { get; set; }
+            public Type? ValueConverterType { get; set; }
             public int? Position { get; set; }
             public bool IsRequired { get; set; }
             public object? DefaultValue { get; set; }
@@ -200,10 +206,12 @@ namespace Ookii.CommandLine
                 Type[] genericArguments = dictionaryType.GetGenericArguments();
                 _elementType = typeof(KeyValuePair<,>).MakeGenericType(genericArguments);
                 _valueDescription = info.ValueDescription ?? string.Format(CultureInfo.CurrentCulture, "{0}={1}", GetFriendlyTypeName(genericArguments[0]), GetFriendlyTypeName(genericArguments[1]));
-                if (converterType == null)
-                    converterType = typeof(KeyValuePairConverter<,>).MakeGenericType(dictionaryType.GetGenericArguments());
-
                 _allowNull = DetermineDictionaryValueTypeAllowsNull(dictionaryType, info.Property, info.Parameter);
+                if (converterType == null)
+                {
+                    converterType = typeof(KeyValuePairConverter<,>).MakeGenericType(dictionaryType.GetGenericArguments());
+                    _converter = (TypeConverter)Activator.CreateInstance(converterType, _argumentName, _allowNull, info.KeyConverterType, info.ValueConverterType)!;
+                }
             }
             else if (collectionType != null)
             {
@@ -213,7 +221,8 @@ namespace Ookii.CommandLine
             if ( _valueDescription == null )
                 _valueDescription = info.ValueDescription ?? GetFriendlyTypeName(_elementType);
 
-            _converter = CreateConverter(converterType);
+            if (_converter == null)
+                _converter = CreateConverter(converterType);
             _defaultValue = DetermineDefaultValue(info.DefaultValue);
         }
 
@@ -546,6 +555,48 @@ namespace Ookii.CommandLine
         public string? UsedArgumentName { get; internal set; }
 
         /// <summary>
+        /// Gets a value that indicates whether or not this argument accepts <see langword="null" /> values.
+        /// </summary>
+        /// <value>
+        ///   <see langword="true" /> if the <see cref="ArgumentType"/> is a nullable reference type; <see langword="false" />
+        ///   if the argument is a value type (except for <see cref="Nullable{T}"/> or (.Net 6.0 and later only) a 
+        ///   non-nullable reference type.
+        /// </value>
+        /// <remarks>
+        /// <para>
+        ///   For a multi-value argument (array or collection), this value indicates whether the element type can be
+        ///   <see langword="null" />.
+        /// </para>
+        /// <para>
+        ///   For a dictionary argument, this value indicates whether the type of the dictionary's values can be
+        ///   <see langword="null" />. Dictionary key types are always non-nullable, as this is a constraint on
+        ///   <see cref="Dictionary{TKey, TValue}"/>. This works only if the argument type is <see cref="Dictionary{TKey, TValue}"/>
+        ///   or <see cref="IDictionary{TKey, TValue}"/>. For other types that implement <see cref="IDictionary{TKey, TValue}"/>,
+        ///   it is not possible to determine the nullability of <c>TValue</c> except if it's
+        ///   a value type.
+        /// </para>
+        /// <para>
+        ///   This property indicates what happens when the <see cref="TypeConverter"/> used for this argument returns
+        ///   <see langword="null" /> from its <see cref="TypeConverter.ConvertFrom(ITypeDescriptorContext?, CultureInfo?, object)"/>
+        ///   method.
+        /// </para>
+        /// <para>
+        ///   If this property is <see langword="true" />, the argument's value will be set to <see langword="null" />.
+        ///   If it's <see langword="false" />, a <see cref="CommandLineArgumentException"/> will be thrown during
+        ///   parsing with <see cref="CommandLineArgumentErrorCategory.NullArgumentValue"/>.
+        /// </para>
+        /// <para>
+        ///   If the project containing the command line argument type does not use nullable reference types, or does
+        ///   not support them (e.g. on older .Net versions), this property will only be <see langword="false" /> for
+        ///   value types (other than <see cref="Nullable{T}"/>. Only on .Net 6.0 and later will the property be
+        ///   <see langword="false"/> for non-nullable reference types. Although nullable reference types are available
+        ///   on .Net Core 3.x, only .Net 6.0 and later will get this behavior due to the necessary runtime support to
+        ///   determine nullability of a property or constructor argument.
+        /// </para>
+        /// </remarks>
+        public bool AllowNull => _allowNull;
+
+        /// <summary>
         /// Converts the specified string to the argument type, as specified in the <see cref="ArgumentType"/> property.
         /// </summary>
         /// <param name="culture">The culture to use to convert the argument.</param>
@@ -570,8 +621,8 @@ namespace Ookii.CommandLine
             try
             {
                 var converted = _converter.ConvertFrom(null, culture, argument);
-                if (converted == null && !_allowNull)
-                    throw new CommandLineArgumentException(String.Format(CultureInfo.CurrentCulture, Properties.Resources.NullArgumentValueFormat, _argumentName), CommandLineArgumentErrorCategory.NullArgumentValue);
+                if (converted == null && (!_allowNull || _isDictionary))
+                    throw new CommandLineArgumentException(String.Format(CultureInfo.CurrentCulture, Properties.Resources.NullArgumentValueFormat, ArgumentName), ArgumentName, CommandLineArgumentErrorCategory.NullArgumentValue);
 
                 return converted;
             }
@@ -652,6 +703,8 @@ namespace Ookii.CommandLine
                 throw new ArgumentNullException(nameof(parameter));
 
             var typeConverterAttribute = TypeHelper.GetAttribute<TypeConverterAttribute>(parameter);
+            var keyTypeConverterAttribute = TypeHelper.GetAttribute<KeyTypeConverterAttribute>(parameter);
+            var valueTypeConverterAttribute = TypeHelper.GetAttribute<ValueTypeConverterAttribute>(parameter);
             var argumentName = TypeHelper.GetAttribute<ArgumentNameAttribute>(parameter)?.ArgumentName ?? parameter.Name;
             var info = new ArgumentInfo()
             {
@@ -664,6 +717,8 @@ namespace Ookii.CommandLine
                 ValueDescription = TypeHelper.GetAttribute<ValueDescriptionAttribute>(parameter)?.ValueDescription,
                 AllowDuplicateDictionaryKeys = Attribute.IsDefined(parameter, typeof(AllowDuplicateDictionaryKeysAttribute)),
                 ConverterType = typeConverterAttribute == null ? null : Type.GetType(typeConverterAttribute.ConverterTypeName, true),
+                KeyConverterType = keyTypeConverterAttribute == null ? null : Type.GetType(keyTypeConverterAttribute.ConverterTypeName, true),
+                ValueConverterType = valueTypeConverterAttribute == null ? null : Type.GetType(valueTypeConverterAttribute.ConverterTypeName, true),
                 MultiValueSeparator = GetMultiValueSeparator(TypeHelper.GetAttribute<MultiValueSeparatorAttribute>(parameter)),
                 Aliases = GetAliases(Attribute.GetCustomAttributes(parameter, typeof(AliasAttribute)), argumentName),
                 Position = parameter.Position,
@@ -686,6 +741,8 @@ namespace Ookii.CommandLine
                 throw new ArgumentException(Properties.Resources.MissingArgumentAttribute, nameof(property));
 
             var typeConverterAttribute = TypeHelper.GetAttribute<TypeConverterAttribute>(property);
+            var keyTypeConverterAttribute = TypeHelper.GetAttribute<KeyTypeConverterAttribute>(property);
+            var valueTypeConverterAttribute = TypeHelper.GetAttribute<ValueTypeConverterAttribute>(property);
             var argumentName = attribute.ArgumentName ?? property.Name;
             var info = new ArgumentInfo()
             {
@@ -698,6 +755,8 @@ namespace Ookii.CommandLine
                 Position = attribute.Position < 0 ? null : attribute.Position,
                 AllowDuplicateDictionaryKeys = Attribute.IsDefined(property, typeof(AllowDuplicateDictionaryKeysAttribute)),
                 ConverterType = typeConverterAttribute == null ? null : Type.GetType(typeConverterAttribute.ConverterTypeName, true),
+                KeyConverterType = keyTypeConverterAttribute == null ? null : Type.GetType(keyTypeConverterAttribute.ConverterTypeName, true),
+                ValueConverterType = valueTypeConverterAttribute == null ? null : Type.GetType(valueTypeConverterAttribute.ConverterTypeName, true),
                 MultiValueSeparator = GetMultiValueSeparator(TypeHelper.GetAttribute<MultiValueSeparatorAttribute>(property)),
                 Aliases = GetAliases(Attribute.GetCustomAttributes(property, typeof(AliasAttribute)), argumentName),
                 DefaultValue = attribute.DefaultValue,
@@ -776,8 +835,9 @@ namespace Ookii.CommandLine
 
             if( IsDictionary )
             {
-                // Only switch arguments can have null values, and dictionaries aren't switches.
-                SetDictionaryValue(value!, convertedValue);
+                // Value is not null because IsDictionary and IsSwitch are mutually exclusive.
+                // ConvertedValue is not null because ConvertToArgumentType ensures that if the argument is a dictionary.
+                SetDictionaryValue(value!, convertedValue!);
             }
             else if( IsMultiValue )
             {
@@ -853,7 +913,7 @@ namespace Ookii.CommandLine
             }
         }
 
-        private void SetDictionaryValue(string value, object? convertedValue)
+        private void SetDictionaryValue(string value, object convertedValue)
         {
             if( !HasValue )
             {
@@ -902,8 +962,9 @@ namespace Ookii.CommandLine
 
         private static bool DetermineDictionaryValueTypeAllowsNull(Type type, PropertyInfo? property, ParameterInfo? parameter)
         {
-            if (type.GetGenericArguments()[1].IsValueType)
-                return false;
+            var valueTypeNull = DetermineValueTypeNullable(type.GetGenericArguments()[1]);
+            if (valueTypeNull != null)
+                return valueTypeNull.Value;
 
 #if NET6_0_OR_GREATER
             // Type is the IDictionary<,> implemented interface, not the actual type of the property
@@ -932,11 +993,10 @@ namespace Ookii.CommandLine
 
         private static bool DetermineCollectionElementTypeAllowsNull(Type type, PropertyInfo? property, ParameterInfo? parameter)
         {
-            if (type.IsArray && type.GetElementType()!.IsValueType)
-                return false;
-
-            if (!type.IsArray && type.GetGenericArguments()[0].IsValueType)
-                return false;
+            Type elementType = type.IsArray ? type.GetElementType()! : type.GetGenericArguments()[0];
+            var valueTypeNull = DetermineValueTypeNullable(elementType);
+            if (valueTypeNull != null)
+                return valueTypeNull.Value;
 
 #if NET6_0_OR_GREATER
             // Type is the ICollection<> implemented interface, not the actual type of the property
@@ -967,8 +1027,9 @@ namespace Ookii.CommandLine
 
         private static bool DetermineAllowsNull(ParameterInfo parameter)
         {
-            if (parameter.ParameterType.IsValueType)
-                return false;
+            var valueTypeNull = DetermineValueTypeNullable(parameter.ParameterType);
+            if (valueTypeNull != null)
+                return valueTypeNull.Value;
 
 #if NET6_0_OR_GREATER
             var context = new NullabilityInfoContext();
@@ -981,8 +1042,9 @@ namespace Ookii.CommandLine
 
         private static bool DetermineAllowsNull(PropertyInfo property)
         {
-            if (property.PropertyType.IsValueType)
-                return false;
+            var valueTypeNull = DetermineValueTypeNullable(property.PropertyType);
+            if (valueTypeNull != null)
+                return valueTypeNull.Value;
 
 #if NET6_0_OR_GREATER
             var context = new NullabilityInfoContext();
@@ -991,6 +1053,16 @@ namespace Ookii.CommandLine
 #else
             return true;
 #endif
+        }
+
+        private static bool? DetermineValueTypeNullable(Type type)
+        {
+            if (type.IsValueType)
+            {
+                return type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>);
+            }
+
+            return null;
         }
     }
 }

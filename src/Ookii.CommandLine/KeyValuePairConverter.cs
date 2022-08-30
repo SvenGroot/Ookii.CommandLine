@@ -24,8 +24,35 @@ namespace Ookii.CommandLine
     /// </remarks>
     public class KeyValuePairConverter<TKey, TValue> : TypeConverter
     {
-        private static readonly TypeConverter _keyConverter = GetConverter(typeof(TKey));
-        private static readonly TypeConverter _valueConverter = GetConverter(typeof(TValue));
+        private readonly TypeConverter _keyConverter;
+        private readonly TypeConverter _valueConverter;
+        private readonly string _argumentName;
+        private readonly bool _allowNullValues;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="KeyValuePairConverter{TKey, TValue}"/> class.
+        /// </summary>
+        /// <param name="argumentName">The name of the argument that this converter is for.</param>
+        /// <param name="allowNullValues">Indicates whether the value type accepts <see langword="null"/> values.</param>
+        /// <param name="keyConverterType">Provides an optional <see cref="TypeConverter"/> type to use to convert keys.
+        /// If <see langword="null"/>, the default converter for <typeparamref name="TKey"/> is used.</param>
+        /// <param name="valueConverterType">Provides an optional <see cref="TypeConverter"/> type to use to convert values.
+        /// If <see langword="null"/>, the default converter for <typeparamref name="TValue"/> is used.</param>
+        public KeyValuePairConverter(string argumentName, bool allowNullValues, Type? keyConverterType, Type? valueConverterType)
+        {
+            _argumentName = argumentName ?? throw new ArgumentNullException(nameof(argumentName));
+            _allowNullValues = allowNullValues;
+            _keyConverter = GetConverter(keyConverterType, typeof(TKey));
+            _valueConverter = GetConverter(valueConverterType, typeof(TValue));
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="KeyValuePairConverter{TKey, TValue}"/> class.
+        /// </summary>
+        public KeyValuePairConverter()
+            : this(string.Empty, true, null, null)
+        {
+        }
 
         /// <summary>
         /// Returns whether this converter can convert an object of the given type to the type of this converter, using the specified context.
@@ -81,7 +108,12 @@ namespace Ookii.CommandLine
                     throw new FormatException(Properties.Resources.NoKeyValuePairSeparator);
                 string key = stringValue.Substring(0, index);
                 string valueForKey = stringValue.Substring(index + 1);
-                return new KeyValuePair<TKey, TValue?>((TKey)_keyConverter.ConvertFromString(context, culture, key)!, (TValue?)_valueConverter.ConvertFromString(context, culture, valueForKey));
+                object? convertedKey = _keyConverter.ConvertFromString(context, culture, key);
+                object? convertedValue = _valueConverter.ConvertFromString(context, culture, valueForKey);
+                if (convertedKey == null || (!_allowNullValues && convertedValue == null))
+                    throw new CommandLineArgumentException(String.Format(CultureInfo.CurrentCulture, Properties.Resources.NullArgumentValueFormat, _argumentName), _argumentName, CommandLineArgumentErrorCategory.NullArgumentValue);
+
+                return new KeyValuePair<TKey, TValue?>((TKey)convertedKey, (TValue?)convertedValue);
             }
 
             return base.ConvertFrom(context, culture, value);
@@ -117,9 +149,9 @@ namespace Ookii.CommandLine
             return base.ConvertTo(context, culture, value, destinationType);
         }
 
-        private static TypeConverter GetConverter(Type type)
+        private static TypeConverter GetConverter(Type? converterType, Type type)
         {
-            TypeConverter converter = TypeDescriptor.GetConverter(type);
+            TypeConverter converter = converterType == null ? TypeDescriptor.GetConverter(type) : (TypeConverter)Activator.CreateInstance(converterType)!;
             if( converter == null || !(converter.CanConvertFrom(typeof(string)) && converter.CanConvertTo(typeof(string))) )
                 throw new NotSupportedException(string.Format(CultureInfo.InvariantCulture, Properties.Resources.NoTypeConverterFormat, type));
             return converter;

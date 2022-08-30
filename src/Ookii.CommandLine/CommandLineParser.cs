@@ -850,6 +850,24 @@ namespace Ookii.CommandLine
         }
 
         /// <summary>
+        /// Gets a command line argument by name.
+        /// </summary>
+        /// <param name="name">The name of the argument.</param>
+        /// <returns>The <see cref="CommandLineArgument"/> instance containing information about
+        /// the argument, or <see langword="null" /> if the argument was not found.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="name"/> is <see langword="null"/>.</exception>
+        public CommandLineArgument? GetArgument(string name)
+        {
+            if (name == null)
+                throw new ArgumentNullException(nameof(name));
+
+            if (_argumentsByName.TryGetValue(name, out var argument))
+                return argument;
+            else
+                return null;
+        }
+
+        /// <summary>
         /// Raises the <see cref="ArgumentParsed"/> event.
         /// </summary>
         /// <param name="e">The data for the event.</param>
