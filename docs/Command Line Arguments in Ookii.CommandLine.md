@@ -1,8 +1,8 @@
 # Command line arguments
 
-Command line arguments are passed to your application when it is started, and are typically accessed through the parameter of the `static void Main(string[] args)` method (`Shared Sub Main(ByVal args() As String)` in Visual Basic). This provides with the arguments as an array of strings, which is not terribly useful. What Ookii.CommandLine allows you to do is to convert that array of strings into a strongly typed set of named values, which are stored in the properties of the class that was used to define the arguments.
+Command line arguments are passed to your application when it is started, and are typically accessed through the parameter of the `static void Main(string[] args)` method (`Shared Sub Main(ByVal args() As String)` in Visual Basic). This provides the arguments as an array of strings, which is not terribly useful. What Ookii.CommandLine allows you to do is to convert that array of strings into a strongly typed set of named values, which are stored in the properties of the class that was used to define the arguments.
 
-The method used to extract values from the array of string arguments is determined by the command line argument parsing rules. Ookii.CommandLine uses parsing rules that are very similar to how Microsoft PowerShell parses arguments for cmdlets, so if you have used PowerShell these rules will be familiar with you.
+The method used to extract values from the array of string arguments is determined by the command line argument parsing rules. Ookii.CommandLine uses parsing rules that are very similar to how Microsoft PowerShell parses arguments for cmdlets, so if you have used PowerShell these rules will be familiar to you.
 
 Command line arguments follow the name of your application on the command prompt, and typically take the following form:
 
@@ -30,9 +30,23 @@ A positional argument can still be supplied by explicitly supplying its name. If
 
 A command line argument that is required must be present on all invocations of the application. If a required argument is not present, the `CommandLineParser` class will throw an exception during parsing.
 
-Any argument can be made required. Usually it is recommended for any required argument to also be a positional argument, but this is not necessary.
+Any argument can be made required. Usually it is recommended for any required argument to also be a positional argument, but this is not mandatory.
 
-For positional arguments, required arguments must always come before optional arguments; it is an error to define a required argument after an optional argument.
+For positional arguments, required arguments must always come before optional arguments; it is an error to define a required positional argument after an optional positional argument.
+
+## Switch arguments
+
+A switch argument is an argument with a Boolean type (`bool` in C#). Its value is determined by its presence or absence on the command line; the value will be true if the argument is supplied, and false if not. The following arguments set the switch argument named “Switch” to true:
+
+    -Switch
+
+A switch argument’s value can be specified explicitly, as in the following example:
+
+    -Switch:true
+
+You must use a colon to specify an explicit value for a switch argument; you cannot use white space to separate the name and the value.
+
+If you use a nullable Boolean type (`bool?` in C#) as the type of the argument, it will be null if omitted, true if supplied, and false only if explicitly set to false using `-Switch:false`.
 
 ## Arguments with multiple values
 
@@ -58,6 +72,8 @@ If a multi-value argument is positional, it must be the last positional argument
 
 If a multi-value argument is required, it means it must have at least one value.
 
+If the type of the argument is an array of Boolean values (`bool[]`), it will act as a multi-value argument and a switch. A value of true (or the explicit value if one is given) gets added to the array for every time that the argument is supplied.
+
 ## Dictionary arguments
 
 Dictionary arguments are multi-value arguments that specify a set of key/value pairs. Each value for a dictionary argument takes the form key=value, like in the following example:
@@ -70,22 +86,6 @@ A dictionary argument must have a type of `Dictionary<TKey, TValue>` where TKey 
 
 If you specify the same key more than once an exception will be thrown unless the `AllowDuplicateDictionaryKeysAttribute` attribute is specified on the constructor parameter or property that defines the dictionary argument.
 
-## Switch arguments
-
-A switch argument is an argument with a Boolean type (`bool` in C#). Its value is determined by its presence or absence on the command line; the value will be true if the argument is supplied, and false if not. The following arguments set the switch argument named “switch” to true:
-
-    -switch
-
-A switch argument’s value can be specified explicitly, as in the following example:
-
-    -switch:true
-
-You must use a colon to specify an explicit value for a switch argument; you cannot use white space to separate the name and the value.
-
-If you use a nullable Boolean type (`bool?` In C#) as the type of the argument, it will be null if omitted, true if supplied, and false only if explicitly set to false using `-switch:false`.
-
-If the type of the argument is an array of Boolean values, it will act as a multi-value argument and a switch. A value of true (or the explicit value if one is given) gets added to the array for every time that the argument is supplied.
-
 ## Argument value conversion
 
 Ookii.CommandLine allows you to define arguments with any .Net type, including types such as `System.String`, `System.Int32`, `System.DateTime`, and many more. Any type can be used; the only requirement is that it is possible to convert a string value to that type.
@@ -94,9 +94,34 @@ The .Net Framework provides a very flexible method for converting one type to an
 
 It is possible to override the default conversion by specifying a custom type converter using the `System.ComponentModel.TypeConverterAttribute`. When this attribute is applied to a constructor parameter or property that defines an argument, the specified type converter will be used for conversion instead. Note that for multi-value, dictionary and nullable value-type arguments the converter must be for the element type (e.g. if the argument is a multi-value argument of type `int[]`, the type converter must be able to convert to `int`). For a dictionary argument the element type is `KeyValuePair<TKey, TValue>`, and the type converter is responsible for parsing the key and value from the argument value.
 
+For a dictionary argument, instead of creating a custom `TypeConverter` that parses into a `KeyValuePair<TKey, TValue>`, you can
+also customize conversion of the key and/or value alone by specifying the `KeyTypeConverterAttribute` and/or the
+`ValueTypeConverterAttribute` respectively. This is the recommended way of customizing type conversion for dictionary arguments.
+
 For many types, the conversion can be culture dependent. For example, converting numbers or dates depends on the culture which defines the accepted formats and how they’re interpreted; some cultures might use a period as the decimal separators, while others use a comma.
 
 The culture used for argument value conversions is specified the `CommandLineParser.Culture` property, which defaults to the current culture. If you wish your argument parsing to be independent of the user’s culture, set this property to `System.Globalization.CultureInfo.InvariantCulture`.
+
+## Arguments with non-nullable types
+
+Ookii.CommandLine provides support for Nullable Reference Types. Not only is the library itself fully annotated (if using
+the .Net 6.0 version of the library), but command line argument parsing takes into account the nullability of the properties or
+parameters that define the arguments. If the argument is declared with a nullable reference or value type (e.g. `string?` or `int?`),
+nothing changes. But if the argument is not nullable (e.g. `string` (in a context with NRT support) or `int`), `CommandLineParser`
+will ensure that the value will not be null.
+
+Assigning a null value to an argument only happens if the `TypeConverter` for that argument returns `null` as the result of the
+conversion. If this happens and the argument is not nullable, a `CommandLineArgumentException` is thrown with the category set to
+`NullArgumentValue`.
+
+Null-checking for non-nullable reference types is only available in .Net 6.0 and later. If you are using the .Net Framework 2.0
+or .Net Standard 2.0 version of Ookii.CommandLine, this check is only done for value types.
+
+For multi-value arguments, the nullability check applies to the type of the elements (e.g. `string?[]` for an array),
+and for dictionary arguments, it applies to the value (e.g. `Dictionary<string, string?>`); the key may never be null for a
+dictionary argument.
+
+See also the [API documentation](https://www.ookii.org/Link/CommandLineDoc) for the `CommandLineArgument.AllowNull` property.
 
 * [Defining Command Line Arguments](Defining%20Command%20Line%20Arguments.md)
 * [Parsing Command Line Arguments](Parsing%20Command%20Line%20Arguments.md)

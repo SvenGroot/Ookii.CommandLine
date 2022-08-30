@@ -45,6 +45,27 @@ The third property defines a switch argument, because its type is a Boolean. Swi
 
 The fourth property does not define an argument, because it doesn’t have the `CommandLineArgumentAttribute` applied.
 
+### Default values
+
+If the default value is specified using the `CommandLineArgumentAttribute.DefaultValue` property, it must either match the type
+of the property, or be a type that the argument's `TypeConverter` can convert from.
+
+Default argument values set by the `CommandLineArgumentAttribute.DefaultValue` property are applied only if the argument is
+not required, it was not specified on the command line, and the default value is not `null`.
+
+If the default value is `null`, the `CommandLineParser` will not set the property even if the argument was not specified. This
+enables you to use property initialization as an alternative way to specify default values:
+
+```csharp
+[CommandLineArgument]
+public string SomeProperty { get; set; } = "default";
+```
+
+Here, the value "default" will not be changed if the argument was not specified.
+
+This is particularly useful if the argument uses a [non-nullable reference type](Command%20Line%20Arguments%20in%20Ookii.CommandLine.md#arguments-with-non-nullable-types),
+which must be initialized with a non-null value.
+
 ## Using constructor parameters
 
 An alternative way to define positional parameters is using a constructor. The parameters of the public constructor for the class that defines the arguments will be used to define arguments. These arguments will be positional arguments, and required if the parameter is a required parameter.
