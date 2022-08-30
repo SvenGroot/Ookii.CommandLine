@@ -61,14 +61,14 @@ enables you to use property initialization as an alternative way to specify defa
 public string SomeProperty { get; set; } = "default";
 ```
 
-Here, the value "default" will not be changed if the argument was not specified.
+Here, the value “default” will not be changed if the argument was not specified.
 
 This is particularly useful if the argument uses a [non-nullable reference type](Command%20Line%20Arguments%20in%20Ookii.CommandLine.md#arguments-with-non-nullable-types),
 which must be initialized with a non-null value.
 
 ## Using constructor parameters
 
-An alternative way to define positional parameters is using a constructor. The parameters of the public constructor for the class that defines the arguments will be used to define arguments. These arguments will be positional arguments, and required if the parameter is a required parameter.
+An alternative way to define positional parameters is using a constructor. The parameters of the public constructor for the class will be used to define arguments. These arguments will be positional arguments, and required if the parameter is a required parameter.
 
 Every constructor parameter creates a positional argument with its position matching the position of the constructor parameter. The type of the constructor parameter is the type of the argument, and by default the name of the constructor parameter is used of as the argument name, but this can be overridden using the `ArgumentNameAttribute` attribute.
 
@@ -82,7 +82,7 @@ public MyArguments(string arg1,
 }
 ```
 
-This constructor defines the following arguments: a required positional argument of type `string` with the name “arg1”, a required positional argument of type `int` with the name “arg3”, and an optional positional argument of type `float` with the name “CustomName” and a default value of 0.
+This constructor defines the following arguments: a required positional argument of type `string` with the name “arg1”, a required positional argument of type `int` with the name “arg2”, and an optional positional argument of type `float` with the name “CustomName” and a default value of 0.
 
 If you are not using the C# 4.0 compiler, you can apply the `System.Runtime.InteropServices.OptionalAttribute` attribute and the `System.Runtime.InteropServices.DefaultParameterValueAttribute` to the parameter to define an optional argument. In Visual Basic, you can use the usual syntax for optional parameters (for an example, see the source code of the Visual Basic sample application included with the library).
 
