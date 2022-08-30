@@ -254,6 +254,15 @@ namespace Ookii.CommandLine.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The key-value separator cannot be an empty string..
+        /// </summary>
+        internal static string EmptyKeyValueSeparator {
+            get {
+                return ResourceManager.GetString("EmptyKeyValueSeparator", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The type of the default value for argument &apos;{0}&apos; is not compatible with the type of the argument..
         /// </summary>
         internal static string IncorrectDefaultValueTypeFormat {
@@ -353,11 +362,11 @@ namespace Ookii.CommandLine.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to An key/value pair must contain a &apos;=&apos; character..
+        ///   Looks up a localized string similar to A key/value pair must contain &quot;{-}&quot; as a separator..
         /// </summary>
-        internal static string NoKeyValuePairSeparator {
+        internal static string NoKeyValuePairSeparatorFormat {
             get {
-                return ResourceManager.GetString("NoKeyValuePairSeparator", resourceCulture);
+                return ResourceManager.GetString("NoKeyValuePairSeparatorFormat", resourceCulture);
             }
         }
         

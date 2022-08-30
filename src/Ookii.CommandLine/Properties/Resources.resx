@@ -228,8 +228,8 @@
   <data name="InvalidDictionaryValueFormat" xml:space="preserve">
     <value>The value '{0}' provided for argument '{1}' was invalid: {2}</value>
   </data>
-  <data name="NoKeyValuePairSeparator" xml:space="preserve">
-    <value>An key/value pair must contain a '=' character.</value>
+  <data name="NoKeyValuePairSeparatorFormat" xml:space="preserve">
+    <value>A key/value pair must contain "{-}" as a separator.</value>
   </data>
   <data name="NoTypeConverterFormat" xml:space="preserve">
     <value>No type converter that can convert to and from a string exists for type '{0}'.</value>
@@ -254,5 +254,8 @@
   </data>
   <data name="NullArgumentValueFormat" xml:space="preserve">
     <value>The argument '{0}' cannot be null.</value>
+  </data>
+  <data name="EmptyKeyValueSeparator" xml:space="preserve">
+    <value>The key-value separator cannot be an empty string.</value>
   </data>
 </root>

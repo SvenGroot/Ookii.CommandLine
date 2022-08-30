@@ -167,6 +167,16 @@ namespace Ookii.CommandLine.Tests
             public string Argument2 { get; set; }
         }
 
+        class KeyValueSeparatorArguments
+        {
+            [CommandLineArgument]
+            public Dictionary<string, int> DefaultSeparator { get; set; }
+
+            [CommandLineArgument]
+            [KeyValueSeparator("<=>")]
+            public Dictionary<string, string> CustomSeparator { get; set; }
+        }
+
         #endregion
 
         private TestContext testContextInstance;
@@ -416,6 +426,42 @@ namespace Ookii.CommandLine.Tests
             catch (CommandLineArgumentException ex)
             {
                 Assert.AreEqual(CommandLineArgumentErrorCategory.UnknownArgument, ex.Category);
+            }
+        }
+
+        [TestMethod]
+        public void ParseTestKeyValueSeparator()
+        {
+            var target = new CommandLineParser(typeof(KeyValueSeparatorArguments));
+            Assert.AreEqual("=", target.GetArgument("DefaultSeparator")!.KeyValueSeparator);
+            Assert.AreEqual("String=Int32", target.GetArgument("DefaultSeparator")!.ValueDescription);
+            Assert.AreEqual("<=>", target.GetArgument("CustomSeparator")!.KeyValueSeparator);
+            Assert.AreEqual("String<=>String", target.GetArgument("CustomSeparator")!.ValueDescription);
+
+            var result = (KeyValueSeparatorArguments)target.Parse(new[] { "-CustomSeparator", "foo<=>bar", "-CustomSeparator", "baz<=>contains<=>separator", "-CustomSeparator", "hello<=>" });
+            Assert.IsNotNull(result);
+            CollectionAssert.AreEquivalent(new[] { KeyValuePair.Create("foo", "bar"), KeyValuePair.Create("baz", "contains<=>separator"), KeyValuePair.Create("hello", "") }, result.CustomSeparator);
+
+            try
+            {
+                target.Parse(new[] { "-CustomSeparator", "foo=bar" });
+                Assert.Fail("Exception expected.");
+            }
+            catch (CommandLineArgumentException ex)
+            {
+                Assert.AreEqual(CommandLineArgumentErrorCategory.ArgumentValueConversion, ex.Category);
+                Assert.AreEqual("CustomSeparator", ex.ArgumentName);
+            }
+
+            try
+            {
+                target.Parse(new[] { "-DefaultSeparator", "foo<=>bar" });
+                Assert.Fail("Exception expected.");
+            }
+            catch (CommandLineArgumentException ex)
+            {
+                Assert.AreEqual(CommandLineArgumentErrorCategory.ArgumentValueConversion, ex.Category);
+                Assert.AreEqual("DefaultSeparator", ex.ArgumentName);
             }
         }
 

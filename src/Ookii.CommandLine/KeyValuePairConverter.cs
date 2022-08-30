@@ -13,6 +13,17 @@ using System.Globalization;
 namespace Ookii.CommandLine
 {
     /// <summary>
+    /// Static class providing constants for <see cref="KeyValuePairConverter{TKey, TValue}"/>.
+    /// </summary>
+    public static class KeyValuePairConverter
+    {
+        /// <summary>
+        /// Gets the default key/value separator, which is "=".
+        /// </summary>
+        public const string DefaultSeparator = "=";
+    }
+
+    /// <summary>
     /// Converts key-value pairs to and from strings using key=value notation.
     /// </summary>
     /// <typeparam name="TKey">The type of the key.</typeparam>
@@ -28,6 +39,7 @@ namespace Ookii.CommandLine
         private readonly TypeConverter _valueConverter;
         private readonly string _argumentName;
         private readonly bool _allowNullValues;
+        private readonly string _separator;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="KeyValuePairConverter{TKey, TValue}"/> class.
@@ -38,19 +50,28 @@ namespace Ookii.CommandLine
         /// If <see langword="null"/>, the default converter for <typeparamref name="TKey"/> is used.</param>
         /// <param name="valueConverterType">Provides an optional <see cref="TypeConverter"/> type to use to convert values.
         /// If <see langword="null"/>, the default converter for <typeparamref name="TValue"/> is used.</param>
-        public KeyValuePairConverter(string argumentName, bool allowNullValues, Type? keyConverterType, Type? valueConverterType)
+        /// <param name="separator">Provides an optional custom key/value separator. If <see langword="null" />, the value
+        /// of <see cref="KeyValuePairConverter.DefaultSeparator"/> is used.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="argumentName"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentException"><paramref name="separator"/> is an empty string.</exception>
+        /// <exception cref="NotSupportedException">Either the key or value <see cref="TypeConverter"/> does not support converting from a string.</exception>
+        public KeyValuePairConverter(string argumentName, bool allowNullValues, Type? keyConverterType, Type? valueConverterType, string? separator)
         {
             _argumentName = argumentName ?? throw new ArgumentNullException(nameof(argumentName));
             _allowNullValues = allowNullValues;
             _keyConverter = GetConverter(keyConverterType, typeof(TKey));
             _valueConverter = GetConverter(valueConverterType, typeof(TValue));
+            _separator = separator ?? KeyValuePairConverter.DefaultSeparator;
+            if (_separator.Length == 0)
+                throw new ArgumentException(Properties.Resources.EmptyKeyValueSeparator, nameof(separator));
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="KeyValuePairConverter{TKey, TValue}"/> class.
         /// </summary>
+        /// <exception cref="NotSupportedException">Either the key or value <see cref="TypeConverter"/> does not support converting from a string.</exception>
         public KeyValuePairConverter()
-            : this(string.Empty, true, null, null)
+            : this(string.Empty, true, null, null, null)
         {
         }
 
@@ -103,11 +124,12 @@ namespace Ookii.CommandLine
             var stringValue = value as string;
             if( stringValue != null )
             {
-                int index = stringValue.IndexOf('=');
+                int index = stringValue.IndexOf(_separator);
                 if( index < 0 )
-                    throw new FormatException(Properties.Resources.NoKeyValuePairSeparator);
+                    throw new FormatException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.NoKeyValuePairSeparatorFormat, _separator));
+
                 string key = stringValue.Substring(0, index);
-                string valueForKey = stringValue.Substring(index + 1);
+                string valueForKey = stringValue.Substring(index + _separator.Length);
                 object? convertedKey = _keyConverter.ConvertFromString(context, culture, key);
                 object? convertedValue = _valueConverter.ConvertFromString(context, culture, valueForKey);
                 if (convertedKey == null || (!_allowNullValues && convertedValue == null))

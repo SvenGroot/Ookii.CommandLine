@@ -121,6 +121,7 @@ namespace Ookii.CommandLine
         private readonly bool _isDictionary;
         private readonly bool _allowDuplicateDictionaryKeys;
         private readonly string? _multiValueSeparator;
+        private readonly string? _keyValueSeparator;
         private readonly bool _allowNull;
         private object? _value;
 
@@ -142,6 +143,7 @@ namespace Ookii.CommandLine
             public string? Description { get; set; }
             public string? ValueDescription { get; set; }
             public string? MultiValueSeparator { get; set; }
+            public string? KeyValueSeparator { get; set; }
             public bool AllowDuplicateDictionaryKeys { get; set; }
             public bool AllowNull { get; set; }
         }
@@ -205,13 +207,15 @@ namespace Ookii.CommandLine
                 _allowDuplicateDictionaryKeys = info.AllowDuplicateDictionaryKeys;
                 Type[] genericArguments = dictionaryType.GetGenericArguments();
                 _elementType = typeof(KeyValuePair<,>).MakeGenericType(genericArguments);
-                _valueDescription = info.ValueDescription ?? string.Format(CultureInfo.CurrentCulture, "{0}={1}", GetFriendlyTypeName(genericArguments[0]), GetFriendlyTypeName(genericArguments[1]));
                 _allowNull = DetermineDictionaryValueTypeAllowsNull(dictionaryType, info.Property, info.Parameter);
+                _keyValueSeparator = info.KeyValueSeparator ?? KeyValuePairConverter.DefaultSeparator;
                 if (converterType == null)
                 {
                     converterType = typeof(KeyValuePairConverter<,>).MakeGenericType(dictionaryType.GetGenericArguments());
-                    _converter = (TypeConverter)Activator.CreateInstance(converterType, _argumentName, _allowNull, info.KeyConverterType, info.ValueConverterType)!;
+                    _converter = (TypeConverter)Activator.CreateInstance(converterType, _argumentName, _allowNull, info.KeyConverterType, info.ValueConverterType, _keyValueSeparator)!;
                 }
+
+                _valueDescription = info.ValueDescription ?? string.Format(CultureInfo.CurrentCulture, "{0}{1}{2}", GetFriendlyTypeName(genericArguments[0]), _keyValueSeparator, GetFriendlyTypeName(genericArguments[1]));
             }
             else if (collectionType != null)
             {
@@ -436,6 +440,20 @@ namespace Ookii.CommandLine
         {
             get { return _multiValueSeparator; }
         }
+
+        /// <summary>
+        /// Gets the separator for key/value pairs if this argument is a dictionary argument.
+        /// </summary>
+        /// <value>
+        /// The custom value specified using the <see cref="KeyValueSeparatorAttribute"/> attribute, or <see cref="KeyValuePairConverter.DefaultSeparator"/>
+        /// if no attribute was present, or <see langword="null" /> if this is not a dictionary argument.
+        /// </value>
+        /// <remarks>
+        /// <para>
+        ///   This property is only meaningful if the <see cref="IsDictionary"/> property is <see langword="true"/>.
+        /// </para>
+        /// </remarks>
+        public string? KeyValueSeparator => _keyValueSeparator;
 
         /// <summary>
         /// Gets a value indicating whether this argument is a dictionary argument.
@@ -720,6 +738,7 @@ namespace Ookii.CommandLine
                 KeyConverterType = keyTypeConverterAttribute == null ? null : Type.GetType(keyTypeConverterAttribute.ConverterTypeName, true),
                 ValueConverterType = valueTypeConverterAttribute == null ? null : Type.GetType(valueTypeConverterAttribute.ConverterTypeName, true),
                 MultiValueSeparator = GetMultiValueSeparator(TypeHelper.GetAttribute<MultiValueSeparatorAttribute>(parameter)),
+                KeyValueSeparator = TypeHelper.GetAttribute<KeyValueSeparatorAttribute>(parameter)?.Separator,
                 Aliases = GetAliases(Attribute.GetCustomAttributes(parameter, typeof(AliasAttribute)), argumentName),
                 Position = parameter.Position,
                 IsRequired = !parameter.IsOptional,
@@ -758,6 +777,7 @@ namespace Ookii.CommandLine
                 KeyConverterType = keyTypeConverterAttribute == null ? null : Type.GetType(keyTypeConverterAttribute.ConverterTypeName, true),
                 ValueConverterType = valueTypeConverterAttribute == null ? null : Type.GetType(valueTypeConverterAttribute.ConverterTypeName, true),
                 MultiValueSeparator = GetMultiValueSeparator(TypeHelper.GetAttribute<MultiValueSeparatorAttribute>(property)),
+                KeyValueSeparator = TypeHelper.GetAttribute<KeyValueSeparatorAttribute>(property)?.Separator,
                 Aliases = GetAliases(Attribute.GetCustomAttributes(property, typeof(AliasAttribute)), argumentName),
                 DefaultValue = attribute.DefaultValue,
                 IsRequired = attribute.IsRequired,

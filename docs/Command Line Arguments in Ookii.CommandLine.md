@@ -10,7 +10,11 @@ Command line arguments follow the name of your application on the command prompt
 
 The argument name is preceded by the _argument name prefix_. This prefix is configurable, but Ookii.CommandLine defaults to accepting a forward slash (`/`) and a dash (`-`) on Windows, and only a dash (`-`) on other platforms (other platforms are supported through .Net Core and Mono).
 
-The argument value follows the name, separated either by a space or a colon (`:`). Not all arguments require values; those that do not are called _switch arguments_ and have a value determined by their presence or absence on the command line.
+The argument value follows the name, separated either by a space or a colon (`:`). You can configure how argument names and values
+can be separated by using the `CommandLineParser.AllowWhiteSpaceValueSeparator` and the `CommandLineParser.NameValueSeparator`
+properties.
+
+Not all arguments require values; those that do not are called _switch arguments_ and have a value determined by their presence or absence on the command line.
 
 An argument can have one or more aliases: alternative names that can also be used to specify the command name. For example, a parameter named “Verbose” might use the alias “v” as a shorter to type alternative.
 
@@ -44,7 +48,7 @@ A switch argument’s value can be specified explicitly, as in the following exa
 
     -Switch:true
 
-You must use a colon to specify an explicit value for a switch argument; you cannot use white space to separate the name and the value.
+You must use a colon (or your custom name-value separator if configured) to specify an explicit value for a switch argument; you cannot use white space to separate the name and the value.
 
 If you use a nullable Boolean type (`bool?` in C#) as the type of the argument, it will be null if omitted, true if supplied, and false only if explicitly set to false using `-Switch:false`.
 
@@ -86,6 +90,8 @@ A dictionary argument must have a type of `Dictionary<TKey, TValue>` where TKey 
 
 If you specify the same key more than once an exception will be thrown unless the `AllowDuplicateDictionaryKeysAttribute` attribute is specified on the constructor parameter or property that defines the dictionary argument.
 
+The default key/value separator (which is '=') can be overridden using the `KeyValueSeparatorAttribute` attribute.
+
 ## Argument value conversion
 
 Ookii.CommandLine allows you to define arguments with any .Net type, including types such as `System.String`, `System.Int32`, `System.DateTime`, and many more. Any type can be used; the only requirement is that it is possible to convert a string value to that type.
@@ -97,6 +103,9 @@ It is possible to override the default conversion by specifying a custom type co
 For a dictionary argument, instead of creating a custom `TypeConverter` that parses into a `KeyValuePair<TKey, TValue>`, you can
 also customize conversion of the key and/or value alone by specifying the `KeyTypeConverterAttribute` and/or the
 `ValueTypeConverterAttribute` respectively. This is the recommended way of customizing type conversion for dictionary arguments.
+
+If you do specify the `TypeConverterAttribute` for a dictionary argument, the `KeyTypeConverterAttribute`, `ValueTypeConverterAttribute`,
+and `KeyValueSeparatorAttribute` arguments will be ignored.
 
 For many types, the conversion can be culture dependent. For example, converting numbers or dates depends on the culture which defines the accepted formats and how they’re interpreted; some cultures might use a period as the decimal separators, while others use a comma.
 
