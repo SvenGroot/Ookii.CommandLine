@@ -1,4 +1,5 @@
-﻿using System;
+﻿// Copyright (c) Sven Groot (Ookii.org)
+using System;
 
 namespace Ookii.CommandLine
 {

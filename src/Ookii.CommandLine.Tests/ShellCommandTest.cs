@@ -1,4 +1,5 @@
-﻿using System;
+﻿// Copyright (c) Sven Groot (Ookii.org)
+using System;
 using System.Text;
 using System.Collections.Generic;
 using System.Linq;

@@ -1,4 +1,5 @@
-﻿#nullable enable
+﻿// Copyright (c) Sven Groot (Ookii.org)
+#nullable enable
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
