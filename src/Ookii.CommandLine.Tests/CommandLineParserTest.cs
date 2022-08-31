@@ -479,6 +479,34 @@ namespace Ookii.CommandLine.Tests
             Assert.AreEqual(_expectedDefaultUsage, actual);
         }
 
+        [TestMethod]
+        public void TestStaticParse()
+        {
+            using var output = new StringWriter();
+            using var error = new StringWriter();
+            var options = new ParseOptions()
+            {
+                ArgumentNamePrefixes = new[] { "/", "-" },
+                Culture = CultureInfo.InvariantCulture,
+                Out = output,
+                Error = error,
+            };
+
+            options.UsageOptions.UsagePrefix = "Usage: test";
+
+            var result = CommandLineParser.Parse<TestArguments>(new[] { "foo", "-Arg6", "bar" }, options);
+            Assert.IsNotNull(result);
+            Assert.AreEqual("foo", result.Arg1);
+            Assert.AreEqual("bar", result.Arg6);
+            Assert.AreEqual(0, output.ToString().Length);
+            Assert.AreEqual(0, error.ToString().Length);
+
+            result = CommandLineParser.Parse<TestArguments>(new string[0], options);
+            Assert.IsNull(result);
+            Assert.IsTrue(error.ToString().Length > 0);
+            Assert.AreEqual(_expectedDefaultUsage, output.ToString());
+        }
+
         private static void TestArgument(IEnumerator<CommandLineArgument> arguments, string name, string memberName, Type type, Type elementType, int? position, bool isRequired, object defaultValue, string description, string valueDescription, bool isSwitch, bool isMultiValue, bool isDictionary = false, params string[] aliases)
         {
             arguments.MoveNext();

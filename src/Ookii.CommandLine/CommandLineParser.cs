@@ -850,6 +850,152 @@ namespace Ookii.CommandLine
         }
 
         /// <summary>
+        /// Parses the specified command line arguments, starting at the specified index, into the
+        /// specified type.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        ///   This is a convenience function that instantiates a <see cref="CommandLineParser"/>,
+        ///   calls <see cref="Parse(string[], int)"/>, and returns the result. If an error occurs, it prints error and usage
+        ///   according to <paramref name="options"/>.
+        /// </para>
+        /// <para>
+        ///   If you want more control over the parsing process, including custom error/usage output
+        ///   or handling the <see cref="ArgumentParsed"/> event, do not use this function; instead
+        ///   perform these steps manually.
+        /// </para>
+        /// </remarks>
+        /// <typeparam name="T">The type defining the command line arguments.</typeparam>
+        /// <param name="args">The command line arguments.</param>
+        /// <param name="index">The index of the first argument to parse.</param>
+        /// <param name="options">The options that control parsing behavior.</param>
+        /// <returns>
+        ///   An instance of the type <typeparamref name="T"/>, or <see langword="null"/> if argument
+        ///   parsing was cancelled by the <see cref="ArgumentParsed"/> event handler.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        ///   <paramref name="options"/> is <see langword="null"/>.
+        /// </exception>
+        /// <exception cref="ArgumentNullException">
+        ///   <paramref name="args"/> is <see langword="null"/>.
+        /// </exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        ///   <paramref name="index"/> does not fall within the bounds of <paramref name="args"/>.
+        /// </exception>
+        /// <exception cref="CommandLineArgumentException">
+        ///   Too many positional arguments were supplied, a required argument was not supplied, an unknown argument name was supplied,
+        ///   no value was supplied for a named argument, an argument was supplied more than once and <see cref="AllowDuplicateArguments"/>
+        ///   is <see langword="false"/>, or one of the argument values could not be converted to the argument's type.
+        /// </exception>
+        public static T? Parse<T>(string[] args, int index, ParseOptions options)
+            where T : class
+        {
+            if (options == null)
+                throw new ArgumentNullException(nameof(options));
+
+            var parser = new CommandLineParser(typeof(T), options.ArgumentNamePrefixes, options.ArgumentNameComparer)
+            {
+                AllowDuplicateArguments = options.AllowDuplicateArguments,
+                AllowWhiteSpaceValueSeparator = options.AllowWhiteSpaceValueSeparator,
+                Culture = options.Culture ?? CultureInfo.CurrentCulture,
+                NameValueSeparator = options.NameValueSeparator,
+            };
+
+            using var output = new TextWriterWrapper(options.Out, LineWrappingTextWriter.ForConsoleOut);
+            using var error = new TextWriterWrapper(options.Error, LineWrappingTextWriter.ForConsoleError);
+            try
+            {
+
+                var result = (T?)parser.Parse(args, index);
+                if (result != null)
+                    return result;
+            }
+            catch (CommandLineArgumentException ex)
+            {
+                error.Writer.WriteLine(ex.Message);
+                error.Writer.WriteLine();
+            }
+
+            // If we're writing this to the console, output should already be a LineWrappingTextWriter, so the max line length argument here is ignored.
+            parser.WriteUsage(output.Writer, 0, options.UsageOptions);
+            return null;
+        }
+
+        /// <summary>
+        /// Parses the specified command line arguments into the specified type.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        ///   This is a convenience function that instantiates a <see cref="CommandLineParser"/>,
+        ///   calls <see cref="Parse(string[])"/>, and returns the result. If an error occurs, it prints error and usage
+        ///   according to <paramref name="options"/>.
+        /// </para>
+        /// <para>
+        ///   If you want more control over the parsing process, including custom error/usage output
+        ///   or handling the <see cref="ArgumentParsed"/> event, do not use this function; instead
+        ///   perform these steps manually.
+        /// </para>
+        /// </remarks>
+        /// <typeparam name="T">The type defining the command line arguments.</typeparam>
+        /// <param name="args">The command line arguments.</param>
+        /// <param name="options">The options that control parsing behavior.</param>
+        /// <returns>
+        ///   An instance of the type <typeparamref name="T"/>, or <see langword="null"/> if argument
+        ///   parsing was cancelled by the <see cref="ArgumentParsed"/> event handler.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        ///   <paramref name="options"/> is <see langword="null"/>.
+        /// </exception>
+        /// <exception cref="ArgumentNullException">
+        ///   <paramref name="args"/> is <see langword="null"/>.
+        /// </exception>
+        /// <exception cref="CommandLineArgumentException">
+        ///   Too many positional arguments were supplied, a required argument was not supplied, an unknown argument name was supplied,
+        ///   no value was supplied for a named argument, an argument was supplied more than once and <see cref="AllowDuplicateArguments"/>
+        ///   is <see langword="false"/>, or one of the argument values could not be converted to the argument's type.
+        /// </exception>
+        public static T? Parse<T>(string[] args, ParseOptions options)
+            where T : class
+        {
+            return Parse<T>(args, 0, options);
+        }
+
+        /// <summary>
+        /// Parses the specified command line arguments into the specified type.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        ///   This is a convenience function that instantiates a <see cref="CommandLineParser"/>,
+        ///   calls <see cref="Parse(string[])"/>, and returns the result. If an error occurs, it prints error and usage
+        ///   according to the default <see cref="ParseOptions"/>.
+        /// </para>
+        /// <para>
+        ///   If you want more control over the parsing process, including custom error/usage output
+        ///   or handling the <see cref="ArgumentParsed"/> event, do not use this function; instead
+        ///   perform these steps manually.
+        /// </para>
+        /// </remarks>
+        /// <typeparam name="T">The type defining the command line arguments.</typeparam>
+        /// <param name="args">The command line arguments.</param>
+        /// <returns>
+        ///   An instance of the type <typeparamref name="T"/>, or <see langword="null"/> if argument
+        ///   parsing was cancelled by the <see cref="ArgumentParsed"/> event handler.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        ///   <paramref name="args"/> is <see langword="null"/>.
+        /// </exception>
+        /// <exception cref="CommandLineArgumentException">
+        ///   Too many positional arguments were supplied, a required argument was not supplied, an unknown argument name was supplied,
+        ///   no value was supplied for a named argument, an argument was supplied more than once and <see cref="AllowDuplicateArguments"/>
+        ///   is <see langword="false"/>, or one of the argument values could not be converted to the argument's type.
+        /// </exception>
+        public static T? Parse<T>(string[] args)
+            where T : class
+        {
+            return Parse<T>(args, 0, new ParseOptions());
+        }
+
+        /// <summary>
         /// Gets a command line argument by name.
         /// </summary>
         /// <param name="name">The name of the argument.</param>
