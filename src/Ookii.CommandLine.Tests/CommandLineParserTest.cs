@@ -177,6 +177,21 @@ namespace Ookii.CommandLine.Tests
             public Dictionary<string, string> CustomSeparator { get; set; }
         }
 
+        class CancelArguments
+        {
+            [CommandLineArgument]
+            public string Argument1 { get; set; }
+
+            [CommandLineArgument]
+            public string Argument2 { get; set; }
+
+            [CommandLineArgument]
+            public bool DoesNotCancel { get; set; }
+
+            [CommandLineArgument(CancelParsing = true)]
+            public bool DoesCancel { get; set; }
+        }
+
         #endregion
 
         private TestContext testContextInstance;
@@ -505,6 +520,67 @@ namespace Ookii.CommandLine.Tests
             Assert.IsNull(result);
             Assert.IsTrue(error.ToString().Length > 0);
             Assert.AreEqual(_expectedDefaultUsage, output.ToString());
+        }
+
+        [TestMethod]
+        public void TestCancelParsing()
+        {
+            var parser = new CommandLineParser(typeof(CancelArguments));
+
+            // Don't cancel if -DoesCancel not specified.
+            var result = (CancelArguments)parser.Parse(new[] { "-Argument1", "foo", "-DoesNotCancel", "-Argument2", "bar" });
+            Assert.IsNotNull(result);
+            Assert.IsTrue(result.DoesNotCancel);
+            Assert.IsFalse(result.DoesCancel);
+            Assert.AreEqual("foo", result.Argument1);
+            Assert.AreEqual("bar", result.Argument2);
+
+            // Cancel if -DoesCancel specified.
+            result = (CancelArguments)parser.Parse(new[] { "-Argument1", "foo", "-DoesCancel", "-Argument2", "bar" });
+            Assert.IsNull(result);
+            Assert.IsTrue(parser.GetArgument("Argument1").HasValue);
+            Assert.AreEqual("foo", (string)parser.GetArgument("Argument1").Value);
+            Assert.IsTrue(parser.GetArgument("DoesCancel").HasValue);
+            Assert.IsTrue((bool)parser.GetArgument("DoesCancel").Value);
+            Assert.IsFalse(parser.GetArgument("DoesNotCancel").HasValue);
+            Assert.IsNull(parser.GetArgument("DoesNotCancel").Value);
+            Assert.IsFalse(parser.GetArgument("Argument2").HasValue);
+            Assert.IsNull(parser.GetArgument("Argument2").Value);
+
+            // Use the event handler to cancel on -DoesNotCancel.
+            static void handler1(object sender, ArgumentParsedEventArgs e)
+            {
+                if (e.Argument.ArgumentName == "DoesNotCancel")
+                    e.Cancel = true;
+            }
+
+            parser.ArgumentParsed += handler1;
+            result = (CancelArguments)parser.Parse(new[] { "-Argument1", "foo", "-DoesNotCancel", "-Argument2", "bar" });
+            Assert.IsNull(result);
+            Assert.IsTrue(parser.GetArgument("Argument1").HasValue);
+            Assert.AreEqual("foo", (string)parser.GetArgument("Argument1").Value);
+            Assert.IsTrue(parser.GetArgument("DoesNotCancel").HasValue);
+            Assert.IsTrue((bool)parser.GetArgument("DoesNotCancel").Value);
+            Assert.IsFalse(parser.GetArgument("DoesCancel").HasValue);
+            Assert.IsNull(parser.GetArgument("DoesCancel").Value);
+            Assert.IsFalse(parser.GetArgument("Argument2").HasValue);
+            Assert.IsNull(parser.GetArgument("Argument2").Value);
+            parser.ArgumentParsed -= handler1;
+
+            // Use the event handler to abort cancelling on -DoesCancel.
+            static void handler2(object sender, ArgumentParsedEventArgs e)
+            {
+                if (e.Argument.ArgumentName == "DoesCancel")
+                    e.OverrideCancelParsing = true;
+            }
+
+            parser.ArgumentParsed += handler2;
+            result = (CancelArguments)parser.Parse(new[] { "-Argument1", "foo", "-DoesCancel", "-Argument2", "bar" });
+            Assert.IsNotNull(result);
+            Assert.IsFalse(result.DoesNotCancel);
+            Assert.IsTrue(result.DoesCancel);
+            Assert.AreEqual("foo", result.Argument1);
+            Assert.AreEqual("bar", result.Argument2);
         }
 
         private static void TestArgument(IEnumerator<CommandLineArgument> arguments, string name, string memberName, Type type, Type elementType, int? position, bool isRequired, object defaultValue, string description, string valueDescription, bool isSwitch, bool isMultiValue, bool isDictionary = false, params string[] aliases)

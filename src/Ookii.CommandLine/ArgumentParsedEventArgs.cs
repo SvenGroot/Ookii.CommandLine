@@ -48,5 +48,23 @@ namespace Ookii.CommandLine
         {
             get { return _argument; }
         }
+
+        /// <summary>
+        /// Gets or sets a value that indicates whether or not the <see cref="CommandLineArgumentAttribute.CancelParsing"/>
+        /// property should be ignored.
+        /// </summary>
+        /// <value>
+        /// <see langword="true"/> if argument parsing should continue even if the argument has
+        /// <see cref="CommandLineArgumentAttribute.CancelParsing"/> set to <see langword="true"/>;
+        /// otherwise, <see langword="false"/>. The default value is <see langword="false"/>.
+        /// </value>
+        /// <remarks>
+        /// <para>
+        ///   This property does not affect the <see cref="CancelEventArgs.Cancel"/> property.
+        ///   If <see cref="CancelEventArgs.Cancel"/> is set to <see langword="true"/>, parsing
+        ///   is always cancelled regardless of the value of <see cref="OverrideCancelParsing"/>.
+        /// </para>
+        /// </remarks>
+        public bool OverrideCancelParsing { get; set; }
     }
 }

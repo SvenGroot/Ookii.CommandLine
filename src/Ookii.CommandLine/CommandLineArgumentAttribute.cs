@@ -122,5 +122,46 @@ namespace Ookii.CommandLine
         /// </note>
         /// </remarks>
         public string? ValueDescription { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value that indicates whether argument parsing should be cancelled if
+        /// this argument is encountered.
+        /// </summary>
+        /// <value>
+        /// <see langword="true"/> if argument parsing should be cancelled after this argument;
+        /// otherwise, <see langword="false"/>. The default value is <see langword="false" />.
+        /// </value>
+        /// <remarks>
+        /// <para>
+        ///   If this property is <see langword="true"/>, the <see cref="CommandLineParser"/> will
+        ///   stop parsing the command line arguments after seeing this argument, and return
+        ///   <see langword="null"/> from the <see cref="CommandLineParser.Parse(string[])"/> method
+        ///   or one of its overloads. Since no instance of the arguments type is returned, it's
+        ///   not possible to determine argument values, or which argument caused the cancellation,
+        ///   except by inspecting the <see cref="CommandLineParser.Arguments"/> property.
+        /// </para>
+        /// <para>
+        ///   This property is most commonly useful to implement a "-Help" or "-?" style switch
+        ///   argument, where the presence of that argument causes usage help to be printed and
+        ///   the program to exit, regardless of whether the rest of the command line is valid
+        ///   or not.
+        /// </para>
+        /// <para>
+        ///   The <see cref="CommandLineParser.Parse{T}(string[])"/> static helper method will print
+        ///   usage information if parsing was cancelled through this method.
+        /// </para>
+        /// <para>
+        ///   Cancelling parsing in this way is identical to handling the <see cref="CommandLineParser.ArgumentParsed"/>
+        ///   event and setting <see cref="System.ComponentModel.CancelEventArgs.Cancel"/> to
+        ///   <see langword="true" />.
+        /// </para>
+        /// <para>
+        ///   It's possible to prevent cancellation when an argument has this property set by
+        ///   handling the <see cref="CommandLineParser.ArgumentParsed"/> event and setting the
+        ///   <see cref="ArgumentParsedEventArgs.OverrideCancelParsing"/> property to 
+        ///   <see langword="true"/>.
+        /// </para>
+        /// </remarks>
+        public bool CancelParsing { get; set; }
     }
 }

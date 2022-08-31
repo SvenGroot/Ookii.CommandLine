@@ -746,7 +746,8 @@ namespace Ookii.CommandLine
         /// <param name="args">The command line arguments.</param>
         /// <returns>
         ///   An instance of the type specified by the <see cref="ArgumentsType"/> property, or <see langword="null"/> if argument
-        ///   parsing was cancelled by the <see cref="ArgumentParsed"/> event handler.
+        ///   parsing was cancelled by the <see cref="ArgumentParsed"/> event handler or the
+        ///   <see cref="CommandLineArgumentAttribute.CancelParsing"/> property.
         /// </returns>
         /// <exception cref="ArgumentNullException">
         ///   <paramref name="args"/> is <see langword="null"/>.
@@ -768,7 +769,8 @@ namespace Ookii.CommandLine
         /// <param name="index">The index of the first argument to parse.</param>
         /// <returns>
         ///   An instance of the type specified by the <see cref="ArgumentsType"/> property, or <see langword="null"/> if argument
-        ///   parsing was cancelled by the <see cref="ArgumentParsed"/> event handler.
+        ///   parsing was cancelled by the <see cref="ArgumentParsed"/> event handler or the
+        ///   <see cref="CommandLineArgumentAttribute.CancelParsing"/> property.
         /// </returns>
         /// <exception cref="ArgumentNullException">
         ///   <paramref name="args"/> is <see langword="null"/>.
@@ -801,7 +803,7 @@ namespace Ookii.CommandLine
                 if( argumentNamePrefix != null )
                 {
                     // If white space was the value separator, this function returns the index of argument containing the value for the named argument.
-                    // It returns -1 if parsing was cancelled by the ArgumentParsed event handler.
+                    // It returns -1 if parsing was cancelled by the ArgumentParsed event handler or the CancelParsing property.
                     x = ParseNamedArgument(args, x, argumentNamePrefix);
                     if( x < 0 )
                         return null;
@@ -821,7 +823,8 @@ namespace Ookii.CommandLine
                     if( positionalArgumentIndex >= _positionalArgumentCount )
                         throw new CommandLineArgumentException(Properties.Resources.TooManyArguments, CommandLineArgumentErrorCategory.TooManyArguments);
 
-                    // ParseArgumentValue returns true if parsing was cancelled by the ArgumentParsed event handler.
+                    // ParseArgumentValue returns true if parsing was cancelled by the ArgumentParsed event handler
+                    // or the CancelParsing property.
                     if( ParseArgumentValue(_arguments[positionalArgumentIndex], arg) )
                         return null;
                 }
@@ -888,7 +891,8 @@ namespace Ookii.CommandLine
         /// <param name="options">The options that control parsing behavior.</param>
         /// <returns>
         ///   An instance of the type <typeparamref name="T"/>, or <see langword="null"/> if argument
-        ///   parsing was cancelled by the <see cref="ArgumentParsed"/> event handler.
+        ///   parsing was cancelled by the <see cref="ArgumentParsed"/> event handler or the
+        ///   <see cref="CommandLineArgumentAttribute.CancelParsing"/> property.
         /// </returns>
         /// <exception cref="ArgumentNullException">
         ///   <paramref name="options"/> is <see langword="null"/>.
@@ -947,7 +951,8 @@ namespace Ookii.CommandLine
         /// <param name="options">The options that control parsing behavior.</param>
         /// <returns>
         ///   An instance of the type <typeparamref name="T"/>, or <see langword="null"/> if argument
-        ///   parsing was cancelled by the <see cref="ArgumentParsed"/> event handler.
+        ///   parsing was cancelled by the <see cref="ArgumentParsed"/> event handler or the
+        ///   <see cref="CommandLineArgumentAttribute.CancelParsing"/> property.
         /// </returns>
         /// <exception cref="ArgumentNullException">
         ///   <paramref name="options"/> is <see langword="null"/>.
@@ -986,7 +991,8 @@ namespace Ookii.CommandLine
         /// <param name="args">The command line arguments.</param>
         /// <returns>
         ///   An instance of the type <typeparamref name="T"/>, or <see langword="null"/> if argument
-        ///   parsing was cancelled by the <see cref="ArgumentParsed"/> event handler.
+        ///   parsing was cancelled by the <see cref="ArgumentParsed"/> event handler or the
+        ///   <see cref="CommandLineArgumentAttribute.CancelParsing"/> property.
         /// </returns>
         /// <exception cref="ArgumentNullException">
         ///   <paramref name="args"/> is <see langword="null"/>.
@@ -1160,9 +1166,9 @@ namespace Ookii.CommandLine
         {
             argument.SetValue(Culture, value);
 
-            ArgumentParsedEventArgs e = new ArgumentParsedEventArgs(argument);
+            var e = new ArgumentParsedEventArgs(argument);
             OnArgumentParsed(e);
-            return e.Cancel;
+            return e.Cancel || (argument.CancelParsing && !e.OverrideCancelParsing);
         }
 
         private int ParseNamedArgument(string[] args, int index, string prefix)
@@ -1190,7 +1196,8 @@ namespace Ookii.CommandLine
                     // No separator was present but a value is required. We take the next argument as its value.
                     argumentValue = args[index];
                 }
-                // ParseArgumentValue returns true if parsing was cancelled by the ArgumentParsed event handler.
+                // ParseArgumentValue returns true if parsing was cancelled by the ArgumentParsed event handler
+                // or the CancelParsing property.
                 argument.UsedArgumentName = argumentName;
                 return ParseArgumentValue(argument, argumentValue) ? -1 : index;
             }
