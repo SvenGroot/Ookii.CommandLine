@@ -14,6 +14,7 @@ Ookii.CommandLine is a class library for use in your own applications for [Micro
 
 * Microsoft .Net Framework 2.0 or later
 * Microsoft .Net Standard 2.0
+* Microsoft .Net 6.0 (for nullable reference type support)
 * [Mono](http://www.mono-project.com/) 2.6 or later, using the .Net 2.0 or .Net 4.0 profile
 
 To view and edit the source code of Ookii.CommandLine or the included sample applications, it is recommended to use the latest version of [Microsoft Visual Studio](https://visualstudio.microsoft.com/). Library documentation is generated using [Sandcastle Help File Builder](https://github.com/EWSoftware/SHFB).

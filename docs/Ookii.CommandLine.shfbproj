@@ -18,11 +18,10 @@
     <OutputPath>.\Help\</OutputPath>
     <HtmlHelpName>Documentation</HtmlHelpName>
     <Language>en-US</Language>
-    <FrameworkVersion>.NET Framework 2.0</FrameworkVersion>
-    <HelpFileFormat>HtmlHelp1, Website</HelpFileFormat>
+    <FrameworkVersion>.NET Core/.NET Standard/.NET 5.0+</FrameworkVersion>
+    <HelpFileFormat>Website</HelpFileFormat>
     <DocumentationSources>
-      <DocumentationSource sourceFile="..\src\Ookii.CommandLine\bin\Release\net20\Ookii.CommandLine.dll" />
-      <DocumentationSource sourceFile="..\src\Ookii.CommandLine\bin\Release\net20\Ookii.CommandLine.xml" />
+      <DocumentationSource sourceFile="..\src\Ookii.CommandLine\Ookii.CommandLine.csproj" />
     </DocumentationSources>
     <NamespaceSummaries>
       <NamespaceSummaryItem name="Ookii.CommandLine" isDocumented="True" xmlns="">&lt;para&gt;
@@ -37,7 +36,7 @@
     </NamespaceSummaries>
     <CopyrightHref>https://github.com/SvenGroot/ookii.commandline</CopyrightHref>
     <CopyrightText>Copyright &amp;#169%3b Sven Groot %28Ookii.org%29</CopyrightText>
-    <HelpTitle>Ookii.CommandLine 2.3 documentation</HelpTitle>
+    <HelpTitle>Ookii.CommandLine 2.4 documentation</HelpTitle>
     <NamingMethod>MemberName</NamingMethod>
     <PresentationStyle>VS2013</PresentationStyle>
     <SyntaxFilters>C#, Visual Basic, Visual Basic Usage, Managed C++</SyntaxFilters>

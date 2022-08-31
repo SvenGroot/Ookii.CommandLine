@@ -1,10 +1,10 @@
 # Ookii.CommandLine
 
-Ookii.CommandLine enables comprehensive command line argument parsing for .Net applications. It allows you to easily define required, optional, positional and named arguments, parse the command line, and generate usage information. It is available for .Net Framework 2.0 and later, and .Net Standard 2.0.
+Ookii.CommandLine enables comprehensive command line argument parsing for .Net applications. It allows you to easily define required, optional, positional and named arguments, parse the command line, and generate usage information. It is provided in versions for .Net Framework 2.0 and later, .Net Standard 2.0, and .Net 6.0 and later.
 
-Ookii.CommandLine can be added to your project in Visual Studio via [NuGet](https://nuget.org/packages/Ookii.CommandLine). A [sample](https://nuget.org/packages/Ookii.CommandLine.Sample) is also available via NuGet. If you wish to use the code snippets, please download the release from GitHub; they are not included with the NuGet package.
-
-Symbols and source code for the NuGet package are available from [SymbolSource](http://www.symbolsource.org/Public/Metadata/NuGet/Project/Ookii.CommandLine/2.2). They can be automatically used in Visual Studio by following [these instructions](http://www.symbolsource.org/Public/Home/VisualStudio).
+Ookii.CommandLine can be added to your project in Visual Studio via [NuGet](https://nuget.org/packages/Ookii.CommandLine).
+A [sample](https://nuget.org/packages/Ookii.CommandLine.Sample) is also available via NuGet. Code snippets are available in a
+[Visual Studio extension](https://marketplace.visualstudio.com/items?itemName=SvenGroot.OokiiCommandLineSnippets24).
 
 ## Overview
 
@@ -40,6 +40,7 @@ An example invocation of this application, specifying all the arguments, would l
 
 > MyApplication.exe foo 42 -SwitchArgument -NamedArgument 2019-08-14
 
-There is also functionality for creating command line utilities that perform multiple operations, each with their own arguments.
+There is also functionality for creating command line utilities that perform multiple operations, each with their own arguments
+(these are called `ShellCommands` in Ookii.CommandLine).
 
-Please see the [Documentation](docs/Documentation.md) for more informaton.
+Please see the [Documentation](docs/Documentation.md) for more informaton, and also check out the [Class Library documentation](https://www.ookii.org/Link/CommandLineDoc).

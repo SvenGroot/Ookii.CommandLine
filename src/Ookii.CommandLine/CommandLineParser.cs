@@ -26,6 +26,10 @@ namespace Ookii.CommandLine
     ///   from the command line.
     /// </para>
     /// <para>
+    ///   The <see cref="Parse{T}(string[], ParseOptions)"/> method is a helper that will parse arguments and print error and
+    ///   usage information if required. For most use cases, this is all you need in addition to a class that defines arguments.
+    /// </para>
+    /// <para>
     ///   The command line arguments are parsed using the parsing rules described below. A command line consists of a series of
     ///   argument values; each value is assigned to the appropriate argument based on either the name or the position of the argument.
     /// </para>
@@ -680,6 +684,10 @@ namespace Ookii.CommandLine
         /// <summary>
         /// Gets command line usage help using the default options and no line wrapping.
         /// </summary>
+        /// <returns>
+        ///   A string containing usage help for the command line options defined by the type
+        ///   specified by <see cref="ArgumentsType"/>.
+        /// </returns>
         /// <remarks>
         ///   <para>
         ///     The usage help consists of first the <see cref="Description"/>, followed by the usage syntax, followed by a description of all the arguments.
@@ -705,6 +713,10 @@ namespace Ookii.CommandLine
         ///   than 65536 is interpreted as infinite line length.
         /// </param>
         /// <param name="options">The options to use for formatting the usage.</param>
+        /// <returns>
+        ///   A string containing usage help for the command line options defined by the type
+        ///   specified by <see cref="ArgumentsType"/>.
+        /// </returns>
         /// <exception cref="ArgumentNullException">
         ///   <paramref name="options"/> is <see langword="null"/>.
         /// </exception>
@@ -884,9 +896,9 @@ namespace Ookii.CommandLine
         /// <param name="index">The index of the first argument to parse.</param>
         /// <param name="options">The options that control parsing behavior.</param>
         /// <returns>
-        ///   An instance of the type <typeparamref name="T"/>, or <see langword="null"/> if argument
-        ///   parsing was cancelled by the <see cref="ArgumentParsed"/> event handler or the
-        ///   <see cref="CommandLineArgumentAttribute.CancelParsing"/> property.
+        ///   An instance of the type <typeparamref name="T"/>, or <see langword="null"/> if an
+        ///   error occurred or if argument parsing was cancelled by the <see cref="ArgumentParsed"/>
+        ///   event handler or the <see cref="CommandLineArgumentAttribute.CancelParsing"/> property.
         /// </returns>
         /// <exception cref="ArgumentNullException">
         ///   <paramref name="options"/> is <see langword="null"/>.
@@ -944,9 +956,9 @@ namespace Ookii.CommandLine
         /// <param name="args">The command line arguments.</param>
         /// <param name="options">The options that control parsing behavior.</param>
         /// <returns>
-        ///   An instance of the type <typeparamref name="T"/>, or <see langword="null"/> if argument
-        ///   parsing was cancelled by the <see cref="ArgumentParsed"/> event handler or the
-        ///   <see cref="CommandLineArgumentAttribute.CancelParsing"/> property.
+        ///   An instance of the type <typeparamref name="T"/>, or <see langword="null"/> if an
+        ///   error occurred or if argument parsing was cancelled by the <see cref="ArgumentParsed"/>
+        ///   event handler or the <see cref="CommandLineArgumentAttribute.CancelParsing"/> property.
         /// </returns>
         /// <exception cref="ArgumentNullException">
         ///   <paramref name="options"/> is <see langword="null"/>.
@@ -984,9 +996,9 @@ namespace Ookii.CommandLine
         /// <typeparam name="T">The type defining the command line arguments.</typeparam>
         /// <param name="args">The command line arguments.</param>
         /// <returns>
-        ///   An instance of the type <typeparamref name="T"/>, or <see langword="null"/> if argument
-        ///   parsing was cancelled by the <see cref="ArgumentParsed"/> event handler or the
-        ///   <see cref="CommandLineArgumentAttribute.CancelParsing"/> property.
+        ///   An instance of the type <typeparamref name="T"/>, or <see langword="null"/> if an
+        ///   error occurred or if argument parsing was cancelled by the <see cref="ArgumentParsed"/>
+        ///   event handler or the <see cref="CommandLineArgumentAttribute.CancelParsing"/> property.
         /// </returns>
         /// <exception cref="ArgumentNullException">
         ///   <paramref name="args"/> is <see langword="null"/>.

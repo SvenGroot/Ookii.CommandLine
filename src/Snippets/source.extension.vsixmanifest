@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
     <Metadata>
-        <Identity Id="Ookii.CommandLine.Snippets.8300bcf3-bffc-4786-a67a-d2db6dc040ad" Version="2.4" Language="en-US" Publisher="Sven Groot" />
+        <Identity Id="Ookii.CommandLine.Snippets.8300bcf3-bffc-4786-a67a-d2db6dc040ae" Version="2.4" Language="en-US" Publisher="Sven Groot" />
         <DisplayName>Ookii.CommandLine.Snippets</DisplayName>
         <Description xml:space="preserve">Code snippets for defining and parsing command line arguments using the Ookii.CommandLine library (version 2.4 or later). Supports C# and Visual Basic.</Description>
+        <MoreInfo>https://www.github.com/SvenGroot/ookii.commandline</MoreInfo>
         <License>license.txt</License>
     </Metadata>
     <Installation>

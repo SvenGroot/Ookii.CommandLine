@@ -1,16 +1,27 @@
 # What’s new in Ookii.CommandLine
 
-Ookii.CommandLine 2.3 offers the following improvements over version 2.2:
+Ookii.CommandLine 2.4:
+
+* Ookii.CommandLine now comes in a .Net 6.0 version that fully supports nullable reference types
+(.Net Framework 2.0 and .Net Standard 2.0 versions are also still provided).
+* New static `Parse<T>` helper methods that make parsing command line arguments and printing
+errors and usage even easier.
+* Support for customization of the separator between argument names and values.
+* Support for customization of the separator between keys and values for dictionary arguments.
+* Support for customizing a dictionary argument's key and value `TypeConverter` separately.
+* Arguments can indicate they cancel parsing to make adding a `-Help` or `-?` argument easier.
+
+Ookii.CommandLine 2.3:
 
 * Ookii.CommandLine now comes in both a .Net Framework 2.0 and .Net Standard 2.0 version.
 
-Ookii.CommandLine 2.2 offers the following improvements over version 2.1:
+Ookii.CommandLine 2.2:
 
 * Added support for alternative names (aliases) for command line arguments.
 * An argument’s aliases and default value can be included in the argument description when generating usage.
 * Added code snippets.
 
-Ookii.CommandLine 2.1 offers the following improvements over version 2.0:
+Ookii.CommandLine 2.1:
 
 * Added support for dictionary arguments; these are special multi-value arguments whose values take the form key=value.
 * Multi-value arguments can be specified using a read-only property of any collection type (in addition to the previous array support).
@@ -23,7 +34,7 @@ Ookii.CommandLine 2.1 offers the following improvements over version 2.0:
 * Shell commands can use custom argument parsing.
 * Various minor bug fixes.
 
-Ookii.CommandLine 2.0 offers the following improvements compared to Ookii.CommandLine 1.0:
+Ookii.CommandLine 2.0:
 
 * Improved argument parsing:
   * All arguments can be specified by name.
