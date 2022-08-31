@@ -15,14 +15,9 @@ clargmulti: Snippet for a multi-value command line argument.
 
 clargdict: Snippet for a dictionary command line argument.
 
-All snippets are provided for C# and Visual Basic. To use them, either run the
-Install-Snippets.ps1 script with PowerShell, or manually copy the snippet files
-to the "Visual Studio <version>\Code Snippets\Visual C#\My Code Snippets" or
+All snippets are provided for C# and Visual Basic. To use them, install the VSIX
+extension, or manually copy the snippet files to the
+"Visual Studio <version>\Code Snippets\Visual C#\My Code Snippets" or
 "Visual Studio <version>\Code Snippets\Visual Basic\My Code Snippets" folder
-located in your My Documents folder. Alternatively, use the snippet manager
+located in your Documents folder. Alternatively, use the snippet manager
 inside Visual Studio to import the snippet files.
-
-The Install-Snippets.ps1 script will install the snippets for Visual Studio 2005,
-and newer, if the snippet folders for those versions exist.
-
-To uninstall, simply remove the files from those folders.

@@ -1,0 +1,5 @@
+﻿[$RootKey$\Languages\CodeExpansions\CSharp\Paths]
+"OokiiCommandLineCS"="$PackageFolder$\OokiiCommandLineCS"
+
+[$RootKey$\Languages\CodeExpansions\Basic\Paths]
+"OokiiCommandLineVB"="$PackageFolder$\OokiiCommandLineVB"
