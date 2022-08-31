@@ -416,7 +416,7 @@ namespace Ookii.CommandLine
             return CreateShellCommand(assembly, args, index, new CreateShellCommandOptions());
         }
 
-        
+
         /// <summary>
         /// Finds and instantiates the shell command with the specified name, or if that fails, writes error and usage information to the specified writers.
         /// </summary>
@@ -432,98 +432,69 @@ namespace Ookii.CommandLine
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> does not fall inside the bounds of <paramref name="args"/>.</exception>
         /// <remarks>
         /// <para>
-        ///   If the command could not be found, a list of possible commands is written to <see cref="CreateShellCommandOptions.Out"/>. If an error occurs parsing the command's arguments, the error
-        ///   message is written to <see cref="CreateShellCommandOptions.Error"/>, and the shell command's usage information is written to <see cref="CreateShellCommandOptions.Out"/>.
+        ///   If the command could not be found, a list of possible commands is written to <see cref="ParseOptions.Out"/>. If an error occurs parsing the command's arguments, the error
+        ///   message is written to <see cref="ParseOptions.Error"/>, and the shell command's usage information is written to <see cref="ParseOptions.Out"/>.
         /// </para>
         /// <para>
-        ///   If the <see cref="CreateShellCommandOptions.Out"/> property or <see cref="CreateShellCommandOptions.Error"/> property is <see langword="null"/>, output
-        ///   is written to the standard output and error streams respectively, with line wrapping at word boundaries applied to the output, wrapping at the console's window width. When the console output is
-        ///   redirected to a file, Microsoft .Net will still report the console's actual window width, but on Mono the value of
-        ///   the <see cref="Console.WindowWidth"/> property will be 0. In that case, the usage information will not be wrapped.
+        ///   If the <see cref="ParseOptions.Out"/> property or <see cref="ParseOptions.Error"/>
+        ///   property is <see langword="null"/>, output is written to a <see cref="LineWrappingTextWriter"/>
+        ///   for the standard output and error streams respectively, wrapping at the console's
+        ///   window width. When the console output is redirected to a file, Microsoft .Net will
+        ///   still report the console's actual window width, but on Mono the value of the
+        ///   <see cref="Console.WindowWidth"/> property will be 0. In that case, the usage
+        ///   information will not be wrapped.
         /// </para>
         /// <para>
-        ///   If the <see cref="CreateShellCommandOptions.Out"/> property or <see cref="CreateShellCommandOptions.Error"/> property are instance of the
-        ///   <see cref="LineWrappingTextWriter"/> class, this method indents additional lines for the usage syntax and argument descriptions according
-        ///   to the values specified by the <see cref="CreateShellCommandOptions"/>, unless the <see cref="LineWrappingTextWriter.MaximumLineLength"/> property is less than 30.
+        ///   If the <see cref="ParseOptions.Out"/> property is instance of the
+        ///   <see cref="LineWrappingTextWriter"/> class, this method indents additional lines for
+        ///   the usage syntax and argument descriptions according to the values specified by the
+        ///   <see cref="CreateShellCommandOptions"/>, unless the <see cref="LineWrappingTextWriter.MaximumLineLength"/>
+        ///   property is less than 30.
         /// </para>
         /// </remarks>
         public static ShellCommand? CreateShellCommand(Assembly assembly, string? commandName, string[] args, int index, CreateShellCommandOptions options)
         {
-            if( assembly == null )
-                throw new ArgumentNullException("assembly");
-            if( args == null )
-                throw new ArgumentNullException("args");
-            if( index < 0 || index > args.Length )
-                throw new ArgumentOutOfRangeException("index");
-            if( options == null )
-                throw new ArgumentNullException("options");
+            if (assembly == null)
+                throw new ArgumentNullException(nameof(assembly));
+            if (args == null)
+                throw new ArgumentNullException(nameof(args));
+            if (index < 0 || index > args.Length)
+                throw new ArgumentOutOfRangeException(nameof(index));
+            if (options == null)
+                throw new ArgumentNullException(nameof(options));
 
-            bool disposeOut = false;
-            bool disposeError = false;
-            var output = options.Out;
-            var error = options.Error;
+            using var output = new TextWriterWrapper(options.Out, LineWrappingTextWriter.ForConsoleOut);
+            using var error = new TextWriterWrapper(options.Error, LineWrappingTextWriter.ForConsoleError);
+
+            var commandType = commandName == null ? null : GetShellCommand(assembly, commandName, options.CommandNameComparer);
+            if (commandType == null)
+            {
+                WriteShellCommandListUsage(output.Writer, assembly, options);
+                return null;
+            }
+
+            // Update the values because the options are passed to the shell command and the ParseInternal method.
+            var originalOut = options.Out;
+            var originalError = options.Error;
+            var originalUsagePrefix = options.UsageOptions.UsagePrefix;
+            options.Out = output.Writer;
+            options.Error = error.Writer;
+            options.UsageOptions.UsagePrefix += " " + GetShellCommandName(commandType);
+
             try
             {
-                if( output == null )
-                {
-                    disposeOut = true;
-                    output = LineWrappingTextWriter.ForConsoleOut();
-                    options.Out = output;
-                }
-                if( error == null )
-                {
-                    disposeError = true;
-                    error = LineWrappingTextWriter.ForConsoleError();
-                    options.Error = error;
-                }
-
-                var commandType = commandName == null ? null : GetShellCommand(assembly, commandName, options.CommandNameComparer);
-                if( commandType == null )
-                {
-                    WriteShellCommandListUsage(output, assembly, options);
-                }
-                else if( CommandUsesCustomArgumentParsing(commandType) )
+                if (CommandUsesCustomArgumentParsing(commandType))
                 {
                     return (ShellCommand?)Activator.CreateInstance(commandType, args, index, options);
                 }
-                else
-                {
-                    CommandLineParser parser = new CommandLineParser(commandType, options.ArgumentNamePrefixes, options.ArgumentNameComparer)
-                    {
-                        AllowDuplicateArguments = options.AllowDuplicateArguments,
-                        AllowWhiteSpaceValueSeparator = options.AllowWhiteSpaceValueSeparator,
-                    };
-                    ShellCommand? command = null;
-                    try
-                    {
-                        command = (ShellCommand?)parser.Parse(args, index);
-                    }
-                    catch( CommandLineArgumentException ex )
-                    {
-                        error.WriteLine(ex.Message);
-                        error.WriteLine();
-                    }
 
-                    if( command == null )
-                    {
-                        string originalPrefix = options.UsageOptions.UsagePrefix;
-                        options.UsageOptions.UsagePrefix += " " + GetShellCommandName(commandType);
-                        // If we're writing this to the console, output should already by a LineWrappingTextWriter, so the max line length argument here is ignored.
-                        parser.WriteUsage(output, 0, options.UsageOptions);
-                        options.UsageOptions.UsagePrefix = originalPrefix;
-                    }
-                    else
-                        return command;
-                }
-
-                return null;
+                return (ShellCommand?)CommandLineParser.ParseInternal(commandType, args, index, options);
             }
             finally
             {
-                if( disposeOut && output != null )
-                    output.Dispose();
-                if( disposeError && error != null )
-                    error.Dispose();
+                options.Out = originalOut;
+                options.Error = originalError;
+                options.UsageOptions.UsagePrefix = originalUsagePrefix;
             }
         }
 
@@ -541,19 +512,24 @@ namespace Ookii.CommandLine
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> does not fall inside the bounds of <paramref name="args"/>.</exception>
         /// <remarks>
         /// <para>
-        ///   If the command could not be found, a list of possible commands is written to <see cref="CreateShellCommandOptions.Out"/>. If an error occurs parsing the command's arguments, the error
-        ///   message is written to <see cref="CreateShellCommandOptions.Error"/>, and the shell command's usage information is written to <see cref="CreateShellCommandOptions.Out"/>.
+        ///   If the command could not be found, a list of possible commands is written to <see cref="ParseOptions.Out"/>. If an error occurs parsing the command's arguments, the error
+        ///   message is written to <see cref="ParseOptions.Error"/>, and the shell command's usage information is written to <see cref="ParseOptions.Out"/>.
         /// </para>
         /// <para>
-        ///   If the <see cref="CreateShellCommandOptions.Out"/> property or <see cref="CreateShellCommandOptions.Error"/> property is <see langword="null"/>, output
-        ///   is written to the standard output and error streams respectively, with line wrapping at word boundaries applied to the output, wrapping at the console's window width. When the console output is
-        ///   redirected to a file, Microsoft .Net will still report the console's actual window width, but on Mono the value of
-        ///   the <see cref="Console.WindowWidth"/> property will be 0. In that case, the usage information will not be wrapped.
+        ///   If the <see cref="ParseOptions.Out"/> property or <see cref="ParseOptions.Error"/>
+        ///   property is <see langword="null"/>, output is written to a <see cref="LineWrappingTextWriter"/>
+        ///   for the standard output and error streams respectively, wrapping at the console's
+        ///   window width. When the console output is redirected to a file, Microsoft .Net will
+        ///   still report the console's actual window width, but on Mono the value of the
+        ///   <see cref="Console.WindowWidth"/> property will be 0. In that case, the usage
+        ///   information will not be wrapped.
         /// </para>
         /// <para>
-        ///   If the <see cref="CreateShellCommandOptions.Out"/> property or <see cref="CreateShellCommandOptions.Error"/> property are instance of the
-        ///   <see cref="LineWrappingTextWriter"/> class, this method indents additional lines for the usage syntax and argument descriptions according
-        ///   to the values specified by the <see cref="CreateShellCommandOptions"/>, unless the <see cref="LineWrappingTextWriter.MaximumLineLength"/> property is less than 30.
+        ///   If the <see cref="ParseOptions.Out"/> property is instance of the
+        ///   <see cref="LineWrappingTextWriter"/> class, this method indents additional lines for
+        ///   the usage syntax and argument descriptions according to the values specified by the
+        ///   <see cref="CreateShellCommandOptions"/>, unless the <see cref="LineWrappingTextWriter.MaximumLineLength"/>
+        ///   property is less than 30.
         /// </para>
         /// </remarks>
         public static ShellCommand? CreateShellCommand(Assembly assembly, string[] args, int index, CreateShellCommandOptions options)
@@ -614,19 +590,24 @@ namespace Ookii.CommandLine
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> does not fall inside the bounds of <paramref name="args"/>.</exception>
         /// <remarks>
         /// <para>
-        ///   If the command could not be found, a list of possible commands is written to <see cref="CreateShellCommandOptions.Out"/>. If an error occurs parsing the command's arguments, the error
-        ///   message is written to <see cref="CreateShellCommandOptions.Error"/>, and the shell command's usage information is written to <see cref="CreateShellCommandOptions.Out"/>.
+        ///   If the command could not be found, a list of possible commands is written to <see cref="ParseOptions.Out"/>. If an error occurs parsing the command's arguments, the error
+        ///   message is written to <see cref="ParseOptions.Error"/>, and the shell command's usage information is written to <see cref="ParseOptions.Out"/>.
         /// </para>
         /// <para>
-        ///   If the <see cref="CreateShellCommandOptions.Out"/> property or <see cref="CreateShellCommandOptions.Error"/> property is <see langword="null"/>, output
-        ///   is written to the standard output and error streams respectively, with line wrapping at word boundaries applied to the output, wrapping at the console's window width. When the console output is
-        ///   redirected to a file, Microsoft .Net will still report the console's actual window width, but on Mono the value of
-        ///   the <see cref="Console.WindowWidth"/> property will be 0. In that case, the usage information will not be wrapped.
+        ///   If the <see cref="ParseOptions.Out"/> property or <see cref="ParseOptions.Error"/>
+        ///   property is <see langword="null"/>, output is written to a <see cref="LineWrappingTextWriter"/>
+        ///   for the standard output and error streams respectively, wrapping at the console's
+        ///   window width. When the console output is redirected to a file, Microsoft .Net will
+        ///   still report the console's actual window width, but on Mono the value of the
+        ///   <see cref="Console.WindowWidth"/> property will be 0. In that case, the usage
+        ///   information will not be wrapped.
         /// </para>
         /// <para>
-        ///   If the <see cref="CreateShellCommandOptions.Out"/> property or <see cref="CreateShellCommandOptions.Error"/> property are instance of the
-        ///   <see cref="LineWrappingTextWriter"/> class, this method indents additional lines for the usage syntax and argument descriptions according
-        ///   to the values specified by the <see cref="CreateShellCommandOptions"/>, unless the <see cref="LineWrappingTextWriter.MaximumLineLength"/> property is less than 30.
+        ///   If the <see cref="ParseOptions.Out"/> property is instance of the
+        ///   <see cref="LineWrappingTextWriter"/> class, this method indents additional lines for
+        ///   the usage syntax and argument descriptions according to the values specified by the
+        ///   <see cref="CreateShellCommandOptions"/>, unless the <see cref="LineWrappingTextWriter.MaximumLineLength"/>
+        ///   property is less than 30.
         /// </para>
         /// </remarks>
         public static int RunShellCommand(Assembly assembly, string[] args, int index, CreateShellCommandOptions options)
@@ -687,19 +668,24 @@ namespace Ookii.CommandLine
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> does not fall inside the bounds of <paramref name="args"/>.</exception>
         /// <remarks>
         /// <para>
-        ///   If the command could not be found, a list of possible commands is written to <see cref="CreateShellCommandOptions.Out"/>. If an error occurs parsing the command's arguments, the error
-        ///   message is written to <see cref="CreateShellCommandOptions.Error"/>, and the shell command's usage information is written to <see cref="CreateShellCommandOptions.Out"/>.
+        ///   If the command could not be found, a list of possible commands is written to <see cref="ParseOptions.Out"/>. If an error occurs parsing the command's arguments, the error
+        ///   message is written to <see cref="ParseOptions.Error"/>, and the shell command's usage information is written to <see cref="ParseOptions.Out"/>.
         /// </para>
         /// <para>
-        ///   If the <see cref="CreateShellCommandOptions.Out"/> property or <see cref="CreateShellCommandOptions.Error"/> property is <see langword="null"/>, output
-        ///   is written to the standard output and error streams respectively, with line wrapping at word boundaries applied to the output, wrapping at the console's window width. When the console output is
-        ///   redirected to a file, Microsoft .Net will still report the console's actual window width, but on Mono the value of
-        ///   the <see cref="Console.WindowWidth"/> property will be 0. In that case, the usage information will not be wrapped.
+        ///   If the <see cref="ParseOptions.Out"/> property or <see cref="ParseOptions.Error"/>
+        ///   property is <see langword="null"/>, output is written to a <see cref="LineWrappingTextWriter"/>
+        ///   for the standard output and error streams respectively, wrapping at the console's
+        ///   window width. When the console output is redirected to a file, Microsoft .Net will
+        ///   still report the console's actual window width, but on Mono the value of the
+        ///   <see cref="Console.WindowWidth"/> property will be 0. In that case, the usage
+        ///   information will not be wrapped.
         /// </para>
         /// <para>
-        ///   If the <see cref="CreateShellCommandOptions.Out"/> property or <see cref="CreateShellCommandOptions.Error"/> property are instance of the
-        ///   <see cref="LineWrappingTextWriter"/> class, this method indents additional lines for the usage syntax and argument descriptions according
-        ///   to the values specified by the <see cref="CreateShellCommandOptions"/>, unless the <see cref="LineWrappingTextWriter.MaximumLineLength"/> property is less than 30.
+        ///   If the <see cref="ParseOptions.Out"/> property is instance of the
+        ///   <see cref="LineWrappingTextWriter"/> class, this method indents additional lines for
+        ///   the usage syntax and argument descriptions according to the values specified by the
+        ///   <see cref="CreateShellCommandOptions"/>, unless the <see cref="LineWrappingTextWriter.MaximumLineLength"/>
+        ///   property is less than 30.
         /// </para>
         /// </remarks>
         public static int RunShellCommand(Assembly assembly, string? commandName, string[] args, int index, CreateShellCommandOptions options)

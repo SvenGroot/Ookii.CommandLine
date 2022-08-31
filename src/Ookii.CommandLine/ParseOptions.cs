@@ -13,9 +13,9 @@ using System.IO;
 namespace Ookii.CommandLine
 {
     /// <summary>
-    /// Provides options for the <see cref="ShellCommand.CreateShellCommand(System.Reflection.Assembly,string,string[],int,CreateShellCommandOptions)"/> method.
+    /// Provides options for the <see cref="CommandLineParser.Parse{T}(string[], ParseOptions)"/> method.
     /// </summary>
-    public sealed class ParseOptions
+    public class ParseOptions
     {
         /// <summary>
         /// Gets or sets the culture used to convert command line argument values from their string representation to the argument type.
@@ -27,7 +27,7 @@ namespace Ookii.CommandLine
         public CultureInfo? Culture { get; set; }
 
         /// <summary>
-        /// Gets or sets the argument name prefixes to use when parsing the shell command's arguments.
+        /// Gets or sets the argument name prefixes to use when parsing the arguments.
         /// </summary>
         /// <value>
         /// The named argument switches, or <see langword="null"/> to indicate the default prefixes for
@@ -44,20 +44,30 @@ namespace Ookii.CommandLine
         public IComparer<string> ArgumentNameComparer { get; set; } = StringComparer.OrdinalIgnoreCase;
 
         /// <summary>
-        /// Gets or sets the output <see cref="TextWriter"/> used to print usage information.
+        /// Gets or sets the output <see cref="TextWriter"/> used to print usage information if
+        /// argument parsing fails or is cancelled.
         /// </summary>
+        /// <remarks>
+        /// If argument parsing is successful, nothing will be written.
+        /// </remarks>
         /// <value>
         /// The <see cref="TextWriter"/> used to print usage information, or <see langword="null"/>
-        /// to print to the standard output stream. The default value is <see langword="null"/>.
+        /// to print to a <see cref="LineWrappingTextWriter"/> for the standard output stream
+        /// (<see cref="Console.Out"/>). The default value is <see langword="null"/>.
         /// </value>
         public TextWriter? Out { get; set; }
 
         /// <summary>
-        /// Gets or sets the <see cref="TextWriter"/> used to print error information.
+        /// Gets or sets the <see cref="TextWriter"/> used to print error information if argument
+        /// parsing fails.
         /// </summary>
+        /// <remarks>
+        /// If argument parsing is successful, nothing will be written.
+        /// </remarks>
         /// <value>
         /// The <see cref="TextWriter"/> used to print error information, or <see langword="null"/>
-        /// to print to the standard output stream. The default value is <see langword="null"/>.
+        /// to print to a <see cref="LineWrappingTextWriter"/> for the standard error stream 
+        /// (<see cref="Console.Error"/>). The default value is <see langword="null"/>.
         /// </value>
         public TextWriter? Error { get; set; }
 
@@ -110,7 +120,8 @@ namespace Ookii.CommandLine
         public char NameValueSeparator { get; set; } = CommandLineParser.DefaultNameValueSeparator;
 
         /// <summary>
-        /// Gets or sets the options to use when parsing the shell command fails.
+        /// Gets or sets the options to use to write usage information to <see cref="Out"/> when
+        /// parsing the arguments fails or is cancelled.
         /// </summary>
         /// <value>
         /// The usage options.

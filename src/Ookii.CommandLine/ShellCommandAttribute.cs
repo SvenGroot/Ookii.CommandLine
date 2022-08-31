@@ -63,7 +63,7 @@ namespace Ookii.CommandLine
         /// </para>
         /// <para>
         ///   This constructor should not throw an exception is argument parsing fails. Instead, it should write error and usage information to the <see cref="System.IO.TextWriter"/> instances specified by
-        ///   <see cref="CreateShellCommandOptions.Error"/> and <see cref="CreateShellCommandOptions.Out"/>.
+        ///   <see cref="ParseOptions.Error"/> and <see cref="ParseOptions.Out"/>.
         /// </para>
         /// <para>
         ///   If this property is set to <see langword="true"/> and the shell command type does not have a constructor with those arguments, creating the command will fail.

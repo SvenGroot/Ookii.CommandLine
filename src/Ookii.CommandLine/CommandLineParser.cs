@@ -856,8 +856,25 @@ namespace Ookii.CommandLine
         /// <remarks>
         /// <para>
         ///   This is a convenience function that instantiates a <see cref="CommandLineParser"/>,
-        ///   calls <see cref="Parse(string[], int)"/>, and returns the result. If an error occurs, it prints error and usage
-        ///   according to <paramref name="options"/>.
+        ///   calls <see cref="Parse(string[], int)"/>, and returns the result. If an error occurs
+        ///   or parsing is cancelled, it prints error and usage according to <see cref="ParseOptions.Error"/>
+        ///   and <see cref="ParseOptions.Out"/> respectively.
+        /// </para>
+        /// <para>
+        ///   If the <see cref="ParseOptions.Out"/> property or <see cref="ParseOptions.Error"/>
+        ///   property is <see langword="null"/>, output is written to a <see cref="LineWrappingTextWriter"/>
+        ///   for the standard output and error streams respectively, wrapping at the console's
+        ///   window width. When the console output is redirected to a file, Microsoft .Net will
+        ///   still report the console's actual window width, but on Mono the value of the
+        ///   <see cref="Console.WindowWidth"/> property will be 0. In that case, the usage
+        ///   information will not be wrapped.
+        /// </para>
+        /// <para>
+        ///   If the <see cref="ParseOptions.Out"/> property is instance of the
+        ///   <see cref="LineWrappingTextWriter"/> class, this method indents additional lines for
+        ///   the usage syntax and argument descriptions according to the values specified by the
+        ///   <see cref="CreateShellCommandOptions"/>, unless the <see cref="LineWrappingTextWriter.MaximumLineLength"/>
+        ///   property is less than 30.
         /// </para>
         /// <para>
         ///   If you want more control over the parsing process, including custom error/usage output
@@ -890,35 +907,7 @@ namespace Ookii.CommandLine
         public static T? Parse<T>(string[] args, int index, ParseOptions options)
             where T : class
         {
-            if (options == null)
-                throw new ArgumentNullException(nameof(options));
-
-            var parser = new CommandLineParser(typeof(T), options.ArgumentNamePrefixes, options.ArgumentNameComparer)
-            {
-                AllowDuplicateArguments = options.AllowDuplicateArguments,
-                AllowWhiteSpaceValueSeparator = options.AllowWhiteSpaceValueSeparator,
-                Culture = options.Culture ?? CultureInfo.CurrentCulture,
-                NameValueSeparator = options.NameValueSeparator,
-            };
-
-            using var output = new TextWriterWrapper(options.Out, LineWrappingTextWriter.ForConsoleOut);
-            using var error = new TextWriterWrapper(options.Error, LineWrappingTextWriter.ForConsoleError);
-            try
-            {
-
-                var result = (T?)parser.Parse(args, index);
-                if (result != null)
-                    return result;
-            }
-            catch (CommandLineArgumentException ex)
-            {
-                error.Writer.WriteLine(ex.Message);
-                error.Writer.WriteLine();
-            }
-
-            // If we're writing this to the console, output should already be a LineWrappingTextWriter, so the max line length argument here is ignored.
-            parser.WriteUsage(output.Writer, 0, options.UsageOptions);
-            return null;
+            return (T?)ParseInternal(typeof(T), args, index, options);
         }
 
         /// <summary>
@@ -927,8 +916,25 @@ namespace Ookii.CommandLine
         /// <remarks>
         /// <para>
         ///   This is a convenience function that instantiates a <see cref="CommandLineParser"/>,
-        ///   calls <see cref="Parse(string[])"/>, and returns the result. If an error occurs, it prints error and usage
-        ///   according to <paramref name="options"/>.
+        ///   calls <see cref="Parse(string[])"/>, and returns the result. If an error occurs
+        ///   or parsing is cancelled, it prints error and usage according to <see cref="ParseOptions.Error"/>
+        ///   and <see cref="ParseOptions.Out"/> respectively.
+        /// </para>
+        /// <para>
+        ///   If the <see cref="ParseOptions.Out"/> property or <see cref="ParseOptions.Error"/>
+        ///   property is <see langword="null"/>, output is written to a <see cref="LineWrappingTextWriter"/>
+        ///   for the standard output and error streams respectively, wrapping at the console's
+        ///   window width. When the console output is redirected to a file, Microsoft .Net will
+        ///   still report the console's actual window width, but on Mono the value of the
+        ///   <see cref="Console.WindowWidth"/> property will be 0. In that case, the usage
+        ///   information will not be wrapped.
+        /// </para>
+        /// <para>
+        ///   If the <see cref="ParseOptions.Out"/> property is instance of the
+        ///   <see cref="LineWrappingTextWriter"/> class, this method indents additional lines for
+        ///   the usage syntax and argument descriptions according to the values specified by the
+        ///   <see cref="CreateShellCommandOptions"/>, unless the <see cref="LineWrappingTextWriter.MaximumLineLength"/>
+        ///   property is less than 30.
         /// </para>
         /// <para>
         ///   If you want more control over the parsing process, including custom error/usage output
@@ -966,8 +972,9 @@ namespace Ookii.CommandLine
         /// <remarks>
         /// <para>
         ///   This is a convenience function that instantiates a <see cref="CommandLineParser"/>,
-        ///   calls <see cref="Parse(string[])"/>, and returns the result. If an error occurs, it prints error and usage
-        ///   according to the default <see cref="ParseOptions"/>.
+        ///   calls <see cref="Parse(string[])"/>, and returns the result. If an error occurs, it
+        ///   prints error and usage information to the standard error and output streams using
+        ///   a <see cref="LineWrappingTextWriter"/>.
         /// </para>
         /// <para>
         ///   If you want more control over the parsing process, including custom error/usage output
@@ -1022,6 +1029,39 @@ namespace Ookii.CommandLine
             EventHandler<ArgumentParsedEventArgs>? handler = ArgumentParsed;
             if( handler != null )
                 handler(this, e);
+        }
+
+        internal static object? ParseInternal(Type argumentsType, string[] args, int index, ParseOptions options)
+        {
+            if (options == null)
+                throw new ArgumentNullException(nameof(options));
+
+            var parser = new CommandLineParser(argumentsType, options.ArgumentNamePrefixes, options.ArgumentNameComparer)
+            {
+                AllowDuplicateArguments = options.AllowDuplicateArguments,
+                AllowWhiteSpaceValueSeparator = options.AllowWhiteSpaceValueSeparator,
+                Culture = options.Culture ?? CultureInfo.CurrentCulture,
+                NameValueSeparator = options.NameValueSeparator,
+            };
+
+            using var output = new TextWriterWrapper(options.Out, LineWrappingTextWriter.ForConsoleOut);
+            using var error = new TextWriterWrapper(options.Error, LineWrappingTextWriter.ForConsoleError);
+            try
+            {
+
+                var result = parser.Parse(args, index);
+                if (result != null)
+                    return result;
+            }
+            catch (CommandLineArgumentException ex)
+            {
+                error.Writer.WriteLine(ex.Message);
+                error.Writer.WriteLine();
+            }
+
+            // If we're writing this to the console, output should already be a LineWrappingTextWriter, so the max line length argument here is ignored.
+            parser.WriteUsage(output.Writer, 0, options.UsageOptions);
+            return null;
         }
 
         private static string[] DetermineArgumentNamePrefixes(IEnumerable<string>? namedArgumentPrefixes)
