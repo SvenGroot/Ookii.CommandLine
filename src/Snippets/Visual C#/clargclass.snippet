@@ -44,22 +44,13 @@
 
     public static $Name$ Create(string[] args)
     {
-        CommandLineParser parser = new CommandLineParser(typeof($Name$));
-        try
+        // Customize the parsing behavior by changing the options.
+        var options = new ParseOptions()
         {
-            return ($Name$)parser.Parse(args);
-        }
-        catch( CommandLineArgumentException ex )
-        {
-            // Replace with more appropriate method to display errors if this is not a console application.
-            using( LineWrappingTextWriter writer = LineWrappingTextWriter.ForConsoleError() )
-            {
-                writer.WriteLine(ex.Message);
-                writer.WriteLine();
-            }
-            parser.WriteUsageToConsole();
-            return null;
-        }
+            Culture = System.Globalization.CultureInfo.CurrentCulture
+        };
+
+        return CommandLineParser.Parse<$Name$>(args, options);
     }
 }]]></Code>
     </Snippet>

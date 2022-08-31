@@ -1,14 +1,15 @@
-﻿' Sample for Ookii.CommandLine 2.2.
+﻿' Sample for Ookii.CommandLine.
 '
-' For more information about this project, and to download code snippets for Ookii.CommandLine, visit http://ookiicommandline.codeplex.com
+' For more information about this project, and to download code snippets for Ookii.CommandLine, visit https://github.com/SvenGroot/ookii.commandline
 Imports System.ComponentModel
+Imports System.Globalization
 Imports Ookii.CommandLine
 
 ''' <summary>
 ''' Class that defines the sample's command line arguments.
 ''' </summary>
-<Description("Sample command line application. The application parses the command line and prints the results, but otherwise does nothing and none of the arguments are actually used for anything.")> _
-Class SampleArguments
+<Description("Sample command line application. The application parses the command line and prints the results, but otherwise does nothing and none of the arguments are actually used for anything.")>
+Class ProgramArguments
 
     ' This property defines a required positional argument called "Source". It can be set by name as e.g. "-Source value", or by position
     ' by specifying "value" as the first positional argument. Note that by default command line argument names are case insensitive, so
@@ -38,7 +39,7 @@ Class SampleArguments
     ' property, which defaults to the user's current culture. Always pay attention when a conversion is culture specific (this goes for
     ' dates, numbers, and various other types) and consider whether the current culture is the right choice for your application. In some cases
     ' using CultureInfo.InvariantCulture could be more appropriate.
-    <CommandLineArgument(), Description("Provides a date to the application; the format to use depends on your locale.")>
+    <CommandLineArgument(), Description("Provides a date to the application.")>
     Public Property [Date] As Date?
 
     ' This property defines an argument named "Count".
@@ -66,22 +67,52 @@ Class SampleArguments
     Public Property Values As String()
 
     ' This property defines a switch argument named "Help", with the alias "?".
-    ' For this argument, we handle the CommandLineParser.ArgumentParsed event to cancel
-    ' command line processing when this argument is supplied. That way, we can print usage regardless of what other arguments are
-    ' present. For more details, see the CommandLineParser.ArgumentParser event handler in Program.cs
-    <CommandLineArgument, [Alias]("?"), Description("Displays this help message.")>
+    ' For this argument, CancelParsing Is set to true so that command line processing is stopped
+    ' when this argument is supplied. That way, we can print usage regardless of what other arguments are
+    ' present.
+    <CommandLineArgument(CancelParsing:=True), [Alias]("?"), Description("Displays this help message.")>
     Public Property Help As Boolean
 
-    Public Shared Function Create(ByVal args() As String) As SampleArguments
-        ' Using a Shared creation function for a command line arguments class is not required, but it's a convenient
-        ' way to place all command-line related functionality in one place. To parse the arguments (eg. from the Main method)
-        ' you then only need to call this function.
-        Dim parser As New CommandLineParser(GetType(SampleArguments))
-        ' The ArgumentParsed event is used by this sample to stop parsing after the -Help argument is specified.
-        AddHandler parser.ArgumentParsed, AddressOf CommandLineParser_ArgumentParsed
+    ' Using a Shared creation function for a command line arguments class is not required, but it's a convenient
+    ' way to place all command-line related functionality in one place. To parse the arguments (eg. from the Main method)
+    ' you then only need to call this function.
+    Public Shared Function Create(ByVal args() As String) As ProgramArguments
+        ' Certain argument types, such as dates and floating point numbers, could have culture
+        ' specific parsing behavior. You can use the InvariantCulture to ensure a consistent
+        ' experience regardless of the user's current culture.
+        ' UsageOptions are used to print usage information if there was an error parsing
+        ' the command line or parsing was cancelled (by the -Help property above).
+        ' By default, aliases and default values are not included in the usage descriptions;
+        ' for this sample, I do want to include them.
+        Dim options As New ParseOptions With {
+            .Culture = CultureInfo.InvariantCulture,
+            .UsageOptions = New WriteUsageOptions With {
+                .IncludeDefaultValueInDescription = True,
+                .IncludeAliasInDescription = True
+            }
+        }
+
+        ' The static Parse method handles parsing, printing error and usage information
+        ' (using a LineWrappingTextWriter to neatly wrap console output), and converting to
+        ' the proper type.
+        Return CommandLineParser.Parse(Of ProgramArguments)(args, options)
+    End Function
+
+    ' If you want more control over the parsing behavior, you can manually create an instance
+    ' of the CommandLineParser class And handle errors And usage yourself, as below.
+    ' This is only necessary if you want to deviate from what the static Parse method does,
+    ' which is Not the case here; this method Is only provided for demonstrative purposes.
+    Public Shared Function CreateCustom(ByVal args() As String) As ProgramArguments
+        ' Certain argument types, such as dates and floating point numbers, could have culture
+        ' specific parsing behavior. You can use the InvariantCulture to ensure a consistent
+        ' experience regardless of the user's current culture.
+        Dim parser As New CommandLineParser(GetType(ProgramArguments)) With {
+            .Culture = CultureInfo.InvariantCulture
+        }
+
         Try
-            ' The Parse function returns Nothing only when the ArgumentParsed event handler cancelled parsing.
-            Dim result As SampleArguments = DirectCast(parser.Parse(args), SampleArguments)
+            ' The Parse function returns Nothing only when the Help argument cancelled parsing.
+            Dim result As ProgramArguments = DirectCast(parser.Parse(args), ProgramArguments)
             If result IsNot Nothing Then
                 Return result
             End If
@@ -96,21 +127,13 @@ Class SampleArguments
 
         ' If we got here, we should print usage information to the console.
         ' By default, aliases and default values are not included in the usage descriptions; for this sample, I do want to include them.
-        Dim options As New WriteUsageOptions With {.IncludeDefaultValueInDescription = True, .IncludeAliasInDescription = True}
+        Dim options As New WriteUsageOptions With {
+            .IncludeDefaultValueInDescription = True,
+            .IncludeAliasInDescription = True
+        }
+
         ' WriteUsageToConsole automatically uses a LineWrappingTextWriter to properly word-wrap the text.
         parser.WriteUsageToConsole(options)
         Return Nothing
     End Function
-
-    Private Shared Sub CommandLineParser_ArgumentParsed(sender As Object, e As ArgumentParsedEventArgs)
-        ' When the -Help argument (or -? using its alias) is specified, parsing is immediately cancelled. That way, CommandLineParser.Parse will
-        ' return null, and the Create method will display usage even if the correct number of positional arguments was supplied.
-        ' Try it: just call the sample with "CommandLineSampleCS.exe foo bar -Help", which will print usage even though both the Source and Destination
-        ' arguments are supplied.
-        If e.Argument.ArgumentName = "Help" Then ' The name is always Help even if the alias was used to specify the argument
-            e.Cancel = True
-        End If
-    End Sub
-
-
 End Class

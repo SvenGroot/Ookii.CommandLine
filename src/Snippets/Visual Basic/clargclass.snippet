@@ -42,18 +42,12 @@
     ' Public Property SampleArgument As String
 
     Public Shared Function Create(ByVal args() As String) As $Name$
-        Dim parser As New CommandLineParser(GetType($Name$))
-        Try
-            Return DirectCast(parser.Parse(args), $Name$)
-        Catch ex As CommandLineArgumentException
-            ' Replace with more appropriate method to display errors if this is not a console application.
-            Using writer As LineWrappingTextWriter = LineWrappingTextWriter.ForConsoleError()
-                writer.WriteLine(ex.Message)
-                writer.WriteLine()
-            End Using
-            parser.WriteUsageToConsole()
-            Return Nothing
-        End Try
+        ' Customize the parsing behavior by changing the options.
+        Dim options As New ParseOptions With {
+            .Culture = System.Globalization.CultureInfo.CurrentCulture
+        }
+
+        return CommandLineParser.Parse(Of $Name$)(args, options)
     End Function
 End Class]]>
       </Code>

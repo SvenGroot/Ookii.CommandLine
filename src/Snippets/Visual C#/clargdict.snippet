@@ -18,13 +18,6 @@
     <Snippet>
       <Declarations>
         <Literal Editable="true">
-          <ID>FieldName</ID>
-          <ToolTip>Field name</ToolTip>
-          <Default>_myArgument</Default>
-          <Function>
-          </Function>
-        </Literal>
-        <Literal Editable="true">
           <ID>Name</ID>
           <ToolTip>Property and argument name</ToolTip>
           <Default>MyArgument</Default>
@@ -60,13 +53,8 @@
           <Namespace>Ookii.CommandLine</Namespace>
         </Import>
       </Imports>
-      <Code Language="csharp"><![CDATA[private readonly Dictionary<$KeyType$, $ValueType$> $FieldName$ = new Dictionary<$KeyType$, $ValueType$>();
-
-[CommandLineArgument]
-public IDictionary<$KeyType$, $ValueType$> $Name$
-{ 
-    get { return $FieldName$; }
-}]]></Code>
+      <Code Language="csharp"><![CDATA[[CommandLineArgument]
+public IDictionary<$KeyType$, $ValueType$> $Name$ { get; } = new Dictionary<$KeyType$, $ValueType>();]]></Code>
     </Snippet>
   </CodeSnippet>
 </CodeSnippets>

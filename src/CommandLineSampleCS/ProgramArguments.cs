@@ -7,6 +7,7 @@
 // documentation, and source files.
 using System;
 using System.ComponentModel;
+using System.Globalization;
 using Ookii.CommandLine;
 
 namespace CommandLineSampleCS
@@ -45,7 +46,7 @@ namespace CommandLineSampleCS
         // property, which defaults to the user's current culture. Always pay attention when a conversion is culture specific (this goes for
         // dates, numbers, and various other types) and consider whether the current culture is the right choice for your application. In some cases
         // using CultureInfo.InvariantCulture could be more appropriate.
-        [CommandLineArgument, Description("Provides a date to the application; the format to use depends on your regional settings.")]
+        [CommandLineArgument, Description("Provides a date to the application.")]
         public DateTime? Date { get; set; }
 
         // This property defines an argument named "Count".
@@ -73,31 +74,65 @@ namespace CommandLineSampleCS
         public string[] Values { get; set; }
 
         // This property defines a switch argument named "Help", with the alias "?".
-        // For this argument, we handle the CommandLineParser.ArgumentParsed event to cancel
-        // command line processing when this argument is supplied. That way, we can print usage regardless of what other arguments are
-        // present. For more details, see the CommandLineParser.ArgumentParser event handler in Program.cs
-        [CommandLineArgument, Alias("?"), Description("Displays this help message.")]
+        // For this argument, CancelParsing is set to true so that command line processing is stopped
+        // when this argument is supplied. That way, we can print usage regardless of what other arguments are
+        // present.
+        [CommandLineArgument(CancelParsing = true), Alias("?"), Description("Displays this help message.")]
         public bool Help { get; set; }
 
+        // Using a static creation function for a command line arguments class is not required, but it's a convenient
+        // way to place all command-line related functionality in one place. To parse the arguments (eg. from the Main method)
+        // you then only need to call this function.
         public static ProgramArguments Create(string[] args)
         {
-            // Using a static creation function for a command line arguments class is not required, but it's a convenient
-            // way to place all command-line related functionality in one place. To parse the arguments (eg. from the Main method)
-            // you then only need to call this function.
-            CommandLineParser parser = new CommandLineParser(typeof(ProgramArguments));
-            // The ArgumentParsed event is used by this sample to stop parsing after the -Help argument is specified.
-            parser.ArgumentParsed += CommandLineParser_ArgumentParsed;
+            var options = new ParseOptions()
+            {
+                // Certain argument types, such as dates and floating point numbers, could have culture
+                // specific parsing behavior. You can use the InvariantCulture to ensure a consistent
+                // experience regardless of the user's current culture.
+                Culture = CultureInfo.InvariantCulture,
+                // UsageOptions are used to print usage information if there was an error parsing
+                // the command line or parsing was cancelled (by the -Help property above).
+                // By default, aliases and default values are not included in the usage descriptions;
+                // for this sample, I do want to include them.
+                UsageOptions = new WriteUsageOptions()
+                {
+                    IncludeDefaultValueInDescription = true,
+                    IncludeAliasInDescription = true,
+                }
+            };
+
+            // The static Parse method handles parsing, printing error and usage information
+            // (using a LineWrappingTextWriter to neatly wrap console output), and converting to
+            // the proper type.
+            return CommandLineParser.Parse<ProgramArguments>(args, options);
+        }
+
+        // If you want more control over the parsing behavior, you can manually create an instance
+        // of the CommandLineParser class and handle errors and usage yourself, as below.
+        // This is only necessary if you want to deviate from what the static Parse method does,
+        // which is not the case here; this method is only provided for demonstrative purposes.
+        public static ProgramArguments CreateCustom(string[] args)
+        {
+            var parser = new CommandLineParser(typeof(ProgramArguments))
+            {
+                // Certain argument types, such as dates and floating point numbers, could have culture
+                // specific parsing behavior. You can use the InvariantCulture to ensure a consistent
+                // experience regardless of the user's current culture.
+                Culture = CultureInfo.InvariantCulture
+            };
+
             try
             {
-                // The Parse function returns null only when the ArgumentParsed event handler cancelled parsing.
-                ProgramArguments result = (ProgramArguments)parser.Parse(args);
-                if( result != null )
+                // The Parse function returns null only when the Help argument cancelled parsing.
+                var result = (ProgramArguments)parser.Parse(args);
+                if (result != null)
                     return result;
             }
-            catch( CommandLineArgumentException ex )
+            catch (CommandLineArgumentException ex)
             {
                 // We use the LineWrappingTextWriter to neatly wrap console output.
-                using( LineWrappingTextWriter writer = LineWrappingTextWriter.ForConsoleError() )
+                using (var writer = LineWrappingTextWriter.ForConsoleError())
                 {
                     // Tell the user what went wrong.
                     writer.WriteLine(ex.Message);
@@ -107,20 +142,15 @@ namespace CommandLineSampleCS
 
             // If we got here, we should print usage information to the console.
             // By default, aliases and default values are not included in the usage descriptions; for this sample, I do want to include them.
-            WriteUsageOptions options = new WriteUsageOptions() { IncludeDefaultValueInDescription = true, IncludeAliasInDescription = true };
+            var options = new WriteUsageOptions()
+            {
+                IncludeDefaultValueInDescription = true,
+                IncludeAliasInDescription = true
+            };
+
             // WriteUsageToConsole automatically uses a LineWrappingTextWriter to properly word-wrap the text.
             parser.WriteUsageToConsole(options);
             return null;
-        }
-
-        private static void CommandLineParser_ArgumentParsed(object sender, ArgumentParsedEventArgs e)
-        {
-            // When the -Help argument (or -? using its alias) is specified, parsing is immediately cancelled. That way, CommandLineParser.Parse will
-            // return null, and the Create method will display usage even if the correct number of positional arguments was supplied.
-            // Try it: just call the sample with "CommandLineSampleCS.exe foo bar -Help", which will print usage even though both the Source and Destination
-            // arguments are supplied.
-            if( e.Argument.ArgumentName == "Help" ) // The name is always Help even if the alias was used to specify the argument
-                e.Cancel = true;
         }
     }
 }

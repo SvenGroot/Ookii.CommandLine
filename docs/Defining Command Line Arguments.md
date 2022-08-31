@@ -61,10 +61,31 @@ enables you to use property initialization as an alternative way to specify defa
 public string SomeProperty { get; set; } = "default";
 ```
 
-Here, the value “default” will not be changed if the argument was not specified.
-
-This is particularly useful if the argument uses a [non-nullable reference type](Command%20Line%20Arguments%20in%20Ookii.CommandLine.md#arguments-with-non-nullable-types),
+Here, the value “default” will not be changed if the argument was not specified. This is particularly
+useful if the argument uses a [non-nullable reference type](Command%20Line%20Arguments%20in%20Ookii.CommandLine.md#arguments-with-non-nullable-types),
 which must be initialized with a non-null value.
+
+However, if this method is used, the default value cannot be included in the usage description
+by setting the `WriteUsageOptions.IncludeDefaultValueInDescription` property.
+
+### Arguments that cancel parsing
+
+Sometimes, you may wish to show usage help even if the command line is valid (all required arguments
+are present and there are no other errors), for example if the user supplied a "-Help" or "-?"
+argument.
+
+To enable this behavior, you set the `CommandLineArgumentAttribute.CancelParsing` property to `true`.
+If this property is set, parsing is stopped when the argument is encountered. The rest of the
+command line is not processed, and `CommandLineParser.Parse` will return `null`. The static `Parse`
+helper method will automatically print usage in this case.
+
+For example, you could use the following argument definition:
+
+```csharp
+[CommandLineArgument(CancelParsing = true)]
+[Alias("?")]
+public bool Help { get; set; }
+```
 
 ## Using constructor parameters
 
