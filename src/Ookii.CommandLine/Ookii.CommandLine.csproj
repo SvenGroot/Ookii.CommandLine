@@ -8,7 +8,7 @@
     <Company>Ookii.org</Company>
     <Copyright>Copyright © Sven Groot (Ookii.org)</Copyright>
     <Version>2.4.0</Version>
-    <PackageLicenseFile>license.md</PackageLicenseFile>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <AssemblyVersion>2.4.0.0</AssemblyVersion>
     <FileVersion>2.4.0.0</FileVersion>
     <PackageProjectUrl>https://github.com/SvenGroot/ookii.commandline</PackageProjectUrl>
