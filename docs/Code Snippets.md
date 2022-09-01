@@ -10,4 +10,7 @@ Several code snippets are provided to make working with Ookii.CommandLine even e
 
 All snippets are provided for C# and Visual Basic. 
 
-A [Visual Studio extension](https://marketplace.visualstudio.com/items?itemName=SvenGroot.OokiiCommandLineSnippets24) is provided that installs the snippets. Alternatively, manually copy the snippet files to the "Visual Studio \<version>\Code Snippets\Visual C#\My Code Snippets" or "Visual Studio \<version>\Code Snippets\Visual Basic\My Code Snippets" folder located in your My Documents folder. Or use the snippet manager inside Visual Studio to import the snippet files.
+A [Visual Studio extension](https://www.ookii.org/Link/CommandLineSnippets) is 
+provided that installs the snippets. Alternatively, manually copy the snippet files to the 
+"Visual Studio \<version>\Code Snippets\Visual C#\My Code Snippets" or "Visual Studio \<version>\Code Snippets\Visual Basic\My Code Snippets"
+folder located in your Documents folder. Or, use the snippet manager inside Visual Studio to import the snippet files.

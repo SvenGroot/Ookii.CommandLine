@@ -3,8 +3,8 @@
 Ookii.CommandLine enables comprehensive command line argument parsing for .Net applications. It allows you to easily define required, optional, positional and named arguments, parse the command line, and generate usage information. It is provided in versions for .Net Framework 2.0 and later, .Net Standard 2.0, and .Net 6.0 and later.
 
 Ookii.CommandLine can be added to your project in Visual Studio via [NuGet](https://nuget.org/packages/Ookii.CommandLine).
-[Code snippets](docs/Code%20Snippets.md) are available in a
-[Visual Studio extension](https://marketplace.visualstudio.com/items?itemName=SvenGroot.OokiiCommandLineSnippets24).
+[Code snippets](docs/Code%20Snippets.md) are available on the
+[Visual Studio marketplace](https://www.ookii.org/Link/CommandLineSnippets).
 
 ## Overview
 
