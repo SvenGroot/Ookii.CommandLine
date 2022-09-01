@@ -9,45 +9,35 @@ Usage help can be generated using the `CommandLineParser.WriteUsage` method. The
 The following example shows the usage help generated for the sample application included with the Ookii.CommandLine library:
 
 ```
-Sample command line application. The application parses the command
-line and prints the results, but otherwise does nothing, and none
-of the arguments are actually used for anything.
+Sample command line application. The application parses the command line and prints the results, but otherwise does
+nothing and none of the arguments are actually used for anything.
 
-Usage: CommandLineSampleCS.exe [-source] <String>
-   [-destination] <String> [[-index] <Number>] [[-id] <String>] [-?]
-   [-Count <Number>] [-Date <DateTime>] [-v] [-val <String>...]
+Usage: CommandLineSampleCS.exe [-Source] <String> [-Destination] <String> [[-Index] <Int32>] [-Count <Number>] [-Date
+   <DateTime>] [-Help] [-Value <String>...] [-Verbose]
 
-    -source <String>
+    -Source <String>
         The source data.
 
-    -destination <String>
+    -Destination <String>
         The destination data.
 
-    -index <Number>
-        The operation's index. This argument is optional, and the
-        default value is 1.
-
-    -id <String>
-        Sets the operation ID. The default value is "default".
-
-    -? [<Boolean>]
-        Displays this help message.
+    -Index <Int32>
+        The operation's index. Default value: 1.
 
     -Count <Number>
-        Provides the count for something to the application. This
-        argument is required.
+        Provides the count for something to the application.
 
     -Date <DateTime>
-        Provides a date to the application; the format to use
-        depends on your regional settings.
+        Provides a date to the application.
 
-    -v [<Boolean>]
-        Print verbose information; this is an example of a switch
-        argument.
+    -Help [<Boolean>]
+        Displays this help message. Alias: -?.
 
-    -val <String>
-        This is an example of an array argument, which can be
-        repeated multiple times to set more than one value.
+    -Value <String>
+        This is an example of a multi-value argument, which can be repeated multiple times to set more than one value.
+
+    -Verbose [<Boolean>]
+        Print verbose information; this is an example of a switch argument. Alias: -v.
 ```
 
 The usage help consists of three components: the application description, the argument syntax, and the argument descriptions.
