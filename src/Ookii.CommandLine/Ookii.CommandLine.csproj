@@ -21,6 +21,8 @@
     <Description>Ookii.CommandLine is a powerful command line parsing library for .Net applications. It allows you to easily define required, optional, positional and named arguments, parse the command line, and generate usage information.</Description>
     <PackageTags>command line arguments parsing parser parse argument args console</PackageTags>
     <PackageReleaseNotes>For details, please view: https://github.com/SvenGroot/ookii.commandline/blob/master/docs/What's%20New%20in%20Ookii.CommandLine.md</PackageReleaseNotes>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
 
   <PropertyGroup>
