@@ -10,6 +10,7 @@ errors and usage even easier.
 * Support for customization of the separator between keys and values for dictionary arguments.
 * Support for customizing a dictionary argument's key and value `TypeConverter` separately.
 * Arguments can indicate they cancel parsing to make adding a `-Help` or `-?` argument easier.
+* Some small bug fixes.
 
 Ookii.CommandLine 2.3:
 

@@ -29,4 +29,4 @@ To view and edit the source code of Ookii.CommandLine or the included sample app
 * [Shell Commands](Shell%20Commands.md)
 * [Line Wrapping Text Writer](Line%20Wrapping%20Text%20Writer.md)
 * [Code Snippets](Code%20Snippets.md)
-* [Class Library Documentation](http://www.ookii.org/link.ashx?id=CommandLineDoc)
+* [Class Library Documentation](https://www.ookii.org/Link/CommandLineDoc)
