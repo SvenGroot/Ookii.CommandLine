@@ -52,6 +52,6 @@ Ookii.CommandLine 2.0:
 
 ## Upgrading from Ookii.CommandLine 1.0
 
-Ookii.CommandLine 2.0 and newer version have substantial changes from version 1.0 and are not designed to be backwards compatible. There are changes in argument parsing behavior and API names and usage.
+Ookii.CommandLine 2.0 and newer versions have substantial changes from version 1.0 and are not designed to be backwards compatible. There are changes in argument parsing behavior and API names and usage.
 
 Upgrading an existing project that is using Ookii.CommandLine 1.0 to Ookii.CommandLine 2.0 or newer may require substantial code changes and may change how command lines are parsed.
