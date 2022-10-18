@@ -1,16 +1,16 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net6.0;net20;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>net6.0;netstandard2.0</TargetFrameworks>
     <Nullable>enable</Nullable>
     <LangVersion>9.0</LangVersion>
     <Authors>Sven Groot</Authors>
     <Company>Ookii.org</Company>
     <Copyright>Copyright © Sven Groot (Ookii.org)</Copyright>
-    <Version>2.4.0</Version>
+    <Version>3.0.0</Version>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <AssemblyVersion>2.4.0.0</AssemblyVersion>
-    <FileVersion>2.4.0.0</FileVersion>
+    <AssemblyVersion>3.0.0.0</AssemblyVersion>
+    <FileVersion>3.0.0.0</FileVersion>
     <PackageProjectUrl>https://github.com/SvenGroot/ookii.commandline</PackageProjectUrl>
     <RepositoryUrl>https://github.com/SvenGroot/ookii.commandline</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
@@ -20,7 +20,7 @@
     <DelaySign>false</DelaySign>
     <Description>Ookii.CommandLine is a powerful command line parsing library for .Net applications. It allows you to easily define required, optional, positional and named arguments, parse the command line, and generate usage information.</Description>
     <PackageTags>command line arguments parsing parser parse argument args console</PackageTags>
-    <PackageReleaseNotes>For details, please view: https://github.com/SvenGroot/ookii.commandline/blob/master/docs/What's%20New%20in%20Ookii.CommandLine.md</PackageReleaseNotes>
+    <PackageReleaseNotes>For details, please view: https://www.ookii.org/Link/CommandLineVersionHistory</PackageReleaseNotes>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
