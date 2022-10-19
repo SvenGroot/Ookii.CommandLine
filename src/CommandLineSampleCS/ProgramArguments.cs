@@ -17,12 +17,12 @@ namespace CommandLineSampleCS
         // On Windows, the default command name prefixes are "/" and "-", so the argument can also be specified as e.g. "/Source value". On Unix
         // (using Mono), only "-" is accepted by default.
         [CommandLineArgument(Position = 0, IsRequired = true), Description("The source data.")]
-        public string Source { get; set; }
+        public string Source { get; set; } = string.Empty;
 
         // This property defines a required positional argument called "Destination". It can be set by name as e.g. "-Destination value", or by position
         // by specifying "value" as the second positional argument.
         [CommandLineArgument(Position = 1, IsRequired = true), Description("The destination data.")]
-        public string Destination { get; set; }
+        public string Destination { get; set; } = string.Empty;
 
         // This property defines a optional positional argument called "Index". It can be set by name as e.g. "-Index 5", or by position
         // by specifying e.g. "5" as the third positional argument. If the argument is not specified, this property
@@ -66,7 +66,7 @@ namespace CommandLineSampleCS
         // Multi-value arguments can be created either using a property of an array type, or using a read-only property of any collection type (e.g. List<T>).
         // The element type doesn't have to be a string. Any type that can be used for normal arguments can also be used for multi-value arguments.
         [CommandLineArgument("Value"), Description("This is an example of a multi-value argument, which can be repeated multiple times to set more than one value.")]
-        public string[] Values { get; set; }
+        public string[]? Values { get; set; }
 
         // This property defines a switch argument named "Help", with the alias "?".
         // For this argument, CancelParsing is set to true so that command line processing is stopped
@@ -78,7 +78,7 @@ namespace CommandLineSampleCS
         // Using a static creation function for a command line arguments class is not required, but it's a convenient
         // way to place all command-line related functionality in one place. To parse the arguments (eg. from the Main method)
         // you then only need to call this function.
-        public static ProgramArguments Create()
+        public static ProgramArguments? Create()
         {
             var options = new ParseOptions()
             {
@@ -104,14 +104,14 @@ namespace CommandLineSampleCS
         // of the CommandLineParser class and handle errors and usage yourself, as below.
         // This is only necessary if you want to deviate from what the static Parse method does,
         // which is not the case here; this method is only provided for demonstrative purposes.
-        public static ProgramArguments CreateCustom(string[] args)
+        public static ProgramArguments? CreateCustom(string[] args)
         {
             var parser = new CommandLineParser(typeof(ProgramArguments));
 
             try
             {
                 // The Parse function returns null only when the Help argument cancelled parsing.
-                var result = (ProgramArguments)parser.Parse(args);
+                var result = (ProgramArguments?)parser.Parse(args);
                 if (result != null)
                     return result;
             }
