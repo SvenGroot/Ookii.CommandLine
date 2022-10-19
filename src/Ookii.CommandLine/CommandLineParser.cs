@@ -83,7 +83,7 @@ namespace Ookii.CommandLine
     ///   but is assigned to "bar", the second positional argument, because "foo" had already been assigned a value by name.
     /// </para>
     /// <para>
-    ///   Arguments can either be required or optional. If an argument is required, the <see cref="CommandLineParser.Parse(string[])"/>
+    ///   Arguments can either be required or optional. If an argument is required, the <see cref="CommandLineParser.Parse(string[], int)"/>
     ///   method will throw a <see cref="CommandLineArgumentException"/> if it is not supplied on the command line. For positional
     ///   arguments, it is not allowed to have a required argument following a positional argument.
     /// </para>
@@ -486,40 +486,12 @@ namespace Ookii.CommandLine
         }
 
         /// <summary>
-        /// Writes command line usage help to the standard output stream using the default options.
-        /// </summary>
-        /// <remarks>
-        ///   <para>
-        ///     The usage help consists of first the <see cref="Description"/>, followed by the usage syntax, followed by a description of all the arguments.
-        ///   </para>
-        ///   <para>
-        ///     This method uses the default usage options, as specified by the default values of the <see cref="WriteUsageOptions"/> class.
-        ///   </para>
-        ///   <para>
-        ///     You can add descriptions to the usage text by applying the <see cref="DescriptionAttribute"/> attribute to your command line arguments type,
-        ///     and the constructor parameters and properties defining command line arguments.
-        ///   </para>
-        ///   <para>
-        ///     Line wrapping at word boundaries is applied to the output, wrapping at the console's window width. When the console output is
-        ///     redirected to a file, Microsoft .Net will still report the console's actual window width, but on Mono the value of
-        ///     the <see cref="Console.WindowWidth"/> property will be 0. In that case, the usage information will not be wrapped.
-        ///   </para>
-        ///   <para>
-        ///     This method indents additional lines for the usage syntax and argument descriptions, unless the <see cref="Console.WindowWidth"/> property is less than 31.
-        ///   </para>
-        /// </remarks>
-        public void WriteUsageToConsole()
-        {
-            WriteUsage(Console.Out, Console.WindowWidth - 1);
-        }
-        
-        /// <summary>
         /// Writes command line usage help to the standard output stream using the specified options.
         /// </summary>
-        /// <param name="options">The options to use for formatting the usage.</param>
-        /// <exception cref="ArgumentNullException">
-        ///   <paramref name="options"/> is <see langword="null"/>.
-        /// </exception>
+        /// <param name="options">
+        ///   The options to use for formatting the usage. If <see langword="null"/>, the default
+        ///   options are used.
+        /// </param>
         /// <exception cref="ArgumentOutOfRangeException">
         ///   <see cref="WriteUsageOptions.Indent"/> is less than zero or greater than or equal to <see cref="Console.WindowWidth"/> - 1, or 
         ///   <see cref="WriteUsageOptions.ArgumentDescriptionIndent"/> is less than zero or greater than or equal to <see cref="Console.WindowWidth"/> - 1.
@@ -541,47 +513,11 @@ namespace Ookii.CommandLine
         ///     This method indents additional lines for the usage syntax and argument descriptions, unless the <see cref="Console.WindowWidth"/> property is less than 31.
         ///   </para>
         /// </remarks>
-        public void WriteUsageToConsole(WriteUsageOptions options)
+        public void WriteUsageToConsole(WriteUsageOptions? options = null)
         {
             WriteUsage(Console.Out, Console.WindowWidth - 1, options);
         }
         
-        /// <summary>
-        /// Writes command line usage help to the specified <see cref="TextWriter"/> using the default options.
-        /// </summary>
-        /// <param name="writer">The <see cref="TextWriter"/> to write the usage to.</param>
-        /// <param name="maximumLineLength">
-        ///   The maximum line length of lines in the usage text; if <paramref name="writer"/> is an instance 
-        ///   of <see cref="LineWrappingTextWriter"/>, this parameter is ignored. A value less than 1 or larger than 65536 is interpreted as infinite line length.
-        /// </param>
-        /// <exception cref="ArgumentNullException">
-        ///   <paramref name="writer"/> is <see langword="null"/>.
-        /// </exception>
-        /// <remarks>
-        ///   <para>
-        ///     The usage help consists of first the <see cref="Description"/>, followed by the usage syntax, followed by a description of all the arguments.
-        ///   </para>
-        ///   <para>
-        ///     This method uses the default usage options, as specified by the default values of the <see cref="WriteUsageOptions"/> class.
-        ///   </para>
-        ///   <para>
-        ///     You can add descriptions to the usage text by applying the <see cref="DescriptionAttribute"/> attribute to your command line arguments type,
-        ///     and the constructor parameters and properties defining command line arguments.
-        ///   </para>
-        ///   <para>
-        ///     Line wrapping at word boundaries is applied to the output, wrapping at the specified line length. If the specified <paramref name="writer"/>
-        ///     is an instance of the <see cref="LineWrappingTextWriter"/> class, its <see cref="LineWrappingTextWriter.MaximumLineLength"/> property is used
-        ///     and the <paramref name="maximumLineLength"/> parameter is ignored.
-        ///   </para>
-        ///   <para>
-        ///     This method indents additional lines for the usage syntax and argument descriptions, unless the maximum line length is less than 30.
-        ///   </para>
-        /// </remarks>
-        public void WriteUsage(TextWriter writer, int maximumLineLength)
-        {
-            WriteUsage(writer, maximumLineLength, new WriteUsageOptions());
-        }
-
         /// <summary>
         /// Writes command line usage help to the specified <see cref="TextWriter"/> using the specified options.
         /// </summary>
@@ -590,9 +526,12 @@ namespace Ookii.CommandLine
         ///   The maximum line length of lines in the usage text; if <paramref name="writer"/> is an instance 
         ///   of <see cref="LineWrappingTextWriter"/>, this parameter is ignored. A value less than 1 or larger than 65536 is interpreted as infinite line length.
         /// </param>
-        /// <param name="options">The options to use for formatting the usage.</param>
+        /// <param name="options">
+        ///   The options to use for formatting the usage. If <see langword="null"/>, the default
+        ///   options are used.
+        /// </param>
         /// <exception cref="ArgumentNullException">
-        ///   <paramref name="writer"/> or <paramref name="options"/> is <see langword="null"/>.
+        ///   <paramref name="writer"/> is <see langword="null"/>.
         /// </exception>
         /// <exception cref="ArgumentOutOfRangeException">
         ///   <see cref="WriteUsageOptions.Indent"/> is less than zero or greater than or equal to <paramref name="maximumLineLength"/>, or 
@@ -615,13 +554,12 @@ namespace Ookii.CommandLine
         ///     This method indents additional lines for the usage syntax and argument descriptions, unless the maximum line length is less than 30.
         ///   </para>
         /// </remarks>
-        public void WriteUsage(TextWriter writer, int maximumLineLength, WriteUsageOptions options)
+        public void WriteUsage(TextWriter writer, int maximumLineLength, WriteUsageOptions? options = null)
         {
             if( writer == null )
                 throw new ArgumentNullException(nameof(writer));
-            if( options == null )
-                throw new ArgumentNullException(nameof(options));
 
+            options ??= new();
             using var lineWriter = DisposableWrapper.Create(writer as LineWrappingTextWriter,
                 () => new LineWrappingTextWriter(writer, maximumLineLength, false));
 
@@ -632,7 +570,6 @@ namespace Ookii.CommandLine
             }
 
             WriteUsageSyntax(lineWriter.Inner, options);
-
             WriteArgumentDescriptions(lineWriter.Inner, options);
         }
 
@@ -667,14 +604,14 @@ namespace Ookii.CommandLine
         ///   The maximum line length of lines in the usage text; . A value less than 1 or larger
         ///   than 65536 is interpreted as infinite line length.
         /// </param>
-        /// <param name="options">The options to use for formatting the usage.</param>
+        /// <param name="options">
+        ///   The options to use for formatting the usage. If <see langword="null"/>, the default
+        ///   options are used.
+        /// </param>
         /// <returns>
         ///   A string containing usage help for the command line options defined by the type
         ///   specified by <see cref="ArgumentsType"/>.
         /// </returns>
-        /// <exception cref="ArgumentNullException">
-        ///   <paramref name="options"/> is <see langword="null"/>.
-        /// </exception>
         /// <exception cref="ArgumentOutOfRangeException">
         ///   <see cref="WriteUsageOptions.Indent"/> is less than zero or greater than or equal to <paramref name="maximumLineLength"/>, or 
         ///   <see cref="WriteUsageOptions.ArgumentDescriptionIndent"/> is less than zero or greater than or equal to <paramref name="maximumLineLength"/>.
@@ -694,35 +631,13 @@ namespace Ookii.CommandLine
         ///     This method indents additional lines for the usage syntax and argument descriptions, unless the maximum line length is less than 30.
         ///   </para>
         /// </remarks>
-        public string GetUsage(int maximumLineLength, WriteUsageOptions options)
+        public string GetUsage(int maximumLineLength = 0, WriteUsageOptions? options = null)
         {
-            var writer = new StringWriter();
+            using var writer = new StringWriter();
             WriteUsage(writer, maximumLineLength, options);
             return writer.ToString();
         }
 
-        /// <summary>
-        /// Parses the specified command line arguments.
-        /// </summary>
-        /// <param name="args">The command line arguments.</param>
-        /// <returns>
-        ///   An instance of the type specified by the <see cref="ArgumentsType"/> property, or <see langword="null"/> if argument
-        ///   parsing was cancelled by the <see cref="ArgumentParsed"/> event handler or the
-        ///   <see cref="CommandLineArgumentAttribute.CancelParsing"/> property.
-        /// </returns>
-        /// <exception cref="ArgumentNullException">
-        ///   <paramref name="args"/> is <see langword="null"/>.
-        /// </exception>
-        /// <exception cref="CommandLineArgumentException">
-        ///   Too many positional arguments were supplied, a required argument was not supplied, an unknown argument name was supplied,
-        ///   no value was supplied for a named argument, an argument was supplied more than once and <see cref="AllowDuplicateArguments"/>
-        ///   is <see langword="false"/>, or one of the argument values could not be converted to the argument's type.
-        /// </exception>
-        public object? Parse(string[] args)
-        {
-            return Parse(args, 0);
-        }
-        
         /// <summary>
         /// Parses the specified command line arguments, starting at the specified index.
         /// </summary>
@@ -744,14 +659,14 @@ namespace Ookii.CommandLine
         ///   no value was supplied for a named argument, an argument was supplied more than once and <see cref="AllowDuplicateArguments"/>
         ///   is <see langword="false"/>, or one of the argument values could not be converted to the argument's type.
         /// </exception>
-        public object? Parse(string[] args, int index)
+        public object? Parse(string[] args, int index = 0)
         {
             if( args == null )
-                throw new ArgumentNullException("args");
+                throw new ArgumentNullException(nameof(index));
             if( index < 0 || index > args.Length )
-                throw new ArgumentOutOfRangeException("index");
+                throw new ArgumentOutOfRangeException(nameof(index));
 
-            // Reset all arguments to their default value.
+            // Reset all arguments to their default value.s
             foreach( CommandLineArgument argument in _arguments )
                 argument.Reset();
  
@@ -849,15 +764,15 @@ namespace Ookii.CommandLine
         /// <typeparam name="T">The type defining the command line arguments.</typeparam>
         /// <param name="args">The command line arguments.</param>
         /// <param name="index">The index of the first argument to parse.</param>
-        /// <param name="options">The options that control parsing behavior.</param>
+        /// <param name="options">
+        ///   The options that control parsing behavior. If <see langword="null" />, the default
+        ///   options are used.
+        /// </param>
         /// <returns>
         ///   An instance of the type <typeparamref name="T"/>, or <see langword="null"/> if an
         ///   error occurred or if argument parsing was cancelled by the <see cref="ArgumentParsed"/>
         ///   event handler or the <see cref="CommandLineArgumentAttribute.CancelParsing"/> property.
         /// </returns>
-        /// <exception cref="ArgumentNullException">
-        ///   <paramref name="options"/> is <see langword="null"/>.
-        /// </exception>
         /// <exception cref="ArgumentNullException">
         ///   <paramref name="args"/> is <see langword="null"/>.
         /// </exception>
@@ -869,7 +784,7 @@ namespace Ookii.CommandLine
         ///   no value was supplied for a named argument, an argument was supplied more than once and <see cref="AllowDuplicateArguments"/>
         ///   is <see langword="false"/>, or one of the argument values could not be converted to the argument's type.
         /// </exception>
-        public static T? Parse<T>(string[] args, int index, ParseOptions options)
+        public static T? Parse<T>(string[] args, int index, ParseOptions? options = null)
             where T : class
         {
             return (T?)ParseInternal(typeof(T), args, index, options);
@@ -881,7 +796,7 @@ namespace Ookii.CommandLine
         /// <remarks>
         /// <para>
         ///   This is a convenience function that instantiates a <see cref="CommandLineParser"/>,
-        ///   calls <see cref="Parse(string[])"/>, and returns the result. If an error occurs
+        ///   calls <see cref="Parse(string[], int)"/>, and returns the result. If an error occurs
         ///   or parsing is cancelled, it prints error and usage according to <see cref="ParseOptions.Error"/>
         ///   and <see cref="ParseOptions.Out"/> respectively.
         /// </para>
@@ -909,15 +824,15 @@ namespace Ookii.CommandLine
         /// </remarks>
         /// <typeparam name="T">The type defining the command line arguments.</typeparam>
         /// <param name="args">The command line arguments.</param>
-        /// <param name="options">The options that control parsing behavior.</param>
+        /// <param name="options">
+        ///   The options that control parsing behavior. If <see langword="null" />, the default
+        ///   options are used.
+        /// </param>
         /// <returns>
         ///   An instance of the type <typeparamref name="T"/>, or <see langword="null"/> if an
         ///   error occurred or if argument parsing was cancelled by the <see cref="ArgumentParsed"/>
         ///   event handler or the <see cref="CommandLineArgumentAttribute.CancelParsing"/> property.
         /// </returns>
-        /// <exception cref="ArgumentNullException">
-        ///   <paramref name="options"/> is <see langword="null"/>.
-        /// </exception>
         /// <exception cref="ArgumentNullException">
         ///   <paramref name="args"/> is <see langword="null"/>.
         /// </exception>
@@ -926,47 +841,10 @@ namespace Ookii.CommandLine
         ///   no value was supplied for a named argument, an argument was supplied more than once and <see cref="AllowDuplicateArguments"/>
         ///   is <see langword="false"/>, or one of the argument values could not be converted to the argument's type.
         /// </exception>
-        public static T? Parse<T>(string[] args, ParseOptions options)
+        public static T? Parse<T>(string[] args, ParseOptions? options = null)
             where T : class
         {
             return Parse<T>(args, 0, options);
-        }
-
-        /// <summary>
-        /// Parses the specified command line arguments into the specified type.
-        /// </summary>
-        /// <remarks>
-        /// <para>
-        ///   This is a convenience function that instantiates a <see cref="CommandLineParser"/>,
-        ///   calls <see cref="Parse(string[])"/>, and returns the result. If an error occurs, it
-        ///   prints error and usage information to the standard error and output streams using
-        ///   a <see cref="LineWrappingTextWriter"/>.
-        /// </para>
-        /// <para>
-        ///   If you want more control over the parsing process, including custom error/usage output
-        ///   or handling the <see cref="ArgumentParsed"/> event, do not use this function; instead
-        ///   perform these steps manually.
-        /// </para>
-        /// </remarks>
-        /// <typeparam name="T">The type defining the command line arguments.</typeparam>
-        /// <param name="args">The command line arguments.</param>
-        /// <returns>
-        ///   An instance of the type <typeparamref name="T"/>, or <see langword="null"/> if an
-        ///   error occurred or if argument parsing was cancelled by the <see cref="ArgumentParsed"/>
-        ///   event handler or the <see cref="CommandLineArgumentAttribute.CancelParsing"/> property.
-        /// </returns>
-        /// <exception cref="ArgumentNullException">
-        ///   <paramref name="args"/> is <see langword="null"/>.
-        /// </exception>
-        /// <exception cref="CommandLineArgumentException">
-        ///   Too many positional arguments were supplied, a required argument was not supplied, an unknown argument name was supplied,
-        ///   no value was supplied for a named argument, an argument was supplied more than once and <see cref="AllowDuplicateArguments"/>
-        ///   is <see langword="false"/>, or one of the argument values could not be converted to the argument's type.
-        /// </exception>
-        public static T? Parse<T>(string[] args)
-            where T : class
-        {
-            return Parse<T>(args, 0, new ParseOptions());
         }
 
         /// <summary>
@@ -998,11 +876,9 @@ namespace Ookii.CommandLine
                 handler(this, e);
         }
 
-        internal static object? ParseInternal(Type argumentsType, string[] args, int index, ParseOptions options)
+        internal static object? ParseInternal(Type argumentsType, string[] args, int index, ParseOptions? options)
         {
-            if (options == null)
-                throw new ArgumentNullException(nameof(options));
-
+            options ??= new();
             var parser = new CommandLineParser(argumentsType, null, null, options);
 
             using var output = DisposableWrapper.Create(options.Out, LineWrappingTextWriter.ForConsoleOut);

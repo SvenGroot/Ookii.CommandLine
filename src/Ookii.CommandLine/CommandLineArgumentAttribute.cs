@@ -129,7 +129,7 @@ namespace Ookii.CommandLine
         /// <para>
         ///   If this property is <see langword="true"/>, the <see cref="CommandLineParser"/> will
         ///   stop parsing the command line arguments after seeing this argument, and return
-        ///   <see langword="null"/> from the <see cref="CommandLineParser.Parse(string[])"/> method
+        ///   <see langword="null"/> from the <see cref="CommandLineParser.Parse(string[], int)"/> method
         ///   or one of its overloads. Since no instance of the arguments type is returned, it's
         ///   not possible to determine argument values, or which argument caused the cancellation,
         ///   except by inspecting the <see cref="CommandLineParser.Arguments"/> property.
@@ -141,7 +141,7 @@ namespace Ookii.CommandLine
         ///   or not.
         /// </para>
         /// <para>
-        ///   The <see cref="CommandLineParser.Parse{T}(string[])"/> static helper method will print
+        ///   The <see cref="CommandLineParser.Parse{T}(string[], ParseOptions?)"/> static helper method will print
         ///   usage information if parsing was cancelled through this method.
         /// </para>
         /// <para>

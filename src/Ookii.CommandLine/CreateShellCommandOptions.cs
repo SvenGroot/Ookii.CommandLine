@@ -6,7 +6,8 @@ using System.IO;
 namespace Ookii.CommandLine
 {
     /// <summary>
-    /// Provides options for the <see cref="ShellCommand.CreateShellCommand(System.Reflection.Assembly,string,string[],int,CreateShellCommandOptions)"/> method.
+    /// Provides options for the <see cref="ShellCommand.CreateShellCommand(System.Reflection.Assembly,string,string[],int,CreateShellCommandOptions)"/>
+    /// and <see cref="ShellCommand.RunShellCommand(System.Reflection.Assembly, string?, string[], int, CreateShellCommandOptions)"/> methods.
     /// </summary>
     public class CreateShellCommandOptions : ParseOptions
     {

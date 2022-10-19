@@ -21,7 +21,7 @@ namespace Ookii.CommandLine
         /// <summary>
         /// Initializes a new instance of the <see cref="ShellCommandAttribute"/> class using the specified command name.
         /// </summary>
-        /// <param name="commandName">The name of the command, which can be used to locate it using the <see cref="ShellCommand.GetShellCommand(System.Reflection.Assembly,string)"/> method.</param>
+        /// <param name="commandName">The name of the command, which can be used to locate it using the <see cref="ShellCommand.GetShellCommand"/> method.</param>
         public ShellCommandAttribute(string commandName)
         {
             if( commandName == null )
@@ -31,7 +31,7 @@ namespace Ookii.CommandLine
         }
 
         /// <summary>
-        /// Gets the name of the command, which can be used to locate it using the <see cref="ShellCommand.GetShellCommand(System.Reflection.Assembly,string)"/> method.
+        /// Gets the name of the command, which can be used to locate it using the <see cref="ShellCommand.GetShellCommand"/> method.
         /// </summary>
         /// <value>
         /// The name of the command.
@@ -49,8 +49,8 @@ namespace Ookii.CommandLine
         /// </value>
         /// <remarks>
         /// <para>
-        ///   If this property is set to <see langword="true"/>, the <see cref="ShellCommand.CreateShellCommand(System.Reflection.Assembly, string[], int)"/> method and 
-        ///   the <see cref="ShellCommand.RunShellCommand(System.Reflection.Assembly, string[], int)"/>  will not create the command with the <see cref="CommandLineParser"/>. Instead,
+        ///   If this property is set to <see langword="true"/>, the <see cref="ShellCommand.CreateShellCommand(System.Reflection.Assembly, string[], int, CreateShellCommandOptions?)"/> method and 
+        ///   the <see cref="ShellCommand.RunShellCommand(System.Reflection.Assembly, string[], int, CreateShellCommandOptions?)"/>  will not create the command with the <see cref="CommandLineParser"/>. Instead,
         ///   the command type must define a constructor that takes three arguments: an array of <see cref="String"/> values that will contain the raw command line arguments, an <see cref="Int32"/> that
         ///   indicates the index of the first argument in the array after the command name, and a <see cref="CreateShellCommandOptions"/> instance specifying argument parsing
         ///   and error handling options.

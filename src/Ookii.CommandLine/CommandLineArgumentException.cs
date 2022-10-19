@@ -9,7 +9,7 @@ namespace Ookii.CommandLine
     /// </summary>
     /// <remarks>
     /// <para>
-    ///   This exception indicates that the command line passed to the <see cref="CommandLineParser.Parse(string[])"/> method
+    ///   This exception indicates that the command line passed to the <see cref="CommandLineParser.Parse(string[], int)"/> method
     ///   was invalid for the arguments defined by the <see cref="CommandLineParser"/> instance.
     /// </para>
     /// <para>

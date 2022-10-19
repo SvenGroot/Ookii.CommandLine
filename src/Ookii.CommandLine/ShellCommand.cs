@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 
 namespace Ookii.CommandLine
@@ -30,14 +31,14 @@ namespace Ookii.CommandLine
     /// </para>
     /// <para>
     ///   An application can get a list of all shell commands defined in an assembly by using the <see cref="GetShellCommands"/> method, or
-    ///   get a specific shell command using the <see cref="GetShellCommand(Assembly,string)"/> method. The <see cref="GetShellCommand(Assembly,string)"/> method searches
+    ///   get a specific shell command using the <see cref="GetShellCommand"/> method. The <see cref="GetShellCommand"/> method searches
     ///   for a type that inherits from <see cref="ShellCommand"/> and defines the <see cref="ShellCommandAttribute"/> attribute, and
     ///   where the value of the <see cref="ShellCommandAttribute.CommandName"/> property matches the specified command name.
     ///   If a matching type is found, it returns the <see cref="Type"/> instance for that type.
     /// </para>
     /// <para>
     ///   Shell commands behave like regular command line arguments classes for the <see cref="CommandLineParser"/> class. Once
-    ///   a shell command has been found using the <see cref="GetShellCommand(Assembly,string)"/> method, you can instantiate it by creating an
+    ///   a shell command has been found using the <see cref="GetShellCommand"/> method, you can instantiate it by creating an
     ///   instance of the <see cref="CommandLineParser"/> class, passing the shell command's <see cref="Type"/> to the <see cref="CommandLineParser.CommandLineParser(Type, IEnumerable{string}?, IComparer{string}?)"/>
     ///   constructor. Then invoke the <see cref="CommandLineParser.Parse(string[],int)"/> method to parse the shell command's arguments (make sure to
     ///   set index so that the command does not try to parse the command name), and cast the result to a <see cref="ShellCommand"/> instance.
@@ -92,7 +93,7 @@ namespace Ookii.CommandLine
         public static Type[] GetShellCommands(Assembly assembly)
         {
             if( assembly == null )
-                throw new ArgumentNullException("assembly");
+                throw new ArgumentNullException(nameof(assembly));
 
             List<Type> result = new List<Type>();
             foreach( Type type in assembly.GetTypes() )
@@ -198,11 +199,11 @@ namespace Ookii.CommandLine
         public static void WriteAssemblyCommandList(TextWriter writer, Assembly assembly, string commandFormat)
         {
             if( writer == null )
-                throw new ArgumentNullException("writer");
+                throw new ArgumentNullException(nameof(writer));
             if( assembly == null )
-                throw new ArgumentNullException("assembly");
+                throw new ArgumentNullException(nameof(assembly));
             if( commandFormat == null )
-                throw new ArgumentNullException("commandFormat");
+                throw new ArgumentNullException(nameof(commandFormat));
 
             var lineWriter = writer as LineWrappingTextWriter;
             Type[] commandTypes = GetShellCommands(assembly);
@@ -236,7 +237,7 @@ namespace Ookii.CommandLine
         public static bool IsShellCommand(Type type)
         {
             if( type == null )
-                throw new ArgumentNullException("type");
+                throw new ArgumentNullException(nameof(type));
             return !type.IsAbstract && type.IsSubclassOf(typeof(ShellCommand)) && Attribute.IsDefined(type, typeof(ShellCommandAttribute));
         }
 
@@ -259,7 +260,7 @@ namespace Ookii.CommandLine
         public static string GetShellCommandName(Type commandType)
         {
             if( commandType == null )
-                throw new ArgumentNullException("commandType");
+                throw new ArgumentNullException(nameof(commandType));
             if( !IsShellCommand(commandType) )
                 throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.TypeIsNotShellCommandFormat, commandType.FullName));
 
@@ -286,32 +287,13 @@ namespace Ookii.CommandLine
         public static string? GetShellCommandDescription(Type commandType)
         {
             if( commandType == null )
-                throw new ArgumentNullException("commandType");
+                throw new ArgumentNullException(nameof(commandType));
             if( !IsShellCommand(commandType) )
                 throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.TypeIsNotShellCommandFormat, commandType.FullName));
 
             return TypeHelper.GetAttribute<DescriptionAttribute>(commandType)?.Description;
         }
         
-        /// <summary>
-        /// Gets the shell command with the specified command name, using a case-insensitive string comparison for the command names.
-        /// </summary>
-        /// <param name="assembly">The assembly whose types to search.</param>
-        /// <param name="commandName">The command name of the shell command.</param>
-        /// <returns>The <see cref="Type"/> of the specified shell command, or <see langword="null"/> if none could be found.</returns>
-        /// <exception cref="ArgumentNullException">
-        ///   <paramref name="assembly"/> or <paramref name="commandName"/> is <see langword="null"/>.
-        /// </exception>
-        /// <remarks>
-        /// <para>
-        ///   This method uses <see cref="StringComparer.OrdinalIgnoreCase"/> to compare command names.
-        /// </para>
-        /// </remarks>
-        public static Type? GetShellCommand(Assembly assembly, string commandName)
-        {
-            return GetShellCommand(assembly, commandName, null);
-        }
-
         /// <summary>
         /// Gets the shell command with the specified command name, using the specified <see cref="IEqualityComparer{T}"/> to compare command names.
         /// </summary>
@@ -327,89 +309,17 @@ namespace Ookii.CommandLine
         ///   This method uses <see cref="StringComparer.OrdinalIgnoreCase"/> to compare command names if <paramref name="commandNameComparer"/> is <see langword="null"/>.
         /// </para>
         /// </remarks>
-        public static Type? GetShellCommand(Assembly assembly, string commandName, IEqualityComparer<string>? commandNameComparer)
+        public static Type? GetShellCommand(Assembly assembly, string commandName, IEqualityComparer<string>? commandNameComparer = null)
         {
             if( assembly == null )
-                throw new ArgumentNullException("assembly");
+                throw new ArgumentNullException(nameof(assembly));
             if( commandName == null )
-                throw new ArgumentNullException("commandName");
+                throw new ArgumentNullException(nameof(commandName));
 
-            if( commandNameComparer == null )
-                commandNameComparer = StringComparer.OrdinalIgnoreCase;
-
-            Type[] types = assembly.GetTypes();
-            foreach( Type type in types )
-            {
-                if( IsShellCommand(type) && commandNameComparer.Equals(GetShellCommandName(type), commandName) )
-                {
-                    return type;
-                }
-            }
-
-            return null;
+            commandNameComparer ??= StringComparer.OrdinalIgnoreCase;
+            return assembly.GetTypes().FirstOrDefault(
+                type => IsShellCommand(type) && commandNameComparer.Equals(GetShellCommandName(type), commandName));
         }
-
-        /// <summary>
-        /// Finds and instantiates the shell command with the specified name, or if that fails, writes error and usage information to the standard error and output streams.
-        /// </summary>
-        /// <param name="assembly">The assembly to search for the shell command.</param>
-        /// <param name="commandName">The name of the command.</param>
-        /// <param name="args">The arguments to the shell command.</param>
-        /// <param name="index">The index in <paramref name="args"/> at which to start parsing the arguments.</param>
-        /// <returns>An instance a class deriving from <see cref="ShellCommand"/>, or <see langword="null"/> if the command was not found or an error occurred parsing the arguments.</returns>
-        /// <exception cref="ArgumentNullException">
-        ///   <paramref name="assembly"/> or <paramref name="args"/> is <see langword="null"/>
-        /// </exception>
-        /// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> does not fall inside the bounds of <paramref name="args"/>.</exception>
-        /// <remarks>
-        /// <para>
-        ///   If the command could not be found, a list of possible commands is written to the standard output stream. If an error occurs parsing the command's arguments, the error
-        ///   message is written to the standard error stream, and the shell command's usage information is written to the standard output stream.
-        /// </para>
-        /// <para>
-        ///   Line wrapping at word boundaries is applied to the output, wrapping at the console's window width. When the console output is
-        ///   redirected to a file, Microsoft .Net will still report the console's actual window width, but on Mono the value of
-        ///   the <see cref="Console.WindowWidth"/> property will be 0. In that case, the usage information will not be wrapped.
-        /// </para>
-        /// <para>
-        ///   This method indents additional lines for the usage syntax, argument descriptions and command descriptions, unless the <see cref="Console.WindowWidth"/> property is less than 31.
-        /// </para>
-        /// </remarks>
-        public static ShellCommand? CreateShellCommand(Assembly assembly, string? commandName, string[] args, int index)
-        {
-            return CreateShellCommand(assembly, commandName, args, index, new CreateShellCommandOptions());
-        }
-
-        /// <summary>
-        /// Finds and instantiates the shell command from the specified arguments, or if that fails, writes error and usage information to the standard error and output streams.
-        /// </summary>
-        /// <param name="assembly">The assembly to search for the shell command.</param>
-        /// <param name="args">The arguments to the shell command, with the shell command name at the position specified by <paramref name="index"/>.</param>
-        /// <param name="index">The index in <paramref name="args"/> at which to start parsing the arguments.</param>
-        /// <returns>An instance a class deriving from <see cref="ShellCommand"/>, or <see langword="null"/> if the command was not found or an error occurred parsing the arguments.</returns>
-        /// <exception cref="ArgumentNullException">
-        ///   <paramref name="assembly"/> or <paramref name="args"/> is <see langword="null"/>
-        /// </exception>
-        /// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> does not fall inside the bounds of <paramref name="args"/>.</exception>
-        /// <remarks>
-        /// <para>
-        ///   If the command could not be found, a list of possible commands is written to the standard output stream. If an error occurs parsing the command's arguments, the error
-        ///   message is written to the standard error stream, and the shell command's usage information is written to the standard output stream.
-        /// </para>
-        /// <para>
-        ///   Line wrapping at word boundaries is applied to the output, wrapping at the console's window width. When the console output is
-        ///   redirected to a file, Microsoft .Net will still report the console's actual window width, but on Mono the value of
-        ///   the <see cref="Console.WindowWidth"/> property will be 0. In that case, the usage information will not be wrapped.
-        /// </para>
-        /// <para>
-        ///   This method indents additional lines for the usage syntax, argument descriptions and command descriptions, unless the <see cref="Console.WindowWidth"/> property is less than 31.
-        /// </para>
-        /// </remarks>
-        public static ShellCommand? CreateShellCommand(Assembly assembly, string[] args, int index)
-        {
-            return CreateShellCommand(assembly, args, index, new CreateShellCommandOptions());
-        }
-
 
         /// <summary>
         /// Finds and instantiates the shell command with the specified name, or if that fails, writes error and usage information to the specified writers.
@@ -418,7 +328,10 @@ namespace Ookii.CommandLine
         /// <param name="commandName">The name of the command.</param>
         /// <param name="args">The arguments to the shell command.</param>
         /// <param name="index">The index in <paramref name="args"/> at which to start parsing the arguments.</param>
-        /// <param name="options">The options to use.</param>
+        /// <param name="options">
+        ///   The options that control parsing behavior. If <see langword="null" />, the default
+        ///   options are used.
+        /// </param>
         /// <returns>An instance a class deriving from <see cref="ShellCommand"/>, or <see langword="null"/> if the command was not found or an error occurred parsing the arguments.</returns>
         /// <exception cref="ArgumentNullException">
         ///   <paramref name="assembly"/>, <paramref name="args"/>, or <paramref name="options"/> is <see langword="null"/>
@@ -446,7 +359,7 @@ namespace Ookii.CommandLine
         ///   property is less than 30.
         /// </para>
         /// </remarks>
-        public static ShellCommand? CreateShellCommand(Assembly assembly, string? commandName, string[] args, int index, CreateShellCommandOptions options)
+        public static ShellCommand? CreateShellCommand(Assembly assembly, string? commandName, string[] args, int index, CreateShellCommandOptions? options = null)
         {
             if (assembly == null)
                 throw new ArgumentNullException(nameof(assembly));
@@ -454,9 +367,8 @@ namespace Ookii.CommandLine
                 throw new ArgumentNullException(nameof(args));
             if (index < 0 || index > args.Length)
                 throw new ArgumentOutOfRangeException(nameof(index));
-            if (options == null)
-                throw new ArgumentNullException(nameof(options));
 
+            options ??= new();
             using var output = DisposableWrapper.Create(options.Out, LineWrappingTextWriter.ForConsoleOut);
             using var error = DisposableWrapper.Create(options.Error, LineWrappingTextWriter.ForConsoleError);
 
@@ -498,7 +410,10 @@ namespace Ookii.CommandLine
         /// <param name="assembly">The assembly to search for the shell command.</param>
         /// <param name="args">The arguments to the shell command, with the shell command name at the position specified by <paramref name="index"/>.</param>
         /// <param name="index">The index in <paramref name="args"/> at which to start parsing the arguments.</param>
-        /// <param name="options">The options to use.</param>
+        /// <param name="options">
+        ///   The options that control parsing behavior. If <see langword="null" />, the default
+        ///   options are used.
+        /// </param>
         /// <returns>An instance a class deriving from <see cref="ShellCommand"/>, or <see langword="null"/> if the command was not found or an error occurred parsing the arguments.</returns>
         /// <exception cref="ArgumentNullException">
         ///   <paramref name="assembly"/>, <paramref name="args"/>, or <paramref name="options"/> is <see langword="null"/>
@@ -526,16 +441,14 @@ namespace Ookii.CommandLine
         ///   property is less than 30.
         /// </para>
         /// </remarks>
-        public static ShellCommand? CreateShellCommand(Assembly assembly, string[] args, int index, CreateShellCommandOptions options)
+        public static ShellCommand? CreateShellCommand(Assembly assembly, string[] args, int index, CreateShellCommandOptions? options = null)
         {
             if( assembly == null )
-                throw new ArgumentNullException("assembly");
+                throw new ArgumentNullException(nameof(assembly));
             if( args == null )
-                throw new ArgumentNullException("args");
+                throw new ArgumentNullException(nameof(args));
             if( index < 0 || index > args.Length )
-                throw new ArgumentOutOfRangeException("index");
-            if( options == null )
-                throw new ArgumentNullException("options");
+                throw new ArgumentOutOfRangeException(nameof(index));
 
             return CreateShellCommand(assembly, index == args.Length ? null : args[index], args, index == args.Length ? index : index + 1, options);
         }
@@ -546,40 +459,13 @@ namespace Ookii.CommandLine
         /// <param name="assembly">The assembly to search for the shell command.</param>
         /// <param name="args">The arguments to the shell command, with the shell command name at the position specified by <paramref name="index"/>.</param>
         /// <param name="index">The index in <paramref name="args"/> at which to start parsing the arguments.</param>
+        /// <param name="options">
+        ///   The options that control parsing behavior. If <see langword="null" />, the default
+        ///   options are used.
+        /// </param>
         /// <returns>The value of the <see cref="ShellCommand.ExitCode"/> property after the command finishes running, or -1 if the command could not be created.</returns>
         /// <exception cref="ArgumentNullException">
         ///   <paramref name="assembly"/> or <paramref name="args"/> is <see langword="null"/>
-        /// </exception>
-        /// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> does not fall inside the bounds of <paramref name="args"/>.</exception>
-        /// <remarks>
-        /// <para>
-        ///   If the command could not be found, a list of possible commands is written to the standard output stream. If an error occurs parsing the command's arguments, the error
-        ///   message is written to  to the standard error stream, and the shell command's usage information is written to  to the standard output stream.
-        /// </para>
-        /// <para>
-        ///   Line wrapping at word boundaries is applied to the output, wrapping at the console's window width. When the console output is
-        ///   redirected to a file, Microsoft .Net will still report the console's actual window width, but on Mono the value of
-        ///   the <see cref="Console.WindowWidth"/> property will be 0. In that case, the usage information will not be wrapped.
-        /// </para>
-        /// <para>
-        ///   This method indents additional lines for the usage syntax, argument descriptions and command descriptions, unless the <see cref="Console.WindowWidth"/> property is less than 31.
-        /// </para>
-        /// </remarks>
-        public static int RunShellCommand(Assembly assembly, string[] args, int index)
-        {
-            return RunShellCommand(assembly, args, index, new CreateShellCommandOptions());
-        }
-
-        /// <summary>
-        /// Runs a shell command with the specified arguments; if the command name or arguments are invalid, prints error and usage information.
-        /// </summary>
-        /// <param name="assembly">The assembly to search for the shell command.</param>
-        /// <param name="args">The arguments to the shell command, with the shell command name at the position specified by <paramref name="index"/>.</param>
-        /// <param name="index">The index in <paramref name="args"/> at which to start parsing the arguments.</param>
-        /// <param name="options">The options to use.</param>
-        /// <returns>The value of the <see cref="ShellCommand.ExitCode"/> property after the command finishes running, or -1 if the command could not be created.</returns>
-        /// <exception cref="ArgumentNullException">
-        ///   <paramref name="assembly"/>, <paramref name="args"/>, or <paramref name="options"/> is <see langword="null"/>
         /// </exception>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> does not fall inside the bounds of <paramref name="args"/>.</exception>
         /// <remarks>
@@ -604,7 +490,7 @@ namespace Ookii.CommandLine
         ///   property is less than 30.
         /// </para>
         /// </remarks>
-        public static int RunShellCommand(Assembly assembly, string[] args, int index, CreateShellCommandOptions options)
+        public static int RunShellCommand(Assembly assembly, string[] args, int index, CreateShellCommandOptions? options = null)
         {
             var command = CreateShellCommand(assembly, args, index, options);
             if( command != null )
@@ -615,37 +501,6 @@ namespace Ookii.CommandLine
             else
                 return -1;
         }
-        
-        /// <summary>
-        /// Runs the specified shell command with the specified arguments; if the command name or arguments are invalid, prints error and usage information.
-        /// </summary>
-        /// <param name="assembly">The assembly to search for the shell command.</param>
-        /// <param name="commandName">The name of the command.</param>
-        /// <param name="args">The arguments to the shell command.</param>
-        /// <param name="index">The index in <paramref name="args"/> at which to start parsing the arguments.</param>
-        /// <returns>The value of the <see cref="ShellCommand.ExitCode"/> property after the command finishes running, or -1 if the command could not be created.</returns>
-        /// <exception cref="ArgumentNullException">
-        ///   <paramref name="assembly"/> or <paramref name="args"/> is <see langword="null"/>
-        /// </exception>
-        /// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> does not fall inside the bounds of <paramref name="args"/>.</exception>
-        /// <remarks>
-        /// <para>
-        ///   If the command could not be found, a list of possible commands is written to the standard output stream. If an error occurs parsing the command's arguments, the error
-        ///   message is written to the standard error stream, and the shell command's usage information is written to the standard output stream.
-        /// </para>
-        /// <para>
-        ///   Line wrapping at word boundaries is applied to the output, wrapping at the console's window width. When the console output is
-        ///   redirected to a file, Microsoft .Net will still report the console's actual window width, but on Mono the value of
-        ///   the <see cref="Console.WindowWidth"/> property will be 0. In that case, the usage information will not be wrapped.
-        /// </para>
-        /// <para>
-        ///   This method indents additional lines for the usage syntax, argument descriptions and command descriptions, unless the <see cref="Console.WindowWidth"/> property is less than 31.
-        /// </para>
-        /// </remarks>
-        public static int RunShellCommand(Assembly assembly, string? commandName, string[] args, int index)
-        {
-            return RunShellCommand(assembly, commandName, args, index, new CreateShellCommandOptions());
-        }
 
         /// <summary>
         /// Runs the specified shell command with the specified arguments; if the command name or arguments are invalid, prints error and usage information.
@@ -654,10 +509,13 @@ namespace Ookii.CommandLine
         /// <param name="commandName">The name of the command.</param>
         /// <param name="args">The arguments to the shell command.</param>
         /// <param name="index">The index in <paramref name="args"/> at which to start parsing the arguments.</param>
-        /// <param name="options">The options to use.</param>
+        /// <param name="options">
+        ///   The options that control parsing behavior. If <see langword="null" />, the default
+        ///   options are used.
+        /// </param>
         /// <returns>The value of the <see cref="ShellCommand.ExitCode"/> property after the command finishes running, or -1 if the command could not be created.</returns>
         /// <exception cref="ArgumentNullException">
-        ///   <paramref name="assembly"/>, <paramref name="args"/>, or <paramref name="options"/> is <see langword="null"/>
+        ///   <paramref name="assembly"/> or <paramref name="args"/> is <see langword="null"/>
         /// </exception>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> does not fall inside the bounds of <paramref name="args"/>.</exception>
         /// <remarks>
@@ -682,7 +540,7 @@ namespace Ookii.CommandLine
         ///   property is less than 30.
         /// </para>
         /// </remarks>
-        public static int RunShellCommand(Assembly assembly, string? commandName, string[] args, int index, CreateShellCommandOptions options)
+        public static int RunShellCommand(Assembly assembly, string? commandName, string[] args, int index, CreateShellCommandOptions? options = null)
         {
             var command = CreateShellCommand(assembly, commandName, args, index, options);
             if( command != null )
