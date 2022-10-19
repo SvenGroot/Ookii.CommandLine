@@ -75,7 +75,7 @@ Class ProgramArguments
     ' Using a Shared creation function for a command line arguments class is not required, but it's a convenient
     ' way to place all command-line related functionality in one place. To parse the arguments (eg. from the Main method)
     ' you then only need to call this function.
-    Public Shared Function Create(ByVal args() As String) As ProgramArguments
+    Public Shared Function Create() As ProgramArguments
         ' UsageOptions are used to print usage information if there was an error parsing
         ' the command line or parsing was cancelled (by the -Help property above).
         ' By default, aliases and default values are not included in the usage descriptions;
@@ -90,7 +90,8 @@ Class ProgramArguments
         ' The static Parse method handles parsing, printing error and usage information
         ' (using a LineWrappingTextWriter to neatly wrap console output), and converting to
         ' the proper type.
-        Return CommandLineParser.Parse(Of ProgramArguments)(args, options)
+        ' It takes the arguments from Environment.GetCommandLineArgs().
+        Return CommandLineParser.Parse(Of ProgramArguments)(options)
     End Function
 
     ' If you want more control over the parsing behavior, you can manually create an instance

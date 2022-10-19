@@ -78,7 +78,7 @@ namespace CommandLineSampleCS
         // Using a static creation function for a command line arguments class is not required, but it's a convenient
         // way to place all command-line related functionality in one place. To parse the arguments (eg. from the Main method)
         // you then only need to call this function.
-        public static ProgramArguments Create(string[] args)
+        public static ProgramArguments Create()
         {
             var options = new ParseOptions()
             {
@@ -96,7 +96,8 @@ namespace CommandLineSampleCS
             // The static Parse method handles parsing, printing error and usage information
             // (using a LineWrappingTextWriter to neatly wrap console output), and converting to
             // the proper type.
-            return CommandLineParser.Parse<ProgramArguments>(args, options);
+            // It takes the arguments from Environment.GetCommandLineArgs().
+            return CommandLineParser.Parse<ProgramArguments>(options);
         }
 
         // If you want more control over the parsing behavior, you can manually create an instance

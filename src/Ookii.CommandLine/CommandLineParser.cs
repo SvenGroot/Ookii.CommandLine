@@ -275,11 +275,20 @@ namespace Ookii.CommandLine
         /// Gets the default prefix for the command line usage information.
         /// </summary>
         /// <value>
-        /// A string consisting of the text "Usage: " followed by the file name of the application's entry point assembly.
+        /// A string consisting of the text "Usage: " followed by the file name of the application's executable.
         /// </value>
         public static string DefaultUsagePrefix
         {
-            get { return string.Format(CultureInfo.CurrentCulture, Properties.Resources.DefaultUsagePrefixFormat, Path.GetFileName(Assembly.GetEntryAssembly()?.Location)); }
+            get 
+            {
+                string? path = null;
+#if NET6_0_OR_GREATER
+                // Prefer this because it actually returns the exe name, not the dll.
+                path = Environment.ProcessPath;
+#endif
+                path ??= Environment.GetCommandLineArgs().FirstOrDefault() ?? Assembly.GetEntryAssembly()?.Location;
+                return string.Format(CultureInfo.CurrentCulture, Properties.Resources.DefaultUsagePrefixFormat, Path.GetFileName(path));
+            }
         }
 
         /// <summary>
@@ -634,6 +643,25 @@ namespace Ookii.CommandLine
         }
 
         /// <summary>
+        /// Parses the current application's arguments.
+        /// </summary>
+        /// <returns>
+        ///   An instance of the type specified by the <see cref="ArgumentsType"/> property, or <see langword="null"/> if argument
+        ///   parsing was cancelled by the <see cref="ArgumentParsed"/> event handler or the
+        ///   <see cref="CommandLineArgumentAttribute.CancelParsing"/> property.
+        /// </returns>
+        /// <exception cref="CommandLineArgumentException">
+        ///   Too many positional arguments were supplied, a required argument was not supplied, an unknown argument name was supplied,
+        ///   no value was supplied for a named argument, an argument was supplied more than once and <see cref="AllowDuplicateArguments"/>
+        ///   is <see langword="false"/>, or one of the argument values could not be converted to the argument's type.
+        /// </exception>
+        public object? Parse()
+        {
+            // GetCommandLineArgs include the executable, so skip it.
+            return Parse(Environment.GetCommandLineArgs(), 1);
+        }
+
+        /// <summary>
         /// Parses the specified command line arguments, starting at the specified index.
         /// </summary>
         /// <param name="args">The command line arguments.</param>
@@ -721,6 +749,60 @@ namespace Ookii.CommandLine
                 argument.ApplyPropertyValue(commandLineArguments);
             }
             return commandLineArguments;
+        }
+
+        /// <summary>
+        /// Parses the current application's arguments.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        ///   This is a convenience function that instantiates a <see cref="CommandLineParser"/>,
+        ///   calls <see cref="Parse()"/>, and returns the result. If an error occurs
+        ///   or parsing is cancelled, it prints error and usage according to <see cref="ParseOptions.Error"/>
+        ///   and <see cref="ParseOptions.Out"/> respectively.
+        /// </para>
+        /// <para>
+        ///   If the <see cref="ParseOptions.Out"/> property or <see cref="ParseOptions.Error"/>
+        ///   property is <see langword="null"/>, output is written to a <see cref="LineWrappingTextWriter"/>
+        ///   for the standard output and error streams respectively, wrapping at the console's
+        ///   window width. When the console output is redirected to a file, Microsoft .Net will
+        ///   still report the console's actual window width, but on Mono the value of the
+        ///   <see cref="Console.WindowWidth"/> property will be 0. In that case, the usage
+        ///   information will not be wrapped.
+        /// </para>
+        /// <para>
+        ///   If the <see cref="ParseOptions.Out"/> property is instance of the
+        ///   <see cref="LineWrappingTextWriter"/> class, this method indents additional lines for
+        ///   the usage syntax and argument descriptions according to the values specified by the
+        ///   <see cref="CreateShellCommandOptions"/>, unless the <see cref="LineWrappingTextWriter.MaximumLineLength"/>
+        ///   property is less than 30.
+        /// </para>
+        /// <para>
+        ///   If you want more control over the parsing process, including custom error/usage output
+        ///   or handling the <see cref="ArgumentParsed"/> event, do not use this function; instead
+        ///   perform these steps manually.
+        /// </para>
+        /// </remarks>
+        /// <typeparam name="T">The type defining the command line arguments.</typeparam>
+        /// <param name="options">
+        ///   The options that control parsing behavior. If <see langword="null" />, the default
+        ///   options are used.
+        /// </param>
+        /// <returns>
+        ///   An instance of the type <typeparamref name="T"/>, or <see langword="null"/> if an
+        ///   error occurred or if argument parsing was cancelled by the <see cref="ArgumentParsed"/>
+        ///   event handler or the <see cref="CommandLineArgumentAttribute.CancelParsing"/> property.
+        /// </returns>
+        /// <exception cref="CommandLineArgumentException">
+        ///   Too many positional arguments were supplied, a required argument was not supplied, an unknown argument name was supplied,
+        ///   no value was supplied for a named argument, an argument was supplied more than once and <see cref="AllowDuplicateArguments"/>
+        ///   is <see langword="false"/>, or one of the argument values could not be converted to the argument's type.
+        /// </exception>
+        public static T? Parse<T>(ParseOptions? options = null)
+            where T : class
+        {
+            // GetCommandLineArgs include the executable, so skip it.
+            return Parse<T>(Environment.GetCommandLineArgs(), 1, options);
         }
 
         /// <summary>
