@@ -38,7 +38,7 @@ namespace Ookii.CommandLine
     /// <para>
     ///   Shell commands behave like regular command line arguments classes for the <see cref="CommandLineParser"/> class. Once
     ///   a shell command has been found using the <see cref="GetShellCommand(Assembly,string)"/> method, you can instantiate it by creating an
-    ///   instance of the <see cref="CommandLineParser"/> class, passing the shell command's <see cref="Type"/> to the <see cref="CommandLineParser.CommandLineParser(Type)"/>
+    ///   instance of the <see cref="CommandLineParser"/> class, passing the shell command's <see cref="Type"/> to the <see cref="CommandLineParser.CommandLineParser(Type, IEnumerable{string}?, IComparer{string}?)"/>
     ///   constructor. Then invoke the <see cref="CommandLineParser.Parse(string[],int)"/> method to parse the shell command's arguments (make sure to
     ///   set index so that the command does not try to parse the command name), and cast the result to a <see cref="ShellCommand"/> instance.
     ///   Then invoke the <see cref="ShellCommand.Run"/> method to invoke the command.

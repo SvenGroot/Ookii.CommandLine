@@ -5,7 +5,9 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Text;
 
 namespace Ookii.CommandLine
@@ -16,7 +18,7 @@ namespace Ookii.CommandLine
     /// <remarks>
     /// <para>
     ///   The <see cref="CommandLineParser"/> class can parse a set of command line arguments into values. Which arguments are
-    ///   accepted is determined from the constructor parameters and properties of the type passed to the <see cref="CommandLineParser.CommandLineParser(Type)"/>
+    ///   accepted is determined from the constructor parameters and properties of the type passed to the <see cref="CommandLineParser.CommandLineParser(Type, IEnumerable{string}?, IComparer{string}?)"/>
     ///   constructor. The result of a parsing operation is an instance of that type that was constructed using the constructor parameters and
     ///   property values from their respective command line arguments.
     /// </para>
@@ -37,7 +39,7 @@ namespace Ookii.CommandLine
     ///   Every argument has a name, and can have its value specified by name. To specify an argument name on the command line it must
     ///   be preceded by a special prefix. On Windows, the argument name prefix is typically a forward
     ///   slash (/), while on Unix platforms it is usually a single dash (-) or double dash (--). Which prefixes
-    ///   are accepted by the <see cref="CommandLineParser"/> class can be specified by using the <see cref="CommandLineParser.CommandLineParser(Type,IEnumerable{string})"/>
+    ///   are accepted by the <see cref="CommandLineParser"/> class can be specified by using the <see cref="CommandLineParser.CommandLineParser(Type, IEnumerable{string}?, IComparer{string}?)"/>
     ///   constructor. By default, it will accept both "/" and "-" on Windows, and only a "-" on all other platforms (other platforms are
     ///   supported via <a href="http://www.mono-project.com">Mono</a>).
     /// </para>
@@ -215,65 +217,20 @@ namespace Ookii.CommandLine
         public event EventHandler<ArgumentParsedEventArgs>? ArgumentParsed;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="CommandLineParser"/> class using the specified arguments type, the default argument name prefixes,
-        /// and the default case-insensitive argument name comparer.
-        /// </summary>
-        /// <param name="argumentsType">The <see cref="Type"/> of the class that defines the command line arguments.</param>
-        /// <exception cref="ArgumentNullException">
-        ///   <paramref name="argumentsType"/> is <see langword="null"/>.
-        /// </exception>
-        /// <exception cref="NotSupportedException">
-        ///   The <see cref="CommandLineParser"/> cannot use <paramref name="argumentsType"/> as the command line arguments type, because it defines a required
-        ///   postional argument after an optional positional argument, it defines a positional array argument that is not the last positional argument, it defines an argument with an invalid name,
-        ///   it defines two arguments with the same name, or it has two properties with the same <see cref="CommandLineArgumentAttribute.Position"/> property value.
-        /// </exception>
-        /// <remarks>
-        /// <para>
-        ///   This constructor uses the <see cref="StringComparer.OrdinalIgnoreCase"/> comparer for argument names.
-        /// </para>
-        /// </remarks>
-        public CommandLineParser(Type argumentsType)
-            : this(argumentsType, null, null)
-        {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="CommandLineParser"/> class using the specified arguments type, the specified argument name prefixes,
-        /// and the default case-insensitive argument name comparer.
-        /// </summary>
-        /// <param name="argumentsType">The <see cref="Type"/> of the class that defines the command line arguments.</param>
-        /// <param name="argumentNamePrefixes">The prefixes that are used to indicate argument names on the command line, or <see langword="null"/> to use the default prefixes for the current platform.</param>
-        /// <exception cref="ArgumentNullException">
-        ///   <paramref name="argumentsType"/> is <see langword="null"/>.
-        /// </exception>
-        /// <exception cref="ArgumentException">
-        ///   <paramref name="argumentNamePrefixes"/> contains no elements or contains a <see langword="null"/> or empty string value.
-        /// </exception>
-        /// <exception cref="NotSupportedException">
-        ///   The <see cref="CommandLineParser"/> cannot use <paramref name="argumentsType"/> as the command line arguments type, because it defines a required
-        ///   postional argument after an optional positional argument, it defines a positional array argument that is not the last positional argument, it defines an argument with an invalid name,
-        ///   it defines two arguments with the same name, or it has two properties with the same <see cref="CommandLineArgumentAttribute.Position"/> property value.
-        /// </exception>
-        /// <remarks>
-        /// <para>
-        ///   If you specify multiple argument name prefixes, the first one will be used when generating usage information using the <see cref="WriteUsage(TextWriter,int,WriteUsageOptions)"/> method.
-        /// </para>
-        /// <para>
-        ///   This constructor uses the <see cref="StringComparer.OrdinalIgnoreCase"/> comparer for argument names.
-        /// </para>
-        /// </remarks>
-        public CommandLineParser(Type argumentsType, IEnumerable<string>? argumentNamePrefixes)
-            : this(argumentsType, argumentNamePrefixes, null)
-        {
-        }
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="CommandLineParser"/> class using the specified arguments type, the specified argument name prefixes,
         /// and the specified <see cref="IComparer{T}"/> for comparing argument names.
         /// </summary>
         /// <param name="argumentsType">The <see cref="Type"/> of the class that defines the command line arguments.</param>
-        /// <param name="argumentNamePrefixes">The prefixes that are used to indicate argument names on the command line, or <see langword="null"/> to use the default prefixes for the current platform.</param>
-        /// <param name="argumentNameComparer">An <see cref="IComparer{T}"/> that is used to match the names of arguments, or <see langword="null"/> to use the default case-insensitive comparer.</param>
+        /// <param name="argumentNamePrefixes">
+        ///   Optional prefixes that are used to indicate argument names on the command line, or
+        ///   <see langword="null"/> to use the prefixes from <see cref="ParseOptionsAttribute.ArgumentNamePrefixes"/>
+        ///   or the default prefixes for the current platform.
+        /// </param>
+        /// <param name="argumentNameComparer">
+        ///   An optional <see cref="IComparer{T}"/> that is used to match the names of arguments, or
+        ///   <see langword="null"/> to use the default comparer, case-insensitive by default or
+        ///   case-sensitive if specified using <see cref="ParseOptionsAttribute.CaseSensitive"/>.
+        ///   </param>
         /// <exception cref="ArgumentNullException">
         ///   <paramref name="argumentsType"/> is <see langword="null"/>.
         /// </exception>
@@ -290,26 +247,29 @@ namespace Ookii.CommandLine
         ///   If you specify multiple argument name prefixes, the first one will be used when generating usage information using the <see cref="WriteUsage(TextWriter,int,WriteUsageOptions)"/> method.
         /// </para>
         /// </remarks>
-        public CommandLineParser(Type argumentsType, IEnumerable<string>? argumentNamePrefixes, IComparer<string>? argumentNameComparer)
+        public CommandLineParser(Type argumentsType, IEnumerable<string>? argumentNamePrefixes = null, IComparer<string>? argumentNameComparer = null)
+            : this(argumentsType, argumentNamePrefixes, argumentNameComparer, null)
         {
-            if( argumentsType == null )
-                throw new ArgumentNullException("argumentsType");
+        }
 
-            _argumentNamePrefixes = DetermineArgumentNamePrefixes(argumentNamePrefixes);
-
-            _argumentsByName = new SortedList<string, CommandLineArgument>(argumentNameComparer ?? StringComparer.OrdinalIgnoreCase);
-
-            _argumentsType = argumentsType;
-            _commandLineConstructor = GetCommandLineConstructor();
-
-            DetermineConstructorArguments();
-            _constructorArgumentCount = _arguments.Count; // Named positional arguments added by DeterminePropertyParameters are not constructor arguments.
-
-            _positionalArgumentCount = _constructorArgumentCount + DeterminePropertyArguments();
-
-            VerifyPositionalArgumentRules();
-
-            AllowWhiteSpaceValueSeparator = true;
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CommandLineParser"/> class using the
+        /// specified arguments type and options.
+        /// </summary>
+        /// <param name="argumentsType">The <see cref="Type"/> of the class that defines the command line arguments.</param>
+        /// <param name="options">The options that control parsing behavior.</param>
+        /// <exception cref="ArgumentNullException">
+        ///   <paramref name="argumentsType"/> or <paramref name="options"/> is <see langword="null"/>.
+        /// </exception>
+        /// <remarks>
+        /// <para>
+        ///   The <see cref="ParseOptions.UsageOptions"/> are not used here. If you want those to
+        ///   take effect, they must still be passed to <see cref="WriteUsage(TextWriter, int, WriteUsageOptions)"/>.
+        /// </para>
+        /// </remarks>
+        public CommandLineParser(Type argumentsType, ParseOptions options)
+            : this(argumentsType, null, null, options ?? throw new ArgumentNullException(nameof(options)))
+        {
         }
 
         /// <summary>
@@ -326,12 +286,33 @@ namespace Ookii.CommandLine
         /// <summary>
         /// Gets the default argument name prefixes for the current platform.
         /// </summary>
-        /// <value>
-        /// A forward slash (/) and a dash (-) for Windows, or a dash (-) for all other platforms platforms.
-        /// </value>
-        public static IEnumerable<string> DefaultArgumentNamePrefixes
+        /// <returns>
+        /// An array containing the default separators for the current platform.
+        /// </returns>
+        /// <remarks>
+        /// <para>
+        ///   The default prefixes for each platform are:
+        /// </para>
+        /// <list type="table">
+        ///   <listheader>
+        ///     <term>Platform</term>
+        ///     <description>Separators</description>
+        ///   </listheader>
+        ///   <item>
+        ///     <term>Windows</term>
+        ///     <description>'-' and '/'</description>
+        ///   </item>
+        ///   <item>
+        ///     <term>Other</term>
+        ///     <description>'-'</description>
+        ///   </item>
+        /// </list>
+        /// </remarks>
+        public static string[] GetDefaultArgumentNamePrefixes()
         {
-            get { return DefaultArgumentNamePrefixesCore; }
+            return RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+                ? new[] { "-", "/" }
+                : new[] { "-" };
         }
 
         /// <summary>
@@ -504,18 +485,6 @@ namespace Ookii.CommandLine
             }
         }
 
-        // This property is used so we can assign it directly to _argumentNamePrefixes if we want the default values,
-        // rather than getting an IEnumerable{T} from DefaultArgumentNamePrefixes.
-        private static string[] DefaultArgumentNamePrefixesCore
-        {
-            get
-            {
-                // The Windows platforms are the first 4 values of the PlatformID enum, and WinCE is the last one.
-                // We allocate a new array each time, because we don't want this to be changed.
-                return Environment.OSVersion.Platform <= PlatformID.WinCE ? new[] { "-", "/" } : new[] { "-" };
-            }
-        }
-
         /// <summary>
         /// Writes command line usage help to the standard output stream using the default options.
         /// </summary>
@@ -655,6 +624,7 @@ namespace Ookii.CommandLine
 
             bool disposeWriter = false;
             LineWrappingTextWriter? lineWriter = null;
+
             try
             {
                 lineWriter = writer as LineWrappingTextWriter;
@@ -1048,13 +1018,7 @@ namespace Ookii.CommandLine
             if (options == null)
                 throw new ArgumentNullException(nameof(options));
 
-            var parser = new CommandLineParser(argumentsType, options.ArgumentNamePrefixes, options.ArgumentNameComparer)
-            {
-                AllowDuplicateArguments = options.AllowDuplicateArguments,
-                AllowWhiteSpaceValueSeparator = options.AllowWhiteSpaceValueSeparator,
-                Culture = options.Culture ?? CultureInfo.CurrentCulture,
-                NameValueSeparator = options.NameValueSeparator,
-            };
+            var parser = new CommandLineParser(argumentsType, null, null, options);
 
             using var output = new TextWriterWrapper(options.Out, LineWrappingTextWriter.ForConsoleOut);
             using var error = new TextWriterWrapper(options.Error, LineWrappingTextWriter.ForConsoleError);
@@ -1076,21 +1040,46 @@ namespace Ookii.CommandLine
             return null;
         }
 
+        private CommandLineParser(Type argumentsType, IEnumerable<string>? argumentNamePrefixes, IComparer<string>? argumentNameComparer, ParseOptions? options)
+        {
+            _argumentsType = argumentsType ?? throw new ArgumentNullException(nameof(argumentsType));
+
+            var optionsAttribute = _argumentsType.GetCustomAttribute<ParseOptionsAttribute>();
+            var prefixes = argumentNamePrefixes ?? options?.ArgumentNamePrefixes ?? optionsAttribute?.ArgumentNamePrefixes;
+            _argumentNamePrefixes = DetermineArgumentNamePrefixes(prefixes);
+
+            var comparer = argumentNameComparer ?? options?.ArgumentNameComparer ?? optionsAttribute?.GetStringComparer() ?? StringComparer.OrdinalIgnoreCase;
+            _argumentsByName = new(comparer);
+
+            _commandLineConstructor = GetCommandLineConstructor();
+
+            DetermineConstructorArguments();
+            _constructorArgumentCount = _arguments.Count;
+            _positionalArgumentCount = _constructorArgumentCount + DeterminePropertyArguments();
+
+            VerifyPositionalArgumentRules();
+
+            AllowDuplicateArguments = options?.AllowDuplicateArguments ?? optionsAttribute?.AllowDuplicateArguments ?? false;
+            AllowWhiteSpaceValueSeparator = options?.AllowWhiteSpaceValueSeparator ?? optionsAttribute?.AllowWhiteSpaceValueSeparator ?? true;
+            NameValueSeparator = options?.NameValueSeparator ?? optionsAttribute?.NameValueSeparator ?? DefaultNameValueSeparator;
+            Culture = options?.Culture ?? CultureInfo.CurrentCulture;
+        }
+
+
         private static string[] DetermineArgumentNamePrefixes(IEnumerable<string>? namedArgumentPrefixes)
         {
             if( namedArgumentPrefixes == null )
-                return DefaultArgumentNamePrefixesCore;
+                return GetDefaultArgumentNamePrefixes();
             else
             {
-                List<string> result = new List<string>(namedArgumentPrefixes);
-                if( result.Count == 0 )
-                    throw new ArgumentException(Properties.Resources.EmptyArgumentNamePrefixes, "namedArgumentPrefixes");
-                foreach( string prefix in result )
-                {
-                    if( string.IsNullOrEmpty(prefix) )
-                        throw new ArgumentException(Properties.Resources.EmptyArgumentNamePrefix, "namedArgumentPrefixes");
-                }
-                return result.ToArray();
+                var result = namedArgumentPrefixes.ToArray();
+                if (result.Length == 0)
+                    throw new ArgumentException(Properties.Resources.EmptyArgumentNamePrefixes, nameof(namedArgumentPrefixes));
+
+                if (result.Any(prefix => string.IsNullOrWhiteSpace(prefix)))
+                    throw new ArgumentException(Properties.Resources.EmptyArgumentNamePrefix, nameof(namedArgumentPrefixes));
+
+                return result;
             }
         }
 
@@ -1228,28 +1217,18 @@ namespace Ookii.CommandLine
         private ConstructorInfo GetCommandLineConstructor()
         {
             ConstructorInfo[] ctors = _argumentsType.GetConstructors();
-            ConstructorInfo? ctor = null;
-            if( ctors.Length < 1 )
+            if (ctors.Length < 1)
                 throw new NotSupportedException(Properties.Resources.NoConstructor);
-            else if( ctors.Length > 1 )
-            {
-                foreach( ConstructorInfo c in ctors )
-                {
-                    if( Attribute.IsDefined(c, typeof(CommandLineConstructorAttribute)) )
-                    {
-                        if( ctor == null )
-                            ctor = c;
-                        else
-                            throw new NotSupportedException(Properties.Resources.MultipleMarkedConstructors);
-                    }
-                }
+            else if (ctors.Length == 1)
+                return ctors[0];
 
-                if( ctor == null )
-                    throw new NotSupportedException(Properties.Resources.NoMarkedConstructor);
-            }
-            else // ctors.Length == 1
-                ctor = ctors[0];
-            return ctor;
+            var markedCtors = ctors.Where(c => Attribute.IsDefined(c, typeof(CommandLineConstructorAttribute)));
+            if (!markedCtors.Any())
+                throw new NotSupportedException(Properties.Resources.NoMarkedConstructor);
+            else if (markedCtors.Count() > 1)
+                throw new NotSupportedException(Properties.Resources.MultipleMarkedConstructors);
+
+            return markedCtors.First();
         }
 
         private void WriteArgumentDescriptions(LineWrappingTextWriter writer, WriteUsageOptions options)
