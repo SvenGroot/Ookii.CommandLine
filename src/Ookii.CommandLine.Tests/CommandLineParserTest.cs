@@ -535,15 +535,15 @@ Usage: test [/arg1] <String> [[/other] <Number>] [[/notSwitch] <Boolean>] [[/Arg
         Arg1 description.
 
     /other <Number>
-        Arg2 description.
+        Arg2 description. Default value: 42.
 
     /Arg5 <Single>
         Arg5 description.
 
     /other2 <Number>
-        Arg4 description.
+        Arg4 description. Default value: 47.
 
-    /Arg6 <String>
+    /Arg6 <String> (/Alias1, /Alias2)
         Arg6 description.
 
 ";

@@ -157,7 +157,7 @@ namespace Ookii.CommandLine
         /// Gets or sets the format string to use for the description of an argument.
         /// </summary>
         /// <value>
-        /// The format string to use for the description of an argument; the default value is "&#160;&#160;&#160;&#160;{3}{0} {2}\n{1}{4}{5}\n" (note that it contains line breaks).
+        /// The format string to use for the description of an argument; the default value is "&#160;&#160;&#160;&#160;{3}{0} {2}{5}\n{1}{4}\n" (note that it contains line breaks).
         /// </value>
         /// <remarks>
         /// <para>
@@ -235,7 +235,8 @@ namespace Ookii.CommandLine
         /// Gets or sets a value indicating whether the alias or aliases of an argument should be included in the argument description..
         /// </summary>
         /// <value>
-        /// <see langword="true" /> if the alias(es) should be included in the description; otherwise, <see langword="false" />.
+        /// <see langword="true" /> if the alias(es) should be included in the description;
+        /// otherwise, <see langword="false" />. The default value is <see langword="true" />.
         /// </value>
         /// <remarks>
         /// <para>
@@ -247,13 +248,14 @@ namespace Ookii.CommandLine
         ///   For arguments that do not have any aliases, this property has no effect.
         /// </para>
         /// </remarks>
-        public bool IncludeAliasInDescription { get; set; }
+        public bool IncludeAliasInDescription { get; set; } = true;
 
         /// <summary>
         /// Gets or sets a value indicating whether the default value of an argument should be included in the argument description.
         /// </summary>
         /// <value>
-        /// <see langword="true" /> if the default value should be included in the description; otherwise, <see langword="false" />.
+        /// <see langword="true" /> if the default value should be included in the description;
+        /// otherwise, <see langword="false" />. The default value is <see langword="true" />.
         /// </value>
         /// <para>
         ///   If this property is <see langword="true"/> and an argument has a default value other than <see langword="null"/>, the default value will be formatted using
@@ -262,13 +264,13 @@ namespace Ookii.CommandLine
         /// <para>
         ///   For arguments with a default value of <see langword="null"/>, this property has no effect.
         /// </para>
-        public bool IncludeDefaultValueInDescription { get; set; }
+        public bool IncludeDefaultValueInDescription { get; set; } = true;
 
         /// <summary>
         /// Gets or sets the format string to use to display the alias of an argument that only has one alias.
         /// </summary>
         /// <value>
-        /// The format string for the alias of an argument; the default value is " Alias: {0}." (note the leading space).
+        /// The format string for the alias of an argument; the default value is " ({0})" (note the leading space).
         /// </value>
         /// <remarks>
         /// <para>
@@ -296,7 +298,7 @@ namespace Ookii.CommandLine
         /// Gets or sets the format string to use to display the alias of an argument that only has one alias.
         /// </summary>
         /// <value>
-        /// The format string for the alias of an argument; the default value is " Aliases: {0}." (note the leading space).
+        /// The format string for the alias of an argument; the default value is " ({0})" (note the leading space).
         /// </value>
         /// <remarks>
         /// <para>

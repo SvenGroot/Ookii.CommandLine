@@ -97,7 +97,7 @@ namespace Ookii.CommandLine.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to  Aliases: {0}..
+        ///   Looks up a localized string similar to  ({0}).
         /// </summary>
         internal static string DefaultAliasesFormat {
             get {
@@ -106,7 +106,7 @@ namespace Ookii.CommandLine.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to  Alias: {0}..
+        ///   Looks up a localized string similar to  ({0}).
         /// </summary>
         internal static string DefaultAliasFormat {
             get {
@@ -115,8 +115,8 @@ namespace Ookii.CommandLine.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to     {3}{0} {2}
-        ///{1}{4}{5}
+        ///   Looks up a localized string similar to     {3}{0} {2}{5}
+        ///{1}{4}
         ///.
         /// </summary>
         internal static string DefaultArgumentDescriptionFormat {
@@ -362,7 +362,7 @@ namespace Ookii.CommandLine.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to A key/value pair must contain &quot;{-}&quot; as a separator..
+        ///   Looks up a localized string similar to A key/value pair must contain &quot;{0}&quot; as a separator..
         /// </summary>
         internal static string NoKeyValuePairSeparatorFormat {
             get {
