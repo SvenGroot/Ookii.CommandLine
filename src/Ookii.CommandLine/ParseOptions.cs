@@ -24,7 +24,7 @@ namespace Ookii.CommandLine
         /// </summary>
         /// <value>
         /// The culture used to convert command line argument values from their string representation to the argument type, or
-        /// <see langword="null" /> to use <see cref="CultureInfo.CurrentCulture"/>. The default value is <see langword="null"/>
+        /// <see langword="null" /> to use <see cref="CultureInfo.InvariantCulture"/>. The default value is <see langword="null"/>
         /// </value>
         public CultureInfo? Culture { get; set; }
 

@@ -181,4 +181,10 @@ namespace Ookii.CommandLine.Tests
         public string Argument { get; set; }
     }
 
+    class CultureArguments
+    {
+        [CommandLineArgument]
+        public float Argument { get; set; }
+    }
+
 }

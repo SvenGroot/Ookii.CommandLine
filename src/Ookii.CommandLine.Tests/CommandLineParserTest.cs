@@ -40,7 +40,7 @@ namespace Ookii.CommandLine.Tests
         {
             Type argumentsType = typeof(EmptyArguments);
             CommandLineParser target = new CommandLineParser(argumentsType);
-            Assert.AreEqual(CultureInfo.CurrentCulture, target.Culture);
+            Assert.AreEqual(CultureInfo.InvariantCulture, target.Culture);
             Assert.AreEqual(false, target.AllowDuplicateArguments);
             Assert.AreEqual(true, target.AllowWhiteSpaceValueSeparator);
             CollectionAssert.AreEqual(CommandLineParser.GetDefaultArgumentNamePrefixes(), target.ArgumentNamePrefixes);
@@ -54,7 +54,7 @@ namespace Ookii.CommandLine.Tests
         {
             Type argumentsType = typeof(TestArguments);
             CommandLineParser target = new CommandLineParser(argumentsType);
-            Assert.AreEqual(CultureInfo.CurrentCulture, target.Culture);
+            Assert.AreEqual(CultureInfo.InvariantCulture, target.Culture);
             Assert.AreEqual(false, target.AllowDuplicateArguments);
             Assert.AreEqual(true, target.AllowWhiteSpaceValueSeparator);
             CollectionAssert.AreEqual(CommandLineParser.GetDefaultArgumentNamePrefixes(), target.ArgumentNamePrefixes);
@@ -87,7 +87,7 @@ namespace Ookii.CommandLine.Tests
         {
             Type argumentsType = typeof(MultipleConstructorsArguments);
             CommandLineParser target = new CommandLineParser(argumentsType);
-            Assert.AreEqual(CultureInfo.CurrentCulture, target.Culture);
+            Assert.AreEqual(CultureInfo.InvariantCulture, target.Culture);
             Assert.AreEqual(false, target.AllowDuplicateArguments);
             Assert.AreEqual(true, target.AllowWhiteSpaceValueSeparator);
             CollectionAssert.AreEqual(CommandLineParser.GetDefaultArgumentNamePrefixes(), target.ArgumentNamePrefixes);
@@ -103,7 +103,7 @@ namespace Ookii.CommandLine.Tests
         public void ParseTest()
         {
             Type argumentsType = typeof(TestArguments);
-            CommandLineParser target = new CommandLineParser(argumentsType, new[] { "/", "-" }) { Culture = CultureInfo.InvariantCulture };
+            CommandLineParser target = new CommandLineParser(argumentsType, new[] { "/", "-" });
 
             // Only required arguments
             TestParse(target, "val1 2 /arg6 val6", "val1", 2, arg6: "val6");
@@ -129,7 +129,7 @@ namespace Ookii.CommandLine.Tests
         public void ParseTestEmptyArguments()
         {
             Type argumentsType = typeof(EmptyArguments);
-            CommandLineParser target = new CommandLineParser(argumentsType, new[] { "/", "-" }) { Culture = CultureInfo.InvariantCulture };
+            CommandLineParser target = new CommandLineParser(argumentsType, new[] { "/", "-" });
 
             // This test was added because version 2.0 threw an IndexOutOfRangeException when you tried to specify a positional argument when there were no positional arguments defined.
             try
@@ -147,7 +147,7 @@ namespace Ookii.CommandLine.Tests
         public void ParseTestTooManyArguments()
         {
             Type argumentsType = typeof(MultipleConstructorsArguments);
-            CommandLineParser target = new CommandLineParser(argumentsType, new[] { "/", "-" }) { Culture = CultureInfo.InvariantCulture };
+            CommandLineParser target = new CommandLineParser(argumentsType, new[] { "/", "-" });
 
             try
             {
@@ -165,7 +165,7 @@ namespace Ookii.CommandLine.Tests
         public void ParseTestPropertySetterThrows()
         {
             Type argumentsType = typeof(MultipleConstructorsArguments);
-            CommandLineParser target = new CommandLineParser(argumentsType, new[] { "/", "-" }) { Culture = CultureInfo.InvariantCulture };
+            CommandLineParser target = new CommandLineParser(argumentsType, new[] { "/", "-" });
 
             try
             {
@@ -184,7 +184,7 @@ namespace Ookii.CommandLine.Tests
         public void ParseTestConstructorThrows()
         {
             Type argumentsType = typeof(MultipleConstructorsArguments);
-            CommandLineParser target = new CommandLineParser(argumentsType, new[] { "/", "-" }) { Culture = CultureInfo.InvariantCulture };
+            CommandLineParser target = new CommandLineParser(argumentsType, new[] { "/", "-" });
 
             try
             {
@@ -203,7 +203,7 @@ namespace Ookii.CommandLine.Tests
         public void ParseTestDuplicateDictionaryKeys()
         {
             Type argumentsType = typeof(DictionaryArguments);
-            CommandLineParser target = new CommandLineParser(argumentsType, new[] { "/", "-" }) { Culture = CultureInfo.InvariantCulture };
+            CommandLineParser target = new CommandLineParser(argumentsType, new[] { "/", "-" });
 
             DictionaryArguments args = (DictionaryArguments)target.Parse(new[] { "-DuplicateKeys", "Foo=1", "-DuplicateKeys", "Bar=2", "-DuplicateKeys", "Foo=3" });
             Assert.IsNotNull(args);
@@ -226,7 +226,7 @@ namespace Ookii.CommandLine.Tests
         public void ParseTestMultiValueSeparator()
         {
             Type argumentsType = typeof(MultiValueSeparatorArguments);
-            CommandLineParser target = new CommandLineParser(argumentsType, new[] { "/", "-" }) { Culture = CultureInfo.InvariantCulture };
+            CommandLineParser target = new CommandLineParser(argumentsType, new[] { "/", "-" });
 
             MultiValueSeparatorArguments args = (MultiValueSeparatorArguments)target.Parse(new[] { "-NoSeparator", "Value1,Value2", "-NoSeparator", "Value3", "-Separator", "Value1,Value2", "-Separator", "Value3" });
             Assert.IsNotNull(args);
@@ -238,7 +238,7 @@ namespace Ookii.CommandLine.Tests
         public void ParseTestNameValueSeparator()
         {
             Type argumentsType = typeof(SimpleArguments);
-            CommandLineParser target = new CommandLineParser(argumentsType, new[] { "/", "-" }) { Culture = CultureInfo.InvariantCulture };
+            CommandLineParser target = new CommandLineParser(argumentsType, new[] { "/", "-" });
             Assert.AreEqual(CommandLineParser.DefaultNameValueSeparator, target.NameValueSeparator);
             SimpleArguments args =  (SimpleArguments)target.Parse(new[] { "-Argument1:test", "-Argument2:foo:bar" });
             Assert.IsNotNull(args);
@@ -310,7 +310,7 @@ namespace Ookii.CommandLine.Tests
         public void TestWriteUsage()
         {
             Type argumentsType = typeof(TestArguments);
-            CommandLineParser target = new CommandLineParser(argumentsType, new[] { "/", "-" }) { Culture = CultureInfo.InvariantCulture };
+            CommandLineParser target = new CommandLineParser(argumentsType, new[] { "/", "-" });
             var options = new WriteUsageOptions()
             {
                 UsagePrefix = "Usage: test"
@@ -328,7 +328,6 @@ namespace Ookii.CommandLine.Tests
             var options = new ParseOptions()
             {
                 ArgumentNamePrefixes = new[] { "/", "-" },
-                Culture = CultureInfo.InvariantCulture,
                 Out = output,
                 Error = error,
             };
@@ -449,6 +448,21 @@ namespace Ookii.CommandLine.Tests
             // Verify case insensitivity.
             Assert.IsNotNull(parser.GetArgument("argument"));
             Assert.IsNotNull(parser.GetArgument("Argument"));
+        }
+
+        [TestMethod]
+        public void TestCulture()
+        {
+            var result = CommandLineParser.Parse<CultureArguments>(new[] { "-Argument", "5.5 " });
+            Assert.IsNotNull(result);
+            Assert.AreEqual(5.5, result.Argument);
+            Assert.IsNull(CommandLineParser.Parse<CultureArguments>(new[] { "-Argument", "5,5 " }));
+
+            var options = new ParseOptions { Culture = new CultureInfo("nl-NL") };
+            result = CommandLineParser.Parse<CultureArguments>(new[] { "-Argument", "5,5" }, options);
+            Assert.IsNotNull(result);
+            Assert.AreEqual(5.5, result.Argument);
+            Assert.IsNull(CommandLineParser.Parse<CultureArguments>(new[] { "-Argument", "5.5" }, options));
         }
 
         private static void TestArgument(IEnumerator<CommandLineArgument> arguments, string name, string memberName, Type type, Type elementType, int? position, bool isRequired, object defaultValue, string description, string valueDescription, bool isSwitch, bool isMultiValue, bool isDictionary = false, params string[] aliases)

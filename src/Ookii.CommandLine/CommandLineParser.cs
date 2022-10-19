@@ -188,7 +188,6 @@ namespace Ookii.CommandLine
         private readonly string[] _argumentNamePrefixes;
         private ReadOnlyCollection<CommandLineArgument>? _argumentsReadOnlyWrapper;
         private ReadOnlyCollection<string>? _argumentNamePrefixesReadOnlyWrapper;
-        private CultureInfo? _culture;
 
         /// <summary>
         /// Gets the default character used to separate the name and the value of an argument.
@@ -371,13 +370,9 @@ namespace Ookii.CommandLine
         /// </summary>
         /// <value>
         /// The culture used to convert command line argument values from their string representation to the argument type. The default value
-        /// is <see cref="CultureInfo.CurrentCulture"/>.
+        /// is <see cref="CultureInfo.InvariantCulture"/>.
         /// </value>
-        public CultureInfo Culture
-        {
-            get { return _culture ?? CultureInfo.CurrentCulture; }
-            set { _culture = value; }
-        }
+        public CultureInfo Culture { get; set; } = CultureInfo.InvariantCulture;
         
 
         /// <summary>
@@ -923,7 +918,7 @@ namespace Ookii.CommandLine
             AllowDuplicateArguments = options?.AllowDuplicateArguments ?? optionsAttribute?.AllowDuplicateArguments ?? false;
             AllowWhiteSpaceValueSeparator = options?.AllowWhiteSpaceValueSeparator ?? optionsAttribute?.AllowWhiteSpaceValueSeparator ?? true;
             NameValueSeparator = options?.NameValueSeparator ?? optionsAttribute?.NameValueSeparator ?? DefaultNameValueSeparator;
-            Culture = options?.Culture ?? CultureInfo.CurrentCulture;
+            Culture = options?.Culture ?? CultureInfo.InvariantCulture;
         }
 
 

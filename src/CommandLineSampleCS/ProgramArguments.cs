@@ -36,9 +36,11 @@ namespace CommandLineSampleCS
         // the correct type. You can use your own custom classes or structures for command line arguments as long as you create a TypeConverter for
         // the type.
         // The type conversion from string to DateTime is culture sensitive. Which culture is used is indicated by the CommandLineParser.Culture
-        // property, which defaults to the user's current culture. Always pay attention when a conversion is culture specific (this goes for
-        // dates, numbers, and various other types) and consider whether the current culture is the right choice for your application. In some cases
-        // using CultureInfo.InvariantCulture could be more appropriate.
+        // property, which defaults to the invariant culture. This is preferred to ensure a
+        // consistent parsing experience regardless of the user's culture.
+        // Always pay attention when a conversion is culture specific (this goes for dates, numbers,
+        // and various other types) and consider which culture is the right choice for your
+        // application.
         [CommandLineArgument, Description("Provides a date to the application.")]
         public DateTime? Date { get; set; }
 
@@ -80,10 +82,6 @@ namespace CommandLineSampleCS
         {
             var options = new ParseOptions()
             {
-                // Certain argument types, such as dates and floating point numbers, could have culture
-                // specific parsing behavior. You can use the InvariantCulture to ensure a consistent
-                // experience regardless of the user's current culture.
-                Culture = CultureInfo.InvariantCulture,
                 // UsageOptions are used to print usage information if there was an error parsing
                 // the command line or parsing was cancelled (by the -Help property above).
                 // By default, aliases and default values are not included in the usage descriptions;
@@ -107,13 +105,7 @@ namespace CommandLineSampleCS
         // which is not the case here; this method is only provided for demonstrative purposes.
         public static ProgramArguments CreateCustom(string[] args)
         {
-            var parser = new CommandLineParser(typeof(ProgramArguments))
-            {
-                // Certain argument types, such as dates and floating point numbers, could have culture
-                // specific parsing behavior. You can use the InvariantCulture to ensure a consistent
-                // experience regardless of the user's current culture.
-                Culture = CultureInfo.InvariantCulture
-            };
+            var parser = new CommandLineParser(typeof(ProgramArguments));
 
             try
             {
