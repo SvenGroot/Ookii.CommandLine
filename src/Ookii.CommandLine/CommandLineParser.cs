@@ -622,33 +622,18 @@ namespace Ookii.CommandLine
             if( options == null )
                 throw new ArgumentNullException(nameof(options));
 
-            bool disposeWriter = false;
-            LineWrappingTextWriter? lineWriter = null;
+            using var lineWriter = DisposableWrapper.Create(writer as LineWrappingTextWriter,
+                () => new LineWrappingTextWriter(writer, maximumLineLength, false));
 
-            try
+            if( options.IncludeApplicationDescription && !string.IsNullOrEmpty(Description) )
             {
-                lineWriter = writer as LineWrappingTextWriter;
-                if( lineWriter == null )
-                {
-                    disposeWriter = true;
-                    lineWriter = new LineWrappingTextWriter(writer, maximumLineLength, false);
-                }
-
-                if( options.IncludeApplicationDescription && !string.IsNullOrEmpty(Description) )
-                {
-                    lineWriter.WriteLine(Description);
-                    lineWriter.WriteLine();
-                }
-
-                WriteUsageSyntax(lineWriter, options);
-
-                WriteArgumentDescriptions(lineWriter, options);
+                lineWriter.Inner.WriteLine(Description);
+                lineWriter.Inner.WriteLine();
             }
-            finally
-            {
-                if( disposeWriter && lineWriter != null )
-                    lineWriter.Dispose();
-            }
+
+            WriteUsageSyntax(lineWriter.Inner, options);
+
+            WriteArgumentDescriptions(lineWriter.Inner, options);
         }
 
         /// <summary>
@@ -1020,8 +1005,8 @@ namespace Ookii.CommandLine
 
             var parser = new CommandLineParser(argumentsType, null, null, options);
 
-            using var output = new TextWriterWrapper(options.Out, LineWrappingTextWriter.ForConsoleOut);
-            using var error = new TextWriterWrapper(options.Error, LineWrappingTextWriter.ForConsoleError);
+            using var output = DisposableWrapper.Create(options.Out, LineWrappingTextWriter.ForConsoleOut);
+            using var error = DisposableWrapper.Create(options.Error, LineWrappingTextWriter.ForConsoleError);
             try
             {
 
@@ -1031,12 +1016,12 @@ namespace Ookii.CommandLine
             }
             catch (CommandLineArgumentException ex)
             {
-                error.Writer.WriteLine(ex.Message);
-                error.Writer.WriteLine();
+                error.Inner.WriteLine(ex.Message);
+                error.Inner.WriteLine();
             }
 
             // If we're writing this to the console, output should already be a LineWrappingTextWriter, so the max line length argument here is ignored.
-            parser.WriteUsage(output.Writer, 0, options.UsageOptions);
+            parser.WriteUsage(output.Inner, 0, options.UsageOptions);
             return null;
         }
 

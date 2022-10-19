@@ -457,13 +457,13 @@ namespace Ookii.CommandLine
             if (options == null)
                 throw new ArgumentNullException(nameof(options));
 
-            using var output = new TextWriterWrapper(options.Out, LineWrappingTextWriter.ForConsoleOut);
-            using var error = new TextWriterWrapper(options.Error, LineWrappingTextWriter.ForConsoleError);
+            using var output = DisposableWrapper.Create(options.Out, LineWrappingTextWriter.ForConsoleOut);
+            using var error = DisposableWrapper.Create(options.Error, LineWrappingTextWriter.ForConsoleError);
 
             var commandType = commandName == null ? null : GetShellCommand(assembly, commandName, options.CommandNameComparer);
             if (commandType == null)
             {
-                WriteShellCommandListUsage(output.Writer, assembly, options);
+                WriteShellCommandListUsage(output.Inner, assembly, options);
                 return null;
             }
 
@@ -471,8 +471,8 @@ namespace Ookii.CommandLine
             var originalOut = options.Out;
             var originalError = options.Error;
             var originalUsagePrefix = options.UsageOptions.UsagePrefix;
-            options.Out = output.Writer;
-            options.Error = error.Writer;
+            options.Out = output.Inner;
+            options.Error = error.Inner;
             options.UsageOptions.UsagePrefix += " " + GetShellCommandName(commandType);
 
             try

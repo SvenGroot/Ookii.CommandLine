@@ -4,28 +4,35 @@ using System.IO;
 
 namespace Ookii.CommandLine
 {
-    // .Net Framework 2.0 does not have Func<T>.
-    internal delegate TextWriter CreateDelegate();
-
-    internal class TextWriterWrapper : IDisposable
+    internal static class DisposableWrapper
     {
-        private readonly TextWriter _writer;
+        public static DisposableWrapper<T> Create<T>(T? obj, Func<T> createIfNull)
+            where T : IDisposable
+        {
+            return new DisposableWrapper<T>(obj, createIfNull);
+        }
+    }
+
+    internal class DisposableWrapper<T> : IDisposable
+        where T : IDisposable
+    {
+        private readonly T _inner;
         private bool _needDispose;
 
-        public TextWriterWrapper(TextWriter? stream, CreateDelegate createIfNull)
+        public DisposableWrapper(T? inner, Func<T> createIfNull)
         {
-            if (stream == null)
+            if (inner == null)
             {
-                _writer = createIfNull();
+                _inner = createIfNull();
                 _needDispose = true;
             }
             else
             {
-                _writer = stream;
+                _inner = inner;
             }
         }
 
-        public TextWriter Writer => _writer;
+        public T Inner => _inner;
 
         protected virtual void Dispose(bool disposing)
         {
@@ -33,7 +40,7 @@ namespace Ookii.CommandLine
             {
                 if (disposing)
                 {
-                    _writer.Dispose();
+                    _inner.Dispose();
                 }
 
                 _needDispose = false;
