@@ -3,7 +3,7 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <RootNamespace>CommandLineSampleVB</RootNamespace>
-    <TargetFrameworks>net6.0;net20</TargetFrameworks>
+    <TargetFramework>net6.0</TargetFramework>
     <Description>Command line parsing sample for Ookii.CommandLine</Description>
   </PropertyGroup>
 

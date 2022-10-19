@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFrameworks>net6.0;net20</TargetFrameworks>
+    <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>disable</ImplicitUsings>
     <Nullable>disable</Nullable>
     <Description>ShellCommand sample for Ookii.CommandLine</Description>

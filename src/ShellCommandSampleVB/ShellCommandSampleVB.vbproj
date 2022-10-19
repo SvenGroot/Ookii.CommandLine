@@ -3,8 +3,8 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <RootNamespace>ShellCommandSampleVB</RootNamespace>
-    <TargetFrameworks>net6.0;net20</TargetFrameworks>
-      <Description>ShellCommand sample for Ookii.CommandLine</Description>
+    <TargetFramework>net6.0</TargetFramework>
+    <Description>ShellCommand sample for Ookii.CommandLine</Description>
   </PropertyGroup>
 
   <ItemGroup>
