@@ -25,7 +25,7 @@ namespace Ookii.CommandLine
         public ArgumentNameAttribute(string argumentName)
         {
             if( argumentName == null )
-                throw new ArgumentNullException("argumentName");
+                throw new ArgumentNullException(nameof(argumentName));
 
             _argumentName = argumentName;
         }

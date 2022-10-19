@@ -230,7 +230,7 @@ namespace Ookii.CommandLine
             set 
             {
                 if( value < 0 || (_maximumLineLength > 0 && value >= _maximumLineLength) )
-                    throw new ArgumentOutOfRangeException("value", Properties.Resources.IndentOutOfRange);
+                    throw new ArgumentOutOfRangeException(nameof(value), Properties.Resources.IndentOutOfRange);
                 _indent = value;
             }
         }

@@ -25,7 +25,7 @@ namespace Ookii.CommandLine
         public ShellCommandAttribute(string commandName)
         {
             if( commandName == null )
-                throw new ArgumentNullException("commandName");
+                throw new ArgumentNullException(nameof(commandName));
 
             _commandName = commandName;
         }

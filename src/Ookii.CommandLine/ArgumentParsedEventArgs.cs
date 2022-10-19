@@ -27,7 +27,7 @@ namespace Ookii.CommandLine
         public ArgumentParsedEventArgs(CommandLineArgument argument)
         {
             if( argument == null )
-                throw new ArgumentNullException("argument");
+                throw new ArgumentNullException(nameof(argument));
 
             _argument = argument;
         }

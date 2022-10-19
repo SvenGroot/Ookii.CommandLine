@@ -103,7 +103,7 @@ namespace Ookii.CommandLine.Tests
         public MultipleConstructorsArguments(string arg1)
         {
             if (arg1 == "invalid")
-                throw new ArgumentException("Invalid argument value.", "arg1");
+                throw new ArgumentException("Invalid argument value.", nameof(arg1));
         }
 
         [CommandLineArgument]
@@ -113,7 +113,7 @@ namespace Ookii.CommandLine.Tests
             set
             {
                 if (value < 0)
-                    throw new ArgumentOutOfRangeException("value");
+                    throw new ArgumentOutOfRangeException(nameof(value));
                 _throwingArgument = value;
             }
         }

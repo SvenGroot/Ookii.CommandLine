@@ -38,7 +38,7 @@ namespace Ookii.CommandLine
         public AliasAttribute(string alias)
         {
             if( alias == null )
-                throw new ArgumentNullException("alias");
+                throw new ArgumentNullException(nameof(alias));
             _alias = alias;
         }
 

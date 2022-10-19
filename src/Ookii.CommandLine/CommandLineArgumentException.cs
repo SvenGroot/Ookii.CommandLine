@@ -139,7 +139,7 @@ namespace Ookii.CommandLine
         public override void GetObjectData(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context)
         {
             if( info == null )
-                throw new ArgumentNullException("info");
+                throw new ArgumentNullException(nameof(info));
             base.GetObjectData(info, context);
 
             info.AddValue("ArgumentName", ArgumentName);

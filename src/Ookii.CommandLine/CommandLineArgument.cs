@@ -673,7 +673,7 @@ namespace Ookii.CommandLine
         public object? ConvertToArgumentType(CultureInfo culture, string argument)
         {
             if( culture == null )
-                throw new ArgumentNullException("culture");
+                throw new ArgumentNullException(nameof(culture));
 
             try
             {
@@ -831,7 +831,7 @@ namespace Ookii.CommandLine
         internal void ApplyPropertyValue(object target)
         {
             if( target == null )
-                throw new ArgumentNullException("target");
+                throw new ArgumentNullException(nameof(target));
 
             // Do nothing for parameter-based values
             if( _property != null )

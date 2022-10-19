@@ -9,11 +9,11 @@ namespace Ookii.CommandLine
         public static Type? FindGenericInterface(Type type, Type interfaceType)
         {
             if( type == null )
-                throw new ArgumentNullException("type");
+                throw new ArgumentNullException(nameof(type));
             if( interfaceType == null )
-                throw new ArgumentNullException("interfaceType");
+                throw new ArgumentNullException(nameof(interfaceType));
             if( !(interfaceType.IsInterface && interfaceType.IsGenericTypeDefinition) )
-                throw new ArgumentException(Properties.Resources.TypeNotGenericDefinition, "interfaceType");
+                throw new ArgumentException(Properties.Resources.TypeNotGenericDefinition, nameof(interfaceType));
 
             if( type.IsInterface && type.IsGenericType && type.GetGenericTypeDefinition() == interfaceType )
                 return type;
