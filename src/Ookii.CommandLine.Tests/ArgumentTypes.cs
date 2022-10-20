@@ -215,7 +215,7 @@ namespace Ookii.CommandLine.Tests
         [CommandLineArgument(ShortName = 't')]
         public bool Switch2 { get; set; }
 
-        [CommandLineArgument(ShortName = 'u')]
+        [CommandLineArgument(ShortName = 'u', Long = false)]
         public bool Switch3 { get; set; }
     }
 

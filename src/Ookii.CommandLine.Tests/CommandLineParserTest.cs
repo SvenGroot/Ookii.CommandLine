@@ -422,7 +422,8 @@ namespace Ookii.CommandLine.Tests
             Assert.AreSame(parser.GetArgument("arg2"), parser.GetShortArgument('a'));
             Assert.AreSame(parser.GetArgument("switch1"), parser.GetShortArgument('s'));
             Assert.AreSame(parser.GetArgument("switch2"), parser.GetShortArgument('t'));
-            Assert.AreSame(parser.GetArgument("switch3"), parser.GetShortArgument('u'));
+            Assert.IsNull(parser.GetArgument("switch3"));
+            Assert.AreEqual("u", parser.GetShortArgument('u').ArgumentName);
             Assert.AreEqual('f', parser.GetArgument("foo").ShortName);
             Assert.IsTrue(parser.GetArgument("foo").HasShortName);
             Assert.AreEqual('\0', parser.GetArgument("bar").ShortName);
