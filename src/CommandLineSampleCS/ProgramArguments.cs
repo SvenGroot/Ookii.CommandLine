@@ -106,12 +106,12 @@ namespace CommandLineSampleCS
         // which is not the case here; this method is only provided for demonstrative purposes.
         public static ProgramArguments? CreateCustom(string[] args)
         {
-            var parser = new CommandLineParser(typeof(ProgramArguments));
+            var parser = new CommandLineParser<ProgramArguments>();
 
             try
             {
                 // The Parse function returns null only when the Help argument cancelled parsing.
-                var result = (ProgramArguments?)parser.Parse(args);
+                var result = parser.Parse(args);
                 if (result != null)
                     return result;
             }

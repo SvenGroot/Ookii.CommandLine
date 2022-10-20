@@ -96,27 +96,26 @@ namespace Ookii.CommandLine.Tests
         [TestMethod]
         public void ParseTest()
         {
-            Type argumentsType = typeof(TestArguments);
-            CommandLineParser target = new CommandLineParser(argumentsType, new[] { "/", "-" });
+            var target = new CommandLineParser<TestArguments>();
 
             // Only required arguments
-            TestParse(target, "val1 2 /arg6 val6", "val1", 2, arg6: "val6");
+            TestParse(target, "val1 2 -arg6 val6", "val1", 2, arg6: "val6");
             // Make sure negative numbers are accepted, and not considered an argument name.
-            TestParse(target, "val1 -2 /arg6 val6", "val1", -2, arg6: "val6");
+            TestParse(target, "val1 -2 -arg6 val6", "val1", -2, arg6: "val6");
             // All positional arguments except array
-            TestParse(target, "val1 2 true 5.5 4 /arg6 arg6", "val1", 2, true, arg4: 4, arg5: 5.5f, arg6: "arg6");
+            TestParse(target, "val1 2 true 5.5 4 -arg6 arg6", "val1", 2, true, arg4: 4, arg5: 5.5f, arg6: "arg6");
             // All positional arguments including array
-            TestParse(target, "val1 2 true 5.5 4 /arg6 arg6 Monday Tuesday", "val1", 2, true, arg4: 4, arg5: 5.5f, arg6: "arg6", arg8: new[] { DayOfWeek.Monday, DayOfWeek.Tuesday });
+            TestParse(target, "val1 2 true 5.5 4 -arg6 arg6 Monday Tuesday", "val1", 2, true, arg4: 4, arg5: 5.5f, arg6: "arg6", arg8: new[] { DayOfWeek.Monday, DayOfWeek.Tuesday });
             // All positional arguments including array, which is specified by name first and then by position
-            TestParse(target, "val1 2 true 5.5 4 /arg6 arg6 /arg8 Monday Tuesday", "val1", 2, true, arg4: 4, arg5: 5.5f, arg6: "arg6", arg8: new[] { DayOfWeek.Monday, DayOfWeek.Tuesday });
+            TestParse(target, "val1 2 true 5.5 4 -arg6 arg6 -arg8 Monday Tuesday", "val1", 2, true, arg4: 4, arg5: 5.5f, arg6: "arg6", arg8: new[] { DayOfWeek.Monday, DayOfWeek.Tuesday });
             // Some positional arguments using names, in order
-            TestParse(target, "/arg1 val1 2 true /arg5 5.5 4 /arg6 arg6", "val1", 2, true, arg4: 4, arg5: 5.5f, arg6: "arg6");
+            TestParse(target, "-arg1 val1 2 true -arg5 5.5 4 -arg6 arg6", "val1", 2, true, arg4: 4, arg5: 5.5f, arg6: "arg6");
             // Some position arguments using names, out of order (also uses : and - for one of them to mix things up)
-            TestParse(target, "/other 2 val1 -arg5:5.5 true 4 /arg6 arg6", "val1", 2, true, arg4: 4, arg5: 5.5f, arg6: "arg6");
+            TestParse(target, "-other 2 val1 -arg5:5.5 true 4 -arg6 arg6", "val1", 2, true, arg4: 4, arg5: 5.5f, arg6: "arg6");
             // All arguments
-            TestParse(target, "val1 2 true /arg3 val3 -other2:4 5.5 /arg6 val6 /arg7 /arg8 Monday /arg8 Tuesday /arg9 9 /arg10 /arg10 /arg10:false /arg11:false /arg12 12 /arg12 13 /arg13 foo=13 /arg13 bar=14 /arg14 hello=1 /arg14 bye=2 /arg15 something=5", "val1", 2, true, "val3", 4, 5.5f, "val6", true, new[] { DayOfWeek.Monday, DayOfWeek.Tuesday }, 9, new[] { true, true, false }, false, new[] { 12, 13 }, new Dictionary<string,int>() { { "foo", 13 }, { "bar", 14 } }, new Dictionary<string,int>() { { "hello", 1 }, { "bye", 2 } }, new KeyValuePair<string,int>("something", 5));
+            TestParse(target, "val1 2 true -arg3 val3 -other2:4 5.5 -arg6 val6 -arg7 -arg8 Monday -arg8 Tuesday -arg9 9 -arg10 -arg10 -arg10:false -arg11:false -arg12 12 -arg12 13 -arg13 foo=13 -arg13 bar=14 -arg14 hello=1 -arg14 bye=2 -arg15 something=5", "val1", 2, true, "val3", 4, 5.5f, "val6", true, new[] { DayOfWeek.Monday, DayOfWeek.Tuesday }, 9, new[] { true, true, false }, false, new[] { 12, 13 }, new Dictionary<string,int>() { { "foo", 13 }, { "bar", 14 } }, new Dictionary<string,int>() { { "hello", 1 }, { "bye", 2 } }, new KeyValuePair<string,int>("something", 5));
             // Using aliases
-            TestParse(target, "val1 2 /alias1 valalias6 /alias3", "val1", 2, arg6: "valalias6", arg7: true);
+            TestParse(target, "val1 2 -alias1 valalias6 -alias3", "val1", 2, arg6: "valalias6", arg7: true);
             // Long prefix cannot be used
             CheckThrows(() => target.Parse(new[] { "val1", "2", "--arg6", "val6" }), CommandLineArgumentErrorCategory.UnknownArgument, "-arg6");
             // Short name cannot be used
@@ -486,10 +485,10 @@ namespace Ookii.CommandLine.Tests
             }
         }
 
-        private static void TestParse(CommandLineParser target, string commandLine, string arg1 = null, int arg2 = 42, bool notSwitch = false, string arg3 = null, int arg4 = 47, float arg5 = 0.0f, string arg6 = null, bool arg7 = false, DayOfWeek[] arg8 = null, int? arg9 = null, bool[] arg10 = null, bool? arg11 = null, int[] arg12 = null, Dictionary<string, int> arg13 = null, Dictionary<string, int> arg14 = null, KeyValuePair<string, int>? arg15 = null)
+        private static void TestParse(CommandLineParser<TestArguments> target, string commandLine, string arg1 = null, int arg2 = 42, bool notSwitch = false, string arg3 = null, int arg4 = 47, float arg5 = 0.0f, string arg6 = null, bool arg7 = false, DayOfWeek[] arg8 = null, int? arg9 = null, bool[] arg10 = null, bool? arg11 = null, int[] arg12 = null, Dictionary<string, int> arg13 = null, Dictionary<string, int> arg14 = null, KeyValuePair<string, int>? arg15 = null)
         {
             string[] args = commandLine.Split(' '); // not using quoted arguments in the tests, so this is fine.
-            TestArguments result = (TestArguments)target.Parse(args);
+            var result = target.Parse(args);
             Assert.AreEqual(arg1, result.Arg1);
             Assert.AreEqual(arg2, result.Arg2);
             Assert.AreEqual(arg3, result.Arg3);
