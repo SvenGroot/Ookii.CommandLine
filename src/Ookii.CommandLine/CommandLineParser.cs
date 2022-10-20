@@ -1162,6 +1162,11 @@ namespace Ookii.CommandLine
             if (_argumentsByShortName != null && argument.HasShortName)
             {
                 _argumentsByShortName.Add(argument.ShortName.ToString(), argument);
+                if (argument.ShortAliases != null)
+                {
+                    foreach (var alias in argument.ShortAliases)
+                        _argumentsByShortName.Add(alias.ToString(), argument);
+                }
             }
 
             _arguments.Add(argument);

@@ -264,7 +264,7 @@ namespace Ookii.CommandLine
             if( !IsShellCommand(commandType) )
                 throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.TypeIsNotShellCommandFormat, commandType.FullName));
 
-            return TypeHelper.GetAttribute<ShellCommandAttribute>(commandType)?.CommandName ?? commandType.Name;
+            return commandType.GetCustomAttribute<ShellCommandAttribute>()?.CommandName ?? commandType.Name;
         }
 
         /// <summary>
@@ -291,7 +291,7 @@ namespace Ookii.CommandLine
             if( !IsShellCommand(commandType) )
                 throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.TypeIsNotShellCommandFormat, commandType.FullName));
 
-            return TypeHelper.GetAttribute<DescriptionAttribute>(commandType)?.Description;
+            return commandType.GetCustomAttribute<DescriptionAttribute>()?.Description;
         }
         
         /// <summary>
@@ -566,7 +566,7 @@ namespace Ookii.CommandLine
 
         private static bool CommandUsesCustomArgumentParsing(Type commandType)
         {
-            return TypeHelper.GetAttribute<ShellCommandAttribute>(commandType)?.CustomArgumentParsing ?? false;
+            return commandType.GetCustomAttribute<ShellCommandAttribute>()?.CustomArgumentParsing ?? false;
         }
     }
 }

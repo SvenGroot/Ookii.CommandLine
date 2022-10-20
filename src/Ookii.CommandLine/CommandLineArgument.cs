@@ -1,9 +1,11 @@
 ﻿// Copyright (c) Sven Groot (Ookii.org)
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
+using System.Linq;
 using System.Reflection;
 using System.Text;
 
@@ -107,7 +109,8 @@ namespace Ookii.CommandLine
             public bool Long { get; set; }
             public bool Short { get; set; }
             public char ShortName { get; set; }
-            public IList<string>? Aliases { get; set; }
+            public IEnumerable<string>? Aliases { get; set; }
+            public IEnumerable<char>? ShortAliases { get; set; }
             public Type ArgumentType { get; set; }
             public Type? ConverterType { get; set; }
             public Type? KeyConverterType { get; set; }
@@ -133,7 +136,8 @@ namespace Ookii.CommandLine
         private readonly string _argumentName;
         private readonly bool _hasLongName = true;
         private readonly char _shortName;
-        private readonly IList<string>? _aliases;
+        private readonly ReadOnlyCollection<string>? _aliases;
+        private readonly ReadOnlyCollection<char>? _shortAliases;
         private readonly Type _argumentType;
         private readonly Type _elementType;
         private readonly string? _description;
@@ -176,8 +180,11 @@ namespace Ookii.CommandLine
                 }
             }
 
-            if (HasLongName)
-                _aliases = info.Aliases;
+            if (HasLongName && info.Aliases != null)
+                _aliases = new(info.Aliases.ToArray());
+
+            if (HasShortName && info.ShortAliases != null)
+                _shortAliases = new(info.ShortAliases.ToArray());
 
             _argumentType = info.ArgumentType;
             _elementType = info.ArgumentType;
@@ -329,10 +336,29 @@ namespace Ookii.CommandLine
         /// <value>
         /// A list of alternative names for this command line argument, or <see langword="null"/> if none were specified.
         /// </value>
-        public IList<string>? Aliases
-        {
-            get { return _aliases; }
-        }
+        /// <remarks>
+        /// <para>
+        ///   If the <see cref="CommandLineParser.Mode"/> property is <see cref="ParsingMode.LongShort"/>,
+        ///   and the <see cref="HasLongName"/> proerty is <see langword="false"/>, this property
+        ///   will always return <see langword="null"/>.
+        /// </para>
+        /// </remarks>
+        public ReadOnlyCollection<string>? Aliases => _aliases;
+
+        /// <summary>
+        /// Gets the alternative short names for this command line argument.
+        /// </summary>
+        /// <value>
+        /// A list of alternative short names for this command line argument, or <see langword="null"/> if none were specified.
+        /// </value>
+        /// <remarks>
+        /// <para>
+        ///   If the <see cref="CommandLineParser.Mode"/> property is not <see cref="ParsingMode.LongShort"/>,
+        ///   or the <see cref="HasShortName"/> property is <see langword="false"/>, this property
+        ///   will always return <see langword="null"/>.
+        /// </para>
+        /// </remarks>
+        public ReadOnlyCollection<char>? ShortAliases => _shortAliases;
 
         /// <summary>
         /// Gets the type of the argument.
@@ -827,10 +853,10 @@ namespace Ookii.CommandLine
             if( parameter?.Name == null )
                 throw new ArgumentNullException(nameof(parameter));
 
-            var typeConverterAttribute = TypeHelper.GetAttribute<TypeConverterAttribute>(parameter);
-            var keyTypeConverterAttribute = TypeHelper.GetAttribute<KeyTypeConverterAttribute>(parameter);
-            var valueTypeConverterAttribute = TypeHelper.GetAttribute<ValueTypeConverterAttribute>(parameter);
-            var argumentNameAttribute = TypeHelper.GetAttribute<ArgumentNameAttribute>(parameter);
+            var typeConverterAttribute = parameter.GetCustomAttribute<TypeConverterAttribute>();
+            var keyTypeConverterAttribute = parameter.GetCustomAttribute<KeyTypeConverterAttribute>();
+            var valueTypeConverterAttribute = parameter.GetCustomAttribute<ValueTypeConverterAttribute>();
+            var argumentNameAttribute = parameter.GetCustomAttribute<ArgumentNameAttribute>();
             var argumentName = argumentNameAttribute?.ArgumentName ?? parameter.Name;
             var info = new ArgumentInfo()
             {
@@ -841,16 +867,17 @@ namespace Ookii.CommandLine
                 Short = argumentNameAttribute?.Short ?? false,
                 ShortName = argumentNameAttribute?.ShortName ?? '\0',
                 ArgumentType = parameter.ParameterType,
-                Description = TypeHelper.GetAttribute<DescriptionAttribute>(parameter)?.Description,
+                Description = parameter.GetCustomAttribute<DescriptionAttribute>()?.Description,
                 DefaultValue = (parameter.Attributes & ParameterAttributes.HasDefault) == ParameterAttributes.HasDefault ? parameter.DefaultValue : null,
-                ValueDescription = TypeHelper.GetAttribute<ValueDescriptionAttribute>(parameter)?.ValueDescription,
+                ValueDescription = parameter.GetCustomAttribute<ValueDescriptionAttribute>()?.ValueDescription,
                 AllowDuplicateDictionaryKeys = Attribute.IsDefined(parameter, typeof(AllowDuplicateDictionaryKeysAttribute)),
                 ConverterType = typeConverterAttribute == null ? null : Type.GetType(typeConverterAttribute.ConverterTypeName, true),
                 KeyConverterType = keyTypeConverterAttribute == null ? null : Type.GetType(keyTypeConverterAttribute.ConverterTypeName, true),
                 ValueConverterType = valueTypeConverterAttribute == null ? null : Type.GetType(valueTypeConverterAttribute.ConverterTypeName, true),
-                MultiValueSeparator = GetMultiValueSeparator(TypeHelper.GetAttribute<MultiValueSeparatorAttribute>(parameter)),
-                KeyValueSeparator = TypeHelper.GetAttribute<KeyValueSeparatorAttribute>(parameter)?.Separator,
-                Aliases = GetAliases(Attribute.GetCustomAttributes(parameter, typeof(AliasAttribute)), argumentName),
+                MultiValueSeparator = GetMultiValueSeparator(parameter.GetCustomAttribute<MultiValueSeparatorAttribute>()),
+                KeyValueSeparator = parameter.GetCustomAttribute<KeyValueSeparatorAttribute>()?.Separator,
+                Aliases = GetAliases(parameter.GetCustomAttributes<AliasAttribute>(), argumentName),
+                ShortAliases = GetShortAliases(parameter.GetCustomAttributes<ShortAliasAttribute>(), argumentName),
                 Position = parameter.Position,
                 IsRequired = !parameter.IsOptional,
                 MemberName = parameter.Name,
@@ -866,13 +893,13 @@ namespace Ookii.CommandLine
                 throw new ArgumentNullException(nameof(parser));
             if( property == null )
                 throw new ArgumentNullException(nameof(property));
-            var attribute = TypeHelper.GetAttribute<CommandLineArgumentAttribute>(property);
+            var attribute = property.GetCustomAttribute<CommandLineArgumentAttribute>();
             if( attribute == null )
                 throw new ArgumentException(Properties.Resources.MissingArgumentAttribute, nameof(property));
 
-            var typeConverterAttribute = TypeHelper.GetAttribute<TypeConverterAttribute>(property);
-            var keyTypeConverterAttribute = TypeHelper.GetAttribute<KeyTypeConverterAttribute>(property);
-            var valueTypeConverterAttribute = TypeHelper.GetAttribute<ValueTypeConverterAttribute>(property);
+            var typeConverterAttribute = property.GetCustomAttribute<TypeConverterAttribute>();
+            var keyTypeConverterAttribute = property.GetCustomAttribute<KeyTypeConverterAttribute>();
+            var valueTypeConverterAttribute = property.GetCustomAttribute<ValueTypeConverterAttribute>();
             var argumentName = attribute.ArgumentName ?? property.Name;
             var info = new ArgumentInfo()
             {
@@ -883,16 +910,17 @@ namespace Ookii.CommandLine
                 Short = attribute.Short,
                 ShortName = attribute.ShortName,
                 ArgumentType = property.PropertyType,
-                Description = TypeHelper.GetAttribute<DescriptionAttribute>(property)?.Description,
+                Description = property.GetCustomAttribute<DescriptionAttribute>()?.Description,
                 ValueDescription = attribute.ValueDescription,  // If null, the ctor will sort it out.
                 Position = attribute.Position < 0 ? null : attribute.Position,
                 AllowDuplicateDictionaryKeys = Attribute.IsDefined(property, typeof(AllowDuplicateDictionaryKeysAttribute)),
                 ConverterType = typeConverterAttribute == null ? null : Type.GetType(typeConverterAttribute.ConverterTypeName, true),
                 KeyConverterType = keyTypeConverterAttribute == null ? null : Type.GetType(keyTypeConverterAttribute.ConverterTypeName, true),
                 ValueConverterType = valueTypeConverterAttribute == null ? null : Type.GetType(valueTypeConverterAttribute.ConverterTypeName, true),
-                MultiValueSeparator = GetMultiValueSeparator(TypeHelper.GetAttribute<MultiValueSeparatorAttribute>(property)),
-                KeyValueSeparator = TypeHelper.GetAttribute<KeyValueSeparatorAttribute>(property)?.Separator,
-                Aliases = GetAliases(Attribute.GetCustomAttributes(property, typeof(AliasAttribute)), argumentName),
+                MultiValueSeparator = GetMultiValueSeparator(property.GetCustomAttribute<MultiValueSeparatorAttribute>()),
+                KeyValueSeparator = property.GetCustomAttribute<KeyValueSeparatorAttribute>()?.Separator,
+                Aliases = GetAliases(property.GetCustomAttributes<AliasAttribute>(), argumentName),
+                ShortAliases = GetShortAliases(property.GetCustomAttributes<ShortAliasAttribute>(), argumentName),
                 DefaultValue = attribute.DefaultValue,
                 IsRequired = attribute.IsRequired,
                 MemberName = property.Name,
@@ -1079,20 +1107,32 @@ namespace Ookii.CommandLine
             ((ICollectionHelper)_value!).Add(convertedValue);
         }
 
-        private static IList<string>? GetAliases(Attribute[] aliasAttributes, string argumentName)
+        private static IEnumerable<string>? GetAliases(IEnumerable<AliasAttribute> aliasAttributes, string argumentName)
         {
-            if( aliasAttributes == null || aliasAttributes.Length == 0 )
+            if (!aliasAttributes.Any())
                 return null;
 
-            string[] aliases = new string[aliasAttributes.Length];
-            for( int x = 0; x < aliasAttributes.Length; ++x )
+            return aliasAttributes.Select(alias =>
             {
-                aliases[x] = ((AliasAttribute)aliasAttributes[x]).Alias;
-                if( string.IsNullOrEmpty(aliases[x]) )
+                if (string.IsNullOrEmpty(alias.Alias))
                     throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.EmptyAliasFormat, argumentName));
-            }
 
-            return aliases;
+                return alias.Alias;
+            });
+        }
+
+        private static IEnumerable<char>? GetShortAliases(IEnumerable<ShortAliasAttribute> aliasAttributes, string argumentName)
+        {
+            if (!aliasAttributes.Any())
+                return null;
+
+            return aliasAttributes.Select(alias =>
+            {
+                if (alias.Alias == '\0')
+                    throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.EmptyAliasFormat, argumentName));
+
+                return alias.Alias;
+            });
         }
 
         private static bool DetermineDictionaryValueTypeAllowsNull(Type type, PropertyInfo? property, ParameterInfo? parameter)

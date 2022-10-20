@@ -414,7 +414,7 @@ namespace Ookii.CommandLine.Tests
         [TestMethod]
         public void TestLongShortMode()
         {
-            var parser = new CommandLineParser(typeof(LongShortArguments));
+            var parser = new CommandLineParser<LongShortArguments>();
             Assert.AreEqual(ParsingMode.LongShort, parser.Mode);
             Assert.AreEqual(CommandLineParser.DefaultLongArgumentNamePrefix, parser.LongArgumentNamePrefix);
             CollectionAssert.AreEqual(CommandLineParser.GetDefaultArgumentNamePrefixes(), parser.ArgumentNamePrefixes);
@@ -429,7 +429,7 @@ namespace Ookii.CommandLine.Tests
             Assert.AreEqual('\0', parser.GetArgument("bar").ShortName);
             Assert.IsFalse(parser.GetArgument("bar").HasShortName);
 
-            var result = (LongShortArguments)parser.Parse(new[] { "-f", "5", "--bar", "6", "-a", "7", "--arg1", "8", "-s" });
+            var result = parser.Parse(new[] { "-f", "5", "--bar", "6", "-a", "7", "--arg1", "8", "-s" });
             Assert.AreEqual(5, result.Foo);
             Assert.AreEqual(6, result.Bar);
             Assert.AreEqual(7, result.Arg2);
@@ -439,10 +439,14 @@ namespace Ookii.CommandLine.Tests
             Assert.IsFalse(result.Switch3);
 
             // Combine switches.
-            result = (LongShortArguments)parser.Parse(new[] { "-su" });
+            result = parser.Parse(new[] { "-su" });
             Assert.IsTrue(result.Switch1);
             Assert.IsFalse(result.Switch2);
             Assert.IsTrue(result.Switch3);
+
+            // Use a short alias.
+            result = parser.Parse(new[] { "-b", "5" });
+            Assert.AreEqual(5, result.Arg2);
 
             // Combining non-switches is an error.
             CheckThrows(() => parser.Parse(new[] { "-sf" }), CommandLineArgumentErrorCategory.CombinedShortNameNonSwitch, "sf");
@@ -452,6 +456,9 @@ namespace Ookii.CommandLine.Tests
 
             // And vice versa.
             CheckThrows(() => parser.Parse(new[] { "-Switch1" }), CommandLineArgumentErrorCategory.UnknownArgument, "w");
+
+            // Short alias is ignored on an argument without a short name.
+            CheckThrows(() => parser.Parse(new[] { "-c" }), CommandLineArgumentErrorCategory.UnknownArgument, "c");
         }
 
         private static void TestArgument(IEnumerator<CommandLineArgument> arguments, string name, string memberName, Type type, Type elementType, int? position, bool isRequired, object defaultValue, string description, string valueDescription, bool isSwitch, bool isMultiValue, bool isDictionary = false, params string[] aliases)

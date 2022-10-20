@@ -199,15 +199,11 @@ namespace Ookii.CommandLine.Tests
             Bar = bar;
         }
 
-        [CommandLineArgument]
+        [CommandLineArgument, ShortAlias('c')]
         public int Arg1 { get; set; }
 
-        [CommandLineArgument(ShortName = 'a')]
+        [CommandLineArgument(ShortName = 'a'), ShortAlias('b')]
         public int Arg2 { get; set; }
-
-        public int Foo { get; set; }
-
-        public int Bar { get; set; }
 
         [CommandLineArgument(Short = true)]
         public bool Switch1 { get; set; }
@@ -217,6 +213,10 @@ namespace Ookii.CommandLine.Tests
 
         [CommandLineArgument(ShortName = 'u', Long = false)]
         public bool Switch3 { get; set; }
+
+        public int Foo { get; set; }
+
+        public int Bar { get; set; }
     }
 
 }

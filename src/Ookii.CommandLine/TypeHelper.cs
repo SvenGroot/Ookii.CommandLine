@@ -1,5 +1,7 @@
 ﻿// Copyright (c) Sven Groot (Ookii.org)
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 
 namespace Ookii.CommandLine
@@ -26,24 +28,5 @@ namespace Ookii.CommandLine
 
             return null;
         }
-
-        public static T? GetAttribute<T>(ParameterInfo element)
-            where T: Attribute
-        {
-            return (T?)Attribute.GetCustomAttribute(element, typeof(T));
-        }
-
-        public static T? GetAttribute<T>(PropertyInfo element)
-            where T : Attribute
-        {
-            return (T?)Attribute.GetCustomAttribute(element, typeof(T));
-        }
-
-        public static T? GetAttribute<T>(Type element)
-            where T : Attribute
-        {
-            return (T?)Attribute.GetCustomAttribute(element, typeof(T));
-        }
-
     }
 }

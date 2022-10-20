@@ -92,6 +92,11 @@ namespace Ookii.CommandLine
         /// <para>
         ///   Setting this property implies <see cref="Short"/> is <see langword="true"/>.
         /// </para>
+        /// <para>
+        ///   To derive the short name from the first character of the long name, set the
+        ///   <see cref="Short"/> property to <see langword="true"/> without setting the
+        ///   <see cref="ShortName"/> property.
+        /// </para>
         /// </remarks>
         public char ShortName { get; set; }
 
