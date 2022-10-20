@@ -43,7 +43,9 @@ namespace Ookii.CommandLine.Tests
             Assert.AreEqual(CultureInfo.InvariantCulture, target.Culture);
             Assert.AreEqual(false, target.AllowDuplicateArguments);
             Assert.AreEqual(true, target.AllowWhiteSpaceValueSeparator);
+            Assert.AreEqual(ParsingMode.Default, target.Mode);
             CollectionAssert.AreEqual(CommandLineParser.GetDefaultArgumentNamePrefixes(), target.ArgumentNamePrefixes);
+            Assert.IsNull(target.LongArgumentNamePrefix);
             Assert.AreEqual(argumentsType, target.ArgumentsType);
             Assert.AreEqual(string.Empty, target.Description);
             Assert.AreEqual(0, target.Arguments.Count);
@@ -57,7 +59,9 @@ namespace Ookii.CommandLine.Tests
             Assert.AreEqual(CultureInfo.InvariantCulture, target.Culture);
             Assert.AreEqual(false, target.AllowDuplicateArguments);
             Assert.AreEqual(true, target.AllowWhiteSpaceValueSeparator);
+            Assert.AreEqual(ParsingMode.Default, target.Mode);
             CollectionAssert.AreEqual(CommandLineParser.GetDefaultArgumentNamePrefixes(), target.ArgumentNamePrefixes);
+            Assert.IsNull(target.LongArgumentNamePrefix);
             Assert.AreEqual(argumentsType, target.ArgumentsType);
             Assert.AreEqual("Test arguments description.", target.Description);
             Assert.AreEqual(16, target.Arguments.Count);
@@ -90,7 +94,9 @@ namespace Ookii.CommandLine.Tests
             Assert.AreEqual(CultureInfo.InvariantCulture, target.Culture);
             Assert.AreEqual(false, target.AllowDuplicateArguments);
             Assert.AreEqual(true, target.AllowWhiteSpaceValueSeparator);
+            Assert.AreEqual(ParsingMode.Default, target.Mode);
             CollectionAssert.AreEqual(CommandLineParser.GetDefaultArgumentNamePrefixes(), target.ArgumentNamePrefixes);
+            Assert.IsNull(target.LongArgumentNamePrefix);
             Assert.AreEqual(argumentsType, target.ArgumentsType);
             Assert.AreEqual("", target.Description);
             Assert.AreEqual(2, target.Arguments.Count); // Constructor argument + one property argument.
@@ -123,6 +129,10 @@ namespace Ookii.CommandLine.Tests
             TestParse(target, "val1 2 true /arg3 val3 -other2:4 5.5 /arg6 val6 /arg7 /arg8 Monday /arg8 Tuesday /arg9 9 /arg10 /arg10 /arg10:false /arg11:false /arg12 12 /arg12 13 /arg13 foo=13 /arg13 bar=14 /arg14 hello=1 /arg14 bye=2 /arg15 something=5", "val1", 2, true, "val3", 4, 5.5f, "val6", true, new[] { DayOfWeek.Monday, DayOfWeek.Tuesday }, 9, new[] { true, true, false }, false, new[] { 12, 13 }, new Dictionary<string,int>() { { "foo", 13 }, { "bar", 14 } }, new Dictionary<string,int>() { { "hello", 1 }, { "bye", 2 } }, new KeyValuePair<string,int>("something", 5));
             // Using aliases
             TestParse(target, "val1 2 /alias1 valalias6 /alias3", "val1", 2, arg6: "valalias6", arg7: true);
+            // Long prefix cannot be used
+            CheckThrows(() => target.Parse(new[] { "val1", "2", "--arg6", "val6" }), CommandLineArgumentErrorCategory.UnknownArgument, "-arg6");
+            // Short name cannot be used
+            CheckThrows(() => target.Parse(new[] { "val1", "2", "-arg6", "val6", "-a:5.5" }), CommandLineArgumentErrorCategory.UnknownArgument, "a");
         }
 
         [TestMethod]
@@ -415,7 +425,9 @@ namespace Ookii.CommandLine.Tests
             Assert.IsFalse(parser.AllowWhiteSpaceValueSeparator);
             Assert.IsTrue(parser.AllowDuplicateArguments);
             Assert.AreEqual('=', parser.NameValueSeparator);
+            Assert.AreEqual(ParsingMode.LongShort, parser.Mode);
             CollectionAssert.AreEqual(new[] { "--", "-" }, parser.ArgumentNamePrefixes);
+            Assert.AreEqual("---", parser.LongArgumentNamePrefix);
             // Verify case sensitivity.
             Assert.IsNull(parser.GetArgument("argument"));
             Assert.IsNotNull(parser.GetArgument("Argument"));
@@ -425,7 +437,9 @@ namespace Ookii.CommandLine.Tests
             Assert.IsFalse(parser.AllowWhiteSpaceValueSeparator);
             Assert.IsTrue(parser.AllowDuplicateArguments);
             Assert.AreEqual('=', parser.NameValueSeparator);
+            Assert.AreEqual(ParsingMode.LongShort, parser.Mode);
             CollectionAssert.AreEqual(new[] { "+" }, parser.ArgumentNamePrefixes);
+            Assert.AreEqual("---", parser.LongArgumentNamePrefix);
             // Verify case insensitivity.
             Assert.IsNotNull(parser.GetArgument("argument"));
             Assert.IsNotNull(parser.GetArgument("Argument"));
@@ -433,6 +447,7 @@ namespace Ookii.CommandLine.Tests
             // ParseOptions take precedence
             var options = new ParseOptions()
             {
+                Mode = ParsingMode.Default,
                 ArgumentNameComparer = StringComparer.OrdinalIgnoreCase,
                 AllowWhiteSpaceValueSeparator = true,
                 AllowDuplicateArguments = false,
@@ -444,7 +459,9 @@ namespace Ookii.CommandLine.Tests
             Assert.IsTrue(parser.AllowWhiteSpaceValueSeparator);
             Assert.IsFalse(parser.AllowDuplicateArguments);
             Assert.AreEqual(';', parser.NameValueSeparator);
+            Assert.AreEqual(ParsingMode.Default, parser.Mode);
             CollectionAssert.AreEqual(new[] { "+" }, parser.ArgumentNamePrefixes);
+            Assert.IsNull(parser.LongArgumentNamePrefix);
             // Verify case insensitivity.
             Assert.IsNotNull(parser.GetArgument("argument"));
             Assert.IsNotNull(parser.GetArgument("Argument"));
@@ -465,12 +482,51 @@ namespace Ookii.CommandLine.Tests
             Assert.IsNull(CommandLineParser.Parse<CultureArguments>(new[] { "-Argument", "5.5" }, options));
         }
 
+        [TestMethod]
+        public void TestLongShortMode()
+        {
+            var parser = new CommandLineParser(typeof(LongShortArguments));
+            Assert.AreEqual(ParsingMode.LongShort, parser.Mode);
+            Assert.AreEqual(CommandLineParser.DefaultLongArgumentNamePrefix, parser.LongArgumentNamePrefix);
+            CollectionAssert.AreEqual(CommandLineParser.GetDefaultArgumentNamePrefixes(), parser.ArgumentNamePrefixes);
+            Assert.AreSame(parser.GetArgument("foo"), parser.GetShortArgument('f'));
+            Assert.AreSame(parser.GetArgument("arg2"), parser.GetShortArgument('a'));
+            Assert.AreSame(parser.GetArgument("switch1"), parser.GetShortArgument('s'));
+            Assert.AreSame(parser.GetArgument("switch2"), parser.GetShortArgument('t'));
+            Assert.AreSame(parser.GetArgument("switch3"), parser.GetShortArgument('u'));
+            var result = (LongShortArguments)parser.Parse(new[] { "-f", "5", "--bar", "6", "-a", "7", "--arg1", "8", "-s" });
+            Assert.AreEqual(5, result.Foo);
+            Assert.AreEqual(6, result.Bar);
+            Assert.AreEqual(7, result.Arg2);
+            Assert.AreEqual(8, result.Arg1);
+            Assert.IsTrue(result.Switch1);
+            Assert.IsFalse(result.Switch2);
+            Assert.IsFalse(result.Switch3);
+
+            // Combine switches.
+            result = (LongShortArguments)parser.Parse(new[] { "-su" });
+            Assert.IsTrue(result.Switch1);
+            Assert.IsFalse(result.Switch2);
+            Assert.IsTrue(result.Switch3);
+
+            // Combining non-switches is an error.
+            CheckThrows(() => parser.Parse(new[] { "-sf" }), CommandLineArgumentErrorCategory.CombinedShortNameNonSwitch, "sf");
+
+            // Can't use long argument prefix with short names.
+            CheckThrows(() => parser.Parse(new[] { "--s" }), CommandLineArgumentErrorCategory.UnknownArgument, "s");
+
+            // And vice versa.
+            CheckThrows(() => parser.Parse(new[] { "-Switch1" }), CommandLineArgumentErrorCategory.UnknownArgument, "w");
+        }
+
         private static void TestArgument(IEnumerator<CommandLineArgument> arguments, string name, string memberName, Type type, Type elementType, int? position, bool isRequired, object defaultValue, string description, string valueDescription, bool isSwitch, bool isMultiValue, bool isDictionary = false, params string[] aliases)
         {
             arguments.MoveNext();
             CommandLineArgument argument = arguments.Current;
             Assert.AreEqual(memberName, argument.MemberName);
             Assert.AreEqual(name, argument.ArgumentName);
+            Assert.IsFalse(argument.HasShortName);
+            Assert.AreEqual('\0', argument.ShortName);
             Assert.AreEqual(type, argument.ArgumentType);
             if( elementType == null )
                 Assert.AreEqual(argument.ArgumentType, argument.ElementType);
@@ -484,8 +540,8 @@ namespace Ookii.CommandLine.Tests
             Assert.AreEqual(isDictionary, argument.IsDictionary);
             Assert.AreEqual(isSwitch, argument.IsSwitch);
             Assert.AreEqual(defaultValue, argument.DefaultValue);
-            Assert.AreEqual(null, argument.Value);
-            Assert.AreEqual(false, argument.HasValue);
+            Assert.IsNull(argument.Value);
+            Assert.IsFalse(argument.HasValue);
             if( aliases == null || aliases.Length == 0 )
                 Assert.IsNull(argument.Aliases);
             else
@@ -523,6 +579,20 @@ namespace Ookii.CommandLine.Tests
                 Assert.AreEqual(default(KeyValuePair<string, int>), result.Arg15);
             else
                 Assert.AreEqual(arg15.Value, result.Arg15);
+        }
+
+        private static void CheckThrows(Action operation, CommandLineArgumentErrorCategory category, string argumentName = null)
+        {
+            try
+            {
+                operation();
+                Assert.Fail("Expected CommandLineException was not thrown.");
+            }
+            catch (CommandLineArgumentException ex)
+            {
+                Assert.AreEqual(category, ex.Category);
+                Assert.AreEqual(argumentName, ex.ArgumentName);
+            }
         }
 
         #region Expected usage

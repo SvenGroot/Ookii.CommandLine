@@ -258,4 +258,7 @@
   <data name="EmptyKeyValueSeparator" xml:space="preserve">
     <value>The key-value separator cannot be an empty string.</value>
   </data>
+  <data name="CombinedShortNameNonSwitchFormat" xml:space="preserve">
+    <value>The combined short argument '{0}' contains an argument that is not a switch.</value>
+  </data>
 </root>

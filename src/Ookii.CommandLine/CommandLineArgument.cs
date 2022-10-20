@@ -104,6 +104,7 @@ namespace Ookii.CommandLine
         private readonly PropertyInfo? _property;
         private readonly string _valueDescription;
         private readonly string _argumentName;
+        private readonly char _shortName;
         private readonly IList<string>? _aliases;
         private readonly Type _argumentType;
         private readonly Type _elementType;
@@ -119,7 +120,6 @@ namespace Ookii.CommandLine
         private readonly bool _allowNull;
         private readonly bool _cancelParsing;
         private object? _value;
-
         private struct ArgumentInfo
         {
             public CommandLineParser Parser { get; set; }
@@ -127,6 +127,7 @@ namespace Ookii.CommandLine
             public ParameterInfo? Parameter { get; set; }
             public string MemberName { get; set; }
             public string ArgumentName { get; set; }
+            public char ShortName { get; set; }
             public IList<string>? Aliases { get; set; }
             public Type ArgumentType { get; set; }
             public Type? ConverterType { get; set; }
@@ -151,6 +152,7 @@ namespace Ookii.CommandLine
             _property = info.Property;
             _memberName = info.MemberName;
             _argumentName = info.ArgumentName;
+            _shortName = info.ShortName;
             _aliases = info.Aliases;
             _argumentType = info.ArgumentType;
             _elementType = info.ArgumentType;
@@ -254,6 +256,27 @@ namespace Ookii.CommandLine
         {
             get { return _argumentName; }
         }
+
+        /// <summary>
+        /// Gets the short name of this argument.
+        /// </summary>
+        /// <value>
+        /// The short name of the argument, or a null character ('\0') if it doesn't have one.
+        /// </value>
+        /// <remarks>
+        /// <para>
+        ///   The short name is only used if the parser is using <see cref="ParsingMode.LongShort"/>.
+        /// </para>
+        /// </remarks>
+        public char ShortName => _shortName;
+
+        /// <summary>
+        /// Gets a value that indicates whether the argument has a short name.
+        /// </summary>
+        /// <value>
+        /// <see langword="true"/> if the argument has a short name; otherwise, <see langword="false"/>.
+        /// </value>
+        public bool HasShortName => _shortName != '\0';
 
         /// <summary>
         /// Gets the alternative names for this command line argument.
@@ -762,12 +785,14 @@ namespace Ookii.CommandLine
             var typeConverterAttribute = TypeHelper.GetAttribute<TypeConverterAttribute>(parameter);
             var keyTypeConverterAttribute = TypeHelper.GetAttribute<KeyTypeConverterAttribute>(parameter);
             var valueTypeConverterAttribute = TypeHelper.GetAttribute<ValueTypeConverterAttribute>(parameter);
-            var argumentName = TypeHelper.GetAttribute<ArgumentNameAttribute>(parameter)?.ArgumentName ?? parameter.Name;
+            var argumentNameAttribute = TypeHelper.GetAttribute<ArgumentNameAttribute>(parameter);
+            var argumentName = argumentNameAttribute?.ArgumentName ?? parameter.Name;
             var info = new ArgumentInfo()
             {
                 Parser = parser,
                 Parameter = parameter,
                 ArgumentName = argumentName,
+                ShortName = argumentNameAttribute?.ShortName ?? '\0',
                 ArgumentType = parameter.ParameterType,
                 Description = TypeHelper.GetAttribute<DescriptionAttribute>(parameter)?.Description,
                 DefaultValue = (parameter.Attributes & ParameterAttributes.HasDefault) == ParameterAttributes.HasDefault ? parameter.DefaultValue : null,
@@ -807,6 +832,7 @@ namespace Ookii.CommandLine
                 Parser = parser,
                 Property = property,
                 ArgumentName = argumentName,
+                ShortName = attribute.ShortName,
                 ArgumentType = property.PropertyType,
                 Description = TypeHelper.GetAttribute<DescriptionAttribute>(property)?.Description,
                 ValueDescription = attribute.ValueDescription,  // If null, the ctor will sort it out.

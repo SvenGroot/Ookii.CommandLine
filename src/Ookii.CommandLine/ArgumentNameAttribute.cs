@@ -16,17 +16,14 @@ namespace Ookii.CommandLine
     [AttributeUsage(AttributeTargets.Parameter)]
     public sealed class ArgumentNameAttribute : Attribute
     {
-        private readonly string _argumentName;
+        private readonly string? _argumentName;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ArgumentNameAttribute"/> class.
         /// </summary>
         /// <param name="argumentName">The name of the argument.</param>
-        public ArgumentNameAttribute(string argumentName)
+        public ArgumentNameAttribute(string? argumentName = null)
         {
-            if( argumentName == null )
-                throw new ArgumentNullException(nameof(argumentName));
-
             _argumentName = argumentName;
         }
 
@@ -36,9 +33,18 @@ namespace Ookii.CommandLine
         /// <value>
         /// The name of the argument.
         /// </value>
-        public string ArgumentName
-        {
-            get { return _argumentName; }
-        }
+        public string? ArgumentName => _argumentName;
+
+        /// <summary>
+        /// Gets or sets the argument's short name.
+        /// </summary>
+        /// <value>The short name, or a null character ('\0') if the argument has no short name.</value>
+        /// <remarks>
+        /// <para>
+        ///   This property is ignored if <see cref="CommandLineParser.Mode"/> is not
+        ///   <see cref="ParsingMode.LongShort"/>.
+        /// </para>
+        /// </remarks>
+        public char ShortName { get; set; }
     }
 }

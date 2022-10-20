@@ -42,6 +42,18 @@ namespace Ookii.CommandLine
         }
 
         /// <summary>
+        /// Gets or sets the argument's short name.
+        /// </summary>
+        /// <value>The short name, or a null character ('\0') if the argument has no short name.</value>
+        /// <remarks>
+        /// <para>
+        ///   This property is ignored if <see cref="CommandLineParser.Mode"/> is not
+        ///   <see cref="ParsingMode.LongShort"/>.
+        /// </para>
+        /// </remarks>
+        public char ShortName { get; set; }
+
+        /// <summary>
         /// Gets or sets a value indicating whether the named argument is required.
         /// </summary>
         /// <value>

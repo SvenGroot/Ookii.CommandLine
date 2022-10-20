@@ -52,5 +52,9 @@ namespace Ookii.CommandLine
         /// type or (in .Net 6.0 and later) a non-nullable reference type.
         /// </summary>
         NullArgumentValue,
+        /// <summary>
+        /// A combined short argument contains an argument that is not a switch.
+        /// </summary>
+        CombinedShortNameNonSwitch
     }
 }

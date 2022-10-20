@@ -7,7 +7,8 @@ using System.IO;
 namespace Ookii.CommandLine
 {
     /// <summary>
-    /// Provides options for the <see cref="CommandLineParser.Parse{T}(string[], ParseOptions)"/> method.
+    /// Provides options for the <see cref="CommandLineParser.Parse{T}(string[], ParseOptions)"/> method
+    /// and the <see cref="CommandLineParser.CommandLineParser(Type, ParseOptions?)"/> constructor.
     /// </summary>
     /// <remarks>
     /// <para>
@@ -19,6 +20,8 @@ namespace Ookii.CommandLine
     /// </remarks>
     public class ParseOptions
     {
+        private WriteUsageOptions? _usageOptions;
+
         /// <summary>
         /// Gets or sets the culture used to convert command line argument values from their string representation to the argument type.
         /// </summary>
@@ -29,19 +32,61 @@ namespace Ookii.CommandLine
         public CultureInfo? Culture { get; set; }
 
         /// <summary>
+        /// Gets or sets a value that indicates the command line argument parsing rules to use.
+        /// </summary>
+        /// <value>
+        /// The <see cref="Ookii.CommandLine.ParsingMode"/> to use. The default is <see cref="ParsingMode.Default"/>.
+        /// </value>
+        /// <remarks>
+        /// <para>
+        ///   If not <see langword="null"/>, this property overrides the value of the
+        ///   <see cref="ParseOptionsAttribute.Mode"/> property.
+        /// </para>
+        /// </remarks>
+        public ParsingMode? Mode { get; set; }
+
+        /// <summary>
         /// Gets or sets the argument name prefixes to use when parsing the arguments.
         /// </summary>
         /// <value>
-        /// The named argument switches, or <see langword="null"/> to indicate the default prefixes for
-        /// the current platform must be used. The default value is <see langword="null"/>.
+        /// The named argument switches, or <see langword="null"/> to indicate the values from the
+        /// <see cref="ParseOptionsAttribute.ArgumentNamePrefixes"/> property, or the default
+        /// prefixes for/ the current platform must be used. The default value is <see langword="null"/>.
         /// </value>
         /// <remarks>
+        /// <para>
+        ///   If the <see cref="Mode"/> property is <see cref="ParsingMode.LongShort"/>,
+        ///   or if it is <see langword="null"/> and the parsing mode is set to <see cref="ParsingMode.LongShort"/>
+        ///   elsewhere, this property indicates the short argument name prefixes. Use
+        ///   <see cref="LongArgumentNamePrefix"/> to set the argument prefix for long names.
+        /// </para>
         /// <para>
         ///   If not <see langword="null"/>, this property overrides the value of the
         ///   <see cref="ParseOptionsAttribute.ArgumentNamePrefixes"/> property.
         /// </para>
         /// </remarks>
+
         public IEnumerable<string>? ArgumentNamePrefixes { get; set; }
+
+        /// <summary>
+        /// Gets or sets the argument name prefix to se for long argument names.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        ///   This property is only used if the <see cref="Mode"/> property is <see cref="ParsingMode.LongShort"/>,
+        ///   or if it is <see langword="null"/> and the parsing mode is set to <see cref="ParsingMode.LongShort"/>
+        ///   elsewhere.
+        /// </para>
+        /// <para>
+        ///   Use the <see cref="ArgumentNamePrefixes"/> to specify the prefixes for short argument
+        ///   names.
+        /// </para>
+        /// <para>
+        ///   If not <see langword="null"/>, this property overrides the value of the
+        ///   <see cref="ParseOptionsAttribute.LongArgumentNamePrefix"/> property.
+        /// </para>
+        /// </remarks>
+        public string? LongArgumentNamePrefix { get; set; }
 
         /// <summary>
         /// Gets or set the <see cref="IComparer{T}"/> to use to compare argument names.
@@ -156,7 +201,7 @@ namespace Ookii.CommandLine
         ///   <see cref="ParseOptionsAttribute.NameValueSeparator"/> property.
         /// </para>
         /// </remarks>
-        public char? NameValueSeparator { get; set; } = CommandLineParser.DefaultNameValueSeparator;
+        public char? NameValueSeparator { get; set; }
 
         /// <summary>
         /// Gets or sets the options to use to write usage information to <see cref="Out"/> when
@@ -165,6 +210,10 @@ namespace Ookii.CommandLine
         /// <value>
         /// The usage options.
         /// </value>
-        public WriteUsageOptions UsageOptions { get; set; } = new WriteUsageOptions();
+        public WriteUsageOptions UsageOptions
+        {
+            get => _usageOptions ??= new WriteUsageOptions();
+            set => _usageOptions = value;
+        }
     }
 }

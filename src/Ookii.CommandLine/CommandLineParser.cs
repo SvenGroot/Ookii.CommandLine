@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -175,19 +176,31 @@ namespace Ookii.CommandLine
             }
         }
 
+        private struct PrefixInfo
+        {
+            public string Prefix { get; set; }
+            public bool Short { get; set; }
+        }
+
         #endregion
 
         internal const int MaximumLineWidthForIndent = 30; // Don't apply indentation to console output if the line width is less than this.
 
         private readonly Type _argumentsType;
-        private readonly List<CommandLineArgument> _arguments = new List<CommandLineArgument>();
-        private readonly SortedList<string, CommandLineArgument> _argumentsByName;
+        private readonly List<CommandLineArgument> _arguments = new ();
+        private readonly SortedDictionary<string, CommandLineArgument> _argumentsByName;
+        // Uses string, even though short names are single char, so it can use the same comparer
+        // as _argumentsByName.
+        private readonly SortedDictionary<string, CommandLineArgument>? _argumentsByShortName;
         private readonly ConstructorInfo _commandLineConstructor;
         private readonly int _constructorArgumentCount;
         private readonly int _positionalArgumentCount;
         private readonly string[] _argumentNamePrefixes;
+        private readonly PrefixInfo[] _sortedPrefixes;
         private ReadOnlyCollection<CommandLineArgument>? _argumentsReadOnlyWrapper;
         private ReadOnlyCollection<string>? _argumentNamePrefixesReadOnlyWrapper;
+        private readonly ParsingMode _mode;
+        private readonly string? _longArgumentNamePrefix;
 
         /// <summary>
         /// Gets the default character used to separate the name and the value of an argument.
@@ -199,6 +212,12 @@ namespace Ookii.CommandLine
         /// This constant is used as the default value of the <see cref="NameValueSeparator"/> property.
         /// </remarks>
         public const char DefaultNameValueSeparator = ':';
+
+        /// <summary>
+        /// Gets the default prefix used for long argument names if <see cref="Mode"/> is
+        /// <see cref="ParsingMode.LongShort"/>.
+        /// </summary>
+        public const string DefaultLongArgumentNamePrefix = "--";
 
         /// <summary>
         /// Event raised when an argument is parsed from the command line.
@@ -246,8 +265,8 @@ namespace Ookii.CommandLine
         ///   If you specify multiple argument name prefixes, the first one will be used when generating usage information using the <see cref="WriteUsage(TextWriter,int,WriteUsageOptions)"/> method.
         /// </para>
         /// </remarks>
-        public CommandLineParser(Type argumentsType, IEnumerable<string>? argumentNamePrefixes = null, IComparer<string>? argumentNameComparer = null)
-            : this(argumentsType, argumentNamePrefixes, argumentNameComparer, null)
+        public CommandLineParser(Type argumentsType, IEnumerable<string>? argumentNamePrefixes, IComparer<string>? argumentNameComparer = null)
+            : this(argumentsType, CreateOptions(argumentNamePrefixes, argumentNameComparer))
         {
         }
 
@@ -256,9 +275,12 @@ namespace Ookii.CommandLine
         /// specified arguments type and options.
         /// </summary>
         /// <param name="argumentsType">The <see cref="Type"/> of the class that defines the command line arguments.</param>
-        /// <param name="options">The options that control parsing behavior.</param>
+        /// <param name="options">
+        ///   The options that control parsing behavior, or <see langword="null"/> to use the
+        ///   default options.
+        /// </param>
         /// <exception cref="ArgumentNullException">
-        ///   <paramref name="argumentsType"/> or <paramref name="options"/> is <see langword="null"/>.
+        ///   <paramref name="argumentsType"/> is <see langword="null"/>.
         /// </exception>
         /// <remarks>
         /// <para>
@@ -266,9 +288,49 @@ namespace Ookii.CommandLine
         ///   take effect, they must still be passed to <see cref="WriteUsage(TextWriter, int, WriteUsageOptions)"/>.
         /// </para>
         /// </remarks>
-        public CommandLineParser(Type argumentsType, ParseOptions options)
-            : this(argumentsType, null, null, options ?? throw new ArgumentNullException(nameof(options)))
+        public CommandLineParser(Type argumentsType, ParseOptions? options = null)
         {
+            _argumentsType = argumentsType ?? throw new ArgumentNullException(nameof(argumentsType));
+
+            var optionsAttribute = _argumentsType.GetCustomAttribute<ParseOptionsAttribute>();
+            _mode = options?.Mode ?? optionsAttribute?.Mode ?? ParsingMode.Default;
+            var comparer = options?.ArgumentNameComparer ?? optionsAttribute?.GetStringComparer() ?? StringComparer.OrdinalIgnoreCase;
+            var prefixes = options?.ArgumentNamePrefixes ?? optionsAttribute?.ArgumentNamePrefixes;
+            _argumentNamePrefixes = DetermineArgumentNamePrefixes(prefixes);
+            var prefixInfos = _argumentNamePrefixes.Select(p => new PrefixInfo { Prefix = p, Short = true });
+            if (_mode == ParsingMode.LongShort)
+            {
+                _longArgumentNamePrefix = options?.LongArgumentNamePrefix ?? optionsAttribute?.LongArgumentNamePrefix ?? 
+                    DefaultLongArgumentNamePrefix;
+
+                if (string.IsNullOrWhiteSpace(_longArgumentNamePrefix))
+                    throw new ArgumentException(Properties.Resources.EmptyArgumentNamePrefix, nameof(options));
+
+                var longInfo = new PrefixInfo { Prefix = _longArgumentNamePrefix, Short = false };
+#if NET6_0_OR_GREATER
+                prefixInfos = prefixInfos.Append(longInfo);
+#else
+                prefixInfos = prefixInfos.Concat(new[] { longInfo });
+#endif
+                _argumentsByShortName = new(comparer);
+            }
+
+            _sortedPrefixes = prefixInfos.OrderByDescending(info => info.Prefix.Length).ToArray();
+
+            _argumentsByName = new(comparer);
+
+            _commandLineConstructor = GetCommandLineConstructor();
+
+            DetermineConstructorArguments();
+            _constructorArgumentCount = _arguments.Count;
+            _positionalArgumentCount = _constructorArgumentCount + DeterminePropertyArguments();
+
+            VerifyPositionalArgumentRules();
+
+            AllowDuplicateArguments = options?.AllowDuplicateArguments ?? optionsAttribute?.AllowDuplicateArguments ?? false;
+            AllowWhiteSpaceValueSeparator = options?.AllowWhiteSpaceValueSeparator ?? optionsAttribute?.AllowWhiteSpaceValueSeparator ?? true;
+            NameValueSeparator = options?.NameValueSeparator ?? optionsAttribute?.NameValueSeparator ?? DefaultNameValueSeparator;
+            Culture = options?.Culture ?? CultureInfo.InvariantCulture;
         }
 
         /// <summary>
@@ -292,36 +354,13 @@ namespace Ookii.CommandLine
         }
 
         /// <summary>
-        /// Gets the default argument name prefixes for the current platform.
+        /// Gets the command line argument parsing rules used by the parser.
         /// </summary>
-        /// <returns>
-        /// An array containing the default separators for the current platform.
-        /// </returns>
-        /// <remarks>
-        /// <para>
-        ///   The default prefixes for each platform are:
-        /// </para>
-        /// <list type="table">
-        ///   <listheader>
-        ///     <term>Platform</term>
-        ///     <description>Separators</description>
-        ///   </listheader>
-        ///   <item>
-        ///     <term>Windows</term>
-        ///     <description>'-' and '/'</description>
-        ///   </item>
-        ///   <item>
-        ///     <term>Other</term>
-        ///     <description>'-'</description>
-        ///   </item>
-        /// </list>
-        /// </remarks>
-        public static string[] GetDefaultArgumentNamePrefixes()
-        {
-            return RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
-                ? new[] { "-", "/" }
-                : new[] { "-" };
-        }
+        /// <value>
+        /// The <see cref="Ookii.CommandLine.ParsingMode"/> for this parser. The defualt is
+        /// <see cref="ParsingMode.Default"/>.
+        /// </value>
+        public ParsingMode Mode => _mode;
 
         /// <summary>
         /// Gets the argument name prefixes used by this instance.
@@ -333,14 +372,30 @@ namespace Ookii.CommandLine
         /// <para>
         ///   The argument name prefixes are used to distinguish argument names from positional argument values in a command line.
         /// </para>
+        /// <para>
+        ///   These prefixes will be used for short argument names if the <see cref="Mode"/>
+        ///   property is <see cref="ParsingMode.LongShort"/>. Use <see cref="LongArgumentNamePrefix"/>
+        ///   to get the prefix for long argument names.
+        /// </para>
         /// </remarks>
-        public ReadOnlyCollection<string> ArgumentNamePrefixes
-        {
-            get
-            {
-                return _argumentNamePrefixesReadOnlyWrapper ?? (_argumentNamePrefixesReadOnlyWrapper = new ReadOnlyCollection<string>(_argumentNamePrefixes));
-            }
-        }
+        public ReadOnlyCollection<string> ArgumentNamePrefixes => 
+            _argumentNamePrefixesReadOnlyWrapper ??= new(_argumentNamePrefixes);
+
+        /// <summary>
+        /// Gets the prefix to use for long argument names.
+        /// </summary>
+        /// <value>
+        /// The prefix for long argument names, or <see langword="null"/> if <see cref="Mode"/>
+        /// is not <see cref="ParsingMode.LongShort"/>.
+        /// </value>
+        /// <remarks>
+        /// <para>
+        ///   The long argument prefix is only used if <see cref="Mode"/> property is
+        ///   <see cref="ParsingMode.LongShort"/>. See <see cref="ArgumentNamePrefixes"/> to
+        ///   get the prefixes for short argument names.
+        /// </para>
+        /// </remarks>
+        public string? LongArgumentNamePrefix => _longArgumentNamePrefix;
 
         /// <summary>
         /// Gets the type that was used to define the arguments.
@@ -703,7 +758,7 @@ namespace Ookii.CommandLine
                 {
                     // If white space was the value separator, this function returns the index of argument containing the value for the named argument.
                     // It returns -1 if parsing was cancelled by the ArgumentParsed event handler or the CancelParsing property.
-                    x = ParseNamedArgument(args, x, argumentNamePrefix);
+                    x = ParseNamedArgument(args, x, argumentNamePrefix.Value);
                     if( x < 0 )
                         return null;
                 }
@@ -943,9 +998,66 @@ namespace Ookii.CommandLine
         }
 
         /// <summary>
-        /// Raises the <see cref="ArgumentParsed"/> event.
+        /// Gets a command line argument by short name.
         /// </summary>
-        /// <param name="e">The data for the event.</param>
+        /// <param name="shortName">The short name of the argument.</param>
+        /// <returns>The <see cref="CommandLineArgument"/> instance containing information about
+        /// the argument, or <see langword="null" /> if the argument was not found.</returns>
+        /// <remarks>
+        /// <para>
+        ///   If <see cref="Mode"/> is not <see cref="ParsingMode.LongShort"/>, this
+        ///   method always returns <see langword="null"/>
+        /// </para>
+        /// </remarks>
+        public CommandLineArgument? GetShortArgument(char shortName)
+        {
+            if (_argumentsByShortName != null && _argumentsByShortName.TryGetValue(shortName.ToString(), out var argument))
+                return argument;
+            else
+                return null;
+        }
+
+        /// <summary>
+        /// Gets the default argument name prefixes for the current platform.
+        /// </summary>
+        /// <returns>
+        /// An array containing the default separators for the current platform.
+        /// </returns>
+        /// <remarks>
+        /// <para>
+        ///   The default prefixes for each platform are:
+        /// </para>
+        /// <list type="table">
+        ///   <listheader>
+        ///     <term>Platform</term>
+        ///     <description>Separators</description>
+        ///   </listheader>
+        ///   <item>
+        ///     <term>Windows</term>
+        ///     <description>'-' and '/'</description>
+        ///   </item>
+        ///   <item>
+        ///     <term>Other</term>
+        ///     <description>'-'</description>
+        ///   </item>
+        /// </list>
+        /// <para>
+        ///   If <see cref="Mode"/> is <see cref="ParsingMode.LongShort"/>, these
+        ///   prefixes will be used for short argument names. The <see cref="DefaultLongArgumentNamePrefix"/>
+        ///   is the default prefix for long argument names.
+        /// </para>
+        /// </remarks>
+        public static string[] GetDefaultArgumentNamePrefixes()
+        {
+            return RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+                ? new[] { "-", "/" }
+                : new[] { "-" };
+        }
+        
+        /// <summary>
+                 /// Raises the <see cref="ArgumentParsed"/> event.
+                 /// </summary>
+                 /// <param name="e">The data for the event.</param>
         protected virtual void OnArgumentParsed(ArgumentParsedEventArgs e)
         {
             EventHandler<ArgumentParsedEventArgs>? handler = ArgumentParsed;
@@ -956,7 +1068,7 @@ namespace Ookii.CommandLine
         internal static object? ParseInternal(Type argumentsType, string[] args, int index, ParseOptions? options)
         {
             options ??= new();
-            var parser = new CommandLineParser(argumentsType, null, null, options);
+            var parser = new CommandLineParser(argumentsType, options);
 
             using var output = DisposableWrapper.Create(options.Out, LineWrappingTextWriter.ForConsoleOut);
             using var error = DisposableWrapper.Create(options.Error, LineWrappingTextWriter.ForConsoleError);
@@ -977,32 +1089,6 @@ namespace Ookii.CommandLine
             parser.WriteUsage(output.Inner, 0, options.UsageOptions);
             return null;
         }
-
-        private CommandLineParser(Type argumentsType, IEnumerable<string>? argumentNamePrefixes, IComparer<string>? argumentNameComparer, ParseOptions? options)
-        {
-            _argumentsType = argumentsType ?? throw new ArgumentNullException(nameof(argumentsType));
-
-            var optionsAttribute = _argumentsType.GetCustomAttribute<ParseOptionsAttribute>();
-            var prefixes = argumentNamePrefixes ?? options?.ArgumentNamePrefixes ?? optionsAttribute?.ArgumentNamePrefixes;
-            _argumentNamePrefixes = DetermineArgumentNamePrefixes(prefixes);
-
-            var comparer = argumentNameComparer ?? options?.ArgumentNameComparer ?? optionsAttribute?.GetStringComparer() ?? StringComparer.OrdinalIgnoreCase;
-            _argumentsByName = new(comparer);
-
-            _commandLineConstructor = GetCommandLineConstructor();
-
-            DetermineConstructorArguments();
-            _constructorArgumentCount = _arguments.Count;
-            _positionalArgumentCount = _constructorArgumentCount + DeterminePropertyArguments();
-
-            VerifyPositionalArgumentRules();
-
-            AllowDuplicateArguments = options?.AllowDuplicateArguments ?? optionsAttribute?.AllowDuplicateArguments ?? false;
-            AllowWhiteSpaceValueSeparator = options?.AllowWhiteSpaceValueSeparator ?? optionsAttribute?.AllowWhiteSpaceValueSeparator ?? true;
-            NameValueSeparator = options?.NameValueSeparator ?? optionsAttribute?.NameValueSeparator ?? DefaultNameValueSeparator;
-            Culture = options?.Culture ?? CultureInfo.InvariantCulture;
-        }
-
 
         private static string[] DetermineArgumentNamePrefixes(IEnumerable<string>? namedArgumentPrefixes)
         {
@@ -1061,13 +1147,20 @@ namespace Ookii.CommandLine
         private void AddNamedArgument(CommandLineArgument argument)
         {
             if( argument.ArgumentName.IndexOf(NameValueSeparator) >= 0 )
-                throw new NotSupportedException(string.Format(System.Globalization.CultureInfo.CurrentCulture, Properties.Resources.ArgumentNameContainsSeparatorFormat, argument.ArgumentName));
+                throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.ArgumentNameContainsSeparatorFormat, argument.ArgumentName));
+
             _argumentsByName.Add(argument.ArgumentName, argument);
+            if (_argumentsByShortName != null && argument.HasShortName)
+            {
+                _argumentsByShortName.Add(argument.ShortName.ToString(), argument);
+            }
+
             if( argument.Aliases != null )
             {
                 foreach( string alias in argument.Aliases )
                     _argumentsByName.Add(alias, argument);
             }
+
             _arguments.Add(argument);
         }
 
@@ -1104,7 +1197,7 @@ namespace Ookii.CommandLine
             return e.Cancel || (argument.CancelParsing && !e.OverrideCancelParsing);
         }
 
-        private int ParseNamedArgument(string[] args, int index, string prefix)
+        private int ParseNamedArgument(string[] args, int index, PrefixInfo prefix)
         {
             string argumentName;
             string? argumentValue = null;
@@ -1115,40 +1208,76 @@ namespace Ookii.CommandLine
             int separatorIndex = arg.IndexOf(NameValueSeparator);
             if( separatorIndex >= 0 )
             {
-                argumentName = arg.Substring(prefix.Length, separatorIndex - prefix.Length);
+                argumentName = arg.Substring(prefix.Prefix.Length, separatorIndex - prefix.Prefix.Length);
                 argumentValue = arg.Substring(separatorIndex + 1);
             }
             else
-                argumentName = arg.Substring(prefix.Length);
+                argumentName = arg.Substring(prefix.Prefix.Length);
 
-            CommandLineArgument? argument;
-            if( _argumentsByName.TryGetValue(argumentName, out argument) )
+            CommandLineArgument? argument = null;
+            if (_argumentsByShortName != null && prefix.Short)
             {
-                if( argumentValue == null && !argument.IsSwitch && AllowWhiteSpaceValueSeparator && ++index < args.Length && CheckArgumentNamePrefix(args[index]) == null )
+                if (argumentName.Length == 1)
+                    argument = GetShortArgumentOrThrow(argumentName);
+                else
                 {
-                    // No separator was present but a value is required. We take the next argument as its value.
-                    argumentValue = args[index];
+                    // ParseShortArgument returns true if parsing was cancelled by the
+                    // ArgumentParsed event handler or the CancelParsing property.
+                    return ParseShortArgument(argumentName, argumentValue) ? -1 : index;
                 }
-                // ParseArgumentValue returns true if parsing was cancelled by the ArgumentParsed event handler
-                // or the CancelParsing property.
-                argument.UsedArgumentName = argumentName;
-                return ParseArgumentValue(argument, argumentValue) ? -1 : index;
             }
-            else
-                throw new CommandLineArgumentException(string.Format(System.Globalization.CultureInfo.CurrentCulture, Properties.Resources.UnknownArgumentFormat, argumentName), argumentName, CommandLineArgumentErrorCategory.UnknownArgument);
+
+            if (argument == null && !_argumentsByName.TryGetValue(argumentName, out argument))
+                throw CommandLineArgumentException.Create(CommandLineArgumentErrorCategory.UnknownArgument, Properties.Resources.UnknownArgumentFormat, argumentName);
+
+            if (argumentValue == null && !argument.IsSwitch && AllowWhiteSpaceValueSeparator && ++index < args.Length && CheckArgumentNamePrefix(args[index]) == null)
+            {
+                // No separator was present but a value is required. We take the next argument as its value.
+                argumentValue = args[index];
+            }
+
+            // ParseArgumentValue returns true if parsing was cancelled by the ArgumentParsed event handler
+            // or the CancelParsing property.
+            argument.UsedArgumentName = argumentName;
+            return ParseArgumentValue(argument, argumentValue) ? -1 : index;
         }
 
-        private string? CheckArgumentNamePrefix(string argument)
+        private bool ParseShortArgument(string name, string? value)
+        {
+            foreach (var ch in name)
+            {
+                var arg = GetShortArgumentOrThrow(ch.ToString());
+                if (!arg.IsSwitch)
+                    throw CommandLineArgumentException.Create(CommandLineArgumentErrorCategory.CombinedShortNameNonSwitch, Properties.Resources.CombinedShortNameNonSwitchFormat, name);
+
+                if (ParseArgumentValue(arg, value))
+                    return true;
+            }
+
+            return false;
+        }
+
+        private CommandLineArgument GetShortArgumentOrThrow(string shortName)
+        {
+            Debug.Assert(shortName.Length == 1);
+            if (_argumentsByShortName!.TryGetValue(shortName, out CommandLineArgument? argument))
+                return argument;
+
+            throw CommandLineArgumentException.Create(CommandLineArgumentErrorCategory.UnknownArgument, Properties.Resources.UnknownArgumentFormat, shortName);
+        }
+
+        private PrefixInfo? CheckArgumentNamePrefix(string argument)
         {
             // Even if '-' is the argument name prefix, we consider an argument starting with dash followed by a digit as a value, because it could be a negative number.
             if( argument.Length >= 2 && argument[0] == '-' && char.IsDigit(argument, 1) )
                 return null;
 
-            foreach( string namedArgumentPrefix in _argumentNamePrefixes )
+            foreach( var prefix in _sortedPrefixes )
             {
-                if( argument.StartsWith(namedArgumentPrefix, StringComparison.Ordinal) )
-                    return namedArgumentPrefix;
+                if( argument.StartsWith(prefix.Prefix, StringComparison.Ordinal) )
+                    return prefix;
             }
+
             return null;
         }
         
@@ -1235,6 +1364,18 @@ namespace Ookii.CommandLine
             {
                 throw new CommandLineArgumentException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.CreateArgumentsTypeErrorFormat, ex.InnerException?.Message), CommandLineArgumentErrorCategory.CreateArgumentsTypeError, ex.InnerException);
             }
+        }
+
+        private static ParseOptions? CreateOptions(IEnumerable<string>? argumentNamePrefixes, IComparer<string>? argumentNameComparer)
+        {
+            if (argumentNamePrefixes == null && argumentNameComparer == null)
+                return null;
+
+            return new ParseOptions()
+            {
+                ArgumentNamePrefixes = argumentNamePrefixes,
+                ArgumentNameComparer = argumentNameComparer,
+            };
         }
     }
 }

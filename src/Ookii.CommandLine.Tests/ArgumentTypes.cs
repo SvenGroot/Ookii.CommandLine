@@ -42,7 +42,8 @@ namespace Ookii.CommandLine.Tests
         [CommandLineArgument("other2", DefaultValue = "47", ValueDescription = "Number", Position = 1), System.ComponentModel.Description("Arg4 description.")]
         public int Arg4 { get; set; }
 
-        [CommandLineArgument(Position = 0), System.ComponentModel.Description("Arg5 description.")]
+        // Short name should be ignored if not using LongShort mode.
+        [CommandLineArgument(Position = 0, ShortName = 'a'), System.ComponentModel.Description("Arg5 description.")]
         public float Arg5 { get; set; }
 
         [Alias("Alias1")]
@@ -170,9 +171,11 @@ namespace Ookii.CommandLine.Tests
     }
 
     [ParseOptions(
+        Mode = ParsingMode.LongShort,
         AllowDuplicateArguments = true,
         AllowWhiteSpaceValueSeparator = false,
         ArgumentNamePrefixes = new[] { "--", "-" },
+        LongArgumentNamePrefix = "---",
         CaseSensitive = true,
         NameValueSeparator = '=')]
     class ParseOptionsArguments
@@ -185,6 +188,35 @@ namespace Ookii.CommandLine.Tests
     {
         [CommandLineArgument]
         public float Argument { get; set; }
+    }
+
+    [ParseOptions(Mode = ParsingMode.LongShort)]
+    class LongShortArguments
+    {
+        public LongShortArguments([ArgumentName(ShortName = 'f')] int foo = 0, int bar = 0)
+        {
+            Foo = foo;
+            Bar = bar;
+        }
+
+        [CommandLineArgument]
+        public int Arg1 { get; set; }
+
+        [CommandLineArgument(ShortName = 'a')]
+        public int Arg2 { get; set; }
+
+        public int Foo { get; set; }
+
+        public int Bar { get; set; }
+
+        [CommandLineArgument(ShortName = 's')]
+        public bool Switch1 { get; set; }
+
+        [CommandLineArgument(ShortName = 't')]
+        public bool Switch2 { get; set; }
+
+        [CommandLineArgument(ShortName = 'u')]
+        public bool Switch3 { get; set; }
     }
 
 }

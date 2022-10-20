@@ -34,6 +34,20 @@ namespace Ookii.CommandLine
     public class ParseOptionsAttribute : Attribute
     {
         /// <summary>
+        /// Gets or sets a value that indicates the command line argument parsing rules to use.
+        /// </summary>
+        /// <value>
+        /// The <see cref="Ookii.CommandLine.ParsingMode"/> to use. The default is <see cref="ParsingMode.Default"/>.
+        /// </value>
+        /// <remarks>
+        /// <para>
+        ///   This value can be overridden by the <see cref="ParseOptions.Mode"/>
+        ///   property.
+        /// </para>
+        /// </remarks>
+        public ParsingMode Mode { get; set; }
+
+        /// <summary>
         /// Gets or sets the prefixes that can be used to specify an argument name on the command
         /// line.
         /// </summary>
@@ -44,12 +58,38 @@ namespace Ookii.CommandLine
         /// </value>
         /// <remarks>
         /// <para>
+        ///   If the <see cref="Mode"/> property is <see cref="ParsingMode.LongShort"/>,
+        ///   or if the parsing mode is set to <see cref="ParsingMode.LongShort"/>
+        ///   elsewhere, this property indicates the short argument name prefixes. Use
+        ///   <see cref="LongArgumentNamePrefix"/> to set the argument prefix for long names.
+        /// </para>
+        /// <para>
         ///   This value can be overridden by the <see cref="ParseOptions.ArgumentNamePrefixes"/>
         ///   property, or the <see cref="CommandLineParser.CommandLineParser(Type, IEnumerable{string}?, IComparer{string}?)"/>
         ///   constructor.
         /// </para>
         /// </remarks>
         public string[]? ArgumentNamePrefixes { get; set; }
+
+        /// <summary>
+        /// Gets or sets the argument name prefix to se for long argument names.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        ///   This property is only used if the <see cref="Mode"/> property is 
+        ///   <see cref="ParsingMode.LongShort"/>, or if the parsing mode is set to
+        ///   <see cref="ParsingMode.LongShort"/> elsewhere.
+        /// </para>
+        /// <para>
+        ///   Use the <see cref="ArgumentNamePrefixes"/> to specify the prefixes for short argument
+        ///   names.
+        /// </para>
+        /// <para>
+        ///   This value can be overridden by the <see cref="ParseOptions.LongArgumentNamePrefix"/>
+        ///   property.
+        /// </para>
+        /// </remarks>
+        public string? LongArgumentNamePrefix { get; set; }
 
         /// <summary>
         /// Gets or sets a value that indicates whether argument names are treated as case
@@ -141,15 +181,7 @@ namespace Ookii.CommandLine
         /// <seealso cref="CommandLineParser.NameValueSeparator"/>
         public char NameValueSeparator { get; set; } = CommandLineParser.DefaultNameValueSeparator;
 
-        /// <summary>
-        /// Gets the string comparer to use, according to the value of the <see cref="CaseSensitive"/>
-        /// property.
-        /// </summary>
-        /// <returns>
-        /// <see cref="StringComparer.Ordinal"/> if <see cref="CaseSensitive"/> is  <see langword="true" />;
-        /// otherwise, <see cref="StringComparer.OrdinalIgnoreCase"/>
-        /// </returns>
-        public IComparer<string> GetStringComparer()
+        internal IComparer<string> GetStringComparer()
         {
             if (CaseSensitive)
                 return StringComparer.Ordinal;

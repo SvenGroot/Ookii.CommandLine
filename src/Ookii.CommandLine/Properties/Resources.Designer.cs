@@ -88,6 +88,15 @@ namespace Ookii.CommandLine.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The combined short argument &apos;{0}&apos; contains an argument that is not a switch..
+        /// </summary>
+        internal static string CombinedShortNameNonSwitchFormat {
+            get {
+                return ResourceManager.GetString("CombinedShortNameNonSwitchFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to An error occurred creating an instance of the arguments type: {0}.
         /// </summary>
         internal static string CreateArgumentsTypeErrorFormat {
