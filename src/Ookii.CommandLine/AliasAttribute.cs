@@ -25,6 +25,10 @@ namespace Ookii.CommandLine
     ///   does not list the aliases. Either manually add them to the description, or set the <see cref="WriteUsageOptions.IncludeAliasInDescription"/>
     ///   property to <see langword="true"/>.
     /// </para>
+    /// <note>
+    ///   If the <see cref="CommandLineParser.Mode"/> property is <see cref="ParsingMode.LongShort"/>, and the argument
+    ///   this is applied to does not have a long name, this attribute is ignored.
+    /// </note>
     /// </remarks>
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Parameter, AllowMultiple=true)]
     public sealed class AliasAttribute : Attribute

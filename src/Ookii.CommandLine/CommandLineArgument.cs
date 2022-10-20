@@ -97,29 +97,6 @@ namespace Ookii.CommandLine
             }
         }
 
-        #endregion
-
-        private readonly CommandLineParser _parser;
-        private readonly TypeConverter _converter;
-        private readonly PropertyInfo? _property;
-        private readonly string _valueDescription;
-        private readonly string _argumentName;
-        private readonly char _shortName;
-        private readonly IList<string>? _aliases;
-        private readonly Type _argumentType;
-        private readonly Type _elementType;
-        private readonly string? _description;
-        private readonly bool _isRequired;
-        private readonly string _memberName;
-        private readonly object? _defaultValue;
-        private readonly bool _isMultiValue;
-        private readonly bool _isDictionary;
-        private readonly bool _allowDuplicateDictionaryKeys;
-        private readonly string? _multiValueSeparator;
-        private readonly string? _keyValueSeparator;
-        private readonly bool _allowNull;
-        private readonly bool _cancelParsing;
-        private object? _value;
         private struct ArgumentInfo
         {
             public CommandLineParser Parser { get; set; }
@@ -127,6 +104,8 @@ namespace Ookii.CommandLine
             public ParameterInfo? Parameter { get; set; }
             public string MemberName { get; set; }
             public string ArgumentName { get; set; }
+            public bool Long { get; set; }
+            public bool Short { get; set; }
             public char ShortName { get; set; }
             public IList<string>? Aliases { get; set; }
             public Type ArgumentType { get; set; }
@@ -145,6 +124,31 @@ namespace Ookii.CommandLine
             public bool CancelParsing { get; set; }
         }
 
+        #endregion
+
+        private readonly CommandLineParser _parser;
+        private readonly TypeConverter _converter;
+        private readonly PropertyInfo? _property;
+        private readonly string _valueDescription;
+        private readonly string _argumentName;
+        private readonly bool _hasLongName = true;
+        private readonly char _shortName;
+        private readonly IList<string>? _aliases;
+        private readonly Type _argumentType;
+        private readonly Type _elementType;
+        private readonly string? _description;
+        private readonly bool _isRequired;
+        private readonly string _memberName;
+        private readonly object? _defaultValue;
+        private readonly bool _isMultiValue;
+        private readonly bool _isDictionary;
+        private readonly bool _allowDuplicateDictionaryKeys;
+        private readonly string? _multiValueSeparator;
+        private readonly string? _keyValueSeparator;
+        private readonly bool _allowNull;
+        private readonly bool _cancelParsing;
+        private object? _value;
+
         private CommandLineArgument(ArgumentInfo info, ParsingMode mode)
         {
             // If this method throws anything other than a NotSupportedException, it constitutes a bug in the Ookii.CommandLine library.
@@ -153,9 +157,28 @@ namespace Ookii.CommandLine
             _memberName = info.MemberName;
             _argumentName = info.ArgumentName;
             if (mode == ParsingMode.LongShort)
-                _shortName = info.ShortName;
+            {
+                _hasLongName = info.Long;
+                if (info.Short)
+                {
+                    if (info.ShortName != '\0')
+                        _shortName = info.ShortName;
+                    else
+                        _shortName = _argumentName[0];
+                }
 
-            _aliases = info.Aliases;
+                if (!HasLongName)
+                {
+                    if (!HasShortName)
+                        throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.NoLongOrShortName, _argumentName));
+
+                    _argumentName = _shortName.ToString();
+                }
+            }
+
+            if (HasLongName)
+                _aliases = info.Aliases;
+
             _argumentType = info.ArgumentType;
             _elementType = info.ArgumentType;
             _description = info.Description;
@@ -278,7 +301,27 @@ namespace Ookii.CommandLine
         /// <value>
         /// <see langword="true"/> if the argument has a short name; otherwise, <see langword="false"/>.
         /// </value>
+        /// <remarks>
+        /// <para>
+        ///   The short name is only used if the parser is using <see cref="ParsingMode.LongShort"/>.
+        ///   Otherwise, this property always returns <see langword="false"/>.
+        /// </para>
+        /// </remarks>
         public bool HasShortName => _shortName != '\0';
+
+        /// <summary>
+        /// Gets a value that indicates whether the argument has a long name.
+        /// </summary>
+        /// <value>
+        ///   <see langword="true"/> if the argument has a long name; otherwise, <see langword="false"/>.
+        /// </value>
+        /// <remarks>
+        /// <para>
+        ///   If the <see cref="CommandLineParser.Mode"/> property is not <see cref="ParsingMode.LongShort"/>,
+        ///   this property is not used and always returns <see langword="true"/>.
+        /// </para>
+        /// </remarks>
+        public bool HasLongName => _hasLongName;
 
         /// <summary>
         /// Gets the alternative names for this command line argument.
@@ -794,6 +837,8 @@ namespace Ookii.CommandLine
                 Parser = parser,
                 Parameter = parameter,
                 ArgumentName = argumentName,
+                Long = argumentNameAttribute?.Long ?? true,
+                Short = argumentNameAttribute?.Short ?? false,
                 ShortName = argumentNameAttribute?.ShortName ?? '\0',
                 ArgumentType = parameter.ParameterType,
                 Description = TypeHelper.GetAttribute<DescriptionAttribute>(parameter)?.Description,
@@ -834,6 +879,8 @@ namespace Ookii.CommandLine
                 Parser = parser,
                 Property = property,
                 ArgumentName = argumentName,
+                Long = attribute.Long,
+                Short = attribute.Short,
                 ShortName = attribute.ShortName,
                 ArgumentType = property.PropertyType,
                 Description = TypeHelper.GetAttribute<DescriptionAttribute>(property)?.Description,

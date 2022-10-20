@@ -261,4 +261,7 @@
   <data name="CombinedShortNameNonSwitchFormat" xml:space="preserve">
     <value>The combined short argument '{0}' contains an argument that is not a switch.</value>
   </data>
+  <data name="NoLongOrShortName" xml:space="preserve">
+    <value>The argument '{0}' cannot be accessed by either long or short name.</value>
+  </data>
 </root>

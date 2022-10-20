@@ -380,6 +380,15 @@ namespace Ookii.CommandLine.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The argument &apos;{0}&apos; cannot be accessed by either long or short name..
+        /// </summary>
+        internal static string NoLongOrShortName {
+            get {
+                return ResourceManager.GetString("NoLongOrShortName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The command line arguments type has more than one constructor, none of which has the CommandLineConstructorAttribute attribute..
         /// </summary>
         internal static string NoMarkedConstructor {

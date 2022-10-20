@@ -11,6 +11,7 @@ namespace Ookii.CommandLine
     public sealed class CommandLineArgumentAttribute : Attribute
     {
         private readonly string? _argumentName;
+        private bool _short;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CommandLineArgumentAttribute"/> class using the property name as the argument name.
@@ -42,13 +43,54 @@ namespace Ookii.CommandLine
         }
 
         /// <summary>
+        /// Gets or sets a value that indicates whether the argument has a long name.
+        /// </summary>
+        /// <value>
+        /// <see langword="true"/> if the argument has a long name; otherwise, <see langword="false"/>.
+        /// The default value is <see langword="true"/>.
+        /// </value>
+        /// <remarks>
+        /// <note>
+        ///   This property is ignored if <see cref="CommandLineParser.Mode"/> is not
+        ///   <see cref="ParsingMode.LongShort"/>.
+        /// </note>
+        /// </remarks>
+        public bool Long { get; set; } = true;
+        
+        /// <summary>
+        /// Gets or sets a value that indicates whether the argument has a short name.
+        /// </summary>
+        /// <value>
+        /// <see langword="true"/> if the argument has a short name; otherwise, <see langword="false"/>.
+        /// The default value is <see langword="false"/>.
+        /// </value>
+        /// <remarks>
+        /// <note>
+        ///   This property is ignored if <see cref="CommandLineParser.Mode"/> is not
+        ///   <see cref="ParsingMode.LongShort"/>.
+        /// </note>
+        /// <para>
+        ///   If <see cref="ShortName"/> is not set but this property is set to <see langword="true"/>,
+        ///   the short name will be derived using the first character of the long name.
+        /// </para>
+        /// </remarks>
+        public bool Short
+        {
+            get => _short || ShortName != '\0';
+            set => _short = value;
+        }
+
+        /// <summary>
         /// Gets or sets the argument's short name.
         /// </summary>
         /// <value>The short name, or a null character ('\0') if the argument has no short name.</value>
         /// <remarks>
-        /// <para>
+        /// <note>
         ///   This property is ignored if <see cref="CommandLineParser.Mode"/> is not
         ///   <see cref="ParsingMode.LongShort"/>.
+        /// </note>
+        /// <para>
+        ///   Setting this property implies <see cref="Short"/> is <see langword="true"/>.
         /// </para>
         /// </remarks>
         public char ShortName { get; set; }

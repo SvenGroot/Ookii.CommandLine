@@ -42,8 +42,8 @@ namespace Ookii.CommandLine.Tests
         [CommandLineArgument("other2", DefaultValue = "47", ValueDescription = "Number", Position = 1), System.ComponentModel.Description("Arg4 description.")]
         public int Arg4 { get; set; }
 
-        // Short name should be ignored if not using LongShort mode.
-        [CommandLineArgument(Position = 0, ShortName = 'a'), System.ComponentModel.Description("Arg5 description.")]
+        // Short/long name stuff should be ignored if not using LongShort mode.
+        [CommandLineArgument(Position = 0, ShortName = 'a', Long = false), System.ComponentModel.Description("Arg5 description.")]
         public float Arg5 { get; set; }
 
         [Alias("Alias1")]
@@ -193,7 +193,7 @@ namespace Ookii.CommandLine.Tests
     [ParseOptions(Mode = ParsingMode.LongShort)]
     class LongShortArguments
     {
-        public LongShortArguments([ArgumentName(ShortName = 'f')] int foo = 0, int bar = 0)
+        public LongShortArguments([ArgumentName(Short = true)] int foo = 0, int bar = 0)
         {
             Foo = foo;
             Bar = bar;
@@ -209,7 +209,7 @@ namespace Ookii.CommandLine.Tests
 
         public int Bar { get; set; }
 
-        [CommandLineArgument(ShortName = 's')]
+        [CommandLineArgument(Short = true)]
         public bool Switch1 { get; set; }
 
         [CommandLineArgument(ShortName = 't')]

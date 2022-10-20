@@ -1149,16 +1149,19 @@ namespace Ookii.CommandLine
             if( argument.ArgumentName.IndexOf(NameValueSeparator) >= 0 )
                 throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.ArgumentNameContainsSeparatorFormat, argument.ArgumentName));
 
-            _argumentsByName.Add(argument.ArgumentName, argument);
+            if (argument.HasLongName)
+            {
+                _argumentsByName.Add(argument.ArgumentName, argument);
+                if (argument.Aliases != null)
+                {
+                    foreach (string alias in argument.Aliases)
+                        _argumentsByName.Add(alias, argument);
+                }
+            }
+
             if (_argumentsByShortName != null && argument.HasShortName)
             {
                 _argumentsByShortName.Add(argument.ShortName.ToString(), argument);
-            }
-
-            if( argument.Aliases != null )
-            {
-                foreach( string alias in argument.Aliases )
-                    _argumentsByName.Add(alias, argument);
             }
 
             _arguments.Add(argument);
