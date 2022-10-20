@@ -145,14 +145,16 @@ namespace Ookii.CommandLine
             public bool CancelParsing { get; set; }
         }
 
-        private CommandLineArgument(ArgumentInfo info)
+        private CommandLineArgument(ArgumentInfo info, ParsingMode mode)
         {
             // If this method throws anything other than a NotSupportedException, it constitutes a bug in the Ookii.CommandLine library.
             _parser = info.Parser;
             _property = info.Property;
             _memberName = info.MemberName;
             _argumentName = info.ArgumentName;
-            _shortName = info.ShortName;
+            if (mode == ParsingMode.LongShort)
+                _shortName = info.ShortName;
+
             _aliases = info.Aliases;
             _argumentType = info.ArgumentType;
             _elementType = info.ArgumentType;
@@ -810,7 +812,7 @@ namespace Ookii.CommandLine
                 AllowNull = DetermineAllowsNull(parameter),
             };
 
-            return new CommandLineArgument(info);
+            return new CommandLineArgument(info, parser.Mode);
         }
 
         internal static CommandLineArgument Create(CommandLineParser parser, PropertyInfo property)
@@ -851,7 +853,7 @@ namespace Ookii.CommandLine
                 CancelParsing = attribute.CancelParsing,
             };
 
-            return new CommandLineArgument(info);
+            return new CommandLineArgument(info, parser.Mode);
         }
 
         internal void ApplyPropertyValue(object target)

@@ -20,18 +20,6 @@ namespace Ookii.CommandLine.Tests
     [TestClass()]
     public class CommandLineParserTest
     {
-        private TestContext testContextInstance;
-
-        /// <summary>
-        ///Gets or sets the test context which provides
-        ///information about and functionality for the current test run.
-        ///</summary>
-        public TestContext TestContext
-        {
-            get { return testContextInstance; }
-            set { testContextInstance = value; }
-        }
-
         /// <summary>
         ///A test for CommandLineParser Constructor
         ///</summary>
@@ -142,15 +130,7 @@ namespace Ookii.CommandLine.Tests
             CommandLineParser target = new CommandLineParser(argumentsType, new[] { "/", "-" });
 
             // This test was added because version 2.0 threw an IndexOutOfRangeException when you tried to specify a positional argument when there were no positional arguments defined.
-            try
-            {
-                target.Parse(new[] { "Foo", "Bar" });
-                Assert.Fail("Expected CommandLineArgumentException.");
-            }
-            catch( CommandLineArgumentException ex )
-            {
-                Assert.AreEqual(CommandLineArgumentErrorCategory.TooManyArguments, ex.Category);
-            }
+            CheckThrows(() => target.Parse(new[] { "Foo", "Bar" }), CommandLineArgumentErrorCategory.TooManyArguments);
         }
 
         [TestMethod]
@@ -159,16 +139,8 @@ namespace Ookii.CommandLine.Tests
             Type argumentsType = typeof(MultipleConstructorsArguments);
             CommandLineParser target = new CommandLineParser(argumentsType, new[] { "/", "-" });
 
-            try
-            {
-                // Only accepts one positional argument.
-                target.Parse(new[] { "Foo", "Bar" });
-                Assert.Fail("Expected CommandLineArgumentException.");
-            }
-            catch( CommandLineArgumentException ex )
-            {
-                Assert.AreEqual(CommandLineArgumentErrorCategory.TooManyArguments, ex.Category);
-            }
+            // Only accepts one positional argument.
+            CheckThrows(() => target.Parse(new[] { "Foo", "Bar" }), CommandLineArgumentErrorCategory.TooManyArguments);
         }
 
         [TestMethod]
@@ -177,17 +149,10 @@ namespace Ookii.CommandLine.Tests
             Type argumentsType = typeof(MultipleConstructorsArguments);
             CommandLineParser target = new CommandLineParser(argumentsType, new[] { "/", "-" });
 
-            try
-            {
-                target.Parse(new[] { "Foo", "-ThrowingArgument", "-5" });
-                Assert.Fail("Expected CommandLineArgumentException.");
-            }
-            catch( CommandLineArgumentException ex )
-            {
-                Assert.AreEqual(CommandLineArgumentErrorCategory.ApplyValueError, ex.Category);
-                Assert.AreEqual("ThrowingArgument", ex.ArgumentName);
-                Assert.IsInstanceOfType(ex.InnerException, typeof(ArgumentOutOfRangeException));
-            }
+            CheckThrows(() => target.Parse(new[] { "Foo", "-ThrowingArgument", "-5" }),
+                CommandLineArgumentErrorCategory.ApplyValueError,
+                "ThrowingArgument",
+                typeof(ArgumentOutOfRangeException));
         }
 
         [TestMethod]
@@ -196,17 +161,10 @@ namespace Ookii.CommandLine.Tests
             Type argumentsType = typeof(MultipleConstructorsArguments);
             CommandLineParser target = new CommandLineParser(argumentsType, new[] { "/", "-" });
 
-            try
-            {
-                target.Parse(new[] { "invalid" });
-                Assert.Fail("Expected CommandLineArgumentException.");
-            }
-            catch( CommandLineArgumentException ex )
-            {
-                Assert.AreEqual(CommandLineArgumentErrorCategory.CreateArgumentsTypeError, ex.Category);
-                Assert.IsNull(ex.ArgumentName);
-                Assert.IsInstanceOfType(ex.InnerException, typeof(ArgumentException));
-            }
+            CheckThrows(() => target.Parse(new[] { "invalid" }),
+                CommandLineArgumentErrorCategory.CreateArgumentsTypeError,
+                null,
+                typeof(ArgumentException));
         }
 
         [TestMethod]
@@ -220,16 +178,11 @@ namespace Ookii.CommandLine.Tests
             Assert.AreEqual(2, args.DuplicateKeys.Count);
             Assert.AreEqual(3, args.DuplicateKeys["Foo"]);
             Assert.AreEqual(2, args.DuplicateKeys["Bar"]);
-            try
-            {
-                target.Parse(new[] { "-NoDuplicateKeys", "Foo=1", "-NoDuplicateKeys", "Bar=2", "-NoDuplicateKeys", "Foo=3" });
-            }
-            catch( CommandLineArgumentException ex )
-            {
-                Assert.AreEqual(CommandLineArgumentErrorCategory.InvalidDictionaryValue, ex.Category);
-                Assert.AreEqual("NoDuplicateKeys", ex.ArgumentName);
-                Assert.IsInstanceOfType(ex.InnerException, typeof(ArgumentException));
-            }
+
+            CheckThrows(() => target.Parse(new[] { "-NoDuplicateKeys", "Foo=1", "-NoDuplicateKeys", "Bar=2", "-NoDuplicateKeys", "Foo=3" }),
+                CommandLineArgumentErrorCategory.InvalidDictionaryValue,
+                "NoDuplicateKeys",
+                typeof(ArgumentException));
         }
 
         [TestMethod]
@@ -254,30 +207,18 @@ namespace Ookii.CommandLine.Tests
             Assert.IsNotNull(args);
             Assert.AreEqual("test", args.Argument1);
             Assert.AreEqual("foo:bar", args.Argument2);
-            try
-            {
-                args = (SimpleArguments)target.Parse(new[] { "-Argument1=test" });
-                Assert.Fail("Exception expected");
-            }
-            catch (CommandLineArgumentException ex)
-            {
-                Assert.AreEqual(CommandLineArgumentErrorCategory.UnknownArgument, ex.Category);
-            }
+            CheckThrows(() => target.Parse(new[] { "-Argument1=test" }),
+                CommandLineArgumentErrorCategory.UnknownArgument,
+                "Argument1=test");
 
             target.NameValueSeparator = '=';
             args = (SimpleArguments)target.Parse(new[] { "-Argument1=test", "-Argument2=foo=bar" });
             Assert.IsNotNull(args);
             Assert.AreEqual("test", args.Argument1);
             Assert.AreEqual("foo=bar", args.Argument2);
-            try
-            {
-                args = (SimpleArguments)target.Parse(new[] { "-Argument1:test" });
-                Assert.Fail("Exception expected");
-            }
-            catch (CommandLineArgumentException ex)
-            {
-                Assert.AreEqual(CommandLineArgumentErrorCategory.UnknownArgument, ex.Category);
-            }
+            CheckThrows(() => target.Parse(new[] { "-Argument1:test" }),
+                CommandLineArgumentErrorCategory.UnknownArgument,
+                "Argument1:test");
         }
 
         [TestMethod]
@@ -292,28 +233,17 @@ namespace Ookii.CommandLine.Tests
             var result = (KeyValueSeparatorArguments)target.Parse(new[] { "-CustomSeparator", "foo<=>bar", "-CustomSeparator", "baz<=>contains<=>separator", "-CustomSeparator", "hello<=>" });
             Assert.IsNotNull(result);
             CollectionAssert.AreEquivalent(new[] { KeyValuePair.Create("foo", "bar"), KeyValuePair.Create("baz", "contains<=>separator"), KeyValuePair.Create("hello", "") }, result.CustomSeparator);
+            CheckThrows(() => target.Parse(new[] { "-CustomSeparator", "foo=bar" }),
+                CommandLineArgumentErrorCategory.ArgumentValueConversion,
+                "CustomSeparator",
+                typeof(FormatException));
 
-            try
-            {
-                target.Parse(new[] { "-CustomSeparator", "foo=bar" });
-                Assert.Fail("Exception expected.");
-            }
-            catch (CommandLineArgumentException ex)
-            {
-                Assert.AreEqual(CommandLineArgumentErrorCategory.ArgumentValueConversion, ex.Category);
-                Assert.AreEqual("CustomSeparator", ex.ArgumentName);
-            }
-
-            try
-            {
-                target.Parse(new[] { "-DefaultSeparator", "foo<=>bar" });
-                Assert.Fail("Exception expected.");
-            }
-            catch (CommandLineArgumentException ex)
-            {
-                Assert.AreEqual(CommandLineArgumentErrorCategory.ArgumentValueConversion, ex.Category);
-                Assert.AreEqual("DefaultSeparator", ex.ArgumentName);
-            }
+            // Inner exception is Argument exception because what throws here is trying to convert
+            // ">bar" to int.
+            CheckThrows(() => target.Parse(new[] { "-DefaultSeparator", "foo<=>bar" }),
+                CommandLineArgumentErrorCategory.ArgumentValueConversion,
+                "DefaultSeparator",
+                typeof(ArgumentException));
         }
 
         [TestMethod]
@@ -494,6 +424,11 @@ namespace Ookii.CommandLine.Tests
             Assert.AreSame(parser.GetArgument("switch1"), parser.GetShortArgument('s'));
             Assert.AreSame(parser.GetArgument("switch2"), parser.GetShortArgument('t'));
             Assert.AreSame(parser.GetArgument("switch3"), parser.GetShortArgument('u'));
+            Assert.AreEqual('f', parser.GetArgument("foo").ShortName);
+            Assert.IsTrue(parser.GetArgument("foo").HasShortName);
+            Assert.AreEqual('\0', parser.GetArgument("bar").ShortName);
+            Assert.IsFalse(parser.GetArgument("bar").HasShortName);
+
             var result = (LongShortArguments)parser.Parse(new[] { "-f", "5", "--bar", "6", "-a", "7", "--arg1", "8", "-s" });
             Assert.AreEqual(5, result.Foo);
             Assert.AreEqual(6, result.Bar);
@@ -581,7 +516,7 @@ namespace Ookii.CommandLine.Tests
                 Assert.AreEqual(arg15.Value, result.Arg15);
         }
 
-        private static void CheckThrows(Action operation, CommandLineArgumentErrorCategory category, string argumentName = null)
+        private static void CheckThrows(Action operation, CommandLineArgumentErrorCategory category, string argumentName = null, Type innerExceptionType = null)
         {
             try
             {
@@ -592,6 +527,10 @@ namespace Ookii.CommandLine.Tests
             {
                 Assert.AreEqual(category, ex.Category);
                 Assert.AreEqual(argumentName, ex.ArgumentName);
+                if (innerExceptionType == null)
+                    Assert.IsNull(ex.InnerException);
+                else
+                    Assert.IsInstanceOfType(ex.InnerException, innerExceptionType);
             }
         }
 
