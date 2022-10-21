@@ -133,7 +133,7 @@ namespace Ookii.CommandLine.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to     {3}{0} {2}{5}
+        ///   Looks up a localized string similar to     {6}{3}{0} {2}{5}{7}
         ///{1}{4}
         ///.
         /// </summary>
@@ -351,6 +351,15 @@ namespace Ookii.CommandLine.Properties {
         internal static string InvalidOptionalArgumentOrder {
             get {
                 return ResourceManager.GetString("InvalidOptionalArgumentOrder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid standard stream value..
+        /// </summary>
+        internal static string InvalidStandardStream {
+            get {
+                return ResourceManager.GetString("InvalidStandardStream", resourceCulture);
             }
         }
         

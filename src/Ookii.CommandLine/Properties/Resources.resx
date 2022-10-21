@@ -124,7 +124,7 @@
     <value>A positional array argument must be the last positional argument.</value>
   </data>
   <data name="DefaultArgumentDescriptionFormat" xml:space="preserve">
-    <value>    {3}{0} {2}{5}
+    <value>    {6}{3}{0} {2}{5}{7}
 {1}{4}
 </value>
     <comment>Note this contains a newline at the end of the format. If you change this format, you may also need to change the indent used in the code.</comment>
@@ -275,5 +275,8 @@
 {5}{6}
 </value>
     <comment>Note this contains a newline at the end of the format. If you change this format, you may also need to change the indent used in the code.</comment>
+  </data>
+  <data name="InvalidStandardStream" xml:space="preserve">
+    <value>Invalid standard stream value.</value>
   </data>
 </root>

@@ -1327,6 +1327,11 @@ namespace Ookii.CommandLine
                 ? new string(' ', _argumentNamePrefixes[0].Length + 1 + options.ArgumentNamesSeparator.Length)
                 : string.Empty;
 
+            // TODO: Optional based on options, check support in WriteUsageForConsole.
+            VirtualTerminal.EnableColor(VirtualTerminal.StandardStream.Output);
+            string colorStart = VirtualTerminal.GetTextFormatSequence(VirtualTerminal.TextFormat.ForegroundGreen);
+            string colorEnd = VirtualTerminal.GetTextFormatSequence(VirtualTerminal.TextFormat.Default); ;
+
             foreach (var argument in _arguments)
             {
                 bool include = options.ArgumentDescriptionListFilter switch
@@ -1359,7 +1364,7 @@ namespace Ookii.CommandLine
                 else
                 {
                     writer.WriteLine(options.ArgumentDescriptionFormat, argument.ArgumentName, argument.Description,
-                        valueDescription, _argumentNamePrefixes[0], defaultValue, alias);
+                        valueDescription, _argumentNamePrefixes[0], defaultValue, alias, colorStart, colorEnd);
                 }
             }
         }
