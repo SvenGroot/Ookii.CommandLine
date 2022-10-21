@@ -840,6 +840,34 @@ namespace Ookii.CommandLine
                 return string.Format(CultureInfo.CurrentCulture, options.OptionalArgumentFormat, argument);
         }
 
+        internal bool HasInformation(WriteUsageOptions options)
+        {
+            if (!string.IsNullOrEmpty(Description))
+                return true;
+
+            if (options.UseAbbreviatedSyntax && Position == null)
+                return true;
+
+            if (options.UseShortNamesForSyntax)
+            {
+                if (HasLongName)
+                    return true;
+            }
+            else if (HasShortName)
+                return true;
+
+            if (options.IncludeAliasInDescription &&
+                ((Aliases != null && Aliases.Count > 0) || (ShortAliases != null && ShortAliases.Count > 0)))
+            {
+                return true;
+            }
+
+            if (options.IncludeDefaultValueInDescription && DefaultValue != null)
+                return true;
+
+            return false;
+        }
+
         internal void SetValue(CultureInfo culture, string? value)
         {
             if( IsMultiValue && _multiValueSeparator != null )

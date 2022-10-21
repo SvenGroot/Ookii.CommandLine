@@ -440,6 +440,15 @@ namespace Ookii.CommandLine
         public int LongShortArgumentDescriptionIndent { get; set; } = 12;
 
         /// <summary>
+        /// Gets or sets a value that indicates which arguments should be included.
+        /// </summary>
+        /// <value>
+        /// One of the <see cref="DescriptionListFilterMode"/> values. The default is
+        /// <see cref="DescriptionListFilterMode.Information"/>.
+        /// </value>
+        public DescriptionListFilterMode ArgumentDescriptionListFilter { get; set; }
+
+        /// <summary>
         /// Gets or sets a string used to separator argument names.
         /// </summary>
         /// <value>

@@ -1309,7 +1309,9 @@ namespace Ookii.CommandLine
 
         private void WriteArgumentDescriptions(LineWrappingTextWriter writer, WriteUsageOptions options)
         {
-            writer.ResetIndent();
+            if (options.ArgumentDescriptionListFilter == DescriptionListFilterMode.None)
+                return;
+
             if (writer.MaximumLineLength > 0 && writer.MaximumLineLength < MaximumLineWidthForIndent)
             {
                 writer.Indent = 0;
@@ -1327,8 +1329,16 @@ namespace Ookii.CommandLine
 
             foreach (var argument in _arguments)
             {
-                // Omit arguments that don't have a description.
-                if (string.IsNullOrEmpty(argument.Description))
+                bool include = options.ArgumentDescriptionListFilter switch
+                {
+                    DescriptionListFilterMode.Information => argument.HasInformation(options),
+                    DescriptionListFilterMode.Description => !string.IsNullOrEmpty(argument.Description),
+                    DescriptionListFilterMode.All => true,
+                    _ => false,
+                };
+
+                // Omit arguments that don't fit the filter.
+                if (!include)
                     continue;
 
                 writer.ResetIndent();

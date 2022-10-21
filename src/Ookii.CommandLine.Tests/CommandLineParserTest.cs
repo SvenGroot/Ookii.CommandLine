@@ -286,6 +286,28 @@ namespace Ookii.CommandLine.Tests
         }
 
         [TestMethod]
+        public void TestWriteUsageFilter()
+        {
+            var target = new CommandLineParser<TestArguments>();
+            var options = new WriteUsageOptions()
+            {
+                UsagePrefix = _usagePrefix,
+                ArgumentDescriptionListFilter = DescriptionListFilterMode.Description
+            };
+
+            string actual = target.GetUsage(0, options);
+            Assert.AreEqual(_expectedUsageDescriptionOnly, actual);
+
+            options.ArgumentDescriptionListFilter = DescriptionListFilterMode.All;
+            actual = target.GetUsage(0, options);
+            Assert.AreEqual(_expectedUsageAll, actual);
+
+            options.ArgumentDescriptionListFilter = DescriptionListFilterMode.None;
+            actual = target.GetUsage(0, options);
+            Assert.AreEqual(_expectedUsageNone, actual);
+        }
+
+        [TestMethod]
         public void TestStaticParse()
         {
             using var output = new StringWriter();
@@ -581,6 +603,9 @@ Usage: test [/arg1] <String> [[/other] <Number>] [[/notSwitch] <Boolean>] [[/Arg
     /other <Number>
         Arg2 description. Default value: 42.
 
+    /notSwitch <Boolean>
+         Default value: False.
+
     /Arg5 <Single>
         Arg5 description.
 
@@ -589,6 +614,12 @@ Usage: test [/arg1] <String> [[/other] <Number>] [[/notSwitch] <Boolean>] [[/Arg
 
     /Arg6 <String> (/Alias1, /Alias2)
         Arg6 description.
+
+    /Arg12 <Int32>
+         Default value: 42.
+
+    /Arg7 [<Boolean>] (/Alias3)
+
 
 ";
 
@@ -666,6 +697,88 @@ Usage: test [/arg1] <String> [[/other] <Number>] [[/notSwitch] <Boolean>] [[/Arg
             Switch3 description.
 
 ";
+
+        private const string _expectedUsageDescriptionOnly = @"Test arguments description.
+
+Usage: test [-arg1] <String> [[-other] <Number>] [[-notSwitch] <Boolean>] [[-Arg5] <Single>] [[-other2] <Number>] [[-Arg8] <DayOfWeek>...] -Arg6 <String> [-Arg10...] [-Arg11] [-Arg12 <Int32>...] [-Arg13 <String=Int32>...] [-Arg14 <String=Int32>...] [-Arg15 <KeyValuePair<String, Int32>>] [-Arg3 <String>] [-Arg7] [-Arg9 <Int32>]
+
+    -arg1 <String>
+        Arg1 description.
+
+    -other <Number>
+        Arg2 description. Default value: 42.
+
+    -Arg5 <Single>
+        Arg5 description.
+
+    -other2 <Number>
+        Arg4 description. Default value: 47.
+
+    -Arg6 <String> (-Alias1, -Alias2)
+        Arg6 description.
+
+";
+
+        private const string _expectedUsageAll = @"Test arguments description.
+
+Usage: test [-arg1] <String> [[-other] <Number>] [[-notSwitch] <Boolean>] [[-Arg5] <Single>] [[-other2] <Number>] [[-Arg8] <DayOfWeek>...] -Arg6 <String> [-Arg10...] [-Arg11] [-Arg12 <Int32>...] [-Arg13 <String=Int32>...] [-Arg14 <String=Int32>...] [-Arg15 <KeyValuePair<String, Int32>>] [-Arg3 <String>] [-Arg7] [-Arg9 <Int32>]
+
+    -arg1 <String>
+        Arg1 description.
+
+    -other <Number>
+        Arg2 description. Default value: 42.
+
+    -notSwitch <Boolean>
+         Default value: False.
+
+    -Arg5 <Single>
+        Arg5 description.
+
+    -other2 <Number>
+        Arg4 description. Default value: 47.
+
+    -Arg8 <DayOfWeek>
+
+
+    -Arg6 <String> (-Alias1, -Alias2)
+        Arg6 description.
+
+    -Arg10 [<Boolean>]
+
+
+    -Arg11 [<Boolean>]
+
+
+    -Arg12 <Int32>
+         Default value: 42.
+
+    -Arg13 <String=Int32>
+
+
+    -Arg14 <String=Int32>
+
+
+    -Arg15 <KeyValuePair<String, Int32>>
+
+
+    -Arg3 <String>
+
+
+    -Arg7 [<Boolean>] (-Alias3)
+
+
+    -Arg9 <Int32>
+
+
+";
+
+        private const string _expectedUsageNone = @"Test arguments description.
+
+Usage: test [-arg1] <String> [[-other] <Number>] [[-notSwitch] <Boolean>] [[-Arg5] <Single>] [[-other2] <Number>] [[-Arg8] <DayOfWeek>...] -Arg6 <String> [-Arg10...] [-Arg11] [-Arg12 <Int32>...] [-Arg13 <String=Int32>...] [-Arg14 <String=Int32>...] [-Arg15 <KeyValuePair<String, Int32>>] [-Arg3 <String>] [-Arg7] [-Arg9 <Int32>]
+
+";
+
 
         #endregion
 
