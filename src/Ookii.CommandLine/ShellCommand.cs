@@ -369,6 +369,11 @@ namespace Ookii.CommandLine
                 throw new ArgumentOutOfRangeException(nameof(index));
 
             options ??= new();
+            if (options.UsageOptions.UseColor == null && options.Out == null)
+            {
+                options.UsageOptions.UseColor = VirtualTerminal.EnableColor(VirtualTerminal.StandardStream.Output);
+            }
+
             using var output = DisposableWrapper.Create(options.Out, LineWrappingTextWriter.ForConsoleOut);
             using var error = DisposableWrapper.Create(options.Error, LineWrappingTextWriter.ForConsoleError);
 

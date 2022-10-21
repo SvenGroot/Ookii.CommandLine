@@ -136,8 +136,8 @@ namespace Ookii.CommandLine
         private readonly string _argumentName;
         private readonly bool _hasLongName = true;
         private readonly char _shortName;
-        private readonly ReadOnlyCollection<string> _aliases;
-        private readonly ReadOnlyCollection<char> _shortAliases;
+        private readonly ReadOnlyCollection<string>? _aliases;
+        private readonly ReadOnlyCollection<char>? _shortAliases;
         private readonly Type _argumentType;
         private readonly Type _elementType;
         private readonly string? _description;
@@ -343,7 +343,7 @@ namespace Ookii.CommandLine
         ///   will always return an empty collection .
         /// </para>
         /// </remarks>
-        public ReadOnlyCollection<string> Aliases => _aliases;
+        public ReadOnlyCollection<string>? Aliases => _aliases;
 
         /// <summary>
         /// Gets the alternative short names for this command line argument.
@@ -358,7 +358,7 @@ namespace Ookii.CommandLine
         ///   will always return an empty collection .
         /// </para>
         /// </remarks>
-        public ReadOnlyCollection<char> ShortAliases => _shortAliases;
+        public ReadOnlyCollection<char>? ShortAliases => _shortAliases;
 
         /// <summary>
         /// Gets the type of the argument.

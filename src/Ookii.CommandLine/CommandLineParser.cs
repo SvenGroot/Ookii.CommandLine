@@ -575,6 +575,12 @@ namespace Ookii.CommandLine
         /// </remarks>
         public void WriteUsageToConsole(WriteUsageOptions? options = null)
         {
+            options ??= new();
+            if (options.UseColor == null)
+            {
+                options.UseColor = VirtualTerminal.EnableColor(VirtualTerminal.StandardStream.Output);
+            }
+
             WriteUsage(Console.Out, Console.WindowWidth - 1, options);
         }
         
@@ -1071,6 +1077,11 @@ namespace Ookii.CommandLine
             options ??= new();
             var parser = new CommandLineParser(argumentsType, options);
 
+            if (options.UsageOptions.UseColor == null && options.Out == null)
+            {
+                options.UsageOptions.UseColor = VirtualTerminal.EnableColor(VirtualTerminal.StandardStream.Output);
+            }
+
             using var output = DisposableWrapper.Create(options.Out, LineWrappingTextWriter.ForConsoleOut);
             using var error = DisposableWrapper.Create(options.Error, LineWrappingTextWriter.ForConsoleError);
             try
@@ -1328,9 +1339,14 @@ namespace Ookii.CommandLine
                 : string.Empty;
 
             // TODO: Optional based on options, check support in WriteUsageForConsole.
-            VirtualTerminal.EnableColor(VirtualTerminal.StandardStream.Output);
-            string colorStart = VirtualTerminal.GetTextFormatSequence(VirtualTerminal.TextFormat.ForegroundGreen);
-            string colorEnd = VirtualTerminal.GetTextFormatSequence(VirtualTerminal.TextFormat.Default); ;
+            bool useColor = options.UseColor ?? false;
+            string colorStart = string.Empty;
+            string colorEnd = string.Empty;
+            if (useColor)
+            {
+                colorStart = options.ArgumentDescriptionColor;
+                colorEnd = options.ColorReset;
+            }
 
             foreach (var argument in _arguments)
             {

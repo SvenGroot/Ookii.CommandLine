@@ -448,6 +448,8 @@ namespace Ookii.CommandLine
         /// </value>
         public DescriptionListFilterMode ArgumentDescriptionListFilter { get; set; }
 
+        public string ArgumentDescriptionColor { get; set; } = VirtualTerminal.TextFormat.ForegroundGreen;
+
         /// <summary>
         /// Gets or sets a string used to separator argument names.
         /// </summary>
@@ -607,5 +609,9 @@ namespace Ookii.CommandLine
             get { return _defaultValueFormat ?? Properties.Resources.DefaultDefaultValueFormat; }
             set { _defaultValueFormat = value; }
         }
+
+        public string ColorReset { get; set; } = VirtualTerminal.TextFormat.Default;
+
+        public bool? UseColor { get; set; }
     }
 }
