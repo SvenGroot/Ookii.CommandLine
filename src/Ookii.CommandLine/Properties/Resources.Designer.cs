@@ -106,6 +106,15 @@ namespace Ookii.CommandLine.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to [arguments].
+        /// </summary>
+        internal static string DefaultAbbreviatedRemainingArguments {
+            get {
+                return ResourceManager.GetString("DefaultAbbreviatedRemainingArguments", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to  ({0}).
         /// </summary>
         internal static string DefaultAliasesFormat {
@@ -131,6 +140,15 @@ namespace Ookii.CommandLine.Properties {
         internal static string DefaultArgumentDescriptionFormat {
             get {
                 return ResourceManager.GetString("DefaultArgumentDescriptionFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to , .
+        /// </summary>
+        internal static string DefaultArgumentNamesSeparator {
+            get {
+                return ResourceManager.GetString("DefaultArgumentNamesSeparator", resourceCulture);
             }
         }
         
@@ -178,6 +196,17 @@ namespace Ookii.CommandLine.Properties {
         internal static string DefaultDefaultValueFormat {
             get {
                 return ResourceManager.GetString("DefaultDefaultValueFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to     {0}{1}{2} {3}{4}
+        ///{5}{6}
+        ///.
+        /// </summary>
+        internal static string DefaultLongShortArgumentDescriptionFormat {
+            get {
+                return ResourceManager.GetString("DefaultLongShortArgumentDescriptionFormat", resourceCulture);
             }
         }
         

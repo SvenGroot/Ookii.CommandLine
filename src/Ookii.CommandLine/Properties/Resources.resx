@@ -264,4 +264,16 @@
   <data name="NoLongOrShortName" xml:space="preserve">
     <value>The argument '{0}' cannot be accessed by either long or short name.</value>
   </data>
+  <data name="DefaultAbbreviatedRemainingArguments" xml:space="preserve">
+    <value>[arguments]</value>
+  </data>
+  <data name="DefaultArgumentNamesSeparator" xml:space="preserve">
+    <value>, </value>
+  </data>
+  <data name="DefaultLongShortArgumentDescriptionFormat" xml:space="preserve">
+    <value>    {0}{1}{2} {3}{4}
+{5}{6}
+</value>
+    <comment>Note this contains a newline at the end of the format. If you change this format, you may also need to change the indent used in the code.</comment>
+  </data>
 </root>

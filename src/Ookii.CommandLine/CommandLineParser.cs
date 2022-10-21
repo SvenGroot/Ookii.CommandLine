@@ -10,6 +10,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 
 namespace Ookii.CommandLine
 {
@@ -1309,40 +1310,82 @@ namespace Ookii.CommandLine
         private void WriteArgumentDescriptions(LineWrappingTextWriter writer, WriteUsageOptions options)
         {
             writer.ResetIndent();
-            writer.Indent = writer.MaximumLineLength > 0 && writer.MaximumLineLength < MaximumLineWidthForIndent ? 0 : options.ArgumentDescriptionIndent;
+            if (writer.MaximumLineLength > 0 && writer.MaximumLineLength < MaximumLineWidthForIndent)
+            {
+                writer.Indent = 0;
+            }
+            else
+            {
+                writer.Indent = Mode == ParsingMode.LongShort
+                    ? options.LongShortArgumentDescriptionIndent
+                    : options.ArgumentDescriptionIndent;
+            }
 
-            foreach( CommandLineArgument argument in _arguments )
+            var shortNameSpacing = Mode == ParsingMode.LongShort && options.PreserveShortNameSpacing
+                ? new string(' ', _argumentNamePrefixes[0].Length + 1 + options.ArgumentNamesSeparator.Length)
+                : string.Empty;
+
+            foreach (var argument in _arguments)
             {
                 // Omit arguments that don't have a description.
-                if( !string.IsNullOrEmpty(argument.Description) )
+                if (string.IsNullOrEmpty(argument.Description))
+                    continue;
+
+                writer.ResetIndent();
+                string valueDescription = string.Format(CultureInfo.CurrentCulture, options.ValueDescriptionFormat, argument.ValueDescription);
+                if (argument.IsSwitch)
+                    valueDescription = string.Format(CultureInfo.CurrentCulture, options.OptionalArgumentFormat, valueDescription);
+                string defaultValue = options.IncludeDefaultValueInDescription && argument.DefaultValue != null ? string.Format(Culture, options.DefaultValueFormat, argument.DefaultValue) : string.Empty;
+                string alias = FormatAliasesForDescription(options, argument);
+                if (Mode == ParsingMode.LongShort)
                 {
-                    writer.ResetIndent();
-                    string valueDescription = string.Format(CultureInfo.CurrentCulture, options.ValueDescriptionFormat, argument.ValueDescription);
-                    if( argument.IsSwitch )
-                        valueDescription = string.Format(CultureInfo.CurrentCulture, options.OptionalArgumentFormat, valueDescription);
-                    string defaultValue = options.IncludeDefaultValueInDescription && argument.DefaultValue != null ? string.Format(Culture, options.DefaultValueFormat, argument.DefaultValue) : string.Empty;
-                    string alias = FormatAliasesForDescription(options, argument);
-                    writer.WriteLine(options.ArgumentDescriptionFormat, argument.ArgumentName, argument.Description, valueDescription, _argumentNamePrefixes[0], defaultValue, alias);
+                    var shortName = argument.HasShortName ? ArgumentNamePrefixes[0] + argument.ShortName : shortNameSpacing;
+                    var longName = argument.HasLongName ? LongArgumentNamePrefix + argument.ArgumentName : string.Empty;
+                    var separator = argument.HasShortName && argument.HasLongName ? options.ArgumentNamesSeparator : string.Empty;
+
+                    writer.WriteLine(options.LongShortArgumentDescriptionFormat,shortName, separator, longName, valueDescription,
+                        alias, argument.Description, defaultValue);
+                }
+                else
+                {
+                    writer.WriteLine(options.ArgumentDescriptionFormat, argument.ArgumentName, argument.Description,
+                        valueDescription, _argumentNamePrefixes[0], defaultValue, alias);
                 }
             }
         }
 
         private string FormatAliasesForDescription(WriteUsageOptions options, CommandLineArgument argument)
         {
-            if( !options.IncludeAliasInDescription || argument.Aliases == null || argument.Aliases.Count == 0 )
+            if (!options.IncludeAliasInDescription || (argument.ShortAliases == null && argument.Aliases == null))
                 return string.Empty;
-            else
+
+            var result = new StringBuilder();
+            var count = AppendAliases(result, options, _argumentNamePrefixes[0], argument.ShortAliases, 0);
+            var prefix = LongArgumentNamePrefix ?? _argumentNamePrefixes[0];
+            count = AppendAliases(result, options, prefix, argument.Aliases, count);
+
+            if (count == 0)
+                return string.Empty;
+
+            return string.Format(Culture, count == 1 ? options.AliasFormat : options.AliasesFormat, result);
+        }
+
+        private static int AppendAliases<T>(StringBuilder builder, WriteUsageOptions options, string prefix, IEnumerable<T>? aliases, int count)
+        {
+            if (aliases == null)
+                return count;
+
+            foreach (var alias in aliases)
             {
-                StringBuilder result = new StringBuilder();
-                foreach( string alias in argument.Aliases )
-                {
-                    if( result.Length > 0 )
-                        result.Append(", ");
-                    result.Append(_argumentNamePrefixes[0]);
-                    result.Append(alias);
-                }
-                return string.Format(Culture, argument.Aliases.Count == 1 ? options.AliasFormat : options.AliasesFormat, result);
+                if (count != 0)
+                    builder.Append(options.ArgumentNamesSeparator);
+
+                builder.Append(prefix);
+                builder.Append(alias);
+                ++count;
             }
+
+            return count;
         }
 
         private void WriteUsageSyntax(LineWrappingTextWriter writer, WriteUsageOptions options)
@@ -1355,6 +1398,12 @@ namespace Ookii.CommandLine
             foreach( CommandLineArgument argument in _arguments )
             {
                 writer.Write(" ");
+                if (options.UseAbbreviatedSyntax && argument.Position == null)
+                {
+                    writer.Write(options.AbbreviatedRemainingArguments);
+                    break;
+                }
+
                 writer.Write(argument.ToString(options));
             }
 

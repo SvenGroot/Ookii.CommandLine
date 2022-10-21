@@ -136,8 +136,8 @@ namespace Ookii.CommandLine
         private readonly string _argumentName;
         private readonly bool _hasLongName = true;
         private readonly char _shortName;
-        private readonly ReadOnlyCollection<string>? _aliases;
-        private readonly ReadOnlyCollection<char>? _shortAliases;
+        private readonly ReadOnlyCollection<string> _aliases;
+        private readonly ReadOnlyCollection<char> _shortAliases;
         private readonly Type _argumentType;
         private readonly Type _elementType;
         private readonly string? _description;
@@ -153,14 +153,14 @@ namespace Ookii.CommandLine
         private readonly bool _cancelParsing;
         private object? _value;
 
-        private CommandLineArgument(ArgumentInfo info, ParsingMode mode)
+        private CommandLineArgument(ArgumentInfo info)
         {
             // If this method throws anything other than a NotSupportedException, it constitutes a bug in the Ookii.CommandLine library.
             _parser = info.Parser;
             _property = info.Property;
             _memberName = info.MemberName;
             _argumentName = info.ArgumentName;
-            if (mode == ParsingMode.LongShort)
+            if (_parser.Mode == ParsingMode.LongShort)
             {
                 _hasLongName = info.Long;
                 if (info.Short)
@@ -334,31 +334,31 @@ namespace Ookii.CommandLine
         /// Gets the alternative names for this command line argument.
         /// </summary>
         /// <value>
-        /// A list of alternative names for this command line argument, or <see langword="null"/> if none were specified.
+        /// A list of alternative names for this command line argument, or an empty collection if none were specified.
         /// </value>
         /// <remarks>
         /// <para>
         ///   If the <see cref="CommandLineParser.Mode"/> property is <see cref="ParsingMode.LongShort"/>,
         ///   and the <see cref="HasLongName"/> proerty is <see langword="false"/>, this property
-        ///   will always return <see langword="null"/>.
+        ///   will always return an empty collection .
         /// </para>
         /// </remarks>
-        public ReadOnlyCollection<string>? Aliases => _aliases;
+        public ReadOnlyCollection<string> Aliases => _aliases;
 
         /// <summary>
         /// Gets the alternative short names for this command line argument.
         /// </summary>
         /// <value>
-        /// A list of alternative short names for this command line argument, or <see langword="null"/> if none were specified.
+        /// A list of alternative short names for this command line argument, or an empty collection if none were specified.
         /// </value>
         /// <remarks>
         /// <para>
         ///   If the <see cref="CommandLineParser.Mode"/> property is not <see cref="ParsingMode.LongShort"/>,
         ///   or the <see cref="HasShortName"/> property is <see langword="false"/>, this property
-        ///   will always return <see langword="null"/>.
+        ///   will always return an empty collection .
         /// </para>
         /// </remarks>
-        public ReadOnlyCollection<char>? ShortAliases => _shortAliases;
+        public ReadOnlyCollection<char> ShortAliases => _shortAliases;
 
         /// <summary>
         /// Gets the type of the argument.
@@ -812,7 +812,16 @@ namespace Ookii.CommandLine
 
         internal string ToString(WriteUsageOptions options)
         {
-            string argumentName = _parser.ArgumentNamePrefixes[0] + ArgumentName;
+            var prefix = _parser.Mode != ParsingMode.LongShort || !HasLongName || (HasShortName && options.UseShortNamesForSyntax)
+                ? _parser.ArgumentNamePrefixes[0]
+                : _parser.LongArgumentNamePrefix!;
+
+            string argumentName;
+            if (HasShortName && options.UseShortNamesForSyntax)
+                argumentName = prefix + ShortName;
+            else
+                argumentName = prefix + ArgumentName;
+
             if( Position != null )
                 argumentName = string.Format(CultureInfo.CurrentCulture, options.OptionalArgumentFormat, argumentName); // for positional parameters, the name itself is optional
 
@@ -884,7 +893,7 @@ namespace Ookii.CommandLine
                 AllowNull = DetermineAllowsNull(parameter),
             };
 
-            return new CommandLineArgument(info, parser.Mode);
+            return new CommandLineArgument(info);
         }
 
         internal static CommandLineArgument Create(CommandLineParser parser, PropertyInfo property)
@@ -928,7 +937,7 @@ namespace Ookii.CommandLine
                 CancelParsing = attribute.CancelParsing,
             };
 
-            return new CommandLineArgument(info, parser.Mode);
+            return new CommandLineArgument(info);
         }
 
         internal void ApplyPropertyValue(object target)

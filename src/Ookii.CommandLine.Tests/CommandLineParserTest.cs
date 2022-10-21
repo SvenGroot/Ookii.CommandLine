@@ -252,11 +252,37 @@ namespace Ookii.CommandLine.Tests
             CommandLineParser target = new CommandLineParser(argumentsType, new[] { "/", "-" });
             var options = new WriteUsageOptions()
             {
-                UsagePrefix = "Usage: test"
+                UsagePrefix = _usagePrefix
             };
 
             string actual = target.GetUsage(0, options);
             Assert.AreEqual(_expectedDefaultUsage, actual);
+        }
+
+        [TestMethod]
+        public void TestWriteUsageLongShort()
+        {
+            var target = new CommandLineParser<LongShortArguments>();
+            var options = new WriteUsageOptions()
+            {
+                UsagePrefix = _usagePrefix
+            };
+
+            string actual = target.GetUsage(0, options);
+            Assert.AreEqual(_expectedLongShortUsage, actual);
+
+            options.UseShortNamesForSyntax = true;
+            actual = target.GetUsage(0, options);
+            Assert.AreEqual(_expectedLongShortUsageShortNameSyntax, actual);
+
+            options = new WriteUsageOptions()
+            {
+                UsagePrefix = _usagePrefix,
+                UseAbbreviatedSyntax = true,
+            };
+
+            actual = target.GetUsage(0, options);
+            Assert.AreEqual(_expectedLongShortUsageAbbreviated, actual);
         }
 
         [TestMethod]
@@ -271,7 +297,7 @@ namespace Ookii.CommandLine.Tests
                 Error = error,
             };
 
-            options.UsageOptions.UsagePrefix = "Usage: test";
+            options.UsageOptions.UsagePrefix = _usagePrefix;
 
             var result = CommandLineParser.Parse<TestArguments>(new[] { "foo", "-Arg6", "bar" }, options);
             Assert.IsNotNull(result);
@@ -543,6 +569,8 @@ namespace Ookii.CommandLine.Tests
 
         #region Expected usage
 
+        private const string _usagePrefix = "Usage: test";
+
         private const string _expectedDefaultUsage = @"Test arguments description.
 
 Usage: test [/arg1] <String> [[/other] <Number>] [[/notSwitch] <Boolean>] [[/Arg5] <Single>] [[/other2] <Number>] [[/Arg8] <DayOfWeek>...] /Arg6 <String> [/Arg10...] [/Arg11] [/Arg12 <Int32>...] [/Arg13 <String=Int32>...] [/Arg14 <String=Int32>...] [/Arg15 <KeyValuePair<String, Int32>>] [/Arg3 <String>] [/Arg7] [/Arg9 <Int32>]
@@ -561,6 +589,81 @@ Usage: test [/arg1] <String> [[/other] <Number>] [[/notSwitch] <Boolean>] [[/Arg
 
     /Arg6 <String> (/Alias1, /Alias2)
         Arg6 description.
+
+";
+
+        private const string _expectedLongShortUsage = @"Usage: test [[--foo] <Int32>] [[--bar] <Int32>] [--Arg1 <Int32>] [--Arg2 <Int32>] [--Switch1] [--Switch2] [-u]
+
+    -f, --foo <Int32>
+            Foo description. Default value: 0.
+
+        --bar <Int32>
+            Bar description. Default value: 0.
+
+        --Arg1 <Int32>
+            Arg1 description.
+
+    -a, --Arg2 <Int32> (-b, --baz)
+            Arg2 description.
+
+    -S, --Switch1 [<Boolean>]
+            Switch1 description.
+
+    -t, --Switch2 [<Boolean>]
+            Switch2 description.
+
+    -u [<Boolean>]
+            Switch3 description.
+
+";
+
+        private const string _expectedLongShortUsageShortNameSyntax = @"Usage: test [[-f] <Int32>] [[--bar] <Int32>] [--Arg1 <Int32>] [-a <Int32>] [-S] [-t] [-u]
+
+    -f, --foo <Int32>
+            Foo description. Default value: 0.
+
+        --bar <Int32>
+            Bar description. Default value: 0.
+
+        --Arg1 <Int32>
+            Arg1 description.
+
+    -a, --Arg2 <Int32> (-b, --baz)
+            Arg2 description.
+
+    -S, --Switch1 [<Boolean>]
+            Switch1 description.
+
+    -t, --Switch2 [<Boolean>]
+            Switch2 description.
+
+    -u [<Boolean>]
+            Switch3 description.
+
+";
+
+        private const string _expectedLongShortUsageAbbreviated = @"Usage: test [[--foo] <Int32>] [[--bar] <Int32>] [arguments]
+
+    -f, --foo <Int32>
+            Foo description. Default value: 0.
+
+        --bar <Int32>
+            Bar description. Default value: 0.
+
+        --Arg1 <Int32>
+            Arg1 description.
+
+    -a, --Arg2 <Int32> (-b, --baz)
+            Arg2 description.
+
+    -S, --Switch1 [<Boolean>]
+            Switch1 description.
+
+    -t, --Switch2 [<Boolean>]
+            Switch2 description.
+
+    -u [<Boolean>]
+            Switch3 description.
 
 ";
 

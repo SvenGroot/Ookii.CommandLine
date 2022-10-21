@@ -108,7 +108,7 @@ namespace Ookii.CommandLine
         /// </para>
         /// <para>
         ///   This value can be overridden by the <see cref="ParseOptions.ArgumentNameComparer"/>
-        ///   property, or the <see cref="CommandLineParser.CommandLineParser(Type, IEnumerable{string}?, IComparer{string}?)"/>
+        ///   property, or the <see cref="CommandLineParser(Type, IEnumerable{string}?, IComparer{string}?)"/>
         ///   constructor.
         /// </para>
         /// </remarks>

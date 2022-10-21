@@ -193,25 +193,31 @@ namespace Ookii.CommandLine.Tests
     [ParseOptions(Mode = ParsingMode.LongShort)]
     class LongShortArguments
     {
-        public LongShortArguments([ArgumentName(Short = true)] int foo = 0, int bar = 0)
+        public LongShortArguments([ArgumentName(Short = true), Description("Foo description.")] int foo = 0,
+            [Description("Bar description.")]int bar = 0)
         {
             Foo = foo;
             Bar = bar;
         }
 
         [CommandLineArgument, ShortAlias('c')]
+        [Description("Arg1 description.")]
         public int Arg1 { get; set; }
 
-        [CommandLineArgument(ShortName = 'a'), ShortAlias('b')]
+        [CommandLineArgument(ShortName = 'a'), ShortAlias('b'), Alias("baz")]
+        [Description("Arg2 description.")]
         public int Arg2 { get; set; }
 
         [CommandLineArgument(Short = true)]
+        [Description("Switch1 description.")]
         public bool Switch1 { get; set; }
 
         [CommandLineArgument(ShortName = 't')]
+        [Description("Switch2 description.")]
         public bool Switch2 { get; set; }
 
         [CommandLineArgument(ShortName = 'u', Long = false)]
+        [Description("Switch3 description.")]
         public bool Switch3 { get; set; }
 
         public int Foo { get; set; }
