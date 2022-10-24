@@ -387,10 +387,10 @@ namespace Ookii.CommandLine
             // Update the values because the options are passed to the shell command and the ParseInternal method.
             var originalOut = options.Out;
             var originalError = options.Error;
-            var originalUsagePrefix = options.UsageOptions.UsagePrefix;
+            var originalUsagePrefix = options.UsageOptions.UsagePrefixFormat;
             options.Out = output.Inner;
             options.Error = error.Inner;
-            options.UsageOptions.UsagePrefix += " " + GetShellCommandName(commandType);
+            options.UsageOptions.UsagePrefixFormat += " " + GetShellCommandName(commandType);
 
             try
             {
@@ -405,7 +405,7 @@ namespace Ookii.CommandLine
             {
                 options.Out = originalOut;
                 options.Error = originalError;
-                options.UsageOptions.UsagePrefix = originalUsagePrefix;
+                options.UsageOptions.UsagePrefixFormat = originalUsagePrefix;
             }
         }
 
@@ -559,7 +559,7 @@ namespace Ookii.CommandLine
 
         private static void WriteShellCommandListUsage(TextWriter output, Assembly assembly, CreateShellCommandOptions options)
         {
-            output.WriteLine(options.CommandUsageFormat, options.UsageOptions.UsagePrefix);
+            output.WriteLine(options.CommandUsageFormat, options.UsageOptions.UsagePrefixFormat);
             output.WriteLine();
             output.WriteLine(options.AvailableCommandsHeader);
             output.WriteLine();

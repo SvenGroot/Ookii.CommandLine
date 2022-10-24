@@ -338,9 +338,9 @@ namespace Ookii.CommandLine
         /// Gets the default prefix for the command line usage information.
         /// </summary>
         /// <value>
-        /// A string consisting of the text "Usage: " followed by the file name of the application's executable.
+        /// A string consisting of the text "{0}Usage:{1} " followed by the file name of the application's executable.
         /// </value>
-        public static string DefaultUsagePrefix
+        public static string DefaultUsagePrefixFormat
         {
             get 
             {
@@ -1338,7 +1338,6 @@ namespace Ookii.CommandLine
                 ? new string(' ', _argumentNamePrefixes[0].Length + 1 + options.ArgumentNamesSeparator.Length)
                 : string.Empty;
 
-            // TODO: Optional based on options, check support in WriteUsageForConsole.
             bool useColor = options.UseColor ?? false;
             string colorStart = string.Empty;
             string colorEnd = string.Empty;
@@ -1424,7 +1423,17 @@ namespace Ookii.CommandLine
             writer.ResetIndent();
             writer.Indent = writer.MaximumLineLength > 0 && writer.MaximumLineLength < MaximumLineWidthForIndent ? 0 : options.Indent;
 
-            writer.Write(options.UsagePrefix);
+            bool useColor = options.UseColor ?? false;
+            string colorStart = string.Empty;
+            string colorEnd = string.Empty;
+            if (useColor)
+            {
+                colorStart = options.UsagePrefixColor;
+                colorEnd = options.ColorReset;
+            }
+
+
+            writer.Write(options.UsagePrefixFormat, colorStart, colorEnd);
 
             foreach( CommandLineArgument argument in _arguments )
             {

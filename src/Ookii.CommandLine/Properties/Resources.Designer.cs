@@ -220,7 +220,7 @@ namespace Ookii.CommandLine.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Usage: {0}.
+        ///   Looks up a localized string similar to {{0}}Usage:{{1}} {0}.
         /// </summary>
         internal static string DefaultUsagePrefixFormat {
             get {

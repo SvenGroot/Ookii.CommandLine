@@ -8,7 +8,7 @@ namespace Ookii.CommandLine
     /// </summary>
     public sealed class WriteUsageOptions
     {
-        private string? _usagePrefix;
+        private string? _usagePrefixFormat;
         private string? _valueDescriptionFormat;
         private string? _optionalArgumentFormat;
         private string? _arraySuffix;
@@ -47,7 +47,7 @@ namespace Ookii.CommandLine
         /// </summary>
         /// <value>
         /// The prefix to use  for the argument syntax; typically this contains the executable name. The default value
-        /// is "Usage: " followed by the file name of the application's entry point assembly.
+        /// is "{0}Usage:{1} " followed by the file name of the application's entry point assembly.
         /// </value>
         /// <remarks>
         /// <para>
@@ -57,12 +57,62 @@ namespace Ookii.CommandLine
         /// <para>
         ///   Setting this property to <see langword="null"/> will revert it to its default value.
         /// </para>
+        /// <para>
+        ///   This string can have the following placeholders:
+        /// </para>
+        /// <list type="table">
+        ///   <listheader>
+        ///     <term>Placeholder</term>
+        ///     <description>Description</description>
+        ///   </listheader>
+        ///   <item>
+        ///     <term>{0}</term>
+        ///     <description>
+        ///       If the <see cref="UseColor"/> property is <see langword="true"/>, the value of
+        ///       the <see cref="UsagePrefixColor"/> property; otherwise, an empty string.
+        ///     </description>
+        ///   </item>
+        ///   <item>
+        ///     <term>{1}</term>
+        ///     <description>
+        ///       If the <see cref="UseColor"/> property is <see langword="false"/>, the value of
+        ///       the <see cref="ColorReset"/> property; otherwise, an empty string.
+        ///     </description>
+        ///   </item>
+        /// </list>
         /// </remarks>
-        public string UsagePrefix
+        public string UsagePrefixFormat
         {
-            get { return _usagePrefix ?? CommandLineParser.DefaultUsagePrefix; }
-            set { _usagePrefix = value; }
+            get { return _usagePrefixFormat ?? CommandLineParser.DefaultUsagePrefixFormat; }
+            set { _usagePrefixFormat = value; }
         }
+
+        /// <summary>
+        /// Gets or sets the color applied to the <see cref="UsagePrefixFormat"/>.
+        /// </summary>
+        /// <value>
+        ///   The virtual terminal sequence for a color. The default value is
+        ///   <see cref="VirtualTerminal.TextFormat.ForegroundCyan"/>.
+        /// </value>
+        /// <remarks>
+        /// <para>
+        ///   The color will only be used if the <see cref="UseColor"/> property is
+        ///   <see langword="true"/>; otherwise, it will be replaced with an empty string.
+        /// </para>
+        /// <para>
+        ///   If the string contains anything other than virtual terminal sequences, those parts
+        ///   will be included in the output, but only when the <see cref="UseColor"/> property is
+        ///   <see langword="true"/>.
+        /// </para>
+        /// <para>
+        ///   The portion of the string that has color will end with the <see cref="ColorReset"/>.
+        /// </para>
+        /// <para>
+        ///   With the default value, only the "Usage:" portion of the string has color; the
+        ///   application name does not.
+        /// </para>
+        /// </remarks>
+        public string UsagePrefixColor { get; set; } = VirtualTerminal.TextFormat.ForegroundCyan;
 
         /// <summary>
         /// Gets or sets the format string to use for the value description of an argument.
@@ -98,7 +148,7 @@ namespace Ookii.CommandLine
         /// </value>
         /// <remarks>
         /// <para>
-        ///   The command line syntax is a single line that consists of the usage prefix <see cref="UsagePrefix"/> followed by the
+        ///   The command line syntax is a single line that consists of the usage prefix <see cref="UsagePrefixFormat"/> followed by the
         ///   syntax of all the arguments. This indentation is used when that line exceeds the maximum line length.
         /// </para>
         /// <para>
@@ -276,6 +326,20 @@ namespace Ookii.CommandLine
         ///       property is <see langword="false"/>, an empty string.
         ///     </description>
         ///   </item>
+        ///   <item>
+        ///     <term>{6}</term>
+        ///     <description>
+        ///       If the <see cref="UseColor"/> property is <see langword="true"/>, the value of
+        ///       the <see cref="ArgumentDescriptionColor"/> property; otherwise, an empty string.
+        ///     </description>
+        ///   </item>
+        ///   <item>
+        ///     <term>{7}</term>
+        ///     <description>
+        ///       If the <see cref="UseColor"/> property is <see langword="false"/>, the value of
+        ///       the <see cref="ColorReset"/> property; otherwise, an empty string.
+        ///     </description>
+        ///   </item>
         /// </list>
         /// </remarks>
         public string ArgumentDescriptionFormat
@@ -448,6 +512,31 @@ namespace Ookii.CommandLine
         /// </value>
         public DescriptionListFilterMode ArgumentDescriptionListFilter { get; set; }
 
+        /// <summary>
+        /// Gets or sets the color applied to the <see cref="ArgumentDescriptionFormat"/>.
+        /// </summary>
+        /// <value>
+        ///   The virtual terminal sequence for a color. The default value is
+        ///   <see cref="VirtualTerminal.TextFormat.ForegroundGreen"/>.
+        /// </value>
+        /// <remarks>
+        /// <para>
+        ///   The color will only be used if the <see cref="UseColor"/> property is
+        ///   <see langword="true"/>; otherwise, it will be replaced with an empty string.
+        /// </para>
+        /// <para>
+        ///   If the string contains anything other than virtual terminal sequences, those parts
+        ///   will be included in the output, but only when the <see cref="UseColor"/> property is
+        ///   <see langword="true"/>.
+        /// </para>
+        /// <para>
+        ///   The portion of the string that has color will end with the <see cref="ColorReset"/>.
+        /// </para>
+        /// <para>
+        ///   With the default value, only the argument name, value description and aliases
+        ///   portion of the string has color; the actual argument description does not.
+        /// </para>
+        /// </remarks>
         public string ArgumentDescriptionColor { get; set; } = VirtualTerminal.TextFormat.ForegroundGreen;
 
         /// <summary>
@@ -610,8 +699,46 @@ namespace Ookii.CommandLine
             set { _defaultValueFormat = value; }
         }
 
+        /// <summary>
+        /// Gets or sets the sequence used to reset color applied a usage help element.
+        /// </summary>
+        /// <value>
+        ///   The virtual terminal sequence used to reset color. The default value is
+        ///   <see cref="VirtualTerminal.TextFormat.Default"/>.
+        /// </value>
+        /// <remarks>
+        /// <para>
+        ///   This property will only be used if the <see cref="UseColor"/> property is
+        ///   <see langword="true"/>; otherwise, it will be replaced with an empty string.
+        /// </para>
+        /// <para>
+        ///   If the string contains anything other than virtual terminal sequences, those parts
+        ///   will be included in the output, but only when the <see cref="UseColor"/> property is
+        ///   <see langword="true"/>.
+        /// </para>
+        /// </remarks>
         public string ColorReset { get; set; } = VirtualTerminal.TextFormat.Default;
 
+        /// <summary>
+        /// Gets or sets a value that indicates whether the usage help should use color.
+        /// </summary>
+        /// <value>
+        ///   <see langword="true"/> to enable color output; <see langword="false"/> to disable
+        ///   color output; or <see langword="null"/> to enable it if the output supports it.
+        /// </value>
+        /// <remarks>
+        /// <para>
+        ///   If this property is <see langword="null"/>, the <see cref="CommandLineParser.Parse{T}(string[], int, ParseOptions?)"/>,
+        ///   <see cref="CommandLineParser.WriteUsageToConsole"/>, and <see cref="ShellCommand.CreateShellCommand(System.Reflection.Assembly, string[], int, CreateShellCommandOptions?)"/>
+        ///   methods will enable color support if the output is not redirected, supports virtual
+        ///   terminal sequences, and there is no environment variable named "NO_COLOR".
+        /// </para>
+        /// <para>
+        ///   If this property is set to <see langword="true"/> explicitly, virtual terminal
+        ///   sequences may be included in the output even if it's not supported, which may lead to
+        ///   garbage characters appearing in the output.
+        /// </para>
+        /// </remarks>
         public bool? UseColor { get; set; }
     }
 }

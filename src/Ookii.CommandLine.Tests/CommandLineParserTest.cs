@@ -252,7 +252,7 @@ namespace Ookii.CommandLine.Tests
             CommandLineParser target = new CommandLineParser(argumentsType, new[] { "/", "-" });
             var options = new WriteUsageOptions()
             {
-                UsagePrefix = _usagePrefix
+                UsagePrefixFormat = _usagePrefix
             };
 
             string actual = target.GetUsage(0, options);
@@ -265,7 +265,7 @@ namespace Ookii.CommandLine.Tests
             var target = new CommandLineParser<LongShortArguments>();
             var options = new WriteUsageOptions()
             {
-                UsagePrefix = _usagePrefix
+                UsagePrefixFormat = _usagePrefix
             };
 
             string actual = target.GetUsage(0, options);
@@ -277,7 +277,7 @@ namespace Ookii.CommandLine.Tests
 
             options = new WriteUsageOptions()
             {
-                UsagePrefix = _usagePrefix,
+                UsagePrefixFormat = _usagePrefix,
                 UseAbbreviatedSyntax = true,
             };
 
@@ -291,7 +291,7 @@ namespace Ookii.CommandLine.Tests
             var target = new CommandLineParser<TestArguments>();
             var options = new WriteUsageOptions()
             {
-                UsagePrefix = _usagePrefix,
+                UsagePrefixFormat = _usagePrefix,
                 ArgumentDescriptionListFilter = DescriptionListFilterMode.Description
             };
 
@@ -308,6 +308,21 @@ namespace Ookii.CommandLine.Tests
         }
 
         [TestMethod]
+        public void TestWriteUsageColor()
+        {
+            Type argumentsType = typeof(TestArguments);
+            CommandLineParser target = new CommandLineParser(argumentsType, new[] { "/", "-" });
+            var options = new WriteUsageOptions()
+            {
+                UsagePrefixFormat = _usagePrefix,
+                UseColor = true,
+            };
+
+            string actual = target.GetUsage(0, options);
+            Assert.AreEqual(_expectedUsageColor, actual);
+        }
+
+        [TestMethod]
         public void TestStaticParse()
         {
             using var output = new StringWriter();
@@ -319,7 +334,7 @@ namespace Ookii.CommandLine.Tests
                 Error = error,
             };
 
-            options.UsageOptions.UsagePrefix = _usagePrefix;
+            options.UsageOptions.UsagePrefixFormat = _usagePrefix;
 
             var result = CommandLineParser.Parse<TestArguments>(new[] { "foo", "-Arg6", "bar" }, options);
             Assert.IsNotNull(result);
@@ -591,7 +606,7 @@ namespace Ookii.CommandLine.Tests
 
         #region Expected usage
 
-        private const string _usagePrefix = "Usage: test";
+        private const string _usagePrefix = "{0}Usage:{1} test";
 
         private const string _expectedDefaultUsage = @"Test arguments description.
 
@@ -776,6 +791,38 @@ Usage: test [-arg1] <String> [[-other] <Number>] [[-notSwitch] <Boolean>] [[-Arg
         private const string _expectedUsageNone = @"Test arguments description.
 
 Usage: test [-arg1] <String> [[-other] <Number>] [[-notSwitch] <Boolean>] [[-Arg5] <Single>] [[-other2] <Number>] [[-Arg8] <DayOfWeek>...] -Arg6 <String> [-Arg10...] [-Arg11] [-Arg12 <Int32>...] [-Arg13 <String=Int32>...] [-Arg14 <String=Int32>...] [-Arg15 <KeyValuePair<String, Int32>>] [-Arg3 <String>] [-Arg7] [-Arg9 <Int32>]
+
+";
+
+        // Raw strings would be nice here so including the escape character directly wouldn't be
+        // necessary but that requires C++11.
+        private const string _expectedUsageColor = @"Test arguments description.
+
+[36mUsage:[0m test [/arg1] <String> [[/other] <Number>] [[/notSwitch] <Boolean>] [[/Arg5] <Single>] [[/other2] <Number>] [[/Arg8] <DayOfWeek>...] /Arg6 <String> [/Arg10...] [/Arg11] [/Arg12 <Int32>...] [/Arg13 <String=Int32>...] [/Arg14 <String=Int32>...] [/Arg15 <KeyValuePair<String, Int32>>] [/Arg3 <String>] [/Arg7] [/Arg9 <Int32>]
+
+    [32m/arg1 <String>[0m
+        Arg1 description.
+
+    [32m/other <Number>[0m
+        Arg2 description. Default value: 42.
+
+    [32m/notSwitch <Boolean>[0m
+         Default value: False.
+
+    [32m/Arg5 <Single>[0m
+        Arg5 description.
+
+    [32m/other2 <Number>[0m
+        Arg4 description. Default value: 47.
+
+    [32m/Arg6 <String> (/Alias1, /Alias2)[0m
+        Arg6 description.
+
+    [32m/Arg12 <Int32>[0m
+         Default value: 42.
+
+    [32m/Arg7 [<Boolean>] (/Alias3)[0m
+
 
 ";
 

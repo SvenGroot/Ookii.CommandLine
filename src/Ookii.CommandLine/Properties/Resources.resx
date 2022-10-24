@@ -151,7 +151,7 @@
     <value>&lt;{0}&gt;</value>
   </data>
   <data name="DefaultUsagePrefixFormat" xml:space="preserve">
-    <value>Usage: {0}</value>
+    <value>{{0}}Usage:{{1}} {0}</value>
   </data>
   <data name="DuplicateArgumentFormat" xml:space="preserve">
     <value>The argument '{0}' was supplied more than once.</value>
