@@ -253,6 +253,19 @@ namespace Ookii.CommandLine.Tests
             Assert.AreEqual(_expectedFormattingCounted, WriteString(writer, _inputFormatting, _inputFormatting.Length));
         }
 
+        [TestMethod]
+        public void TestSplitFormatting()
+        {
+            using var writer = LineWrappingTextWriter.ForStringWriter(14);
+            writer.Write("Hello \x1b[38;2");
+            writer.Write(";1;2");
+            writer.Write(";3mWorld and stuff Bye\r");
+            writer.Write("\nEveryone");
+            writer.Flush();
+            string actual = "Hello \x1b[38;2;1;2;3mWorld\nand stuff Bye\nEveryone\n".ReplaceLineEndings();
+            Assert.AreEqual(actual, writer.BaseWriter.ToString());
+        }
+
         private static string WriteString(string value, int maxLength, int segmentSize, int indent = 0)
         {
             using var writer = LineWrappingTextWriter.ForStringWriter(maxLength);

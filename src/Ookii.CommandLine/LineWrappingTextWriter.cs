@@ -53,6 +53,8 @@ namespace Ookii.CommandLine
             Text,
             Formatting,
             LineBreak,
+            PartialFormatting,
+            PartialLineBreak
         }
 
         [DebuggerDisplay("Type = {Type}, Indent = {Indent}, {Content}")]
@@ -72,18 +74,27 @@ namespace Ookii.CommandLine
             public int ContentLength => 
                 Type switch
                 {
-                    SegmentType.Formatting => 0,
+                    SegmentType.Formatting or SegmentType.PartialFormatting => 0,
                     _ => (Content?.Length ?? 0) + Indent,
                 };
 
 
             public void WriteTo(TextWriter writer)
             {
-                if (Indent > 0)
-                    WriteIndent(writer, Indent);
+                // If we're writing segments and we still have a partial line break, it should be
+                // treated as an actual line break.
+                if (Type == SegmentType.LineBreak || Type == SegmentType.PartialLineBreak)
+                {
+                    writer.WriteLine();
+                }
+                else
+                {
+                    if (Indent > 0)
+                        WriteIndent(writer, Indent);
 
-                if (Content != null)
-                    Content.Value.WriteTo(writer);
+                    if (Content != null)
+                        Content.Value.WriteTo(writer);
+                }
             }
         }
 
@@ -154,18 +165,27 @@ namespace Ookii.CommandLine
                     int end;
                     if (this[separatorIndex] == VirtualTerminal.Escape)
                     {
+                        // This is a VT sequence.
                         if (newLinesOnly)
                         {
+                            // Ignore it if requested.
                             pos = separatorIndex + 1;
                             continue;
                         }
 
-                        end = VirtualTerminal.FindSequenceEnd(Characters.Skip(separatorIndex + 1));
-                        end += separatorIndex + 1;
-
                         if (separatorIndex > segmentStart)
                             yield return new Segment(SegmentType.Text, this.Slice(segmentStart, separatorIndex - segmentStart));
 
+                        // Find the end of the sequence.
+                        end = VirtualTerminal.FindSequenceEnd(Characters.Skip(separatorIndex + 1));
+                        if (end == -1)
+                        {
+                            // No end? Should come in a following write.
+                            yield return new Segment(SegmentType.PartialFormatting, this.Slice(separatorIndex));
+                            break;
+                        }
+
+                        end += separatorIndex + 1;
                         yield return new Segment(SegmentType.Formatting, this.Slice(separatorIndex, end - separatorIndex));
                     }
                     else
@@ -174,8 +194,15 @@ namespace Ookii.CommandLine
                         if (separatorIndex > segmentStart)
                             yield return new Segment(SegmentType.Text, this.Slice(segmentStart, separatorIndex - segmentStart));
 
-                        // TODO: Partial line breaks.
-                        yield return new Segment(SegmentType.LineBreak);
+                        if (end == Length && this[end - 1] == '\r')
+                        {
+                            // This could be the start of a Windows-style break, the remainder of
+                            // which could follow in the next write.
+                            yield return new Segment(SegmentType.PartialLineBreak, this.Slice(separatorIndex));
+                            break;
+                        }
+
+                        yield return new Segment(SegmentType.LineBreak, this.Slice(separatorIndex, end - separatorIndex));
                     }
 
                     pos = end;
@@ -236,10 +263,28 @@ namespace Ookii.CommandLine
             public void Append(Segment segment)
             {
                 Debug.Assert(segment.Type != SegmentType.LineBreak);
+                if (LastSegment is Segment last && last.Type == SegmentType.PartialFormatting)
+                {
+                    if (segment.Type == SegmentType.Text)
+                    {
+                        Debug.Assert(segment.Content != null);
+                        FindPartialFormattingEnd(segment);
+                        return;
+                    }
+                    else
+                    {
+                        // If this is not a text segment, we never found the end of the formatting,
+                        // so just treat everything up to now as formatting.
+                        ConvertPartialToFormatting();
+                    }
+                }
+
                 _segments.Add(segment);
                 ContentLength += segment.ContentLength;
                 IsEmpty = false;
             }
+
+            public Segment? LastSegment => _segments.LastOrDefault();
 
             public void FlushTo(TextWriter writer, int indent)
             {
@@ -258,6 +303,61 @@ namespace Ookii.CommandLine
 
                 writer.WriteLine();
                 ClearCurrentLine(indent);
+            }
+
+            public bool CheckAndRemovePartialLineBreak()
+            {
+                if (LastSegment is Segment last && last.Type == SegmentType.PartialLineBreak)
+                {
+                    _segments.RemoveAt(_segments.Count - 1);
+                    return true;
+                }
+
+                return false;
+            }
+
+            private void FindPartialFormattingEnd(Segment segment)
+            {
+                var partialText = _segments
+                    .SkipWhile(s => s.Type != SegmentType.PartialFormatting)
+                    .SelectMany(s => s.Content!.Value.Characters);
+
+                var text = partialText
+                    .Concat(segment.Content!.Value.Characters)
+                    .Skip(1);
+
+                int end = VirtualTerminal.FindSequenceEnd(text);
+                if (end == -1)
+                {
+                    segment.Type = SegmentType.PartialFormatting;
+                    _segments.Add(segment);
+                }
+                else
+                {
+                    end += 1 - partialText.Count();
+                    var formattingEnd = segment.Content!.Value.Slice(0, end);
+                    _segments.Add(new Segment(SegmentType.Formatting, formattingEnd));
+                    ConvertPartialToFormatting();
+                    var remain = segment.Content!.Value.Slice(end);
+                    if (remain.Length != 0)
+                    {
+                        _segments.Add(new Segment(SegmentType.Text, remain));
+                        ContentLength += remain.Length;
+                    }
+                }
+            }
+
+            private void ConvertPartialToFormatting()
+            {
+                for (int i = 0; i < _segments.Count; i++)
+                {
+                    var segment = _segments[i];
+                    if (segment.Type == SegmentType.PartialFormatting)
+                    {
+                        segment.Type = SegmentType.Formatting;
+                        _segments[i] = segment;
+                    }
+                }
             }
 
             private static void WriteSegments(TextWriter writer, IEnumerable<Segment> segments)
@@ -645,9 +745,16 @@ namespace Ookii.CommandLine
 
             foreach (var segment in buffer.Split(_countFormatting))
             {
+                bool hadPartialLineBreak = _lineBuffer.CheckAndRemovePartialLineBreak();
+                if (hadPartialLineBreak)
+                    _lineBuffer.WriteLineTo(_baseWriter, _indent);
+
                 if (segment.Type == SegmentType.LineBreak)
                 {
-                    _lineBuffer.WriteLineTo(_baseWriter, _indent);
+                    // Check if this is just the end of a partial line break. If it is, it was
+                    // already written above.
+                    if (!hadPartialLineBreak || segment.Content!.Value.Length == 1 && segment.Content!.Value[0] != '\n')
+                        _lineBuffer.WriteLineTo(_baseWriter, _indent);
                 }
                 else
                 {

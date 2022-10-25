@@ -322,8 +322,8 @@ namespace Ookii.CommandLine
         {
             return value.First() switch
             {
-                '[' => FindCsiEnd(value.Skip(1)) + 1,
-                ']' => FindOscEnd(value.Skip(1)) + 1,
+                '[' => FindCsiEnd(value),
+                ']' => FindOscEnd(value),
                 '(' => 2,
                 _ => 1,
             };
@@ -332,34 +332,34 @@ namespace Ookii.CommandLine
         private static int FindCsiEnd(IEnumerable<char> value)
         {
             int index = 0;
-            foreach (var ch in value)
+            foreach (var ch in value.Skip(1))
             {
                 if (!char.IsNumber(ch) && ch != ';' && ch != ' ')
-                    break;
+                    return index + 2;
 
                 ++index;
             }
 
-            return index + 1;
+            return -1;
         }
 
         private static int FindOscEnd(IEnumerable<char> value)
         {
             int index = 0;
             bool hasEscape = false;
-            foreach (var ch in value)
+            foreach (var ch in value.Skip(1))
             {
                 if (ch == 0x7)
-                    break;
+                    return index + 2;
                 if (hasEscape && ch == '\\')
-                    break;
+                    return index + 2;
                 if (ch == Escape)
                     hasEscape = true;
 
                 ++index;
             }
 
-            return index + 1;
+            return -1;
         }
     }
 }
