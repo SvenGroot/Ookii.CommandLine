@@ -317,5 +317,49 @@ namespace Ookii.CommandLine
         {
             return FormattableString.Invariant($"{Escape}[{(foreground ? 38 : 48)};2;{color.R};{color.G};{color.B}m");
         }
+
+        internal static int FindSequenceEnd(IEnumerable<char> value)
+        {
+            return value.First() switch
+            {
+                '[' => FindCsiEnd(value.Skip(1)) + 1,
+                ']' => FindOscEnd(value.Skip(1)) + 1,
+                '(' => 2,
+                _ => 1,
+            };
+        }
+
+        private static int FindCsiEnd(IEnumerable<char> value)
+        {
+            int index = 0;
+            foreach (var ch in value)
+            {
+                if (!char.IsNumber(ch) && ch != ';' && ch != ' ')
+                    break;
+
+                ++index;
+            }
+
+            return index + 1;
+        }
+
+        private static int FindOscEnd(IEnumerable<char> value)
+        {
+            int index = 0;
+            bool hasEscape = false;
+            foreach (var ch in value)
+            {
+                if (ch == 0x7)
+                    break;
+                if (hasEscape && ch == '\\')
+                    break;
+                if (ch == Escape)
+                    hasEscape = true;
+
+                ++index;
+            }
+
+            return index + 1;
+        }
     }
 }
