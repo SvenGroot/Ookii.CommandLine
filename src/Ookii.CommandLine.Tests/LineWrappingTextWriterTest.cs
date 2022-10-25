@@ -192,7 +192,7 @@ namespace Ookii.CommandLine.Tests
                 {
                 }
 
-                Assert.AreEqual("test\r\n", baseWriter.ToString());
+                Assert.AreEqual("test\n".ReplaceLineEndings(), baseWriter.ToString());
             }
         }
 
@@ -209,7 +209,7 @@ namespace Ookii.CommandLine.Tests
                 // This will throw if the base writer was disposed.
                 baseWriter.Write("foo");
 
-                Assert.AreEqual("test\r\nfoo", baseWriter.ToString());
+                Assert.AreEqual("test\nfoo".ReplaceLineEndings(), baseWriter.ToString());
             }
         }
 
@@ -288,7 +288,7 @@ namespace Ookii.CommandLine.Tests
 
         #region Input and expected values
 
-        private const string _input = @"
+        private static readonly string _input = @"
 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Donec adipiscing tristique risus nec feugiat in fermentum.
 
 Tincidunt vitae semper quis lectus nulla at volutpat diam ut. Vitae tempus
@@ -299,9 +299,9 @@ ullamcorper eget nulla facilisi etiam dignissim diam. Condimentum vitae sapien p
 Augue neque gravida in
 fermentum et sollicitudin ac orci. Aliquam malesuada bibendum arcu vitae elementum curabitur.
 
-01234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789";
+01234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789".ReplaceLineEndings();
 
-        private const string _expectedNoIndent = @"
+        private static readonly string _expectedNoIndent = @"
 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
 incididunt ut labore et dolore magna aliqua. Donec adipiscing tristique risus
 nec feugiat in fermentum.
@@ -320,9 +320,9 @@ elementum curabitur.
 01234567890123456789012345678901234567890123456789012345678901234567890123456789
 01234567890123456789012345678901234567890123456789012345678901234567890123456789
 0123456789012345678901234567890123456789
-";
+".ReplaceLineEndings();
 
-        private const string _expectedIndent = @"
+        private static readonly string _expectedIndent = @"
 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
         incididunt ut labore et dolore magna aliqua. Donec adipiscing tristique
         risus nec feugiat in fermentum.
@@ -342,9 +342,9 @@ Tincidunt vitae semper quis lectus nulla at volutpat diam ut. Vitae tempus
 01234567890123456789012345678901234567890123456789012345678901234567890123456789
         012345678901234567890123456789012345678901234567890123456789012345678901
         234567890123456789012345678901234567890123456789
-";
+".ReplaceLineEndings();
 
-        private const string _expectedIndentChanges = @"
+        private static readonly string _expectedIndentChanges = @"
 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
     incididunt ut labore et dolore magna aliqua. Donec adipiscing tristique
     risus nec feugiat in fermentum.
@@ -402,9 +402,9 @@ Tincidunt vitae semper quis lectus nulla at volutpat diam ut. Vitae tempus
 01234567890123456789012345678901234567890123456789012345678901234567890123456789
         012345678901234567890123456789012345678901234567890123456789012345678901
         234567890123456789012345678901234567890123456789
-";
+".ReplaceLineEndings();
 
-        private const string _expectedIndentNoMaximum = @"
+        private static readonly string _expectedIndentNoMaximum = @"
 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Donec adipiscing tristique risus nec feugiat in fermentum.
 
 Tincidunt vitae semper quis lectus nulla at volutpat diam ut. Vitae tempus
@@ -415,22 +415,22 @@ Tincidunt vitae semper quis lectus nulla at volutpat diam ut. Vitae tempus
         Augue neque gravida in
         fermentum et sollicitudin ac orci. Aliquam malesuada bibendum arcu vitae elementum curabitur.
 
-01234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789";
+01234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789".ReplaceLineEndings();
 
-        private const string _inputFormatting = "\x1b[34mLorem \x1b[34mipsum \x1b[34mdolor \x1b[34msit \x1b[34mamet, \x1b[34mconsectetur \x1b[34madipiscing \x1b[34melit, \x1b]0;new title\x1b\\sed do \x1b]0;new title2\x0007eiusmod \x1b(Btempor\x1bH incididunt\nut labore et dolore magna aliqua. Donec\x1b[38;2;1;2;3m adipiscing tristique risus nec feugiat in fermentum.\x1b[0m";
+        private static readonly string _inputFormatting = "\x1b[34mLorem \x1b[34mipsum \x1b[34mdolor \x1b[34msit \x1b[34mamet, \x1b[34mconsectetur \x1b[34madipiscing \x1b[34melit, \x1b]0;new title\x1b\\sed do \x1b]0;new title2\x0007eiusmod \x1b(Btempor\x1bH incididunt\nut labore et dolore magna aliqua. Donec\x1b[38;2;1;2;3m adipiscing tristique risus nec feugiat in fermentum.\x1b[0m".ReplaceLineEndings();
 
-        private const string _expectedFormatting = @"[34mLorem [34mipsum [34mdolor [34msit [34mamet, [34mconsectetur [34madipiscing [34melit, ]0;new title\sed do ]0;new title2eiusmod (BtemporH
+        private static readonly string _expectedFormatting = @"[34mLorem [34mipsum [34mdolor [34msit [34mamet, [34mconsectetur [34madipiscing [34melit, ]0;new title\sed do ]0;new title2eiusmod (BtemporH
         incididunt
         ut labore et dolore magna aliqua. Donec[38;2;1;2;3m adipiscing tristique risus nec
         feugiat in fermentum.[0m
-";
+".ReplaceLineEndings();
 
-        private const string _expectedFormattingCounted = @"[34mLorem [34mipsum [34mdolor [34msit [34mamet, [34mconsectetur
+        private static readonly string _expectedFormattingCounted = @"[34mLorem [34mipsum [34mdolor [34msit [34mamet, [34mconsectetur
         [34madipiscing [34melit, ]0;new title\sed do ]0;new title2eiusmod
         (BtemporH incididunt
         ut labore et dolore magna aliqua. Donec[38;2;1;2;3m adipiscing
         tristique risus nec feugiat in fermentum.[0m
-";
+".ReplaceLineEndings();
 
 
         #endregion

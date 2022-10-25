@@ -608,7 +608,7 @@ namespace Ookii.CommandLine.Tests
 
         private const string _usagePrefix = "{0}Usage:{1} test";
 
-        private const string _expectedDefaultUsage = @"Test arguments description.
+        private static readonly string _expectedDefaultUsage = @"Test arguments description.
 
 Usage: test [/arg1] <String> [[/other] <Number>] [[/notSwitch] <Boolean>] [[/Arg5] <Single>] [[/other2] <Number>] [[/Arg8] <DayOfWeek>...] /Arg6 <String> [/Arg10...] [/Arg11] [/Arg12 <Int32>...] [/Arg13 <String=Int32>...] [/Arg14 <String=Int32>...] [/Arg15 <KeyValuePair<String, Int32>>] [/Arg3 <String>] [/Arg7] [/Arg9 <Int32>]
 
@@ -636,34 +636,9 @@ Usage: test [/arg1] <String> [[/other] <Number>] [[/notSwitch] <Boolean>] [[/Arg
     /Arg7 [<Boolean>] (/Alias3)
 
 
-";
+".ReplaceLineEndings();
 
-        private const string _expectedLongShortUsage = @"Usage: test [[--foo] <Int32>] [[--bar] <Int32>] [--Arg1 <Int32>] [--Arg2 <Int32>] [--Switch1] [--Switch2] [-u]
-
-    -f, --foo <Int32>
-            Foo description. Default value: 0.
-
-        --bar <Int32>
-            Bar description. Default value: 0.
-
-        --Arg1 <Int32>
-            Arg1 description.
-
-    -a, --Arg2 <Int32> (-b, --baz)
-            Arg2 description.
-
-    -S, --Switch1 [<Boolean>]
-            Switch1 description.
-
-    -t, --Switch2 [<Boolean>]
-            Switch2 description.
-
-    -u [<Boolean>]
-            Switch3 description.
-
-";
-
-        private const string _expectedLongShortUsageShortNameSyntax = @"Usage: test [[-f] <Int32>] [[--bar] <Int32>] [--Arg1 <Int32>] [-a <Int32>] [-S] [-t] [-u]
+        private static readonly string _expectedLongShortUsage = @"Usage: test [[--foo] <Int32>] [[--bar] <Int32>] [--Arg1 <Int32>] [--Arg2 <Int32>] [--Switch1] [--Switch2] [-u]
 
     -f, --foo <Int32>
             Foo description. Default value: 0.
@@ -686,9 +661,9 @@ Usage: test [/arg1] <String> [[/other] <Number>] [[/notSwitch] <Boolean>] [[/Arg
     -u [<Boolean>]
             Switch3 description.
 
-";
+".ReplaceLineEndings();
 
-        private const string _expectedLongShortUsageAbbreviated = @"Usage: test [[--foo] <Int32>] [[--bar] <Int32>] [arguments]
+        private static readonly string _expectedLongShortUsageShortNameSyntax = @"Usage: test [[-f] <Int32>] [[--bar] <Int32>] [--Arg1 <Int32>] [-a <Int32>] [-S] [-t] [-u]
 
     -f, --foo <Int32>
             Foo description. Default value: 0.
@@ -711,9 +686,34 @@ Usage: test [/arg1] <String> [[/other] <Number>] [[/notSwitch] <Boolean>] [[/Arg
     -u [<Boolean>]
             Switch3 description.
 
-";
+".ReplaceLineEndings();
 
-        private const string _expectedUsageDescriptionOnly = @"Test arguments description.
+        private static readonly string _expectedLongShortUsageAbbreviated = @"Usage: test [[--foo] <Int32>] [[--bar] <Int32>] [arguments]
+
+    -f, --foo <Int32>
+            Foo description. Default value: 0.
+
+        --bar <Int32>
+            Bar description. Default value: 0.
+
+        --Arg1 <Int32>
+            Arg1 description.
+
+    -a, --Arg2 <Int32> (-b, --baz)
+            Arg2 description.
+
+    -S, --Switch1 [<Boolean>]
+            Switch1 description.
+
+    -t, --Switch2 [<Boolean>]
+            Switch2 description.
+
+    -u [<Boolean>]
+            Switch3 description.
+
+".ReplaceLineEndings();
+
+        private static readonly string _expectedUsageDescriptionOnly = @"Test arguments description.
 
 Usage: test [-arg1] <String> [[-other] <Number>] [[-notSwitch] <Boolean>] [[-Arg5] <Single>] [[-other2] <Number>] [[-Arg8] <DayOfWeek>...] -Arg6 <String> [-Arg10...] [-Arg11] [-Arg12 <Int32>...] [-Arg13 <String=Int32>...] [-Arg14 <String=Int32>...] [-Arg15 <KeyValuePair<String, Int32>>] [-Arg3 <String>] [-Arg7] [-Arg9 <Int32>]
 
@@ -732,9 +732,9 @@ Usage: test [-arg1] <String> [[-other] <Number>] [[-notSwitch] <Boolean>] [[-Arg
     -Arg6 <String> (-Alias1, -Alias2)
         Arg6 description.
 
-";
+".ReplaceLineEndings();
 
-        private const string _expectedUsageAll = @"Test arguments description.
+        private static readonly string _expectedUsageAll = @"Test arguments description.
 
 Usage: test [-arg1] <String> [[-other] <Number>] [[-notSwitch] <Boolean>] [[-Arg5] <Single>] [[-other2] <Number>] [[-Arg8] <DayOfWeek>...] -Arg6 <String> [-Arg10...] [-Arg11] [-Arg12 <Int32>...] [-Arg13 <String=Int32>...] [-Arg14 <String=Int32>...] [-Arg15 <KeyValuePair<String, Int32>>] [-Arg3 <String>] [-Arg7] [-Arg9 <Int32>]
 
@@ -786,17 +786,17 @@ Usage: test [-arg1] <String> [[-other] <Number>] [[-notSwitch] <Boolean>] [[-Arg
     -Arg9 <Int32>
 
 
-";
+".ReplaceLineEndings();
 
-        private const string _expectedUsageNone = @"Test arguments description.
+        private static readonly string _expectedUsageNone = @"Test arguments description.
 
 Usage: test [-arg1] <String> [[-other] <Number>] [[-notSwitch] <Boolean>] [[-Arg5] <Single>] [[-other2] <Number>] [[-Arg8] <DayOfWeek>...] -Arg6 <String> [-Arg10...] [-Arg11] [-Arg12 <Int32>...] [-Arg13 <String=Int32>...] [-Arg14 <String=Int32>...] [-Arg15 <KeyValuePair<String, Int32>>] [-Arg3 <String>] [-Arg7] [-Arg9 <Int32>]
 
-";
+".ReplaceLineEndings();
 
         // Raw strings would be nice here so including the escape character directly wouldn't be
         // necessary but that requires C++11.
-        private const string _expectedUsageColor = @"Test arguments description.
+        private static readonly string _expectedUsageColor = @"Test arguments description.
 
 [36mUsage:[0m test [/arg1] <String> [[/other] <Number>] [[/notSwitch] <Boolean>] [[/Arg5] <Single>] [[/other2] <Number>] [[/Arg8] <DayOfWeek>...] /Arg6 <String> [/Arg10...] [/Arg11] [/Arg12 <Int32>...] [/Arg13 <String=Int32>...] [/Arg14 <String=Int32>...] [/Arg15 <KeyValuePair<String, Int32>>] [/Arg3 <String>] [/Arg7] [/Arg9 <Int32>]
 
@@ -824,7 +824,7 @@ Usage: test [-arg1] <String> [[-other] <Number>] [[-notSwitch] <Boolean>] [[-Arg
     [32m/Arg7 [<Boolean>] (/Alias3)[0m
 
 
-";
+".ReplaceLineEndings();
 
 
         #endregion
