@@ -117,9 +117,9 @@ namespace Ookii.CommandLine.Tests
             // Using aliases
             TestParse(target, "val1 2 -alias1 valalias6 -alias3", "val1", 2, arg6: "valalias6", arg7: true);
             // Long prefix cannot be used
-            CheckThrows(() => target.Parse(new[] { "val1", "2", "--arg6", "val6" }), CommandLineArgumentErrorCategory.UnknownArgument, "-arg6");
+            CheckThrows(() => target.Parse(new[] { "val1", "2", "--arg6", "val6" }), target, CommandLineArgumentErrorCategory.UnknownArgument, "-arg6");
             // Short name cannot be used
-            CheckThrows(() => target.Parse(new[] { "val1", "2", "-arg6", "val6", "-a:5.5" }), CommandLineArgumentErrorCategory.UnknownArgument, "a");
+            CheckThrows(() => target.Parse(new[] { "val1", "2", "-arg6", "val6", "-a:5.5" }), target, CommandLineArgumentErrorCategory.UnknownArgument, "a");
         }
 
         [TestMethod]
@@ -129,7 +129,7 @@ namespace Ookii.CommandLine.Tests
             CommandLineParser target = new CommandLineParser(argumentsType, new[] { "/", "-" });
 
             // This test was added because version 2.0 threw an IndexOutOfRangeException when you tried to specify a positional argument when there were no positional arguments defined.
-            CheckThrows(() => target.Parse(new[] { "Foo", "Bar" }), CommandLineArgumentErrorCategory.TooManyArguments);
+            CheckThrows(() => target.Parse(new[] { "Foo", "Bar" }), target, CommandLineArgumentErrorCategory.TooManyArguments);
         }
 
         [TestMethod]
@@ -139,7 +139,7 @@ namespace Ookii.CommandLine.Tests
             CommandLineParser target = new CommandLineParser(argumentsType, new[] { "/", "-" });
 
             // Only accepts one positional argument.
-            CheckThrows(() => target.Parse(new[] { "Foo", "Bar" }), CommandLineArgumentErrorCategory.TooManyArguments);
+            CheckThrows(() => target.Parse(new[] { "Foo", "Bar" }), target, CommandLineArgumentErrorCategory.TooManyArguments);
         }
 
         [TestMethod]
@@ -149,6 +149,7 @@ namespace Ookii.CommandLine.Tests
             CommandLineParser target = new CommandLineParser(argumentsType, new[] { "/", "-" });
 
             CheckThrows(() => target.Parse(new[] { "Foo", "-ThrowingArgument", "-5" }),
+                target,
                 CommandLineArgumentErrorCategory.ApplyValueError,
                 "ThrowingArgument",
                 typeof(ArgumentOutOfRangeException));
@@ -160,7 +161,8 @@ namespace Ookii.CommandLine.Tests
             Type argumentsType = typeof(MultipleConstructorsArguments);
             CommandLineParser target = new CommandLineParser(argumentsType, new[] { "/", "-" });
 
-            CheckThrows(() => target.Parse(new[] { "invalid" }),
+            CheckThrows(() => target.Parse(new[] { "invalid" }), 
+                target,
                 CommandLineArgumentErrorCategory.CreateArgumentsTypeError,
                 null,
                 typeof(ArgumentException));
@@ -178,7 +180,8 @@ namespace Ookii.CommandLine.Tests
             Assert.AreEqual(3, args.DuplicateKeys["Foo"]);
             Assert.AreEqual(2, args.DuplicateKeys["Bar"]);
 
-            CheckThrows(() => target.Parse(new[] { "-NoDuplicateKeys", "Foo=1", "-NoDuplicateKeys", "Bar=2", "-NoDuplicateKeys", "Foo=3" }),
+            CheckThrows(() => target.Parse(new[] { "-NoDuplicateKeys", "Foo=1", "-NoDuplicateKeys", "Bar=2", "-NoDuplicateKeys", "Foo=3" }), 
+                target,
                 CommandLineArgumentErrorCategory.InvalidDictionaryValue,
                 "NoDuplicateKeys",
                 typeof(ArgumentException));
@@ -206,7 +209,8 @@ namespace Ookii.CommandLine.Tests
             Assert.IsNotNull(args);
             Assert.AreEqual("test", args.Argument1);
             Assert.AreEqual("foo:bar", args.Argument2);
-            CheckThrows(() => target.Parse(new[] { "-Argument1=test" }),
+            CheckThrows(() => target.Parse(new[] { "-Argument1=test" }), 
+                target,
                 CommandLineArgumentErrorCategory.UnknownArgument,
                 "Argument1=test");
 
@@ -216,6 +220,7 @@ namespace Ookii.CommandLine.Tests
             Assert.AreEqual("test", args.Argument1);
             Assert.AreEqual("foo=bar", args.Argument2);
             CheckThrows(() => target.Parse(new[] { "-Argument1:test" }),
+                target,
                 CommandLineArgumentErrorCategory.UnknownArgument,
                 "Argument1:test");
         }
@@ -233,6 +238,7 @@ namespace Ookii.CommandLine.Tests
             Assert.IsNotNull(result);
             CollectionAssert.AreEquivalent(new[] { KeyValuePair.Create("foo", "bar"), KeyValuePair.Create("baz", "contains<=>separator"), KeyValuePair.Create("hello", "") }, result.CustomSeparator);
             CheckThrows(() => target.Parse(new[] { "-CustomSeparator", "foo=bar" }),
+                target,
                 CommandLineArgumentErrorCategory.ArgumentValueConversion,
                 "CustomSeparator",
                 typeof(FormatException));
@@ -240,6 +246,7 @@ namespace Ookii.CommandLine.Tests
             // Inner exception is Argument exception because what throws here is trying to convert
             // ">bar" to int.
             CheckThrows(() => target.Parse(new[] { "-DefaultSeparator", "foo<=>bar" }),
+                target,
                 CommandLineArgumentErrorCategory.ArgumentValueConversion,
                 "DefaultSeparator",
                 typeof(ArgumentException));
@@ -512,16 +519,16 @@ namespace Ookii.CommandLine.Tests
             Assert.AreEqual(5, result.Arg2);
 
             // Combining non-switches is an error.
-            CheckThrows(() => parser.Parse(new[] { "-sf" }), CommandLineArgumentErrorCategory.CombinedShortNameNonSwitch, "sf");
+            CheckThrows(() => parser.Parse(new[] { "-sf" }), parser, CommandLineArgumentErrorCategory.CombinedShortNameNonSwitch, "sf");
 
             // Can't use long argument prefix with short names.
-            CheckThrows(() => parser.Parse(new[] { "--s" }), CommandLineArgumentErrorCategory.UnknownArgument, "s");
+            CheckThrows(() => parser.Parse(new[] { "--s" }), parser, CommandLineArgumentErrorCategory.UnknownArgument, "s");
 
             // And vice versa.
-            CheckThrows(() => parser.Parse(new[] { "-Switch1" }), CommandLineArgumentErrorCategory.UnknownArgument, "w");
+            CheckThrows(() => parser.Parse(new[] { "-Switch1" }), parser, CommandLineArgumentErrorCategory.UnknownArgument, "w");
 
             // Short alias is ignored on an argument without a short name.
-            CheckThrows(() => parser.Parse(new[] { "-c" }), CommandLineArgumentErrorCategory.UnknownArgument, "c");
+            CheckThrows(() => parser.Parse(new[] { "-c" }), parser, CommandLineArgumentErrorCategory.UnknownArgument, "c");
         }
 
         [TestMethod]
@@ -529,6 +536,7 @@ namespace Ookii.CommandLine.Tests
         {
             var parser = new CommandLineParser<MethodArguments>();
 
+            Assert.AreEqual(ArgumentKind.Method, parser.GetArgument("NoCancel").Kind);
             Assert.IsNull(parser.GetArgument("NotAnArgument"));
             Assert.IsNull(parser.GetArgument("NotStatic"));
             Assert.IsNull(parser.GetArgument("NotPublic"));
@@ -594,6 +602,8 @@ namespace Ookii.CommandLine.Tests
             Assert.AreEqual(valueDescription, argument.ValueDescription);
             Assert.AreEqual(isMultiValue, argument.IsMultiValue);
             Assert.AreEqual(isDictionary, argument.IsDictionary);
+            var kind = isDictionary ? ArgumentKind.Dictionary : (isMultiValue ? ArgumentKind.MultiValue : ArgumentKind.SingleValue);
+            Assert.AreEqual(kind, argument.Kind);
             Assert.AreEqual(isSwitch, argument.IsSwitch);
             Assert.AreEqual(defaultValue, argument.DefaultValue);
             Assert.IsNull(argument.Value);
@@ -611,6 +621,8 @@ namespace Ookii.CommandLine.Tests
         {
             string[] args = commandLine.Split(' '); // not using quoted arguments in the tests, so this is fine.
             var result = target.Parse(args);
+            Assert.IsNotNull(result);
+            Assert.IsFalse(target.HelpRequested);
             Assert.AreEqual(arg1, result.Arg1);
             Assert.AreEqual(arg2, result.Arg2);
             Assert.AreEqual(arg3, result.Arg3);
@@ -637,7 +649,7 @@ namespace Ookii.CommandLine.Tests
                 Assert.AreEqual(arg15.Value, result.Arg15);
         }
 
-        private static void CheckThrows(Action operation, CommandLineArgumentErrorCategory category, string argumentName = null, Type innerExceptionType = null)
+        private static void CheckThrows(Action operation, CommandLineParser parser, CommandLineArgumentErrorCategory category, string argumentName = null, Type innerExceptionType = null)
         {
             try
             {
@@ -646,6 +658,7 @@ namespace Ookii.CommandLine.Tests
             }
             catch (CommandLineArgumentException ex)
             {
+                Assert.IsTrue(parser.HelpRequested);
                 Assert.AreEqual(category, ex.Category);
                 Assert.AreEqual(argumentName, ex.ArgumentName);
                 if (innerExceptionType == null)
