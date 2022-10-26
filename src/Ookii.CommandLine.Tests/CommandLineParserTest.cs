@@ -524,6 +524,57 @@ namespace Ookii.CommandLine.Tests
             CheckThrows(() => parser.Parse(new[] { "-c" }), CommandLineArgumentErrorCategory.UnknownArgument, "c");
         }
 
+        [TestMethod]
+        public void TestMethodArguments()
+        {
+            var parser = new CommandLineParser<MethodArguments>();
+
+            Assert.IsNull(parser.GetArgument("NotAnArgument"));
+            Assert.IsNull(parser.GetArgument("NotStatic"));
+            Assert.IsNull(parser.GetArgument("NotPublic"));
+
+            Assert.IsNotNull(parser.Parse(new[] { "-NoCancel" }));
+            Assert.IsFalse(parser.HelpRequested);
+            Assert.AreEqual(nameof(MethodArguments.NoCancel), MethodArguments.CalledMethodName);
+
+            Assert.IsNull(parser.Parse(new[] { "-Cancel" }));
+            Assert.IsFalse(parser.HelpRequested);
+            Assert.AreEqual(nameof(MethodArguments.Cancel), MethodArguments.CalledMethodName);
+
+            Assert.IsNull(parser.Parse(new[] { "-CancelWithHelp" }));
+            Assert.IsTrue(parser.HelpRequested);
+            Assert.AreEqual(nameof(MethodArguments.CancelWithHelp), MethodArguments.CalledMethodName);
+
+            Assert.IsNotNull(parser.Parse(new[] { "-CancelWithValue", "1" }));
+            Assert.IsFalse(parser.HelpRequested);
+            Assert.AreEqual(nameof(MethodArguments.CancelWithValue), MethodArguments.CalledMethodName);
+            Assert.AreEqual(1, MethodArguments.Value);
+
+            Assert.IsNull(parser.Parse(new[] { "-CancelWithValue", "-1" }));
+            Assert.IsFalse(parser.HelpRequested);
+            Assert.AreEqual(nameof(MethodArguments.CancelWithValue), MethodArguments.CalledMethodName);
+            Assert.AreEqual(-1, MethodArguments.Value);
+
+            Assert.IsNotNull(parser.Parse(new[] { "-CancelWithValueAndHelp", "1" }));
+            Assert.IsFalse(parser.HelpRequested);
+            Assert.AreEqual(nameof(MethodArguments.CancelWithValueAndHelp), MethodArguments.CalledMethodName);
+            Assert.AreEqual(1, MethodArguments.Value);
+
+            Assert.IsNull(parser.Parse(new[] { "-CancelWithValueAndHelp", "-1" }));
+            Assert.IsTrue(parser.HelpRequested);
+            Assert.AreEqual(nameof(MethodArguments.CancelWithValueAndHelp), MethodArguments.CalledMethodName);
+            Assert.AreEqual(-1, MethodArguments.Value);
+
+            Assert.IsNotNull(parser.Parse(new[] { "-NoReturn" }));
+            Assert.IsFalse(parser.HelpRequested);
+            Assert.AreEqual(nameof(MethodArguments.NoReturn), MethodArguments.CalledMethodName);
+
+            Assert.IsNotNull(parser.Parse(new[] { "42" }));
+            Assert.IsFalse(parser.HelpRequested);
+            Assert.AreEqual(nameof(MethodArguments.Positional), MethodArguments.CalledMethodName);
+            Assert.AreEqual(42, MethodArguments.Value);
+        }
+
         private static void TestArgument(IEnumerator<CommandLineArgument> arguments, string name, string memberName, Type type, Type elementType, int? position, bool isRequired, object defaultValue, string description, string valueDescription, bool isSwitch, bool isMultiValue, bool isDictionary = false, params string[] aliases)
         {
             arguments.MoveNext();

@@ -225,4 +225,79 @@ namespace Ookii.CommandLine.Tests
         public int Bar { get; set; }
     }
 
+    class MethodArguments
+    {
+        // Using method arguments to store stuff in static fields isn't really recommended. It's
+        // done here for testing purposes only.
+        public static string CalledMethodName;
+        public static int Value;
+
+        [CommandLineArgument]
+        public static bool NoCancel()
+        {
+            CalledMethodName = nameof(NoCancel);
+            return true;
+        }
+
+        [CommandLineArgument]
+        public static bool Cancel()
+        {
+            CalledMethodName = nameof(Cancel);
+            return false;
+        }
+
+        [CommandLineArgument]
+        public static bool CancelWithHelp(CommandLineParser parser)
+        {
+            CalledMethodName = nameof(CancelWithHelp);
+            parser.HelpRequested = true;
+            return false;
+        }
+
+        [CommandLineArgument]
+        public static bool CancelWithValue(int value)
+        {
+            CalledMethodName = nameof(CancelWithValue);
+            Value = value;
+            return value > 0;
+        }
+
+        [CommandLineArgument]
+        public static bool CancelWithValueAndHelp(int value, CommandLineParser parser)
+        {
+            CalledMethodName = nameof(CancelWithValueAndHelp);
+            Value = value;
+            // This should be reset to false if parsing continues.
+            parser.HelpRequested = true;
+            return value > 0;
+        }
+
+        [CommandLineArgument]
+        public static void NoReturn()
+        {
+            CalledMethodName = nameof(NoReturn);
+        }
+
+        [CommandLineArgument(Position = 0)]
+        public static void Positional(int value)
+        {
+            CalledMethodName = nameof(Positional);
+            Value = value;
+        }
+
+        [CommandLineArgument]
+        public void NotStatic()
+        {
+        }
+
+        [CommandLineArgument]
+        private static void NotPublic() 
+        { 
+        }
+
+        public static void NotAnArgument()
+        { 
+        }
+    }
+
 }

@@ -184,7 +184,7 @@
     <value>The command line constructor cannot have non-optional arguments after an optional argument.</value>
   </data>
   <data name="MissingArgumentAttribute" xml:space="preserve">
-    <value>The specified property is not a command line argument.</value>
+    <value>The specified property or method is not a command line argument.</value>
   </data>
   <data name="MissingRequiredArgumentFormat" xml:space="preserve">
     <value>The required argument '{0}' was not supplied.</value>
@@ -278,5 +278,8 @@
   </data>
   <data name="InvalidStandardStream" xml:space="preserve">
     <value>Invalid standard stream value.</value>
+  </data>
+  <data name="InvalidMethodSignatureFormat" xml:space="preserve">
+    <value>The method '{0}' has an unsupported signature.</value>
   </data>
 </root>

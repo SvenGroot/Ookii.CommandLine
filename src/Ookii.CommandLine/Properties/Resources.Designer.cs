@@ -346,6 +346,15 @@ namespace Ookii.CommandLine.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The method &apos;{0}&apos; has an unsupported signature..
+        /// </summary>
+        internal static string InvalidMethodSignatureFormat {
+            get {
+                return ResourceManager.GetString("InvalidMethodSignatureFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The command line constructor cannot have non-optional arguments after an optional argument..
         /// </summary>
         internal static string InvalidOptionalArgumentOrder {
@@ -364,7 +373,7 @@ namespace Ookii.CommandLine.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The specified property is not a command line argument..
+        ///   Looks up a localized string similar to The specified property or method is not a command line argument..
         /// </summary>
         internal static string MissingArgumentAttribute {
             get {

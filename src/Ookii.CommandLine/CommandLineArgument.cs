@@ -23,7 +23,7 @@ namespace Ookii.CommandLine
         private interface IValueHelper
         {
             object? Value { get; }
-            void SetValue(CommandLineArgument argument, CultureInfo culture, string? value);
+            bool SetValue(CommandLineArgument argument, CultureInfo culture, string? value);
             void ApplyValue(object target, PropertyInfo property);
         }
 
@@ -41,9 +41,10 @@ namespace Ookii.CommandLine
                 property.SetValue(target, Value);
             }
 
-            public void SetValue(CommandLineArgument argument, CultureInfo culture, string? value)
+            public bool SetValue(CommandLineArgument argument, CultureInfo culture, string? value)
             {
                 Value = argument.ConvertToArgumentType(culture, value);
+                return true;
             }
         }
 
@@ -73,17 +74,19 @@ namespace Ookii.CommandLine
                     list.Add(value);
             }
 
-            public void SetValue(CommandLineArgument argument, CultureInfo culture, string? value)
+            public bool SetValue(CommandLineArgument argument, CultureInfo culture, string? value)
             {
                 if (value == null || argument.MultiValueSeparator == null)
                 {
                     _values.Add((T?)argument.ConvertToArgumentType(culture, value));
-                    return;
+                    return true;
                 }
 
                 string[] values = value.Split(new[] { argument.MultiValueSeparator }, StringSplitOptions.None);
                 foreach (string separateValue in values)
                     _values.Add((T?)argument.ConvertToArgumentType(culture, separateValue));
+
+                return true;
             }
         }
 
@@ -120,17 +123,19 @@ namespace Ookii.CommandLine
                     dictionary.Add(pair.Key, pair.Value);
             }
 
-            public void SetValue(CommandLineArgument argument, CultureInfo culture, string? value)
+            public bool SetValue(CommandLineArgument argument, CultureInfo culture, string? value)
             {
                 if (value == null || argument.MultiValueSeparator == null)
                 {
                     SetValueCore(argument, culture, value);
-                    return;
+                    return true;
                 }
 
                 string[] values = value.Split(new[] { argument.MultiValueSeparator }, StringSplitOptions.None);
                 foreach (string separateValue in values)
                     SetValueCore(argument, culture, separateValue);
+
+                return true;
             }
 
             private void SetValueCore(CommandLineArgument argument, CultureInfo culture, string? value)
@@ -157,10 +162,46 @@ namespace Ookii.CommandLine
             }
         }
 
+        private class MethodValueHelper : IValueHelper
+        {
+            public object? Value { get; private set; }
+
+            public void ApplyValue(object target, PropertyInfo property)
+            {
+                throw new InvalidOperationException();
+            }
+
+            public bool SetValue(CommandLineArgument argument, CultureInfo culture, string? value)
+            {
+                Value = argument.ConvertToArgumentType(culture, value);
+                var info = argument._method!.Value;
+                int parameterCount = (info.HasValueParameter ? 1 : 0) + (info.HasParserParameter ? 1 : 0);
+                var parameters = new object?[parameterCount];
+                int index = 0;
+                if (info.HasValueParameter)
+                {
+                    parameters[index] = Value;
+                    ++index;
+                }
+
+                if (info.HasParserParameter)
+                {
+                    parameters[index] = argument._parser;
+                }
+
+                var returnValue = info.Method.Invoke(null, parameters);
+                if (returnValue == null)
+                    return true;
+                else
+                    return (bool)returnValue;
+            }
+        }
+
         private struct ArgumentInfo
         {
             public CommandLineParser Parser { get; set; }
             public PropertyInfo? Property { get; set; }
+            public MethodArgumentInfo? Method { get; set; }
             public ParameterInfo? Parameter { get; set; }
             public string MemberName { get; set; }
             public string ArgumentName { get; set; }
@@ -185,11 +226,19 @@ namespace Ookii.CommandLine
             public bool CancelParsing { get; set; }
         }
 
+        private struct MethodArgumentInfo
+        {
+            public MethodInfo Method { get; set; }
+            public bool HasValueParameter { get; set; }
+            public bool HasParserParameter { get; set; }
+        }
+
         #endregion
 
         private readonly CommandLineParser _parser;
         private readonly TypeConverter _converter;
         private readonly PropertyInfo? _property;
+        private readonly MethodArgumentInfo? _method;
         private readonly string _valueDescription;
         private readonly string _argumentName;
         private readonly bool _hasLongName = true;
@@ -202,8 +251,7 @@ namespace Ookii.CommandLine
         private readonly bool _isRequired;
         private readonly string _memberName;
         private readonly object? _defaultValue;
-        private readonly bool _isMultiValue;
-        private readonly bool _isDictionary;
+        private readonly ArgumentKind _argumentKind;
         private readonly bool _allowDuplicateDictionaryKeys;
         private readonly string? _multiValueSeparator;
         private readonly string? _keyValueSeparator;
@@ -216,6 +264,7 @@ namespace Ookii.CommandLine
             // If this method throws anything other than a NotSupportedException, it constitutes a bug in the Ookii.CommandLine library.
             _parser = info.Parser;
             _property = info.Property;
+            _method = info.Method;
             _memberName = info.MemberName;
             _argumentName = info.ArgumentName;
             if (_parser.Mode == ParsingMode.LongShort)
@@ -254,60 +303,40 @@ namespace Ookii.CommandLine
             Position = info.Position;
             var converterType = info.ConverterType;
 
-            Type? dictionaryType = null;
-            Type? collectionType = null;
-            if( _argumentType.IsGenericType && _argumentType.GetGenericTypeDefinition() == typeof(Dictionary<,>) )
+            if (_method == null)
             {
-                dictionaryType = _argumentType;
-            }
-            else if( _argumentType.IsArray )
-            {
-                if( _argumentType.GetArrayRank() != 1 )
-                    throw new NotSupportedException(Properties.Resources.InvalidArrayRank);
-                _isMultiValue = true;
-                _elementType = _argumentType.GetElementType()!;
-                collectionType = _argumentType;
-                if( _property != null && _property.GetSetMethod() == null )
-                    throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.PropertyIsReadOnlyFormat, _argumentName));
-            }
-            else if( _property != null && _property.GetSetMethod() == null ) // Don't use CanWrite because that returns true for properties with a private set accessor.
-            {
-                dictionaryType = TypeHelper.FindGenericInterface(_argumentType, typeof(IDictionary<,>));
-                if( dictionaryType == null )
+                var (collectionType, dictionaryType, elementType) = DetermineMultiValueType();
+
+                if (dictionaryType != null)
                 {
-                    collectionType = TypeHelper.FindGenericInterface(_argumentType, typeof(ICollection<>));
-                    if( collectionType == null )
+                    Debug.Assert(elementType != null);
+                    _argumentKind = ArgumentKind.Dictionary;
+                    _elementType = elementType!;
+                    _allowDuplicateDictionaryKeys = info.AllowDuplicateDictionaryKeys;
+                    _allowNull = DetermineDictionaryValueTypeAllowsNull(dictionaryType, info.Property, info.Parameter);
+                    _keyValueSeparator = info.KeyValueSeparator ?? KeyValuePairConverter.DefaultSeparator;
+                    var genericArguments = dictionaryType.GetGenericArguments();
+                    if (converterType == null)
                     {
-                        throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.PropertyIsReadOnlyFormat, _argumentName));
+                        converterType = typeof(KeyValuePairConverter<,>).MakeGenericType(genericArguments);
+                        _converter = (TypeConverter)Activator.CreateInstance(converterType, _argumentName, _allowNull, info.KeyConverterType, info.ValueConverterType, _keyValueSeparator)!;
                     }
-                    else
-                    {
-                        _isMultiValue = true;
-                        _elementType = collectionType.GetGenericArguments()[0];
-                    }
+
+                    _valueDescription = info.ValueDescription ??
+                        string.Format(CultureInfo.CurrentCulture, "{0}{1}{2}",
+                            GetFriendlyTypeName(genericArguments[0]), _keyValueSeparator, GetFriendlyTypeName(genericArguments[1]));
+                }
+                else if (collectionType != null)
+                {
+                    Debug.Assert(elementType != null);
+                    _argumentKind = ArgumentKind.MultiValue;
+                    _elementType = elementType!;
+                    _allowNull = DetermineCollectionElementTypeAllowsNull(collectionType, info.Property, info.Parameter);
                 }
             }
-
-            if (dictionaryType != null)
+            else
             {
-                _isDictionary = true;
-                _isMultiValue = true;
-                _allowDuplicateDictionaryKeys = info.AllowDuplicateDictionaryKeys;
-                Type[] genericArguments = dictionaryType.GetGenericArguments();
-                _elementType = typeof(KeyValuePair<,>).MakeGenericType(genericArguments);
-                _allowNull = DetermineDictionaryValueTypeAllowsNull(dictionaryType, info.Property, info.Parameter);
-                _keyValueSeparator = info.KeyValueSeparator ?? KeyValuePairConverter.DefaultSeparator;
-                if (converterType == null)
-                {
-                    converterType = typeof(KeyValuePairConverter<,>).MakeGenericType(dictionaryType.GetGenericArguments());
-                    _converter = (TypeConverter)Activator.CreateInstance(converterType, _argumentName, _allowNull, info.KeyConverterType, info.ValueConverterType, _keyValueSeparator)!;
-                }
-
-                _valueDescription = info.ValueDescription ?? string.Format(CultureInfo.CurrentCulture, "{0}{1}{2}", GetFriendlyTypeName(genericArguments[0]), _keyValueSeparator, GetFriendlyTypeName(genericArguments[1]));
-            }
-            else if (collectionType != null)
-            {
-                _allowNull = DetermineCollectionElementTypeAllowsNull(collectionType, info.Property, info.Parameter);
+                _argumentKind = ArgumentKind.Method;
             }
 
             if ( _valueDescription == null )
@@ -315,6 +344,7 @@ namespace Ookii.CommandLine
 
             if (_converter == null)
                 _converter = CreateConverter(converterType);
+
             _defaultValue = DetermineDefaultValue(info.DefaultValue);
         }
 
@@ -552,6 +582,37 @@ namespace Ookii.CommandLine
         }
 
         /// <summary>
+        /// Gets a value which indicates what kind of argument this instance represents.
+        /// </summary>
+        /// <value>
+        /// One of the values of the <see cref="ArgumentKind"/> enumeration.
+        /// </value>
+        /// <remarks>
+        /// <para>
+        ///   An argument that is <see cref="ArgumentKind.MultiValue"/> can accept multiple values
+        ///   by being supplied more than once. An argument is multi-value if its <see cref="ArgumentType"/>
+        ///   is an array or the argument was defined by a read-only property whose type implements
+        ///   the <see cref="ICollection{T}"/> generic interface.
+        /// </para>
+        /// <para>
+        ///   An argument is <see cref="ArgumentKind.Dictionary"/> dictionary argument is a
+        ///   multi-value argument whose values are key/value pairs, which get added to a
+        ///   dictionary based on the key. An argument is a dictionary argument when its
+        ///   <see cref="ArgumentType"/> is <see cref="Dictionary{TKey,TValue}"/>, or it was defined
+        ///   by a read-only property whose type implements the <see cref="IDictionary{TKey,TValue}"/>
+        ///   property.
+        /// </para>
+        /// <para>
+        ///   An argument is <see cref="ArgumentKind.Method"/> if it is backed by a method instead
+        ///   of a property, which will be invoked when the argument is set.
+        /// </para>
+        /// <para>
+        ///   Otherwise, the value will be <see cref="ArgumentKind.SingleValue"/>.
+        /// </para>
+        /// </remarks>
+        public ArgumentKind Kind => _argumentKind;
+
+        /// <summary>
         /// Gets a value indicating whether this argument is a multi-value argument.
         /// </summary>
         /// <value>
@@ -567,10 +628,7 @@ namespace Ookii.CommandLine
         /// </para>
         /// </remarks>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Multi")]
-        public bool IsMultiValue
-        {
-            get { return _isMultiValue; }
-        }
+        public bool IsMultiValue => _argumentKind == ArgumentKind.MultiValue || _argumentKind == ArgumentKind.Dictionary;
 
         /// <summary>
         /// Gets the separator for the values if this argument is a multi-value argument
@@ -618,10 +676,7 @@ namespace Ookii.CommandLine
         ///   a read-only property whose type implements the <see cref="IDictionary{TKey,TValue}"/> property.
         /// </para>
         /// </remarks>
-        public bool IsDictionary
-        {
-            get { return _isDictionary; }
-        }
+        public bool IsDictionary => _argumentKind == ArgumentKind.Dictionary;
 
         /// <summary>
         /// Gets a value indicating whether this argument, if it is a dictionary argument, allows duplicate keys.
@@ -826,7 +881,7 @@ namespace Ookii.CommandLine
             try
             {
                 var converted = _converter.ConvertFrom(null, culture, argumentValue);
-                if (converted == null && (!_allowNull || _isDictionary))
+                if (converted == null && (!_allowNull || IsDictionary))
                     throw new CommandLineArgumentException(String.Format(CultureInfo.CurrentCulture, Properties.Resources.NullArgumentValueFormat, ArgumentName), ArgumentName, CommandLineArgumentErrorCategory.NullArgumentValue);
 
                 return converted;
@@ -922,7 +977,7 @@ namespace Ookii.CommandLine
             return false;
         }
 
-        internal void SetValue(CultureInfo culture, string? value)
+        internal bool SetValue(CultureInfo culture, string? value)
         {
             if (_valueHelper == null)
                 CreateValueHelper();
@@ -932,8 +987,9 @@ namespace Ookii.CommandLine
             if (HasValue && !IsMultiValue && !_parser.AllowDuplicateArguments)
                 throw CommandLineArgumentException.Create(CommandLineArgumentErrorCategory.DuplicateArgument, Properties.Resources.DuplicateArgumentFormat, ArgumentName);
 
-            _valueHelper.SetValue(this, culture, value);
+            bool continueParsing = _valueHelper!.SetValue(this, culture, value);
             HasValue = true;
+            return continueParsing;
         }
 
         internal static CommandLineArgument Create(CommandLineParser parser, ParameterInfo parameter)
@@ -1015,6 +1071,55 @@ namespace Ookii.CommandLine
                 IsRequired = attribute.IsRequired,
                 MemberName = property.Name,
                 AllowNull = DetermineAllowsNull(property),
+                CancelParsing = attribute.CancelParsing,
+            };
+
+            return new CommandLineArgument(info);
+        }
+
+        internal static CommandLineArgument Create(CommandLineParser parser, MethodInfo method)
+        {
+            if (parser == null)
+                throw new ArgumentNullException(nameof(parser));
+            if (method == null)
+                throw new ArgumentNullException(nameof(method));
+            var attribute = method.GetCustomAttribute<CommandLineArgumentAttribute>();
+            if (attribute == null)
+                throw new ArgumentException(Properties.Resources.MissingArgumentAttribute, nameof(method));
+
+            var infoTuple = DetermineMethodArgumentInfo(method);
+            if (infoTuple == null)
+                throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.InvalidMethodSignatureFormat, method.Name));
+
+            var (methodInfo, argumentType, allowsNull) = infoTuple.Value;
+            var typeConverterAttribute = method.GetCustomAttribute<TypeConverterAttribute>();
+            var keyTypeConverterAttribute = method.GetCustomAttribute<KeyTypeConverterAttribute>();
+            var valueTypeConverterAttribute = method.GetCustomAttribute<ValueTypeConverterAttribute>();
+            var argumentName = attribute.ArgumentName ?? method.Name;
+            var info = new ArgumentInfo()
+            {
+                Parser = parser,
+                Method = methodInfo,
+                ArgumentName = argumentName,
+                Long = attribute.Long,
+                Short = attribute.Short,
+                ShortName = attribute.ShortName,
+                ArgumentType = argumentType,
+                Description = method.GetCustomAttribute<DescriptionAttribute>()?.Description,
+                ValueDescription = attribute.ValueDescription,  // If null, the ctor will sort it out.
+                Position = attribute.Position < 0 ? null : attribute.Position,
+                AllowDuplicateDictionaryKeys = Attribute.IsDefined(method, typeof(AllowDuplicateDictionaryKeysAttribute)),
+                ConverterType = typeConverterAttribute == null ? null : Type.GetType(typeConverterAttribute.ConverterTypeName, true),
+                KeyConverterType = keyTypeConverterAttribute == null ? null : Type.GetType(keyTypeConverterAttribute.ConverterTypeName, true),
+                ValueConverterType = valueTypeConverterAttribute == null ? null : Type.GetType(valueTypeConverterAttribute.ConverterTypeName, true),
+                MultiValueSeparator = GetMultiValueSeparator(method.GetCustomAttribute<MultiValueSeparatorAttribute>()),
+                KeyValueSeparator = method.GetCustomAttribute<KeyValueSeparatorAttribute>()?.Separator,
+                Aliases = GetAliases(method.GetCustomAttributes<AliasAttribute>(), argumentName),
+                ShortAliases = GetShortAliases(method.GetCustomAttributes<ShortAliasAttribute>(), argumentName),
+                DefaultValue = attribute.DefaultValue,
+                IsRequired = attribute.IsRequired,
+                MemberName = method.Name,
+                AllowNull = allowsNull,
                 CancelParsing = attribute.CancelParsing,
             };
 
@@ -1117,20 +1222,27 @@ namespace Ookii.CommandLine
         private void CreateValueHelper()
         {
             Debug.Assert(_valueHelper == null);
-            if (IsDictionary)
+            Type type;
+            switch (_argumentKind)
             {
-                var type = typeof(DictionaryValueHelper<,>).MakeGenericType(_elementType.GetGenericArguments());
+            case ArgumentKind.Dictionary:
+                type = typeof(DictionaryValueHelper<,>).MakeGenericType(_elementType.GetGenericArguments());
                 _valueHelper = (IValueHelper)Activator.CreateInstance(type, _allowDuplicateDictionaryKeys, _allowNull)!;
-            }
-            else if (IsMultiValue)
-            {
-                var type = typeof(MultiValueHelper<>).MakeGenericType(ElementType);
+                break;
+
+            case ArgumentKind.MultiValue:
+                type = typeof(MultiValueHelper<>).MakeGenericType(ElementType);
                 _valueHelper = (IValueHelper)Activator.CreateInstance(type)!;
-            }
-            else
-            {
+                break;
+
+            case ArgumentKind.Method:
+                _valueHelper = new MethodValueHelper();
+                break;
+
+            default:
                 Debug.Assert(_defaultValue == null);
                 _valueHelper = new SingleValueHelper(null);
+                break;
             }
         }
 
@@ -1265,6 +1377,97 @@ namespace Ookii.CommandLine
             }
 
             return null;
+        }
+
+        // Returns a tuple of (collectionType, dictionaryType, elementType)
+        private (Type?, Type?, Type?) DetermineMultiValueType()
+        {
+            // If the type is Dictionary<TKey, TValue> it doesn't matter if the property is
+            // read-only or not.
+            if (_argumentType.IsGenericType && _argumentType.GetGenericTypeDefinition() == typeof(Dictionary<,>))
+            {
+                var elementType = typeof(KeyValuePair<,>).MakeGenericType(_argumentType.GetGenericArguments());
+                return (null, _argumentType, elementType);
+            }
+
+            if (_argumentType.IsArray)
+            {
+                if (_argumentType.GetArrayRank() != 1)
+                    throw new NotSupportedException(Properties.Resources.InvalidArrayRank);
+
+                if (_property != null && _property.GetSetMethod() == null)
+                    throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.PropertyIsReadOnlyFormat, _argumentName));
+
+                var elementType = _argumentType.GetElementType()!;
+                return (_argumentType, null, elementType);
+            }
+
+            // The interface approach requires a read-only property. If it's read-write, treat it
+            // like a non-multi-value argument.
+            // Don't use CanWrite because that returns true for properties with a private set
+            // accessor.
+            if (_property == null || _property.GetSetMethod() != null)
+                return (null, null, null);
+
+            var dictionaryType = TypeHelper.FindGenericInterface(_argumentType, typeof(IDictionary<,>));
+            if (dictionaryType != null)
+            {
+                var elementType = typeof(KeyValuePair<,>).MakeGenericType(dictionaryType.GetGenericArguments());
+                return (null, dictionaryType, elementType);
+            }
+
+            var collectionType = TypeHelper.FindGenericInterface(_argumentType, typeof(ICollection<>));
+            if (collectionType != null)
+            {
+                var elementType = collectionType.GetGenericArguments()[0];
+                return (collectionType, null, elementType);
+            }
+
+            // This is a read-only property with an unsupported type.
+            throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.PropertyIsReadOnlyFormat, _argumentName));
+        }
+
+        private static (MethodArgumentInfo, Type, bool)? DetermineMethodArgumentInfo(MethodInfo method)
+        {
+            var parameters = method.GetParameters();
+            if (!method.IsStatic ||
+                (method.ReturnType != typeof(bool) && method.ReturnType != typeof(void)) ||
+                parameters.Length > 2)
+            {
+                return null;
+            }
+
+            bool allowsNull = false;
+            var argumentType = typeof(bool);
+            var info = new MethodArgumentInfo() { Method = method };
+            if (parameters.Length == 2)
+            {
+                argumentType = parameters[0].ParameterType;
+                if (parameters[1].ParameterType != typeof(CommandLineParser))
+                    return null;
+
+                info.HasValueParameter = true;
+                info.HasParserParameter = true;
+            }
+            else if (parameters.Length == 1)
+            {
+                if (parameters[0].ParameterType == typeof(CommandLineParser))
+                {
+                    info.HasParserParameter = true;
+                }
+                else
+                {
+                    argumentType = parameters[0].ParameterType;
+                    info.HasValueParameter = true;
+                }
+            }
+
+            if (info.HasValueParameter)
+            {
+                allowsNull = DetermineAllowsNull(parameters[0]);
+            }
+
+            return (info, argumentType, allowsNull);
         }
     }
 }

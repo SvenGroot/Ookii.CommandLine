@@ -226,8 +226,14 @@ namespace Ookii.CommandLine
         /// <remarks>
         /// <para>
         ///   If the event handler sets the <see cref="CancelEventArgs.Cancel"/> property to <see langword="true"/>, command line processing will stop immediately,
-        ///   and the <see cref="CommandLineParser.Parse(string[],int)"/> method will return <see langword="null"/>. You can use this for instance to implement a "-help"
-        ///   argument that will display usage and quit regardless of the other command line arguments.
+        ///   and the <see cref="CommandLineParser.Parse(string[],int)"/> method will return <see langword="null"/>. The
+        ///   <see cref="HelpRequested"/> property will be set to <see langword="true"/> automatically.
+        /// </para>
+        /// <para>
+        ///   If the argument used <see cref="ArgumentKind.Method"/> and the argument's method
+        ///   cancelled parsing, the <see cref="CancelEventArgs.Cancel"/> property will already be
+        ///   true when the event is raised. In this case, the <see cref="HelpRequested"/> property
+        ///   will not automatically be set to <see langword="true"/>.
         /// </para>
         /// <para>
         ///   This event is invoked after the <see cref="CommandLineArgument.Value"/> and <see cref="CommandLineArgument.UsedArgumentName"/> properties have been set.
@@ -324,7 +330,7 @@ namespace Ookii.CommandLine
 
             DetermineConstructorArguments();
             _constructorArgumentCount = _arguments.Count;
-            _positionalArgumentCount = _constructorArgumentCount + DeterminePropertyArguments();
+            _positionalArgumentCount = _constructorArgumentCount + DetermineMemberArguments();
 
             VerifyPositionalArgumentRules();
 
@@ -526,6 +532,32 @@ namespace Ookii.CommandLine
         public char NameValueSeparator { get; set; } = DefaultNameValueSeparator;
 
         /// <summary>
+        /// Gets or sets a value that indicates whether usage help should be displayed if the <see cref="Parse(string[], int)"/>
+        /// method returned <see langword="null"/>.
+        /// </summary>
+        /// <value>
+        /// <see langword="true"/> if usage help should be displayed; otherwise, <see langword="false"/>.
+        /// </value>
+        /// <remarks>
+        /// <para>
+        ///   Check this property after calling the <see cref="Parse(string[], int)"/> method
+        ///   to see if usage help should be displayed.
+        /// </para>
+        /// <para>
+        ///  This property will be <see langword="true"/> if the <see cref="Parse(string[], int)"/>
+        ///  method threw a <see cref="CommandLineArgumentException"/>, if an argument used
+        ///  <see cref="CommandLineArgumentAttribute.CancelParsing"/>, if parsing was cancelled
+        ///  using the <see cref="ArgumentParsed"/> event, or if an argument with <see cref="ArgumentKind.Method"/>
+        ///  cancelled parsing and explicitly set this value.
+        /// </para>
+        /// <para>
+        ///   It will always be <see langword="false"/> if <see cref="Parse(string[], int)"/>
+        ///   returned a non-null value.
+        /// </para>
+        /// </remarks>
+        public bool HelpRequested { get; set; }
+
+        /// <summary>
         /// Gets the arguments supported by this <see cref="CommandLineParser"/> instance.
         /// </summary>
         /// <value>
@@ -709,9 +741,16 @@ namespace Ookii.CommandLine
         /// </summary>
         /// <returns>
         ///   An instance of the type specified by the <see cref="ArgumentsType"/> property, or <see langword="null"/> if argument
-        ///   parsing was cancelled by the <see cref="ArgumentParsed"/> event handler or the
-        ///   <see cref="CommandLineArgumentAttribute.CancelParsing"/> property.
+        ///   parsing was cancelled by the <see cref="ArgumentParsed"/> event handler, the
+        ///   <see cref="CommandLineArgumentAttribute.CancelParsing"/> property, or an argument
+        ///   with <see cref="ArgumentKind.Method"/>.
         /// </returns>
+        /// <remarks>
+        /// <para>
+        ///   If the return value is <see langword="null"/>, check the <see cref="HelpRequested"/>
+        ///   property to see if usage help should be displayed.
+        /// </para>
+        /// </remarks>
         /// <exception cref="CommandLineArgumentException">
         ///   Too many positional arguments were supplied, a required argument was not supplied, an unknown argument name was supplied,
         ///   no value was supplied for a named argument, an argument was supplied more than once and <see cref="AllowDuplicateArguments"/>
@@ -730,9 +769,16 @@ namespace Ookii.CommandLine
         /// <param name="index">The index of the first argument to parse.</param>
         /// <returns>
         ///   An instance of the type specified by the <see cref="ArgumentsType"/> property, or <see langword="null"/> if argument
-        ///   parsing was cancelled by the <see cref="ArgumentParsed"/> event handler or the
-        ///   <see cref="CommandLineArgumentAttribute.CancelParsing"/> property.
+        ///   parsing was cancelled by the <see cref="ArgumentParsed"/> event handler, the
+        ///   <see cref="CommandLineArgumentAttribute.CancelParsing"/> property, or an argument
+        ///   with <see cref="ArgumentKind.Method"/>.
         /// </returns>
+        /// <remarks>
+        /// <para>
+        ///   If the return value is <see langword="null"/>, check the <see cref="HelpRequested"/>
+        ///   property to see if usage help should be displayed.
+        /// </para>
+        /// </remarks>
         /// <exception cref="ArgumentNullException">
         ///   <paramref name="args"/> is <see langword="null"/>.
         /// </exception>
@@ -746,71 +792,16 @@ namespace Ookii.CommandLine
         /// </exception>
         public object? Parse(string[] args, int index = 0)
         {
-            if( args == null )
-                throw new ArgumentNullException(nameof(index));
-            if( index < 0 || index > args.Length )
-                throw new ArgumentOutOfRangeException(nameof(index));
-
-            // Reset all arguments to their default value.s
-            foreach( CommandLineArgument argument in _arguments )
-                argument.Reset();
- 
-            int positionalArgumentIndex = 0;
-
-            for( int x = index; x < args.Length; ++x )
+            try
             {
-                string arg = args[x];
-                var argumentNamePrefix = CheckArgumentNamePrefix(arg);
-                if( argumentNamePrefix != null )
-                {
-                    // If white space was the value separator, this function returns the index of argument containing the value for the named argument.
-                    // It returns -1 if parsing was cancelled by the ArgumentParsed event handler or the CancelParsing property.
-                    x = ParseNamedArgument(args, x, argumentNamePrefix.Value);
-                    if( x < 0 )
-                        return null;
-                }
-                else
-                {
-                    // If this is an array argument is must be the last argument.
-                    if( positionalArgumentIndex < _positionalArgumentCount && !_arguments[positionalArgumentIndex].IsMultiValue )
-                    {
-                        // Skip named positional arguments that have already been specified by name.
-                        while( positionalArgumentIndex < _positionalArgumentCount && !_arguments[positionalArgumentIndex].IsMultiValue && _arguments[positionalArgumentIndex].HasValue )
-                        {
-                            ++positionalArgumentIndex;
-                        }
-                    }
-
-                    if( positionalArgumentIndex >= _positionalArgumentCount )
-                        throw new CommandLineArgumentException(Properties.Resources.TooManyArguments, CommandLineArgumentErrorCategory.TooManyArguments);
-
-                    // ParseArgumentValue returns true if parsing was cancelled by the ArgumentParsed event handler
-                    // or the CancelParsing property.
-                    if( ParseArgumentValue(_arguments[positionalArgumentIndex], arg) )
-                        return null;
-                }
+                HelpRequested = false;
+                return ParseCore(args, index);
             }
-
-            // Check required arguments and convert array arguments. This is done in usage order so the first missing positional argument is reported, rather
-            // than the missing argument that is first alphabetically.
-            foreach( CommandLineArgument argument in _arguments )
+            catch (CommandLineArgumentException)
             {
-                if( argument.IsRequired && !argument.HasValue )
-                    throw new CommandLineArgumentException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.MissingRequiredArgumentFormat, argument.ArgumentName), argument.ArgumentName, CommandLineArgumentErrorCategory.MissingRequiredArgument);
+                HelpRequested = true;
+                throw;
             }
-
-            object?[] constructorArgumentValues = new object[_constructorArgumentCount];
-            for( int x = 0; x < _constructorArgumentCount; ++x )
-                constructorArgumentValues[x] = _arguments[x].Value;
-
-            
-            object commandLineArguments = CreateArgumentsTypeInstance(constructorArgumentValues);
-            foreach( CommandLineArgument argument in _arguments )
-            {
-                // Apply property argument values (this does nothing for constructor arguments).
-                argument.ApplyPropertyValue(commandLineArguments);
-            }
-            return commandLineArguments;
         }
 
         /// <summary>
@@ -1062,14 +1053,12 @@ namespace Ookii.CommandLine
         }
         
         /// <summary>
-                 /// Raises the <see cref="ArgumentParsed"/> event.
-                 /// </summary>
-                 /// <param name="e">The data for the event.</param>
+        /// Raises the <see cref="ArgumentParsed"/> event.
+        /// </summary>
+        /// <param name="e">The data for the event.</param>
         protected virtual void OnArgumentParsed(ArgumentParsedEventArgs e)
         {
-            EventHandler<ArgumentParsedEventArgs>? handler = ArgumentParsed;
-            if( handler != null )
-                handler(this, e);
+            ArgumentParsed?.Invoke(this, e);
         }
 
         internal static object? ParseInternal(Type argumentsType, string[] args, int index, ParseOptions? options)
@@ -1084,12 +1073,10 @@ namespace Ookii.CommandLine
 
             using var output = DisposableWrapper.Create(options.Out, LineWrappingTextWriter.ForConsoleOut);
             using var error = DisposableWrapper.Create(options.Error, LineWrappingTextWriter.ForConsoleError);
+            object? result = null;
             try
             {
-
-                var result = parser.Parse(args, index);
-                if (result != null)
-                    return result;
+                result = parser.Parse(args, index);
             }
             catch (CommandLineArgumentException ex)
             {
@@ -1097,9 +1084,14 @@ namespace Ookii.CommandLine
                 error.Inner.WriteLine();
             }
 
-            // If we're writing this to the console, output should already be a LineWrappingTextWriter, so the max line length argument here is ignored.
-            parser.WriteUsage(output.Inner, 0, options.UsageOptions);
-            return null;
+            if (parser.HelpRequested)
+            {
+                // If we're writing this to the console, output should already be a
+                // LineWrappingTextWriter, so the max line length argument here is ignored.
+                parser.WriteUsage(output.Inner, 0, options.UsageOptions);
+            }
+
+            return result;
         }
 
         private static string[] DetermineArgumentNamePrefixes(IEnumerable<string>? namedArgumentPrefixes)
@@ -1129,16 +1121,23 @@ namespace Ookii.CommandLine
             }
         }
 
-        private int DeterminePropertyArguments()
+        private int DetermineMemberArguments()
         {
             int additionalPositionalArgumentCount = 0;
 
-            PropertyInfo[] properties = _argumentsType.GetProperties(BindingFlags.Public | BindingFlags.Instance);
-            foreach( PropertyInfo prop in properties )
+            MemberInfo[] properties = _argumentsType.GetProperties(BindingFlags.Public | BindingFlags.Instance);
+            MethodInfo[] methods = _argumentsType.GetMethods(BindingFlags.Public | BindingFlags.Static);
+            foreach (var member in properties.Concat(methods))
             {
-                if( Attribute.IsDefined(prop, typeof(CommandLineArgumentAttribute)) )
+                if (Attribute.IsDefined(member, typeof(CommandLineArgumentAttribute)))
                 {
-                    CommandLineArgument argument = CommandLineArgument.Create(this, prop);
+                    var argument = member switch
+                    {
+                        PropertyInfo prop => CommandLineArgument.Create(this, prop),
+                        MethodInfo method => CommandLineArgument.Create(this, method),
+                        _ => throw new InvalidOperationException(),
+                    };
+
                     AddNamedArgument(argument);
                     if( argument.Position != null )
                     {
@@ -1147,7 +1146,7 @@ namespace Ookii.CommandLine
                 }
             }
 
-            if( _arguments.Count > _constructorArgumentCount )
+            if ( _arguments.Count > _constructorArgumentCount )
             {
                 // Sort the added arguments in usage order (positional first, then required non-positional arguments, then the rest by name
                 _arguments.Sort(_constructorArgumentCount, _arguments.Count - _constructorArgumentCount, new CommandLineArgumentComparer(_argumentsByName.Comparer));
@@ -1158,7 +1157,7 @@ namespace Ookii.CommandLine
 
         private void AddNamedArgument(CommandLineArgument argument)
         {
-            if( argument.ArgumentName.IndexOf(NameValueSeparator) >= 0 )
+            if (argument.ArgumentName.Contains(NameValueSeparator))
                 throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.ArgumentNameContainsSeparatorFormat, argument.ArgumentName));
 
             if (argument.HasLongName)
@@ -1208,13 +1207,94 @@ namespace Ookii.CommandLine
             }
         }
 
+        private object? ParseCore(string[] args, int index)
+        {
+            if (args == null)
+                throw new ArgumentNullException(nameof(index));
+            if (index < 0 || index > args.Length)
+                throw new ArgumentOutOfRangeException(nameof(index));
+
+            // Reset all arguments to their default value.
+            foreach (CommandLineArgument argument in _arguments)
+                argument.Reset();
+
+            HelpRequested = false;
+            int positionalArgumentIndex = 0;
+
+            for (int x = index; x < args.Length; ++x)
+            {
+                string arg = args[x];
+                var argumentNamePrefix = CheckArgumentNamePrefix(arg);
+                if (argumentNamePrefix != null)
+                {
+                    // If white space was the value separator, this function returns the index of argument containing the value for the named argument.
+                    // It returns -1 if parsing was cancelled by the ArgumentParsed event handler or the CancelParsing property.
+                    x = ParseNamedArgument(args, x, argumentNamePrefix.Value);
+                    if (x < 0)
+                        return null;
+                }
+                else
+                {
+                    // If this is an array argument is must be the last argument.
+                    if (positionalArgumentIndex < _positionalArgumentCount && !_arguments[positionalArgumentIndex].IsMultiValue)
+                    {
+                        // Skip named positional arguments that have already been specified by name.
+                        while (positionalArgumentIndex < _positionalArgumentCount && !_arguments[positionalArgumentIndex].IsMultiValue && _arguments[positionalArgumentIndex].HasValue)
+                        {
+                            ++positionalArgumentIndex;
+                        }
+                    }
+
+                    if (positionalArgumentIndex >= _positionalArgumentCount)
+                        throw new CommandLineArgumentException(Properties.Resources.TooManyArguments, CommandLineArgumentErrorCategory.TooManyArguments);
+
+                    // ParseArgumentValue returns true if parsing was cancelled by the ArgumentParsed event handler
+                    // or the CancelParsing property.
+                    if (ParseArgumentValue(_arguments[positionalArgumentIndex], arg))
+                        return null;
+                }
+            }
+
+            // Check required arguments and convert array arguments. This is done in usage order so the first missing positional argument is reported, rather
+            // than the missing argument that is first alphabetically.
+            foreach (CommandLineArgument argument in _arguments)
+            {
+                if (argument.IsRequired && !argument.HasValue)
+                    throw new CommandLineArgumentException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.MissingRequiredArgumentFormat, argument.ArgumentName), argument.ArgumentName, CommandLineArgumentErrorCategory.MissingRequiredArgument);
+            }
+
+            object?[] constructorArgumentValues = new object[_constructorArgumentCount];
+            for (int x = 0; x < _constructorArgumentCount; ++x)
+                constructorArgumentValues[x] = _arguments[x].Value;
+
+
+            object commandLineArguments = CreateArgumentsTypeInstance(constructorArgumentValues);
+            foreach (CommandLineArgument argument in _arguments)
+            {
+                // Apply property argument values (this does nothing for constructor arguments).
+                argument.ApplyPropertyValue(commandLineArguments);
+            }
+            return commandLineArguments;
+        }
+
         private bool ParseArgumentValue(CommandLineArgument argument, string? value)
         {
-            argument.SetValue(Culture, value);
+            bool continueParsing = argument.SetValue(Culture, value);
+            var e = new ArgumentParsedEventArgs(argument)
+            {
+                Cancel = !continueParsing
+            };
 
-            var e = new ArgumentParsedEventArgs(argument);
             OnArgumentParsed(e);
-            return e.Cancel || (argument.CancelParsing && !e.OverrideCancelParsing);
+            var cancel = e.Cancel || (argument.CancelParsing && !e.OverrideCancelParsing);
+
+            // Automatically request help only if the cancellation was not due to the SetValue
+            // call.
+            if (continueParsing)
+            {
+                HelpRequested = cancel;
+            }
+            return cancel;
         }
 
         private int ParseNamedArgument(string[] args, int index, PrefixInfo prefix)
