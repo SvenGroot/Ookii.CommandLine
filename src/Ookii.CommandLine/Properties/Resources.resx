@@ -226,7 +226,7 @@
     <value>The type must be a generic type definition.</value>
   </data>
   <data name="InvalidDictionaryValueFormat" xml:space="preserve">
-    <value>The value '{0}' provided for argument '{1}' was invalid: {2}</value>
+    <value>The value '{1}' provided for argument '{0}' was invalid: {2}</value>
   </data>
   <data name="NoKeyValuePairSeparatorFormat" xml:space="preserve">
     <value>A key/value pair must contain "{0}" as a separator.</value>

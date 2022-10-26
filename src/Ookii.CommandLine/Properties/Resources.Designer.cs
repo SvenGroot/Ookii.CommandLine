@@ -337,7 +337,7 @@ namespace Ookii.CommandLine.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The value &apos;{0}&apos; provided for argument &apos;{1}&apos; was invalid: {2}.
+        ///   Looks up a localized string similar to The value &apos;{1}&apos; provided for argument &apos;{0}&apos; was invalid: {2}.
         /// </summary>
         internal static string InvalidDictionaryValueFormat {
             get {

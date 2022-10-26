@@ -20,45 +20,74 @@ namespace Ookii.CommandLine
     {
         #region Nested types
 
-        private interface ICollectionHelper
+        private interface IValueHelper
         {
-            Array Values { get; }
-            void Add(object? value);
-            void ApplyValues(object collection);
+            object? Value { get; }
+            void SetValue(CommandLineArgument argument, CultureInfo culture, string? value);
+            void ApplyValue(object target, PropertyInfo property);
         }
 
-        private class CollectionHelper<T> : ICollectionHelper
+        private class SingleValueHelper : IValueHelper
+        {
+            public SingleValueHelper(object? initialValue)
+            {
+                Value = initialValue;
+            }
+
+            public object? Value { get; private set; }
+
+            public void ApplyValue(object target, PropertyInfo property)
+            {
+                property.SetValue(target, Value);
+            }
+
+            public void SetValue(CommandLineArgument argument, CultureInfo culture, string? value)
+            {
+                Value = argument.ConvertToArgumentType(culture, value);
+            }
+        }
+
+        private class MultiValueHelper<T> : IValueHelper
         {
             // The actual element type may not be nullable. This is handled by the allow null check
             // when parsing the value. Here, we always treat the values as if they're nullable.
             private readonly List<T?> _values = new();
 
-            public Array Values
+            public object? Value => _values.ToArray();
+
+            public void ApplyValue(object target, PropertyInfo property)
             {
-                get { return _values.ToArray(); }
+                if (property.PropertyType.IsArray)
+                {
+                    property.SetValue(target, Value);
+                    return;
+                }
+
+                object? collection = property.GetValue(target, null);
+                if (collection == null)
+                    throw new InvalidOperationException();
+
+                var list = (ICollection<T?>)collection;
+                list.Clear();
+                foreach (var value in _values)
+                    list.Add(value);
             }
 
-            public void Add(object? value)
+            public void SetValue(CommandLineArgument argument, CultureInfo culture, string? value)
             {
-                _values.Add((T?)value);
-            }
+                if (value == null || argument.MultiValueSeparator == null)
+                {
+                    _values.Add((T?)argument.ConvertToArgumentType(culture, value));
+                    return;
+                }
 
-            public void ApplyValues(object collectionObject)
-            {
-                var collection = (ICollection<T?>)collectionObject;
-                foreach (T? value in _values)
-                    collection.Add(value);
+                string[] values = value.Split(new[] { argument.MultiValueSeparator }, StringSplitOptions.None);
+                foreach (string separateValue in values)
+                    _values.Add((T?)argument.ConvertToArgumentType(culture, separateValue));
             }
         }
 
-        private interface IDictionaryHelper
-        {
-            object Dictionary { get; }
-            void Add(string argumentName, object keyValuePair);
-            void ApplyValues(object dictionary);
-        }
-
-        private class DictionaryHelper<TKey, TValue> : IDictionaryHelper
+        private class DictionaryValueHelper<TKey, TValue> : IValueHelper
             where TKey : notnull
         {
             // The actual value type may not be nullable. This is handled by the allow null check.
@@ -66,37 +95,65 @@ namespace Ookii.CommandLine
             private readonly bool _allowDuplicateKeys;
             private readonly bool _allowNullValues;
 
-            public DictionaryHelper(bool allowDuplicateKeys, bool allowNullValues)
+            public DictionaryValueHelper(bool allowDuplicateKeys, bool allowNullValues)
             {
                 _allowDuplicateKeys = allowDuplicateKeys;
                 _allowNullValues = allowNullValues;
             }
 
-            public object Dictionary
+            public object? Value => _dictionary;
+
+            public void ApplyValue(object target, PropertyInfo property)
             {
-                get { return _dictionary; }
+                if (property.GetSetMethod() != null)
+                {
+                    property.SetValue(target, _dictionary);
+                    return;
+                }
+
+                var dictionary = (IDictionary<TKey, TValue?>?)property.GetValue(target, null);
+                if (dictionary == null)
+                    throw new InvalidOperationException();
+
+                dictionary.Clear();
+                foreach (var pair in _dictionary)
+                    dictionary.Add(pair.Key, pair.Value);
             }
 
-            public void Add(string argumentName, object keyValuePair)
+            public void SetValue(CommandLineArgument argument, CultureInfo culture, string? value)
             {
-                var pair = (KeyValuePair<TKey, TValue>)keyValuePair;
+                if (value == null || argument.MultiValueSeparator == null)
+                {
+                    SetValueCore(argument, culture, value);
+                    return;
+                }
+
+                string[] values = value.Split(new[] { argument.MultiValueSeparator }, StringSplitOptions.None);
+                foreach (string separateValue in values)
+                    SetValueCore(argument, culture, separateValue);
+            }
+
+            private void SetValueCore(CommandLineArgument argument, CultureInfo culture, string? value)
+            {
+                // ConvertToArgumentType is guaranteed to return non-null for dictionary arguments.
+                var pair = (KeyValuePair<TKey, TValue>)argument.ConvertToArgumentType(culture, value)!;
 
                 // With the KeyValuePairConverter, these should already be checked, but it's still
                 // checked here to deal with custom converters.
                 if (pair.Key == null || (!_allowNullValues && pair.Value == null))
-                    throw new CommandLineArgumentException(String.Format(CultureInfo.CurrentCulture, Properties.Resources.NullArgumentValueFormat, argumentName), argumentName, CommandLineArgumentErrorCategory.NullArgumentValue);
+                    throw CommandLineArgumentException.Create(CommandLineArgumentErrorCategory.NullArgumentValue, Properties.Resources.NullArgumentValueFormat, argument.ArgumentName);
 
-                if (_allowDuplicateKeys)
-                    _dictionary[pair.Key] = pair.Value;
-                else
-                    _dictionary.Add(pair.Key, pair.Value);
-            }
-
-            public void ApplyValues(object dictionaryObject)
-            {
-                var dictionary = (IDictionary<TKey, TValue?>)dictionaryObject;
-                foreach (var pair in _dictionary)
-                    dictionary.Add(pair.Key, pair.Value);
+                try
+                {
+                    if (_allowDuplicateKeys)
+                        _dictionary[pair.Key] = pair.Value;
+                    else
+                        _dictionary.Add(pair.Key, pair.Value);
+                }
+                catch (ArgumentException ex)
+                {
+                    throw CommandLineArgumentException.Create(CommandLineArgumentErrorCategory.InvalidDictionaryValue, Properties.Resources.InvalidDictionaryValueFormat, argument.ArgumentName, value, ex);
+                }
             }
         }
 
@@ -152,7 +209,7 @@ namespace Ookii.CommandLine
         private readonly string? _keyValueSeparator;
         private readonly bool _allowNull;
         private readonly bool _cancelParsing;
-        private object? _value;
+        private IValueHelper? _valueHelper;
 
         private CommandLineArgument(ArgumentInfo info)
         {
@@ -190,7 +247,6 @@ namespace Ookii.CommandLine
             _argumentType = info.ArgumentType;
             _elementType = info.ArgumentType;
             _description = info.Description;
-            _defaultValue = info.DefaultValue;
             _isRequired = info.IsRequired;
             _multiValueSeparator = info.MultiValueSeparator;
             _allowNull = info.AllowNull;
@@ -613,18 +669,7 @@ namespace Ookii.CommandLine
         ///   return a <see cref="Dictionary{TKey, TValue}"/> with all the values, even if the argument type is a different type.
         /// </para>
         /// </remarks>
-        public object? Value
-        {
-            get
-            {
-                if( HasValue && _isDictionary )
-                    return ((IDictionaryHelper)_value!).Dictionary;
-                else if( HasValue && _isMultiValue )
-                    return ((ICollectionHelper)_value!).Values;
-                else
-                    return _value;
-            }
-        }
+        public object? Value => _valueHelper?.Value;
 
         /// <summary>
         /// Gets a value indicating whether the value of this argument was supplied on the command line in the last
@@ -649,7 +694,7 @@ namespace Ookii.CommandLine
         ///   between an argument that was supplied or omitted even if the supplied value matches the default.
         /// </para>
         /// </remarks>
-        public bool HasValue { get; internal set; }
+        public bool HasValue { get; private set; }
 
         /// <summary>
         /// Gets the name or alias that was used on the command line to specify this argument.
@@ -752,7 +797,7 @@ namespace Ookii.CommandLine
         /// Converts the specified string to the argument type, as specified in the <see cref="ArgumentType"/> property.
         /// </summary>
         /// <param name="culture">The culture to use to convert the argument.</param>
-        /// <param name="argument">The string to convert.</param>
+        /// <param name="argumentValue">The string to convert.</param>
         /// <returns>The argument, converted to the type specified by the <see cref="ArgumentType"/> property.</returns>
         /// <remarks>
         /// <para>
@@ -763,16 +808,24 @@ namespace Ookii.CommandLine
         ///   <paramref name="culture"/> is <see langword="null"/>
         /// </exception>
         /// <exception cref="CommandLineArgumentException">
-        ///   <paramref name="argument"/> could not be converted to the type specified in the <see cref="ArgumentType"/> property.
+        ///   <paramref name="argumentValue"/> could not be converted to the type specified in the <see cref="ArgumentType"/> property.
         /// </exception>
-        public object? ConvertToArgumentType(CultureInfo culture, string argument)
+        public object? ConvertToArgumentType(CultureInfo culture, string? argumentValue)
         {
             if( culture == null )
                 throw new ArgumentNullException(nameof(culture));
 
+            if (argumentValue == null)
+            {
+                if (IsSwitch)
+                    return true;
+                else
+                    throw new CommandLineArgumentException(string.Format(System.Globalization.CultureInfo.CurrentCulture, Properties.Resources.MissingValueForNamedArgumentFormat, ArgumentName), ArgumentName, CommandLineArgumentErrorCategory.MissingNamedArgumentValue);
+            }
+
             try
             {
-                var converted = _converter.ConvertFrom(null, culture, argument);
+                var converted = _converter.ConvertFrom(null, culture, argumentValue);
                 if (converted == null && (!_allowNull || _isDictionary))
                     throw new CommandLineArgumentException(String.Format(CultureInfo.CurrentCulture, Properties.Resources.NullArgumentValueFormat, ArgumentName), ArgumentName, CommandLineArgumentErrorCategory.NullArgumentValue);
 
@@ -780,17 +833,17 @@ namespace Ookii.CommandLine
             }
             catch( NotSupportedException ex )
             {
-                throw new CommandLineArgumentException(string.Format(System.Globalization.CultureInfo.CurrentCulture, Properties.Resources.ArgumentConversionErrorFormat, argument, ArgumentName, ValueDescription), ArgumentName, CommandLineArgumentErrorCategory.ArgumentValueConversion, ex);
+                throw new CommandLineArgumentException(string.Format(System.Globalization.CultureInfo.CurrentCulture, Properties.Resources.ArgumentConversionErrorFormat, argumentValue, ArgumentName, ValueDescription), ArgumentName, CommandLineArgumentErrorCategory.ArgumentValueConversion, ex);
             }
             catch( FormatException ex )
             {
-                throw new CommandLineArgumentException(string.Format(System.Globalization.CultureInfo.CurrentCulture, Properties.Resources.ArgumentConversionErrorFormat, argument, ArgumentName, ValueDescription), ArgumentName, CommandLineArgumentErrorCategory.ArgumentValueConversion, ex);
+                throw new CommandLineArgumentException(string.Format(System.Globalization.CultureInfo.CurrentCulture, Properties.Resources.ArgumentConversionErrorFormat, argumentValue, ArgumentName, ValueDescription), ArgumentName, CommandLineArgumentErrorCategory.ArgumentValueConversion, ex);
             }
             catch( Exception ex )
             {
                 // Yeah, I don't like catching Exception, but unfortunately BaseNumberConverter (e.g. used for int) can *throw* a System.Exception (not a derived class) so there's nothing I can do about it.
                 if( ex.InnerException is FormatException )
-                    throw new CommandLineArgumentException(string.Format(System.Globalization.CultureInfo.CurrentCulture, Properties.Resources.ArgumentConversionErrorFormat, argument, ArgumentName, ValueDescription), ArgumentName, CommandLineArgumentErrorCategory.ArgumentValueConversion, ex);
+                    throw new CommandLineArgumentException(string.Format(System.Globalization.CultureInfo.CurrentCulture, Properties.Resources.ArgumentConversionErrorFormat, argumentValue, ArgumentName, ValueDescription), ArgumentName, CommandLineArgumentErrorCategory.ArgumentValueConversion, ex);
                 else
                     throw;
             }
@@ -871,17 +924,16 @@ namespace Ookii.CommandLine
 
         internal void SetValue(CultureInfo culture, string? value)
         {
-            if( IsMultiValue && _multiValueSeparator != null )
-            {
-                if (value == null)
-                    throw new CommandLineArgumentException(string.Format(System.Globalization.CultureInfo.CurrentCulture, Properties.Resources.MissingValueForNamedArgumentFormat, ArgumentName), ArgumentName, CommandLineArgumentErrorCategory.MissingNamedArgumentValue);
+            if (_valueHelper == null)
+                CreateValueHelper();
 
-                string[] values = value!.Split(new[] { _multiValueSeparator }, StringSplitOptions.None);
-                foreach( string separateValue in values )
-                    SetValueCore(culture, separateValue);
-            }
-            else
-                SetValueCore(culture, value);
+            Debug.Assert(_valueHelper != null);
+
+            if (HasValue && !IsMultiValue && !_parser.AllowDuplicateArguments)
+                throw CommandLineArgumentException.Create(CommandLineArgumentErrorCategory.DuplicateArgument, Properties.Resources.DuplicateArgumentFormat, ArgumentName);
+
+            _valueHelper.SetValue(this, culture, value);
+            HasValue = true;
         }
 
         internal static CommandLineArgument Create(CommandLineParser parser, ParameterInfo parameter)
@@ -971,86 +1023,34 @@ namespace Ookii.CommandLine
 
         internal void ApplyPropertyValue(object target)
         {
-            if( target == null )
-                throw new ArgumentNullException(nameof(target));
-
             // Do nothing for parameter-based values
-            if( _property != null )
+            if (_property == null)
+                return;
+
+            try
             {
-                try
-                {
-                    if( _isDictionary && _property.GetSetMethod() == null )
-                    {
-                        var dictionary = (System.Collections.IDictionary?)_property.GetValue(target, null);
-                        if (dictionary == null)
-                            throw new InvalidOperationException();
-
-                        dictionary.Clear();
-                        if( HasValue )
-                            ((IDictionaryHelper)_value!).ApplyValues(dictionary);
-                    }
-                    else if( !_isDictionary && _isMultiValue && !ArgumentType.IsArray )
-                    {
-                        object? collection = _property.GetValue(target, null);
-                        if (collection == null)
-                            throw new InvalidOperationException();
-
-                        System.Collections.IList? list = collection as System.Collections.IList;
-                        if( list != null )
-                            list.Clear();
-                        else
-                            typeof(ICollection<>).MakeGenericType(ElementType).GetMethod("Clear")?.Invoke(collection, null);
-
-                        if( HasValue )
-                            ((ICollectionHelper)_value!).ApplyValues(collection);
-                    }
-                    else if( HasValue || Value != null ) // Don't set the value of an unspecified argument with a null default value.
-                        _property.SetValue(target, Value, null);
-                }
-                catch( TargetInvocationException ex )
-                {
-                    throw new CommandLineArgumentException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.SetValueErrorFormat, ArgumentName, ex.InnerException?.Message), ArgumentName, CommandLineArgumentErrorCategory.ApplyValueError, ex.InnerException);
-                }
+                if (_valueHelper != null)
+                    _valueHelper.ApplyValue(target, _property);
+            }
+            catch( TargetInvocationException ex )
+            {
+                throw new CommandLineArgumentException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.SetValueErrorFormat, ArgumentName, ex.InnerException?.Message), ArgumentName, CommandLineArgumentErrorCategory.ApplyValueError, ex.InnerException);
             }
         }
 
         internal void Reset()
         {
-            _value = IsMultiValue ? null : DefaultValue;
+            if (!IsMultiValue && _defaultValue != null)
+            {
+                _valueHelper = new SingleValueHelper(_defaultValue);
+            }
+            else
+            {
+                _valueHelper = null;
+            }
+
             HasValue = false;
             UsedArgumentName = null;
-        }
-
-        private void SetValueCore(CultureInfo culture, string? value)
-        {
-            object? convertedValue;
-            if( value == null )
-            {
-                if( IsSwitch )
-                    convertedValue = true;
-                else
-                    throw new CommandLineArgumentException(string.Format(System.Globalization.CultureInfo.CurrentCulture, Properties.Resources.MissingValueForNamedArgumentFormat, ArgumentName), ArgumentName, CommandLineArgumentErrorCategory.MissingNamedArgumentValue);
-            }
-            else
-                convertedValue = ConvertToArgumentType(culture, value);
-
-            if( IsDictionary )
-            {
-                // Value is not null because IsDictionary and IsSwitch are mutually exclusive.
-                // ConvertedValue is not null because ConvertToArgumentType ensures that if the argument is a dictionary.
-                SetDictionaryValue(value!, convertedValue!);
-            }
-            else if( IsMultiValue )
-            {
-                SetCollectionValue(convertedValue);
-            }
-            else if( !HasValue || _parser.AllowDuplicateArguments )
-            {
-                _value = convertedValue;
-                HasValue = true;
-            }
-            else
-                throw new CommandLineArgumentException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.DuplicateArgumentFormat, ArgumentName), ArgumentName, CommandLineArgumentErrorCategory.DuplicateArgument);
         }
 
         private static string? GetMultiValueSeparator(MultiValueSeparatorAttribute? attribute)
@@ -1114,35 +1114,24 @@ namespace Ookii.CommandLine
             }
         }
 
-        private void SetDictionaryValue(string value, object convertedValue)
+        private void CreateValueHelper()
         {
-            if( !HasValue )
+            Debug.Assert(_valueHelper == null);
+            if (IsDictionary)
             {
-                Debug.Assert(_value == null);
-                // _elementType is KeyValuePair<TKey, TValue>, so we use that to get the generic arguments for the dictionary.
-                _value = Activator.CreateInstance(typeof(DictionaryHelper<,>).MakeGenericType(_elementType.GetGenericArguments()), _allowDuplicateDictionaryKeys, _allowNull);
-                HasValue = true;
+                var type = typeof(DictionaryValueHelper<,>).MakeGenericType(_elementType.GetGenericArguments());
+                _valueHelper = (IValueHelper)Activator.CreateInstance(type, _allowDuplicateDictionaryKeys, _allowNull)!;
             }
-
-            try
+            else if (IsMultiValue)
             {
-                ((IDictionaryHelper)_value!).Add(_argumentName, convertedValue);
+                var type = typeof(MultiValueHelper<>).MakeGenericType(ElementType);
+                _valueHelper = (IValueHelper)Activator.CreateInstance(type)!;
             }
-            catch( ArgumentException ex )
+            else
             {
-                throw new CommandLineArgumentException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.InvalidDictionaryValueFormat, value, ArgumentName, ex.Message), ArgumentName, CommandLineArgumentErrorCategory.InvalidDictionaryValue, ex);
+                Debug.Assert(_defaultValue == null);
+                _valueHelper = new SingleValueHelper(null);
             }
-        }
-
-        private void SetCollectionValue(object? convertedValue)
-        {
-            if( !HasValue )
-            {
-                Debug.Assert(_value == null);
-                _value = Activator.CreateInstance(typeof(CollectionHelper<>).MakeGenericType(ElementType));
-                HasValue = true;
-            }
-            ((ICollectionHelper)_value!).Add(convertedValue);
         }
 
         private static IEnumerable<string>? GetAliases(IEnumerable<AliasAttribute> aliasAttributes, string argumentName)
