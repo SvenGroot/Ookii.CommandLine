@@ -8,6 +8,7 @@ using System.Globalization;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Reflection;
 
 namespace Ookii.CommandLine.Tests
 {
@@ -35,6 +36,7 @@ namespace Ookii.CommandLine.Tests
             CollectionAssert.AreEqual(CommandLineParser.GetDefaultArgumentNamePrefixes(), target.ArgumentNamePrefixes);
             Assert.IsNull(target.LongArgumentNamePrefix);
             Assert.AreEqual(argumentsType, target.ArgumentsType);
+            Assert.AreEqual(Assembly.GetExecutingAssembly().GetName().Name, target.ApplicationFriendlyName);
             Assert.AreEqual(string.Empty, target.Description);
             Assert.AreEqual(2, target.Arguments.Count);
             using var args = target.Arguments.GetEnumerator();
@@ -57,6 +59,7 @@ namespace Ookii.CommandLine.Tests
             CollectionAssert.AreEqual(CommandLineParser.GetDefaultArgumentNamePrefixes(), target.ArgumentNamePrefixes);
             Assert.IsNull(target.LongArgumentNamePrefix);
             Assert.AreEqual(argumentsType, target.ArgumentsType);
+            Assert.AreEqual("Friendly name", target.ApplicationFriendlyName);
             Assert.AreEqual("Test arguments description.", target.Description);
             Assert.AreEqual(18, target.Arguments.Count);
             TestArguments(target.Arguments, new[]
@@ -623,6 +626,7 @@ namespace Ookii.CommandLine.Tests
         {
             var parser = new CommandLineParser(typeof(AutomaticConflictingNameArguments));
             TestArgument(parser.GetArgument("Help"), new ExpectedArgument("Help", typeof(int)));
+            TestArgument(parser.GetArgument("Version"), new ExpectedArgument("Version", typeof(int)));
 
             parser = new CommandLineParser(typeof(AutomaticConflictingShortNameArguments));
             TestArgument(parser.GetShortArgument('?'), new ExpectedArgument("Foo", typeof(int)) { ShortName = '?' });

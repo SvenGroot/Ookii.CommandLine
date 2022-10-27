@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Ookii.CommandLine;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -12,6 +13,7 @@ namespace Ookii.CommandLine.Tests
     {
     }
 
+    [ApplicationFriendlyName("Friendly name")]
     [System.ComponentModel.Description("Test arguments description.")]
     class TestArguments
     {
@@ -305,6 +307,9 @@ namespace Ookii.CommandLine.Tests
     {
         [CommandLineArgument]
         public int Help { get; set; }
+
+        [CommandLineArgument]
+        public int Version { get; set; }
     }
 
     [ParseOptions(Mode = ParsingMode.LongShort)]
