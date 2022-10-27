@@ -294,4 +294,10 @@
   <data name="AutomaticHelpShortAlias" xml:space="preserve">
     <value>h</value>
   </data>
+  <data name="AutomaticVersionDescription" xml:space="preserve">
+    <value>Displays version information.</value>
+  </data>
+  <data name="AutomaticVersionName" xml:space="preserve">
+    <value>Version</value>
+  </data>
 </root>

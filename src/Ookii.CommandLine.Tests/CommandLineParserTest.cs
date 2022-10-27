@@ -36,11 +36,12 @@ namespace Ookii.CommandLine.Tests
             Assert.IsNull(target.LongArgumentNamePrefix);
             Assert.AreEqual(argumentsType, target.ArgumentsType);
             Assert.AreEqual(string.Empty, target.Description);
-            Assert.AreEqual(1, target.Arguments.Count);
+            Assert.AreEqual(2, target.Arguments.Count);
             using var args = target.Arguments.GetEnumerator();
             TestArguments(target.Arguments, new[]
             {
-                new ExpectedArgument("Help", typeof(bool), ArgumentKind.Method) { MemberName = "AutomaticHelp", Description = "Displays this help message.", IsSwitch = true, Aliases = new[] { "?", "h" } }
+                new ExpectedArgument("Help", typeof(bool), ArgumentKind.Method) { MemberName = "AutomaticHelp", Description = "Displays this help message.", IsSwitch = true, Aliases = new[] { "?", "h" } },
+                new ExpectedArgument("Version", typeof(bool), ArgumentKind.Method) { MemberName = "AutomaticVersion", Description = "Displays version information.", IsSwitch = true },
             });
         }
 
@@ -57,7 +58,7 @@ namespace Ookii.CommandLine.Tests
             Assert.IsNull(target.LongArgumentNamePrefix);
             Assert.AreEqual(argumentsType, target.ArgumentsType);
             Assert.AreEqual("Test arguments description.", target.Description);
-            Assert.AreEqual(17, target.Arguments.Count);
+            Assert.AreEqual(18, target.Arguments.Count);
             TestArguments(target.Arguments, new[]
             {
                 new ExpectedArgument("arg1", typeof(string)) { Position = 0, IsRequired = true, Description = "Arg1 description." },
@@ -76,7 +77,8 @@ namespace Ookii.CommandLine.Tests
                 new ExpectedArgument("Arg3", typeof(string)) { Position = null },
                 new ExpectedArgument("Arg7", typeof(bool)) { Position = null, IsSwitch = true, Aliases = new[] { "Alias3" } },
                 new ExpectedArgument("Arg9", typeof(int?)) { Position = null, ValueDescription = "Int32" },
-                new ExpectedArgument("Help", typeof(bool), ArgumentKind.Method) { MemberName = "AutomaticHelp", Description = "Displays this help message.", IsSwitch = true, Aliases = new[] { "?", "h" } }
+                new ExpectedArgument("Help", typeof(bool), ArgumentKind.Method) { MemberName = "AutomaticHelp", Description = "Displays this help message.", IsSwitch = true, Aliases = new[] { "?", "h" } },
+                new ExpectedArgument("Version", typeof(bool), ArgumentKind.Method) { MemberName = "AutomaticVersion", Description = "Displays version information.", IsSwitch = true },
             });
         }
 
@@ -93,12 +95,13 @@ namespace Ookii.CommandLine.Tests
             Assert.IsNull(target.LongArgumentNamePrefix);
             Assert.AreEqual(argumentsType, target.ArgumentsType);
             Assert.AreEqual("", target.Description);
-            Assert.AreEqual(3, target.Arguments.Count); // Constructor argument + one property argument.
+            Assert.AreEqual(4, target.Arguments.Count); // Constructor argument + one property argument.
             TestArguments(target.Arguments, new[]
             {
                 new ExpectedArgument("arg1", typeof(string)) { Position = 0, IsRequired = true },
                 new ExpectedArgument("Help", typeof(bool), ArgumentKind.Method) { MemberName = "AutomaticHelp", Description = "Displays this help message.", IsSwitch = true, Aliases = new[] { "?", "h" } },
                 new ExpectedArgument("ThrowingArgument", typeof(int)),
+                new ExpectedArgument("Version", typeof(bool), ArgumentKind.Method) { MemberName = "AutomaticVersion", Description = "Displays version information.", IsSwitch = true },
             });
         }
 
@@ -741,7 +744,7 @@ namespace Ookii.CommandLine.Tests
 
         private static readonly string _expectedDefaultUsage = @"Test arguments description.
 
-Usage: test [/arg1] <String> [[/other] <Number>] [[/notSwitch] <Boolean>] [[/Arg5] <Single>] [[/other2] <Number>] [[/Arg8] <DayOfWeek>...] /Arg6 <String> [/Arg10...] [/Arg11] [/Arg12 <Int32>...] [/Arg13 <String=Int32>...] [/Arg14 <String=Int32>...] [/Arg15 <KeyValuePair<String, Int32>>] [/Arg3 <String>] [/Arg7] [/Arg9 <Int32>] [/Help]
+Usage: test [/arg1] <String> [[/other] <Number>] [[/notSwitch] <Boolean>] [[/Arg5] <Single>] [[/other2] <Number>] [[/Arg8] <DayOfWeek>...] /Arg6 <String> [/Arg10...] [/Arg11] [/Arg12 <Int32>...] [/Arg13 <String=Int32>...] [/Arg14 <String=Int32>...] [/Arg15 <KeyValuePair<String, Int32>>] [/Arg3 <String>] [/Arg7] [/Arg9 <Int32>] [/Help] [/Version]
 
     /arg1 <String>
         Arg1 description.
@@ -770,9 +773,12 @@ Usage: test [/arg1] <String> [[/other] <Number>] [[/notSwitch] <Boolean>] [[/Arg
     /Help [<Boolean>] (/?, /h)
         Displays this help message.
 
+    /Version [<Boolean>]
+        Displays version information.
+
 ".ReplaceLineEndings();
 
-        private static readonly string _expectedLongShortUsage = @"Usage: test [[--foo] <Int32>] [[--bar] <Int32>] [--Arg1 <Int32>] [--Arg2 <Int32>] [--Help] [--Switch1] [--Switch2] [-u]
+        private static readonly string _expectedLongShortUsage = @"Usage: test [[--foo] <Int32>] [[--bar] <Int32>] [--Arg1 <Int32>] [--Arg2 <Int32>] [--Help] [--Switch1] [--Switch2] [-u] [--Version]
 
     -f, --foo <Int32>
             Foo description. Default value: 0.
@@ -798,9 +804,12 @@ Usage: test [/arg1] <String> [[/other] <Number>] [[/notSwitch] <Boolean>] [[/Arg
     -u [<Boolean>]
             Switch3 description.
 
+        --Version [<Boolean>]
+            Displays version information.
+
 ".ReplaceLineEndings();
 
-        private static readonly string _expectedLongShortUsageShortNameSyntax = @"Usage: test [[-f] <Int32>] [[--bar] <Int32>] [--Arg1 <Int32>] [-a <Int32>] [-?] [-S] [-t] [-u]
+        private static readonly string _expectedLongShortUsageShortNameSyntax = @"Usage: test [[-f] <Int32>] [[--bar] <Int32>] [--Arg1 <Int32>] [-a <Int32>] [-?] [-S] [-t] [-u] [--Version]
 
     -f, --foo <Int32>
             Foo description. Default value: 0.
@@ -825,6 +834,9 @@ Usage: test [/arg1] <String> [[/other] <Number>] [[/notSwitch] <Boolean>] [[/Arg
 
     -u [<Boolean>]
             Switch3 description.
+
+        --Version [<Boolean>]
+            Displays version information.
 
 ".ReplaceLineEndings();
 
@@ -854,11 +866,14 @@ Usage: test [/arg1] <String> [[/other] <Number>] [[/notSwitch] <Boolean>] [[/Arg
     -u [<Boolean>]
             Switch3 description.
 
+        --Version [<Boolean>]
+            Displays version information.
+
 ".ReplaceLineEndings();
 
         private static readonly string _expectedUsageDescriptionOnly = @"Test arguments description.
 
-Usage: test [-arg1] <String> [[-other] <Number>] [[-notSwitch] <Boolean>] [[-Arg5] <Single>] [[-other2] <Number>] [[-Arg8] <DayOfWeek>...] -Arg6 <String> [-Arg10...] [-Arg11] [-Arg12 <Int32>...] [-Arg13 <String=Int32>...] [-Arg14 <String=Int32>...] [-Arg15 <KeyValuePair<String, Int32>>] [-Arg3 <String>] [-Arg7] [-Arg9 <Int32>] [-Help]
+Usage: test [-arg1] <String> [[-other] <Number>] [[-notSwitch] <Boolean>] [[-Arg5] <Single>] [[-other2] <Number>] [[-Arg8] <DayOfWeek>...] -Arg6 <String> [-Arg10...] [-Arg11] [-Arg12 <Int32>...] [-Arg13 <String=Int32>...] [-Arg14 <String=Int32>...] [-Arg15 <KeyValuePair<String, Int32>>] [-Arg3 <String>] [-Arg7] [-Arg9 <Int32>] [-Help] [-Version]
 
     -arg1 <String>
         Arg1 description.
@@ -878,11 +893,14 @@ Usage: test [-arg1] <String> [[-other] <Number>] [[-notSwitch] <Boolean>] [[-Arg
     -Help [<Boolean>] (-?, -h)
         Displays this help message.
 
+    -Version [<Boolean>]
+        Displays version information.
+
 ".ReplaceLineEndings();
 
         private static readonly string _expectedUsageAll = @"Test arguments description.
 
-Usage: test [-arg1] <String> [[-other] <Number>] [[-notSwitch] <Boolean>] [[-Arg5] <Single>] [[-other2] <Number>] [[-Arg8] <DayOfWeek>...] -Arg6 <String> [-Arg10...] [-Arg11] [-Arg12 <Int32>...] [-Arg13 <String=Int32>...] [-Arg14 <String=Int32>...] [-Arg15 <KeyValuePair<String, Int32>>] [-Arg3 <String>] [-Arg7] [-Arg9 <Int32>] [-Help]
+Usage: test [-arg1] <String> [[-other] <Number>] [[-notSwitch] <Boolean>] [[-Arg5] <Single>] [[-other2] <Number>] [[-Arg8] <DayOfWeek>...] -Arg6 <String> [-Arg10...] [-Arg11] [-Arg12 <Int32>...] [-Arg13 <String=Int32>...] [-Arg14 <String=Int32>...] [-Arg15 <KeyValuePair<String, Int32>>] [-Arg3 <String>] [-Arg7] [-Arg9 <Int32>] [-Help] [-Version]
 
     -arg1 <String>
         Arg1 description.
@@ -935,19 +953,22 @@ Usage: test [-arg1] <String> [[-other] <Number>] [[-notSwitch] <Boolean>] [[-Arg
     -Help [<Boolean>] (-?, -h)
         Displays this help message.
 
+    -Version [<Boolean>]
+        Displays version information.
+
 ".ReplaceLineEndings();
 
         private static readonly string _expectedUsageNone = @"Test arguments description.
 
-Usage: test [-arg1] <String> [[-other] <Number>] [[-notSwitch] <Boolean>] [[-Arg5] <Single>] [[-other2] <Number>] [[-Arg8] <DayOfWeek>...] -Arg6 <String> [-Arg10...] [-Arg11] [-Arg12 <Int32>...] [-Arg13 <String=Int32>...] [-Arg14 <String=Int32>...] [-Arg15 <KeyValuePair<String, Int32>>] [-Arg3 <String>] [-Arg7] [-Arg9 <Int32>] [-Help]
+Usage: test [-arg1] <String> [[-other] <Number>] [[-notSwitch] <Boolean>] [[-Arg5] <Single>] [[-other2] <Number>] [[-Arg8] <DayOfWeek>...] -Arg6 <String> [-Arg10...] [-Arg11] [-Arg12 <Int32>...] [-Arg13 <String=Int32>...] [-Arg14 <String=Int32>...] [-Arg15 <KeyValuePair<String, Int32>>] [-Arg3 <String>] [-Arg7] [-Arg9 <Int32>] [-Help] [-Version]
 
 ".ReplaceLineEndings();
 
         // Raw strings would be nice here so including the escape character directly wouldn't be
-        // necessary but that requires C++11.
+        // necessary but that requires C# 11.
         private static readonly string _expectedUsageColor = @"Test arguments description.
 
-[36mUsage:[0m test [/arg1] <String> [[/other] <Number>] [[/notSwitch] <Boolean>] [[/Arg5] <Single>] [[/other2] <Number>] [[/Arg8] <DayOfWeek>...] /Arg6 <String> [/Arg10...] [/Arg11] [/Arg12 <Int32>...] [/Arg13 <String=Int32>...] [/Arg14 <String=Int32>...] [/Arg15 <KeyValuePair<String, Int32>>] [/Arg3 <String>] [/Arg7] [/Arg9 <Int32>] [/Help]
+[36mUsage:[0m test [/arg1] <String> [[/other] <Number>] [[/notSwitch] <Boolean>] [[/Arg5] <Single>] [[/other2] <Number>] [[/Arg8] <DayOfWeek>...] /Arg6 <String> [/Arg10...] [/Arg11] [/Arg12 <Int32>...] [/Arg13 <String=Int32>...] [/Arg14 <String=Int32>...] [/Arg15 <KeyValuePair<String, Int32>>] [/Arg3 <String>] [/Arg7] [/Arg9 <Int32>] [/Help] [/Version]
 
     [32m/arg1 <String>[0m
         Arg1 description.
@@ -975,6 +996,9 @@ Usage: test [-arg1] <String> [[-other] <Number>] [[-notSwitch] <Boolean>] [[-Arg
 
     [32m/Help [<Boolean>] (/?, /h)[0m
         Displays this help message.
+
+    [32m/Version [<Boolean>][0m
+        Displays version information.
 
 ".ReplaceLineEndings();
 

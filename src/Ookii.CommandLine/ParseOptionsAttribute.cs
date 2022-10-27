@@ -191,12 +191,13 @@ namespace Ookii.CommandLine
         /// <remarks>
         /// <para>
         ///   If this property is <see langword="true"/>, the <see cref="CommandLineParser"/>
-        ///   will automatically add an argument with the name "Help" and the short name "?" (used
-        ///   only when using <see cref="ParsingMode.LongShort"/>). When present, this argument
-        ///   will cancel parsing and cause usage help to be printed.
+        ///   will automatically add an argument with the name "Help". If using <see cref="ParsingMode.LongShort"/>,
+        ///   this argument will have the short name "?" and a short alias "h"; otherwise, it
+        ///   will have the aliases "?" and "h". When supplied, this argument will cancel parsing
+        ///   and cause usage help to be printed.
         /// </para>
         /// <para>
-        ///   If you already have an argument named "Help" or a short argument named "?", the
+        ///   If you already have an argument conflicting with the names or aliases above, the
         ///   the automatic help argument will not be created even if this property is
         ///   <see langword="true"/>.
         /// </para>
@@ -206,6 +207,34 @@ namespace Ookii.CommandLine
         /// </para>
         /// </remarks>
         public bool AutoHelpArgument { get; set; } = true;
+
+        /// <summary>
+        /// Gets or sets a value that indicates a version argument will be automatically added.
+        /// </summary>
+        /// <value>
+        ///   <see langword="true"/> to automatically create a version argument; otherwise,
+        ///   <see langword="false"/>. The default value is <see langword="true"/>.
+        /// </value>
+        /// <remarks>
+        /// <para>
+        ///   If this property is <see langword="true"/>, the <see cref="CommandLineParser"/>
+        ///   will automatically add an argument with the name "Version". When supplied, this
+        ///   argument will write version information to the console and cancel parsing, without
+        ///   showing usage help.
+        /// </para>
+        /// <para>
+        ///   If you already have an argument named "Version", the the automatic version argument
+        ///   will not be created even if this property is <see langword="true"/>.
+        /// </para>
+        /// <note>
+        ///   The automatic version argument will never be created for shell commands (subcommands).
+        /// </note>
+        /// <para>
+        ///   This value can be overridden by the <see cref="ParseOptions.AutoVersionArgument"/>
+        ///   property.
+        /// </para>
+        /// </remarks>
+        public bool? AutoVersionArgument { get; set; } = true;
 
         internal IComparer<string> GetStringComparer()
         {

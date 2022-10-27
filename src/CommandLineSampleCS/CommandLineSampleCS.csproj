@@ -6,6 +6,8 @@
     <ImplicitUsings>disable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <Description>Command line parsing sample for Ookii.CommandLine</Description>
+    <VersionPrefix>3.0.0</VersionPrefix>
+    <Copyright>Copyright © Sven Groot (Ookii.org)</Copyright>
   </PropertyGroup>
 
   <ItemGroup>

@@ -1161,6 +1161,30 @@ namespace Ookii.CommandLine
             return new CommandLineArgument(info);
         }
 
+        internal static CommandLineArgument CreateAutomaticVersion(CommandLineParser parser)
+        {
+            if (parser == null)
+                throw new ArgumentNullException(nameof(parser));
+            var argumentName = Properties.Resources.AutomaticVersionName;
+            var memberName = nameof(AutomaticVersion);
+            var info = new ArgumentInfo()
+            {
+                Parser = parser,
+                Method = new()
+                {
+                    Method = typeof(CommandLineArgument).GetMethod(memberName, BindingFlags.NonPublic | BindingFlags.Static)!,
+                    HasParserParameter = true,
+                },
+                ArgumentName = argumentName,
+                Long = true,
+                ArgumentType = typeof(bool),
+                Description = Properties.Resources.AutomaticVersionDescription,
+                MemberName = memberName,
+            };
+
+            return new CommandLineArgument(info);
+        }
+
         internal void ApplyPropertyValue(object target)
         {
             // Do nothing for parameter-based values
@@ -1508,6 +1532,21 @@ namespace Ookii.CommandLine
         private static void AutomaticHelp()
         {
             // Intentionally blank.
+        }
+
+        private static bool AutomaticVersion(CommandLineParser parser)
+        {
+            var assembly = parser.ArgumentsType.Assembly;
+            var versionAttribute = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>();
+            var version = versionAttribute?.InformationalVersion ?? assembly.GetName().Version?.ToString() ?? string.Empty;
+            var copyRightAttribute = assembly.GetCustomAttribute<AssemblyCopyrightAttribute>();
+
+            Console.WriteLine($"{parser.ApplicationFriendlyName} {version}");
+            if (copyRightAttribute != null)
+                Console.WriteLine(copyRightAttribute.Copyright);
+
+            // Cancel parsing but do not show help.
+            return false;
         }
     }
 }

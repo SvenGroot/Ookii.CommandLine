@@ -8,6 +8,7 @@ namespace CommandLineSampleCS
     /// <summary>
     /// Class that defines the sample's command line arguments.
     /// </summary>
+    [ApplicationFriendlyName("Ookii.CommandLine Sample")]
     [Description("Sample command line application. The application parses the command line and prints the results, but otherwise does nothing and none of the arguments are actually used for anything.")]
     class ProgramArguments
     {

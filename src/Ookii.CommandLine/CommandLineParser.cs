@@ -423,6 +423,34 @@ namespace Ookii.CommandLine
         }
 
         /// <summary>
+        /// Gets the friendly name of the application.
+        /// </summary>
+        /// <value>
+        /// The friendly name of the application.
+        /// </value>
+        /// <remarks>
+        /// <para>
+        ///   The friendly name is determined by checking for the <see cref="ApplicationFriendlyNameAttribute"/>
+        ///   attribute first on the arguments type, then on the arguments type's assembly. If
+        ///   neither exists, the arguments type's assembly's name is used.
+        /// </para>
+        /// <para>
+        ///   This name is only used in the output of the automatically created "-Version"
+        ///   attribute.
+        /// </para>
+        /// </remarks>
+        public string ApplicationFriendlyName
+        {
+            get
+            {
+                var attribute = _argumentsType.GetCustomAttribute<ApplicationFriendlyNameAttribute>() ??
+                    _argumentsType.Assembly.GetCustomAttribute<ApplicationFriendlyNameAttribute>();
+
+                return attribute?.Name ?? _argumentsType.Assembly.GetName().Name ?? string.Empty;
+            }
+        }
+
+        /// <summary>
         /// Gets a description that is used when generating usage information.
         /// </summary>
         /// <value>
@@ -1168,6 +1196,15 @@ namespace Ookii.CommandLine
                        GetArgument(Properties.Resources.AutomaticHelpShortAlias) == null)))
             {
                 AddNamedArgument(CommandLineArgument.CreateAutomaticHelp(this));
+            }
+
+            if (!ShellCommand.IsShellCommand(_argumentsType))
+            {
+                bool autoVersion = options?.AutoVersionArgument ?? optionsAttribute?.AutoVersionArgument ?? true;
+                if (autoVersion && GetArgument(Properties.Resources.AutomaticVersionName) == null)
+                {
+                    AddNamedArgument(CommandLineArgument.CreateAutomaticVersion(this));
+                }
             }
         }
 
