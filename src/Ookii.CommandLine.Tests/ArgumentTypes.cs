@@ -45,7 +45,7 @@ namespace Ookii.CommandLine.Tests
         public int Arg4 { get; set; }
 
         // Short/long name stuff should be ignored if not using LongShort mode.
-        [CommandLineArgument(Position = 0, ShortName = 'a', Long = false), System.ComponentModel.Description("Arg5 description.")]
+        [CommandLineArgument(Position = 0, ShortName = 'a', IsLong = false), System.ComponentModel.Description("Arg5 description.")]
         public float Arg5 { get; set; }
 
         [Alias("Alias1")]
@@ -211,7 +211,7 @@ namespace Ookii.CommandLine.Tests
         [Description("Arg2 description.")]
         public int Arg2 { get; set; }
 
-        [CommandLineArgument(Short = true)]
+        [CommandLineArgument(IsShort = true)]
         [Description("Switch1 description.")]
         public bool Switch1 { get; set; }
 
@@ -219,7 +219,7 @@ namespace Ookii.CommandLine.Tests
         [Description("Switch2 description.")]
         public bool Switch2 { get; set; }
 
-        [CommandLineArgument(ShortName = 'u', Long = false)]
+        [CommandLineArgument(ShortName = 'u', IsLong = false)]
         [Description("Switch3 description.")]
         public bool Switch3 { get; set; }
 
@@ -317,5 +317,14 @@ namespace Ookii.CommandLine.Tests
     {
         [CommandLineArgument(ShortName = '?')]
         public int Foo { get; set; }
+    }
+
+    class HiddenArguments
+    {
+        [CommandLineArgument]
+        public int Foo { get; set; }
+
+        [CommandLineArgument(IsHidden = true)]
+        public int Hidden { get; set; }
     }
 }

@@ -224,6 +224,7 @@ namespace Ookii.CommandLine
             public bool AllowDuplicateDictionaryKeys { get; set; }
             public bool AllowNull { get; set; }
             public bool CancelParsing { get; set; }
+            public bool IsHidden { get; set; }
         }
 
         private struct MethodArgumentInfo
@@ -257,6 +258,7 @@ namespace Ookii.CommandLine
         private readonly string? _keyValueSeparator;
         private readonly bool _allowNull;
         private readonly bool _cancelParsing;
+        private readonly bool _isHidden;
         private IValueHelper? _valueHelper;
 
         private CommandLineArgument(ArgumentInfo info)
@@ -300,6 +302,8 @@ namespace Ookii.CommandLine
             _multiValueSeparator = info.MultiValueSeparator;
             _allowNull = info.AllowNull;
             _cancelParsing = info.CancelParsing;
+            // Required or positional arguments cannot be hidden.
+            _isHidden = info.IsHidden && !info.IsRequired && info.Position == null;
             Position = info.Position;
             var converterType = info.ConverterType;
 
@@ -849,6 +853,25 @@ namespace Ookii.CommandLine
         public bool CancelParsing => _cancelParsing;
 
         /// <summary>
+        /// Gets or sets a value that indicates whether the argument is hidden from the usage help.
+        /// </summary>
+        /// <value>
+        /// <see langword="true"/> if the argument is hidden from the usage help; otherwise,
+        /// <see langword="false"/>. The default value is <see langword="false"/>.
+        /// </value>
+        /// <remarks>
+        /// <para>
+        ///   A hidden argument will not be included in the usage syntax or the argument description
+        ///   list, even if <see cref="DescriptionListFilterMode.All"/> is used.
+        /// </para>
+        /// <para>
+        ///   This property is always <see langword="false"/> for positional or required arguments,
+        ///   which may not be hidden.
+        /// </para>
+        /// </remarks>
+        public bool IsHidden => _isHidden;
+
+        /// <summary>
         /// Converts the specified string to the argument type, as specified in the <see cref="ArgumentType"/> property.
         /// </summary>
         /// <param name="culture">The culture to use to convert the argument.</param>
@@ -1052,8 +1075,8 @@ namespace Ookii.CommandLine
                 Parser = parser,
                 Property = property,
                 ArgumentName = argumentName,
-                Long = attribute.Long,
-                Short = attribute.Short,
+                Long = attribute.IsLong,
+                Short = attribute.IsShort,
                 ShortName = attribute.ShortName,
                 ArgumentType = property.PropertyType,
                 Description = property.GetCustomAttribute<DescriptionAttribute>()?.Description,
@@ -1072,6 +1095,7 @@ namespace Ookii.CommandLine
                 MemberName = property.Name,
                 AllowNull = DetermineAllowsNull(property),
                 CancelParsing = attribute.CancelParsing,
+                IsHidden = attribute.IsHidden,
             };
 
             return new CommandLineArgument(info);
@@ -1101,8 +1125,8 @@ namespace Ookii.CommandLine
                 Parser = parser,
                 Method = methodInfo,
                 ArgumentName = argumentName,
-                Long = attribute.Long,
-                Short = attribute.Short,
+                Long = attribute.IsLong,
+                Short = attribute.IsShort,
                 ShortName = attribute.ShortName,
                 ArgumentType = argumentType,
                 Description = method.GetCustomAttribute<DescriptionAttribute>()?.Description,

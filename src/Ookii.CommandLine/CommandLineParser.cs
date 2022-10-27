@@ -1506,7 +1506,7 @@ namespace Ookii.CommandLine
 
             foreach (var argument in _arguments)
             {
-                bool include = options.ArgumentDescriptionListFilter switch
+                bool include = !argument.IsHidden && options.ArgumentDescriptionListFilter switch
                 {
                     DescriptionListFilterMode.Information => argument.HasInformation(options),
                     DescriptionListFilterMode.Description => !string.IsNullOrEmpty(argument.Description),
@@ -1594,6 +1594,9 @@ namespace Ookii.CommandLine
 
             foreach( CommandLineArgument argument in _arguments )
             {
+                if (argument.IsHidden)
+                    continue;
+
                 writer.Write(" ");
                 if (options.UseAbbreviatedSyntax && argument.Position == null)
                 {

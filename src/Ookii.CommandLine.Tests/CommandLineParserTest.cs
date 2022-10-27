@@ -635,6 +635,25 @@ namespace Ookii.CommandLine.Tests
             TestArgument(parser.GetShortArgument('?'), new ExpectedArgument("Foo", typeof(int)) { ShortName = '?' });
         }
 
+        [TestMethod]
+        public void TestHiddenArgument()
+        {
+            var parser = new CommandLineParser<HiddenArguments>();
+
+            // Verify the hidden argument exists.
+            TestArgument(parser.GetArgument("Hidden"), new ExpectedArgument("Hidden", typeof(int)) { IsHidden = true });
+
+            // Verify it's not in the usage.
+            var options = new WriteUsageOptions()
+            {
+                UsagePrefixFormat = _usagePrefix,
+                ArgumentDescriptionListFilter = DescriptionListFilterMode.All,
+            };
+
+            var usage = parser.GetUsage(0, options);
+            Assert.AreEqual(_expectedUsageHidden, usage);
+        }
+
         private record class ExpectedArgument
         {
             public ExpectedArgument(string name, Type type, ArgumentKind kind = ArgumentKind.SingleValue)
@@ -658,6 +677,7 @@ namespace Ookii.CommandLine.Tests
             public string[] Aliases { get; set; }
             public char? ShortName { get; set; }
             public char[] ShortAliases { get; set; }
+            public bool IsHidden { get; set; }
         }
 
         private static void TestArgument(CommandLineArgument argument, ExpectedArgument expected)
@@ -677,6 +697,7 @@ namespace Ookii.CommandLine.Tests
             Assert.AreEqual(expected.Kind == ArgumentKind.Dictionary, argument.IsDictionary);
             Assert.AreEqual(expected.IsSwitch, argument.IsSwitch);
             Assert.AreEqual(expected.DefaultValue, argument.DefaultValue);
+            Assert.AreEqual(expected.IsHidden, argument.IsHidden);
             Assert.IsNull(argument.Value);
             Assert.IsFalse(argument.HasValue);
             CollectionAssert.AreEqual(expected.Aliases, argument.Aliases);
@@ -1037,6 +1058,19 @@ Usage: test [-arg1] <String> [[-other] <Number>] [[-notSwitch] <Boolean>] [[-Arg
 
     [32m    --Version [<Boolean>][0m
             Displays version information.
+
+".ReplaceLineEndings();
+
+        private static readonly string _expectedUsageHidden = @"Usage: test [-Foo <Int32>] [-Help] [-Version]
+
+    -Foo <Int32>
+
+
+    -Help [<Boolean>] (-?, -h)
+        Displays this help message.
+
+    -Version [<Boolean>]
+        Displays version information.
 
 ".ReplaceLineEndings();
 

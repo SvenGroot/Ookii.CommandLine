@@ -100,7 +100,7 @@ namespace Ookii.CommandLine
         ///   <see cref="ParsingMode.LongShort"/>.
         /// </note>
         /// </remarks>
-        public bool Long { get; set; } = true;
+        public bool IsLong { get; set; } = true;
         
         /// <summary>
         /// Gets or sets a value that indicates whether the argument has a short name.
@@ -119,7 +119,7 @@ namespace Ookii.CommandLine
         ///   the short name will be derived using the first character of the long name.
         /// </para>
         /// </remarks>
-        public bool Short
+        public bool IsShort
         {
             get => _short || ShortName != '\0';
             set => _short = value;
@@ -135,11 +135,11 @@ namespace Ookii.CommandLine
         ///   <see cref="ParsingMode.LongShort"/>.
         /// </note>
         /// <para>
-        ///   Setting this property implies <see cref="Short"/> is <see langword="true"/>.
+        ///   Setting this property implies <see cref="IsShort"/> is <see langword="true"/>.
         /// </para>
         /// <para>
         ///   To derive the short name from the first character of the long name, set the
-        ///   <see cref="Short"/> property to <see langword="true"/> without setting the
+        ///   <see cref="IsShort"/> property to <see langword="true"/> without setting the
         ///   <see cref="ShortName"/> property.
         /// </para>
         /// </remarks>
@@ -262,5 +262,24 @@ namespace Ookii.CommandLine
         /// </para>
         /// </remarks>
         public bool CancelParsing { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value that indicates whether the argument is hidden from the usage help.
+        /// </summary>
+        /// <value>
+        /// <see langword="true"/> if the argument is hidden from the usage help; otherwise,
+        /// <see langword="false"/>. The default value is <see langword="false"/>.
+        /// </value>
+        /// <remarks>
+        /// <para>
+        ///   A hidden argument will not be included in the usage syntax or the argument description
+        ///   list, even if <see cref="DescriptionListFilterMode.All"/> is used.
+        /// </para>
+        /// <para>
+        ///   This property is ignored for positional or required arguments, which may not be
+        ///   hidden.
+        /// </para>
+        /// </remarks>
+        public bool IsHidden { get; set; }
     }
 }
