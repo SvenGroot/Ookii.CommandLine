@@ -1161,7 +1161,11 @@ namespace Ookii.CommandLine
             bool autoHelp = options?.AutoHelpArgument ?? optionsAttribute?.AutoHelpArgument ?? true;
             if (autoHelp && 
                 GetArgument(Properties.Resources.AutomaticHelpName) == null && 
-                GetShortArgument(Properties.Resources.AutomaticHelpShortName[0]) == null)
+                (Mode == ParsingMode.LongShort 
+                    ? (GetShortArgument(Properties.Resources.AutomaticHelpShortName[0]) == null &&
+                       GetShortArgument(Properties.Resources.AutomaticHelpShortAlias[0]) == null)
+                    : (GetArgument(Properties.Resources.AutomaticHelpShortName) == null &&
+                       GetArgument(Properties.Resources.AutomaticHelpShortAlias) == null)))
             {
                 AddNamedArgument(CommandLineArgument.CreateAutomaticHelp(this));
             }

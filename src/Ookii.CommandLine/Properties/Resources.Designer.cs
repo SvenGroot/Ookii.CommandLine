@@ -106,6 +106,15 @@ namespace Ookii.CommandLine.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to h.
+        /// </summary>
+        internal static string AutomaticHelpShortAlias {
+            get {
+                return ResourceManager.GetString("AutomaticHelpShortAlias", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to ?.
         /// </summary>
         internal static string AutomaticHelpShortName {

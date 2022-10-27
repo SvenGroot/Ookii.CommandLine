@@ -1149,6 +1149,15 @@ namespace Ookii.CommandLine
                 CancelParsing = true,
             };
 
+            if (parser.Mode == ParsingMode.LongShort)
+            {
+                info.ShortAliases = new[] { Properties.Resources.AutomaticHelpShortAlias[0] };
+            }
+            else
+            {
+                info.Aliases = new[] { Properties.Resources.AutomaticHelpShortName, Properties.Resources.AutomaticHelpShortAlias };
+            }
+
             return new CommandLineArgument(info);
         }
 

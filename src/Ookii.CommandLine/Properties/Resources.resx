@@ -291,4 +291,7 @@
   <data name="InvalidMethodSignatureFormat" xml:space="preserve">
     <value>The method '{0}' has an unsupported signature.</value>
   </data>
+  <data name="AutomaticHelpShortAlias" xml:space="preserve">
+    <value>h</value>
+  </data>
 </root>

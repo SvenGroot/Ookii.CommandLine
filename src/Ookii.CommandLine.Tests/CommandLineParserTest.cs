@@ -40,7 +40,7 @@ namespace Ookii.CommandLine.Tests
             using var args = target.Arguments.GetEnumerator();
             TestArguments(target.Arguments, new[]
             {
-                new ExpectedArgument("Help", typeof(bool), ArgumentKind.Method) { MemberName = "AutomaticHelp", Description = "Displays this help message.", IsSwitch = true }
+                new ExpectedArgument("Help", typeof(bool), ArgumentKind.Method) { MemberName = "AutomaticHelp", Description = "Displays this help message.", IsSwitch = true, Aliases = new[] { "?", "h" } }
             });
         }
 
@@ -76,7 +76,7 @@ namespace Ookii.CommandLine.Tests
                 new ExpectedArgument("Arg3", typeof(string)) { Position = null },
                 new ExpectedArgument("Arg7", typeof(bool)) { Position = null, IsSwitch = true, Aliases = new[] { "Alias3" } },
                 new ExpectedArgument("Arg9", typeof(int?)) { Position = null, ValueDescription = "Int32" },
-                new ExpectedArgument("Help", typeof(bool), ArgumentKind.Method) { MemberName = "AutomaticHelp", Description = "Displays this help message.", IsSwitch = true }
+                new ExpectedArgument("Help", typeof(bool), ArgumentKind.Method) { MemberName = "AutomaticHelp", Description = "Displays this help message.", IsSwitch = true, Aliases = new[] { "?", "h" } }
             });
         }
 
@@ -97,7 +97,7 @@ namespace Ookii.CommandLine.Tests
             TestArguments(target.Arguments, new[]
             {
                 new ExpectedArgument("arg1", typeof(string)) { Position = 0, IsRequired = true },
-                new ExpectedArgument("Help", typeof(bool), ArgumentKind.Method) { MemberName = "AutomaticHelp", Description = "Displays this help message.", IsSwitch = true },
+                new ExpectedArgument("Help", typeof(bool), ArgumentKind.Method) { MemberName = "AutomaticHelp", Description = "Displays this help message.", IsSwitch = true, Aliases = new[] { "?", "h" } },
                 new ExpectedArgument("ThrowingArgument", typeof(int)),
             });
         }
@@ -767,7 +767,7 @@ Usage: test [/arg1] <String> [[/other] <Number>] [[/notSwitch] <Boolean>] [[/Arg
     /Arg7 [<Boolean>] (/Alias3)
 
 
-    /Help [<Boolean>]
+    /Help [<Boolean>] (/?, /h)
         Displays this help message.
 
 ".ReplaceLineEndings();
@@ -786,7 +786,7 @@ Usage: test [/arg1] <String> [[/other] <Number>] [[/notSwitch] <Boolean>] [[/Arg
     -a, --Arg2 <Int32> (-b, --baz)
             Arg2 description.
 
-    -?, --Help [<Boolean>]
+    -?, --Help [<Boolean>] (-h)
             Displays this help message.
 
     -S, --Switch1 [<Boolean>]
@@ -814,7 +814,7 @@ Usage: test [/arg1] <String> [[/other] <Number>] [[/notSwitch] <Boolean>] [[/Arg
     -a, --Arg2 <Int32> (-b, --baz)
             Arg2 description.
 
-    -?, --Help [<Boolean>]
+    -?, --Help [<Boolean>] (-h)
             Displays this help message.
 
     -S, --Switch1 [<Boolean>]
@@ -842,7 +842,7 @@ Usage: test [/arg1] <String> [[/other] <Number>] [[/notSwitch] <Boolean>] [[/Arg
     -a, --Arg2 <Int32> (-b, --baz)
             Arg2 description.
 
-    -?, --Help [<Boolean>]
+    -?, --Help [<Boolean>] (-h)
             Displays this help message.
 
     -S, --Switch1 [<Boolean>]
@@ -875,7 +875,7 @@ Usage: test [-arg1] <String> [[-other] <Number>] [[-notSwitch] <Boolean>] [[-Arg
     -Arg6 <String> (-Alias1, -Alias2)
         Arg6 description.
 
-    -Help [<Boolean>]
+    -Help [<Boolean>] (-?, -h)
         Displays this help message.
 
 ".ReplaceLineEndings();
@@ -932,7 +932,7 @@ Usage: test [-arg1] <String> [[-other] <Number>] [[-notSwitch] <Boolean>] [[-Arg
     -Arg9 <Int32>
 
 
-    -Help [<Boolean>]
+    -Help [<Boolean>] (-?, -h)
         Displays this help message.
 
 ".ReplaceLineEndings();
@@ -973,7 +973,7 @@ Usage: test [-arg1] <String> [[-other] <Number>] [[-notSwitch] <Boolean>] [[-Arg
     [32m/Arg7 [<Boolean>] (/Alias3)[0m
 
 
-    [32m/Help [<Boolean>][0m
+    [32m/Help [<Boolean>] (/?, /h)[0m
         Displays this help message.
 
 ".ReplaceLineEndings();
