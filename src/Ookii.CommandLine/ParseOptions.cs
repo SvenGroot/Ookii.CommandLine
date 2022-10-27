@@ -265,6 +265,52 @@ namespace Ookii.CommandLine
         public bool AutoVersionArgument { get; set; } = true;
 
         /// <summary>
+        /// Gets or sets the color applied to error messages.
+        /// </summary>
+        /// <value>
+        ///   The virtual terminal sequence for a color. The default value is
+        ///   <see cref="VirtualTerminal.TextFormat.ForegroundRed"/>.
+        /// </value>
+        /// <remarks>
+        /// <para>
+        ///   The color will only be used if the <see cref="UseErrorColor"/> property is
+        ///   <see langword="true"/>; otherwise, it will be replaced with an empty string.
+        /// </para>
+        /// <para>
+        ///   If the string contains anything other than virtual terminal sequences, those parts
+        ///   will be included in the output, but only when the <see cref="UseErrorColor"/> property is
+        ///   <see langword="true"/>.
+        /// </para>
+        /// <para>
+        ///   After the error message, the value of the <see cref="WriteUsageOptions.ColorReset"/>
+        ///   property will be written.
+        /// </para>
+        /// </remarks>
+        public string ErrorColor { get; set; } = VirtualTerminal.TextFormat.ForegroundRed;
+
+        /// <summary>
+        /// Gets or sets a value that indicates whether error messages should use color.
+        /// </summary>
+        /// <value>
+        ///   <see langword="true"/> to enable color output; <see langword="false"/> to disable
+        ///   color output; or <see langword="null"/> to enable it if the error output supports it.
+        /// </value>
+        /// <remarks>
+        /// <para>
+        ///   If this property is <see langword="null"/>, the <see cref="CommandLineParser.Parse{T}(string[], int, ParseOptions?)"/>,
+        ///   <see cref="CommandLineParser.WriteUsageToConsole"/>, and <see cref="ShellCommand.CreateShellCommand(System.Reflection.Assembly, string[], int, CreateShellCommandOptions?)"/>
+        ///   methods will enable color support if the standard error stream is not redirected, supports virtual
+        ///   terminal sequences, and there is no environment variable named "NO_COLOR".
+        /// </para>
+        /// <para>
+        ///   If this property is set to <see langword="true"/> explicitly, virtual terminal
+        ///   sequences may be included in the output even if it's not supported, which may lead to
+        ///   garbage characters appearing in the output.
+        /// </para>
+        /// </remarks>
+        public bool? UseErrorColor { get; set; }
+
+        /// <summary>
         /// Gets or sets the options to use to write usage information to <see cref="Out"/> when
         /// parsing the arguments fails or is cancelled.
         /// </summary>

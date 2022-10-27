@@ -49,17 +49,48 @@ namespace Ookii.CommandLine
         /// Gets or sets the format string used to format a command's name and description.
         /// </summary>
         /// <value>
-        /// The format string used to format a command's name and description. The default value is "&#160;&#160;&#160;&#160;{0}\n{1}\n".
+        /// The format string used to format a command's name and description. The default value is "&#160;&#160;&#160;&#160;{2}{0}{3}\n{1}\n".
         /// </value>
         /// <remarks>
-        /// <para>
-        ///   This format string should have two placeholders, which are used for command's name and description respectively. If the
-        ///   format ends in a line break, the commands will be separated by a blank line (this is the default).
-        /// </para>
         /// <para>
         ///   If you change the description format, you should also change the value of the <see cref="CommandDescriptionIndent"/>
         ///   to an appropriate value. The default format uses an indentation of 8 characters.
         /// </para>
+        /// <para>
+        ///   This string can have the following placeholders:
+        /// </para>
+        /// <list type="table">
+        ///   <listheader>
+        ///     <term>Placeholder</term>
+        ///     <description>Description</description>
+        ///   </listheader>
+        ///   <item>
+        ///     <term>{0}</term>
+        ///     <description>
+        ///       The name of the command.
+        ///     </description>
+        ///   </item>
+        ///   <item>
+        ///     <term>{1}</term>
+        ///     <description>
+        ///       The description of the command.
+        ///     </description>
+        ///   </item>
+        ///   <item>
+        ///     <term>{2}</term>
+        ///     <description>
+        ///       If the <see cref="WriteUsageOptions.UseColor"/> property is <see langword="true"/>, the value of
+        ///       the <see cref="CommandDescriptionColor"/> property; otherwise, an empty string.
+        ///     </description>
+        ///   </item>
+        ///   <item>
+        ///     <term>{3}</term>
+        ///     <description>
+        ///       If the <see cref="WriteUsageOptions.UseColor"/> property is <see langword="false"/>, the value of
+        ///       the <see cref="WriteUsageOptions.ColorReset"/> property; otherwise, an empty string.
+        ///     </description>
+        ///   </item>
+        /// </list>
         /// </remarks>
         public string CommandDescriptionFormat
         {
@@ -67,6 +98,32 @@ namespace Ookii.CommandLine
             set { _commandDescriptionFormat = value; }
         }
 
+        /// <summary>
+        /// Gets or sets the color applied to the <see cref="CommandDescriptionFormat"/>.
+        /// </summary>
+        /// <value>
+        ///   The virtual terminal sequence for a color. The default value is
+        ///   <see cref="VirtualTerminal.TextFormat.ForegroundGreen"/>.
+        /// </value>
+        /// <remarks>
+        /// <para>
+        ///   The color will only be used if the <see cref="WriteUsageOptions.UseColor"/> property is
+        ///   <see langword="true"/>; otherwise, it will be replaced with an empty string.
+        /// </para>
+        /// <para>
+        ///   If the string contains anything other than virtual terminal sequences, those parts
+        ///   will be included in the output, but only when the <see cref="WriteUsageOptions.UseColor"/> property is
+        ///   <see langword="true"/>.
+        /// </para>
+        /// <para>
+        ///   The portion of the string that has color will end with the <see cref="WriteUsageOptions.ColorReset"/>.
+        /// </para>
+        /// <para>
+        ///   With the default value, only the command name portion of the string has color; the
+        ///   application name does not.
+        /// </para>
+        /// </remarks>
+        public string CommandDescriptionColor { get; set; } = VirtualTerminal.TextFormat.ForegroundGreen;
 
         /// <summary>
         /// Gets or sets the number of characters by which to indent the all but the first line of command descriptions.

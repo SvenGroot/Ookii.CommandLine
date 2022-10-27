@@ -332,8 +332,7 @@ namespace Ookii.CommandLine.Tests
         [TestMethod]
         public void TestWriteUsageColor()
         {
-            Type argumentsType = typeof(TestArguments);
-            CommandLineParser target = new CommandLineParser(argumentsType, new[] { "/", "-" });
+            var target = new CommandLineParser(typeof(TestArguments), new[] { "/", "-" });
             var options = new WriteUsageOptions()
             {
                 UsagePrefixFormat = _usagePrefix,
@@ -342,6 +341,10 @@ namespace Ookii.CommandLine.Tests
 
             string actual = target.GetUsage(0, options);
             Assert.AreEqual(_expectedUsageColor, actual);
+
+            target = new CommandLineParser(typeof(LongShortArguments));
+            actual = target.GetUsage(0, options);
+            Assert.AreEqual(_expectedLongShortUsageColor, actual);
         }
 
         [TestMethod]
@@ -1006,6 +1009,36 @@ Usage: test [-arg1] <String> [[-other] <Number>] [[-notSwitch] <Boolean>] [[-Arg
 
 ".ReplaceLineEndings();
 
+        private static readonly string _expectedLongShortUsageColor = @"[36mUsage:[0m test [[--foo] <Int32>] [[--bar] <Int32>] [--Arg1 <Int32>] [--Arg2 <Int32>] [--Help] [--Switch1] [--Switch2] [-u] [--Version]
+
+    [32m-f, --foo <Int32>[0m
+            Foo description. Default value: 0.
+
+    [32m    --bar <Int32>[0m
+            Bar description. Default value: 0.
+
+    [32m    --Arg1 <Int32>[0m
+            Arg1 description.
+
+    [32m-a, --Arg2 <Int32> (-b, --baz)[0m
+            Arg2 description.
+
+    [32m-?, --Help [<Boolean>] (-h)[0m
+            Displays this help message.
+
+    [32m-S, --Switch1 [<Boolean>][0m
+            Switch1 description.
+
+    [32m-t, --Switch2 [<Boolean>][0m
+            Switch2 description.
+
+    [32m-u [<Boolean>][0m
+            Switch3 description.
+
+    [32m    --Version [<Boolean>][0m
+            Displays version information.
+
+".ReplaceLineEndings();
 
         #endregion
 

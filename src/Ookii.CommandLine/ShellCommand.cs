@@ -151,8 +151,21 @@ namespace Ookii.CommandLine
             using var writer = DisposableWrapper.Create(options.Out, LineWrappingTextWriter.ForConsoleOut);
             var lineWriter = writer.Inner as LineWrappingTextWriter;
 
-            // TODO: Color
-            writer.Inner.WriteLine(options.CommandUsageFormat, options.UsageOptions.UsagePrefixFormat);
+            bool useColor = options.UsageOptions.UseColor ?? false;
+            string usageColorStart = string.Empty;
+            string colorStart = string.Empty;
+            string colorEnd = string.Empty;
+            if (useColor)
+            {
+                usageColorStart = options.UsageOptions.UsagePrefixColor;
+                colorStart = options.CommandDescriptionColor;
+                colorEnd = options.UsageOptions.ColorReset;
+            }
+
+            var prefix = string.Format(writer.Inner.FormatProvider, options.UsageOptions.UsagePrefixFormat,
+                usageColorStart, colorEnd);
+
+            writer.Inner.WriteLine(options.CommandUsageFormat, prefix);
             writer.Inner.WriteLine();
             writer.Inner.WriteLine(options.AvailableCommandsHeader);
             writer.Inner.WriteLine();
@@ -162,7 +175,8 @@ namespace Ookii.CommandLine
             foreach (var command in GetShellCommands(assembly, options.CommandNameComparer, options.AutoVersionCommand))
             {
                 lineWriter?.ResetIndent();
-                writer.Inner.WriteLine(options.CommandDescriptionFormat, command.Name, command.Description ?? string.Empty);
+                writer.Inner.WriteLine(options.CommandDescriptionFormat, command.Name, command.Description ?? string.Empty,
+                    colorStart, colorEnd);
             }
         }
 
@@ -337,14 +351,11 @@ namespace Ookii.CommandLine
             }
 
             using var output = DisposableWrapper.Create(options.Out, LineWrappingTextWriter.ForConsoleOut);
-            using var error = DisposableWrapper.Create(options.Error, LineWrappingTextWriter.ForConsoleError);
 
             // Update the values because the options are passed to the shell command and the ParseInternal method.
             var originalOut = options.Out;
-            var originalError = options.Error;
             var originalUsagePrefix = options.UsageOptions.UsagePrefixFormat;
             options.Out = output.Inner;
-            options.Error = error.Inner;
 
             try
             {
@@ -364,7 +375,6 @@ namespace Ookii.CommandLine
             finally
             {
                 options.Out = originalOut;
-                options.Error = originalError;
                 options.UsageOptions.UsagePrefixFormat = originalUsagePrefix;
             }
         }

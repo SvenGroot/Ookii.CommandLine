@@ -1107,7 +1107,6 @@ namespace Ookii.CommandLine
             }
 
             using var output = DisposableWrapper.Create(options.Out, LineWrappingTextWriter.ForConsoleOut);
-            using var error = DisposableWrapper.Create(options.Error, LineWrappingTextWriter.ForConsoleError);
             object? result = null;
             try
             {
@@ -1115,7 +1114,20 @@ namespace Ookii.CommandLine
             }
             catch (CommandLineArgumentException ex)
             {
-                error.Inner.WriteLine(ex.Message);
+                if (options.UseErrorColor == null && options.UseErrorColor == null)
+                {
+                    options.UseErrorColor = VirtualTerminal.EnableColor(VirtualTerminal.StandardStream.Error);
+                }
+
+                using var error = DisposableWrapper.Create(options.Error, LineWrappingTextWriter.ForConsoleError);
+                if (options.UseErrorColor ?? false)
+                    error.Inner.Write(options.ErrorColor);
+
+                error.Inner.Write(ex.Message);
+                if (options.UseErrorColor ?? false)
+                    error.Inner.Write(options.UsageOptions.ColorReset);
+
+                error.Inner.WriteLine();
                 error.Inner.WriteLine();
             }
 
@@ -1507,7 +1519,7 @@ namespace Ookii.CommandLine
                     var separator = argument.HasShortName && argument.HasLongName ? options.ArgumentNamesSeparator : string.Empty;
 
                     writer.WriteLine(options.LongShortArgumentDescriptionFormat,shortName, separator, longName, valueDescription,
-                        alias, argument.Description, defaultValue);
+                        alias, argument.Description, defaultValue, colorStart, colorEnd);
                 }
                 else
                 {

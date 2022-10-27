@@ -354,7 +354,7 @@ namespace Ookii.CommandLine
         /// </summary>
         /// <value>
         /// The format string to use for the description of an argument; the default value is
-        /// "&#160;&#160;&#160;&#160;{0}{1}{2} {3}{4}\n{5}{6}\n" (note that it contains line
+        /// "&#160;&#160;&#160;&#160;{7}{0}{1}{2} {3}{4}{8}\n{5}{6}\n" (note that it contains line
         /// breaks, and widths that assume the primary short name prefix is a single character).
         /// </value>
         /// <remarks>
@@ -430,6 +430,20 @@ namespace Ookii.CommandLine
         ///       <see cref="DefaultValueFormat"/> property. If the argument has no default value,
         ///       or the <see cref="IncludeDefaultValueInDescription"/> property is <see langword="false"/>,
         ///       an empty string.
+        ///     </description>
+        ///   </item>
+        ///   <item>
+        ///     <term>{7}</term>
+        ///     <description>
+        ///       If the <see cref="UseColor"/> property is <see langword="true"/>, the value of
+        ///       the <see cref="ArgumentDescriptionColor"/> property; otherwise, an empty string.
+        ///     </description>
+        ///   </item>
+        ///   <item>
+        ///     <term>{8}</term>
+        ///     <description>
+        ///       If the <see cref="UseColor"/> property is <see langword="false"/>, the value of
+        ///       the <see cref="ColorReset"/> property; otherwise, an empty string.
         ///     </description>
         ///   </item>
         /// </list>

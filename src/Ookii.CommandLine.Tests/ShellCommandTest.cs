@@ -88,7 +88,7 @@ namespace Ookii.CommandLine.Tests
                 Error = writer,
                 UsageOptions = new WriteUsageOptions()
                 {
-                    UsagePrefixFormat = "Usage: test"
+                    UsagePrefixFormat = _usagePrefix
                 }
             };
 
@@ -133,7 +133,7 @@ namespace Ookii.CommandLine.Tests
                 Error = writer,
                 UsageOptions = new WriteUsageOptions()
                 {
-                    UsagePrefixFormat = "Usage: test"
+                    UsagePrefixFormat = _usagePrefix
                 }
             };
 
@@ -141,7 +141,28 @@ namespace Ookii.CommandLine.Tests
             Assert.AreEqual(_expectedUsage, writer.BaseWriter.ToString());
         }
 
+        [TestMethod]
+        public void TestWriteUsageColor()
+        {
+            using var writer = LineWrappingTextWriter.ForStringWriter(0);
+            var options = new CreateShellCommandOptions()
+            {
+                Out = writer,
+                Error = writer,
+                UsageOptions = new WriteUsageOptions()
+                {
+                    UsagePrefixFormat = _usagePrefix,
+                    UseColor = true,
+                }
+            };
+
+            ShellCommand.WriteUsage(_commandAssembly, options);
+            Assert.AreEqual(_expectedUsageColor, writer.BaseWriter.ToString());
+        }
+
         #region Expected usage
+
+        private const string _usagePrefix = "{0}Usage:{1} test";
 
         public static readonly string _expectedUsage = @"Usage: test <command> [arguments]
 
@@ -173,6 +194,24 @@ The following commands are available:
 
     test
         Test command description.
+
+".ReplaceLineEndings();
+
+        public static readonly string _expectedUsageColor = @"[36mUsage:[0m test <command> [arguments]
+
+The following commands are available:
+
+    [32mAnotherCommand[0m
+
+
+    [32mcustom[0m
+        Custom parsing command.
+
+    [32mtest[0m
+        Test command description.
+
+    [32mversion[0m
+        Displays version information.
 
 ".ReplaceLineEndings();
 

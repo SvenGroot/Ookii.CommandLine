@@ -136,7 +136,7 @@
     <value>The following commands are available:</value>
   </data>
   <data name="DefaultCommandFormat" xml:space="preserve">
-    <value>    {0}
+    <value>    {2}{0}{3}
 {1}
 </value>
     <comment>Note this contains a newline at the end of the format. If you change this format, you may also need to change the indent used in the code.</comment>
@@ -271,7 +271,7 @@
     <value>, </value>
   </data>
   <data name="DefaultLongShortArgumentDescriptionFormat" xml:space="preserve">
-    <value>    {0}{1}{2} {3}{4}
+    <value>    {7}{0}{1}{2} {3}{4}{8}
 {5}{6}
 </value>
     <comment>Note this contains a newline at the end of the format. If you change this format, you may also need to change the indent used in the code.</comment>
