@@ -26,13 +26,13 @@ namespace Ookii.CommandLine
         /// <value>
         /// The <see cref="IEqualityComparer{T}"/> used to compare command names. The default value is <see cref="StringComparer.OrdinalIgnoreCase"/>.
         /// </value>
-        public IEqualityComparer<string> CommandNameComparer { get; set; } = StringComparer.OrdinalIgnoreCase;
+        public IComparer<string> CommandNameComparer { get; set; } = StringComparer.OrdinalIgnoreCase;
 
         /// <summary>
         /// Gets or sets the format string to use for the usage help if no command name was supplied or the command name was not recognized.
         /// </summary>
         /// <value>
-        /// The format string to use for the usage if no command was specified or the command name was not recognized. The default value is "{0} &lt;command&gt; [args...]".
+        /// The format string to use for the usage if no command was specified or the command name was not recognized. The default value is "{0} &lt;command&gt; [arguments]".
         /// </value>
         /// <remarks>
         /// <para>
@@ -96,6 +96,24 @@ namespace Ookii.CommandLine
             get { return _availableCommandsHeader ?? Properties.Resources.DefaultAvailableCommandsHeader; }
             set { _availableCommandsHeader = value; }
         }
-        
+
+        /// <summary>
+        /// Gets or sets a value that indicates whether a version command should automatically be
+        /// created.
+        /// </summary>
+        /// <value>
+        /// <see langword="true"/> to automatically create a version command; otherwise,
+        /// <see langword="false"/>. The default is <see langword="true"/>.
+        /// </value>
+        /// <remarks>
+        /// <para>
+        ///   If this property is true, a command named "version" will be automatically added to
+        ///   the list of available commands, unless a command with that name already exists.
+        ///   When invoked, the command will show version information for the application, based
+        ///   on the entry point assembly.
+        /// </para>
+        /// </remarks>
+        public bool AutoVersionCommand { get; set; } = true;
+
     }
 }

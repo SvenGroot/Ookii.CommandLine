@@ -142,7 +142,7 @@
     <comment>Note this contains a newline at the end of the format. If you change this format, you may also need to change the indent used in the code.</comment>
   </data>
   <data name="DefaultCommandUsageFormat" xml:space="preserve">
-    <value>{0} &lt;command&gt; [args...]</value>
+    <value>{0} &lt;command&gt; [arguments]</value>
   </data>
   <data name="DefaultOptionalArgumentFormat" xml:space="preserve">
     <value>[{0}]</value>
@@ -299,5 +299,11 @@
   </data>
   <data name="AutomaticVersionName" xml:space="preserve">
     <value>Version</value>
+  </data>
+  <data name="AutomaticVersionCommandName" xml:space="preserve">
+    <value>version</value>
+  </data>
+  <data name="UnknownVersion" xml:space="preserve">
+    <value>Unknown version.</value>
   </data>
 </root>

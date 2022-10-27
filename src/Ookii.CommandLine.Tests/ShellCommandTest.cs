@@ -8,90 +8,54 @@ using System.Reflection;
 
 namespace Ookii.CommandLine.Tests
 {
-    #region Shell commands
-
-    [ShellCommand("test")]
-    public class TestCommand : ShellCommand
-    {
-        [CommandLineArgument]
-        public string Argument { get; set; }
-
-        public override void Run()
-        {
-            throw new NotImplementedException();
-        }
-    }
-
-    [ShellCommand]
-    public class AnotherCommand : ShellCommand
-    {
-        [CommandLineArgument]
-        public int Value { get; set; }
-
-        public override void Run()
-        {
-            throw new NotImplementedException();
-        }
-    }
-
-    [ShellCommand("custom", CustomArgumentParsing = true)]
-    internal class CustomParsingCommand : ShellCommand
-    {
-        public CustomParsingCommand(string[] args, int index, CreateShellCommandOptions options)
-        {
-            Value = args[index];
-        }
-
-        public string Value { get; set; }
-
-        public override void Run()
-        {
-            throw new NotImplementedException();
-        }
-    }
-
-    public class NotACommand : ShellCommand
-    {
-        public override void Run()
-        {
-            throw new NotImplementedException();
-        }
-    }
-
-    #endregion
-
     [TestClass]
     public class ShellCommandTest
     {
+        private static readonly Assembly _commandAssembly = Assembly.GetExecutingAssembly();
+
         [TestMethod]
         public void GetShellCommandsTest()
         {
-            Type[] commands = ShellCommand.GetShellCommands(Assembly.GetExecutingAssembly());
+            var commands = ShellCommand.GetShellCommands(_commandAssembly).ToArray();
 
             Assert.IsNotNull(commands);
-            Assert.AreEqual(3, commands.Length);
-            CollectionAssert.Contains(commands, typeof(TestCommand));
-            CollectionAssert.Contains(commands, typeof(AnotherCommand));
-            CollectionAssert.Contains(commands, typeof(CustomParsingCommand));
+            Assert.AreEqual(4, commands.Length);
+            Assert.AreEqual("AnotherCommand", commands[0].Name);
+            Assert.AreEqual(typeof(AnotherCommand), commands[0].CommandType);
+            Assert.IsFalse(commands[0].CustomArgumentParsing);
+            Assert.AreEqual("custom", commands[1].Name);
+            Assert.AreEqual(typeof(CustomParsingCommand), commands[1].CommandType);
+            Assert.IsTrue(commands[1].CustomArgumentParsing);
+            Assert.AreEqual("test", commands[2].Name);
+            Assert.IsFalse(commands[2].CustomArgumentParsing);
+            Assert.AreEqual(typeof(TestCommand), commands[2].CommandType);
+            Assert.AreEqual("version", commands[3].Name);
+            Assert.IsFalse(commands[2].CustomArgumentParsing);
         }
 
         [TestMethod]
         public void GetShellCommandTest()
         {
-            Type command = ShellCommand.GetShellCommand(Assembly.GetExecutingAssembly(), "test");
-            Assert.AreEqual(typeof(TestCommand), command);
+            var command = ShellCommand.GetShellCommand(_commandAssembly, "test");
+            Assert.IsNotNull(command);
+            Assert.AreEqual("test", command.Value.Name);
+            Assert.AreEqual(typeof(TestCommand), command.Value.CommandType);
 
-            command = ShellCommand.GetShellCommand(Assembly.GetExecutingAssembly(), "wrong");
+            command = ShellCommand.GetShellCommand(_commandAssembly, "wrong");
             Assert.IsNull(command);
 
-            command = ShellCommand.GetShellCommand(Assembly.GetExecutingAssembly(), "Test"); // default is case-insensitive
-            Assert.AreEqual(typeof(TestCommand), command);
+            command = ShellCommand.GetShellCommand(_commandAssembly, "Test"); // default is case-insensitive
+            Assert.IsNotNull(command);
+            Assert.AreEqual("test", command.Value.Name);
+            Assert.AreEqual(typeof(TestCommand), command.Value.CommandType);
 
-            command = ShellCommand.GetShellCommand(Assembly.GetExecutingAssembly(), "Test", StringComparer.Ordinal);
+            command = ShellCommand.GetShellCommand(_commandAssembly, "Test", StringComparer.Ordinal);
             Assert.IsNull(command);
 
-            command = ShellCommand.GetShellCommand(Assembly.GetExecutingAssembly(), "AnotherCommand");
-            Assert.AreEqual(typeof(AnotherCommand), command);        
+            command = ShellCommand.GetShellCommand(_commandAssembly, "AnotherCommand");
+            Assert.IsNotNull(command);
+            Assert.AreEqual("AnotherCommand", command.Value.Name);
+            Assert.AreEqual(typeof(AnotherCommand), command.Value.CommandType);
         }
 
         [TestMethod]
@@ -117,21 +81,101 @@ namespace Ookii.CommandLine.Tests
         [TestMethod]
         public void CreateShellCommandTest()
         {
-            TestCommand command = (TestCommand)ShellCommand.CreateShellCommand(Assembly.GetExecutingAssembly(), "test", new[] { "-Argument", "Foo" }, 0);
+            using var writer = LineWrappingTextWriter.ForStringWriter(0);
+            var options = new CreateShellCommandOptions()
+            {
+                Out = writer,
+                Error = writer,
+                UsageOptions = new WriteUsageOptions()
+                {
+                    UsagePrefixFormat = "Usage: test"
+                }
+            };
+
+            TestCommand command = (TestCommand)ShellCommand.CreateShellCommand(_commandAssembly, "test", new[] { "-Argument", "Foo" }, 0, options);
             Assert.IsNotNull(command);
             Assert.AreEqual("Foo", command.Argument);
+            Assert.AreEqual("", writer.BaseWriter.ToString());
 
-            command = (TestCommand)ShellCommand.CreateShellCommand(Assembly.GetExecutingAssembly(), new[] { "test", "-Argument", "Bar" }, 0);
+            command = (TestCommand)ShellCommand.CreateShellCommand(_commandAssembly, new[] { "test", "-Argument", "Bar" }, 0, options);
             Assert.IsNotNull(command);
             Assert.AreEqual("Bar", command.Argument);
+            Assert.AreEqual("", writer.BaseWriter.ToString());
 
-            AnotherCommand command2 = (AnotherCommand)ShellCommand.CreateShellCommand(Assembly.GetExecutingAssembly(), "anothercommand", new[] { "skip", "-Value", "42" }, 1);
+            AnotherCommand command2 = (AnotherCommand)ShellCommand.CreateShellCommand(_commandAssembly, "anothercommand", new[] { "skip", "-Value", "42" }, 1, options);
             Assert.IsNotNull(command2);
             Assert.AreEqual(42, command2.Value);
+            Assert.AreEqual("", writer.BaseWriter.ToString());
 
-            CustomParsingCommand command3 = (CustomParsingCommand)ShellCommand.CreateShellCommand(Assembly.GetExecutingAssembly(), new[] { "custom", "hello" }, 0);
+            CustomParsingCommand command3 = (CustomParsingCommand)ShellCommand.CreateShellCommand(_commandAssembly, new[] { "custom", "hello" }, 0, options);
             Assert.IsNotNull(command3);
             Assert.AreEqual("hello", command3.Value);
+            Assert.AreEqual("", writer.BaseWriter.ToString());
+
+            var versionCommand = ShellCommand.CreateShellCommand(_commandAssembly, new[] { "version" }, 0, options);
+            Assert.IsNotNull(versionCommand);
+            Assert.AreEqual("", writer.BaseWriter.ToString());
+
+            options.AutoVersionCommand = false;
+            versionCommand = ShellCommand.CreateShellCommand(_commandAssembly, new[] { "version" }, 0, options);
+            Assert.IsNull(versionCommand);
+            Assert.AreEqual(_expectedUsageNoVersion, writer.BaseWriter.ToString());
+
         }
+
+        [TestMethod]
+        public void TestWriteUsage()
+        {
+            using var writer = LineWrappingTextWriter.ForStringWriter(0);
+            var options = new CreateShellCommandOptions()
+            {
+                Out = writer,
+                Error = writer,
+                UsageOptions = new WriteUsageOptions()
+                {
+                    UsagePrefixFormat = "Usage: test"
+                }
+            };
+
+            ShellCommand.WriteUsage(_commandAssembly, options);
+            Assert.AreEqual(_expectedUsage, writer.BaseWriter.ToString());
+        }
+
+        #region Expected usage
+
+        public static readonly string _expectedUsage = @"Usage: test <command> [arguments]
+
+The following commands are available:
+
+    AnotherCommand
+
+
+    custom
+        Custom parsing command.
+
+    test
+        Test command description.
+
+    version
+        Displays version information.
+
+".ReplaceLineEndings();
+
+        public static readonly string _expectedUsageNoVersion = @"Usage: test <command> [arguments]
+
+The following commands are available:
+
+    AnotherCommand
+
+
+    custom
+        Custom parsing command.
+
+    test
+        Test command description.
+
+".ReplaceLineEndings();
+
+        #endregion
     }
 }

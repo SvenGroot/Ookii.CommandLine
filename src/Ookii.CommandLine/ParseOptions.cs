@@ -92,7 +92,10 @@ namespace Ookii.CommandLine
         /// Gets or set the <see cref="IComparer{T}"/> to use to compare argument names.
         /// </summary>
         /// <value>
-        /// The <see cref="IComparer{T}"/> to use to compare the names of named arguments. The default value is <see cref="StringComparer.OrdinalIgnoreCase"/>.
+        /// The <see cref="IComparer{T}"/> to use to compare the names of named arguments, or
+        /// <see langword="null"/> to use the determined using <see cref="ParseOptionsAttribute.CaseSensitive"/>,
+        /// or if the <see cref="ParseOptionsAttribute"/> is not present, <see cref="StringComparer.OrdinalIgnoreCase"/>.
+        /// The default value is <see langword="null"/>.
         /// </value>
         /// <remarks>
         /// <para>

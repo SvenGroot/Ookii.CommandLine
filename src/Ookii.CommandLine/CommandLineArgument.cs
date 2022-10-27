@@ -1536,17 +1536,21 @@ namespace Ookii.CommandLine
 
         private static bool AutomaticVersion(CommandLineParser parser)
         {
-            var assembly = parser.ArgumentsType.Assembly;
+            ShowVersion(parser.ArgumentsType.Assembly, parser.ApplicationFriendlyName);
+
+            // Cancel parsing but do not show help.
+            return false;
+        }
+
+        internal static void ShowVersion(Assembly assembly, string friendlyName)
+        {
             var versionAttribute = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>();
             var version = versionAttribute?.InformationalVersion ?? assembly.GetName().Version?.ToString() ?? string.Empty;
             var copyRightAttribute = assembly.GetCustomAttribute<AssemblyCopyrightAttribute>();
 
-            Console.WriteLine($"{parser.ApplicationFriendlyName} {version}");
+            Console.WriteLine($"{friendlyName} {version}");
             if (copyRightAttribute != null)
                 Console.WriteLine(copyRightAttribute.Copyright);
-
-            // Cancel parsing but do not show help.
-            return false;
         }
     }
 }

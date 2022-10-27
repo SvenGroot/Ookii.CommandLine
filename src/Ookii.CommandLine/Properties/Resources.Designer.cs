@@ -124,6 +124,15 @@ namespace Ookii.CommandLine.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to version.
+        /// </summary>
+        internal static string AutomaticVersionCommandName {
+            get {
+                return ResourceManager.GetString("AutomaticVersionCommandName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Displays version information..
         /// </summary>
         internal static string AutomaticVersionDescription {
@@ -236,7 +245,7 @@ namespace Ookii.CommandLine.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to {0} &lt;command&gt; [args...].
+        ///   Looks up a localized string similar to {0} &lt;command&gt; [arguments].
         /// </summary>
         internal static string DefaultCommandUsageFormat {
             get {
@@ -576,6 +585,15 @@ namespace Ookii.CommandLine.Properties {
         internal static string UnknownArgumentFormat {
             get {
                 return ResourceManager.GetString("UnknownArgumentFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unknown version..
+        /// </summary>
+        internal static string UnknownVersion {
+            get {
+                return ResourceManager.GetString("UnknownVersion", resourceCulture);
             }
         }
         

@@ -86,135 +86,83 @@ namespace Ookii.CommandLine
         /// Gets the <see cref="Type"/> instance for shell commands defined in the specified assembly.
         /// </summary>
         /// <param name="assembly">The assembly whose types to search.</param>
+        /// <param name="nameComparer">
+        ///   The <see cref="StringComparer"/> to use to sort command names, or <see langword="null"/>
+        ///   to use <see cref="StringComparer.OrdinalIgnoreCase"/>.
+        /// </param>
+        /// <param name="autoVersionCommand">
+        ///   <see langword="true"/> to automatically add a command named "version" if there isn't
+        ///   one; otherwise, <see langword="false"/>.
+        /// </param>
         /// <returns>A list of types that inherit from <see cref="ShellCommand"/> and specify the <see cref="ShellCommandAttribute"/> attribute.</returns>
         /// <exception cref="ArgumentNullException">
         ///   <paramref name="assembly"/> is <see langword="null"/>.
         /// </exception>
-        public static Type[] GetShellCommands(Assembly assembly)
+        public static IEnumerable<ShellCommandInfo> GetShellCommands(Assembly assembly, IComparer<string>? nameComparer = null, bool autoVersionCommand = true)
         {
             if( assembly == null )
                 throw new ArgumentNullException(nameof(assembly));
 
-            List<Type> result = new List<Type>();
-            foreach( Type type in assembly.GetTypes() )
+            nameComparer ??= StringComparer.OrdinalIgnoreCase;
+            var commands = GetShellCommandsUnsorted(assembly);
+            if (autoVersionCommand &&
+                !commands.Any(c => nameComparer.Compare(c.Name, Properties.Resources.AutomaticVersionCommandName) == 0))
             {
-                if( IsShellCommand(type) )
-                    result.Add(type);
+                var versionCommand = ShellCommandInfo.GetAutomaticVersionCommand();
+#if NET6_0_OR_GREATER
+                commands = commands.Append(versionCommand);
+#else
+                commands = commands.Concat(new[] { versionCommand });
+#endif
             }
 
-            result.Sort((x, y) => StringComparer.OrdinalIgnoreCase.Compare(GetShellCommandName(x), GetShellCommandName(y)));
-            return result.ToArray();
+            return commands.OrderBy(c => c.Name, nameComparer);
         }
 
         /// <summary>
-        /// Writes a list of all the shell commands in the specified assembly to the standard output stream.
+        /// Writes usage help with a list of all the shell commands in the specified assembly using
+        /// the specified options.
         /// </summary>
         /// <param name="assembly">The assembly that contains the shell commands.</param>
+        /// <param name="options">
+        ///   The options used to write the command list, or <see langword="null"/> to use the
+        ///   default options.
+        /// </param>
         /// <exception cref="ArgumentNullException">
-        ///   <paramref name="assembly"/> is <see langword="null"/>.
+        ///   <paramref name="assembly"/>  is <see langword="null"/>.
         /// </exception>
         /// <remarks>
         /// <para>
-        ///   This method writes a list of all shell command names and their descriptions to the standard output stream, wrapping
-        ///   the lines to fit on the console automatically.
+        ///   This method writes usage help for the application, including a list of all shell
+        ///   command names and their descriptions to <see cref="ParseOptions.Out"/>.
         /// </para>
         /// <para>
-        ///   A command's name is retrieved from its <see cref="ShellCommandAttribute"/> attribute, and the description is retrieved
-        ///   from its <see cref="DescriptionAttribute"/> attribute.
-        /// </para>
-        /// <para>
-        ///   Line wrapping at word boundaries is applied to the output, wrapping at the console's window width. When the console output is
-        ///   redirected to a file, Microsoft .Net will still report the console's actual window width, but on Mono the value of
-        ///   the <see cref="Console.WindowWidth"/> property will be 0. In that case, the usage information will not be wrapped.
-        /// </para>
-        /// <para>
-        ///   This method indents additional lines for the command descriptions, unless the <see cref="Console.WindowWidth"/> property is less than 31.
+        ///   A command's name is retrieved from its <see cref="ShellCommandAttribute"/> attribute,
+        ///   and the description is retrieved from its <see cref="DescriptionAttribute"/> attribute.
         /// </para>
         /// </remarks>
-        public static void WriteAssemblyCommandListToConsole(Assembly assembly)
+        public static void WriteUsage(Assembly assembly, CreateShellCommandOptions? options = null)
         {
-            using( LineWrappingTextWriter writer = LineWrappingTextWriter.ForConsoleOut() )
-            {
-                WriteAssemblyCommandList(writer, assembly);
-            }
-        }
-
-        /// <summary>
-        /// Writes a list of all the shell commands in the specified assembly to the specified <see cref="TextWriter"/>.
-        /// </summary>
-        /// <param name="writer">The <see cref="TextWriter"/> to write the commands to.</param>
-        /// <param name="assembly">The assembly that contains the shell commands.</param>
-        /// <exception cref="ArgumentNullException">
-        ///   <paramref name="writer"/> or <paramref name="assembly"/> is <see langword="null"/>.
-        /// </exception>
-        /// <remarks>
-        /// <para>
-        ///   This method writes a list of all shell command names and their descriptions to <paramref name="writer"/>.
-        /// </para>
-        /// <para>
-        ///   A command's name is retrieved from its <see cref="ShellCommandAttribute"/> attribute, and the description is retrieved
-        ///   from its <see cref="DescriptionAttribute"/> attribute.
-        /// </para>
-        /// <para>
-        ///   If <paramref name="writer"/> is an instance of the <see cref="LineWrappingTextWriter"/> class, the <see cref="LineWrappingTextWriter.Indent"/>
-        ///   property will be set to a value appropriate for the formatting of the command list, and indenting will be reset before each command. Indenting
-        ///   will not be used if the <see cref="LineWrappingTextWriter.MaximumLineLength"/> is less than 30.
-        /// </para>
-        /// </remarks>
-        public static void WriteAssemblyCommandList(TextWriter writer, Assembly assembly)
-        {
-            var lineWriter = writer as LineWrappingTextWriter;
-            if( lineWriter != null )
-                lineWriter.Indent = lineWriter.MaximumLineLength < CommandLineParser.MaximumLineWidthForIndent ? 0 : 16;
-
-            WriteAssemblyCommandList(writer, assembly, Properties.Resources.DefaultCommandFormat);
-        }
-
-        /// <summary>
-        /// Writes a list of all the shell commands in the specified assembly to the specified <see cref="TextWriter"/> using the specified formatting options.
-        /// </summary>
-        /// <param name="writer">The <see cref="TextWriter"/> to write the commands to.</param>
-        /// <param name="assembly">The assembly that contains the shell commands.</param>
-        /// <param name="commandFormat">The format string used to format a command's name and description, for example "{0,13} : {1}".</param>
-        /// <exception cref="ArgumentNullException">
-        ///   <paramref name="writer"/>, <paramref name="assembly"/> or <paramref name="commandFormat"/> is <see langword="null"/>.
-        /// </exception>
-        /// <remarks>
-        /// <para>
-        ///   The <paramref name="commandFormat"/> should have two placeholders, which are used for the command name and description respectively.
-        /// </para>
-        /// <para>
-        ///   This method writes a list of all shell command names and their descriptions to <paramref name="writer"/>.
-        /// </para>
-        /// <para>
-        ///   A command's name is retrieved from its <see cref="ShellCommandAttribute"/> attribute, and the description is retrieved
-        ///   from its <see cref="DescriptionAttribute"/> attribute.
-        /// </para>
-        /// <para>
-        ///   If <paramref name="writer"/> is a <see cref="LineWrappingTextWriter"/>, the writer's indent will be reset before every
-        ///   command. It is recommended to set the <see cref="LineWrappingTextWriter.Indent"/> property to a value appropriate for
-        ///   your <paramref name="commandFormat"/>.
-        /// </para>
-        /// </remarks>
-        public static void WriteAssemblyCommandList(TextWriter writer, Assembly assembly, string commandFormat)
-        {
-            if( writer == null )
-                throw new ArgumentNullException(nameof(writer));
             if( assembly == null )
                 throw new ArgumentNullException(nameof(assembly));
-            if( commandFormat == null )
-                throw new ArgumentNullException(nameof(commandFormat));
 
-            var lineWriter = writer as LineWrappingTextWriter;
-            Type[] commandTypes = GetShellCommands(assembly);
-            foreach( Type commandType in commandTypes )
+            options ??= new();
+
+            using var writer = DisposableWrapper.Create(options.Out, LineWrappingTextWriter.ForConsoleOut);
+            var lineWriter = writer.Inner as LineWrappingTextWriter;
+
+            // TODO: Color
+            writer.Inner.WriteLine(options.CommandUsageFormat, options.UsageOptions.UsagePrefixFormat);
+            writer.Inner.WriteLine();
+            writer.Inner.WriteLine(options.AvailableCommandsHeader);
+            writer.Inner.WriteLine();
+            if (lineWriter != null)
+                lineWriter.Indent = (lineWriter.MaximumLineLength > 0 && lineWriter.MaximumLineLength < CommandLineParser.MaximumLineWidthForIndent) ? 0 : options.CommandDescriptionIndent;
+
+            foreach (var command in GetShellCommands(assembly, options.CommandNameComparer, options.AutoVersionCommand))
             {
-                string name = GetShellCommandName(commandType);
-                string? description = GetShellCommandDescription(commandType);
-
-                if( lineWriter != null )
-                    lineWriter.ResetIndent();
-                writer.WriteLine(commandFormat, name, description ?? string.Empty);
+                lineWriter?.ResetIndent();
+                writer.Inner.WriteLine(options.CommandDescriptionFormat, command.Name, command.Description ?? string.Empty);
             }
         }
 
@@ -293,13 +241,17 @@ namespace Ookii.CommandLine
 
             return commandType.GetCustomAttribute<DescriptionAttribute>()?.Description;
         }
-        
+
         /// <summary>
         /// Gets the shell command with the specified command name, using the specified <see cref="IEqualityComparer{T}"/> to compare command names.
         /// </summary>
         /// <param name="assembly">The assembly whose types to search.</param>
         /// <param name="commandName">The command name of the shell command.</param>
-        /// <param name="commandNameComparer">The <see cref="IEqualityComparer{T}"/> to use to compare command names, or <see langword="null"/> to use the default case-insensitive comparer.</param>
+        /// <param name="commandNameComparer">The <see cref="IComparer{T}"/> to use to compare command names, or <see langword="null"/> to use the default case-insensitive comparer.</param>
+        /// <param name="autoVersionCommand">
+        ///   <see langword="true"/> to automatically add a command named "version" if there isn't
+        ///   one; otherwise, <see langword="false"/>.
+        /// </param>
         /// <returns>The <see cref="Type"/> of the specified shell command, or <see langword="null"/> if none could be found.</returns>
         /// <exception cref="ArgumentNullException">
         ///   <paramref name="assembly"/> or <paramref name="commandName"/> is <see langword="null"/>.
@@ -309,16 +261,26 @@ namespace Ookii.CommandLine
         ///   This method uses <see cref="StringComparer.OrdinalIgnoreCase"/> to compare command names if <paramref name="commandNameComparer"/> is <see langword="null"/>.
         /// </para>
         /// </remarks>
-        public static Type? GetShellCommand(Assembly assembly, string commandName, IEqualityComparer<string>? commandNameComparer = null)
+        public static ShellCommandInfo? GetShellCommand(Assembly assembly, string commandName, IComparer<string>? commandNameComparer = null, bool autoVersionCommand = true)
         {
-            if( assembly == null )
+            if (assembly == null)
                 throw new ArgumentNullException(nameof(assembly));
-            if( commandName == null )
+            if (commandName == null)
                 throw new ArgumentNullException(nameof(commandName));
 
             commandNameComparer ??= StringComparer.OrdinalIgnoreCase;
-            return assembly.GetTypes().FirstOrDefault(
-                type => IsShellCommand(type) && commandNameComparer.Equals(GetShellCommandName(type), commandName));
+            var command = GetShellCommandsUnsorted(assembly)
+                .Where(c => commandNameComparer.Compare(c.Name, commandName) == 0)
+                .Cast<ShellCommandInfo?>()
+                .FirstOrDefault();
+
+            if (command == null && autoVersionCommand &&
+                commandNameComparer.Compare(commandName, Properties.Resources.AutomaticVersionCommandName) == 0)
+            {
+                command = ShellCommandInfo.GetAutomaticVersionCommand();
+            }
+
+            return command;
         }
 
         /// <summary>
@@ -377,29 +339,27 @@ namespace Ookii.CommandLine
             using var output = DisposableWrapper.Create(options.Out, LineWrappingTextWriter.ForConsoleOut);
             using var error = DisposableWrapper.Create(options.Error, LineWrappingTextWriter.ForConsoleError);
 
-            var commandType = commandName == null ? null : GetShellCommand(assembly, commandName, options.CommandNameComparer);
-            if (commandType == null)
-            {
-                WriteShellCommandListUsage(output.Inner, assembly, options);
-                return null;
-            }
-
             // Update the values because the options are passed to the shell command and the ParseInternal method.
             var originalOut = options.Out;
             var originalError = options.Error;
             var originalUsagePrefix = options.UsageOptions.UsagePrefixFormat;
             options.Out = output.Inner;
             options.Error = error.Inner;
-            options.UsageOptions.UsagePrefixFormat += " " + GetShellCommandName(commandType);
 
             try
             {
-                if (CommandUsesCustomArgumentParsing(commandType))
+                var commandInfo = commandName == null 
+                    ? null 
+                    : GetShellCommand(assembly, commandName, options.CommandNameComparer, options.AutoVersionCommand);
+
+                if (commandInfo == null)
                 {
-                    return (ShellCommand?)Activator.CreateInstance(commandType, args, index, options);
+                    WriteUsage(assembly, options);
+                    return null;
                 }
 
-                return (ShellCommand?)CommandLineParser.ParseInternal(commandType, args, index, options);
+                options.UsageOptions.UsagePrefixFormat += " " + commandInfo.Value.Name;
+                return commandInfo.Value.CreateInstance(args, index, options);
             }
             finally
             {
@@ -455,7 +415,7 @@ namespace Ookii.CommandLine
             if( index < 0 || index > args.Length )
                 throw new ArgumentOutOfRangeException(nameof(index));
 
-            return CreateShellCommand(assembly, index == args.Length ? null : args[index], args, index == args.Length ? index : index + 1, options);
+            return CreateShellCommand(assembly, index >= args.Length ? null : args[index], args, index == args.Length ? index : index + 1, options);
         }
 
         /// <summary>
@@ -557,21 +517,16 @@ namespace Ookii.CommandLine
                 return -1;
         }
 
-        private static void WriteShellCommandListUsage(TextWriter output, Assembly assembly, CreateShellCommandOptions options)
+        private static IEnumerable<ShellCommandInfo> GetShellCommandsUnsorted(Assembly assembly)
         {
-            output.WriteLine(options.CommandUsageFormat, options.UsageOptions.UsagePrefixFormat);
-            output.WriteLine();
-            output.WriteLine(options.AvailableCommandsHeader);
-            output.WriteLine();
-            var lineWriter = output as LineWrappingTextWriter;
-            if( lineWriter != null )
-                lineWriter.Indent = lineWriter.MaximumLineLength < CommandLineParser.MaximumLineWidthForIndent ? 0 : options.CommandDescriptionIndent;
-            WriteAssemblyCommandList(output, assembly, options.CommandDescriptionFormat);
-        }
+            if (assembly == null)
+                throw new ArgumentNullException(nameof(assembly));
 
-        private static bool CommandUsesCustomArgumentParsing(Type commandType)
-        {
-            return commandType.GetCustomAttribute<ShellCommandAttribute>()?.CustomArgumentParsing ?? false;
+            var commands = assembly.GetTypes()
+                .Where(t => IsShellCommand(t))
+                .Select(t => new ShellCommandInfo(t));
+
+            return commands;
         }
     }
 }
