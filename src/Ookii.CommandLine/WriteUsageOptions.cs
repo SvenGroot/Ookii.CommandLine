@@ -83,9 +83,25 @@ namespace Ookii.CommandLine
         /// </remarks>
         public string UsagePrefixFormat
         {
-            get { return _usagePrefixFormat ?? CommandLineParser.DefaultUsagePrefixFormat; }
+            get { return _usagePrefixFormat ?? CommandLineParser.GetDefaultUsagePrefixFormat(this); }
             set { _usagePrefixFormat = value; }
         }
+
+        /// <summary>
+        /// Gets or sets a value that indicates whether the default value for the <see cref="UsagePrefixFormat"/>
+        /// property should include the file extension of the application's executable.
+        /// </summary>
+        /// <value>
+        /// <see langword="true"/> if the extension should be included; otherwise, <see langword="false"/>.
+        /// The default value is <see langword="false"/>.
+        /// </value>
+        /// <remarks>
+        /// <para>
+        ///   This property is not used if the <see cref="UsagePrefixFormat"/> property was assigned
+        ///   an explicit value.
+        /// </para>
+        /// </remarks>
+        public bool IncludeExecutableExtension { get; set; }
 
         /// <summary>
         /// Gets or sets the color applied to the <see cref="UsagePrefixFormat"/>.

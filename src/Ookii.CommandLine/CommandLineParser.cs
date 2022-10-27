@@ -348,26 +348,6 @@ namespace Ookii.CommandLine
         }
 
         /// <summary>
-        /// Gets the default prefix for the command line usage information.
-        /// </summary>
-        /// <value>
-        /// A string consisting of the text "{0}Usage:{1} " followed by the file name of the application's executable.
-        /// </value>
-        public static string DefaultUsagePrefixFormat
-        {
-            get 
-            {
-                string? path = null;
-#if NET6_0_OR_GREATER
-                // Prefer this because it actually returns the exe name, not the dll.
-                path = Environment.ProcessPath;
-#endif
-                path ??= Environment.GetCommandLineArgs().FirstOrDefault() ?? Assembly.GetEntryAssembly()?.Location;
-                return string.Format(CultureInfo.CurrentCulture, Properties.Resources.DefaultUsagePrefixFormat, Path.GetFileName(path));
-            }
-        }
-
-        /// <summary>
         /// Gets the command line argument parsing rules used by the parser.
         /// </summary>
         /// <value>
@@ -610,6 +590,38 @@ namespace Ookii.CommandLine
             {
                 return _argumentsReadOnlyWrapper ?? (_argumentsReadOnlyWrapper = _arguments.AsReadOnly());
             }
+        }
+
+        /// <summary>
+        /// Gets the default prefix for the command line usage information.
+        /// </summary>
+        /// <param name="options">
+        ///   The options to use for formatting the usage. If <see langword="null"/>, the default
+        ///   options are used.
+        /// </param>
+        /// <returns>
+        /// A string consisting of the text "{0}Usage:{1} " followed by the file name of the application's executable.
+        /// </returns>
+        public static string GetDefaultUsagePrefixFormat(WriteUsageOptions? options = null)
+        {
+            string? path = null;
+#if NET6_0_OR_GREATER
+            // Prefer this because it actually returns the exe name, not the dll.
+            path = Environment.ProcessPath;
+
+            // Fall back if this returned the dotnet executable.
+            if (Path.GetFileNameWithoutExtension(path) == "dotnet")
+                path = null;
+#endif
+            path ??= Environment.GetCommandLineArgs().FirstOrDefault() ?? Assembly.GetEntryAssembly()?.Location;
+            if (path == null)
+                path = string.Empty;
+            else if (options?.IncludeExecutableExtension ?? false)
+                path = Path.GetFileName(path);
+            else
+                path = Path.GetFileNameWithoutExtension(path);
+
+            return string.Format(CultureInfo.CurrentCulture, Properties.Resources.DefaultUsagePrefixFormat, path);
         }
 
         /// <summary>
