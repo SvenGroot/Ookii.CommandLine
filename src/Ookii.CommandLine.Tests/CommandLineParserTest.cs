@@ -36,7 +36,12 @@ namespace Ookii.CommandLine.Tests
             Assert.IsNull(target.LongArgumentNamePrefix);
             Assert.AreEqual(argumentsType, target.ArgumentsType);
             Assert.AreEqual(string.Empty, target.Description);
-            Assert.AreEqual(0, target.Arguments.Count);
+            Assert.AreEqual(1, target.Arguments.Count);
+            using var args = target.Arguments.GetEnumerator();
+            TestArguments(target.Arguments, new[]
+            {
+                new ExpectedArgument("Help", typeof(bool), ArgumentKind.Method) { MemberName = "AutomaticHelp", Description = "Displays this help message.", IsSwitch = true }
+            });
         }
 
         [TestMethod()]
@@ -52,26 +57,27 @@ namespace Ookii.CommandLine.Tests
             Assert.IsNull(target.LongArgumentNamePrefix);
             Assert.AreEqual(argumentsType, target.ArgumentsType);
             Assert.AreEqual("Test arguments description.", target.Description);
-            Assert.AreEqual(16, target.Arguments.Count);
-            using( IEnumerator<CommandLineArgument> args = target.Arguments.GetEnumerator() )
+            Assert.AreEqual(17, target.Arguments.Count);
+            TestArguments(target.Arguments, new[]
             {
-                TestArgument(args, "arg1", "arg1", typeof(string), null, 0, true, null, "Arg1 description.", "String", false, false);
-                TestArgument(args, "other", "arg2", typeof(int), null, 1, false, 42, "Arg2 description.", "Number", false, false);
-                TestArgument(args, "notSwitch", "notSwitch", typeof(bool), null, 2, false, false, "", "Boolean", false, false);
-                TestArgument(args, "Arg5", "Arg5", typeof(float), null, 3, false, null, "Arg5 description.", "Single", false, false);
-                TestArgument(args, "other2", "Arg4", typeof(int), null, 4, false, 47, "Arg4 description.", "Number", false, false);
-                TestArgument(args, "Arg8", "Arg8", typeof(DayOfWeek[]), typeof(DayOfWeek), 5, false, null, "", "DayOfWeek", false, true);
-                TestArgument(args, "Arg6", "Arg6", typeof(string), null, null, true, null, "Arg6 description.", "String", false, false, false, "Alias1", "Alias2");
-                TestArgument(args, "Arg10", "Arg10", typeof(bool[]), typeof(bool), null, false, null, "", "Boolean", true, true);
-                TestArgument(args, "Arg11", "Arg11", typeof(bool?), null, null, false, null, "", "Boolean", true, false);
-                TestArgument(args, "Arg12", "Arg12", typeof(Collection<int>), typeof(int), null, false, 42, "", "Int32", false, true);
-                TestArgument(args, "Arg13", "Arg13", typeof(Dictionary<string, int>), typeof(KeyValuePair<string, int>), null, false, null, "", "String=Int32", false, true, true);
-                TestArgument(args, "Arg14", "Arg14", typeof(IDictionary<string, int>), typeof(KeyValuePair<string, int>), null, false, null, "", "String=Int32", false, true, true);
-                TestArgument(args, "Arg15", "Arg15", typeof(KeyValuePair<string, int>), typeof(KeyValuePair<string, int>), null, false, null, "", "KeyValuePair<String, Int32>", false, false, false);
-                TestArgument(args, "Arg3", "Arg3", typeof(string), null, null, false, null, "", "String", false, false);
-                TestArgument(args, "Arg7", "Arg7", typeof(bool), null, null, false, null, "", "Boolean", true, false, false, "Alias3");
-                TestArgument(args, "Arg9", "Arg9", typeof(int?), null, null, false, null, "", "Int32", false, false);
-            }
+                new ExpectedArgument("arg1", typeof(string)) { Position = 0, IsRequired = true, Description = "Arg1 description." },
+                new ExpectedArgument("other", typeof(int)) { MemberName = "arg2", Position = 1, DefaultValue = 42, Description = "Arg2 description.", ValueDescription = "Number" },
+                new ExpectedArgument("notSwitch", typeof(bool)) { Position = 2, DefaultValue = false },
+                new ExpectedArgument("Arg5", typeof(float)) { Position = 3, Description = "Arg5 description." },
+                new ExpectedArgument("other2", typeof(int)) { MemberName = "Arg4", Position = 4, DefaultValue = 47, Description = "Arg4 description.", ValueDescription = "Number" },
+                new ExpectedArgument("Arg8", typeof(DayOfWeek[]), ArgumentKind.MultiValue) { ElementType = typeof(DayOfWeek), Position = 5 },
+                new ExpectedArgument("Arg6", typeof(string)) { Position = null, IsRequired = true, Description = "Arg6 description.", Aliases = new[] { "Alias1", "Alias2" } },
+                new ExpectedArgument("Arg10", typeof(bool[]), ArgumentKind.MultiValue) { ElementType = typeof(bool), Position = null, IsSwitch = true },
+                new ExpectedArgument("Arg11", typeof(bool?)) { Position = null, ValueDescription = "Boolean", IsSwitch = true },
+                new ExpectedArgument("Arg12", typeof(Collection<int>), ArgumentKind.MultiValue) { ElementType = typeof(int), Position = null, DefaultValue = 42 },
+                new ExpectedArgument("Arg13", typeof(Dictionary<string, int>), ArgumentKind.Dictionary) { ElementType = typeof(KeyValuePair<string, int>), ValueDescription = "String=Int32" },
+                new ExpectedArgument("Arg14", typeof(IDictionary<string, int>), ArgumentKind.Dictionary) { ElementType = typeof(KeyValuePair<string, int>), ValueDescription = "String=Int32" },
+                new ExpectedArgument("Arg15", typeof(KeyValuePair<string, int>)) { ValueDescription = "KeyValuePair<String, Int32>" },
+                new ExpectedArgument("Arg3", typeof(string)) { Position = null },
+                new ExpectedArgument("Arg7", typeof(bool)) { Position = null, IsSwitch = true, Aliases = new[] { "Alias3" } },
+                new ExpectedArgument("Arg9", typeof(int?)) { Position = null, ValueDescription = "Int32" },
+                new ExpectedArgument("Help", typeof(bool), ArgumentKind.Method) { MemberName = "AutomaticHelp", Description = "Displays this help message.", IsSwitch = true }
+            });
         }
 
         [TestMethod]
@@ -87,10 +93,13 @@ namespace Ookii.CommandLine.Tests
             Assert.IsNull(target.LongArgumentNamePrefix);
             Assert.AreEqual(argumentsType, target.ArgumentsType);
             Assert.AreEqual("", target.Description);
-            Assert.AreEqual(2, target.Arguments.Count); // Constructor argument + one property argument.
-            IEnumerator<CommandLineArgument> args = target.Arguments.GetEnumerator();
-            TestArgument(args, "arg1", "arg1", typeof(string), null, 0, true, null, "", "String", false, false);
-            TestArgument(args, "ThrowingArgument", "ThrowingArgument", typeof(int), null, null, false, null, "", "Int32", false, false);
+            Assert.AreEqual(3, target.Arguments.Count); // Constructor argument + one property argument.
+            TestArguments(target.Arguments, new[]
+            {
+                new ExpectedArgument("arg1", typeof(string)) { Position = 0, IsRequired = true },
+                new ExpectedArgument("Help", typeof(bool), ArgumentKind.Method) { MemberName = "AutomaticHelp", Description = "Displays this help message.", IsSwitch = true },
+                new ExpectedArgument("ThrowingArgument", typeof(int)),
+            });
         }
 
         [TestMethod]
@@ -354,6 +363,13 @@ namespace Ookii.CommandLine.Tests
             Assert.IsNull(result);
             Assert.IsTrue(error.ToString().Length > 0);
             Assert.AreEqual(_expectedDefaultUsage, output.ToString());
+
+            output.GetStringBuilder().Clear();
+            error.GetStringBuilder().Clear();
+            result = CommandLineParser.Parse<TestArguments>(new[] { "-Help" }, options);
+            Assert.IsNull(result);
+            Assert.AreEqual(0, error.ToString().Length);
+            Assert.AreEqual(_expectedDefaultUsage, output.ToString());
         }
 
         [TestMethod]
@@ -364,6 +380,7 @@ namespace Ookii.CommandLine.Tests
             // Don't cancel if -DoesCancel not specified.
             var result = (CancelArguments)parser.Parse(new[] { "-Argument1", "foo", "-DoesNotCancel", "-Argument2", "bar" });
             Assert.IsNotNull(result);
+            Assert.IsFalse(parser.HelpRequested);
             Assert.IsTrue(result.DoesNotCancel);
             Assert.IsFalse(result.DoesCancel);
             Assert.AreEqual("foo", result.Argument1);
@@ -372,6 +389,7 @@ namespace Ookii.CommandLine.Tests
             // Cancel if -DoesCancel specified.
             result = (CancelArguments)parser.Parse(new[] { "-Argument1", "foo", "-DoesCancel", "-Argument2", "bar" });
             Assert.IsNull(result);
+            Assert.IsTrue(parser.HelpRequested);
             Assert.IsTrue(parser.GetArgument("Argument1").HasValue);
             Assert.AreEqual("foo", (string)parser.GetArgument("Argument1").Value);
             Assert.IsTrue(parser.GetArgument("DoesCancel").HasValue);
@@ -391,6 +409,7 @@ namespace Ookii.CommandLine.Tests
             parser.ArgumentParsed += handler1;
             result = (CancelArguments)parser.Parse(new[] { "-Argument1", "foo", "-DoesNotCancel", "-Argument2", "bar" });
             Assert.IsNull(result);
+            Assert.IsTrue(parser.HelpRequested);
             Assert.IsTrue(parser.GetArgument("Argument1").HasValue);
             Assert.AreEqual("foo", (string)parser.GetArgument("Argument1").Value);
             Assert.IsTrue(parser.GetArgument("DoesNotCancel").HasValue);
@@ -411,10 +430,16 @@ namespace Ookii.CommandLine.Tests
             parser.ArgumentParsed += handler2;
             result = (CancelArguments)parser.Parse(new[] { "-Argument1", "foo", "-DoesCancel", "-Argument2", "bar" });
             Assert.IsNotNull(result);
+            Assert.IsFalse(parser.HelpRequested);
             Assert.IsFalse(result.DoesNotCancel);
             Assert.IsTrue(result.DoesCancel);
             Assert.AreEqual("foo", result.Argument1);
             Assert.AreEqual("bar", result.Argument2);
+
+            // Automatic help argument should cancel.
+            result = (CancelArguments)parser.Parse(new[] { "-Help" });
+            Assert.IsNull(result);
+            Assert.IsTrue(parser.HelpRequested);
         }
 
         [TestMethod]
@@ -430,6 +455,8 @@ namespace Ookii.CommandLine.Tests
             // Verify case sensitivity.
             Assert.IsNull(parser.GetArgument("argument"));
             Assert.IsNotNull(parser.GetArgument("Argument"));
+            // Verify no auto help argument.
+            Assert.IsNull(parser.GetArgument("Help"));
 
             // Constructor params take precedence.
             parser = new CommandLineParser(typeof(ParseOptionsArguments), new[] { "+" }, StringComparer.OrdinalIgnoreCase);
@@ -442,6 +469,8 @@ namespace Ookii.CommandLine.Tests
             // Verify case insensitivity.
             Assert.IsNotNull(parser.GetArgument("argument"));
             Assert.IsNotNull(parser.GetArgument("Argument"));
+            // Verify no auto help argument.
+            Assert.IsNull(parser.GetArgument("Help"));
 
             // ParseOptions take precedence
             var options = new ParseOptions()
@@ -452,6 +481,7 @@ namespace Ookii.CommandLine.Tests
                 AllowDuplicateArguments = false,
                 NameValueSeparator = ';',
                 ArgumentNamePrefixes = new[] { "+" },
+                AutoHelpArgument = true,
             };
 
             parser = new CommandLineParser(typeof(ParseOptionsArguments), options);
@@ -464,6 +494,8 @@ namespace Ookii.CommandLine.Tests
             // Verify case insensitivity.
             Assert.IsNotNull(parser.GetArgument("argument"));
             Assert.IsNotNull(parser.GetArgument("Argument"));
+            // Verify auto help argument.
+            Assert.IsNotNull(parser.GetArgument("Help"));
         }
 
         [TestMethod]
@@ -583,37 +615,72 @@ namespace Ookii.CommandLine.Tests
             Assert.AreEqual(42, MethodArguments.Value);
         }
 
-        private static void TestArgument(IEnumerator<CommandLineArgument> arguments, string name, string memberName, Type type, Type elementType, int? position, bool isRequired, object defaultValue, string description, string valueDescription, bool isSwitch, bool isMultiValue, bool isDictionary = false, params string[] aliases)
+        [TestMethod]
+        public void TestAutomaticArgumentConflict()
         {
-            arguments.MoveNext();
-            CommandLineArgument argument = arguments.Current;
-            Assert.AreEqual(memberName, argument.MemberName);
-            Assert.AreEqual(name, argument.ArgumentName);
-            Assert.IsFalse(argument.HasShortName);
-            Assert.AreEqual('\0', argument.ShortName);
-            Assert.AreEqual(type, argument.ArgumentType);
-            if( elementType == null )
-                Assert.AreEqual(argument.ArgumentType, argument.ElementType);
-            else
-                Assert.AreEqual(elementType, argument.ElementType);
-            Assert.AreEqual(position, argument.Position);
-            Assert.AreEqual(isRequired, argument.IsRequired);
-            Assert.AreEqual(description, argument.Description);
-            Assert.AreEqual(valueDescription, argument.ValueDescription);
-            Assert.AreEqual(isMultiValue, argument.IsMultiValue);
-            Assert.AreEqual(isDictionary, argument.IsDictionary);
-            var kind = isDictionary ? ArgumentKind.Dictionary : (isMultiValue ? ArgumentKind.MultiValue : ArgumentKind.SingleValue);
-            Assert.AreEqual(kind, argument.Kind);
-            Assert.AreEqual(isSwitch, argument.IsSwitch);
-            Assert.AreEqual(defaultValue, argument.DefaultValue);
+            var parser = new CommandLineParser(typeof(AutomaticConflictingNameArguments));
+            TestArgument(parser.GetArgument("Help"), new ExpectedArgument("Help", typeof(int)));
+
+            parser = new CommandLineParser(typeof(AutomaticConflictingShortNameArguments));
+            TestArgument(parser.GetShortArgument('?'), new ExpectedArgument("Foo", typeof(int)) { ShortName = '?' });
+        }
+
+        private record class ExpectedArgument
+        {
+            public ExpectedArgument(string name, Type type, ArgumentKind kind = ArgumentKind.SingleValue)
+            {
+                Name = name;
+                Type = type;
+                Kind = kind;
+            }
+
+            public string Name { get; set; }
+            public string MemberName { get; set; }
+            public Type Type { get; set; }
+            public Type ElementType { get; set; }
+            public int? Position { get; set; }
+            public bool IsRequired { get; set; }
+            public object DefaultValue { get; set; }
+            public string Description { get; set; }
+            public string ValueDescription { get; set; }
+            public bool IsSwitch { get; set; }
+            public ArgumentKind Kind { get; set; }
+            public string[] Aliases { get; set; }
+            public char? ShortName { get; set; }
+            public char[] ShortAliases { get; set; }
+        }
+
+        private static void TestArgument(CommandLineArgument argument, ExpectedArgument expected)
+        {
+            Assert.AreEqual(expected.Name, argument.ArgumentName);
+            Assert.AreEqual(expected.MemberName ?? expected.Name, argument.MemberName);
+            Assert.AreEqual(expected.ShortName.HasValue, argument.HasShortName);
+            Assert.AreEqual(expected.ShortName ?? '\0', argument.ShortName);
+            Assert.AreEqual(expected.Type, argument.ArgumentType);
+            Assert.AreEqual(expected.ElementType ?? expected.Type, argument.ElementType);
+            Assert.AreEqual(expected.Position, argument.Position);
+            Assert.AreEqual(expected.IsRequired, argument.IsRequired);
+            Assert.AreEqual(expected.Description ?? string.Empty, argument.Description);
+            Assert.AreEqual(expected.ValueDescription ?? argument.ElementType.Name, argument.ValueDescription);
+            Assert.AreEqual(expected.Kind, argument.Kind);
+            Assert.AreEqual(expected.Kind == ArgumentKind.MultiValue || expected.Kind == ArgumentKind.Dictionary, argument.IsMultiValue);
+            Assert.AreEqual(expected.Kind == ArgumentKind.Dictionary, argument.IsDictionary);
+            Assert.AreEqual(expected.IsSwitch, argument.IsSwitch);
+            Assert.AreEqual(expected.DefaultValue, argument.DefaultValue);
             Assert.IsNull(argument.Value);
             Assert.IsFalse(argument.HasValue);
-            if( aliases == null || aliases.Length == 0 )
-                Assert.IsNull(argument.Aliases);
-            else
+            CollectionAssert.AreEqual(expected.Aliases, argument.Aliases);
+            CollectionAssert.AreEqual(expected.ShortAliases, argument.ShortAliases);
+        }
+
+        private static void TestArguments(IEnumerable<CommandLineArgument> arguments, ExpectedArgument[] expected)
+        {
+            int index = 0;
+            foreach (var arg in arguments)
             {
-                Assert.IsNotNull(argument.Aliases);
-                CollectionAssert.AreEqual(aliases.ToArray(), argument.Aliases.ToArray());
+                Assert.IsTrue(index < expected.Length, "Too many arguments.");
+                TestArgument(arg, expected[index]);
+                ++index;
             }
         }
 
@@ -674,7 +741,7 @@ namespace Ookii.CommandLine.Tests
 
         private static readonly string _expectedDefaultUsage = @"Test arguments description.
 
-Usage: test [/arg1] <String> [[/other] <Number>] [[/notSwitch] <Boolean>] [[/Arg5] <Single>] [[/other2] <Number>] [[/Arg8] <DayOfWeek>...] /Arg6 <String> [/Arg10...] [/Arg11] [/Arg12 <Int32>...] [/Arg13 <String=Int32>...] [/Arg14 <String=Int32>...] [/Arg15 <KeyValuePair<String, Int32>>] [/Arg3 <String>] [/Arg7] [/Arg9 <Int32>]
+Usage: test [/arg1] <String> [[/other] <Number>] [[/notSwitch] <Boolean>] [[/Arg5] <Single>] [[/other2] <Number>] [[/Arg8] <DayOfWeek>...] /Arg6 <String> [/Arg10...] [/Arg11] [/Arg12 <Int32>...] [/Arg13 <String=Int32>...] [/Arg14 <String=Int32>...] [/Arg15 <KeyValuePair<String, Int32>>] [/Arg3 <String>] [/Arg7] [/Arg9 <Int32>] [/Help]
 
     /arg1 <String>
         Arg1 description.
@@ -700,9 +767,12 @@ Usage: test [/arg1] <String> [[/other] <Number>] [[/notSwitch] <Boolean>] [[/Arg
     /Arg7 [<Boolean>] (/Alias3)
 
 
+    /Help [<Boolean>]
+        Displays this help message.
+
 ".ReplaceLineEndings();
 
-        private static readonly string _expectedLongShortUsage = @"Usage: test [[--foo] <Int32>] [[--bar] <Int32>] [--Arg1 <Int32>] [--Arg2 <Int32>] [--Switch1] [--Switch2] [-u]
+        private static readonly string _expectedLongShortUsage = @"Usage: test [[--foo] <Int32>] [[--bar] <Int32>] [--Arg1 <Int32>] [--Arg2 <Int32>] [--Help] [--Switch1] [--Switch2] [-u]
 
     -f, --foo <Int32>
             Foo description. Default value: 0.
@@ -715,6 +785,9 @@ Usage: test [/arg1] <String> [[/other] <Number>] [[/notSwitch] <Boolean>] [[/Arg
 
     -a, --Arg2 <Int32> (-b, --baz)
             Arg2 description.
+
+    -?, --Help [<Boolean>]
+            Displays this help message.
 
     -S, --Switch1 [<Boolean>]
             Switch1 description.
@@ -727,7 +800,7 @@ Usage: test [/arg1] <String> [[/other] <Number>] [[/notSwitch] <Boolean>] [[/Arg
 
 ".ReplaceLineEndings();
 
-        private static readonly string _expectedLongShortUsageShortNameSyntax = @"Usage: test [[-f] <Int32>] [[--bar] <Int32>] [--Arg1 <Int32>] [-a <Int32>] [-S] [-t] [-u]
+        private static readonly string _expectedLongShortUsageShortNameSyntax = @"Usage: test [[-f] <Int32>] [[--bar] <Int32>] [--Arg1 <Int32>] [-a <Int32>] [-?] [-S] [-t] [-u]
 
     -f, --foo <Int32>
             Foo description. Default value: 0.
@@ -740,6 +813,9 @@ Usage: test [/arg1] <String> [[/other] <Number>] [[/notSwitch] <Boolean>] [[/Arg
 
     -a, --Arg2 <Int32> (-b, --baz)
             Arg2 description.
+
+    -?, --Help [<Boolean>]
+            Displays this help message.
 
     -S, --Switch1 [<Boolean>]
             Switch1 description.
@@ -766,6 +842,9 @@ Usage: test [/arg1] <String> [[/other] <Number>] [[/notSwitch] <Boolean>] [[/Arg
     -a, --Arg2 <Int32> (-b, --baz)
             Arg2 description.
 
+    -?, --Help [<Boolean>]
+            Displays this help message.
+
     -S, --Switch1 [<Boolean>]
             Switch1 description.
 
@@ -779,7 +858,7 @@ Usage: test [/arg1] <String> [[/other] <Number>] [[/notSwitch] <Boolean>] [[/Arg
 
         private static readonly string _expectedUsageDescriptionOnly = @"Test arguments description.
 
-Usage: test [-arg1] <String> [[-other] <Number>] [[-notSwitch] <Boolean>] [[-Arg5] <Single>] [[-other2] <Number>] [[-Arg8] <DayOfWeek>...] -Arg6 <String> [-Arg10...] [-Arg11] [-Arg12 <Int32>...] [-Arg13 <String=Int32>...] [-Arg14 <String=Int32>...] [-Arg15 <KeyValuePair<String, Int32>>] [-Arg3 <String>] [-Arg7] [-Arg9 <Int32>]
+Usage: test [-arg1] <String> [[-other] <Number>] [[-notSwitch] <Boolean>] [[-Arg5] <Single>] [[-other2] <Number>] [[-Arg8] <DayOfWeek>...] -Arg6 <String> [-Arg10...] [-Arg11] [-Arg12 <Int32>...] [-Arg13 <String=Int32>...] [-Arg14 <String=Int32>...] [-Arg15 <KeyValuePair<String, Int32>>] [-Arg3 <String>] [-Arg7] [-Arg9 <Int32>] [-Help]
 
     -arg1 <String>
         Arg1 description.
@@ -796,11 +875,14 @@ Usage: test [-arg1] <String> [[-other] <Number>] [[-notSwitch] <Boolean>] [[-Arg
     -Arg6 <String> (-Alias1, -Alias2)
         Arg6 description.
 
+    -Help [<Boolean>]
+        Displays this help message.
+
 ".ReplaceLineEndings();
 
         private static readonly string _expectedUsageAll = @"Test arguments description.
 
-Usage: test [-arg1] <String> [[-other] <Number>] [[-notSwitch] <Boolean>] [[-Arg5] <Single>] [[-other2] <Number>] [[-Arg8] <DayOfWeek>...] -Arg6 <String> [-Arg10...] [-Arg11] [-Arg12 <Int32>...] [-Arg13 <String=Int32>...] [-Arg14 <String=Int32>...] [-Arg15 <KeyValuePair<String, Int32>>] [-Arg3 <String>] [-Arg7] [-Arg9 <Int32>]
+Usage: test [-arg1] <String> [[-other] <Number>] [[-notSwitch] <Boolean>] [[-Arg5] <Single>] [[-other2] <Number>] [[-Arg8] <DayOfWeek>...] -Arg6 <String> [-Arg10...] [-Arg11] [-Arg12 <Int32>...] [-Arg13 <String=Int32>...] [-Arg14 <String=Int32>...] [-Arg15 <KeyValuePair<String, Int32>>] [-Arg3 <String>] [-Arg7] [-Arg9 <Int32>] [-Help]
 
     -arg1 <String>
         Arg1 description.
@@ -850,11 +932,14 @@ Usage: test [-arg1] <String> [[-other] <Number>] [[-notSwitch] <Boolean>] [[-Arg
     -Arg9 <Int32>
 
 
+    -Help [<Boolean>]
+        Displays this help message.
+
 ".ReplaceLineEndings();
 
         private static readonly string _expectedUsageNone = @"Test arguments description.
 
-Usage: test [-arg1] <String> [[-other] <Number>] [[-notSwitch] <Boolean>] [[-Arg5] <Single>] [[-other2] <Number>] [[-Arg8] <DayOfWeek>...] -Arg6 <String> [-Arg10...] [-Arg11] [-Arg12 <Int32>...] [-Arg13 <String=Int32>...] [-Arg14 <String=Int32>...] [-Arg15 <KeyValuePair<String, Int32>>] [-Arg3 <String>] [-Arg7] [-Arg9 <Int32>]
+Usage: test [-arg1] <String> [[-other] <Number>] [[-notSwitch] <Boolean>] [[-Arg5] <Single>] [[-other2] <Number>] [[-Arg8] <DayOfWeek>...] -Arg6 <String> [-Arg10...] [-Arg11] [-Arg12 <Int32>...] [-Arg13 <String=Int32>...] [-Arg14 <String=Int32>...] [-Arg15 <KeyValuePair<String, Int32>>] [-Arg3 <String>] [-Arg7] [-Arg9 <Int32>] [-Help]
 
 ".ReplaceLineEndings();
 
@@ -862,7 +947,7 @@ Usage: test [-arg1] <String> [[-other] <Number>] [[-notSwitch] <Boolean>] [[-Arg
         // necessary but that requires C++11.
         private static readonly string _expectedUsageColor = @"Test arguments description.
 
-[36mUsage:[0m test [/arg1] <String> [[/other] <Number>] [[/notSwitch] <Boolean>] [[/Arg5] <Single>] [[/other2] <Number>] [[/Arg8] <DayOfWeek>...] /Arg6 <String> [/Arg10...] [/Arg11] [/Arg12 <Int32>...] [/Arg13 <String=Int32>...] [/Arg14 <String=Int32>...] [/Arg15 <KeyValuePair<String, Int32>>] [/Arg3 <String>] [/Arg7] [/Arg9 <Int32>]
+[36mUsage:[0m test [/arg1] <String> [[/other] <Number>] [[/notSwitch] <Boolean>] [[/Arg5] <Single>] [[/other2] <Number>] [[/Arg8] <DayOfWeek>...] /Arg6 <String> [/Arg10...] [/Arg11] [/Arg12 <Int32>...] [/Arg13 <String=Int32>...] [/Arg14 <String=Int32>...] [/Arg15 <KeyValuePair<String, Int32>>] [/Arg3 <String>] [/Arg7] [/Arg9 <Int32>] [/Help]
 
     [32m/arg1 <String>[0m
         Arg1 description.
@@ -887,6 +972,9 @@ Usage: test [-arg1] <String> [[-other] <Number>] [[-notSwitch] <Boolean>] [[-Arg
 
     [32m/Arg7 [<Boolean>] (/Alias3)[0m
 
+
+    [32m/Help [<Boolean>][0m
+        Displays this help message.
 
 ".ReplaceLineEndings();
 

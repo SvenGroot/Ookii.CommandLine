@@ -279,6 +279,15 @@
   <data name="InvalidStandardStream" xml:space="preserve">
     <value>Invalid standard stream value.</value>
   </data>
+  <data name="AutomaticHelpDescription" xml:space="preserve">
+    <value>Displays this help message.</value>
+  </data>
+  <data name="AutomaticHelpName" xml:space="preserve">
+    <value>Help</value>
+  </data>
+  <data name="AutomaticHelpShortName" xml:space="preserve">
+    <value>?</value>
+  </data>
   <data name="InvalidMethodSignatureFormat" xml:space="preserve">
     <value>The method '{0}' has an unsupported signature.</value>
   </data>

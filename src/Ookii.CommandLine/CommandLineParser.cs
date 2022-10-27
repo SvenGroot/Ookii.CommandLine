@@ -331,6 +331,13 @@ namespace Ookii.CommandLine
             DetermineConstructorArguments();
             _constructorArgumentCount = _arguments.Count;
             _positionalArgumentCount = _constructorArgumentCount + DetermineMemberArguments();
+            DetermineAutomaticArguments(options, optionsAttribute);
+            if (_arguments.Count > _constructorArgumentCount)
+            {
+                // Sort the member arguments in usage order (positional first, then required
+                // non-positional arguments, then the rest by name.
+                _arguments.Sort(_constructorArgumentCount, _arguments.Count - _constructorArgumentCount, new CommandLineArgumentComparer(_argumentsByName.Comparer));
+            }
 
             VerifyPositionalArgumentRules();
 
@@ -1146,13 +1153,18 @@ namespace Ookii.CommandLine
                 }
             }
 
-            if ( _arguments.Count > _constructorArgumentCount )
-            {
-                // Sort the added arguments in usage order (positional first, then required non-positional arguments, then the rest by name
-                _arguments.Sort(_constructorArgumentCount, _arguments.Count - _constructorArgumentCount, new CommandLineArgumentComparer(_argumentsByName.Comparer));
-            }
-
             return additionalPositionalArgumentCount;
+        }
+
+        private void DetermineAutomaticArguments(ParseOptions? options, ParseOptionsAttribute? optionsAttribute)
+        {
+            bool autoHelp = options?.AutoHelpArgument ?? optionsAttribute?.AutoHelpArgument ?? true;
+            if (autoHelp && 
+                GetArgument(Properties.Resources.AutomaticHelpName) == null && 
+                GetShortArgument(Properties.Resources.AutomaticHelpShortName[0]) == null)
+            {
+                AddNamedArgument(CommandLineArgument.CreateAutomaticHelp(this));
+            }
         }
 
         private void AddNamedArgument(CommandLineArgument argument)

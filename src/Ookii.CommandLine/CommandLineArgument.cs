@@ -532,7 +532,7 @@ namespace Ookii.CommandLine
         /// </remarks>
         public string Description
         {
-            get { return _description ?? ""; }
+            get { return _description ?? string.Empty; }
         }
 
         /// <summary>
@@ -1126,6 +1126,32 @@ namespace Ookii.CommandLine
             return new CommandLineArgument(info);
         }
 
+        internal static CommandLineArgument CreateAutomaticHelp(CommandLineParser parser)
+        {
+            if (parser == null)
+                throw new ArgumentNullException(nameof(parser));
+            var argumentName = Properties.Resources.AutomaticHelpName;
+            var memberName = nameof(AutomaticHelp);
+            var info = new ArgumentInfo()
+            {
+                Parser = parser,
+                Method = new()
+                {
+                    Method = typeof(CommandLineArgument).GetMethod(memberName, BindingFlags.NonPublic | BindingFlags.Static)!,
+                },
+                ArgumentName = argumentName,
+                Long = true,
+                Short = true,
+                ShortName = Properties.Resources.AutomaticHelpShortName[0],
+                ArgumentType = typeof(bool),
+                Description = Properties.Resources.AutomaticHelpDescription,
+                MemberName = memberName,
+                CancelParsing = true,
+            };
+
+            return new CommandLineArgument(info);
+        }
+
         internal void ApplyPropertyValue(object target)
         {
             // Do nothing for parameter-based values
@@ -1468,6 +1494,11 @@ namespace Ookii.CommandLine
             }
 
             return (info, argumentType, allowsNull);
+        }
+
+        private static void AutomaticHelp()
+        {
+            // Intentionally blank.
         }
     }
 }

@@ -181,6 +181,32 @@ namespace Ookii.CommandLine
         /// <seealso cref="CommandLineParser.NameValueSeparator"/>
         public char NameValueSeparator { get; set; } = CommandLineParser.DefaultNameValueSeparator;
 
+        /// <summary>
+        /// Gets or sets a value that indicates a help argument will be automatically added.
+        /// </summary>
+        /// <value>
+        ///   <see langword="true"/> to automatically create a help argument; otherwise,
+        ///   <see langword="false"/>. The default value is <see langword="true"/>.
+        /// </value>
+        /// <remarks>
+        /// <para>
+        ///   If this property is <see langword="true"/>, the <see cref="CommandLineParser"/>
+        ///   will automatically add an argument with the name "Help" and the short name "?" (used
+        ///   only when using <see cref="ParsingMode.LongShort"/>). When present, this argument
+        ///   will cancel parsing and cause usage help to be printed.
+        /// </para>
+        /// <para>
+        ///   If you already have an argument named "Help" or a short argument named "?", the
+        ///   the automatic help argument will not be created even if this property is
+        ///   <see langword="true"/>.
+        /// </para>
+        /// <para>
+        ///   This value can be overridden by the <see cref="ParseOptions.AutoHelpArgument"/>
+        ///   property.
+        /// </para>
+        /// </remarks>
+        public bool AutoHelpArgument { get; set; } = true;
+
         internal IComparer<string> GetStringComparer()
         {
             if (CaseSensitive)

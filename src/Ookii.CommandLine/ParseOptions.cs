@@ -204,6 +204,37 @@ namespace Ookii.CommandLine
         public char? NameValueSeparator { get; set; }
 
         /// <summary>
+        /// Gets or sets a value that indicates a help argument will be automatically added.
+        /// </summary>
+        /// <value>
+        ///   <see langword="true"/> to automatically create a help argument; otherwise,
+        ///   <see langword="false"/>.
+        ///   <see langword="true"/> to automatically create a help argument; <see langword="false"/>
+        ///   to not create one, or <see langword="null" /> to use the value from the
+        ///   <see cref="ParseOptionsAttribute.AllowWhiteSpaceValueSeparator"/> property, or if the
+        ///   <see cref="ParseOptionsAttribute"/> is not present, the default option which is <see langword="true"/>.
+        ///   The default value is <see langword="null"/>.
+        /// </value>
+        /// <remarks>
+        /// <para>
+        ///   If this property is <see langword="true"/>, the <see cref="CommandLineParser"/>
+        ///   will automatically add an argument with the name "Help" and the short name "?" (used
+        ///   only when using <see cref="ParsingMode.LongShort"/>). When present, this argument
+        ///   will cancel parsing and cause usage help to be printed.
+        /// </para>
+        /// <para>
+        ///   If you already have an argument named "Help" or a short argument named "?", the
+        ///   the automatic help argument will not be created even if this property is
+        ///   <see langword="true"/>.
+        /// </para>
+        /// <para>
+        ///   If not <see langword="null"/>, this property overrides the value of the
+        ///   <see cref="ParseOptionsAttribute.AutoHelpArgument"/> property.
+        /// </para>
+        /// </remarks>
+        public bool? AutoHelpArgument { get; set; }
+
+        /// <summary>
         /// Gets or sets the options to use to write usage information to <see cref="Out"/> when
         /// parsing the arguments fails or is cancelled.
         /// </summary>

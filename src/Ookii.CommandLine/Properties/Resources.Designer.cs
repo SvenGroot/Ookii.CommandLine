@@ -88,6 +88,33 @@ namespace Ookii.CommandLine.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Displays this help message..
+        /// </summary>
+        internal static string AutomaticHelpDescription {
+            get {
+                return ResourceManager.GetString("AutomaticHelpDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Help.
+        /// </summary>
+        internal static string AutomaticHelpName {
+            get {
+                return ResourceManager.GetString("AutomaticHelpName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ?.
+        /// </summary>
+        internal static string AutomaticHelpShortName {
+            get {
+                return ResourceManager.GetString("AutomaticHelpShortName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The combined short argument &apos;{0}&apos; contains an argument that is not a switch..
         /// </summary>
         internal static string CombinedShortNameNonSwitchFormat {

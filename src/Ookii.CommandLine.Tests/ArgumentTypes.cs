@@ -177,7 +177,8 @@ namespace Ookii.CommandLine.Tests
         ArgumentNamePrefixes = new[] { "--", "-" },
         LongArgumentNamePrefix = "---",
         CaseSensitive = true,
-        NameValueSeparator = '=')]
+        NameValueSeparator = '=',
+        AutoHelpArgument = false)]
     class ParseOptionsArguments
     {
         [CommandLineArgument]
@@ -300,4 +301,16 @@ namespace Ookii.CommandLine.Tests
         }
     }
 
+    class AutomaticConflictingNameArguments
+    {
+        [CommandLineArgument]
+        public int Help { get; set; }
+    }
+
+    [ParseOptions(Mode = ParsingMode.LongShort)]
+    class AutomaticConflictingShortNameArguments
+    {
+        [CommandLineArgument(ShortName = '?')]
+        public int Foo { get; set; }
+    }
 }
