@@ -64,5 +64,20 @@ namespace Ookii.CommandLine
         /// </para>
         /// </remarks>
         public bool CustomArgumentParsing { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value that indicates whether the command is hidden from the usage help.
+        /// </summary>
+        /// <value>
+        /// <see langword="true"/> if the command is hidden from the usage help; otherwise,
+        /// <see langword="false"/>. The default value is <see langword="false"/>.
+        /// </value>
+        /// <remarks>
+        /// <para>
+        ///   A hidden command will not be included in the command list when usage help is
+        ///   displayed.
+        /// </para>
+        /// </remarks>
+        public bool IsHidden { get; set; }
     }
 }

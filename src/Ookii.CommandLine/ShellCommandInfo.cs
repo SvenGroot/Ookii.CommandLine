@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -15,6 +16,7 @@ namespace Ookii.CommandLine
     {
         private readonly string _name;
         private readonly Type _commandType;
+        private readonly ShellCommandAttribute _attribute;
         private string? _description;
 
         /// <summary>
@@ -29,16 +31,23 @@ namespace Ookii.CommandLine
         /// </exception>
         public ShellCommandInfo(Type commandType)
         {
-            _name = ShellCommand.GetShellCommandName(commandType);
+            var attribute = ShellCommand.GetShellCommandAttribute(commandType);
+            if (attribute == null)
+                throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.TypeIsNotShellCommandFormat, commandType.FullName));
+
+            _name = ShellCommand.GetShellCommandName(attribute, commandType);
             _commandType = commandType;
             _description = null;
+            _attribute = attribute;
         }
 
         private ShellCommandInfo(string name, Type commandType, string description)
         {
+            var attribute = ShellCommand.GetShellCommandAttribute(commandType)!;
             _name = name;
             _commandType = commandType;
             _description = description;
+            _attribute = attribute;
         }
 
         /// <summary>
@@ -70,11 +79,26 @@ namespace Ookii.CommandLine
         /// <summary>
         /// Gets a value that indicates if the shell command uses custom parsing.
         /// </summary>
-        /// <remarks>
+        /// <value>
         /// The value of the command's <see cref="ShellCommandAttribute.CustomArgumentParsing"/>
         /// property.
+        /// </value>
+        public bool CustomArgumentParsing => _attribute.CustomArgumentParsing;
+
+        /// <summary>
+        /// Gets or sets a value that indicates whether the command is hidden from the usage help.
+        /// </summary>
+        /// <value>
+        /// <see langword="true"/> if the command is hidden from the usage help; otherwise,
+        /// <see langword="false"/>.
+        /// </value>
+        /// <remarks>
+        /// <para>
+        ///   A hidden command will not be included in the command list when usage help is
+        ///   displayed.
+        /// </para>
         /// </remarks>
-        public bool CustomArgumentParsing => CommandType.GetCustomAttribute<ShellCommandAttribute>()?.CustomArgumentParsing ?? false;
+        public bool IsHidden => _attribute.IsHidden;
 
         /// <summary>
         /// Creates an instance of the shell command.

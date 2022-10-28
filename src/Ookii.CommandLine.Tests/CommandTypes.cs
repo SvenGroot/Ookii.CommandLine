@@ -49,6 +49,15 @@ namespace Ookii.CommandLine.Tests
         }
     }
 
+    [ShellCommand(IsHidden = true)]
+    class HiddenCommand : ShellCommand
+    {
+        public override void Run()
+        {
+            throw new NotImplementedException();
+        }
+    }
+
     public class NotACommand : ShellCommand
     {
         public override void Run()

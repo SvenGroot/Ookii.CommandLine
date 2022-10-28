@@ -19,18 +19,21 @@ namespace Ookii.CommandLine.Tests
             var commands = ShellCommand.GetShellCommands(_commandAssembly).ToArray();
 
             Assert.IsNotNull(commands);
-            Assert.AreEqual(4, commands.Length);
+            Assert.AreEqual(5, commands.Length);
             Assert.AreEqual("AnotherCommand", commands[0].Name);
             Assert.AreEqual(typeof(AnotherCommand), commands[0].CommandType);
             Assert.IsFalse(commands[0].CustomArgumentParsing);
             Assert.AreEqual("custom", commands[1].Name);
             Assert.AreEqual(typeof(CustomParsingCommand), commands[1].CommandType);
             Assert.IsTrue(commands[1].CustomArgumentParsing);
-            Assert.AreEqual("test", commands[2].Name);
+            Assert.AreEqual("HiddenCommand", commands[2].Name);
             Assert.IsFalse(commands[2].CustomArgumentParsing);
-            Assert.AreEqual(typeof(TestCommand), commands[2].CommandType);
-            Assert.AreEqual("version", commands[3].Name);
-            Assert.IsFalse(commands[2].CustomArgumentParsing);
+            Assert.AreEqual(typeof(HiddenCommand), commands[2].CommandType);
+            Assert.AreEqual("test", commands[3].Name);
+            Assert.IsFalse(commands[3].CustomArgumentParsing);
+            Assert.AreEqual(typeof(TestCommand), commands[3].CommandType);
+            Assert.AreEqual("version", commands[4].Name);
+            Assert.IsFalse(commands[4].CustomArgumentParsing);
         }
 
         [TestMethod]

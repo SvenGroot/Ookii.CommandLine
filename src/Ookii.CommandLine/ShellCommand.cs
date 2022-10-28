@@ -174,6 +174,9 @@ namespace Ookii.CommandLine
 
             foreach (var command in GetShellCommands(assembly, options.CommandNameComparer, options.AutoVersionCommand))
             {
+                if (command.IsHidden)
+                    continue;
+
                 lineWriter?.ResetIndent();
                 writer.Inner.WriteLine(options.CommandDescriptionFormat, command.Name, command.Description ?? string.Empty,
                     colorStart, colorEnd);
@@ -198,9 +201,7 @@ namespace Ookii.CommandLine
         /// </remarks>
         public static bool IsShellCommand(Type type)
         {
-            if( type == null )
-                throw new ArgumentNullException(nameof(type));
-            return !type.IsAbstract && type.IsSubclassOf(typeof(ShellCommand)) && Attribute.IsDefined(type, typeof(ShellCommandAttribute));
+            return GetShellCommandAttribute(type) != null;
         }
 
         /// <summary>
@@ -226,7 +227,7 @@ namespace Ookii.CommandLine
             if( !IsShellCommand(commandType) )
                 throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.TypeIsNotShellCommandFormat, commandType.FullName));
 
-            return commandType.GetCustomAttribute<ShellCommandAttribute>()?.CommandName ?? commandType.Name;
+            return GetShellCommandName(commandType.GetCustomAttribute<ShellCommandAttribute>()!, commandType);
         }
 
         /// <summary>
@@ -525,6 +526,22 @@ namespace Ookii.CommandLine
             }
             else
                 return -1;
+        }
+
+        internal static string GetShellCommandName(ShellCommandAttribute attribute, Type commandType)
+        {
+            return attribute.CommandName ?? commandType.Name;
+        }
+
+        internal static ShellCommandAttribute? GetShellCommandAttribute(Type type)
+        {
+            if( type == null )
+                throw new ArgumentNullException(nameof(type));
+
+            if (type.IsAbstract || !type.IsSubclassOf(typeof(ShellCommand)))
+                return null;
+
+            return type.GetCustomAttribute<ShellCommandAttribute>();
         }
 
         private static IEnumerable<ShellCommandInfo> GetShellCommandsUnsorted(Assembly assembly)
