@@ -1243,24 +1243,19 @@ namespace Ookii.CommandLine
         private void DetermineAutomaticArguments(ParseOptions? options, ParseOptionsAttribute? optionsAttribute)
         {
             bool autoHelp = options?.AutoHelpArgument ?? optionsAttribute?.AutoHelpArgument ?? true;
-            if (autoHelp && 
-                GetArgument(Properties.Resources.AutomaticHelpName) == null && 
-                (Mode == ParsingMode.LongShort 
-                    ? (GetShortArgument(Properties.Resources.AutomaticHelpShortName[0]) == null &&
-                       GetShortArgument(Properties.Resources.AutomaticHelpShortAlias[0]) == null)
-                    : (GetArgument(Properties.Resources.AutomaticHelpShortName) == null &&
-                       GetArgument(Properties.Resources.AutomaticHelpShortAlias) == null)))
+            if (autoHelp)
             {
-                AddNamedArgument(CommandLineArgument.CreateAutomaticHelp(this));
+                var argument = CommandLineArgument.CreateAutomaticHelp(this);
+                if (argument != null)
+                    AddNamedArgument(argument);
             }
 
-            if (!ShellCommand.IsShellCommand(_argumentsType))
+            bool autoVersion = options?.AutoVersionArgument ?? optionsAttribute?.AutoVersionArgument ?? true;
+            if (autoVersion && !ShellCommand.IsShellCommand(_argumentsType))
             {
-                bool autoVersion = options?.AutoVersionArgument ?? optionsAttribute?.AutoVersionArgument ?? true;
-                if (autoVersion && GetArgument(Properties.Resources.AutomaticVersionName) == null)
-                {
-                    AddNamedArgument(CommandLineArgument.CreateAutomaticVersion(this));
-                }
+                var argument = CommandLineArgument.CreateAutomaticVersion(this);
+                if (argument != null)
+                    AddNamedArgument(argument);
             }
         }
 

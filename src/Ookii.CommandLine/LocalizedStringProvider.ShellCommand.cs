@@ -12,6 +12,20 @@ namespace Ookii.CommandLine
     public partial class LocalizedStringProvider
     {
         /// <summary>
+        /// Gets the name of the version command created if the <see cref="CreateShellCommandOptions.AutoVersionCommand"/>
+        /// property is <see langword="true"/>.
+        /// </summary>
+        /// <returns>The string.</returns>
+        public virtual string AutomaticVersionCommandName() => Resources.AutomaticVersionCommandName;
+
+        /// <summary>
+        /// Gets the description of the version command created if the <see cref="CreateShellCommandOptions.AutoVersionCommand"/>
+        /// property is <see langword="true"/>.
+        /// </summary>
+        /// <returns>The string.</returns>
+        public virtual string AutomaticVersionCommandDescription() => Resources.AutomaticVersionDescription;
+
+        /// <summary>
         /// Gets a the usage syntax for an application using shell commands when no command name
         /// was specified, similar to "Usage: executable &lt;command&gt; [arguments]".
         /// </summary>

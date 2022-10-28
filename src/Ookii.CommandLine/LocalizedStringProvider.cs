@@ -27,146 +27,50 @@ namespace Ookii.CommandLine
     public partial class LocalizedStringProvider
     {
         /// <summary>
-        /// Gets the error message for <see cref="CommandLineArgumentErrorCategory.Unspecified"/>.
+        /// Gets the name of the help argument created if the <see cref="ParseOptions.AutoHelpArgument"/>
+        /// property is <see langword="true"/>.
         /// </summary>
-        /// <returns>The error message.</returns>
+        /// <returns>The string.</returns>
+        public virtual string AutomaticHelpName() => Resources.AutomaticHelpName;
+
+        /// <summary>
+        /// Gets the short name of the help argument created if the <see cref="ParseOptions.AutoHelpArgument"/>
+        /// property is <see langword="true"/>, typically '?'.
+        /// </summary>
+        /// <returns>The string.</returns>
         /// <remarks>
         /// <para>
-        ///   Ookii.CommandLine never creates exceptions with this category, so this should not
-        ///   normally be called.
+        ///   The argument will automatically have a short alias that is the lower case first
+        ///   character of the value returned by <see cref="AutomaticHelpName"/>, so this character
+        ///   should be different.
+        /// </para>
+        /// <para>
+        ///   If <see cref="CommandLineParser.Mode"/> is not <see cref="ParsingMode.LongShort"/>,
+        ///   the short name and the short alias will be used as a regular aliases instead.
         /// </para>
         /// </remarks>
-        public virtual string UnspecifiedError() => Resources.UnspecifiedError;
+        public virtual char AutomaticHelpShortName() => Resources.AutomaticHelpShortName[0];
 
         /// <summary>
-        /// Gets the error message for <see cref="CommandLineArgumentErrorCategory.ArgumentValueConversion"/>.
+        /// Gets the description of the help argument created if the <see cref="ParseOptions.AutoHelpArgument"/>
+        /// property is <see langword="true"/>.
         /// </summary>
-        /// <param name="argumentName">The name of the argument.</param>
-        /// <param name="argumentValue">The value of the argument.</param>
-        /// <param name="valueDescription">The value description of the argument.</param>
-        /// <returns>The error message.</returns>
-        public virtual string ArgumentValueConversionError(string argumentName, string? argumentValue, string valueDescription)
-            => Format(Resources.ArgumentConversionErrorFormat, argumentValue, argumentName, valueDescription);
+        /// <returns>The string.</returns>
+        public virtual string AutomaticHelpDescription() => Resources.AutomaticHelpDescription;
 
         /// <summary>
-        /// Gets the error message for <see cref="CommandLineArgumentErrorCategory.UnknownArgument"/>.
+        /// Gets the name of the version argument created if the <see cref="ParseOptions.AutoVersionArgument"/>
+        /// property is <see langword="true"/>.
         /// </summary>
-        /// <param name="argumentName">The name of the argument.</param>
-        /// <returns>The error message.</returns>
-        public virtual string UnknownArgument(string argumentName) => Format(Resources.UnknownArgumentFormat, argumentName);
+        /// <returns>The string.</returns>
+        public virtual string AutomaticVersionName() => Resources.AutomaticVersionName;
 
         /// <summary>
-        /// Gets the error message for <see cref="CommandLineArgumentErrorCategory.MissingNamedArgumentValue"/>.
+        /// Gets the description of the version argument created if the <see cref="ParseOptions.AutoVersionArgument"/>
+        /// property is <see langword="true"/>.
         /// </summary>
-        /// <param name="argumentName">The name of the argument.</param>
-        /// <returns>The error message.</returns>
-        public virtual string MissingNamedArgumentValue(string argumentName)
-            => Format(Resources.MissingValueForNamedArgumentFormat, argumentName);
-
-        /// <summary>
-        /// Gets the error message for <see cref="CommandLineArgumentErrorCategory.DuplicateArgument"/>.
-        /// </summary>
-        /// <param name="argumentName">The name of the argument.</param>
-        /// <returns>The error message.</returns>
-        public virtual string DuplicateArgument(string argumentName) => Format(Resources.DuplicateArgumentFormat, argumentName);
-
-        /// <summary>
-        /// Gets the error message for <see cref="CommandLineArgumentErrorCategory.TooManyArguments"/>.
-        /// </summary>
-        /// <returns>The error message.</returns>
-        public virtual string TooManyArguments() => Resources.TooManyArguments;
-
-        /// <summary>
-        /// Gets the error message for <see cref="CommandLineArgumentErrorCategory.MissingRequiredArgument"/>.
-        /// </summary>
-        /// <param name="argumentName">The name of the argument.</param>
-        /// <returns>The error message.</returns>
-        public virtual string MissingRequiredArgument(string argumentName)
-            => Format(Resources.MissingRequiredArgumentFormat, argumentName);
-
-        /// <summary>
-        /// Gets the error message for <see cref="CommandLineArgumentErrorCategory.InvalidDictionaryValue"/>.
-        /// </summary>
-        /// <param name="argumentName">The name of the argument.</param>
-        /// <param name="argumentValue">The value of the argument.</param>
-        /// <param name="message">The error message of the conversion.</param>
-        /// <returns>The error message.</returns>
-        public virtual string InvalidDictionaryValue(string argumentName, string? argumentValue, string? message)
-            => Format(Resources.InvalidDictionaryValueFormat, argumentName, argumentValue, message);
-
-        /// <summary>
-        /// Gets the error message for <see cref="CommandLineArgumentErrorCategory.CreateArgumentsTypeError"/>.
-        /// </summary>
-        /// <param name="message">The error message of the conversion.</param>
-        /// <returns>The error message.</returns>
-        public virtual string CreateArgumentsTypeError(string? message)
-            => Format(Resources.CreateArgumentsTypeErrorFormat, message);
-
-        /// <summary>
-        /// Gets the error message for <see cref="CommandLineArgumentErrorCategory.ApplyValueError"/>.
-        /// </summary>
-        /// <param name="argumentName">The name of the argument.</param>
-        /// <param name="message">The error message of the conversion.</param>
-        /// <returns>The error message.</returns>
-        public virtual string ApplyValueError(string argumentName, string? message)
-            => Format(Resources.SetValueErrorFormat, argumentName, message);
-
-        /// <summary>
-        /// Gets the error message for <see cref="CommandLineArgumentErrorCategory.NullArgumentValue"/>.
-        /// </summary>
-        /// <param name="argumentName">The name of the argument.</param>
-        /// <returns>The error message.</returns>
-        public virtual string NullArgumentValue(string argumentName) => Format(Resources.NullArgumentValueFormat, argumentName);
-
-        /// <summary>
-        /// Gets the error message for <see cref="CommandLineArgumentErrorCategory.CombinedShortNameNonSwitch"/>.
-        /// </summary>
-        /// <param name="argumentName">The names of the combined short arguments.</param>
-        /// <returns>The error message.</returns>
-        public virtual string CombinedShortNameNonSwitch(string argumentName)
-            => Format(Resources.CombinedShortNameNonSwitchFormat, argumentName);
-
-        /// <summary>
-        /// Gets the error message used if the <see cref="KeyValuePairConverter{TKey, TValue}"/>
-        /// is unable to find the key/value pair separator in the argument value.
-        /// </summary>
-        /// <param name="separator">The key/value pair separator.</param>
-        /// <returns>The error message.</returns>
-        public virtual string MissingKeyValuePairSeparator(string separator)
-            => Format(Resources.NoKeyValuePairSeparatorFormat, separator);
-
-        internal CommandLineArgumentException CreateException(CommandLineArgumentErrorCategory category, Exception? inner, CommandLineArgument argument, string? value = null)
-            => CreateException(category, inner, argument, argument.ArgumentName, value);
-
-        internal CommandLineArgumentException CreateException(CommandLineArgumentErrorCategory category, Exception? inner, string? argumentName = null, string? value = null)
-            => CreateException(category, inner, null, argumentName, value);
-
-        internal CommandLineArgumentException CreateException(CommandLineArgumentErrorCategory category, CommandLineArgument argument, string? value = null)
-            => CreateException(category, null, argument, value);
-
-        internal CommandLineArgumentException CreateException(CommandLineArgumentErrorCategory category, string? argumentName = null, string? value = null)
-            => CreateException(category, null, argumentName, value);
-
-        private CommandLineArgumentException CreateException(CommandLineArgumentErrorCategory category, Exception? inner, CommandLineArgument? argument = null, string? argumentName = null, string? value = null)
-        {
-            var message = category switch
-            {
-                CommandLineArgumentErrorCategory.MissingRequiredArgument => MissingRequiredArgument(argumentName!),
-                CommandLineArgumentErrorCategory.ArgumentValueConversion => ArgumentValueConversionError(argumentName!, value, argument!.ValueDescription),
-                CommandLineArgumentErrorCategory.UnknownArgument => UnknownArgument(argumentName!),
-                CommandLineArgumentErrorCategory.MissingNamedArgumentValue => MissingNamedArgumentValue(argumentName!),
-                CommandLineArgumentErrorCategory.DuplicateArgument => DuplicateArgument(argumentName!),
-                CommandLineArgumentErrorCategory.TooManyArguments => TooManyArguments(),
-                CommandLineArgumentErrorCategory.InvalidDictionaryValue => InvalidDictionaryValue(argumentName!, value, inner?.Message),
-                CommandLineArgumentErrorCategory.CreateArgumentsTypeError => CreateArgumentsTypeError(inner?.Message),
-                CommandLineArgumentErrorCategory.ApplyValueError => ApplyValueError(argumentName!, inner?.Message),
-                CommandLineArgumentErrorCategory.NullArgumentValue => NullArgumentValue(argumentName!),
-                CommandLineArgumentErrorCategory.CombinedShortNameNonSwitch => CombinedShortNameNonSwitch(argumentName!),
-                _ => UnspecifiedError(),
-            };
-
-            return new CommandLineArgumentException(message, argumentName, category, inner);
-        }
+        /// <returns>The string.</returns>
+        public virtual string AutomaticVersionDescription() => Resources.AutomaticVersionDescription;
 
         private static string Format(string format, object? arg0)
             => string.Format(CultureInfo.CurrentCulture, format, arg0);

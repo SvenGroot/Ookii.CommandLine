@@ -86,29 +86,22 @@ namespace Ookii.CommandLine
         /// Gets the <see cref="Type"/> instance for shell commands defined in the specified assembly.
         /// </summary>
         /// <param name="assembly">The assembly whose types to search.</param>
-        /// <param name="nameComparer">
-        ///   The <see cref="StringComparer"/> to use to sort command names, or <see langword="null"/>
-        ///   to use <see cref="StringComparer.OrdinalIgnoreCase"/>.
-        /// </param>
-        /// <param name="autoVersionCommand">
-        ///   <see langword="true"/> to automatically add a command named "version" if there isn't
-        ///   one; otherwise, <see langword="false"/>.
-        /// </param>
+        /// <param name="options">The options, or <see langword="null"/> to use the default options.</param>
         /// <returns>A list of types that inherit from <see cref="ShellCommand"/> and specify the <see cref="ShellCommandAttribute"/> attribute.</returns>
         /// <exception cref="ArgumentNullException">
         ///   <paramref name="assembly"/> is <see langword="null"/>.
         /// </exception>
-        public static IEnumerable<ShellCommandInfo> GetShellCommands(Assembly assembly, IComparer<string>? nameComparer = null, bool autoVersionCommand = true)
+        public static IEnumerable<ShellCommandInfo> GetShellCommands(Assembly assembly, CreateShellCommandOptions? options = null)
         {
             if( assembly == null )
                 throw new ArgumentNullException(nameof(assembly));
 
-            nameComparer ??= StringComparer.OrdinalIgnoreCase;
+            options ??= new CreateShellCommandOptions();
             var commands = GetShellCommandsUnsorted(assembly);
-            if (autoVersionCommand &&
-                !commands.Any(c => nameComparer.Compare(c.Name, Properties.Resources.AutomaticVersionCommandName) == 0))
+            if (options.AutoVersionCommand &&
+                !commands.Any(c => options.CommandNameComparer.Compare(c.Name, Properties.Resources.AutomaticVersionCommandName) == 0))
             {
-                var versionCommand = ShellCommandInfo.GetAutomaticVersionCommand();
+                var versionCommand = ShellCommandInfo.GetAutomaticVersionCommand(options.StringProvider);
 #if NET6_0_OR_GREATER
                 commands = commands.Append(versionCommand);
 #else
@@ -116,7 +109,7 @@ namespace Ookii.CommandLine
 #endif
             }
 
-            return commands.OrderBy(c => c.Name, nameComparer);
+            return commands.OrderBy(c => c.Name, options.CommandNameComparer);
         }
 
         /// <summary>
@@ -170,7 +163,7 @@ namespace Ookii.CommandLine
             if (lineWriter != null)
                 lineWriter.Indent = (lineWriter.MaximumLineLength > 0 && lineWriter.MaximumLineLength < CommandLineParser.MaximumLineWidthForIndent) ? 0 : options.CommandDescriptionIndent;
 
-            foreach (var command in GetShellCommands(assembly, options.CommandNameComparer, options.AutoVersionCommand))
+            foreach (var command in GetShellCommands(assembly, options))
             {
                 if (command.IsHidden)
                     continue;
@@ -259,37 +252,30 @@ namespace Ookii.CommandLine
         /// </summary>
         /// <param name="assembly">The assembly whose types to search.</param>
         /// <param name="commandName">The command name of the shell command.</param>
-        /// <param name="commandNameComparer">The <see cref="IComparer{T}"/> to use to compare command names, or <see langword="null"/> to use the default case-insensitive comparer.</param>
-        /// <param name="autoVersionCommand">
-        ///   <see langword="true"/> to automatically add a command named "version" if there isn't
-        ///   one; otherwise, <see langword="false"/>.
-        /// </param>
+        /// <param name="options">The options, or <see langword="null"/> to use the default options.</param>
         /// <returns>The <see cref="Type"/> of the specified shell command, or <see langword="null"/> if none could be found.</returns>
         /// <exception cref="ArgumentNullException">
         ///   <paramref name="assembly"/> or <paramref name="commandName"/> is <see langword="null"/>.
         /// </exception>
         /// <remarks>
-        /// <para>
-        ///   This method uses <see cref="StringComparer.OrdinalIgnoreCase"/> to compare command names if <paramref name="commandNameComparer"/> is <see langword="null"/>.
-        /// </para>
         /// </remarks>
-        public static ShellCommandInfo? GetShellCommand(Assembly assembly, string commandName, IComparer<string>? commandNameComparer = null, bool autoVersionCommand = true)
+        public static ShellCommandInfo? GetShellCommand(Assembly assembly, string commandName, CreateShellCommandOptions? options = null)
         {
             if (assembly == null)
                 throw new ArgumentNullException(nameof(assembly));
             if (commandName == null)
                 throw new ArgumentNullException(nameof(commandName));
 
-            commandNameComparer ??= StringComparer.OrdinalIgnoreCase;
+            options ??= new CreateShellCommandOptions();
             var command = GetShellCommandsUnsorted(assembly)
-                .Where(c => commandNameComparer.Compare(c.Name, commandName) == 0)
+                .Where(c => options.CommandNameComparer.Compare(c.Name, commandName) == 0)
                 .Cast<ShellCommandInfo?>()
                 .FirstOrDefault();
 
-            if (command == null && autoVersionCommand &&
-                commandNameComparer.Compare(commandName, Properties.Resources.AutomaticVersionCommandName) == 0)
+            if (command == null && options.AutoVersionCommand &&
+                options.CommandNameComparer.Compare(commandName, Properties.Resources.AutomaticVersionCommandName) == 0)
             {
-                command = ShellCommandInfo.GetAutomaticVersionCommand();
+                command = ShellCommandInfo.GetAutomaticVersionCommand(options.StringProvider);
             }
 
             return command;
@@ -358,7 +344,7 @@ namespace Ookii.CommandLine
             {
                 var commandInfo = commandName == null 
                     ? null 
-                    : GetShellCommand(assembly, commandName, options.CommandNameComparer, options.AutoVersionCommand);
+                    : GetShellCommand(assembly, commandName, options);
 
                 if (commandInfo == null)
                 {

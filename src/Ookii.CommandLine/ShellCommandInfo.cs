@@ -130,10 +130,10 @@ namespace Ookii.CommandLine
             return (ShellCommand)CommandLineParser.ParseInternal(CommandType, args, index, options)!;
         }
 
-        internal static ShellCommandInfo GetAutomaticVersionCommand()
+        internal static ShellCommandInfo GetAutomaticVersionCommand(LocalizedStringProvider stringProvider)
         {
-            return new ShellCommandInfo(Properties.Resources.AutomaticVersionCommandName,
-                typeof(AutomaticVersionCommand), Properties.Resources.AutomaticVersionDescription);
+            return new ShellCommandInfo(stringProvider.AutomaticVersionCommandName(),
+                typeof(AutomaticVersionCommand), stringProvider.AutomaticVersionCommandDescription());
         }
     }
 }

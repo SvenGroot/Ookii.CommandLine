@@ -1115,11 +1115,24 @@ namespace Ookii.CommandLine
             return new CommandLineArgument(info);
         }
 
-        internal static CommandLineArgument CreateAutomaticHelp(CommandLineParser parser)
+        internal static CommandLineArgument? CreateAutomaticHelp(CommandLineParser parser)
         {
             if (parser == null)
                 throw new ArgumentNullException(nameof(parser));
-            var argumentName = DetermineArgumentName(null, Properties.Resources.AutomaticHelpName, parser.NameTransform);
+
+            var argumentName = DetermineArgumentName(null, parser.StringProvider.AutomaticHelpName(), parser.NameTransform);
+            var shortName = parser.StringProvider.AutomaticHelpShortName();
+            var shortAlias = char.ToLowerInvariant(argumentName[0]);
+            if (parser.GetArgument(argumentName) != null ||
+                (parser.Mode == ParsingMode.LongShort
+                ? (parser.GetShortArgument(shortName) != null ||
+                   parser.GetShortArgument(shortAlias) != null)
+                : (parser.GetArgument(shortName.ToString()) != null ||
+                   parser.GetArgument(shortAlias.ToString()) != null)))
+            {
+                return null;
+            }
+
             var memberName = nameof(AutomaticHelp);
             var info = new ArgumentInfo()
             {
@@ -1131,30 +1144,36 @@ namespace Ookii.CommandLine
                 ArgumentName = argumentName,
                 Long = true,
                 Short = true,
-                ShortName = Properties.Resources.AutomaticHelpShortName[0],
+                ShortName = parser.StringProvider.AutomaticHelpShortName(),
                 ArgumentType = typeof(bool),
-                Description = Properties.Resources.AutomaticHelpDescription,
+                Description = parser.StringProvider.AutomaticHelpDescription(),
                 MemberName = memberName,
                 CancelParsing = true,
             };
 
             if (parser.Mode == ParsingMode.LongShort)
             {
-                info.ShortAliases = new[] { Properties.Resources.AutomaticHelpShortAlias[0] };
+                info.ShortAliases = new[] { shortAlias };
             }
             else
             {
-                info.Aliases = new[] { Properties.Resources.AutomaticHelpShortName, Properties.Resources.AutomaticHelpShortAlias };
+                info.Aliases = new[] { shortName.ToString(), shortAlias.ToString() };
             }
 
             return new CommandLineArgument(info);
         }
 
-        internal static CommandLineArgument CreateAutomaticVersion(CommandLineParser parser)
+        internal static CommandLineArgument? CreateAutomaticVersion(CommandLineParser parser)
         {
             if (parser == null)
                 throw new ArgumentNullException(nameof(parser));
-            var argumentName = DetermineArgumentName(null, Properties.Resources.AutomaticVersionName, parser.NameTransform);
+
+            var argumentName = DetermineArgumentName(null, parser.StringProvider.AutomaticVersionName(), parser.NameTransform);
+            if (parser.GetArgument(argumentName) != null)
+            {
+                return null;
+            }
+
             var memberName = nameof(AutomaticVersion);
             var info = new ArgumentInfo()
             {
@@ -1167,7 +1186,7 @@ namespace Ookii.CommandLine
                 ArgumentName = argumentName,
                 Long = true,
                 ArgumentType = typeof(bool),
-                Description = Properties.Resources.AutomaticVersionDescription,
+                Description = parser.StringProvider.AutomaticVersionDescription(),
                 MemberName = memberName,
             };
 

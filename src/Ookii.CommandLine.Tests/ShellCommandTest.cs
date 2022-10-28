@@ -52,7 +52,7 @@ namespace Ookii.CommandLine.Tests
             Assert.AreEqual("test", command.Value.Name);
             Assert.AreEqual(typeof(TestCommand), command.Value.CommandType);
 
-            command = ShellCommand.GetShellCommand(_commandAssembly, "Test", StringComparer.Ordinal);
+            command = ShellCommand.GetShellCommand(_commandAssembly, "Test", new CreateShellCommandOptions() { CommandNameComparer = StringComparer.Ordinal });
             Assert.IsNull(command);
 
             command = ShellCommand.GetShellCommand(_commandAssembly, "AnotherCommand");
