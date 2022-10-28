@@ -147,11 +147,5 @@ namespace Ookii.CommandLine
             info.AddValue("ArgumentName", ArgumentName);
             info.AddValue("Category", Category);
         }
-
-        internal static CommandLineArgumentException Create(CommandLineArgumentErrorCategory category, string format, string argumentName, string? value = null, Exception? inner = null)
-        {
-            var message = string.Format(CultureInfo.CurrentCulture, format, argumentName, value, inner?.Message);
-            return new CommandLineArgumentException(message, argumentName, category, inner);
-        }
     }
 }

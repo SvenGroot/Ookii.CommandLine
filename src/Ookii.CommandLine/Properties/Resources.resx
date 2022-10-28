@@ -306,4 +306,7 @@
   <data name="UnknownVersion" xml:space="preserve">
     <value>Unknown version.</value>
   </data>
+  <data name="UnspecifiedError" xml:space="preserve">
+    <value>An unspecified error has occurred.</value>
+  </data>
 </root>

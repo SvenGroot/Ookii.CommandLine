@@ -34,6 +34,7 @@ namespace Ookii.CommandLine
         private readonly string _argumentName;
         private readonly bool _allowNullValues;
         private readonly string _separator;
+        private readonly LocalizedStringProvider _stringProvider;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="KeyValuePairConverter{TKey, TValue}"/> class.
@@ -46,11 +47,13 @@ namespace Ookii.CommandLine
         /// If <see langword="null"/>, the default converter for <typeparamref name="TValue"/> is used.</param>
         /// <param name="separator">Provides an optional custom key/value separator. If <see langword="null" />, the value
         /// of <see cref="KeyValuePairConverter.DefaultSeparator"/> is used.</param>
-        /// <exception cref="ArgumentNullException"><paramref name="argumentName"/> is <see langword="null"/>.</exception>
+        /// <param name="stringProvider">Provides a <see cref="LocalizedStringProvider"/> to get error messages.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="stringProvider"/> or <paramref name="argumentName"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentException"><paramref name="separator"/> is an empty string.</exception>
         /// <exception cref="NotSupportedException">Either the key or value <see cref="TypeConverter"/> does not support converting from a string.</exception>
-        public KeyValuePairConverter(string argumentName, bool allowNullValues, Type? keyConverterType, Type? valueConverterType, string? separator)
+        public KeyValuePairConverter(LocalizedStringProvider stringProvider, string argumentName, bool allowNullValues, Type? keyConverterType, Type? valueConverterType, string? separator)
         {
+            _stringProvider = stringProvider ?? throw new ArgumentNullException(nameof(stringProvider));
             _argumentName = argumentName ?? throw new ArgumentNullException(nameof(argumentName));
             _allowNullValues = allowNullValues;
             _keyConverter = GetConverter(keyConverterType, typeof(TKey));
@@ -65,7 +68,7 @@ namespace Ookii.CommandLine
         /// </summary>
         /// <exception cref="NotSupportedException">Either the key or value <see cref="TypeConverter"/> does not support converting from a string.</exception>
         public KeyValuePairConverter()
-            : this(string.Empty, true, null, null, null)
+            : this(new LocalizedStringProvider(), string.Empty, true, null, null, null)
         {
         }
 
@@ -120,14 +123,14 @@ namespace Ookii.CommandLine
             {
                 int index = stringValue.IndexOf(_separator);
                 if( index < 0 )
-                    throw new FormatException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.NoKeyValuePairSeparatorFormat, _separator));
+                    throw new FormatException(_stringProvider.MissingKeyValuePairSeparator(_separator));
 
                 string key = stringValue.Substring(0, index);
                 string valueForKey = stringValue.Substring(index + _separator.Length);
                 object? convertedKey = _keyConverter.ConvertFromString(context, culture, key);
                 object? convertedValue = _valueConverter.ConvertFromString(context, culture, valueForKey);
                 if (convertedKey == null || (!_allowNullValues && convertedValue == null))
-                    throw new CommandLineArgumentException(String.Format(CultureInfo.CurrentCulture, Properties.Resources.NullArgumentValueFormat, _argumentName), _argumentName, CommandLineArgumentErrorCategory.NullArgumentValue);
+                    throw _stringProvider.CreateException(CommandLineArgumentErrorCategory.NullArgumentValue, _argumentName);
 
                 return new KeyValuePair<TKey, TValue?>((TKey)convertedKey, (TValue?)convertedValue);
             }

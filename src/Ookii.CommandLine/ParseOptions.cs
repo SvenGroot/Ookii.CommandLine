@@ -21,6 +21,7 @@ namespace Ookii.CommandLine
     public class ParseOptions
     {
         private WriteUsageOptions? _usageOptions;
+        private LocalizedStringProvider? _stringProvider;
 
         /// <summary>
         /// Gets or sets the culture used to convert command line argument values from their string representation to the argument type.
@@ -341,6 +342,27 @@ namespace Ookii.CommandLine
         /// </para>
         /// </remarks>
         public bool? UseErrorColor { get; set; }
+
+        /// <summary>
+        /// Gets or sets the <see cref="LocalizedStringProvider"/> implementation to use to get
+        /// strings for error messages and usage.
+        /// </summary>
+        /// <value>
+        /// An instance of a class inheriting from the <see cref="LocalizedStringProvider"/> class.
+        /// The default value is an instance of the <see cref="LocalizedStringProvider"/> class
+        /// itself.
+        /// </value>
+        /// <remarks>
+        /// <para>
+        ///   Set this property if you want to customize or locale error messages or usage help
+        ///   strings.
+        /// </para>
+        /// </remarks>
+        public LocalizedStringProvider StringProvider
+        {
+            get => _stringProvider ??= new LocalizedStringProvider();
+            set => _stringProvider = value;
+        }
 
         /// <summary>
         /// Gets or sets the options to use to write usage information to <see cref="Out"/> when

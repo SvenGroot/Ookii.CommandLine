@@ -203,6 +203,7 @@ namespace Ookii.CommandLine
         private readonly ParsingMode _mode;
         private readonly string? _longArgumentNamePrefix;
         private readonly NameTransform _nameTransform;
+        private readonly LocalizedStringProvider _stringProvider;
 
         /// <summary>
         /// Gets the default character used to separate the name and the value of an argument.
@@ -299,6 +300,7 @@ namespace Ookii.CommandLine
         public CommandLineParser(Type argumentsType, ParseOptions? options = null)
         {
             _argumentsType = argumentsType ?? throw new ArgumentNullException(nameof(argumentsType));
+            _stringProvider = options?.StringProvider ?? new LocalizedStringProvider();
 
             var optionsAttribute = _argumentsType.GetCustomAttribute<ParseOptionsAttribute>();
             _mode = options?.Mode ?? optionsAttribute?.Mode ?? ParsingMode.Default;
@@ -591,6 +593,16 @@ namespace Ookii.CommandLine
         /// </para>
         /// </remarks>
         public bool HelpRequested { get; set; }
+
+        /// <summary>
+        /// Gets the <see cref="LocalizedStringProvider"/> implementation used to get strings for
+        /// error messages and usage help.
+        /// </summary>
+        /// <value>
+        /// An instance of a class inheriting from the <see cref="LocalizedStringProvider"/> class.
+        /// </value>
+        /// <seealso cref="ParseOptions.StringProvider"/>
+        public LocalizedStringProvider StringProvider => _stringProvider;
 
         /// <summary>
         /// Gets the arguments supported by this <see cref="CommandLineParser"/> instance.
@@ -1343,7 +1355,7 @@ namespace Ookii.CommandLine
                     }
 
                     if (positionalArgumentIndex >= _positionalArgumentCount)
-                        throw new CommandLineArgumentException(Properties.Resources.TooManyArguments, CommandLineArgumentErrorCategory.TooManyArguments);
+                        throw StringProvider.CreateException(CommandLineArgumentErrorCategory.TooManyArguments);
 
                     // ParseArgumentValue returns true if parsing was cancelled by the ArgumentParsed event handler
                     // or the CancelParsing property.
@@ -1357,13 +1369,12 @@ namespace Ookii.CommandLine
             foreach (CommandLineArgument argument in _arguments)
             {
                 if (argument.IsRequired && !argument.HasValue)
-                    throw new CommandLineArgumentException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.MissingRequiredArgumentFormat, argument.ArgumentName), argument.ArgumentName, CommandLineArgumentErrorCategory.MissingRequiredArgument);
+                    throw StringProvider.CreateException(CommandLineArgumentErrorCategory.MissingRequiredArgument, argument.ArgumentName);
             }
 
             object?[] constructorArgumentValues = new object[_constructorArgumentCount];
             for (int x = 0; x < _constructorArgumentCount; ++x)
                 constructorArgumentValues[x] = _arguments[x].Value;
-
 
             object commandLineArguments = CreateArgumentsTypeInstance(constructorArgumentValues);
             foreach (CommandLineArgument argument in _arguments)
@@ -1425,7 +1436,7 @@ namespace Ookii.CommandLine
             }
 
             if (argument == null && !_argumentsByName.TryGetValue(argumentName, out argument))
-                throw CommandLineArgumentException.Create(CommandLineArgumentErrorCategory.UnknownArgument, Properties.Resources.UnknownArgumentFormat, argumentName);
+                throw StringProvider.CreateException(CommandLineArgumentErrorCategory.UnknownArgument, argumentName);
 
             if (argumentValue == null && !argument.IsSwitch && AllowWhiteSpaceValueSeparator && ++index < args.Length && CheckArgumentNamePrefix(args[index]) == null)
             {
@@ -1445,7 +1456,7 @@ namespace Ookii.CommandLine
             {
                 var arg = GetShortArgumentOrThrow(ch.ToString());
                 if (!arg.IsSwitch)
-                    throw CommandLineArgumentException.Create(CommandLineArgumentErrorCategory.CombinedShortNameNonSwitch, Properties.Resources.CombinedShortNameNonSwitchFormat, name);
+                    throw StringProvider.CreateException(CommandLineArgumentErrorCategory.CombinedShortNameNonSwitch, name);
 
                 if (ParseArgumentValue(arg, value))
                     return true;
@@ -1460,7 +1471,7 @@ namespace Ookii.CommandLine
             if (_argumentsByShortName!.TryGetValue(shortName, out CommandLineArgument? argument))
                 return argument;
 
-            throw CommandLineArgumentException.Create(CommandLineArgumentErrorCategory.UnknownArgument, Properties.Resources.UnknownArgumentFormat, shortName);
+            throw StringProvider.CreateException(CommandLineArgumentErrorCategory.UnknownArgument, shortName);
         }
 
         private PrefixInfo? CheckArgumentNamePrefix(string argument)
@@ -1639,7 +1650,7 @@ namespace Ookii.CommandLine
             }
             catch( TargetInvocationException ex )
             {
-                throw new CommandLineArgumentException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.CreateArgumentsTypeErrorFormat, ex.InnerException?.Message), CommandLineArgumentErrorCategory.CreateArgumentsTypeError, ex.InnerException);
+                throw StringProvider.CreateException(CommandLineArgumentErrorCategory.CreateArgumentsTypeError, ex.InnerException);
             }
         }
 

@@ -141,12 +141,12 @@ namespace Ookii.CommandLine
             private void SetValueCore(CommandLineArgument argument, CultureInfo culture, string? value)
             {
                 // ConvertToArgumentType is guaranteed to return non-null for dictionary arguments.
-                var pair = (KeyValuePair<TKey, TValue>)argument.ConvertToArgumentType(culture, value)!;
+                var pair = (KeyValuePair<TKey?, TValue?>)argument.ConvertToArgumentType(culture, value)!;
 
                 // With the KeyValuePairConverter, these should already be checked, but it's still
                 // checked here to deal with custom converters.
                 if (pair.Key == null || (!_allowNullValues && pair.Value == null))
-                    throw CommandLineArgumentException.Create(CommandLineArgumentErrorCategory.NullArgumentValue, Properties.Resources.NullArgumentValueFormat, argument.ArgumentName);
+                    throw argument._parser.StringProvider.CreateException(CommandLineArgumentErrorCategory.NullArgumentValue, argument);
 
                 try
                 {
@@ -157,7 +157,7 @@ namespace Ookii.CommandLine
                 }
                 catch (ArgumentException ex)
                 {
-                    throw CommandLineArgumentException.Create(CommandLineArgumentErrorCategory.InvalidDictionaryValue, Properties.Resources.InvalidDictionaryValueFormat, argument.ArgumentName, value, ex);
+                    throw argument._parser.StringProvider.CreateException(CommandLineArgumentErrorCategory.InvalidDictionaryValue, ex, argument, value);
                 }
             }
         }
@@ -323,7 +323,7 @@ namespace Ookii.CommandLine
                     if (converterType == null)
                     {
                         converterType = typeof(KeyValuePairConverter<,>).MakeGenericType(genericArguments);
-                        _converter = (TypeConverter)Activator.CreateInstance(converterType, _argumentName, _allowNull, info.KeyConverterType, info.ValueConverterType, _keyValueSeparator)!;
+                        _converter = (TypeConverter)Activator.CreateInstance(converterType, _parser.StringProvider, _argumentName, _allowNull, info.KeyConverterType, info.ValueConverterType, _keyValueSeparator)!;
                     }
 
                     _valueDescription = info.ValueDescription ??
@@ -898,30 +898,30 @@ namespace Ookii.CommandLine
                 if (IsSwitch)
                     return true;
                 else
-                    throw new CommandLineArgumentException(string.Format(System.Globalization.CultureInfo.CurrentCulture, Properties.Resources.MissingValueForNamedArgumentFormat, ArgumentName), ArgumentName, CommandLineArgumentErrorCategory.MissingNamedArgumentValue);
+                    throw _parser.StringProvider.CreateException(CommandLineArgumentErrorCategory.MissingNamedArgumentValue, this);
             }
 
             try
             {
                 var converted = _converter.ConvertFrom(null, culture, argumentValue);
                 if (converted == null && (!_allowNull || IsDictionary))
-                    throw new CommandLineArgumentException(String.Format(CultureInfo.CurrentCulture, Properties.Resources.NullArgumentValueFormat, ArgumentName), ArgumentName, CommandLineArgumentErrorCategory.NullArgumentValue);
+                    throw _parser.StringProvider.CreateException(CommandLineArgumentErrorCategory.NullArgumentValue, this);
 
                 return converted;
             }
             catch( NotSupportedException ex )
             {
-                throw new CommandLineArgumentException(string.Format(System.Globalization.CultureInfo.CurrentCulture, Properties.Resources.ArgumentConversionErrorFormat, argumentValue, ArgumentName, ValueDescription), ArgumentName, CommandLineArgumentErrorCategory.ArgumentValueConversion, ex);
+                throw _parser.StringProvider.CreateException(CommandLineArgumentErrorCategory.ArgumentValueConversion, ex, this, argumentValue);
             }
             catch( FormatException ex )
             {
-                throw new CommandLineArgumentException(string.Format(System.Globalization.CultureInfo.CurrentCulture, Properties.Resources.ArgumentConversionErrorFormat, argumentValue, ArgumentName, ValueDescription), ArgumentName, CommandLineArgumentErrorCategory.ArgumentValueConversion, ex);
+                throw _parser.StringProvider.CreateException(CommandLineArgumentErrorCategory.ArgumentValueConversion, ex, this, argumentValue);
             }
             catch( Exception ex )
             {
                 // Yeah, I don't like catching Exception, but unfortunately BaseNumberConverter (e.g. used for int) can *throw* a System.Exception (not a derived class) so there's nothing I can do about it.
                 if( ex.InnerException is FormatException )
-                    throw new CommandLineArgumentException(string.Format(System.Globalization.CultureInfo.CurrentCulture, Properties.Resources.ArgumentConversionErrorFormat, argumentValue, ArgumentName, ValueDescription), ArgumentName, CommandLineArgumentErrorCategory.ArgumentValueConversion, ex);
+                    throw _parser.StringProvider.CreateException(CommandLineArgumentErrorCategory.ArgumentValueConversion, ex, this, argumentValue);
                 else
                     throw;
             }
@@ -1008,7 +1008,7 @@ namespace Ookii.CommandLine
             Debug.Assert(_valueHelper != null);
 
             if (HasValue && !IsMultiValue && !_parser.AllowDuplicateArguments)
-                throw CommandLineArgumentException.Create(CommandLineArgumentErrorCategory.DuplicateArgument, Properties.Resources.DuplicateArgumentFormat, ArgumentName);
+                throw _parser.StringProvider.CreateException(CommandLineArgumentErrorCategory.DuplicateArgument, this);
 
             bool continueParsing = _valueHelper!.SetValue(this, culture, value);
             HasValue = true;
@@ -1197,7 +1197,7 @@ namespace Ookii.CommandLine
             }
             catch( TargetInvocationException ex )
             {
-                throw new CommandLineArgumentException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.SetValueErrorFormat, ArgumentName, ex.InnerException?.Message), ArgumentName, CommandLineArgumentErrorCategory.ApplyValueError, ex.InnerException);
+                throw _parser.StringProvider.CreateException(CommandLineArgumentErrorCategory.ApplyValueError, ex.InnerException, this);
             }
         }
 

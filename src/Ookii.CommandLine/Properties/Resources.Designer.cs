@@ -234,7 +234,7 @@ namespace Ookii.CommandLine.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to     {0}
+        ///   Looks up a localized string similar to     {2}{0}{3}
         ///{1}
         ///.
         /// </summary>
@@ -263,7 +263,7 @@ namespace Ookii.CommandLine.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to     {0}{1}{2} {3}{4}
+        ///   Looks up a localized string similar to     {7}{0}{1}{2} {3}{4}{8}
         ///{5}{6}
         ///.
         /// </summary>
@@ -594,6 +594,15 @@ namespace Ookii.CommandLine.Properties {
         internal static string UnknownVersion {
             get {
                 return ResourceManager.GetString("UnknownVersion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to An unspecified error has occurred..
+        /// </summary>
+        internal static string UnspecifiedError {
+            get {
+                return ResourceManager.GetString("UnspecifiedError", resourceCulture);
             }
         }
         
