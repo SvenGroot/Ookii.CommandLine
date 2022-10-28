@@ -129,14 +129,8 @@
   <data name="DefaultAvailableCommandsHeader" xml:space="preserve">
     <value>The following commands are available:</value>
   </data>
-  <data name="DefaultCommandFormat" xml:space="preserve">
-    <value>    {2}{0}{3}
-{1}
-</value>
-    <comment>Note this contains a newline at the end of the format. If you change this format, you may also need to change the indent used in the code.</comment>
-  </data>
-  <data name="DefaultCommandUsageFormat" xml:space="preserve">
-    <value>{0} &lt;command&gt; [arguments]</value>
+  <data name="DefaultCommandUsageSuffix" xml:space="preserve">
+    <value> &lt;command&gt; [arguments]</value>
   </data>
   <data name="DefaultUsagePrefix" xml:space="preserve">
     <value>Usage:</value>

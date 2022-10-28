@@ -196,22 +196,11 @@ namespace Ookii.CommandLine.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to     {2}{0}{3}
-        ///{1}
-        ///.
+        ///   Looks up a localized string similar to  &lt;command&gt; [arguments].
         /// </summary>
-        internal static string DefaultCommandFormat {
+        internal static string DefaultCommandUsageSuffix {
             get {
-                return ResourceManager.GetString("DefaultCommandFormat", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to {0} &lt;command&gt; [arguments].
-        /// </summary>
-        internal static string DefaultCommandUsageFormat {
-            get {
-                return ResourceManager.GetString("DefaultCommandUsageFormat", resourceCulture);
+                return ResourceManager.GetString("DefaultCommandUsageSuffix", resourceCulture);
             }
         }
         

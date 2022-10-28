@@ -153,23 +153,19 @@ namespace Ookii.CommandLine
 
             bool useColor = options.UsageOptions.UseColor ?? false;
             string usageColorStart = string.Empty;
-            string colorStart = string.Empty;
             string colorEnd = string.Empty;
             if (useColor)
             {
                 usageColorStart = options.UsageOptions.UsagePrefixColor;
-                colorStart = options.CommandDescriptionColor;
                 colorEnd = options.UsageOptions.ColorReset;
             }
 
             var executableName = options.UsageOptions.ExecutableName ?? 
                 CommandLineParser.GetExecutableName(options.UsageOptions.IncludeExecutableExtension);
 
-            var prefix = options.StringProvider.UsagePrefix(executableName, usageColorStart, colorEnd);
-
-            writer.Inner.WriteLine(options.CommandUsageFormat, prefix);
+            writer.Inner.WriteLine(options.StringProvider.RootCommandUsageSyntax(executableName, usageColorStart, colorEnd));
             writer.Inner.WriteLine();
-            writer.Inner.WriteLine(options.AvailableCommandsHeader);
+            writer.Inner.WriteLine(options.StringProvider.AvailableCommandsHeader(useColor));
             writer.Inner.WriteLine();
             if (lineWriter != null)
                 lineWriter.Indent = (lineWriter.MaximumLineLength > 0 && lineWriter.MaximumLineLength < CommandLineParser.MaximumLineWidthForIndent) ? 0 : options.CommandDescriptionIndent;
@@ -180,8 +176,7 @@ namespace Ookii.CommandLine
                     continue;
 
                 lineWriter?.ResetIndent();
-                writer.Inner.WriteLine(options.CommandDescriptionFormat, command.Name, command.Description ?? string.Empty,
-                    colorStart, colorEnd);
+                writer.Inner.WriteLine(options.StringProvider.CommandDescription(command, options));
             }
         }
 
