@@ -327,4 +327,20 @@ namespace Ookii.CommandLine.Tests
         [CommandLineArgument(IsHidden = true)]
         public int Hidden { get; set; }
     }
+
+    class NameTransformArguments
+    {
+        public NameTransformArguments(string testArg)
+        {
+        }
+
+        [CommandLineArgument]
+        public int TestArg2 { get; set; }
+
+        [CommandLineArgument]
+        public int __test__arg3__ { get; set; }
+
+        [CommandLineArgument("ExplicitName")]
+        public int Explicit { get; set; }
+    }
 }

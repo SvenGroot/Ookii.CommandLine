@@ -202,6 +202,7 @@ namespace Ookii.CommandLine
         private ReadOnlyCollection<string>? _argumentNamePrefixesReadOnlyWrapper;
         private readonly ParsingMode _mode;
         private readonly string? _longArgumentNamePrefix;
+        private readonly NameTransform _nameTransform;
 
         /// <summary>
         /// Gets the default character used to separate the name and the value of an argument.
@@ -301,6 +302,7 @@ namespace Ookii.CommandLine
 
             var optionsAttribute = _argumentsType.GetCustomAttribute<ParseOptionsAttribute>();
             _mode = options?.Mode ?? optionsAttribute?.Mode ?? ParsingMode.Default;
+            _nameTransform = options?.NameTransform ?? optionsAttribute?.NameTransform ?? NameTransform.None;
             var comparer = options?.ArgumentNameComparer ?? optionsAttribute?.GetStringComparer() ?? StringComparer.OrdinalIgnoreCase;
             var prefixes = options?.ArgumentNamePrefixes ?? optionsAttribute?.ArgumentNamePrefixes;
             _argumentNamePrefixes = DetermineArgumentNamePrefixes(prefixes);
@@ -355,6 +357,24 @@ namespace Ookii.CommandLine
         /// <see cref="ParsingMode.Default"/>.
         /// </value>
         public ParsingMode Mode => _mode;
+
+        /// <summary>
+        /// Gets or sets a value that indicates how names were created for arguments that didn't have
+        /// an explicit name.
+        /// </summary>
+        /// <value>
+        /// One of the values of the <see cref="NameTransform"/> enumeration.
+        /// </value>
+        /// <remarks>
+        /// <para>
+        ///   If an argument didn't have the <see cref="CommandLineArgumentAttribute.ArgumentName"/>
+        ///   property set (or doesn't have an <see cref="ArgumentNameAttribute"/> attribute for
+        ///   constructor parameters), the argument name was determined by taking the name of the
+        ///   property, constructor parameter, or method that defines it, and applying the specified
+        ///   transform.
+        /// </para>
+        /// </remarks>
+        public NameTransform NameTransform => _nameTransform;
 
         /// <summary>
         /// Gets the argument name prefixes used by this instance.

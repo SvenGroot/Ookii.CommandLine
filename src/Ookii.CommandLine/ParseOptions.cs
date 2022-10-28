@@ -35,7 +35,10 @@ namespace Ookii.CommandLine
         /// Gets or sets a value that indicates the command line argument parsing rules to use.
         /// </summary>
         /// <value>
-        /// The <see cref="Ookii.CommandLine.ParsingMode"/> to use. The default is <see cref="ParsingMode.Default"/>.
+        /// One of the values of the <see cref="ParsingMode"/> enumeration, or <see langword="null"/>
+        /// to use the value of <see cref="ParseOptionsAttribute.Mode"/>, or if that
+        /// attribute is not present, <see cref="ParsingMode.Default"/>. The default value is
+        /// <see langword="null"/>.
         /// </value>
         /// <remarks>
         /// <para>
@@ -44,6 +47,35 @@ namespace Ookii.CommandLine
         /// </para>
         /// </remarks>
         public ParsingMode? Mode { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value that indicates how names are created for arguments that don't have
+        /// an explicit name.
+        /// </summary>
+        /// <value>
+        /// One of the values of the <see cref="NameTransform"/> enumeration, or <see langword="null"/>
+        /// to use the value of <see cref="ParseOptionsAttribute.NameTransform"/>, or if that
+        /// attribute is not present, <see cref="NameTransform.None"/>. The default value is
+        /// <see langword="null"/>.
+        /// </value>
+        /// <remarks>
+        /// <para>
+        ///   If an argument doesn't have the <see cref="CommandLineArgumentAttribute.ArgumentName"/>
+        ///   property set (or doesn't have an <see cref="ArgumentNameAttribute"/> attribute for
+        ///   constructor parameters), the argument name is determined by taking the name of the
+        ///   property, constructor parameter, or method that defines it, and applying the specified
+        ///   transform.
+        /// </para>
+        /// <para>
+        ///   The name transform will also be applied to the names of the automatically added
+        ///   help and version attributes.
+        /// </para>
+        /// <para>
+        ///   If not <see langword="null"/>, this property overrides the value of the
+        ///   <see cref="ParseOptionsAttribute.NameTransform"/> property.
+        /// </para>
+        /// </remarks>
+        public NameTransform? NameTransform { get; set; }
 
         /// <summary>
         /// Gets or sets the argument name prefixes to use when parsing the arguments.
@@ -93,7 +125,7 @@ namespace Ookii.CommandLine
         /// </summary>
         /// <value>
         /// The <see cref="IComparer{T}"/> to use to compare the names of named arguments, or
-        /// <see langword="null"/> to use the determined using <see cref="ParseOptionsAttribute.CaseSensitive"/>,
+        /// <see langword="null"/> to use the one determined using <see cref="ParseOptionsAttribute.CaseSensitive"/>,
         /// or if the <see cref="ParseOptionsAttribute"/> is not present, <see cref="StringComparer.OrdinalIgnoreCase"/>.
         /// The default value is <see langword="null"/>.
         /// </value>

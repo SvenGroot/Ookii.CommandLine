@@ -12,6 +12,13 @@ namespace Ookii.CommandLine
     ///   that the name of the argument should be different than the parameter name, or to specify
     ///   a short name if the <see cref="CommandLineParser.Mode"/> property is <see cref="ParsingMode.LongShort"/>.
     /// </para>
+    /// <para>
+    ///   If no argument name is specified, the parameter name will be used, applying the
+    ///   <see cref="NameTransform"/> that is being used.
+    /// </para>
+    /// <para>
+    ///   The <see cref="NameTransform"/> will not be applied to explicitly specified names.
+    /// </para>
     /// </remarks>
     /// <threadsafety static="true" instance="false"/>
     [AttributeUsage(AttributeTargets.Parameter)]
@@ -23,7 +30,15 @@ namespace Ookii.CommandLine
         /// <summary>
         /// Initializes a new instance of the <see cref="ArgumentNameAttribute"/> class.
         /// </summary>
-        /// <param name="argumentName">The name of the argument.</param>
+        /// <param name="argumentName">
+        ///   The name of the argument, or <see langword="null"/> to indicate the parameter name
+        ///   should be used (applying the <see cref="NameTransform"/> that is being used).
+        /// </param>
+        /// <remarks>
+        /// <para>
+        ///   The <see cref="NameTransform"/> will not be applied to explicitly specified names.
+        /// </para>
+        /// </remarks>
         public ArgumentNameAttribute(string? argumentName = null)
         {
             _argumentName = argumentName;

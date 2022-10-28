@@ -48,6 +48,33 @@ namespace Ookii.CommandLine
         public ParsingMode Mode { get; set; }
 
         /// <summary>
+        /// Gets or sets a value that indicates how names are created for arguments that don't have
+        /// an explicit name.
+        /// </summary>
+        /// <value>
+        /// One of the values of the <see cref="NameTransform"/> enumeration. The default value is
+        /// <see cref="NameTransform.None"/>.
+        /// </value>
+        /// <remarks>
+        /// <para>
+        ///   If an argument doesn't have the <see cref="CommandLineArgumentAttribute.ArgumentName"/>
+        ///   property set (or doesn't have an <see cref="ArgumentNameAttribute"/> attribute for
+        ///   constructor parameters), the argument name is determined by taking the name of the
+        ///   property, constructor parameter, or method that defines it, and applying the specified
+        ///   transform.
+        /// </para>
+        /// <para>
+        ///   The name transform will also be applied to the names of the automatically added
+        ///   help and version attributes.
+        /// </para>
+        /// <para>
+        ///   This value can be overridden by the <see cref="ParseOptions.NameTransform"/>
+        ///   property.
+        /// </para>
+        /// </remarks>
+        public NameTransform NameTransform { get; set; }
+
+        /// <summary>
         /// Gets or sets the prefixes that can be used to specify an argument name on the command
         /// line.
         /// </summary>

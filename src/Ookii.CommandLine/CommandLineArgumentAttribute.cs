@@ -59,7 +59,9 @@ namespace Ookii.CommandLine
         private bool _short;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="CommandLineArgumentAttribute"/> class using the property name as the argument name.
+        /// Initializes a new instance of the <see cref="CommandLineArgumentAttribute"/> class using
+        /// the property or method name as the argument name, applying the <see cref="NameTransform"/>
+        /// that is being used.
         /// </summary>
         public CommandLineArgumentAttribute()
             : this(null)
@@ -69,7 +71,15 @@ namespace Ookii.CommandLine
         /// <summary>
         /// Initializes a new instance of the <see cref="CommandLineArgumentAttribute"/> class using the specified argument name.
         /// </summary>
-        /// <param name="argumentName">The name of the argument, or <see langword="null"/> to indicate the property name should be used.</param>
+        /// <param name="argumentName">
+        ///   The name of the argument, or <see langword="null"/> to indicate the property name
+        ///   should be used (applying the <see cref="NameTransform"/> that is being used).
+        /// </param>
+        /// <remarks>
+        /// <para>
+        ///   The <see cref="NameTransform"/> will not be applied to explicitly specified names.
+        /// </para>
+        /// </remarks>
         public CommandLineArgumentAttribute(string? argumentName)
         {
             Position = -1;

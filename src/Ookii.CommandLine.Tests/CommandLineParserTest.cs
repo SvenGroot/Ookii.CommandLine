@@ -654,6 +654,86 @@ namespace Ookii.CommandLine.Tests
             Assert.AreEqual(_expectedUsageHidden, usage);
         }
 
+        [TestMethod]
+        public void TestNameTransformPascalCase()
+        {
+            var options = new ParseOptions
+            {
+                NameTransform = NameTransform.PascalCase
+            };
+
+            var parser = new CommandLineParser<NameTransformArguments>(options);
+            TestArguments(parser.Arguments, new[]
+            {
+                new ExpectedArgument("TestArg", typeof(string)) { MemberName = "testArg", Position = 0, IsRequired = true },
+                new ExpectedArgument("ExplicitName", typeof(int)) { MemberName = "Explicit" },
+                new ExpectedArgument("Help", typeof(bool), ArgumentKind.Method) { MemberName = "AutomaticHelp", Description = "Displays this help message.", IsSwitch = true, Aliases = new[] { "?", "h" } },
+                new ExpectedArgument("TestArg2", typeof(int)) { MemberName = "TestArg2" },
+                new ExpectedArgument("TestArg3", typeof(int)) { MemberName = "__test__arg3__" },
+                new ExpectedArgument("Version", typeof(bool), ArgumentKind.Method) { MemberName = "AutomaticVersion", Description = "Displays version information.", IsSwitch = true },
+            });
+        }
+
+        [TestMethod]
+        public void TestNameTransformCamelCase()
+        {
+            var options = new ParseOptions
+            {
+                NameTransform = NameTransform.CamelCase
+            };
+
+            var parser = new CommandLineParser<NameTransformArguments>(options);
+            TestArguments(parser.Arguments, new[]
+            {
+                new ExpectedArgument("testArg", typeof(string)) { MemberName = "testArg", Position = 0, IsRequired = true },
+                new ExpectedArgument("ExplicitName", typeof(int)) { MemberName = "Explicit" },
+                new ExpectedArgument("help", typeof(bool), ArgumentKind.Method) { MemberName = "AutomaticHelp", Description = "Displays this help message.", IsSwitch = true, Aliases = new[] { "?", "h" } },
+                new ExpectedArgument("testArg2", typeof(int)) { MemberName = "TestArg2" },
+                new ExpectedArgument("testArg3", typeof(int)) { MemberName = "__test__arg3__" },
+                new ExpectedArgument("version", typeof(bool), ArgumentKind.Method) { MemberName = "AutomaticVersion", Description = "Displays version information.", IsSwitch = true },
+            });
+        }
+
+        [TestMethod]
+        public void TestNameTransformSnakeCase()
+        {
+            var options = new ParseOptions
+            {
+                NameTransform = NameTransform.SnakeCase
+            };
+
+            var parser = new CommandLineParser<NameTransformArguments>(options);
+            TestArguments(parser.Arguments, new[]
+            {
+                new ExpectedArgument("test_arg", typeof(string)) { MemberName = "testArg", Position = 0, IsRequired = true },
+                new ExpectedArgument("ExplicitName", typeof(int)) { MemberName = "Explicit" },
+                new ExpectedArgument("help", typeof(bool), ArgumentKind.Method) { MemberName = "AutomaticHelp", Description = "Displays this help message.", IsSwitch = true, Aliases = new[] { "?", "h" } },
+                new ExpectedArgument("test_arg2", typeof(int)) { MemberName = "TestArg2" },
+                new ExpectedArgument("test_arg3", typeof(int)) { MemberName = "__test__arg3__" },
+                new ExpectedArgument("version", typeof(bool), ArgumentKind.Method) { MemberName = "AutomaticVersion", Description = "Displays version information.", IsSwitch = true },
+            });
+        }
+
+        [TestMethod]
+        public void TestNameTransformDashCase()
+        {
+            var options = new ParseOptions
+            {
+                NameTransform = NameTransform.DashCase
+            };
+
+            var parser = new CommandLineParser<NameTransformArguments>(options);
+            TestArguments(parser.Arguments, new[]
+            {
+                new ExpectedArgument("test-arg", typeof(string)) { MemberName = "testArg", Position = 0, IsRequired = true },
+                new ExpectedArgument("ExplicitName", typeof(int)) { MemberName = "Explicit" },
+                new ExpectedArgument("help", typeof(bool), ArgumentKind.Method) { MemberName = "AutomaticHelp", Description = "Displays this help message.", IsSwitch = true, Aliases = new[] { "?", "h" } },
+                new ExpectedArgument("test-arg2", typeof(int)) { MemberName = "TestArg2" },
+                new ExpectedArgument("test-arg3", typeof(int)) { MemberName = "__test__arg3__" },
+                new ExpectedArgument("version", typeof(bool), ArgumentKind.Method) { MemberName = "AutomaticVersion", Description = "Displays version information.", IsSwitch = true },
+            });
+        }
+
         private record class ExpectedArgument
         {
             public ExpectedArgument(string name, Type type, ArgumentKind kind = ArgumentKind.SingleValue)

@@ -1026,7 +1026,7 @@ namespace Ookii.CommandLine
             var keyTypeConverterAttribute = parameter.GetCustomAttribute<KeyTypeConverterAttribute>();
             var valueTypeConverterAttribute = parameter.GetCustomAttribute<ValueTypeConverterAttribute>();
             var argumentNameAttribute = parameter.GetCustomAttribute<ArgumentNameAttribute>();
-            var argumentName = argumentNameAttribute?.ArgumentName ?? parameter.Name;
+            var argumentName = DetermineArgumentName(argumentNameAttribute?.ArgumentName, parameter.Name, parser.NameTransform);
             var info = new ArgumentInfo()
             {
                 Parser = parser,
@@ -1062,43 +1062,8 @@ namespace Ookii.CommandLine
                 throw new ArgumentNullException(nameof(parser));
             if( property == null )
                 throw new ArgumentNullException(nameof(property));
-            var attribute = property.GetCustomAttribute<CommandLineArgumentAttribute>();
-            if( attribute == null )
-                throw new ArgumentException(Properties.Resources.MissingArgumentAttribute, nameof(property));
 
-            var typeConverterAttribute = property.GetCustomAttribute<TypeConverterAttribute>();
-            var keyTypeConverterAttribute = property.GetCustomAttribute<KeyTypeConverterAttribute>();
-            var valueTypeConverterAttribute = property.GetCustomAttribute<ValueTypeConverterAttribute>();
-            var argumentName = attribute.ArgumentName ?? property.Name;
-            var info = new ArgumentInfo()
-            {
-                Parser = parser,
-                Property = property,
-                ArgumentName = argumentName,
-                Long = attribute.IsLong,
-                Short = attribute.IsShort,
-                ShortName = attribute.ShortName,
-                ArgumentType = property.PropertyType,
-                Description = property.GetCustomAttribute<DescriptionAttribute>()?.Description,
-                ValueDescription = attribute.ValueDescription,  // If null, the ctor will sort it out.
-                Position = attribute.Position < 0 ? null : attribute.Position,
-                AllowDuplicateDictionaryKeys = Attribute.IsDefined(property, typeof(AllowDuplicateDictionaryKeysAttribute)),
-                ConverterType = typeConverterAttribute == null ? null : Type.GetType(typeConverterAttribute.ConverterTypeName, true),
-                KeyConverterType = keyTypeConverterAttribute == null ? null : Type.GetType(keyTypeConverterAttribute.ConverterTypeName, true),
-                ValueConverterType = valueTypeConverterAttribute == null ? null : Type.GetType(valueTypeConverterAttribute.ConverterTypeName, true),
-                MultiValueSeparator = GetMultiValueSeparator(property.GetCustomAttribute<MultiValueSeparatorAttribute>()),
-                KeyValueSeparator = property.GetCustomAttribute<KeyValueSeparatorAttribute>()?.Separator,
-                Aliases = GetAliases(property.GetCustomAttributes<AliasAttribute>(), argumentName),
-                ShortAliases = GetShortAliases(property.GetCustomAttributes<ShortAliasAttribute>(), argumentName),
-                DefaultValue = attribute.DefaultValue,
-                IsRequired = attribute.IsRequired,
-                MemberName = property.Name,
-                AllowNull = DetermineAllowsNull(property),
-                CancelParsing = attribute.CancelParsing,
-                IsHidden = attribute.IsHidden,
-            };
-
-            return new CommandLineArgument(info);
+            return Create(parser, property, null, property.PropertyType, DetermineAllowsNull(property));
         }
 
         internal static CommandLineArgument Create(CommandLineParser parser, MethodInfo method)
@@ -1107,44 +1072,54 @@ namespace Ookii.CommandLine
                 throw new ArgumentNullException(nameof(parser));
             if (method == null)
                 throw new ArgumentNullException(nameof(method));
-            var attribute = method.GetCustomAttribute<CommandLineArgumentAttribute>();
-            if (attribute == null)
-                throw new ArgumentException(Properties.Resources.MissingArgumentAttribute, nameof(method));
 
             var infoTuple = DetermineMethodArgumentInfo(method);
             if (infoTuple == null)
                 throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.InvalidMethodSignatureFormat, method.Name));
 
             var (methodInfo, argumentType, allowsNull) = infoTuple.Value;
-            var typeConverterAttribute = method.GetCustomAttribute<TypeConverterAttribute>();
-            var keyTypeConverterAttribute = method.GetCustomAttribute<KeyTypeConverterAttribute>();
-            var valueTypeConverterAttribute = method.GetCustomAttribute<ValueTypeConverterAttribute>();
-            var argumentName = attribute.ArgumentName ?? method.Name;
+            return Create(parser, null, methodInfo, argumentType, allowsNull);
+        }
+
+        private static CommandLineArgument Create(CommandLineParser parser, PropertyInfo? property, MethodArgumentInfo? method,
+            Type argumentType, bool allowsNull)
+        {
+            var member = ((MemberInfo?)property ?? method?.Method)!;
+            var attribute = member.GetCustomAttribute<CommandLineArgumentAttribute>();
+            if (attribute == null)
+                throw new ArgumentException(Properties.Resources.MissingArgumentAttribute, nameof(method));
+
+            var typeConverterAttribute = member.GetCustomAttribute<TypeConverterAttribute>();
+            var keyTypeConverterAttribute = member.GetCustomAttribute<KeyTypeConverterAttribute>();
+            var valueTypeConverterAttribute = member.GetCustomAttribute<ValueTypeConverterAttribute>();
+            var argumentName = DetermineArgumentName(attribute.ArgumentName, member.Name, parser.NameTransform);
             var info = new ArgumentInfo()
             {
                 Parser = parser,
-                Method = methodInfo,
+                Property = property,
+                Method = method,
                 ArgumentName = argumentName,
                 Long = attribute.IsLong,
                 Short = attribute.IsShort,
                 ShortName = attribute.ShortName,
                 ArgumentType = argumentType,
-                Description = method.GetCustomAttribute<DescriptionAttribute>()?.Description,
+                Description = member.GetCustomAttribute<DescriptionAttribute>()?.Description,
                 ValueDescription = attribute.ValueDescription,  // If null, the ctor will sort it out.
                 Position = attribute.Position < 0 ? null : attribute.Position,
-                AllowDuplicateDictionaryKeys = Attribute.IsDefined(method, typeof(AllowDuplicateDictionaryKeysAttribute)),
+                AllowDuplicateDictionaryKeys = Attribute.IsDefined(member, typeof(AllowDuplicateDictionaryKeysAttribute)),
                 ConverterType = typeConverterAttribute == null ? null : Type.GetType(typeConverterAttribute.ConverterTypeName, true),
                 KeyConverterType = keyTypeConverterAttribute == null ? null : Type.GetType(keyTypeConverterAttribute.ConverterTypeName, true),
                 ValueConverterType = valueTypeConverterAttribute == null ? null : Type.GetType(valueTypeConverterAttribute.ConverterTypeName, true),
-                MultiValueSeparator = GetMultiValueSeparator(method.GetCustomAttribute<MultiValueSeparatorAttribute>()),
-                KeyValueSeparator = method.GetCustomAttribute<KeyValueSeparatorAttribute>()?.Separator,
-                Aliases = GetAliases(method.GetCustomAttributes<AliasAttribute>(), argumentName),
-                ShortAliases = GetShortAliases(method.GetCustomAttributes<ShortAliasAttribute>(), argumentName),
+                MultiValueSeparator = GetMultiValueSeparator(member.GetCustomAttribute<MultiValueSeparatorAttribute>()),
+                KeyValueSeparator = member.GetCustomAttribute<KeyValueSeparatorAttribute>()?.Separator,
+                Aliases = GetAliases(member.GetCustomAttributes<AliasAttribute>(), argumentName),
+                ShortAliases = GetShortAliases(member.GetCustomAttributes<ShortAliasAttribute>(), argumentName),
                 DefaultValue = attribute.DefaultValue,
                 IsRequired = attribute.IsRequired,
-                MemberName = method.Name,
+                MemberName = member.Name,
                 AllowNull = allowsNull,
                 CancelParsing = attribute.CancelParsing,
+                IsHidden = attribute.IsHidden,
             };
 
             return new CommandLineArgument(info);
@@ -1154,7 +1129,7 @@ namespace Ookii.CommandLine
         {
             if (parser == null)
                 throw new ArgumentNullException(nameof(parser));
-            var argumentName = Properties.Resources.AutomaticHelpName;
+            var argumentName = DetermineArgumentName(null, Properties.Resources.AutomaticHelpName, parser.NameTransform);
             var memberName = nameof(AutomaticHelp);
             var info = new ArgumentInfo()
             {
@@ -1189,7 +1164,7 @@ namespace Ookii.CommandLine
         {
             if (parser == null)
                 throw new ArgumentNullException(nameof(parser));
-            var argumentName = Properties.Resources.AutomaticVersionName;
+            var argumentName = DetermineArgumentName(null, Properties.Resources.AutomaticVersionName, parser.NameTransform);
             var memberName = nameof(AutomaticVersion);
             var info = new ArgumentInfo()
             {
@@ -1239,6 +1214,17 @@ namespace Ookii.CommandLine
 
             HasValue = false;
             UsedArgumentName = null;
+        }
+
+        internal static void ShowVersion(Assembly assembly, string friendlyName)
+        {
+            var versionAttribute = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>();
+            var version = versionAttribute?.InformationalVersion ?? assembly.GetName().Version?.ToString() ?? string.Empty;
+            var copyRightAttribute = assembly.GetCustomAttribute<AssemblyCopyrightAttribute>();
+
+            Console.WriteLine($"{friendlyName} {version}");
+            if (copyRightAttribute != null)
+                Console.WriteLine(copyRightAttribute.Copyright);
         }
 
         private static string? GetMultiValueSeparator(MultiValueSeparatorAttribute? attribute)
@@ -1566,15 +1552,83 @@ namespace Ookii.CommandLine
             return false;
         }
 
-        internal static void ShowVersion(Assembly assembly, string friendlyName)
+        private static string DetermineArgumentName(string? explicitName, string memberName, NameTransform transform)
         {
-            var versionAttribute = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>();
-            var version = versionAttribute?.InformationalVersion ?? assembly.GetName().Version?.ToString() ?? string.Empty;
-            var copyRightAttribute = assembly.GetCustomAttribute<AssemblyCopyrightAttribute>();
+            if (explicitName != null)
+                return explicitName;
 
-            Console.WriteLine($"{friendlyName} {version}");
-            if (copyRightAttribute != null)
-                Console.WriteLine(copyRightAttribute.Copyright);
+            return transform switch
+            {
+                NameTransform.PascalCase => ToPascalOrCamelCase(memberName, true),
+                NameTransform.CamelCase => ToPascalOrCamelCase(memberName, false),
+                NameTransform.SnakeCase => ToSnakeOrDashCase(memberName, '_'),
+                NameTransform.DashCase => ToSnakeOrDashCase(memberName, '-'),
+                _ => memberName,
+            };
+        }
+
+        private static string ToPascalOrCamelCase(string name, bool pascalCase)
+        {
+            // Remove any underscores, and the first letter (if pascal case) and any letter after an
+            // underscore is converted to uppercase. Other letters are unchanged.
+            var toUpper = pascalCase;
+            var toLower = !pascalCase; // Only for the first character.
+            var first = true;
+            var builder = new StringBuilder(name.Length);
+            foreach (var ch in name)
+            {
+                if (ch == '_')
+                {
+                    toUpper = !first || pascalCase;
+                    continue;
+                }
+
+                first = false;
+                if (toUpper)
+                {
+                    builder.Append(char.ToUpperInvariant(ch));
+                    toUpper = false;
+                }
+                else if (toLower)
+                {
+                    builder.Append(char.ToLowerInvariant(ch));
+                    toLower = false;
+                }
+                else
+                {
+                    builder.Append(ch);
+                }
+            }
+
+            return builder.ToString();
+        }
+
+        private static string ToSnakeOrDashCase(string name, char separator)
+        {
+            var needSeparator = false;
+            var first = true;
+            // Add some leeway to add separators.
+            var builder = new StringBuilder(name.Length * 2);
+            foreach (var ch in name)
+            {
+                if (ch == '_')
+                {
+                    needSeparator = !first;
+                }
+                else
+                {
+                    if (needSeparator || (char.IsUpper(ch) && !first))
+                    {
+                        builder.Append(separator);
+                        needSeparator = false;
+                    }
+
+                    builder.Append(char.ToLowerInvariant(ch));
+                    first = false;
+                }
+            }
+
+            return builder.ToString();
         }
     }
 }
