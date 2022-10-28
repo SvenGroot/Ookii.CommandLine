@@ -91,7 +91,7 @@ namespace Ookii.CommandLine.Tests
                 Error = writer,
                 UsageOptions = new WriteUsageOptions()
                 {
-                    UsagePrefixFormat = _usagePrefix
+                    ExecutableName = _executableName,
                 }
             };
 
@@ -136,7 +136,7 @@ namespace Ookii.CommandLine.Tests
                 Error = writer,
                 UsageOptions = new WriteUsageOptions()
                 {
-                    UsagePrefixFormat = _usagePrefix
+                    ExecutableName = _executableName,
                 }
             };
 
@@ -154,7 +154,7 @@ namespace Ookii.CommandLine.Tests
                 Error = writer,
                 UsageOptions = new WriteUsageOptions()
                 {
-                    UsagePrefixFormat = _usagePrefix,
+                    ExecutableName = _executableName,
                     UseColor = true,
                 }
             };
@@ -165,7 +165,7 @@ namespace Ookii.CommandLine.Tests
 
         #region Expected usage
 
-        private const string _usagePrefix = "{0}Usage:{1} test";
+        private const string _executableName = "test";
 
         public static readonly string _expectedUsage = @"Usage: test <command> [arguments]
 

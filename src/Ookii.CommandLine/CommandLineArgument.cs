@@ -353,6 +353,14 @@ namespace Ookii.CommandLine
         }
 
         /// <summary>
+        /// Gets the <see cref="CommandLineParser"/> that this argument belongs to.
+        /// </summary>
+        /// <value>
+        /// An instance of the <see cref="CommandLineParser"/> class.
+        /// </value>
+        public CommandLineParser Parser => _parser;
+
+        /// <summary>
         /// Gets the name of the property or constructor parameter that defined this command line argument.
         /// </summary>
         /// <value>
@@ -944,32 +952,14 @@ namespace Ookii.CommandLine
 
         internal string ToString(WriteUsageOptions options)
         {
-            var prefix = _parser.Mode != ParsingMode.LongShort || !HasLongName || (HasShortName && options.UseShortNamesForSyntax)
-                ? _parser.ArgumentNamePrefixes[0]
-                : _parser.LongArgumentNamePrefix!;
-
-            string argumentName;
-            if (HasShortName && options.UseShortNamesForSyntax)
-                argumentName = prefix + ShortName;
-            else
-                argumentName = prefix + ArgumentName;
-
-            if( Position != null )
-                argumentName = string.Format(CultureInfo.CurrentCulture, options.OptionalArgumentFormat, argumentName); // for positional parameters, the name itself is optional
-
-            string argument = argumentName;
-            if( !IsSwitch )
+            if (IsRequired)
             {
-                char separator = (_parser.AllowWhiteSpaceValueSeparator && options.UseWhiteSpaceValueSeparator) ? ' ' : _parser.NameValueSeparator;
-                string argumentValue = string.Format(CultureInfo.CurrentCulture, options.ValueDescriptionFormat, ValueDescription);
-                argument = argumentName + separator + argumentValue;
+                return _parser.StringProvider.ArgumentSyntax(this, options);
             }
-            if( IsMultiValue )
-                argument += options.ArraySuffix;
-            if( IsRequired )
-                return argument;
             else
-                return string.Format(CultureInfo.CurrentCulture, options.OptionalArgumentFormat, argument);
+            {
+                return _parser.StringProvider.OptionalArgumentSyntax(this, options);
+            }
         }
 
         internal bool HasInformation(WriteUsageOptions options)

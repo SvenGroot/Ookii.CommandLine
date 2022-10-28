@@ -123,12 +123,6 @@
   <data name="ArrayNotLastArgument" xml:space="preserve">
     <value>A positional array argument must be the last positional argument.</value>
   </data>
-  <data name="DefaultArgumentDescriptionFormat" xml:space="preserve">
-    <value>    {6}{3}{0} {2}{5}{7}
-{1}{4}
-</value>
-    <comment>Note this contains a newline at the end of the format. If you change this format, you may also need to change the indent used in the code.</comment>
-  </data>
   <data name="DefaultArraySuffix" xml:space="preserve">
     <value>...</value>
   </data>
@@ -144,14 +138,8 @@
   <data name="DefaultCommandUsageFormat" xml:space="preserve">
     <value>{0} &lt;command&gt; [arguments]</value>
   </data>
-  <data name="DefaultOptionalArgumentFormat" xml:space="preserve">
-    <value>[{0}]</value>
-  </data>
-  <data name="DefaultValueDescriptionFormat" xml:space="preserve">
-    <value>&lt;{0}&gt;</value>
-  </data>
-  <data name="DefaultUsagePrefixFormat" xml:space="preserve">
-    <value>{{0}}Usage:{{1}} {0}</value>
+  <data name="DefaultUsagePrefix" xml:space="preserve">
+    <value>Usage:</value>
   </data>
   <data name="DuplicateArgumentFormat" xml:space="preserve">
     <value>The argument '{0}' was supplied more than once.</value>
@@ -243,12 +231,6 @@
   <data name="EmptyAliasFormat" xml:space="preserve">
     <value>The argument '{0}' cannot have an empty alias.</value>
   </data>
-  <data name="DefaultAliasesFormat" xml:space="preserve">
-    <value> ({0})</value>
-  </data>
-  <data name="DefaultAliasFormat" xml:space="preserve">
-    <value> ({0})</value>
-  </data>
   <data name="DefaultDefaultValueFormat" xml:space="preserve">
     <value> Default value: {0}.</value>
   </data>
@@ -266,15 +248,6 @@
   </data>
   <data name="DefaultAbbreviatedRemainingArguments" xml:space="preserve">
     <value>[arguments]</value>
-  </data>
-  <data name="DefaultArgumentNamesSeparator" xml:space="preserve">
-    <value>, </value>
-  </data>
-  <data name="DefaultLongShortArgumentDescriptionFormat" xml:space="preserve">
-    <value>    {7}{0}{1}{2} {3}{4}{8}
-{5}{6}
-</value>
-    <comment>Note this contains a newline at the end of the format. If you change this format, you may also need to change the indent used in the code.</comment>
   </data>
   <data name="InvalidStandardStream" xml:space="preserve">
     <value>Invalid standard stream value.</value>

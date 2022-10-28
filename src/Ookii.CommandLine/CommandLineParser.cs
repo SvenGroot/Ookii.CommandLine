@@ -625,16 +625,16 @@ namespace Ookii.CommandLine
         }
 
         /// <summary>
-        /// Gets the default prefix for the command line usage information.
+        /// Gets the name of the executable used to inboke the application.
         /// </summary>
-        /// <param name="options">
-        ///   The options to use for formatting the usage. If <see langword="null"/>, the default
-        ///   options are used.
+        /// <param name="includeExtension">
+        ///   <see langword="true"/> to include the file name extension in the result; otherwise,
+        ///   <see langword="false"/>.
         /// </param>
         /// <returns>
-        /// A string consisting of the text "{0}Usage:{1} " followed by the file name of the application's executable.
+        /// The file name of the application's executable, with or without extension.
         /// </returns>
-        public static string GetDefaultUsagePrefixFormat(WriteUsageOptions? options = null)
+        public static string GetExecutableName(bool includeExtension = false)
         {
             string? path = null;
 #if NET6_0_OR_GREATER
@@ -648,12 +648,12 @@ namespace Ookii.CommandLine
             path ??= Environment.GetCommandLineArgs().FirstOrDefault() ?? Assembly.GetEntryAssembly()?.Location;
             if (path == null)
                 path = string.Empty;
-            else if (options?.IncludeExecutableExtension ?? false)
+            else if (includeExtension)
                 path = Path.GetFileName(path);
             else
                 path = Path.GetFileNameWithoutExtension(path);
 
-            return string.Format(CultureInfo.CurrentCulture, Properties.Resources.DefaultUsagePrefixFormat, path);
+            return path;
         }
 
         /// <summary>
@@ -1522,19 +1522,6 @@ namespace Ookii.CommandLine
                     : options.ArgumentDescriptionIndent;
             }
 
-            var shortNameSpacing = Mode == ParsingMode.LongShort && options.PreserveShortNameSpacing
-                ? new string(' ', _argumentNamePrefixes[0].Length + 1 + options.ArgumentNamesSeparator.Length)
-                : string.Empty;
-
-            bool useColor = options.UseColor ?? false;
-            string colorStart = string.Empty;
-            string colorEnd = string.Empty;
-            if (useColor)
-            {
-                colorStart = options.ArgumentDescriptionColor;
-                colorEnd = options.ColorReset;
-            }
-
             foreach (var argument in _arguments)
             {
                 bool include = !argument.IsHidden && options.ArgumentDescriptionListFilter switch
@@ -1550,60 +1537,8 @@ namespace Ookii.CommandLine
                     continue;
 
                 writer.ResetIndent();
-                string valueDescription = string.Format(CultureInfo.CurrentCulture, options.ValueDescriptionFormat, argument.ValueDescription);
-                if (argument.IsSwitch)
-                    valueDescription = string.Format(CultureInfo.CurrentCulture, options.OptionalArgumentFormat, valueDescription);
-                string defaultValue = options.IncludeDefaultValueInDescription && argument.DefaultValue != null ? string.Format(Culture, options.DefaultValueFormat, argument.DefaultValue) : string.Empty;
-                string alias = FormatAliasesForDescription(options, argument);
-                if (Mode == ParsingMode.LongShort)
-                {
-                    var shortName = argument.HasShortName ? ArgumentNamePrefixes[0] + argument.ShortName : shortNameSpacing;
-                    var longName = argument.HasLongName ? LongArgumentNamePrefix + argument.ArgumentName : string.Empty;
-                    var separator = argument.HasShortName && argument.HasLongName ? options.ArgumentNamesSeparator : string.Empty;
-
-                    writer.WriteLine(options.LongShortArgumentDescriptionFormat,shortName, separator, longName, valueDescription,
-                        alias, argument.Description, defaultValue, colorStart, colorEnd);
-                }
-                else
-                {
-                    writer.WriteLine(options.ArgumentDescriptionFormat, argument.ArgumentName, argument.Description,
-                        valueDescription, _argumentNamePrefixes[0], defaultValue, alias, colorStart, colorEnd);
-                }
+                writer.WriteLine(StringProvider.ArgumentDescription(argument, options));
             }
-        }
-
-        private string FormatAliasesForDescription(WriteUsageOptions options, CommandLineArgument argument)
-        {
-            if (!options.IncludeAliasInDescription || (argument.ShortAliases == null && argument.Aliases == null))
-                return string.Empty;
-
-            var result = new StringBuilder();
-            var count = AppendAliases(result, options, _argumentNamePrefixes[0], argument.ShortAliases, 0);
-            var prefix = LongArgumentNamePrefix ?? _argumentNamePrefixes[0];
-            count = AppendAliases(result, options, prefix, argument.Aliases, count);
-
-            if (count == 0)
-                return string.Empty;
-
-            return string.Format(Culture, count == 1 ? options.AliasFormat : options.AliasesFormat, result);
-        }
-
-        private static int AppendAliases<T>(StringBuilder builder, WriteUsageOptions options, string prefix, IEnumerable<T>? aliases, int count)
-        {
-            if (aliases == null)
-                return count;
-
-            foreach (var alias in aliases)
-            {
-                if (count != 0)
-                    builder.Append(options.ArgumentNamesSeparator);
-
-                builder.Append(prefix);
-                builder.Append(alias);
-                ++count;
-            }
-
-            return count;
         }
 
         private void WriteUsageSyntax(LineWrappingTextWriter writer, WriteUsageOptions options)
@@ -1620,8 +1555,12 @@ namespace Ookii.CommandLine
                 colorEnd = options.ColorReset;
             }
 
+            string executableName = options.ExecutableName ?? GetExecutableName(options.IncludeExecutableExtension);
+            string prefix = options.CommandName == null
+                ? StringProvider.UsagePrefix(executableName, colorStart, colorEnd)
+                : StringProvider.CommandUsagePrefix(executableName, options.CommandName, colorStart, colorEnd);
 
-            writer.Write(options.UsagePrefixFormat, colorStart, colorEnd);
+            writer.Write(prefix);
 
             foreach( CommandLineArgument argument in _arguments )
             {
@@ -1631,7 +1570,7 @@ namespace Ookii.CommandLine
                 writer.Write(" ");
                 if (options.UseAbbreviatedSyntax && argument.Position == null)
                 {
-                    writer.Write(options.AbbreviatedRemainingArguments);
+                    writer.Write(StringProvider.AbbreviatedRemainingArguments(useColor));
                     break;
                 }
 

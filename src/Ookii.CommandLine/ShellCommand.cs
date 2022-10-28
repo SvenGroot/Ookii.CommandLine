@@ -162,8 +162,10 @@ namespace Ookii.CommandLine
                 colorEnd = options.UsageOptions.ColorReset;
             }
 
-            var prefix = string.Format(writer.Inner.FormatProvider, options.UsageOptions.UsagePrefixFormat,
-                usageColorStart, colorEnd);
+            var executableName = options.UsageOptions.ExecutableName ?? 
+                CommandLineParser.GetExecutableName(options.UsageOptions.IncludeExecutableExtension);
+
+            var prefix = options.StringProvider.UsagePrefix(executableName, usageColorStart, colorEnd);
 
             writer.Inner.WriteLine(options.CommandUsageFormat, prefix);
             writer.Inner.WriteLine();
@@ -355,7 +357,6 @@ namespace Ookii.CommandLine
 
             // Update the values because the options are passed to the shell command and the ParseInternal method.
             var originalOut = options.Out;
-            var originalUsagePrefix = options.UsageOptions.UsagePrefixFormat;
             options.Out = output.Inner;
 
             try
@@ -370,13 +371,13 @@ namespace Ookii.CommandLine
                     return null;
                 }
 
-                options.UsageOptions.UsagePrefixFormat += " " + commandInfo.Value.Name;
+                options.UsageOptions.CommandName = commandInfo.Value.Name;
                 return commandInfo.Value.CreateInstance(args, index, options);
             }
             finally
             {
                 options.Out = originalOut;
-                options.UsageOptions.UsagePrefixFormat = originalUsagePrefix;
+                options.UsageOptions.CommandName = null;
             }
         }
 

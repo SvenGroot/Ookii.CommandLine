@@ -36,7 +36,7 @@ namespace Ookii.CommandLine
         /// </value>
         /// <remarks>
         /// <para>
-        ///   This format string shoud have one placeholder, which is used for the value of the <see cref="WriteUsageOptions.UsagePrefixFormat"/> property.
+        ///   This format string should have one placeholder.
         /// </para>
         /// </remarks>
         public string CommandUsageFormat

@@ -274,7 +274,7 @@ namespace Ookii.CommandLine.Tests
             CommandLineParser target = new CommandLineParser(argumentsType, new[] { "/", "-" });
             var options = new WriteUsageOptions()
             {
-                UsagePrefixFormat = _usagePrefix
+                ExecutableName = _executableName
             };
 
             string actual = target.GetUsage(0, options);
@@ -287,7 +287,7 @@ namespace Ookii.CommandLine.Tests
             var target = new CommandLineParser<LongShortArguments>();
             var options = new WriteUsageOptions()
             {
-                UsagePrefixFormat = _usagePrefix
+                ExecutableName = _executableName
             };
 
             string actual = target.GetUsage(0, options);
@@ -299,7 +299,7 @@ namespace Ookii.CommandLine.Tests
 
             options = new WriteUsageOptions()
             {
-                UsagePrefixFormat = _usagePrefix,
+                ExecutableName = _executableName,
                 UseAbbreviatedSyntax = true,
             };
 
@@ -313,7 +313,7 @@ namespace Ookii.CommandLine.Tests
             var target = new CommandLineParser<TestArguments>();
             var options = new WriteUsageOptions()
             {
-                UsagePrefixFormat = _usagePrefix,
+                ExecutableName = _executableName,
                 ArgumentDescriptionListFilter = DescriptionListFilterMode.Description
             };
 
@@ -335,7 +335,7 @@ namespace Ookii.CommandLine.Tests
             var target = new CommandLineParser(typeof(TestArguments), new[] { "/", "-" });
             var options = new WriteUsageOptions()
             {
-                UsagePrefixFormat = _usagePrefix,
+                ExecutableName = _executableName,
                 UseColor = true,
             };
 
@@ -359,7 +359,7 @@ namespace Ookii.CommandLine.Tests
                 Error = error,
             };
 
-            options.UsageOptions.UsagePrefixFormat = _usagePrefix;
+            options.UsageOptions.ExecutableName = _executableName;
 
             var result = CommandLineParser.Parse<TestArguments>(new[] { "foo", "-Arg6", "bar" }, options);
             Assert.IsNotNull(result);
@@ -646,7 +646,7 @@ namespace Ookii.CommandLine.Tests
             // Verify it's not in the usage.
             var options = new WriteUsageOptions()
             {
-                UsagePrefixFormat = _usagePrefix,
+                ExecutableName = _executableName,
                 ArgumentDescriptionListFilter = DescriptionListFilterMode.All,
             };
 
@@ -848,7 +848,7 @@ namespace Ookii.CommandLine.Tests
 
         #region Expected usage
 
-        private const string _usagePrefix = "{0}Usage:{1} test";
+        private const string _executableName = "test";
 
         private static readonly string _expectedDefaultUsage = @"Test arguments description.
 

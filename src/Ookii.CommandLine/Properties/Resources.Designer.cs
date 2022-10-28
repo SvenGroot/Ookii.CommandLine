@@ -178,44 +178,6 @@ namespace Ookii.CommandLine.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to  ({0}).
-        /// </summary>
-        internal static string DefaultAliasesFormat {
-            get {
-                return ResourceManager.GetString("DefaultAliasesFormat", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to  ({0}).
-        /// </summary>
-        internal static string DefaultAliasFormat {
-            get {
-                return ResourceManager.GetString("DefaultAliasFormat", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to     {6}{3}{0} {2}{5}{7}
-        ///{1}{4}
-        ///.
-        /// </summary>
-        internal static string DefaultArgumentDescriptionFormat {
-            get {
-                return ResourceManager.GetString("DefaultArgumentDescriptionFormat", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to , .
-        /// </summary>
-        internal static string DefaultArgumentNamesSeparator {
-            get {
-                return ResourceManager.GetString("DefaultArgumentNamesSeparator", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to ....
         /// </summary>
         internal static string DefaultArraySuffix {
@@ -263,40 +225,11 @@ namespace Ookii.CommandLine.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to     {7}{0}{1}{2} {3}{4}{8}
-        ///{5}{6}
-        ///.
+        ///   Looks up a localized string similar to Usage:.
         /// </summary>
-        internal static string DefaultLongShortArgumentDescriptionFormat {
+        internal static string DefaultUsagePrefix {
             get {
-                return ResourceManager.GetString("DefaultLongShortArgumentDescriptionFormat", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to [{0}].
-        /// </summary>
-        internal static string DefaultOptionalArgumentFormat {
-            get {
-                return ResourceManager.GetString("DefaultOptionalArgumentFormat", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to {{0}}Usage:{{1}} {0}.
-        /// </summary>
-        internal static string DefaultUsagePrefixFormat {
-            get {
-                return ResourceManager.GetString("DefaultUsagePrefixFormat", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to &lt;{0}&gt;.
-        /// </summary>
-        internal static string DefaultValueDescriptionFormat {
-            get {
-                return ResourceManager.GetString("DefaultValueDescriptionFormat", resourceCulture);
+                return ResourceManager.GetString("DefaultUsagePrefix", resourceCulture);
             }
         }
         

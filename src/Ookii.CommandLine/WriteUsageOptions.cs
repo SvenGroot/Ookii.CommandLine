@@ -8,18 +8,6 @@ namespace Ookii.CommandLine
     /// </summary>
     public sealed class WriteUsageOptions
     {
-        private string? _usagePrefixFormat;
-        private string? _valueDescriptionFormat;
-        private string? _optionalArgumentFormat;
-        private string? _arraySuffix;
-        private string? _argumentDescriptionFormat;
-        private string? _longShortArgumentDescriptionFormat;
-        private string? _aliasFormat;
-        private string? _aliasesFormat;
-        private string? _defaultValueFormat;
-        private string? _argumentNamesSeparator;
-        private string? _abbreviatedRemainingArguments;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="WriteUsageOptions"/> class.
         /// </summary>
@@ -43,53 +31,18 @@ namespace Ookii.CommandLine
         public bool IncludeApplicationDescription { get; set; }
 
         /// <summary>
-        /// Gets or sets the prefix to use for the argument syntax; typically this contains the executable name.
+        /// Gets or sets a value that overrides the default application executable name used in the
+        /// usage syntax.
         /// </summary>
         /// <value>
-        /// The prefix to use  for the argument syntax; typically this contains the executable name. The default value
-        /// is "{0}Usage:{1} " followed by the file name of the application's entry point assembly.
+        /// The application executable name, or <see langword="null"/> to use the default value.
         /// </value>
-        /// <remarks>
-        /// <para>
-        ///   The usage prefix is written before the command line syntax of the usage help, and is followed by the syntax
-        ///   of the individual arguments.
-        /// </para>
-        /// <para>
-        ///   Setting this property to <see langword="null"/> will revert it to its default value.
-        /// </para>
-        /// <para>
-        ///   This string can have the following placeholders:
-        /// </para>
-        /// <list type="table">
-        ///   <listheader>
-        ///     <term>Placeholder</term>
-        ///     <description>Description</description>
-        ///   </listheader>
-        ///   <item>
-        ///     <term>{0}</term>
-        ///     <description>
-        ///       If the <see cref="UseColor"/> property is <see langword="true"/>, the value of
-        ///       the <see cref="UsagePrefixColor"/> property; otherwise, an empty string.
-        ///     </description>
-        ///   </item>
-        ///   <item>
-        ///     <term>{1}</term>
-        ///     <description>
-        ///       If the <see cref="UseColor"/> property is <see langword="false"/>, the value of
-        ///       the <see cref="ColorReset"/> property; otherwise, an empty string.
-        ///     </description>
-        ///   </item>
-        /// </list>
-        /// </remarks>
-        public string UsagePrefixFormat
-        {
-            get { return _usagePrefixFormat ?? CommandLineParser.GetDefaultUsagePrefixFormat(this); }
-            set { _usagePrefixFormat = value; }
-        }
+        /// <seealso cref="CommandLineParser.GetExecutableName(bool)"/>
+        public string? ExecutableName { get; set; }
 
         /// <summary>
-        /// Gets or sets a value that indicates whether the default value for the <see cref="UsagePrefixFormat"/>
-        /// property should include the file extension of the application's executable.
+        /// Gets or sets a value that indicates whether the usage syntax should include the file
+        /// name extension of the application's executable.
         /// </summary>
         /// <value>
         /// <see langword="true"/> if the extension should be included; otherwise, <see langword="false"/>.
@@ -97,14 +50,14 @@ namespace Ookii.CommandLine
         /// </value>
         /// <remarks>
         /// <para>
-        ///   This property is not used if the <see cref="UsagePrefixFormat"/> property was assigned
-        ///   an explicit value.
+        ///   This property is not used if the <see cref="ExecutableName"/> property is not
+        ///   <see langword="null"/>.
         /// </para>
         /// </remarks>
         public bool IncludeExecutableExtension { get; set; }
 
         /// <summary>
-        /// Gets or sets the color applied to the <see cref="UsagePrefixFormat"/>.
+        /// Gets or sets the color applied to the <see cref="LocalizedStringProvider.UsagePrefix"/>.
         /// </summary>
         /// <value>
         ///   The virtual terminal sequence for a color. The default value is
@@ -131,32 +84,6 @@ namespace Ookii.CommandLine
         public string UsagePrefixColor { get; set; } = VirtualTerminal.TextFormat.ForegroundCyan;
 
         /// <summary>
-        /// Gets or sets the format string to use for the value description of an argument.
-        /// </summary>
-        /// <value>
-        /// The format string to use for the value description of an argument; the default value is "&lt;{0}&gt;".
-        /// </value>
-        /// <remarks>
-        /// <para>
-        ///   The value description of an argument is used in the command line syntax in the usage help. For example,
-        ///   the usage for an argument might look like "-sample &lt;String&gt;". In this example, "String" is the
-        ///   value description, and that it is surrounded by angle brackets is the default value of the <see cref="ValueDescriptionFormat"/>
-        ///   property.
-        /// </para>
-        /// <para>
-        ///   This format string should have one placeholder, which is used for the value description of the argument.
-        /// </para>
-        /// <para>
-        ///   Setting this property to <see langword="null"/> will revert it to its default value.
-        /// </para>
-        /// </remarks>
-        public string ValueDescriptionFormat
-        {
-            get { return _valueDescriptionFormat ?? Properties.Resources.DefaultValueDescriptionFormat; }
-            set { _valueDescriptionFormat = value; }
-        }
-
-        /// <summary>
         /// Gets or sets the number of characters by which to indent all except the first line of the command line syntax of the usage help.
         /// </summary>
         /// <value>
@@ -164,8 +91,10 @@ namespace Ookii.CommandLine
         /// </value>
         /// <remarks>
         /// <para>
-        ///   The command line syntax is a single line that consists of the usage prefix <see cref="UsagePrefixFormat"/> followed by the
-        ///   syntax of all the arguments. This indentation is used when that line exceeds the maximum line length.
+        ///   The command line syntax is a single line that consists of the usage prefix returned
+        ///   by <see cref="LocalizedStringProvider.UsagePrefix"/> followed by the syntax of all
+        ///   the arguments. This indentation is used when that line exceeds the maximum line
+        ///   length.
         /// </para>
         /// <para>
         ///   This value is not used if the maximum line length of the <see cref="LineWrappingTextWriter"/> to which the usage
@@ -173,54 +102,6 @@ namespace Ookii.CommandLine
         /// </para>
         /// </remarks>
         public int Indent { get; set; }
-
-        /// <summary>
-        /// Gets or sets the format string to use for optional arguments and optional argument names.
-        /// </summary>
-        /// <value>
-        /// The format string to use for optional arguments; the default value is "[{0}]".
-        /// </value>
-        /// <remarks>
-        /// <para>
-        ///   This format string is used for optional parameters in the command line syntax. For example, using the default value, an
-        ///   optional parameter would be formatted as "[-sample &lt;String&gt;]". The format string is also used for positional arguments,
-        ///   in which case the argument name is optional. For example, an optional positional argument would be formatted as "[[-sample] &lt;String&gt;]"
-        ///   using the default value.
-        /// </para>
-        /// <para>
-        ///   This format string should have one placeholder, which is used for the entire argument or the argument name.
-        /// </para>
-        /// <para>
-        ///   Setting this property to <see langword="null"/> will revert it to its default value.
-        /// </para>
-        /// </remarks>
-        public string OptionalArgumentFormat
-        {
-            get { return _optionalArgumentFormat ?? Properties.Resources.DefaultOptionalArgumentFormat; }
-            set { _optionalArgumentFormat = value; }
-        }
-
-        /// <summary>
-        /// Gets or sets the suffix to append to the name of an array argument.
-        /// </summary>
-        /// <value>
-        /// The suffix to append to the name of an array argument; the default value is "...".
-        /// </value>
-        /// <remarks>
-        /// <para>
-        ///   An argument that has an array type can be specified multiple times. This suffix is appended to the command line syntax for
-        ///   the command to indicate that it can be repeated. For example, using the default options, an optional array argument would
-        ///   be formatted as "[-sample &lt;String&gt;...]"
-        /// </para>
-        /// <para>
-        ///   Setting this property to <see langword="null"/> will revert it to its default value.
-        /// </para>
-        /// </remarks>
-        public string ArraySuffix
-        {
-            get { return _arraySuffix ?? Properties.Resources.DefaultArraySuffix; }
-            set { _arraySuffix = value; }
-        }
 
         /// <summary>
         /// Gets or sets a value that indicates whether the usage syntax should use short names
@@ -250,8 +131,8 @@ namespace Ookii.CommandLine
         /// <remarks>
         /// <para>
         ///   Abbreviated usage syntax only lists the positional arguments explicitly. After that,
-        ///   if there are any more arguments, it will just print the value of the <see cref="AbbreviatedRemainingArguments"/>
-        ///   property. The user will have to refer to the description list to see the remaining
+        ///   if there are any more arguments, it will just print the value of the <see cref="LocalizedStringProvider.AbbreviatedRemainingArguments(bool)"/>
+        ///   method. The user will have to refer to the description list to see the remaining
         ///   possible arguments.
         /// </para>
         /// <para>
@@ -259,235 +140,6 @@ namespace Ookii.CommandLine
         /// </para>
         /// </remarks>
         public bool UseAbbreviatedSyntax { get; set; }
-
-        /// <summary>
-        /// Gets or sets the string used to indicate there are more arguments when the
-        /// <see cref="UseAbbreviatedSyntax"/> property is <see langword="true"/>.
-        /// </summary>
-        /// <value>
-        /// The string used to indicate there are more arguments. The default value is "[arguments]".
-        /// </value>
-        public string AbbreviatedRemainingArguments
-        {
-            get => _abbreviatedRemainingArguments ?? Properties.Resources.DefaultAbbreviatedRemainingArguments;
-            set => _abbreviatedRemainingArguments = value;
-        }
-
-        /// <summary>
-        /// Gets or sets the format string to use for the description of an argument if the
-        /// <see cref="CommandLineParser.Mode"/> property is <see cref="ParsingMode.Default"/>.
-        /// </summary>
-        /// <value>
-        /// The format string to use for the description of an argument; the default value is "&#160;&#160;&#160;&#160;{3}{0} {2}{5}\n{1}{4}\n" (note that it contains line breaks).
-        /// </value>
-        /// <remarks>
-        /// <para>
-        ///   This format string is used for the detailed descriptions of the arguments, which is written after
-        ///   the command line syntax.
-        /// </para>
-        /// <para>
-        ///   The <see cref="ArgumentDescriptionIndent"/> property should be set to something appropriate for this format. For example, in
-        ///   the default format, the description is indented by 8 characters.
-        /// </para>
-        /// <para>
-        ///   This format string can have the following placeholders (any can be omitted if desired):
-        /// </para>
-        /// <list type="table">
-        ///   <listheader>
-        ///     <term>Placeholder</term>
-        ///     <description>Description</description>
-        ///   </listheader>
-        ///   <item>
-        ///     <term>{0}</term>
-        ///     <description>
-        ///       The argument name, including the long argument prefix. If the
-        ///       argument doesn't have a long name, this will be an empty string.
-        ///     </description>
-        ///   </item>
-        ///   <item>
-        ///     <term>{1}</term>
-        ///     <description>
-        ///       The description of the argument.
-        ///     </description>
-        ///   </item>
-        ///   <item>
-        ///     <term>{2}</term>
-        ///     <description>
-        ///       The value description, formatted according to <see cref="ValueDescriptionFormat"/>.
-        ///       For a switch argument, also formatted according to <see cref="OptionalArgumentFormat"/>.
-        ///     </description>
-        ///   </item>
-        ///   <item>
-        ///     <term>{3}</term>
-        ///     <description>
-        ///       The primary argument name prefix.
-        ///     </description>
-        ///   </item>
-        ///   <item>
-        ///     <term>{4}</term>
-        ///     <description>
-        ///       If the argument has a default value, the default value formatted according to the
-        ///       <see cref="DefaultValueFormat"/> property. If the argument has no default value,
-        ///       or the <see cref="IncludeDefaultValueInDescription"/> property is <see langword="false"/>,
-        ///       an empty string.
-        ///     </description>
-        ///   </item>
-        ///   <item>
-        ///     <term>{5}</term>
-        ///     <description>
-        ///       If the argument has aliases, a list of the short and long aliases, separated by
-        ///       the value of the <see cref="ArgumentNamesSeparator"/> property, formatted
-        ///       according to <see cref="AliasFormat"/> if there is one alias, or <see cref="AliasesFormat"/>
-        ///       if there is more than one. If the argument has no aliases, or the <see cref="IncludeAliasInDescription"/>
-        ///       property is <see langword="false"/>, an empty string.
-        ///     </description>
-        ///   </item>
-        ///   <item>
-        ///     <term>{6}</term>
-        ///     <description>
-        ///       If the <see cref="UseColor"/> property is <see langword="true"/>, the value of
-        ///       the <see cref="ArgumentDescriptionColor"/> property; otherwise, an empty string.
-        ///     </description>
-        ///   </item>
-        ///   <item>
-        ///     <term>{7}</term>
-        ///     <description>
-        ///       If the <see cref="UseColor"/> property is <see langword="false"/>, the value of
-        ///       the <see cref="ColorReset"/> property; otherwise, an empty string.
-        ///     </description>
-        ///   </item>
-        /// </list>
-        /// </remarks>
-        public string ArgumentDescriptionFormat
-        {
-            get { return _argumentDescriptionFormat ?? Properties.Resources.DefaultArgumentDescriptionFormat; }
-            set { _argumentDescriptionFormat = value; }
-        }
-
-        /// <summary>
-        /// Gets or sets the format string to use for the description of an argument if the
-        /// <see cref="CommandLineParser.Mode"/> property is <see cref="ParsingMode.LongShort"/>.
-        /// </summary>
-        /// <value>
-        /// The format string to use for the description of an argument; the default value is
-        /// "&#160;&#160;&#160;&#160;{7}{0}{1}{2} {3}{4}{8}\n{5}{6}\n" (note that it contains line
-        /// breaks, and widths that assume the primary short name prefix is a single character).
-        /// </value>
-        /// <remarks>
-        /// <para>
-        ///   This format string is used for the detailed descriptions of the arguments, which is
-        ///   written after the command line syntax. This format is used in place of <see cref="ArgumentDescriptionFormat"/>
-        ///   when the <see cref="CommandLineParser.Mode"/> property is <see cref="ParsingMode.LongShort"/>.
-        /// </para>
-        /// <para>
-        ///   The <see cref="LongShortArgumentDescriptionIndent"/> property should be set to
-        ///   something appropriate for this format. For example, in the default format, the
-        ///   description is indented by 12 characters.
-        /// </para>
-        /// <para>
-        ///   This format string can have the following placeholders (any can be omitted if desired):
-        /// </para>
-        /// <list type="table">
-        ///   <listheader>
-        ///     <term>Placeholder</term>
-        ///     <description>Description</description>
-        ///   </listheader>
-        ///   <item>
-        ///     <term>{0}</term>
-        ///     <description>
-        ///       The short argument name, including the primary short argument prefix. If the
-        ///       argument doesn't have a short name, this will be an empty string, or if
-        ///       the <see cref="PreserveShortNameSpacing"/> property is true, an amount of spaces
-        ///       equal to the length of a short name with prefix plus the length of the value of
-        ///       the <see cref="ArgumentNamesSeparator"/> property.
-        ///     </description>
-        ///   </item>
-        ///   <item>
-        ///     <term>{1}</term>
-        ///     <description>
-        ///       If the argument has both a short and a long name, the value of the <see cref="ArgumentNamesSeparator"/>
-        ///       property; otherwise, an empty string.
-        ///     </description>
-        ///   </item>
-        ///   <item>
-        ///     <term>{2}</term>
-        ///     <description>
-        ///       The long argument name, including the long argument prefix. If the
-        ///       argument doesn't have a long name, this will be an empty string.
-        ///     </description>
-        ///   </item>
-        ///   <item>
-        ///     <term>{3}</term>
-        ///     <description>
-        ///       The value description, formatted according to <see cref="ValueDescriptionFormat"/>.
-        ///       For a switch argument, also formatted according to <see cref="OptionalArgumentFormat"/>.
-        ///     </description>
-        ///   </item>
-        ///   <item>
-        ///     <term>{4}</term>
-        ///     <description>
-        ///       If the argument has aliases, a list of the short and long aliases, separated by
-        ///       the value of the <see cref="ArgumentNamesSeparator"/> property, formatted
-        ///       according to <see cref="AliasFormat"/> if there is one alias, or <see cref="AliasesFormat"/>
-        ///       if there is more than one. If the argument has no aliases, or the <see cref="IncludeAliasInDescription"/>
-        ///       property is <see langword="false"/>, an empty string.
-        ///     </description>
-        ///   </item>
-        ///   <item>
-        ///     <term>{5}</term>
-        ///     <description>
-        ///       The description of the argument.
-        ///     </description>
-        ///   </item>
-        ///   <item>
-        ///     <term>{6}</term>
-        ///     <description>
-        ///       If the argument has a default value, the default value formatted according to the
-        ///       <see cref="DefaultValueFormat"/> property. If the argument has no default value,
-        ///       or the <see cref="IncludeDefaultValueInDescription"/> property is <see langword="false"/>,
-        ///       an empty string.
-        ///     </description>
-        ///   </item>
-        ///   <item>
-        ///     <term>{7}</term>
-        ///     <description>
-        ///       If the <see cref="UseColor"/> property is <see langword="true"/>, the value of
-        ///       the <see cref="ArgumentDescriptionColor"/> property; otherwise, an empty string.
-        ///     </description>
-        ///   </item>
-        ///   <item>
-        ///     <term>{8}</term>
-        ///     <description>
-        ///       If the <see cref="UseColor"/> property is <see langword="false"/>, the value of
-        ///       the <see cref="ColorReset"/> property; otherwise, an empty string.
-        ///     </description>
-        ///   </item>
-        /// </list>
-        /// </remarks>
-        public string LongShortArgumentDescriptionFormat
-        {
-            get => _longShortArgumentDescriptionFormat ?? Properties.Resources.DefaultLongShortArgumentDescriptionFormat;
-            set => _longShortArgumentDescriptionFormat = value;
-        }
-
-        /// <summary>
-        /// Gets or sets a value that indicates whether to reserve space for a short name even if
-        /// an argument doesn't have a short name.
-        /// </summary>
-        /// <value>
-        /// <see langword="true"/> to output a number of spaces equal to the length of a short name
-        /// with separator, plus the length of the value of the <see cref="ArgumentNamesSeparator"/>
-        /// property, for the short name placeholder in the <see cref="LongShortArgumentDescriptionFormat"/>
-        /// property; otherwise, <see langword="false"/> to use an empty string. The default value
-        /// is <see langword="true"/>.
-        /// </value>
-        /// <remarks>
-        /// <note>
-        ///   This property is only used when the <see cref="CommandLineParser.Mode"/> property is
-        ///   <see cref="ParsingMode.LongShort"/>.
-        /// </note>
-        /// </remarks>
-        public bool PreserveShortNameSpacing { get; set; } = true;
 
         /// <summary>
         /// Gets or sets the number of characters by which to indent the all but the first line of
@@ -499,7 +151,9 @@ namespace Ookii.CommandLine
         /// </value>
         /// <remarks>
         /// <para>
-        ///   This property should be set to a value appropriate for the format string specified by the <see cref="ArgumentDescriptionFormat"/> property.
+        ///   This property should be set to a value appropriate for the string returned by the
+        ///   <see cref="LocalizedStringProvider.ArgumentDescription"/> method, if you have overridden
+        ///   that method.
         /// </para>
         /// <para>
         ///   This value is not used if the maximum line length of the <see cref="LineWrappingTextWriter"/> to which the usage
@@ -523,8 +177,9 @@ namespace Ookii.CommandLine
         ///   when the <see cref="CommandLineParser.Mode"/> property is <see cref="ParsingMode.LongShort"/>.
         /// </para>
         /// <para>
-        ///   This property should be set to a value appropriate for the format string specified
-        ///   by the <see cref="LongShortArgumentDescriptionFormat"/> property.
+        ///   This property should be set to a value appropriate for the string returned by the
+        ///   <see cref="LocalizedStringProvider.ArgumentDescription"/> method, if you have overridden
+        ///   that method.
         /// </para>
         /// <para>
         ///   This value is not used if the maximum line length of the <see cref="LineWrappingTextWriter"/>
@@ -543,7 +198,7 @@ namespace Ookii.CommandLine
         public DescriptionListFilterMode ArgumentDescriptionListFilter { get; set; }
 
         /// <summary>
-        /// Gets or sets the color applied to the <see cref="ArgumentDescriptionFormat"/>.
+        /// Gets or sets the color applied to the <see cref="LocalizedStringProvider.ArgumentDescription"/>.
         /// </summary>
         /// <value>
         ///   The virtual terminal sequence for a color. The default value is
@@ -568,25 +223,6 @@ namespace Ookii.CommandLine
         /// </para>
         /// </remarks>
         public string ArgumentDescriptionColor { get; set; } = VirtualTerminal.TextFormat.ForegroundGreen;
-
-        /// <summary>
-        /// Gets or sets a string used to separator argument names.
-        /// </summary>
-        /// <value>
-        /// A string used to separator argument names. The default value is ", ".
-        /// </value>
-        /// <remarks>
-        /// <para>
-        ///   The value of this property is used to separate aliases in the <see cref="AliasesFormat"/>,
-        ///   property and to separate the long and short argument name in the
-        ///   <see cref="LongShortArgumentDescriptionFormat"/> property.
-        /// </para>
-        /// </remarks>
-        public string ArgumentNamesSeparator
-        {
-            get => _argumentNamesSeparator ?? Properties.Resources.DefaultArgumentNamesSeparator;
-            set => _argumentNamesSeparator = value;
-        }
 
         /// <summary>
         /// Gets or sets a value indicating whether white space, rather than a colon, is used to separate named arguments and their values
@@ -618,11 +254,6 @@ namespace Ookii.CommandLine
         /// </value>
         /// <remarks>
         /// <para>
-        ///   If this property is <see langword="true"/> and an argument has one or more aliases, the aliases will be formatted using
-        ///   the <see cref="AliasFormat"/> property (if there's one alias) or the <see cref="AliasesFormat"/> property (for multiple
-        ///   aliases), and then included in the description according to the <see cref="ArgumentDescriptionFormat"/> property.
-        /// </para>
-        /// <para>
         ///   For arguments that do not have any aliases, this property has no effect.
         /// </para>
         /// </remarks>
@@ -636,98 +267,9 @@ namespace Ookii.CommandLine
         /// otherwise, <see langword="false" />. The default value is <see langword="true" />.
         /// </value>
         /// <para>
-        ///   If this property is <see langword="true"/> and an argument has a default value other than <see langword="null"/>, the default value will be formatted using
-        ///   the <see cref="DefaultValueFormat"/> property, and then included in the description according to the <see cref="ArgumentDescriptionFormat"/> property.
-        /// </para>
-        /// <para>
         ///   For arguments with a default value of <see langword="null"/>, this property has no effect.
         /// </para>
         public bool IncludeDefaultValueInDescription { get; set; } = true;
-
-        /// <summary>
-        /// Gets or sets the format string to use to display the alias of an argument that only has one alias.
-        /// </summary>
-        /// <value>
-        /// The format string for the alias of an argument; the default value is " ({0})" (note the leading space).
-        /// </value>
-        /// <remarks>
-        /// <para>
-        ///   The format specified by this property is used for an argument that has exactly one alias. Aliases
-        ///   are only added to the description if the <see cref="IncludeAliasInDescription"/> property is
-        ///   <see langword="true"/>.
-        /// </para>
-        /// <para>
-        ///   This format string can have one placeholder, which will be set to the alias preceded by the primary argument name prefix.
-        /// </para>
-        /// <para>
-        ///   To modify the placement of the alias in the description of an argument, use the <see cref="ArgumentDescriptionFormat"/> property.
-        /// </para>
-        /// <para>
-        ///   Setting this property to <see langword="null"/> will revert it to its default value.
-        /// </para>
-        /// </remarks>
-        public string AliasFormat
-        {
-            get { return _aliasFormat ?? Properties.Resources.DefaultAliasFormat; }
-            set { _aliasFormat = value; }
-        }
-
-        /// <summary>
-        /// Gets or sets the format string to use to display the alias of an argument that only has one alias.
-        /// </summary>
-        /// <value>
-        /// The format string for the alias of an argument; the default value is " ({0})" (note the leading space).
-        /// </value>
-        /// <remarks>
-        /// <para>
-        ///   The format specified by this property is used for an argument that has more than one alias. Aliases
-        ///   are only added to the description if the <see cref="IncludeAliasInDescription"/> property is
-        ///   <see langword="true"/>.
-        /// </para>
-        /// <para>
-        ///   This format string can have one placeholder, which will be set to a comma-separated list of the aliases, each
-        ///   preceded by the primary argument name prefix.
-        /// </para>
-        /// <para>
-        ///   To modify the placement of the alias in the description of an argument, use the <see cref="ArgumentDescriptionFormat"/> property.
-        /// </para>
-        /// <para>
-        ///   Setting this property to <see langword="null"/> will revert it to its default value.
-        /// </para>
-        /// </remarks>
-        public string AliasesFormat
-        {
-            get { return _aliasesFormat ?? Properties.Resources.DefaultAliasesFormat; }
-            set { _aliasesFormat = value; }
-        }
-
-        /// <summary>
-        /// Gets or sets the format string to use to display the alias of an argument that only has one alias.
-        /// </summary>
-        /// <value>
-        /// The format string for the alias of an argument; the default value is " Default value: {0}." (note the leading space).
-        /// </value>
-        /// <remarks>
-        /// <para>
-        ///   The format specified by this property is used for an argument that has a default value other than <see langword="null"/>. Default values
-        ///   are only added to the description if the <see cref="IncludeDefaultValueInDescription"/> property is
-        ///   <see langword="true"/>.
-        /// </para>
-        /// <para>
-        ///   This format string can have one placeholder, which will be set to the default value.
-        /// </para>
-        /// <para>
-        ///   To modify the placement of the default value in the description of an argument, use the <see cref="ArgumentDescriptionFormat"/> property.
-        /// </para>
-        /// <para>
-        ///   Setting this property to <see langword="null"/> will revert it to its default value.
-        /// </para>
-        /// </remarks>
-        public string DefaultValueFormat
-        {
-            get { return _defaultValueFormat ?? Properties.Resources.DefaultDefaultValueFormat; }
-            set { _defaultValueFormat = value; }
-        }
 
         /// <summary>
         /// Gets or sets the sequence used to reset color applied a usage help element.
@@ -770,5 +312,7 @@ namespace Ookii.CommandLine
         /// </para>
         /// </remarks>
         public bool? UseColor { get; set; }
+
+        internal string? CommandName { get; set; }
     }
 }
