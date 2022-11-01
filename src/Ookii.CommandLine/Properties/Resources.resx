@@ -150,9 +150,6 @@
   <data name="EmptyArgumentNamePrefix" xml:space="preserve">
     <value>An argument name prefix may not be null or an empty string.</value>
   </data>
-  <data name="IncorrectDefaultValueTypeFormat" xml:space="preserve">
-    <value>The type of the default value for argument '{0}' is not compatible with the type of the argument.</value>
-  </data>
   <data name="IndentOutOfRange" xml:space="preserve">
     <value>The indent must be greater than or equal to zero, and less than the maximum line length.</value>
   </data>
@@ -275,5 +272,47 @@
   </data>
   <data name="UnspecifiedError" xml:space="preserve">
     <value>An unspecified error has occurred.</value>
+  </data>
+  <data name="MinMaxBothNull" xml:space="preserve">
+    <value>The 'minimum' and 'maximum' parameters cannot both be null.</value>
+  </data>
+  <data name="TypeConversionErrorFormat" xml:space="preserve">
+    <value>Could not convert type '{0}' to '{1}' for argument '{2}'.</value>
+  </data>
+  <data name="ValidateCountBothFormat" xml:space="preserve">
+    <value>The argument '{0}' must have between {1} and {2} items.</value>
+  </data>
+  <data name="ValidateCountMaxFormat" xml:space="preserve">
+    <value>The argument '{0}' must have at most {1} items.</value>
+  </data>
+  <data name="ValidateCountMinFormat" xml:space="preserve">
+    <value>The argument '{0}' must have at least {1} items.</value>
+  </data>
+  <data name="ValidateEmptyFailedFormat" xml:space="preserve">
+    <value>The argument '{0}' must not be empty.</value>
+  </data>
+  <data name="ValidateRangeFailedBothFormat" xml:space="preserve">
+    <value>The argument '{0}' must be between {1} and {2}.</value>
+  </data>
+  <data name="ValidateRangeFailedMaxFormat" xml:space="preserve">
+    <value>The argument '{0}' must be most {1}.</value>
+  </data>
+  <data name="ValidateRangeFailedMinFormat" xml:space="preserve">
+    <value>The argument '{0}' must be at least {1}.</value>
+  </data>
+  <data name="ValidateStringLengthBothFormat" xml:space="preserve">
+    <value>The argument '{0}' must be between {1} and {2} characters.</value>
+  </data>
+  <data name="ValidateStringLengthMaxFormat" xml:space="preserve">
+    <value>The argument '{0}' must be at most {1} characters.</value>
+  </data>
+  <data name="ValidateStringLengthMinFormat" xml:space="preserve">
+    <value>The argument '{0}' must be at least {1} characters.</value>
+  </data>
+  <data name="ValidateWhiteSpaceFailedFormat" xml:space="preserve">
+    <value>The argument '{0}' must not be empty or contain only white-space characters.</value>
+  </data>
+  <data name="ValidationFailedFormat" xml:space="preserve">
+    <value>The value for the argument '{0}' is not valid.</value>
   </data>
 </root>

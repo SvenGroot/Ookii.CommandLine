@@ -1,6 +1,8 @@
 ﻿using Ookii.CommandLine.Properties;
+using Ookii.CommandLine.Validation;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
@@ -120,6 +122,92 @@ namespace Ookii.CommandLine
         public virtual string MissingKeyValuePairSeparator(string separator)
             => Format(Resources.NoKeyValuePairSeparatorFormat, separator);
 
+        /// <summary>
+        /// Gets a generic error message for the base implementation of <see cref="ArgumentValidationAttribute.GetErrorMessage"/>.
+        /// </summary>
+        /// <param name="argumentName">The name of the argument.</param>
+        /// <returns>The error message.</returns>
+        public virtual string ValidationFailed(string argumentName)
+            => Format(Resources.ValidationFailedFormat, argumentName);
+
+        /// <summary>
+        /// Gets an error message used if the <see cref="ValidateRangeAttribute"/> fails validation.
+        /// </summary>
+        /// <param name="argumentName">The name of the argument.</param>
+        /// <param name="attribute">The <see cref="ValidateRangeAttribute"/>.</param>
+        /// <returns>The error message.</returns>
+        public virtual string ValidateRangeFailed(string argumentName, ValidateRangeAttribute attribute)
+        {
+            if (attribute.Maximum == null)
+                return Format(Resources.ValidateRangeFailedMinFormat, argumentName, attribute.Minimum);
+            else if (attribute.Minimum == null)
+                return Format(Resources.ValidateRangeFailedMaxFormat, argumentName, attribute.Maximum);
+            else
+                return Format(Resources.ValidateRangeFailedBothFormat, argumentName, attribute.Minimum, attribute.Maximum);
+        }
+
+        /// <summary>
+        /// Gets an error message used if the <see cref="ValidateNotNullOrEmptyAttribute"/> fails
+        /// validation because the string was empty.
+        /// </summary>
+        /// <param name="argumentName">The name of the argument.</param>
+        /// <returns>The error message.</returns>
+        /// <remarks>
+        /// <para>
+        ///   If <see cref="ValidateNotNullOrEmptyAttribute"/> failed because the value was
+        ///   <see langword="null"/>, the <see cref="NullArgumentValue"/> method is called instead.
+        /// </para>
+        /// </remarks>
+        public virtual string ValidateNotEmptyFailed(string argumentName)
+            => Format(Resources.ValidateEmptyFailedFormat, argumentName);
+
+        /// <summary>
+        /// Gets an error message used if the <see cref="ValidateNotNullOrWhiteSpaceAttribute"/> fails
+        /// validation because the string was empty.
+        /// </summary>
+        /// <param name="argumentName">The name of the argument.</param>
+        /// <returns>The error message.</returns>
+        /// <remarks>
+        /// <para>
+        ///   If <see cref="ValidateNotNullOrWhiteSpaceAttribute"/> failed because the value was
+        ///   <see langword="null"/>, the <see cref="NullArgumentValue"/> method is called instead.
+        /// </para>
+        /// </remarks>
+        public virtual string ValidateNotWhiteSpaceFailed(string argumentName)
+            => Format(Resources.ValidateWhiteSpaceFailedFormat, argumentName);
+
+        /// <summary>
+        /// Gets an error message used if the <see cref="ValidateStringLengthAttribute"/> fails validation.
+        /// </summary>
+        /// <param name="argumentName">The name of the argument.</param>
+        /// <param name="attribute">The <see cref="ValidateStringLengthAttribute"/>.</param>
+        /// <returns>The error message.</returns>
+        public virtual string ValidateStringLengthFailed(string argumentName, ValidateStringLengthAttribute attribute)
+        {
+            if (attribute.MaximumLength == int.MaxValue)
+                return Format(Resources.ValidateRangeFailedMinFormat, argumentName, attribute.MinimumLength);
+            else if (attribute.MinimumLength <= 0)
+                return Format(Resources.ValidateRangeFailedMaxFormat, argumentName, attribute.MaximumLength);
+            else
+                return Format(Resources.ValidateRangeFailedBothFormat, argumentName, attribute.MinimumLength, attribute.MaximumLength);
+        }
+
+        /// <summary>
+        /// Gets an error message used if the <see cref="ValidateCountAttribute"/> fails validation.
+        /// </summary>
+        /// <param name="argumentName">The name of the argument.</param>
+        /// <param name="attribute">The <see cref="ValidateCountAttribute"/>.</param>
+        /// <returns>The error message.</returns>
+        public virtual string ValidateCountFailed(string argumentName, ValidateCountAttribute attribute)
+        {
+            if (attribute.Maximum == int.MaxValue)
+                return Format(Resources.ValidateCountMinFormat, argumentName, attribute.Minimum);
+            else if (attribute.Minimum <= 0)
+                return Format(Resources.ValidateCountMaxFormat, argumentName, attribute.Maximum);
+            else
+                return Format(Resources.ValidateCountBothFormat, argumentName, attribute.Minimum, attribute.Maximum);
+        }
+
         internal CommandLineArgumentException CreateException(CommandLineArgumentErrorCategory category, Exception? inner, CommandLineArgument argument, string? value = null)
             => CreateException(category, inner, argument, argument.ArgumentName, value);
 
@@ -134,6 +222,9 @@ namespace Ookii.CommandLine
 
         private CommandLineArgumentException CreateException(CommandLineArgumentErrorCategory category, Exception? inner, CommandLineArgument? argument = null, string? argumentName = null, string? value = null)
         {
+            // These are not created using the helper, because there is not one standard message.
+            Debug.Assert(category != CommandLineArgumentErrorCategory.ValidationFailed);
+
             var message = category switch
             {
                 CommandLineArgumentErrorCategory.MissingRequiredArgument => MissingRequiredArgument(argumentName!),

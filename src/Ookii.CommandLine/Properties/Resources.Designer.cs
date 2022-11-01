@@ -286,15 +286,6 @@ namespace Ookii.CommandLine.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The type of the default value for argument &apos;{0}&apos; is not compatible with the type of the argument..
-        /// </summary>
-        internal static string IncorrectDefaultValueTypeFormat {
-            get {
-                return ResourceManager.GetString("IncorrectDefaultValueTypeFormat", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to The indent must be greater than or equal to zero, and less than the maximum line length..
         /// </summary>
         internal static string IndentOutOfRange {
@@ -354,6 +345,15 @@ namespace Ookii.CommandLine.Properties {
         internal static string InvalidStandardStream {
             get {
                 return ResourceManager.GetString("InvalidStandardStream", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The &apos;minimum&apos; and &apos;maximum&apos; parameters cannot both be null..
+        /// </summary>
+        internal static string MinMaxBothNull {
+            get {
+                return ResourceManager.GetString("MinMaxBothNull", resourceCulture);
             }
         }
         
@@ -484,6 +484,15 @@ namespace Ookii.CommandLine.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Could not convert type &apos;{0}&apos; to &apos;{1}&apos; for argument &apos;{2}&apos;..
+        /// </summary>
+        internal static string TypeConversionErrorFormat {
+            get {
+                return ResourceManager.GetString("TypeConversionErrorFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The type &apos;{0}&apos; does not derive from the ShellCommand class or does not define the ShellCommandAttribute attribute..
         /// </summary>
         internal static string TypeIsNotShellCommandFormat {
@@ -525,6 +534,114 @@ namespace Ookii.CommandLine.Properties {
         internal static string UnspecifiedError {
             get {
                 return ResourceManager.GetString("UnspecifiedError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The argument &apos;{0}&apos; must have between {1} and {2} items..
+        /// </summary>
+        internal static string ValidateCountBothFormat {
+            get {
+                return ResourceManager.GetString("ValidateCountBothFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The argument &apos;{0}&apos; must have at most {1} items..
+        /// </summary>
+        internal static string ValidateCountMaxFormat {
+            get {
+                return ResourceManager.GetString("ValidateCountMaxFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The argument &apos;{0}&apos; must have at least {1} items..
+        /// </summary>
+        internal static string ValidateCountMinFormat {
+            get {
+                return ResourceManager.GetString("ValidateCountMinFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The argument &apos;{0}&apos; must not be empty..
+        /// </summary>
+        internal static string ValidateEmptyFailedFormat {
+            get {
+                return ResourceManager.GetString("ValidateEmptyFailedFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The argument &apos;{0}&apos; must be between {1} and {2}..
+        /// </summary>
+        internal static string ValidateRangeFailedBothFormat {
+            get {
+                return ResourceManager.GetString("ValidateRangeFailedBothFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The argument &apos;{0}&apos; must be most {1}..
+        /// </summary>
+        internal static string ValidateRangeFailedMaxFormat {
+            get {
+                return ResourceManager.GetString("ValidateRangeFailedMaxFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The argument &apos;{0}&apos; must be at least {1}..
+        /// </summary>
+        internal static string ValidateRangeFailedMinFormat {
+            get {
+                return ResourceManager.GetString("ValidateRangeFailedMinFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The argument &apos;{0}&apos; must be between {1} and {2} characters..
+        /// </summary>
+        internal static string ValidateStringLengthBothFormat {
+            get {
+                return ResourceManager.GetString("ValidateStringLengthBothFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The argument &apos;{0}&apos; must be at most {1} characters..
+        /// </summary>
+        internal static string ValidateStringLengthMaxFormat {
+            get {
+                return ResourceManager.GetString("ValidateStringLengthMaxFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The argument &apos;{0}&apos; must be at least {1} characters..
+        /// </summary>
+        internal static string ValidateStringLengthMinFormat {
+            get {
+                return ResourceManager.GetString("ValidateStringLengthMinFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The argument &apos;{0}&apos; must not be empty or contain only white-space characters..
+        /// </summary>
+        internal static string ValidateWhiteSpaceFailedFormat {
+            get {
+                return ResourceManager.GetString("ValidateWhiteSpaceFailedFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The value for the argument &apos;{0}&apos; is not valid..
+        /// </summary>
+        internal static string ValidationFailedFormat {
+            get {
+                return ResourceManager.GetString("ValidationFailedFormat", resourceCulture);
             }
         }
         

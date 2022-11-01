@@ -734,6 +734,50 @@ namespace Ookii.CommandLine.Tests
             });
         }
 
+        [TestMethod]
+        public void TestValidation()
+        {
+            var parser = new CommandLineParser<ValidationArguments>();
+
+            // Range validator on property
+            CheckThrows(() => parser.Parse(new[] { "-Arg1", "0" }), parser, CommandLineArgumentErrorCategory.ValidationFailed, "Arg1");
+            var result = parser.Parse(new[] { "-Arg1", "1" });
+            Assert.AreEqual(1, result.Arg1);
+            result = parser.Parse(new[] { "-Arg1", "5" });
+            Assert.AreEqual(5, result.Arg1);
+            CheckThrows(() => parser.Parse(new[] { "-Arg1", "6" }), parser, CommandLineArgumentErrorCategory.ValidationFailed, "Arg1");
+
+            // Not null or empty on ctor parameter
+            CheckThrows(() => parser.Parse(new[] { "" }), parser, CommandLineArgumentErrorCategory.ValidationFailed, "arg2");
+            result = parser.Parse(new[] { " " });
+            Assert.AreEqual(" ", result.Arg2);
+
+            // Multiple validators on method
+            CheckThrows(() => parser.Parse(new[] { "-Arg3", "1238" }), parser, CommandLineArgumentErrorCategory.ValidationFailed, "Arg3");
+            Assert.AreEqual(0, ValidationArguments.Arg3Value);
+            CheckThrows(() => parser.Parse(new[] { "-Arg3", "123" }), parser, CommandLineArgumentErrorCategory.ValidationFailed, "Arg3");
+            Assert.AreEqual(0, ValidationArguments.Arg3Value);
+            CheckThrows(() => parser.Parse(new[] { "-Arg3", "7001" }), parser, CommandLineArgumentErrorCategory.ValidationFailed, "Arg3");
+            // Range validation is done after setting the value, so this was set!
+            Assert.AreEqual(7001, ValidationArguments.Arg3Value);
+            parser.Parse(new[] { "-Arg3", "1023" });
+            Assert.AreEqual(1023, ValidationArguments.Arg3Value);
+
+            // Validator on multi-value argument
+            CheckThrows(() => parser.Parse(new[] { "-Arg4", "foo;bar;bazz" }), parser, CommandLineArgumentErrorCategory.ValidationFailed, "Arg4");
+            CheckThrows(() => parser.Parse(new[] { "-Arg4", "foo", "-Arg4", "bar", "-Arg4", "bazz" }), parser, CommandLineArgumentErrorCategory.ValidationFailed, "Arg4");
+            result = parser.Parse(new[] { "-Arg4", "foo;bar" });
+            CollectionAssert.AreEqual(new[] { "foo", "bar" }, result.Arg4);
+            result = parser.Parse(new[] { "-Arg4", "foo", "-Arg4", "bar" });
+            CollectionAssert.AreEqual(new[] { "foo", "bar" }, result.Arg4);
+
+            // Count validator
+            CheckThrows(() => parser.Parse(new[] { "-Arg4", "foo" }), parser, CommandLineArgumentErrorCategory.ValidationFailed, "Arg4");
+            CheckThrows(() => parser.Parse(new[] { "-Arg4", "foo;bar;baz;ban;bap" }), parser, CommandLineArgumentErrorCategory.ValidationFailed, "Arg4");
+            result = parser.Parse(new[] { "-Arg4", "foo;bar;baz;ban" });
+            CollectionAssert.AreEqual(new[] { "foo", "bar", "baz", "ban" }, result.Arg4);
+        }
+
         private record class ExpectedArgument
         {
             public ExpectedArgument(string name, Type type, ArgumentKind kind = ArgumentKind.SingleValue)

@@ -55,6 +55,11 @@ namespace Ookii.CommandLine
         /// <summary>
         /// A combined short argument contains an argument that is not a switch.
         /// </summary>
-        CombinedShortNameNonSwitch
+        CombinedShortNameNonSwitch,
+        /// <summary>
+        /// An instance of a class derived from the <see cref="Validation.ArgumentValidationAttribute"/>
+        /// class failed to validate the argument.
+        /// </summary>
+        ValidationFailed,
     }
 }

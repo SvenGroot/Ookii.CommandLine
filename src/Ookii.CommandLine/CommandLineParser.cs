@@ -1359,12 +1359,10 @@ namespace Ookii.CommandLine
                 }
             }
 
-            // Check required arguments and convert array arguments. This is done in usage order so the first missing positional argument is reported, rather
-            // than the missing argument that is first alphabetically.
+            // Check required arguments and post-parsing validation. This is done in usage order.
             foreach (CommandLineArgument argument in _arguments)
             {
-                if (argument.IsRequired && !argument.HasValue)
-                    throw StringProvider.CreateException(CommandLineArgumentErrorCategory.MissingRequiredArgument, argument.ArgumentName);
+                argument.ValidateAfterParsing();
             }
 
             object?[] constructorArgumentValues = new object[_constructorArgumentCount];
@@ -1374,9 +1372,10 @@ namespace Ookii.CommandLine
             object commandLineArguments = CreateArgumentsTypeInstance(constructorArgumentValues);
             foreach (CommandLineArgument argument in _arguments)
             {
-                // Apply property argument values (this does nothing for constructor arguments).
+                // Apply property argument values (this does nothing for constructor or method arguments).
                 argument.ApplyPropertyValue(commandLineArguments);
             }
+
             return commandLineArguments;
         }
 

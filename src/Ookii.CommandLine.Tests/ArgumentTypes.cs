@@ -1,4 +1,5 @@
 ﻿using Ookii.CommandLine;
+using Ookii.CommandLine.Validation;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -342,5 +343,35 @@ namespace Ookii.CommandLine.Tests
 
         [CommandLineArgument("ExplicitName")]
         public int Explicit { get; set; }
+    }
+
+    class ValidationArguments
+    {
+        public static int Arg3Value { get; set; }
+
+        public ValidationArguments([ValidateNotNullOrEmpty] string arg2 = null)
+        {
+            Arg2 = arg2;
+        }
+
+        [CommandLineArgument]
+        [ValidateRange(1, 5)]
+        public int? Arg1 { get; set; }
+
+        public string Arg2 { get; set; }
+
+        [CommandLineArgument]
+        [ValidatePattern("^[0-7]{4}$")]
+        [ValidateRange(1000, 7000)]
+        public static void Arg3(int value)
+        {
+            Arg3Value = value;
+        }
+
+        [CommandLineArgument]
+        [MultiValueSeparator(";")]
+        [ValidateStringLength(1, 3)]
+        [ValidateCount(2, 4)]
+        public string[] Arg4 { get; set; }
     }
 }

@@ -1,4 +1,5 @@
 ﻿// Copyright (c) Sven Groot (Ookii.org)
+using Ookii.CommandLine.Validation;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -23,7 +24,7 @@ namespace Ookii.CommandLine
         private interface IValueHelper
         {
             object? Value { get; }
-            bool SetValue(CommandLineArgument argument, CultureInfo culture, string? value);
+            (object?, bool) SetValue(CommandLineArgument argument, CultureInfo culture, string? value);
             void ApplyValue(object target, PropertyInfo property);
         }
 
@@ -41,10 +42,10 @@ namespace Ookii.CommandLine
                 property.SetValue(target, Value);
             }
 
-            public bool SetValue(CommandLineArgument argument, CultureInfo culture, string? value)
+            public (object?, bool) SetValue(CommandLineArgument argument, CultureInfo culture, string? value)
             {
                 Value = argument.ConvertToArgumentType(culture, value);
-                return true;
+                return (Value, true);
             }
         }
 
@@ -74,20 +75,13 @@ namespace Ookii.CommandLine
                     list.Add(value);
             }
 
-            public bool SetValue(CommandLineArgument argument, CultureInfo culture, string? value)
+            public (object?, bool) SetValue(CommandLineArgument argument, CultureInfo culture, string? value)
             {
-                if (value == null || argument.MultiValueSeparator == null)
-                {
-                    _values.Add((T?)argument.ConvertToArgumentType(culture, value));
-                    return true;
-                }
-
-                string[] values = value.Split(new[] { argument.MultiValueSeparator }, StringSplitOptions.None);
-                foreach (string separateValue in values)
-                    _values.Add((T?)argument.ConvertToArgumentType(culture, separateValue));
-
-                return true;
+                var converted = (T?)argument.ConvertToArgumentType(culture, value);
+                _values.Add(converted);
+                return (converted, true);
             }
+
         }
 
         private class DictionaryValueHelper<TKey, TValue> : IValueHelper
@@ -123,22 +117,7 @@ namespace Ookii.CommandLine
                     dictionary.Add(pair.Key, pair.Value);
             }
 
-            public bool SetValue(CommandLineArgument argument, CultureInfo culture, string? value)
-            {
-                if (value == null || argument.MultiValueSeparator == null)
-                {
-                    SetValueCore(argument, culture, value);
-                    return true;
-                }
-
-                string[] values = value.Split(new[] { argument.MultiValueSeparator }, StringSplitOptions.None);
-                foreach (string separateValue in values)
-                    SetValueCore(argument, culture, separateValue);
-
-                return true;
-            }
-
-            private void SetValueCore(CommandLineArgument argument, CultureInfo culture, string? value)
+            public (object?, bool) SetValue(CommandLineArgument argument, CultureInfo culture, string? value)
             {
                 // ConvertToArgumentType is guaranteed to return non-null for dictionary arguments.
                 var pair = (KeyValuePair<TKey?, TValue?>)argument.ConvertToArgumentType(culture, value)!;
@@ -159,6 +138,8 @@ namespace Ookii.CommandLine
                 {
                     throw argument._parser.StringProvider.CreateException(CommandLineArgumentErrorCategory.InvalidDictionaryValue, ex, argument, value);
                 }
+
+                return (pair, true);
             }
         }
 
@@ -171,7 +152,7 @@ namespace Ookii.CommandLine
                 throw new InvalidOperationException();
             }
 
-            public bool SetValue(CommandLineArgument argument, CultureInfo culture, string? value)
+            public (object?, bool) SetValue(CommandLineArgument argument, CultureInfo culture, string? value)
             {
                 Value = argument.ConvertToArgumentType(culture, value);
                 var info = argument._method!.Value;
@@ -191,9 +172,9 @@ namespace Ookii.CommandLine
 
                 var returnValue = info.Method.Invoke(null, parameters);
                 if (returnValue == null)
-                    return true;
+                    return (Value, true);
                 else
-                    return (bool)returnValue;
+                    return (Value, (bool)returnValue);
             }
         }
 
@@ -225,6 +206,7 @@ namespace Ookii.CommandLine
             public bool AllowNull { get; set; }
             public bool CancelParsing { get; set; }
             public bool IsHidden { get; set; }
+            public IEnumerable<ArgumentValidationAttribute> Validators { get; set; }
         }
 
         private struct MethodArgumentInfo
@@ -259,6 +241,7 @@ namespace Ookii.CommandLine
         private readonly bool _allowNull;
         private readonly bool _cancelParsing;
         private readonly bool _isHidden;
+        private readonly IEnumerable<ArgumentValidationAttribute> _validators;
         private IValueHelper? _valueHelper;
 
         private CommandLineArgument(ArgumentInfo info)
@@ -302,6 +285,7 @@ namespace Ookii.CommandLine
             _multiValueSeparator = info.MultiValueSeparator;
             _allowNull = info.AllowNull;
             _cancelParsing = info.CancelParsing;
+            _validators = info.Validators;
             // Required or positional arguments cannot be hidden.
             _isHidden = info.IsHidden && !info.IsRequired && info.Position == null;
             Position = info.Position;
@@ -349,7 +333,7 @@ namespace Ookii.CommandLine
             if (_converter == null)
                 _converter = CreateConverter(converterType);
 
-            _defaultValue = DetermineDefaultValue(info.DefaultValue);
+            _defaultValue = ConvertToArgumentTypeInvariant(info.DefaultValue);
         }
 
         /// <summary>
@@ -936,6 +920,39 @@ namespace Ookii.CommandLine
         }
 
         /// <summary>
+        /// Converts any type to the argument value.
+        /// </summary>
+        /// <param name="value">The value to convert.</param>
+        /// <returns>The converted value.</returns>
+        /// <exception cref="NotSupportedException">
+        ///   The argument's <see cref="TypeConverter"/> cannot convert between the type of
+        ///   <paramref name="value"/> and the <see cref="ArgumentType"/>.
+        /// </exception>
+        /// <remarks>
+        /// <para>
+        ///   If the type of <paramref name="value"/> is directly assignable to <see cref="ArgumentType"/>,
+        ///   no conversion is done. Otherwise, the <see cref="TypeConverter"/> for the argument
+        ///   is used.
+        /// </para>
+        /// <para>
+        ///   This method is used to convert the <see cref="CommandLineArgumentAttribute.DefaultValue"/>
+        ///   property to the correct type, and is also used by implementations of the 
+        ///   <see cref="ArgumentValidationAttribute"/> class to convert values when needed.
+        /// </para>
+        /// </remarks>
+        public object? ConvertToArgumentTypeInvariant(object? value)
+        {
+            if (value == null || _elementType.IsAssignableFrom(value.GetType()))
+                return value;
+            else
+            {
+                if (!_converter.CanConvertFrom(value.GetType()))
+                    throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.TypeConversionErrorFormat, value.GetType().FullName, _argumentType.FullName, _argumentName));
+                return _converter.ConvertFrom(null, CultureInfo.InvariantCulture, value);
+            }
+        }
+
+        /// <summary>
         /// Returns a <see cref="String"/> that represents the current <see cref="CommandLineArgument"/>.
         /// </summary>
         /// <returns>A <see cref="String"/> that represents the current <see cref="CommandLineArgument"/>.</returns>
@@ -992,15 +1009,35 @@ namespace Ookii.CommandLine
 
         internal bool SetValue(CultureInfo culture, string? value)
         {
-            if (_valueHelper == null)
-                CreateValueHelper();
-
-            Debug.Assert(_valueHelper != null);
-
             if (HasValue && !IsMultiValue && !_parser.AllowDuplicateArguments)
                 throw _parser.StringProvider.CreateException(CommandLineArgumentErrorCategory.DuplicateArgument, this);
 
-            bool continueParsing = _valueHelper!.SetValue(this, culture, value);
+            _valueHelper ??= CreateValueHelper();
+
+            bool continueParsing;
+            if (IsMultiValue && value != null && MultiValueSeparator != null)
+            {
+                continueParsing = false;
+                string[] values = value.Split(new[] { MultiValueSeparator }, StringSplitOptions.None);
+                foreach (string separateValue in values)
+                {
+                    Validate(separateValue, ValidationMode.BeforeConversion);
+                    object? converted;
+                    (converted, continueParsing) = _valueHelper.SetValue(this, culture, separateValue);
+                    if (!continueParsing)
+                        break;
+
+                    Validate(converted, ValidationMode.AfterConversion);
+                }
+            }
+            else
+            {
+                Validate(value, ValidationMode.BeforeConversion);
+                object? converted;
+                (converted, continueParsing) = _valueHelper.SetValue(this, culture, value);
+                Validate(converted, ValidationMode.AfterConversion);
+            }
+
             HasValue = true;
             return continueParsing;
         }
@@ -1041,6 +1078,7 @@ namespace Ookii.CommandLine
                 IsRequired = !parameter.IsOptional,
                 MemberName = parameter.Name,
                 AllowNull = DetermineAllowsNull(parameter),
+                Validators = parameter.GetCustomAttributes<ArgumentValidationAttribute>(),
             };
 
             return new CommandLineArgument(info);
@@ -1110,6 +1148,7 @@ namespace Ookii.CommandLine
                 AllowNull = allowsNull,
                 CancelParsing = attribute.CancelParsing,
                 IsHidden = attribute.IsHidden,
+                Validators = member.GetCustomAttributes<ArgumentValidationAttribute>(),
             };
 
             return new CommandLineArgument(info);
@@ -1149,6 +1188,7 @@ namespace Ookii.CommandLine
                 Description = parser.StringProvider.AutomaticHelpDescription(),
                 MemberName = memberName,
                 CancelParsing = true,
+                Validators = Enumerable.Empty<ArgumentValidationAttribute>(),
             };
 
             if (parser.Mode == ParsingMode.LongShort)
@@ -1188,9 +1228,15 @@ namespace Ookii.CommandLine
                 ArgumentType = typeof(bool),
                 Description = parser.StringProvider.AutomaticVersionDescription(),
                 MemberName = memberName,
+                Validators = Enumerable.Empty<ArgumentValidationAttribute>(),
             };
 
             return new CommandLineArgument(info);
+        }
+
+        internal object? GetConstructorParameterValue()
+        {
+            return Value;
         }
 
         internal void ApplyPropertyValue(object target)
@@ -1202,7 +1248,9 @@ namespace Ookii.CommandLine
             try
             {
                 if (_valueHelper != null)
+                {
                     _valueHelper.ApplyValue(target, _property);
+                }
             }
             catch( TargetInvocationException ex )
             {
@@ -1234,6 +1282,14 @@ namespace Ookii.CommandLine
             Console.WriteLine($"{friendlyName} {version}");
             if (copyRightAttribute != null)
                 Console.WriteLine(copyRightAttribute.Copyright);
+        }
+
+        internal void ValidateAfterParsing()
+        {
+            if (HasValue)
+                Validate(null, ValidationMode.AfterParsing);
+            else if (IsRequired)
+                throw _parser.StringProvider.CreateException(CommandLineArgumentErrorCategory.MissingRequiredArgument, ArgumentName);
         }
 
         private static string? GetMultiValueSeparator(MultiValueSeparatorAttribute? attribute)
@@ -1285,19 +1341,7 @@ namespace Ookii.CommandLine
             return converter;
         }
 
-        private object? DetermineDefaultValue(object? defaultValue)
-        {
-            if( defaultValue == null || _elementType.IsAssignableFrom(defaultValue.GetType()) )
-                return defaultValue;
-            else
-            {
-                if( !_converter.CanConvertFrom(defaultValue.GetType()) )
-                    throw new NotSupportedException(string.Format(System.Globalization.CultureInfo.CurrentCulture, Properties.Resources.IncorrectDefaultValueTypeFormat, _argumentName));
-                return _converter.ConvertFrom(defaultValue);
-            }
-        }
-
-        private void CreateValueHelper()
+        private IValueHelper CreateValueHelper()
         {
             Debug.Assert(_valueHelper == null);
             Type type;
@@ -1305,22 +1349,18 @@ namespace Ookii.CommandLine
             {
             case ArgumentKind.Dictionary:
                 type = typeof(DictionaryValueHelper<,>).MakeGenericType(_elementType.GetGenericArguments());
-                _valueHelper = (IValueHelper)Activator.CreateInstance(type, _allowDuplicateDictionaryKeys, _allowNull)!;
-                break;
+                return (IValueHelper)Activator.CreateInstance(type, _allowDuplicateDictionaryKeys, _allowNull)!;
 
             case ArgumentKind.MultiValue:
                 type = typeof(MultiValueHelper<>).MakeGenericType(ElementType);
-                _valueHelper = (IValueHelper)Activator.CreateInstance(type)!;
-                break;
+                return (IValueHelper)Activator.CreateInstance(type)!;
 
             case ArgumentKind.Method:
-                _valueHelper = new MethodValueHelper();
-                break;
+                return new MethodValueHelper();
 
             default:
                 Debug.Assert(_defaultValue == null);
-                _valueHelper = new SingleValueHelper(null);
-                break;
+                return new SingleValueHelper(null);
             }
         }
 
@@ -1638,6 +1678,15 @@ namespace Ookii.CommandLine
             }
 
             return builder.ToString();
+        }
+
+        private void Validate(object? value, ValidationMode mode)
+        {
+            foreach (var validator in _validators)
+            {
+                if (validator.Mode == mode)
+                    validator.Validate(this, value);
+            }
         }
     }
 }
