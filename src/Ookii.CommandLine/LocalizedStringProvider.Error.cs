@@ -208,6 +208,24 @@ namespace Ookii.CommandLine
                 return Format(Resources.ValidateCountBothFormat, argumentName, attribute.Minimum, attribute.Maximum);
         }
 
+        /// <summary>
+        /// Gets an error message used if the <see cref="RequiresAttribute"/> fails validation.
+        /// </summary>
+        /// <param name="argumentName">The name of the argument.</param>
+        /// <param name="dependencies">The names of the required arguments.</param>
+        /// <returns>The error message.</returns>
+        public virtual string ValidateRequiresFailed(string argumentName, IEnumerable<string> dependencies)
+            => Format(Resources.ValidateRequiresFailedFormat, argumentName, string.Join(ArgumentSeparator, dependencies));
+
+        /// <summary>
+        /// Gets an error message used if the <see cref="ProhibitsAttribute"/> fails validation.
+        /// </summary>
+        /// <param name="argumentName">The name of the argument.</param>
+        /// <param name="prohibitedArguments">The names of the prohibited arguments.</param>
+        /// <returns>The error message.</returns>
+        public virtual string ValidateProhibitsFailed(string argumentName, IEnumerable<string> prohibitedArguments)
+            => Format(Resources.ValidateProhibitsFailedFormat, argumentName, string.Join(ArgumentSeparator, prohibitedArguments));
+
         internal CommandLineArgumentException CreateException(CommandLineArgumentErrorCategory category, Exception? inner, CommandLineArgument argument, string? value = null)
             => CreateException(category, inner, argument, argument.ArgumentName, value);
 

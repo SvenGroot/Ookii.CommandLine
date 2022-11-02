@@ -4,7 +4,9 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Globalization;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -373,5 +375,46 @@ namespace Ookii.CommandLine.Tests
         [ValidateStringLength(1, 3)]
         [ValidateCount(2, 4)]
         public string[] Arg4 { get; set; }
+    }
+
+    class IPAddressTypeConverter : TypeConverter
+    {
+        public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
+        {
+            if (sourceType == typeof(string))
+                return true;
+
+            return base.CanConvertFrom(context, sourceType);
+        }
+
+        public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
+        {
+            if (value is string stringValue)
+                return IPAddress.Parse(stringValue);
+
+            return base.ConvertFrom(context, culture, value);
+        }
+    }
+
+    class DependencyArguments
+    {
+        [CommandLineArgument]
+        [TypeConverter(typeof(IPAddressTypeConverter))]
+        public IPAddress Address { get; set; }
+
+        [CommandLineArgument(DefaultValue = (short)5000)]
+        [Requires(nameof(Address))]
+        public short Port { get; set; }
+
+        [CommandLineArgument]
+        public int Throughput { get; set; }
+
+        [CommandLineArgument]
+        [Requires(nameof(Address), nameof(Throughput))]
+        public int Protocol { get; set; }
+
+        [CommandLineArgument]
+        [Prohibits("Address")]
+        public string Path { get; set; }
     }
 }

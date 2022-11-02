@@ -41,6 +41,16 @@ namespace Ookii.CommandLine.Validation
         public virtual ValidationMode Mode => ValidationMode.AfterConversion;
 
         /// <summary>
+        /// Gets the error category used for the <see cref="CommandLineArgumentException"/> when
+        /// validation fails.
+        /// </summary>
+        /// <value>
+        /// One of the values of the <see cref="CommandLineArgumentErrorCategory"/> enumeration. If not overridden
+        /// in a derived class, the value is <see cref="CommandLineArgumentErrorCategory.ValidationFailed"/>.
+        /// </value>
+        public virtual CommandLineArgumentErrorCategory ErrorCategory => CommandLineArgumentErrorCategory.ValidationFailed;
+
+        /// <summary>
         /// Validates the argument value, and throws an exception if validation failed.
         /// </summary>
         /// <param name="argument">The argument being validated.</param>
@@ -50,7 +60,7 @@ namespace Ookii.CommandLine.Validation
         /// </param>
         /// <exception cref="CommandLineArgumentException">
         ///   The <paramref name="value"/> parameter is not a valid value. The <see cref="CommandLineArgumentException.Category"/>
-        ///   property will be <see cref="CommandLineArgumentErrorCategory.ValidationFailed"/>.
+        ///   property will be the value of the <see cref="ErrorCategory"/> property.
         /// </exception>
         public void Validate(CommandLineArgument argument, object? value)
         {
@@ -58,7 +68,7 @@ namespace Ookii.CommandLine.Validation
                 throw new ArgumentNullException(nameof(argument));
 
             if (!IsValid(argument, value))
-                throw new CommandLineArgumentException(GetErrorMessage(argument, value), argument.ArgumentName, CommandLineArgumentErrorCategory.ValidationFailed);
+                throw new CommandLineArgumentException(GetErrorMessage(argument, value), argument.ArgumentName, ErrorCategory);
         }
 
         /// <summary>
@@ -88,7 +98,7 @@ namespace Ookii.CommandLine.Validation
         ///   <see cref="CommandLineArgument.ArgumentType"/>.
         /// </param>
         /// <returns>
-        ///   <see langword="true"/> if the value is valid; otherwise, <see langword="false"/>
+        ///   <see langword="true"/> if the value is valid; otherwise, <see langword="false"/>.
         /// </returns>
         /// <remarks>
         /// <para>

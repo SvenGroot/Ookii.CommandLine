@@ -605,6 +605,14 @@ namespace Ookii.CommandLine
         public LocalizedStringProvider StringProvider => _stringProvider;
 
         /// <summary>
+        /// Gets the string comparer used for argument names.
+        /// </summary>
+        /// <value>
+        /// An instance of a class implementing the <see cref="IComparer{T}"/> interface.
+        /// </value>
+        public IComparer<string> ArgumentNameComparer => _argumentsByName.Comparer;
+
+        /// <summary>
         /// Gets the arguments supported by this <see cref="CommandLineParser"/> instance.
         /// </summary>
         /// <value>
@@ -1365,7 +1373,7 @@ namespace Ookii.CommandLine
                 argument.ValidateAfterParsing();
             }
 
-            object?[] constructorArgumentValues = new object[_constructorArgumentCount];
+            var constructorArgumentValues = new object?[_constructorArgumentCount];
             for (int x = 0; x < _constructorArgumentCount; ++x)
                 constructorArgumentValues[x] = _arguments[x].Value;
 

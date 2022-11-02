@@ -9,6 +9,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Reflection;
+using System.Net;
 
 namespace Ookii.CommandLine.Tests
 {
@@ -776,6 +777,36 @@ namespace Ookii.CommandLine.Tests
             CheckThrows(() => parser.Parse(new[] { "-Arg4", "foo;bar;baz;ban;bap" }), parser, CommandLineArgumentErrorCategory.ValidationFailed, "Arg4");
             result = parser.Parse(new[] { "-Arg4", "foo;bar;baz;ban" });
             CollectionAssert.AreEqual(new[] { "foo", "bar", "baz", "ban" }, result.Arg4);
+        }
+
+        [TestMethod]
+        public void TestRequires()
+        {
+            var parser = new CommandLineParser<DependencyArguments>();
+
+            var result = parser.Parse(new[] { "-Address", "127.0.0.1" });
+            Assert.AreEqual(IPAddress.Loopback, result.Address);
+            CheckThrows(() => parser.Parse(new[] { "-Port", "9000" }), parser, CommandLineArgumentErrorCategory.DependencyFailed, "Port");
+            result = parser.Parse(new[] { "-Address", "127.0.0.1", "-Port", "9000" });
+            Assert.AreEqual(IPAddress.Loopback, result.Address);
+            Assert.AreEqual(9000, result.Port);
+            CheckThrows(() => parser.Parse(new[] { "-Protocol", "1" }), parser, CommandLineArgumentErrorCategory.DependencyFailed, "Protocol");
+            CheckThrows(() => parser.Parse(new[] { "-Address", "127.0.0.1", "-Protocol", "1" }), parser, CommandLineArgumentErrorCategory.DependencyFailed, "Protocol");
+            CheckThrows(() => parser.Parse(new[] { "-Throughput", "10", "-Protocol", "1" }), parser, CommandLineArgumentErrorCategory.DependencyFailed, "Protocol");
+            result = parser.Parse(new[] { "-Protocol", "1", "-Address", "127.0.0.1", "-Throughput", "10" });
+            Assert.AreEqual(IPAddress.Loopback, result.Address);
+            Assert.AreEqual(10, result.Throughput);
+            Assert.AreEqual(1, result.Protocol);
+        }
+
+        [TestMethod]
+        public void TestProhibits()
+        {
+            var parser = new CommandLineParser<DependencyArguments>();
+
+            var result = parser.Parse(new[] { "-Path", "test" });
+            Assert.AreEqual("test", result.Path);
+            CheckThrows(() => parser.Parse(new[] { "-Path", "test", "-Address", "127.0.0.1" }), parser, CommandLineArgumentErrorCategory.DependencyFailed, "Path");
         }
 
         private record class ExpectedArgument

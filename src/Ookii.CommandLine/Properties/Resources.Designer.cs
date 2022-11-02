@@ -430,7 +430,7 @@ namespace Ookii.CommandLine.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The argument &apos;{0}&apos; has type &apos;{1}&apos; that for which no type converter exists that can convert from a string..
+        ///   Looks up a localized string similar to The argument &apos;{0}&apos; has type &apos;{1}&apos;, which does not have a TypeConverter that can convert from a string. Use the TypeConverterAttribute to specify a custom TypeConverter..
         /// </summary>
         internal static string NoTypeConverterForArgumentFormat {
             get {
@@ -574,6 +574,15 @@ namespace Ookii.CommandLine.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The argument &apos;{0}&apos; cannot be used together with: {1}..
+        /// </summary>
+        internal static string ValidateProhibitsFailedFormat {
+            get {
+                return ResourceManager.GetString("ValidateProhibitsFailedFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The argument &apos;{0}&apos; must be between {1} and {2}..
         /// </summary>
         internal static string ValidateRangeFailedBothFormat {
@@ -597,6 +606,15 @@ namespace Ookii.CommandLine.Properties {
         internal static string ValidateRangeFailedMinFormat {
             get {
                 return ResourceManager.GetString("ValidateRangeFailedMinFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The argument &apos;{0}&apos; must be used together with: {1}..
+        /// </summary>
+        internal static string ValidateRequiresFailedFormat {
+            get {
+                return ResourceManager.GetString("ValidateRequiresFailedFormat", resourceCulture);
             }
         }
         

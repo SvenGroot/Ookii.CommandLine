@@ -184,7 +184,7 @@
     <value>The command line arguments type has more than one constructor, none of which has the CommandLineConstructorAttribute attribute.</value>
   </data>
   <data name="NoTypeConverterForArgumentFormat" xml:space="preserve">
-    <value>The argument '{0}' has type '{1}' that for which no type converter exists that can convert from a string.</value>
+    <value>The argument '{0}' has type '{1}', which does not have a TypeConverter that can convert from a string. Use the TypeConverterAttribute to specify a custom TypeConverter.</value>
   </data>
   <data name="TooManyArguments" xml:space="preserve">
     <value>Too many arguments were supplied.</value>
@@ -314,5 +314,11 @@
   </data>
   <data name="ValidationFailedFormat" xml:space="preserve">
     <value>The value for the argument '{0}' is not valid.</value>
+  </data>
+  <data name="ValidateRequiresFailedFormat" xml:space="preserve">
+    <value>The argument '{0}' must be used together with: {1}.</value>
+  </data>
+  <data name="ValidateProhibitsFailedFormat" xml:space="preserve">
+    <value>The argument '{0}' cannot be used together with: {1}.</value>
   </data>
 </root>
