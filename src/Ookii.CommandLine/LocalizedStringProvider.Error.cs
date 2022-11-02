@@ -232,6 +232,14 @@ namespace Ookii.CommandLine
         public virtual string ValidateProhibitsFailed(string argumentName, IEnumerable<string> prohibitedArguments)
             => Format(Resources.ValidateProhibitsFailedFormat, argumentName, string.Join(ArgumentSeparator, prohibitedArguments));
 
+        /// <summary>
+        /// Gets an error message used if the <see cref="RequiresAnyAttribute"/> fails validation.
+        /// </summary>
+        /// <param name="arguments">The names of the arguments.</param>
+        /// <returns>The error message.</returns>
+        public virtual string ValidateRequiresAnyFailed(IEnumerable<string> arguments)
+            => Format(Resources.ValidateRequiresAnyFailedFormat, string.Join(ArgumentSeparator, arguments));
+
         internal CommandLineArgumentException CreateException(CommandLineArgumentErrorCategory category, Exception? inner, CommandLineArgument argument, string? value = null)
             => CreateException(category, inner, argument, argument.ArgumentName, value);
 

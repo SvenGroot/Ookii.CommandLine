@@ -80,10 +80,8 @@ namespace Ookii.CommandLine.Validation
         /// </summary>
         /// <param name="parser">The argument parser being validated.</param>
         /// <returns>
-        ///   <see langword="true"/> if the value is valid; otherwise, <see langword="false"/>.
+        ///   <see langword="true"/> if the arguments are valid; otherwise, <see langword="false"/>.
         /// </returns>
-        /// <remarks>
-        /// </remarks>
         public abstract bool IsValid(CommandLineParser parser);
     }
 }

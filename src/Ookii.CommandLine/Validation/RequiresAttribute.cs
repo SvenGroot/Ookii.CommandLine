@@ -24,8 +24,8 @@ namespace Ookii.CommandLine.Validation
     ///   error category set to <see cref="CommandLineArgumentErrorCategory.DependencyFailed"/>.
     /// </para>
     /// <para>
-    ///   Names of arguments that are dependencies are not validated when the attribute is created.
-    ///   If one of the specified arguments does not exist, validation will always fail.
+    ///   The names of the arguments that are dependencies are not validated when the attribute is
+    ///   created. If one of the specified arguments does not exist, validation will always fail.
     /// </para>
     /// </remarks>
     /// <threadsafety static="true" instance="true"/>

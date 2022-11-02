@@ -475,6 +475,15 @@ namespace Ookii.CommandLine.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to RequiresAnyAttribute requires at least two arguments; use CommandLineArgumentAttribute.IsRequired to make a single argument required..
+        /// </summary>
+        internal static string RequiresAnySingleArgument {
+            get {
+                return ResourceManager.GetString("RequiresAnySingleArgument", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to An error occurred setting the value of argument &apos;{0}&apos;: {1}.
         /// </summary>
         internal static string SetValueErrorFormat {
@@ -615,6 +624,15 @@ namespace Ookii.CommandLine.Properties {
         internal static string ValidateRangeFailedMinFormat {
             get {
                 return ResourceManager.GetString("ValidateRangeFailedMinFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You must supply at least one of: {0}.
+        /// </summary>
+        internal static string ValidateRequiresAnyFailedFormat {
+            get {
+                return ResourceManager.GetString("ValidateRequiresAnyFailedFormat", resourceCulture);
             }
         }
         

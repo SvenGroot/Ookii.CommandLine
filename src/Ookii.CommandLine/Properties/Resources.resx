@@ -324,4 +324,10 @@
   <data name="ValidateProhibitsFailedFormat" xml:space="preserve">
     <value>The argument '{0}' cannot be used together with: {1}.</value>
   </data>
+  <data name="RequiresAnySingleArgument" xml:space="preserve">
+    <value>RequiresAnyAttribute requires at least two arguments; use CommandLineArgumentAttribute.IsRequired to make a single argument required.</value>
+  </data>
+  <data name="ValidateRequiresAnyFailedFormat" xml:space="preserve">
+    <value>You must supply at least one of: {0}</value>
+  </data>
 </root>
