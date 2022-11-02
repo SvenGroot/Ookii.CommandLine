@@ -1,4 +1,5 @@
 ﻿using Ookii.CommandLine;
+using Ookii.CommandLine.Properties;
 using Ookii.CommandLine.Validation;
 using System;
 using System.Collections.Generic;
@@ -396,6 +397,7 @@ namespace Ookii.CommandLine.Tests
         }
     }
 
+    [RequiresAny(nameof(Address), nameof(Path))]
     class DependencyArguments
     {
         [CommandLineArgument]

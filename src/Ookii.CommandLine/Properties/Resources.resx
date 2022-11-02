@@ -318,6 +318,9 @@
   <data name="ValidateRequiresFailedFormat" xml:space="preserve">
     <value>The argument '{0}' must be used together with: {1}.</value>
   </data>
+  <data name="ClassValidationFailed" xml:space="preserve">
+    <value>The arguments are not valid.</value>
+  </data>
   <data name="ValidateProhibitsFailedFormat" xml:space="preserve">
     <value>The argument '{0}' cannot be used together with: {1}.</value>
   </data>

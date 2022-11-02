@@ -11,12 +11,12 @@ namespace Ookii.CommandLine.Validation
     /// </summary>
     /// <remarks>
     /// <para>
-    ///   Argument validators are executed when an argument's value are set, and allow you to check
-    ///   whether an argument's value meets certain conditions automatically.
+    ///   Argument validators are executed before or after an argument's value is set, and allow
+    ///   you to check whether an argument's value meets certain conditions.
     /// </para>
     /// <para>
     ///   If validation fails, it will throw a <see cref="CommandLineArgumentException"/> with
-    ///   the <see cref="CommandLineArgumentErrorCategory.ValidationFailed"/> category. The
+    ///   the category specified in the <see cref="ErrorCategory"/> property. The
     ///   <see cref="CommandLineParser.Parse{T}(string[], int, ParseOptions?)"/>,
     ///   <see cref="ShellCommand.CreateShellCommand(System.Reflection.Assembly, string?, string[], int, CreateShellCommandOptions?)"/>
     ///   and <see cref="ShellCommand.RunShellCommand(System.Reflection.Assembly, string?, string[], int, CreateShellCommandOptions?)"/>

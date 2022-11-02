@@ -25,6 +25,7 @@ namespace Ookii.CommandLine.Validation
     ///   validation will always fail.
     /// </para>
     /// </remarks>
+    /// <threadsafety static="true" instance="true"/>
     public class ValidateCountAttribute : ArgumentValidationAttribute
     {
         private readonly int _minimum;

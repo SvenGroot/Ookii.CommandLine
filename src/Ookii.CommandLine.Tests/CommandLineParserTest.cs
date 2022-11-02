@@ -809,6 +809,15 @@ namespace Ookii.CommandLine.Tests
             CheckThrows(() => parser.Parse(new[] { "-Path", "test", "-Address", "127.0.0.1" }), parser, CommandLineArgumentErrorCategory.DependencyFailed, "Path");
         }
 
+        [TestMethod]
+        public void TestRequiresAny()
+        {
+            var parser = new CommandLineParser<DependencyArguments>();
+
+            // No need to check if the arguments work indivially since TestRequires and TestProhibits already did that.
+            CheckThrows(() => parser.Parse(Array.Empty<string>()), parser, CommandLineArgumentErrorCategory.MissingRequiredArgument);
+        }
+
         private record class ExpectedArgument
         {
             public ExpectedArgument(string name, Type type, ArgumentKind kind = ArgumentKind.SingleValue)

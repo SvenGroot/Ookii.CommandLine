@@ -1,4 +1,5 @@
 ﻿// Copyright (c) Sven Groot (Ookii.org)
+using Ookii.CommandLine.Validation;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -1371,6 +1372,12 @@ namespace Ookii.CommandLine
             foreach (CommandLineArgument argument in _arguments)
             {
                 argument.ValidateAfterParsing();
+            }
+
+            // Run class validators.
+            foreach (var validator in _argumentsType.GetCustomAttributes<ClassValidationAttribute>())
+            {
+                validator.Validate(this);
             }
 
             var constructorArgumentValues = new object?[_constructorArgumentCount];

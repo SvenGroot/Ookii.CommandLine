@@ -28,6 +28,7 @@ namespace Ookii.CommandLine.Validation
     ///   If one of the specified arguments does not exist, validation will always fail.
     /// </para>
     /// </remarks>
+    /// <threadsafety static="true" instance="true"/>
     public class RequiresAttribute : ArgumentValidationAttribute
     {
         private string? _dependency;

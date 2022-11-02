@@ -131,6 +131,12 @@ namespace Ookii.CommandLine
             => Format(Resources.ValidationFailedFormat, argumentName);
 
         /// <summary>
+        /// Gets a generic error message for the base implementation of <see cref="ClassValidationAttribute.GetErrorMessage"/>.
+        /// </summary>
+        /// <returns>The error message.</returns>
+        public virtual string ClassValidationFailed() => Resources.ClassValidationFailed;
+        
+        /// <summary>
         /// Gets an error message used if the <see cref="ValidateRangeAttribute"/> fails validation.
         /// </summary>
         /// <param name="argumentName">The name of the argument.</param>

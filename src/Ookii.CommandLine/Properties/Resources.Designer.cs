@@ -151,6 +151,15 @@ namespace Ookii.CommandLine.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The arguments are not valid..
+        /// </summary>
+        internal static string ClassValidationFailed {
+            get {
+                return ResourceManager.GetString("ClassValidationFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The combined short argument &apos;{0}&apos; contains an argument that is not a switch..
         /// </summary>
         internal static string CombinedShortNameNonSwitchFormat {
