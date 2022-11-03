@@ -1,4 +1,5 @@
-﻿using Ookii.CommandLine.Properties;
+﻿using Ookii.CommandLine.Commands;
+using Ookii.CommandLine.Properties;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -12,21 +13,21 @@ namespace Ookii.CommandLine
     public partial class LocalizedStringProvider
     {
         /// <summary>
-        /// Gets the name of the version command created if the <see cref="CreateShellCommandOptions.AutoVersionCommand"/>
+        /// Gets the name of the version command created if the <see cref="CommandOptions.AutoVersionCommand"/>
         /// property is <see langword="true"/>.
         /// </summary>
         /// <returns>The string.</returns>
         public virtual string AutomaticVersionCommandName() => Resources.AutomaticVersionCommandName;
 
         /// <summary>
-        /// Gets the description of the version command created if the <see cref="CreateShellCommandOptions.AutoVersionCommand"/>
+        /// Gets the description of the version command created if the <see cref="CommandOptions.AutoVersionCommand"/>
         /// property is <see langword="true"/>.
         /// </summary>
         /// <returns>The string.</returns>
         public virtual string AutomaticVersionCommandDescription() => Resources.AutomaticVersionDescription;
 
         /// <summary>
-        /// Gets a the usage syntax for an application using shell commands when no command name
+        /// Gets a the usage syntax for an application using subcommands when no command name
         /// was specified, similar to "Usage: executable &lt;command&gt; [arguments]".
         /// </summary>
         /// <param name="executableName">The value of <see cref="WriteUsageOptions.ExecutableName"/>.</param>
@@ -43,18 +44,18 @@ namespace Ookii.CommandLine
             => UsagePrefix(executableName, color, colorReset) + Resources.DefaultCommandUsageSuffix;
 
         /// <summary>
-        /// Gets the description of a shell command, used when listing commands in the usage help.
+        /// Gets the description of a subcommand, used when listing commands in the usage help.
         /// </summary>
-        /// <param name="command">The shell command.</param>
+        /// <param name="command">The command.</param>
         /// <param name="options">The options used to format the usage help.</param>
         /// <returns>The string.</returns>
         /// <remarks>
         /// <para>
-        ///   If you override this function, you may also need to change the <see cref="CreateShellCommandOptions.CommandDescriptionIndent"/>
+        ///   If you override this function, you may also need to change the <see cref="CommandOptions.CommandDescriptionIndent"/>
         ///   property to a value suitable for your description format.
         /// </para>
         /// </remarks>
-        public virtual string CommandDescription(ShellCommandInfo command, CreateShellCommandOptions options)
+        public virtual string CommandDescription(CommandInfo command, CommandOptions options)
         {
             bool useColor = options.UsageOptions.UseColor ?? false;
             string colorStart = string.Empty;
@@ -83,11 +84,11 @@ namespace Ookii.CommandLine
         public virtual string AvailableCommandsHeader(bool useColor) => Resources.DefaultAvailableCommandsHeader;
 
         /// <summary>
-        /// Gets a string used at the start of the usage syntax for a <see cref="ShellCommand"/>,
+        /// Gets a string used at the start of the usage syntax for a <see cref="ICommand"/>,
         /// similar to "Usage: executable command_name".
         /// </summary>
         /// <param name="executableName">The value of <see cref="WriteUsageOptions.ExecutableName"/>.</param>
-        /// <param name="commandName">The name of the shell command.</param>
+        /// <param name="commandName">The name of the subcommand.</param>
         /// <param name="color">
         ///   The value of <see cref="WriteUsageOptions.UsagePrefixColor"/>, or an empty string
         ///   if <see cref="WriteUsageOptions.UseColor"/> is <see langword="false"/>.

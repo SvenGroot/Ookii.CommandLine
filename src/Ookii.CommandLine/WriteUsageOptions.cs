@@ -1,4 +1,5 @@
 ﻿// Copyright (c) Sven Groot (Ookii.org)
+using Ookii.CommandLine.Commands;
 using Ookii.CommandLine.Terminal;
 using System;
 
@@ -319,10 +320,10 @@ namespace Ookii.CommandLine
         /// </value>
         /// <remarks>
         /// <para>
-        ///   If this property is <see langword="null"/>, the <see cref="CommandLineParser.Parse{T}(string[], int, ParseOptions?)"/>,
-        ///   <see cref="CommandLineParser.WriteUsageToConsole"/>, and <see cref="ShellCommand.CreateShellCommand(System.Reflection.Assembly, string[], int, CreateShellCommandOptions?)"/>
-        ///   methods will enable color support if the output is not redirected, supports virtual
-        ///   terminal sequences, and there is no environment variable named "NO_COLOR".
+        ///   If this property is <see langword="null"/>, the <see cref="CommandLineParser.Parse{T}(string[], int, ParseOptions?)"/>
+        ///   and <see cref="CommandLineParser.WriteUsageToConsole"/> methods, and the <see cref="CommandManager"/>
+        ///   class will determine if color is supported using the <see cref="VirtualTerminal.EnableColor"/>
+        ///   method for the standard error stream.
         /// </para>
         /// <para>
         ///   If this property is set to <see langword="true"/> explicitly, virtual terminal

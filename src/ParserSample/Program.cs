@@ -2,7 +2,7 @@
 using System.Reflection;
 using Ookii.CommandLine;
 
-namespace CommandLineSampleCS
+namespace ParserSample
 {
     public static class Program
     {

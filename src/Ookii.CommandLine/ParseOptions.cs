@@ -1,4 +1,5 @@
 ﻿// Copyright (c) Sven Groot (Ookii.org)
+using Ookii.CommandLine.Commands;
 using Ookii.CommandLine.Terminal;
 using System;
 using System.Collections.Generic;
@@ -331,10 +332,10 @@ namespace Ookii.CommandLine
         /// </value>
         /// <remarks>
         /// <para>
-        ///   If this property is <see langword="null"/>, the <see cref="CommandLineParser.Parse{T}(string[], int, ParseOptions?)"/>,
-        ///   <see cref="CommandLineParser.WriteUsageToConsole"/>, and <see cref="ShellCommand.CreateShellCommand(System.Reflection.Assembly, string[], int, CreateShellCommandOptions?)"/>
-        ///   methods will enable color support if the standard error stream is not redirected, supports virtual
-        ///   terminal sequences, and there is no environment variable named "NO_COLOR".
+        ///   If this property is <see langword="null"/>, the <see cref="CommandLineParser.Parse{T}(string[], int, ParseOptions?)"/>
+        ///   and <see cref="CommandLineParser.WriteUsageToConsole"/> methods, and the <see cref="CommandManager"/>
+        ///   class will determine if color is supported using the <see cref="VirtualTerminal.EnableColor"/>
+        ///   method for the standard output stream.
         /// </para>
         /// <para>
         ///   If this property is set to <see langword="true"/> explicitly, virtual terminal
@@ -378,21 +379,33 @@ namespace Ookii.CommandLine
             set => _usageOptions = value;
         }
 
-        internal VirtualTerminalSupport? EnableOutputColor()
+        internal OptionsRestorer? EnableOutputColor()
         {
             if (Out == null)
-                return UsageOptions.EnableColor();
+            {
+                var support = UsageOptions.EnableColor();
+                if (support != null)
+                {
+                    return new OptionsRestorer(this, support)
+                    {
+                        ResetUseColor = true,
+                    };
+                }
+            }
 
             return null;
         }
 
-        internal VirtualTerminalSupport? EnableErrorColor()
+        internal OptionsRestorer? EnableErrorColor()
         {
             if (Error == null && UseErrorColor == null)
             {
                 var support = VirtualTerminal.EnableColor(StandardStream.Error);
                 UseErrorColor = support.IsSupported;
-                return support;
+                return new OptionsRestorer(this, support)
+                {
+                    ResetUseErrorColor = true,
+                };
             }
 
             return null;

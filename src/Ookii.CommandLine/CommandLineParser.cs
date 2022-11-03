@@ -1,4 +1,5 @@
 ﻿// Copyright (c) Sven Groot (Ookii.org)
+using Ookii.CommandLine.Commands;
 using Ookii.CommandLine.Terminal;
 using Ookii.CommandLine.Validation;
 using System;
@@ -187,7 +188,8 @@ namespace Ookii.CommandLine
 
         #endregion
 
-        internal const int MaximumLineWidthForIndent = 30; // Don't apply indentation to console output if the line width is less than this.
+        // Don't apply indentation to console output if the line width is less than this.
+        internal const int MinimumLineWidthForIndent = 30;
 
         private readonly Type _argumentsType;
         private readonly List<CommandLineArgument> _arguments = new ();
@@ -910,7 +912,7 @@ namespace Ookii.CommandLine
         ///   If the <see cref="ParseOptions.Out"/> property is instance of the
         ///   <see cref="LineWrappingTextWriter"/> class, this method indents additional lines for
         ///   the usage syntax and argument descriptions according to the values specified by the
-        ///   <see cref="CreateShellCommandOptions"/>, unless the <see cref="LineWrappingTextWriter.MaximumLineLength"/>
+        ///   <see cref="CommandOptions"/>, unless the <see cref="LineWrappingTextWriter.MaximumLineLength"/>
         ///   property is less than 30.
         /// </para>
         /// <para>
@@ -965,7 +967,7 @@ namespace Ookii.CommandLine
         ///   If the <see cref="ParseOptions.Out"/> property is instance of the
         ///   <see cref="LineWrappingTextWriter"/> class, this method indents additional lines for
         ///   the usage syntax and argument descriptions according to the values specified by the
-        ///   <see cref="CreateShellCommandOptions"/>, unless the <see cref="LineWrappingTextWriter.MaximumLineLength"/>
+        ///   <see cref="CommandOptions"/>, unless the <see cref="LineWrappingTextWriter.MaximumLineLength"/>
         ///   property is less than 30.
         /// </para>
         /// <para>
@@ -1026,7 +1028,7 @@ namespace Ookii.CommandLine
         ///   If the <see cref="ParseOptions.Out"/> property is instance of the
         ///   <see cref="LineWrappingTextWriter"/> class, this method indents additional lines for
         ///   the usage syntax and argument descriptions according to the values specified by the
-        ///   <see cref="CreateShellCommandOptions"/>, unless the <see cref="LineWrappingTextWriter.MaximumLineLength"/>
+        ///   <see cref="CommandOptions"/>, unless the <see cref="LineWrappingTextWriter.MaximumLineLength"/>
         ///   property is less than 30.
         /// </para>
         /// <para>
@@ -1181,6 +1183,11 @@ namespace Ookii.CommandLine
             return result;
         }
 
+        internal static bool ShouldIndent(LineWrappingTextWriter writer)
+        {
+            return writer.MaximumLineLength == 0 || writer.MaximumLineLength >= MinimumLineWidthForIndent;
+        }
+
         private static string[] DetermineArgumentNamePrefixes(IEnumerable<string>? namedArgumentPrefixes)
         {
             if( namedArgumentPrefixes == null )
@@ -1247,7 +1254,7 @@ namespace Ookii.CommandLine
             }
 
             bool autoVersion = options?.AutoVersionArgument ?? optionsAttribute?.AutoVersionArgument ?? true;
-            if (autoVersion && !ShellCommand.IsShellCommand(_argumentsType))
+            if (autoVersion && !CommandInfo.IsCommand(_argumentsType))
             {
                 var argument = CommandLineArgument.CreateAutomaticVersion(this);
                 if (argument != null)
@@ -1507,7 +1514,7 @@ namespace Ookii.CommandLine
             if (options.ArgumentDescriptionListFilter == DescriptionListFilterMode.None)
                 return;
 
-            if (writer.MaximumLineLength > 0 && writer.MaximumLineLength < MaximumLineWidthForIndent)
+            if (!ShouldIndent(writer))
             {
                 writer.Indent = 0;
             }
@@ -1540,7 +1547,7 @@ namespace Ookii.CommandLine
         private void WriteUsageSyntax(LineWrappingTextWriter writer, WriteUsageOptions options)
         {
             writer.ResetIndent();
-            writer.Indent = writer.MaximumLineLength > 0 && writer.MaximumLineLength < MaximumLineWidthForIndent ? 0 : options.Indent;
+            writer.Indent = ShouldIndent(writer) ? options.Indent : 0;
 
             bool useColor = options.UseColor ?? false;
             string colorStart = string.Empty;

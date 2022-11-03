@@ -3,7 +3,7 @@ using System.ComponentModel;
 using System.Globalization;
 using Ookii.CommandLine;
 
-namespace CommandLineSampleCS
+namespace ParserSample
 {
     /// <summary>
     /// Class that defines the sample's command line arguments.

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Ookii.CommandLine.Commands;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -17,10 +18,9 @@ namespace Ookii.CommandLine.Validation
     /// <para>
     ///   If validation fails, it will throw a <see cref="CommandLineArgumentException"/> with
     ///   the category specified in the <see cref="ErrorCategory"/> property. The
-    ///   <see cref="CommandLineParser.Parse{T}(string[], int, ParseOptions?)"/>,
-    ///   <see cref="ShellCommand.CreateShellCommand(System.Reflection.Assembly, string?, string[], int, CreateShellCommandOptions?)"/>
-    ///   and <see cref="ShellCommand.RunShellCommand(System.Reflection.Assembly, string?, string[], int, CreateShellCommandOptions?)"/>
-    ///   methods will automatically display the error message and usage help if validation failed.
+    ///   <see cref="CommandLineParser.Parse{T}(string[], int, ParseOptions?)"/> method and the
+    ///   <see cref="CommandManager"/> class will automatically display the error message and usage
+    ///   help if validation failed.
     /// </para>
     /// <para>
     ///   Several built-in validators are provided, and you can derive from this class to create

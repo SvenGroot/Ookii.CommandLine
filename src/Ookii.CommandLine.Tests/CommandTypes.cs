@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Ookii.CommandLine.Commands;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -7,60 +8,60 @@ using System.Threading.Tasks;
 
 namespace Ookii.CommandLine.Tests
 {
-    [ShellCommand("test")]
+    [Command("test")]
     [Description("Test command description.")]
-    public class TestCommand : ShellCommand
+    public class TestCommand : ICommand
     {
         [CommandLineArgument]
         public string Argument { get; set; }
 
-        public override void Run()
+        public int Run()
         {
             throw new NotImplementedException();
         }
     }
 
-    [ShellCommand]
-    public class AnotherCommand : ShellCommand
+    [Command]
+    public class AnotherCommand : ICommand
     {
         [CommandLineArgument]
         public int Value { get; set; }
 
-        public override void Run()
+        public int Run()
         {
             throw new NotImplementedException();
         }
     }
 
-    [ShellCommand("custom", CustomArgumentParsing = true)]
+    [Command("custom")]
     [Description("Custom parsing command.")]
-    internal class CustomParsingCommand : ShellCommand
+    internal class CustomParsingCommand : ICommandWithCustomParsing
     {
-        public CustomParsingCommand(string[] args, int index, CreateShellCommandOptions options)
+        public void Parse(string[] args, int index, ParseOptions options)
         {
             Value = args[index];
         }
 
         public string Value { get; set; }
 
-        public override void Run()
+        public int Run()
         {
             throw new NotImplementedException();
         }
     }
 
-    [ShellCommand(IsHidden = true)]
-    class HiddenCommand : ShellCommand
+    [Command(IsHidden = true)]
+    class HiddenCommand : ICommand
     {
-        public override void Run()
+        public int Run()
         {
             throw new NotImplementedException();
         }
     }
 
-    public class NotACommand : ShellCommand
+    public class NotACommand : ICommand
     {
-        public override void Run()
+        public int Run()
         {
             throw new NotImplementedException();
         }

@@ -511,11 +511,11 @@ namespace Ookii.CommandLine.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The type &apos;{0}&apos; does not derive from the ShellCommand class or does not define the ShellCommandAttribute attribute..
+        ///   Looks up a localized string similar to The type &apos;{0}&apos; does not implement the ICommand interface or does not have the CommandAttribute attribute..
         /// </summary>
-        internal static string TypeIsNotShellCommandFormat {
+        internal static string TypeIsNotCommandFormat {
             get {
-                return ResourceManager.GetString("TypeIsNotShellCommandFormat", resourceCulture);
+                return ResourceManager.GetString("TypeIsNotCommandFormat", resourceCulture);
             }
         }
         

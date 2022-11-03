@@ -5,23 +5,25 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Ookii.CommandLine
+namespace Ookii.CommandLine.Commands
 {
-    [ShellCommand]
-    internal class AutomaticVersionCommand : ShellCommand
+    [Command]
+    internal class AutomaticVersionCommand : ICommand
     {
-        public override void Run()
+        public int Run()
         {
             var assembly = Assembly.GetEntryAssembly();
             if (assembly == null)
             {
                 Console.Write(Properties.Resources.UnknownVersion);
-                return;
+                return 1;
             }
 
             var attribute = assembly.GetCustomAttribute<ApplicationFriendlyNameAttribute>();
             var friendlyName = attribute?.Name ?? assembly.GetName().Name ?? string.Empty;
             CommandLineArgument.ShowVersion(assembly, friendlyName);
+
+            return 0;
         }
     }
 }

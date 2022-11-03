@@ -189,8 +189,8 @@
   <data name="TooManyArguments" xml:space="preserve">
     <value>Too many arguments were supplied.</value>
   </data>
-  <data name="TypeIsNotShellCommandFormat" xml:space="preserve">
-    <value>The type '{0}' does not derive from the ShellCommand class or does not define the ShellCommandAttribute attribute.</value>
+  <data name="TypeIsNotCommandFormat" xml:space="preserve">
+    <value>The type '{0}' does not implement the ICommand interface or does not have the CommandAttribute attribute.</value>
   </data>
   <data name="UnknownArgumentFormat" xml:space="preserve">
     <value>Unknown argument name '{0}'.</value>

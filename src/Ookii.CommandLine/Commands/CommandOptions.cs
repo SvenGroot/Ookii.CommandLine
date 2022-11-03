@@ -4,13 +4,12 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-namespace Ookii.CommandLine
+namespace Ookii.CommandLine.Commands
 {
     /// <summary>
-    /// Provides options for the <see cref="ShellCommand.CreateShellCommand(System.Reflection.Assembly,string,string[],int,CreateShellCommandOptions)"/>
-    /// and <see cref="ShellCommand.RunShellCommand(System.Reflection.Assembly, string?, string[], int, CreateShellCommandOptions)"/> methods.
+    /// Provides options for the <see cref="CommandManager"/> class.
     /// </summary>
-    public class CreateShellCommandOptions : ParseOptions
+    public class CommandOptions : ParseOptions
     {
         /// <summary>
         /// Gets the default value for the <see cref="CommandDescriptionIndent"/> property.

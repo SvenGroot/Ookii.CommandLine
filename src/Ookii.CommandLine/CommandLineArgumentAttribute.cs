@@ -1,4 +1,5 @@
 ﻿// Copyright (c) Sven Groot (Ookii.org)
+using Ookii.CommandLine.Commands;
 using System;
 
 namespace Ookii.CommandLine
@@ -44,11 +45,9 @@ namespace Ookii.CommandLine
     /// <para>
     ///   Unlike using the <see cref="CancelParsing"/> or <see cref="CommandLineParser.ArgumentParsed"/>
     ///   event, cancelling parsing with the return value does not automatically print the usage
-    ///   help when using the <see cref="CommandLineParser.Parse{T}(string[], int, ParseOptions?)"/>,
-    ///   <see cref="ShellCommand.CreateShellCommand(System.Reflection.Assembly, string?, string[], int, CreateShellCommandOptions?)"/>
-    ///   or <see cref="ShellCommand.RunShellCommand(System.Reflection.Assembly, string?, string[], int, CreateShellCommandOptions?)"/>
-    ///   methods. Instead, it must be requested using by setting the <see cref="CommandLineParser.HelpRequested"/>
-    ///   property to <see langword="true"/>.
+    ///   help when using the <see cref="CommandLineParser.Parse{T}(string[], int, ParseOptions?)"/>
+    ///   method or the <see cref="CommandManager"/> class. Instead, it must be requested using by
+    ///   setting the <see cref="CommandLineParser.HelpRequested"/> property to <see langword="true"/>.
     /// </para>
     /// </remarks>
     /// <threadsafety static="true" instance="false"/>

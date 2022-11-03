@@ -1,10 +1,11 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <RootNamespace>ShellCommandSampleVB</RootNamespace>
     <TargetFramework>net6.0</TargetFramework>
-    <Description>ShellCommand sample for Ookii.CommandLine</Description>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <Description>Subcommand sample for Ookii.CommandLine</Description>
   </PropertyGroup>
 
   <ItemGroup>

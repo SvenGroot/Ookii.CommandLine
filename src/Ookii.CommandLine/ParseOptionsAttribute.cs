@@ -254,7 +254,7 @@ namespace Ookii.CommandLine
         ///   will not be created even if this property is <see langword="true"/>.
         /// </para>
         /// <note>
-        ///   The automatic version argument will never be created for shell commands (subcommands).
+        ///   The automatic version argument will never be created for subcommands.
         /// </note>
         /// <para>
         ///   This value can be overridden by the <see cref="ParseOptions.AutoVersionArgument"/>
