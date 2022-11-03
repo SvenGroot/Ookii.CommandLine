@@ -26,7 +26,7 @@ namespace Ookii.CommandLine.Validation
     /// </para>
     /// </remarks>
     /// <threadsafety static="true" instance="true"/>
-    public class ValidateCountAttribute : ArgumentValidationAttribute
+    public class ValidateCountAttribute : ArgumentValidationWithHelpAttribute
     {
         private readonly int _minimum;
         private readonly int _maximum;
@@ -42,7 +42,12 @@ namespace Ookii.CommandLine.Validation
             _maximum = maximum;
         }
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Gets a value that indicates when validation will run.
+        /// </summary>
+        /// <value>
+        /// <see cref="ValidationMode.AfterParsing"/>.
+        /// </value>
         public override ValidationMode Mode => ValidationMode.AfterParsing;
 
         /// <summary>
@@ -61,7 +66,17 @@ namespace Ookii.CommandLine.Validation
         /// </value>
         public int Maximum => _maximum;
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Determines if the argument's item count is in the range.
+        /// </summary>
+        /// <param name="argument">The argument being validated.</param>
+        /// <param name="value">
+        ///   The argument value. If not <see langword="null"/>, this must be an instance of
+        ///   <see cref="CommandLineArgument.ArgumentType"/>.
+        /// </param>
+        /// <returns>
+        ///   <see langword="true"/> if the value is valid; otherwise, <see langword="false"/>.
+        /// </returns>
         public override bool IsValid(CommandLineArgument argument, object? value)
         {
             if (!argument.IsMultiValue)
@@ -71,9 +86,17 @@ namespace Ookii.CommandLine.Validation
             return count >= _minimum && count <= _maximum;
         }
 
-
-        /// <inheritdoc/>
+        /// <summary>
+        /// Gets the error message to display if validation failed.
+        /// </summary>
+        /// <param name="argument">The argument that was validated.</param>
+        /// <param name="value">Not used.</param>
+        /// <returns>The error message.</returns>
         public override string GetErrorMessage(CommandLineArgument argument, object? value)
             => argument.Parser.StringProvider.ValidateCountFailed(argument.ArgumentName, this);
+
+        /// <inheritdoc/>
+        protected override string GetUsageHelpCore(CommandLineArgument argument)
+            => argument.Parser.StringProvider.ValidateCountUsageHelp(this);
     }
 }

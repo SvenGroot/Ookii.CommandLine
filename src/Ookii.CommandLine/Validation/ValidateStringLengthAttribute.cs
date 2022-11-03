@@ -16,23 +16,28 @@ namespace Ookii.CommandLine.Validation
     /// </note>
     /// </remarks>
     /// <threadsafety static="true" instance="true"/>
-    public class ValidateStringLengthAttribute : ArgumentValidationAttribute
+    public class ValidateStringLengthAttribute : ArgumentValidationWithHelpAttribute
     {
-        private readonly int _minimumLength;
-        private readonly int _maximumLength;
+        private readonly int _minimum;
+        private readonly int _maximum;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ValidateStringLengthAttribute"/> class.
         /// </summary>
-        /// <param name="minimumLength">The inclusive lower bound on the length.</param>
-        /// <param name="maximumLength">The inclusive upper bound on the length.</param>
-        public ValidateStringLengthAttribute(int minimumLength, int maximumLength = int.MaxValue)
+        /// <param name="minimum">The inclusive lower bound on the length.</param>
+        /// <param name="maximum">The inclusive upper bound on the length.</param>
+        public ValidateStringLengthAttribute(int minimum, int maximum = int.MaxValue)
         {
-            _minimumLength = minimumLength;
-            _maximumLength = maximumLength;
+            _minimum = minimum;
+            _maximum = maximum;
         }
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Gets a value that indicates when validation will run.
+        /// </summary>
+        /// <value>
+        /// <see cref="ValidationMode.BeforeConversion"/>.
+        /// </value>
         public override ValidationMode Mode => ValidationMode.BeforeConversion;
 
         /// <summary>
@@ -41,7 +46,7 @@ namespace Ookii.CommandLine.Validation
         /// <value>
         /// The inclusive lower bound on the string length.
         /// </value>
-        public int MinimumLength => _minimumLength;
+        public int Minimum => _minimum;
 
         /// <summary>
         /// Get the inclusive upper bound on the string length.
@@ -49,17 +54,36 @@ namespace Ookii.CommandLine.Validation
         /// <value>
         /// The inclusive upper bound on the string length.
         /// </value>
-        public int MaximumLength => _maximumLength;
+        public int Maximum => _maximum;
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Determines if the argument's value's length is in the range.
+        /// </summary>
+        /// <param name="argument">The argument being validated.</param>
+        /// <param name="value">
+        ///   The argument value. If not <see langword="null"/>, this must be an instance of
+        ///   <see cref="CommandLineArgument.ArgumentType"/>.
+        /// </param>
+        /// <returns>
+        ///   <see langword="true"/> if the value is valid; otherwise, <see langword="false"/>.
+        /// </returns>
         public override bool IsValid(CommandLineArgument argument, object? value)
         {
             var length = (value as string)?.Length ?? 0;
-            return length >= _minimumLength && length <= _maximumLength;
+            return length >= _minimum && length <= _maximum;
         }
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Gets the error message to display if validation failed.
+        /// </summary>
+        /// <param name="argument">The argument that was validated.</param>
+        /// <param name="value">Not used.</param>
+        /// <returns>The error message.</returns>
         public override string GetErrorMessage(CommandLineArgument argument, object? value)
             => argument.Parser.StringProvider.ValidateStringLengthFailed(argument.ArgumentName, this);
+
+        /// <inheritdoc/>
+        protected override string GetUsageHelpCore(CommandLineArgument argument)
+            => argument.Parser.StringProvider.ValidateStringLengthUsageHelp(this);
     }
 }

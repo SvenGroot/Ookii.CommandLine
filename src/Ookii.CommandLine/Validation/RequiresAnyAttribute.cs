@@ -118,6 +118,24 @@ namespace Ookii.CommandLine.Validation
         public override CommandLineArgumentErrorCategory ErrorCategory
             => CommandLineArgumentErrorCategory.MissingRequiredArgument;
 
+        /// <summary>
+        /// Gets or sets a value that indicates whether this validator's help should be included
+        /// in the usage help.
+        /// </summary>
+        /// <value>
+        /// <see langword="true"/> to include it in the description; otherwise, <see langword="false"/>.
+        /// The default value is <see langword="true"/>.
+        /// </value>
+        /// <remarks>
+        /// <para>
+        ///   This has no effect if the <see cref="WriteUsageOptions.IncludeValidatorsInDescription"/>
+        ///   property is <see langword="false"/>.
+        /// </para>
+        /// <para>
+        ///   The help text is the value returned by <see cref="GetUsageHelp"/>.
+        /// </para>
+        /// </remarks>
+        public bool IncludeInUsageHelp { get; set; } = true;
 
         /// <summary>
         /// Determines if the at least one of the arguments in <see cref="Arguments"/> was
@@ -133,5 +151,16 @@ namespace Ookii.CommandLine.Validation
         /// <inheritdoc/>
         public override string GetErrorMessage(CommandLineParser parser)
             => parser.StringProvider.ValidateRequiresAnyFailed(_arguments);
+
+        /// <summary>
+        /// Gets the usage help message for this validator.
+        /// </summary>
+        /// <param name="parser">The parser is the validator is for.</param>
+        /// <returns>
+        /// The usage help message, or <see langword="null"/> if the <see cref="IncludeInUsageHelp"/>
+        /// property is <see langword="false"/>.
+        /// </returns>
+        public override string? GetUsageHelp(CommandLineParser parser)
+            => IncludeInUsageHelp ? parser.StringProvider.RequiresAnyUsageHelp(Arguments) : null;
     }
 }

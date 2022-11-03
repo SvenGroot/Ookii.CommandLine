@@ -583,11 +583,65 @@ namespace Ookii.CommandLine.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Must have between {0} and {1} items..
+        /// </summary>
+        internal static string ValidateCountUsageHelpBothFormat {
+            get {
+                return ResourceManager.GetString("ValidateCountUsageHelpBothFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Must have at most {0} items..
+        /// </summary>
+        internal static string ValidateCountUsageHelpMaxFormat {
+            get {
+                return ResourceManager.GetString("ValidateCountUsageHelpMaxFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Must have at least {0} items..
+        /// </summary>
+        internal static string ValidateCountUsageHelpMinFormat {
+            get {
+                return ResourceManager.GetString("ValidateCountUsageHelpMinFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The argument &apos;{0}&apos; must not be empty..
         /// </summary>
-        internal static string ValidateEmptyFailedFormat {
+        internal static string ValidateNotEmptyFailedFormat {
             get {
-                return ResourceManager.GetString("ValidateEmptyFailedFormat", resourceCulture);
+                return ResourceManager.GetString("ValidateNotEmptyFailedFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Must not be empty..
+        /// </summary>
+        internal static string ValidateNotEmptyUsageHelp {
+            get {
+                return ResourceManager.GetString("ValidateNotEmptyUsageHelp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The argument &apos;{0}&apos; must not be empty or contain only white-space characters..
+        /// </summary>
+        internal static string ValidateNotWhiteSpaceFailedFormat {
+            get {
+                return ResourceManager.GetString("ValidateNotWhiteSpaceFailedFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Must not be empty or white-space..
+        /// </summary>
+        internal static string ValidateNotWhiteSpaceUsageHelp {
+            get {
+                return ResourceManager.GetString("ValidateNotWhiteSpaceUsageHelp", resourceCulture);
             }
         }
         
@@ -597,6 +651,15 @@ namespace Ookii.CommandLine.Properties {
         internal static string ValidateProhibitsFailedFormat {
             get {
                 return ResourceManager.GetString("ValidateProhibitsFailedFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot be used with: {0}..
+        /// </summary>
+        internal static string ValidateProhibitsUsageHelpFormat {
+            get {
+                return ResourceManager.GetString("ValidateProhibitsUsageHelpFormat", resourceCulture);
             }
         }
         
@@ -628,7 +691,34 @@ namespace Ookii.CommandLine.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to You must supply at least one of: {0}.
+        ///   Looks up a localized string similar to Must be between {0} and {1}..
+        /// </summary>
+        internal static string ValidateRangeUsageHelpBothFormat {
+            get {
+                return ResourceManager.GetString("ValidateRangeUsageHelpBothFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Must be at most {0}..
+        /// </summary>
+        internal static string ValidateRangeUsageHelpMaxFormat {
+            get {
+                return ResourceManager.GetString("ValidateRangeUsageHelpMaxFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Must be at least {0}..
+        /// </summary>
+        internal static string ValidateRangeUsageHelpMinFormat {
+            get {
+                return ResourceManager.GetString("ValidateRangeUsageHelpMinFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You must supply at least one of: {0}..
         /// </summary>
         internal static string ValidateRequiresAnyFailedFormat {
             get {
@@ -642,6 +732,15 @@ namespace Ookii.CommandLine.Properties {
         internal static string ValidateRequiresFailedFormat {
             get {
                 return ResourceManager.GetString("ValidateRequiresFailedFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Must be used with: {0}..
+        /// </summary>
+        internal static string ValidateRequiresUsageHelpFormat {
+            get {
+                return ResourceManager.GetString("ValidateRequiresUsageHelpFormat", resourceCulture);
             }
         }
         
@@ -673,11 +772,29 @@ namespace Ookii.CommandLine.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The argument &apos;{0}&apos; must not be empty or contain only white-space characters..
+        ///   Looks up a localized string similar to Must be between {0} and {1} characters..
         /// </summary>
-        internal static string ValidateWhiteSpaceFailedFormat {
+        internal static string ValidateStringLengthUsageHelpBothFormat {
             get {
-                return ResourceManager.GetString("ValidateWhiteSpaceFailedFormat", resourceCulture);
+                return ResourceManager.GetString("ValidateStringLengthUsageHelpBothFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Must be at most {0} characters..
+        /// </summary>
+        internal static string ValidateStringLengthUsageHelpMaxFormat {
+            get {
+                return ResourceManager.GetString("ValidateStringLengthUsageHelpMaxFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Must be at least {0} characters..
+        /// </summary>
+        internal static string ValidateStringLengthUsageHelpMinFormat {
+            get {
+                return ResourceManager.GetString("ValidateStringLengthUsageHelpMinFormat", resourceCulture);
             }
         }
         

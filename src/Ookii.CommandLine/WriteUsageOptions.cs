@@ -266,10 +266,28 @@ namespace Ookii.CommandLine
         /// <see langword="true" /> if the default value should be included in the description;
         /// otherwise, <see langword="false" />. The default value is <see langword="true" />.
         /// </value>
+        /// <remarks>
         /// <para>
         ///   For arguments with a default value of <see langword="null"/>, this property has no effect.
         /// </para>
+        /// </remarks>
         public bool IncludeDefaultValueInDescription { get; set; } = true;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the <see cref="Validation.ArgumentValidationAttribute"/>
+        /// attributes of an argument should be included in the argument description.
+        /// </summary>
+        /// <value>
+        /// <see langword="true" /> if the validator descriptions should be included in; otherwise,
+        /// <see langword="false" />. The default value is <see langword="true" />.
+        /// </value>
+        /// <remarks>
+        /// <para>
+        ///   For arguments with no validators, or validators with no usage help, this property
+        ///   has no effect.
+        /// </para>
+        /// </remarks>
+        public bool IncludeValidatorsInDescription { get; set; } = true;
 
         /// <summary>
         /// Gets or sets the sequence used to reset color applied a usage help element.

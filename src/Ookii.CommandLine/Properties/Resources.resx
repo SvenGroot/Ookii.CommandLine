@@ -288,7 +288,7 @@
   <data name="ValidateCountMinFormat" xml:space="preserve">
     <value>The argument '{0}' must have at least {1} items.</value>
   </data>
-  <data name="ValidateEmptyFailedFormat" xml:space="preserve">
+  <data name="ValidateNotEmptyFailedFormat" xml:space="preserve">
     <value>The argument '{0}' must not be empty.</value>
   </data>
   <data name="ValidateRangeFailedBothFormat" xml:space="preserve">
@@ -309,7 +309,7 @@
   <data name="ValidateStringLengthMinFormat" xml:space="preserve">
     <value>The argument '{0}' must be at least {1} characters.</value>
   </data>
-  <data name="ValidateWhiteSpaceFailedFormat" xml:space="preserve">
+  <data name="ValidateNotWhiteSpaceFailedFormat" xml:space="preserve">
     <value>The argument '{0}' must not be empty or contain only white-space characters.</value>
   </data>
   <data name="ValidationFailedFormat" xml:space="preserve">
@@ -327,7 +327,46 @@
   <data name="RequiresAnySingleArgument" xml:space="preserve">
     <value>RequiresAnyAttribute requires at least two arguments; use CommandLineArgumentAttribute.IsRequired to make a single argument required.</value>
   </data>
+  <data name="ValidateRangeUsageHelpBothFormat" xml:space="preserve">
+    <value>Must be between {0} and {1}.</value>
+  </data>
+  <data name="ValidateRangeUsageHelpMaxFormat" xml:space="preserve">
+    <value>Must be at most {0}.</value>
+  </data>
+  <data name="ValidateRangeUsageHelpMinFormat" xml:space="preserve">
+    <value>Must be at least {0}.</value>
+  </data>
   <data name="ValidateRequiresAnyFailedFormat" xml:space="preserve">
-    <value>You must supply at least one of: {0}</value>
+    <value>You must supply at least one of: {0}.</value>
+  </data>
+  <data name="ValidateCountUsageHelpBothFormat" xml:space="preserve">
+    <value>Must have between {0} and {1} items.</value>
+  </data>
+  <data name="ValidateCountUsageHelpMaxFormat" xml:space="preserve">
+    <value>Must have at most {0} items.</value>
+  </data>
+  <data name="ValidateCountUsageHelpMinFormat" xml:space="preserve">
+    <value>Must have at least {0} items.</value>
+  </data>
+  <data name="ValidateNotEmptyUsageHelp" xml:space="preserve">
+    <value>Must not be empty.</value>
+  </data>
+  <data name="ValidateNotWhiteSpaceUsageHelp" xml:space="preserve">
+    <value>Must not be empty or white-space.</value>
+  </data>
+  <data name="ValidateProhibitsUsageHelpFormat" xml:space="preserve">
+    <value>Cannot be used with: {0}.</value>
+  </data>
+  <data name="ValidateRequiresUsageHelpFormat" xml:space="preserve">
+    <value>Must be used with: {0}.</value>
+  </data>
+  <data name="ValidateStringLengthUsageHelpBothFormat" xml:space="preserve">
+    <value>Must be between {0} and {1} characters.</value>
+  </data>
+  <data name="ValidateStringLengthUsageHelpMaxFormat" xml:space="preserve">
+    <value>Must be at most {0} characters.</value>
+  </data>
+  <data name="ValidateStringLengthUsageHelpMinFormat" xml:space="preserve">
+    <value>Must be at least {0} characters.</value>
   </data>
 </root>

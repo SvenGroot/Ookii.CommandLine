@@ -165,7 +165,7 @@ namespace Ookii.CommandLine
         /// </para>
         /// </remarks>
         public virtual string ValidateNotEmptyFailed(string argumentName)
-            => Format(Resources.ValidateEmptyFailedFormat, argumentName);
+            => Format(Resources.ValidateNotEmptyFailedFormat, argumentName);
 
         /// <summary>
         /// Gets an error message used if the <see cref="ValidateNotNullOrWhiteSpaceAttribute"/> fails
@@ -180,7 +180,7 @@ namespace Ookii.CommandLine
         /// </para>
         /// </remarks>
         public virtual string ValidateNotWhiteSpaceFailed(string argumentName)
-            => Format(Resources.ValidateWhiteSpaceFailedFormat, argumentName);
+            => Format(Resources.ValidateNotWhiteSpaceFailedFormat, argumentName);
 
         /// <summary>
         /// Gets an error message used if the <see cref="ValidateStringLengthAttribute"/> fails validation.
@@ -190,12 +190,12 @@ namespace Ookii.CommandLine
         /// <returns>The error message.</returns>
         public virtual string ValidateStringLengthFailed(string argumentName, ValidateStringLengthAttribute attribute)
         {
-            if (attribute.MaximumLength == int.MaxValue)
-                return Format(Resources.ValidateRangeFailedMinFormat, argumentName, attribute.MinimumLength);
-            else if (attribute.MinimumLength <= 0)
-                return Format(Resources.ValidateRangeFailedMaxFormat, argumentName, attribute.MaximumLength);
+            if (attribute.Maximum == int.MaxValue)
+                return Format(Resources.ValidateRangeFailedMinFormat, argumentName, attribute.Minimum);
+            else if (attribute.Minimum <= 0)
+                return Format(Resources.ValidateRangeFailedMaxFormat, argumentName, attribute.Maximum);
             else
-                return Format(Resources.ValidateRangeFailedBothFormat, argumentName, attribute.MinimumLength, attribute.MaximumLength);
+                return Format(Resources.ValidateRangeFailedBothFormat, argumentName, attribute.Minimum, attribute.Maximum);
         }
 
         /// <summary>

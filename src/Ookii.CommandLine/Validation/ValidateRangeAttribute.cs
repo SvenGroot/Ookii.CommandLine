@@ -16,7 +16,7 @@ namespace Ookii.CommandLine.Validation
     /// </para>
     /// </remarks>
     /// <threadsafety static="true" instance="true"/>
-    public class ValidateRangeAttribute : ArgumentValidationAttribute
+    public class ValidateRangeAttribute : ArgumentValidationWithHelpAttribute
     {
         private readonly object? _minimum;
         private readonly object? _maximum;
@@ -63,7 +63,17 @@ namespace Ookii.CommandLine.Validation
         /// </value>
         public virtual object? Maximum => _maximum;
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Determines if the argument's value is in the range.
+        /// </summary>
+        /// <param name="argument">The argument being validated.</param>
+        /// <param name="value">
+        ///   The argument value. If not <see langword="null"/>, this must be an instance of
+        ///   <see cref="CommandLineArgument.ArgumentType"/>.
+        /// </param>
+        /// <returns>
+        ///   <see langword="true"/> if the value is valid; otherwise, <see langword="false"/>.
+        /// </returns>
         public override bool IsValid(CommandLineArgument argument, object? value)
         {
             var min = (IComparable?)argument.ConvertToArgumentTypeInvariant(Minimum);
@@ -78,8 +88,17 @@ namespace Ookii.CommandLine.Validation
             return true;
         }
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Gets the error message to display if validation failed.
+        /// </summary>
+        /// <param name="argument">The argument that was validated.</param>
+        /// <param name="value">Not used.</param>
+        /// <returns>The error message.</returns>
         public override string GetErrorMessage(CommandLineArgument argument, object? value)
             => argument.Parser.StringProvider.ValidateRangeFailed(argument.ArgumentName, this);
+
+        /// <inheritdoc/>
+        protected override string GetUsageHelpCore(CommandLineArgument argument)
+            => argument.Parser.StringProvider.ValidateRangeUsageHelp(this);
     }
 }

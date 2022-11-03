@@ -13,7 +13,7 @@ namespace Ookii.CommandLine.Validation
     /// <remarks>
     /// <para>
     ///   An argument's value can only be <see langword="null"/> if its <see cref="TypeConverter"/>
-    ///   return <see langword="null"/> from the <see cref="TypeConverter.ConvertFrom(ITypeDescriptorContext?, System.Globalization.CultureInfo?, object)"/>
+    ///   returns <see langword="null"/> from the <see cref="TypeConverter.ConvertFrom(ITypeDescriptorContext?, System.Globalization.CultureInfo?, object)"/>
     ///   method.
     /// </para>
     /// <para>
@@ -27,17 +27,35 @@ namespace Ookii.CommandLine.Validation
     ///   so the value may still be <see langword="null"/> if the argument is not supplied, if that
     ///   is the default value.
     /// </para>
+    /// <para>
+    ///   This validator does not add any help text to the argument description.
+    /// </para>
     /// </remarks>
     /// <threadsafety static="true" instance="true"/>
     public class ValidateNotNullAttribute : ArgumentValidationAttribute
     {
-        /// <inheritdoc/>
+        /// <summary>
+        /// Determines if the argument's value is not null.
+        /// </summary>
+        /// <param name="argument">The argument being validated.</param>
+        /// <param name="value">
+        ///   The argument value. If not <see langword="null"/>, this must be an instance of
+        ///   <see cref="CommandLineArgument.ArgumentType"/>.
+        /// </param>
+        /// <returns>
+        ///   <see langword="true"/> if the value is valid; otherwise, <see langword="false"/>.
+        /// </returns>
         public override bool IsValid(CommandLineArgument argument, object? value)
         {
             return value != null;
         }
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Gets the error message to display if validation failed.
+        /// </summary>
+        /// <param name="argument">The argument that was validated.</param>
+        /// <param name="value">Not used.</param>
+        /// <returns>The error message.</returns>
         public override string GetErrorMessage(CommandLineArgument argument, object? value)
         {
             return argument.Parser.StringProvider.NullArgumentValue(argument.ArgumentName);

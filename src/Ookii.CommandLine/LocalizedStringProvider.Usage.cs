@@ -1,4 +1,5 @@
 ﻿using Ookii.CommandLine.Properties;
+using Ookii.CommandLine.Validation;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -338,10 +339,10 @@ namespace Ookii.CommandLine
         /// <para>
         ///   The default implementation calls the <see cref="ArgumentName(string, string, bool)"/>,
         ///   <see cref="ValueDescription(string, bool)"/>,
-        ///   <see cref="OptionalValueDescription(string, bool)"/>, <see cref="DefaultValue(object, bool)"/>
-        ///   and <see cref="Aliases(IEnumerable{string}?, IEnumerable{char}?, string, string, bool)"/>
-        ///   methods, so you do not need to override this method if you only want to customize
-        ///   those elements.
+        ///   <see cref="OptionalValueDescription(string, bool)"/>, <see cref="DefaultValue(object, bool)"/>,
+        ///   <see cref="Aliases(IEnumerable{string}?, IEnumerable{char}?, string, string, bool)"/>,
+        ///   and <see cref="ValidatorDescriptions(CommandLineArgument)"/> methods, so you do not
+        ///   need to override this method if you only want to customize those elements.
         /// </para>
         /// <para>
         ///   If you override this function, you may also need to change the <see cref="WriteUsageOptions.ArgumentDescriptionIndent"/>
@@ -374,6 +375,8 @@ namespace Ookii.CommandLine
                 ? Aliases(argument.Aliases, argument.ShortAliases, prefix, shortPrefix, useColor)
                 : string.Empty;
 
+            var validators = options.IncludeValidatorsInDescription ? ValidatorDescriptions(argument) : string.Empty;
+
             if (argument.Parser.Mode == ParsingMode.LongShort)
             {
                 var shortName = argument.HasShortName
@@ -387,8 +390,125 @@ namespace Ookii.CommandLine
             else
             {
                 var name = ArgumentName(argument.ArgumentName, prefix, useColor);
-                return $"    {colorStart}{name} {valueDescription}{alias}{colorEnd}{Environment.NewLine}{argument.Description}{defaultValue}{Environment.NewLine}";
+                return $"    {colorStart}{name} {valueDescription}{alias}{colorEnd}{Environment.NewLine}{argument.Description}{validators}{defaultValue}{Environment.NewLine}";
             }
+        }
+
+        #endregion
+
+        #region Validators
+
+        /// <summary>
+        /// Gets a formatted list of validator help messages.
+        /// </summary>
+        /// <param name="argument">The command line argument.</param>
+        /// <returns>The string.</returns>
+        /// <remarks>
+        /// <note>
+        ///   The default implementation of <see cref="ArgumentDescription"/> expects the returned
+        ///   value to start with a white-space character.
+        /// </note>
+        /// <para>
+        ///   If you override the <see cref="ArgumentDescription"/> method, this method will not be called.
+        /// </para>
+        /// </remarks>
+        public virtual string ValidatorDescriptions(CommandLineArgument argument)
+        {
+            var messages = argument.Validators
+                .Select(v => v.GetUsageHelp(argument))
+                .Where(h => !string.IsNullOrEmpty(h));
+
+            var result = string.Join(" ", messages);
+            if (result.Length > 0)
+                result = " " + result;
+
+            return result;
+        }
+
+        /// <summary>
+        /// Gets the usage help for the <see cref="ValidateCountAttribute"/> class.
+        /// </summary>
+        /// <param name="attribute">The attribute instance.</param>
+        /// <returns>The string.</returns>
+        public virtual string ValidateCountUsageHelp(ValidateCountAttribute attribute)
+        {
+            if (attribute.Minimum <= 0)
+                return Format(Resources.ValidateCountUsageHelpMaxFormat, attribute.Maximum);
+            else if (attribute.Maximum == int.MaxValue)
+                return Format(Resources.ValidateCountUsageHelpMinFormat, attribute.Minimum);
+
+            return Format(Resources.ValidateCountUsageHelpBothFormat, attribute.Minimum, attribute.Maximum);
+        }
+
+        /// <summary>
+        /// Gets the usage help for the <see cref="ValidateNotNullOrEmptyAttribute"/> class.
+        /// </summary>
+        /// <returns>The string.</returns>
+        public virtual string ValidateNotEmptyUsageHelp()
+            => Resources.ValidateNotEmptyUsageHelp;
+
+        /// <summary>
+        /// Gets the usage help for the <see cref="ValidateNotNullOrWhiteSpaceAttribute"/> class.
+        /// </summary>
+        /// <returns>The string.</returns>
+        public virtual string ValidateNotWhiteSpaceUsageHelp()
+            => Resources.ValidateNotWhiteSpaceUsageHelp;
+
+        /// <summary>
+        /// Gets the usage help for the <see cref="ValidateRangeAttribute"/> class.
+        /// </summary>
+        /// <param name="attribute">The attribute instance.</param>
+        /// <returns>The string.</returns>
+        public virtual string ValidateRangeUsageHelp(ValidateRangeAttribute attribute)
+        {
+            if (attribute.Minimum == null)
+                return Format(Resources.ValidateRangeUsageHelpMaxFormat, attribute.Maximum);
+            else if (attribute.Maximum == null)
+                return Format(Resources.ValidateRangeUsageHelpMinFormat, attribute.Minimum);
+
+            return Format(Resources.ValidateRangeUsageHelpBothFormat, attribute.Minimum, attribute.Maximum);
+        }
+
+        /// <summary>
+        /// Gets the usage help for the <see cref="ValidateStringLengthAttribute"/> class.
+        /// </summary>
+        /// <param name="attribute">The attribute instance.</param>
+        /// <returns>The string.</returns>
+        public virtual string ValidateStringLengthUsageHelp(ValidateStringLengthAttribute attribute)
+        {
+            if (attribute.Minimum <= 0)
+                return Format(Resources.ValidateStringLengthUsageHelpMaxFormat, attribute.Maximum);
+            else if (attribute.Maximum == int.MaxValue)
+                return Format(Resources.ValidateStringLengthUsageHelpMinFormat, attribute.Minimum);
+
+            return Format(Resources.ValidateStringLengthUsageHelpBothFormat, attribute.Minimum, attribute.Maximum);
+        }
+
+        /// <summary>
+        /// Gets the usage help for the <see cref="ProhibitsAttribute"/> class.
+        /// </summary>
+        /// <param name="attribute">The attribute instance.</param>
+        /// <returns>The string.</returns>
+        public virtual string ProhibitsUsageHelp(ProhibitsAttribute attribute)
+            => Format(Resources.ValidateProhibitsUsageHelpFormat, string.Join(ArgumentSeparator, attribute.Arguments));
+
+        /// <summary>
+        /// Gets the usage help for the <see cref="RequiresAttribute"/> class.
+        /// </summary>
+        /// <param name="attribute">The attribute instance.</param>
+        /// <returns>The string.</returns>
+        public virtual string RequiresUsageHelp(RequiresAttribute attribute)
+            => Format(Resources.ValidateRequiresUsageHelpFormat, string.Join(ArgumentSeparator, attribute.Arguments));
+
+        /// <summary>
+        /// Gets an error message used if the <see cref="RequiresAnyAttribute"/> fails validation.
+        /// </summary>
+        /// <param name="arguments">The names of the arguments.</param>
+        /// <returns>The error message.</returns>
+        public virtual string RequiresAnyUsageHelp(IEnumerable<string> arguments)
+        {
+            // This deliberately reuses the error messge.
+            return Format(Resources.ValidateRequiresAnyFailedFormat, string.Join(ArgumentSeparator, arguments));
         }
 
         #endregion

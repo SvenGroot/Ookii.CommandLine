@@ -29,80 +29,31 @@ namespace Ookii.CommandLine.Validation
     /// </para>
     /// </remarks>
     /// <threadsafety static="true" instance="true"/>
-    public class RequiresAttribute : ArgumentValidationAttribute
+    public class RequiresAttribute : DependencyValidationAttribute
     {
-        private string? _dependency;
-        private string[]? _dependencies;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="RequiresAttribute"/> class.
         /// </summary>
-        /// <param name="dependency">The name of the argument that this argument depends on.</param>
+        /// <param name="argument">The name of the argument that this argument depends on.</param>
         /// <exception cref="ArgumentNullException">
-        ///   <paramref name="dependency"/> is <see langword="null"/>.
+        ///   <paramref name="argument"/> is <see langword="null"/>.
         /// </exception>
-        public RequiresAttribute(string dependency)
+        public RequiresAttribute(string argument)
+            : base(true, argument)
         {
-            _dependency = dependency ?? throw new ArgumentNullException(nameof(dependency));
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RequiresAttribute"/> class with multiple
         /// dependencies.
         /// </summary>
-        /// <param name="dependencies">The names of the arguments that this argument depends on.</param>
+        /// <param name="arguments">The names of the arguments that this argument depends on.</param>
         /// <exception cref="ArgumentNullException">
-        ///   <paramref name="dependencies"/> is <see langword="null"/>.
+        ///   <paramref name="arguments"/> is <see langword="null"/>.
         /// </exception>
-        public RequiresAttribute(params string[] dependencies)
+        public RequiresAttribute(params string[] arguments)
+            : base(true, arguments)
         {
-            _dependencies = dependencies ?? throw new ArgumentNullException(nameof(dependencies));
-        }
-
-        /// <summary>
-        /// Gets the names of the arguments that the argument with this attribute depends upon.
-        /// </summary>
-        /// <value>
-        /// An array of argument names.
-        /// </value>
-        public string[] RequiredArguments => _dependencies ?? new[] { _dependency! };
-
-        /// <summary>
-        /// Gets a value that indicates when validation will run.
-        /// </summary>
-        /// <value>
-        /// <see cref="ValidationMode.AfterParsing"/>.
-        /// </value>
-        public override ValidationMode Mode => ValidationMode.AfterParsing;
-
-        /// <summary>
-        /// Gets the error category used for the <see cref="CommandLineArgumentException"/> when
-        /// validation fails.
-        /// </summary>
-        /// <value>
-        /// <see cref="CommandLineArgumentErrorCategory.ValidationFailed"/>.
-        /// </value>
-        public override CommandLineArgumentErrorCategory ErrorCategory => CommandLineArgumentErrorCategory.DependencyFailed;
-
-        /// <summary>
-        /// Determines if the dependencies are met.
-        /// </summary>
-        /// <param name="argument">The argument being validated.</param>
-        /// <param name="value">
-        ///   The argument value. If not <see langword="null"/>, this must be an instance of
-        ///   <see cref="CommandLineArgument.ArgumentType"/>.
-        /// </param>
-        /// <returns>
-        ///   <see langword="true"/> if the value is valid; otherwise, <see langword="false"/>.
-        /// </returns>
-        public override bool IsValid(CommandLineArgument argument, object? value)
-        {
-            if (_dependency != null)
-                return argument.Parser.GetArgument(_dependency)?.HasValue ?? false;
-
-            Debug.Assert(_dependencies != null);
-            return _dependencies
-                .All(name => argument.Parser.GetArgument(name)?.HasValue ?? false);
         }
 
         /// <summary>
@@ -112,6 +63,10 @@ namespace Ookii.CommandLine.Validation
         /// <param name="value">Not used.</param>
         /// <returns>The error message.</returns>
         public override string GetErrorMessage(CommandLineArgument argument, object? value)
-            => argument.Parser.StringProvider.ValidateRequiresFailed(argument.MemberName, RequiredArguments);
+            => argument.Parser.StringProvider.ValidateRequiresFailed(argument.MemberName, Arguments);
+
+        /// <inheritdoc/>
+        protected override string GetUsageHelpCore(CommandLineArgument argument)
+            => argument.Parser.StringProvider.RequiresUsageHelp(this);
     }
 }

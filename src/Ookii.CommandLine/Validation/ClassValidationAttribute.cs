@@ -83,5 +83,21 @@ namespace Ookii.CommandLine.Validation
         ///   <see langword="true"/> if the arguments are valid; otherwise, <see langword="false"/>.
         /// </returns>
         public abstract bool IsValid(CommandLineParser parser);
+
+        /// <summary>
+        /// Gets the usage help message for this validator.
+        /// </summary>
+        /// <param name="parser">The parser is the validator is for.</param>
+        /// <returns>
+        /// The usage help message, or <see langword="null"/> if there is none. The
+        /// base implementation always returns  <see langword="null"/>.
+        /// </returns>
+        /// <remarks>
+        /// <para>
+        ///   This function is only called if the <see cref="WriteUsageOptions.IncludeValidatorsInDescription"/>
+        ///   property is <see langword="true"/>.
+        /// </para>
+        /// </remarks>
+        public virtual string? GetUsageHelp(CommandLineParser parser) => null;
     }
 }

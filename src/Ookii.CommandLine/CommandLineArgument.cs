@@ -864,6 +864,14 @@ namespace Ookii.CommandLine
         public bool IsHidden => _isHidden;
 
         /// <summary>
+        /// Gets the argument validators applied to this argument.
+        /// </summary>
+        /// <value>
+        /// A list of objects deriving from the <see cref="ArgumentValidationAttribute"/> class.
+        /// </value>
+        public IEnumerable<ArgumentValidationAttribute> Validators => _validators;
+
+        /// <summary>
         /// Converts the specified string to the argument type, as specified in the <see cref="ArgumentType"/> property.
         /// </summary>
         /// <param name="culture">The culture to use to convert the argument.</param>
@@ -1003,6 +1011,12 @@ namespace Ookii.CommandLine
 
             if (options.IncludeDefaultValueInDescription && DefaultValue != null)
                 return true;
+
+            if (options.IncludeValidatorsInDescription &&
+                _validators.Any(v => !string.IsNullOrEmpty(v.GetUsageHelp(this))))
+            {
+                return true;
+            }
 
             return false;
         }

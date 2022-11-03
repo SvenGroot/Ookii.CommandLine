@@ -16,6 +16,9 @@ namespace Ookii.CommandLine.Validation
     ///   If the argument's type is not <see cref="string"/>, this validator uses the raw string
     ///   value provided by the user, before type conversion takes place.
     /// </note>
+    /// <para>
+    ///   This validator does not add any help text to the argument description.
+    /// </para>
     /// </remarks>
     /// <threadsafety static="true" instance="true"/>
     public class ValidatePatternAttribute : ArgumentValidationAttribute
@@ -42,7 +45,12 @@ namespace Ookii.CommandLine.Validation
             _options = options;
         }
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Gets a value that indicates when validation will run.
+        /// </summary>
+        /// <value>
+        /// <see cref="ValidationMode.BeforeConversion"/>.
+        /// </value>
         public override ValidationMode Mode => ValidationMode.BeforeConversion;
 
 
@@ -73,7 +81,17 @@ namespace Ookii.CommandLine.Validation
         /// </value>
         public Regex Pattern => _patternRegex ??= new Regex(_pattern, _options);
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Determines if the argument's value matches the pattern.
+        /// </summary>
+        /// <param name="argument">The argument being validated.</param>
+        /// <param name="value">
+        ///   The argument value. If not <see langword="null"/>, this must be an instance of
+        ///   <see cref="CommandLineArgument.ArgumentType"/>.
+        /// </param>
+        /// <returns>
+        ///   <see langword="true"/> if the value is valid; otherwise, <see langword="false"/>.
+        /// </returns>
         public override bool IsValid(CommandLineArgument argument, object? value)
         {
             if (value is not string stringValue)
@@ -82,7 +100,13 @@ namespace Ookii.CommandLine.Validation
             return Pattern.IsMatch(stringValue);
         }
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Gets the error message to display if validation failed.
+        /// </summary>
+        /// <param name="argument">The argument that was validated.</param>
+        /// <param name="value">Not used.</param>
+        /// <returns>The value of the <see cref="ErrorMessage"/> property, or a generic message
+        /// if it's <see langword="null"/>.</returns>
         public override string GetErrorMessage(CommandLineArgument argument, object? value)
         {
             if (ErrorMessage == null)

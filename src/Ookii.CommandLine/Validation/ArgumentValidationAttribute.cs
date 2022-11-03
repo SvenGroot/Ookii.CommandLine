@@ -72,24 +72,6 @@ namespace Ookii.CommandLine.Validation
         }
 
         /// <summary>
-        /// Gets the error message to display if validation failed.
-        /// </summary>
-        /// <param name="argument">The argument that was validated.</param>
-        /// <param name="value">
-        ///   The argument value. If not <see langword="null"/>, this must be an instance of
-        ///   <see cref="CommandLineArgument.ArgumentType"/>.
-        /// </param>
-        /// <returns>The error message.</returns>
-        /// <remarks>
-        /// <para>
-        ///   Override this method in a derived class to provide a custom error message. Otherwise,
-        ///   it will return a generic error message.
-        /// </para>
-        /// </remarks>
-        public virtual string GetErrorMessage(CommandLineArgument argument, object? value)
-            => argument.Parser.StringProvider.ValidationFailed(argument.ArgumentName);
-
-        /// <summary>
         /// When overridden in a derived class, determines if the argument is valid.
         /// </summary>
         /// <param name="argument">The argument being validated.</param>
@@ -114,5 +96,39 @@ namespace Ookii.CommandLine.Validation
         /// </para>
         /// </remarks>
         public abstract bool IsValid(CommandLineArgument argument, object? value);
+
+        /// <summary>
+        /// Gets the error message to display if validation failed.
+        /// </summary>
+        /// <param name="argument">The argument that was validated.</param>
+        /// <param name="value">
+        ///   The argument value. If not <see langword="null"/>, this must be an instance of
+        ///   <see cref="CommandLineArgument.ArgumentType"/>.
+        /// </param>
+        /// <returns>The error message.</returns>
+        /// <remarks>
+        /// <para>
+        ///   Override this method in a derived class to provide a custom error message. Otherwise,
+        ///   it will return a generic error message.
+        /// </para>
+        /// </remarks>
+        public virtual string GetErrorMessage(CommandLineArgument argument, object? value)
+            => argument.Parser.StringProvider.ValidationFailed(argument.ArgumentName);
+
+        /// <summary>
+        /// Gets the usage help message for this validator.
+        /// </summary>
+        /// <param name="argument">The argument is the validator is for.</param>
+        /// <returns>
+        /// The usage help message, or <see langword="null"/> if there is none. The
+        /// base implementation always returns  <see langword="null"/>.
+        /// </returns>
+        /// <remarks>
+        /// <para>
+        ///   This function is only called if the <see cref="WriteUsageOptions.IncludeValidatorsInDescription"/>
+        ///   property is <see langword="true"/>.
+        /// </para>
+        /// </remarks>
+        public virtual string? GetUsageHelp(CommandLineArgument argument) => null;
     }
 }

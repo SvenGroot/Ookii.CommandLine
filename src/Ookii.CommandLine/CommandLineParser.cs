@@ -756,6 +756,7 @@ namespace Ookii.CommandLine
             }
 
             WriteUsageSyntax(lineWriter.Inner, options);
+            WriteClassValidatorHelp(lineWriter.Inner, options);
             WriteArgumentDescriptions(lineWriter.Inner, options);
         }
 
@@ -1588,6 +1589,27 @@ namespace Ookii.CommandLine
 
             writer.WriteLine(); // End syntax line
             writer.WriteLine(); // Blank line
+        }
+
+        private void WriteClassValidatorHelp(LineWrappingTextWriter writer, WriteUsageOptions options)
+        {
+            if (!options.IncludeValidatorsInDescription)
+                return;
+
+            writer.Indent = 0;
+            bool hasHelp = false;
+            foreach (var validator in _argumentsType.GetCustomAttributes<ClassValidationAttribute>())
+            {
+                var help = validator.GetUsageHelp(this);
+                if (!string.IsNullOrEmpty(help))
+                {
+                    hasHelp = true;
+                    writer.WriteLine(help);
+                }
+            }
+
+            if (hasHelp)
+                writer.WriteLine(); // Blank line.
         }
 
         private object CreateArgumentsTypeInstance(object?[] constructorArgumentValues)

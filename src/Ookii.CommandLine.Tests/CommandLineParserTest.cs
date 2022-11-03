@@ -13,14 +13,12 @@ using System.Net;
 
 namespace Ookii.CommandLine.Tests
 {
-    
-    
     /// <summary>
     ///This is a test class for CommandLineParserTest and is intended
     ///to contain all CommandLineParserTest Unit Tests
     ///</summary>
     [TestClass()]
-    public class CommandLineParserTest
+    public partial class CommandLineParserTest
     {
         /// <summary>
         ///A test for CommandLineParser Constructor
@@ -818,6 +816,24 @@ namespace Ookii.CommandLine.Tests
             CheckThrows(() => parser.Parse(Array.Empty<string>()), parser, CommandLineArgumentErrorCategory.MissingRequiredArgument);
         }
 
+        [TestMethod]
+        public void TestValidatorUsageHelp()
+        {
+            CommandLineParser parser = new CommandLineParser<ValidationArguments>();
+            var options = new WriteUsageOptions()
+            {
+                ExecutableName = _executableName,
+            };
+
+            Assert.AreEqual(_expectedUsageValidators, parser.GetUsage(0, options));
+
+            parser = new CommandLineParser<DependencyArguments>();
+            Assert.AreEqual(_expectedUsageDependencies, parser.GetUsage(0, options));
+
+            options.IncludeValidatorsInDescription = false;
+            Assert.AreEqual(_expectedUsageDependenciesDisabled, parser.GetUsage(0, options));
+        }
+
         private record class ExpectedArgument
         {
             public ExpectedArgument(string name, Type type, ArgumentKind kind = ArgumentKind.SingleValue)
@@ -929,316 +945,5 @@ namespace Ookii.CommandLine.Tests
                     Assert.IsInstanceOfType(ex.InnerException, innerExceptionType);
             }
         }
-
-        #region Expected usage
-
-        private const string _executableName = "test";
-
-        private static readonly string _expectedDefaultUsage = @"Test arguments description.
-
-Usage: test [/arg1] <String> [[/other] <Number>] [[/notSwitch] <Boolean>] [[/Arg5] <Single>] [[/other2] <Number>] [[/Arg8] <DayOfWeek>...] /Arg6 <String> [/Arg10...] [/Arg11] [/Arg12 <Int32>...] [/Arg13 <String=Int32>...] [/Arg14 <String=Int32>...] [/Arg15 <KeyValuePair<String, Int32>>] [/Arg3 <String>] [/Arg7] [/Arg9 <Int32>] [/Help] [/Version]
-
-    /arg1 <String>
-        Arg1 description.
-
-    /other <Number>
-        Arg2 description. Default value: 42.
-
-    /notSwitch <Boolean>
-         Default value: False.
-
-    /Arg5 <Single>
-        Arg5 description.
-
-    /other2 <Number>
-        Arg4 description. Default value: 47.
-
-    /Arg6 <String> (/Alias1, /Alias2)
-        Arg6 description.
-
-    /Arg12 <Int32>
-         Default value: 42.
-
-    /Arg7 [<Boolean>] (/Alias3)
-
-
-    /Help [<Boolean>] (/?, /h)
-        Displays this help message.
-
-    /Version [<Boolean>]
-        Displays version information.
-
-".ReplaceLineEndings();
-
-        private static readonly string _expectedLongShortUsage = @"Usage: test [[--foo] <Int32>] [[--bar] <Int32>] [--Arg1 <Int32>] [--Arg2 <Int32>] [--Help] [--Switch1] [--Switch2] [-u] [--Version]
-
-    -f, --foo <Int32>
-            Foo description. Default value: 0.
-
-        --bar <Int32>
-            Bar description. Default value: 0.
-
-        --Arg1 <Int32>
-            Arg1 description.
-
-    -a, --Arg2 <Int32> (-b, --baz)
-            Arg2 description.
-
-    -?, --Help [<Boolean>] (-h)
-            Displays this help message.
-
-    -S, --Switch1 [<Boolean>]
-            Switch1 description.
-
-    -t, --Switch2 [<Boolean>]
-            Switch2 description.
-
-    -u [<Boolean>]
-            Switch3 description.
-
-        --Version [<Boolean>]
-            Displays version information.
-
-".ReplaceLineEndings();
-
-        private static readonly string _expectedLongShortUsageShortNameSyntax = @"Usage: test [[-f] <Int32>] [[--bar] <Int32>] [--Arg1 <Int32>] [-a <Int32>] [-?] [-S] [-t] [-u] [--Version]
-
-    -f, --foo <Int32>
-            Foo description. Default value: 0.
-
-        --bar <Int32>
-            Bar description. Default value: 0.
-
-        --Arg1 <Int32>
-            Arg1 description.
-
-    -a, --Arg2 <Int32> (-b, --baz)
-            Arg2 description.
-
-    -?, --Help [<Boolean>] (-h)
-            Displays this help message.
-
-    -S, --Switch1 [<Boolean>]
-            Switch1 description.
-
-    -t, --Switch2 [<Boolean>]
-            Switch2 description.
-
-    -u [<Boolean>]
-            Switch3 description.
-
-        --Version [<Boolean>]
-            Displays version information.
-
-".ReplaceLineEndings();
-
-        private static readonly string _expectedLongShortUsageAbbreviated = @"Usage: test [[--foo] <Int32>] [[--bar] <Int32>] [arguments]
-
-    -f, --foo <Int32>
-            Foo description. Default value: 0.
-
-        --bar <Int32>
-            Bar description. Default value: 0.
-
-        --Arg1 <Int32>
-            Arg1 description.
-
-    -a, --Arg2 <Int32> (-b, --baz)
-            Arg2 description.
-
-    -?, --Help [<Boolean>] (-h)
-            Displays this help message.
-
-    -S, --Switch1 [<Boolean>]
-            Switch1 description.
-
-    -t, --Switch2 [<Boolean>]
-            Switch2 description.
-
-    -u [<Boolean>]
-            Switch3 description.
-
-        --Version [<Boolean>]
-            Displays version information.
-
-".ReplaceLineEndings();
-
-        private static readonly string _expectedUsageDescriptionOnly = @"Test arguments description.
-
-Usage: test [-arg1] <String> [[-other] <Number>] [[-notSwitch] <Boolean>] [[-Arg5] <Single>] [[-other2] <Number>] [[-Arg8] <DayOfWeek>...] -Arg6 <String> [-Arg10...] [-Arg11] [-Arg12 <Int32>...] [-Arg13 <String=Int32>...] [-Arg14 <String=Int32>...] [-Arg15 <KeyValuePair<String, Int32>>] [-Arg3 <String>] [-Arg7] [-Arg9 <Int32>] [-Help] [-Version]
-
-    -arg1 <String>
-        Arg1 description.
-
-    -other <Number>
-        Arg2 description. Default value: 42.
-
-    -Arg5 <Single>
-        Arg5 description.
-
-    -other2 <Number>
-        Arg4 description. Default value: 47.
-
-    -Arg6 <String> (-Alias1, -Alias2)
-        Arg6 description.
-
-    -Help [<Boolean>] (-?, -h)
-        Displays this help message.
-
-    -Version [<Boolean>]
-        Displays version information.
-
-".ReplaceLineEndings();
-
-        private static readonly string _expectedUsageAll = @"Test arguments description.
-
-Usage: test [-arg1] <String> [[-other] <Number>] [[-notSwitch] <Boolean>] [[-Arg5] <Single>] [[-other2] <Number>] [[-Arg8] <DayOfWeek>...] -Arg6 <String> [-Arg10...] [-Arg11] [-Arg12 <Int32>...] [-Arg13 <String=Int32>...] [-Arg14 <String=Int32>...] [-Arg15 <KeyValuePair<String, Int32>>] [-Arg3 <String>] [-Arg7] [-Arg9 <Int32>] [-Help] [-Version]
-
-    -arg1 <String>
-        Arg1 description.
-
-    -other <Number>
-        Arg2 description. Default value: 42.
-
-    -notSwitch <Boolean>
-         Default value: False.
-
-    -Arg5 <Single>
-        Arg5 description.
-
-    -other2 <Number>
-        Arg4 description. Default value: 47.
-
-    -Arg8 <DayOfWeek>
-
-
-    -Arg6 <String> (-Alias1, -Alias2)
-        Arg6 description.
-
-    -Arg10 [<Boolean>]
-
-
-    -Arg11 [<Boolean>]
-
-
-    -Arg12 <Int32>
-         Default value: 42.
-
-    -Arg13 <String=Int32>
-
-
-    -Arg14 <String=Int32>
-
-
-    -Arg15 <KeyValuePair<String, Int32>>
-
-
-    -Arg3 <String>
-
-
-    -Arg7 [<Boolean>] (-Alias3)
-
-
-    -Arg9 <Int32>
-
-
-    -Help [<Boolean>] (-?, -h)
-        Displays this help message.
-
-    -Version [<Boolean>]
-        Displays version information.
-
-".ReplaceLineEndings();
-
-        private static readonly string _expectedUsageNone = @"Test arguments description.
-
-Usage: test [-arg1] <String> [[-other] <Number>] [[-notSwitch] <Boolean>] [[-Arg5] <Single>] [[-other2] <Number>] [[-Arg8] <DayOfWeek>...] -Arg6 <String> [-Arg10...] [-Arg11] [-Arg12 <Int32>...] [-Arg13 <String=Int32>...] [-Arg14 <String=Int32>...] [-Arg15 <KeyValuePair<String, Int32>>] [-Arg3 <String>] [-Arg7] [-Arg9 <Int32>] [-Help] [-Version]
-
-".ReplaceLineEndings();
-
-        // Raw strings would be nice here so including the escape character directly wouldn't be
-        // necessary but that requires C# 11.
-        private static readonly string _expectedUsageColor = @"Test arguments description.
-
-[36mUsage:[0m test [/arg1] <String> [[/other] <Number>] [[/notSwitch] <Boolean>] [[/Arg5] <Single>] [[/other2] <Number>] [[/Arg8] <DayOfWeek>...] /Arg6 <String> [/Arg10...] [/Arg11] [/Arg12 <Int32>...] [/Arg13 <String=Int32>...] [/Arg14 <String=Int32>...] [/Arg15 <KeyValuePair<String, Int32>>] [/Arg3 <String>] [/Arg7] [/Arg9 <Int32>] [/Help] [/Version]
-
-    [32m/arg1 <String>[0m
-        Arg1 description.
-
-    [32m/other <Number>[0m
-        Arg2 description. Default value: 42.
-
-    [32m/notSwitch <Boolean>[0m
-         Default value: False.
-
-    [32m/Arg5 <Single>[0m
-        Arg5 description.
-
-    [32m/other2 <Number>[0m
-        Arg4 description. Default value: 47.
-
-    [32m/Arg6 <String> (/Alias1, /Alias2)[0m
-        Arg6 description.
-
-    [32m/Arg12 <Int32>[0m
-         Default value: 42.
-
-    [32m/Arg7 [<Boolean>] (/Alias3)[0m
-
-
-    [32m/Help [<Boolean>] (/?, /h)[0m
-        Displays this help message.
-
-    [32m/Version [<Boolean>][0m
-        Displays version information.
-
-".ReplaceLineEndings();
-
-        private static readonly string _expectedLongShortUsageColor = @"[36mUsage:[0m test [[--foo] <Int32>] [[--bar] <Int32>] [--Arg1 <Int32>] [--Arg2 <Int32>] [--Help] [--Switch1] [--Switch2] [-u] [--Version]
-
-    [32m-f, --foo <Int32>[0m
-            Foo description. Default value: 0.
-
-    [32m    --bar <Int32>[0m
-            Bar description. Default value: 0.
-
-    [32m    --Arg1 <Int32>[0m
-            Arg1 description.
-
-    [32m-a, --Arg2 <Int32> (-b, --baz)[0m
-            Arg2 description.
-
-    [32m-?, --Help [<Boolean>] (-h)[0m
-            Displays this help message.
-
-    [32m-S, --Switch1 [<Boolean>][0m
-            Switch1 description.
-
-    [32m-t, --Switch2 [<Boolean>][0m
-            Switch2 description.
-
-    [32m-u [<Boolean>][0m
-            Switch3 description.
-
-    [32m    --Version [<Boolean>][0m
-            Displays version information.
-
-".ReplaceLineEndings();
-
-        private static readonly string _expectedUsageHidden = @"Usage: test [-Foo <Int32>] [-Help] [-Version]
-
-    -Foo <Int32>
-
-
-    -Help [<Boolean>] (-?, -h)
-        Displays this help message.
-
-    -Version [<Boolean>]
-        Displays version information.
-
-".ReplaceLineEndings();
-
-        #endregion
-
     }
 }

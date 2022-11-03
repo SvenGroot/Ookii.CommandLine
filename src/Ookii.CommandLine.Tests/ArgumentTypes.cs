@@ -46,6 +46,7 @@ namespace Ookii.CommandLine.Tests
 
         // Default value is intentionally a string to test default value conversion.
         [CommandLineArgument("other2", DefaultValue = "47", ValueDescription = "Number", Position = 1), System.ComponentModel.Description("Arg4 description.")]
+        [ValidateRange(0, 1000, IncludeInUsageHelp = false)]
         public int Arg4 { get; set; }
 
         // Short/long name stuff should be ignored if not using LongShort mode.
@@ -65,6 +66,7 @@ namespace Ookii.CommandLine.Tests
         public DayOfWeek[] Arg8 { get; set; }
 
         [CommandLineArgument()]
+        [ValidateRange(0, 100)]
         public int? Arg9 { get; set; }
 
         [CommandLineArgument]
@@ -352,18 +354,20 @@ namespace Ookii.CommandLine.Tests
     {
         public static int Arg3Value { get; set; }
 
-        public ValidationArguments([ValidateNotNullOrEmpty] string arg2 = null)
+        public ValidationArguments([ValidateNotNullOrEmpty, Description("Arg2 description.")] string arg2 = null)
         {
             Arg2 = arg2;
         }
 
         [CommandLineArgument]
+        [Description("Arg1 description.")]
         [ValidateRange(1, 5)]
         public int? Arg1 { get; set; }
 
         public string Arg2 { get; set; }
 
         [CommandLineArgument]
+        [Description("Arg3 description.")]
         [ValidatePattern("^[0-7]{4}$")]
         [ValidateRange(1000, 7000)]
         public static void Arg3(int value)
@@ -372,6 +376,7 @@ namespace Ookii.CommandLine.Tests
         }
 
         [CommandLineArgument]
+        [Description("Arg4 description.")]
         [MultiValueSeparator(";")]
         [ValidateStringLength(1, 3)]
         [ValidateCount(2, 4)]
@@ -397,25 +402,31 @@ namespace Ookii.CommandLine.Tests
         }
     }
 
+    // N.B. nameof is only safe if the argument name matches the property name.
     [RequiresAny(nameof(Address), nameof(Path))]
     class DependencyArguments
     {
         [CommandLineArgument]
+        [Description("The address.")]
         [TypeConverter(typeof(IPAddressTypeConverter))]
         public IPAddress Address { get; set; }
 
         [CommandLineArgument(DefaultValue = (short)5000)]
+        [Description("The port.")]
         [Requires(nameof(Address))]
         public short Port { get; set; }
 
         [CommandLineArgument]
+        [Description("The throughput.")]
         public int Throughput { get; set; }
 
         [CommandLineArgument]
+        [Description("The protocol.")]
         [Requires(nameof(Address), nameof(Throughput))]
         public int Protocol { get; set; }
 
         [CommandLineArgument]
+        [Description("The path.")]
         [Prohibits("Address")]
         public string Path { get; set; }
     }
