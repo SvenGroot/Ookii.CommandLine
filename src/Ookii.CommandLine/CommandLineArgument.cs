@@ -24,7 +24,7 @@ namespace Ookii.CommandLine
         private interface IValueHelper
         {
             object? Value { get; }
-            (object?, bool) SetValue(CommandLineArgument argument, CultureInfo culture, string? value);
+            bool SetValue(CommandLineArgument argument, CultureInfo culture, object? value);
             void ApplyValue(object target, PropertyInfo property);
         }
 
@@ -42,10 +42,10 @@ namespace Ookii.CommandLine
                 property.SetValue(target, Value);
             }
 
-            public (object?, bool) SetValue(CommandLineArgument argument, CultureInfo culture, string? value)
+            public bool SetValue(CommandLineArgument argument, CultureInfo culture, object? value)
             {
-                Value = argument.ConvertToArgumentType(culture, value);
-                return (Value, true);
+                Value = value;
+                return true;
             }
         }
 
@@ -75,13 +75,11 @@ namespace Ookii.CommandLine
                     list.Add(value);
             }
 
-            public (object?, bool) SetValue(CommandLineArgument argument, CultureInfo culture, string? value)
+            public bool SetValue(CommandLineArgument argument, CultureInfo culture, object? value)
             {
-                var converted = (T?)argument.ConvertToArgumentType(culture, value);
-                _values.Add(converted);
-                return (converted, true);
+                _values.Add((T?)value);
+                return true;
             }
-
         }
 
         private class DictionaryValueHelper<TKey, TValue> : IValueHelper
@@ -117,10 +115,10 @@ namespace Ookii.CommandLine
                     dictionary.Add(pair.Key, pair.Value);
             }
 
-            public (object?, bool) SetValue(CommandLineArgument argument, CultureInfo culture, string? value)
+            public bool SetValue(CommandLineArgument argument, CultureInfo culture, object? value)
             {
                 // ConvertToArgumentType is guaranteed to return non-null for dictionary arguments.
-                var pair = (KeyValuePair<TKey?, TValue?>)argument.ConvertToArgumentType(culture, value)!;
+                var pair = (KeyValuePair<TKey?, TValue?>)value!;
 
                 // With the KeyValuePairConverter, these should already be checked, but it's still
                 // checked here to deal with custom converters.
@@ -136,10 +134,10 @@ namespace Ookii.CommandLine
                 }
                 catch (ArgumentException ex)
                 {
-                    throw argument._parser.StringProvider.CreateException(CommandLineArgumentErrorCategory.InvalidDictionaryValue, ex, argument, value);
+                    throw argument._parser.StringProvider.CreateException(CommandLineArgumentErrorCategory.InvalidDictionaryValue, ex, argument, value.ToString());
                 }
 
-                return (pair, true);
+                return true;
             }
         }
 
@@ -152,9 +150,9 @@ namespace Ookii.CommandLine
                 throw new InvalidOperationException();
             }
 
-            public (object?, bool) SetValue(CommandLineArgument argument, CultureInfo culture, string? value)
+            public bool SetValue(CommandLineArgument argument, CultureInfo culture, object? value)
             {
-                Value = argument.ConvertToArgumentType(culture, value);
+                Value = value;
                 var info = argument._method!.Value;
                 int parameterCount = (info.HasValueParameter ? 1 : 0) + (info.HasParserParameter ? 1 : 0);
                 var parameters = new object?[parameterCount];
@@ -172,9 +170,9 @@ namespace Ookii.CommandLine
 
                 var returnValue = info.Method.Invoke(null, parameters);
                 if (returnValue == null)
-                    return (Value, true);
+                    return true;
                 else
-                    return (Value, (bool)returnValue);
+                    return (bool)returnValue;
             }
         }
 
@@ -1031,13 +1029,13 @@ namespace Ookii.CommandLine
             bool continueParsing;
             if (IsMultiValue && value != null && MultiValueSeparator != null)
             {
-                continueParsing = false;
+                continueParsing = true;
                 string[] values = value.Split(new[] { MultiValueSeparator }, StringSplitOptions.None);
                 foreach (string separateValue in values)
                 {
                     Validate(separateValue, ValidationMode.BeforeConversion);
-                    object? converted;
-                    (converted, continueParsing) = _valueHelper.SetValue(this, culture, separateValue);
+                    var converted = ConvertToArgumentType(culture, separateValue);
+                    continueParsing = _valueHelper.SetValue(this, culture, converted);
                     if (!continueParsing)
                         break;
 
@@ -1047,8 +1045,8 @@ namespace Ookii.CommandLine
             else
             {
                 Validate(value, ValidationMode.BeforeConversion);
-                object? converted;
-                (converted, continueParsing) = _valueHelper.SetValue(this, culture, value);
+                var converted = ConvertToArgumentType(culture, value);
+                continueParsing = _valueHelper.SetValue(this, culture, converted);
                 Validate(converted, ValidationMode.AfterConversion);
             }
 
