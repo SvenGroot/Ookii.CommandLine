@@ -1,4 +1,5 @@
 ﻿// Copyright (c) Sven Groot (Ookii.org)
+using Ookii.CommandLine.Terminal;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -329,11 +330,7 @@ namespace Ookii.CommandLine
                 throw new ArgumentOutOfRangeException(nameof(index));
 
             options ??= new();
-            if (options.UsageOptions.UseColor == null && options.Out == null)
-            {
-                options.UsageOptions.UseColor = VirtualTerminal.EnableColor(VirtualTerminal.StandardStream.Output);
-            }
-
+            using var vtSupport = options.EnableOutputColor();
             using var output = DisposableWrapper.Create(options.Out, LineWrappingTextWriter.ForConsoleOut);
 
             // Update the values because the options are passed to the shell command and the ParseInternal method.

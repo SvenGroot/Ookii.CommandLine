@@ -1,4 +1,5 @@
 ﻿// Copyright (c) Sven Groot (Ookii.org)
+using Ookii.CommandLine.Terminal;
 using System;
 
 namespace Ookii.CommandLine
@@ -61,7 +62,7 @@ namespace Ookii.CommandLine
         /// </summary>
         /// <value>
         ///   The virtual terminal sequence for a color. The default value is
-        ///   <see cref="VirtualTerminal.TextFormat.ForegroundCyan"/>.
+        ///   <see cref="TextFormat.ForegroundCyan"/>.
         /// </value>
         /// <remarks>
         /// <para>
@@ -81,7 +82,7 @@ namespace Ookii.CommandLine
         ///   application name does not.
         /// </para>
         /// </remarks>
-        public string UsagePrefixColor { get; set; } = VirtualTerminal.TextFormat.ForegroundCyan;
+        public string UsagePrefixColor { get; set; } = TextFormat.ForegroundCyan;
 
         /// <summary>
         /// Gets or sets the number of characters by which to indent all except the first line of the command line syntax of the usage help.
@@ -202,7 +203,7 @@ namespace Ookii.CommandLine
         /// </summary>
         /// <value>
         ///   The virtual terminal sequence for a color. The default value is
-        ///   <see cref="VirtualTerminal.TextFormat.ForegroundGreen"/>.
+        ///   <see cref="TextFormat.ForegroundGreen"/>.
         /// </value>
         /// <remarks>
         /// <para>
@@ -222,7 +223,7 @@ namespace Ookii.CommandLine
         ///   portion of the string has color; the actual argument description does not.
         /// </para>
         /// </remarks>
-        public string ArgumentDescriptionColor { get; set; } = VirtualTerminal.TextFormat.ForegroundGreen;
+        public string ArgumentDescriptionColor { get; set; } = TextFormat.ForegroundGreen;
 
         /// <summary>
         /// Gets or sets a value indicating whether white space, rather than a colon, is used to separate named arguments and their values
@@ -294,7 +295,7 @@ namespace Ookii.CommandLine
         /// </summary>
         /// <value>
         ///   The virtual terminal sequence used to reset color. The default value is
-        ///   <see cref="VirtualTerminal.TextFormat.Default"/>.
+        ///   <see cref="TextFormat.Default"/>.
         /// </value>
         /// <remarks>
         /// <para>
@@ -307,7 +308,7 @@ namespace Ookii.CommandLine
         ///   <see langword="true"/>.
         /// </para>
         /// </remarks>
-        public string ColorReset { get; set; } = VirtualTerminal.TextFormat.Default;
+        public string ColorReset { get; set; } = TextFormat.Default;
 
         /// <summary>
         /// Gets or sets a value that indicates whether the usage help should use color.
@@ -332,5 +333,17 @@ namespace Ookii.CommandLine
         public bool? UseColor { get; set; }
 
         internal string? CommandName { get; set; }
+
+        internal VirtualTerminalSupport? EnableColor()
+        {
+            if (UseColor == null)
+            {
+                var support = VirtualTerminal.EnableColor(StandardStream.Output);
+                UseColor = support.IsSupported;
+                return support;
+            }
+
+            return null;
+        }
     }
 }

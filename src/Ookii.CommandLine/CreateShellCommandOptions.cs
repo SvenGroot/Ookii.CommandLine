@@ -1,4 +1,5 @@
 ﻿// Copyright (c) Sven Groot (Ookii.org)
+using Ookii.CommandLine.Terminal;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -29,7 +30,7 @@ namespace Ookii.CommandLine
         /// </summary>
         /// <value>
         ///   The virtual terminal sequence for a color. The default value is
-        ///   <see cref="VirtualTerminal.TextFormat.ForegroundGreen"/>.
+        ///   <see cref="TextFormat.ForegroundGreen"/>.
         /// </value>
         /// <remarks>
         /// <para>
@@ -49,7 +50,7 @@ namespace Ookii.CommandLine
         ///   application name does not.
         /// </para>
         /// </remarks>
-        public string CommandDescriptionColor { get; set; } = VirtualTerminal.TextFormat.ForegroundGreen;
+        public string CommandDescriptionColor { get; set; } = TextFormat.ForegroundGreen;
 
         /// <summary>
         /// Gets or sets the number of characters by which to indent the all but the first line of command descriptions.

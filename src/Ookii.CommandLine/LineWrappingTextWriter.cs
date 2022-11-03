@@ -1,4 +1,5 @@
 ﻿// Copyright (c) Sven Groot (Ookii.org)
+using Ookii.CommandLine.Terminal;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;

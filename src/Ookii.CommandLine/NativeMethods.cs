@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Ookii.CommandLine.Terminal;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -11,36 +12,37 @@ namespace Ookii.CommandLine
     {
         static readonly IntPtr INVALID_HANDLE_VALUE = new(-1);
 
-        public static bool EnableVirtualTerminalSequences(VirtualTerminal.StandardStream stream, bool enable)
+        public static ConsoleModes? EnableVirtualTerminalSequences(StandardStream stream, bool enable)
         {
-            if (stream == VirtualTerminal.StandardStream.Input)
+            if (stream == StandardStream.Input)
                 throw new ArgumentException(Properties.Resources.InvalidStandardStream, nameof(stream));
 
             var handle = GetStandardHandle(stream);
             if (handle == INVALID_HANDLE_VALUE)
-                return false;
+                return null;
 
             if (!GetConsoleMode(handle, out ConsoleModes mode))
-                return false;
+                return null;
 
+            var oldMode = mode;
             if (enable)
                 mode |= ConsoleModes.ENABLE_VIRTUAL_TERMINAL_PROCESSING;
             else
                 mode &= ~ConsoleModes.ENABLE_VIRTUAL_TERMINAL_PROCESSING;
 
             if (!SetConsoleMode(handle, mode))
-                return false;
+                return null;
 
-            return true;
+            return oldMode;
         }
 
-        public static IntPtr GetStandardHandle(VirtualTerminal.StandardStream stream)
+        public static IntPtr GetStandardHandle(StandardStream stream)
         {
             var stdHandle = stream switch
             {
-                VirtualTerminal.StandardStream.Output => StandardHandle.STD_OUTPUT_HANDLE,
-                VirtualTerminal.StandardStream.Input => StandardHandle.STD_INPUT_HANDLE,
-                VirtualTerminal.StandardStream.Error => StandardHandle.STD_ERROR_HANDLE,
+                StandardStream.Output => StandardHandle.STD_OUTPUT_HANDLE,
+                StandardStream.Input => StandardHandle.STD_INPUT_HANDLE,
+                StandardStream.Error => StandardHandle.STD_ERROR_HANDLE,
                 _ => throw new ArgumentException(Properties.Resources.InvalidStandardStream, nameof(stream)),
             };
 
@@ -48,7 +50,7 @@ namespace Ookii.CommandLine
         }
 
         [DllImport("kernel32.dll", SetLastError = true)]
-        static extern bool SetConsoleMode(IntPtr hConsoleHandle, ConsoleModes dwMode);
+        public static extern bool SetConsoleMode(IntPtr hConsoleHandle, ConsoleModes dwMode);
 
         [DllImport("kernel32.dll", SetLastError = true)]
         static extern bool GetConsoleMode(IntPtr hConsoleHandle, out ConsoleModes lpMode);
@@ -57,7 +59,7 @@ namespace Ookii.CommandLine
         static extern IntPtr GetStdHandle(StandardHandle nStdHandle);
 
         [Flags]
-        private enum ConsoleModes : uint
+        public enum ConsoleModes : uint
         {
             ENABLE_PROCESSED_INPUT = 0x0001,
             ENABLE_LINE_INPUT = 0x0002,

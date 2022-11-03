@@ -1,4 +1,5 @@
 ﻿// Copyright (c) Sven Groot (Ookii.org)
+using Ookii.CommandLine.Terminal;
 using Ookii.CommandLine.Validation;
 using System;
 using System.Collections.Generic;
@@ -696,10 +697,7 @@ namespace Ookii.CommandLine
         public void WriteUsageToConsole(WriteUsageOptions? options = null)
         {
             options ??= new();
-            if (options.UseColor == null)
-            {
-                options.UseColor = VirtualTerminal.EnableColor(VirtualTerminal.StandardStream.Output);
-            }
+            using var vtSupport = options.EnableColor();
 
             WriteUsage(Console.Out, Console.WindowWidth - 1, options);
         }
@@ -1155,11 +1153,7 @@ namespace Ookii.CommandLine
             options ??= new();
             var parser = new CommandLineParser(argumentsType, options);
 
-            if (options.UsageOptions.UseColor == null && options.Out == null)
-            {
-                options.UsageOptions.UseColor = VirtualTerminal.EnableColor(VirtualTerminal.StandardStream.Output);
-            }
-
+            using var vtSupport = options.EnableOutputColor();
             using var output = DisposableWrapper.Create(options.Out, LineWrappingTextWriter.ForConsoleOut);
             object? result = null;
             try
@@ -1168,11 +1162,7 @@ namespace Ookii.CommandLine
             }
             catch (CommandLineArgumentException ex)
             {
-                if (options.UseErrorColor == null && options.UseErrorColor == null)
-                {
-                    options.UseErrorColor = VirtualTerminal.EnableColor(VirtualTerminal.StandardStream.Error);
-                }
-
+                using var errorVtSupport = options.EnableErrorColor();
                 using var error = DisposableWrapper.Create(options.Error, LineWrappingTextWriter.ForConsoleError);
                 if (options.UseErrorColor ?? false)
                     error.Inner.Write(options.ErrorColor);

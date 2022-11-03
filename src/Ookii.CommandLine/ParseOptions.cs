@@ -1,4 +1,5 @@
 ﻿// Copyright (c) Sven Groot (Ookii.org)
+using Ookii.CommandLine.Terminal;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -302,7 +303,7 @@ namespace Ookii.CommandLine
         /// </summary>
         /// <value>
         ///   The virtual terminal sequence for a color. The default value is
-        ///   <see cref="VirtualTerminal.TextFormat.ForegroundRed"/>.
+        ///   <see cref="TextFormat.ForegroundRed"/>.
         /// </value>
         /// <remarks>
         /// <para>
@@ -319,7 +320,7 @@ namespace Ookii.CommandLine
         ///   property will be written.
         /// </para>
         /// </remarks>
-        public string ErrorColor { get; set; } = VirtualTerminal.TextFormat.ForegroundRed;
+        public string ErrorColor { get; set; } = TextFormat.ForegroundRed;
 
         /// <summary>
         /// Gets or sets a value that indicates whether error messages should use color.
@@ -376,5 +377,26 @@ namespace Ookii.CommandLine
             get => _usageOptions ??= new WriteUsageOptions();
             set => _usageOptions = value;
         }
+
+        internal VirtualTerminalSupport? EnableOutputColor()
+        {
+            if (Out == null)
+                return UsageOptions.EnableColor();
+
+            return null;
+        }
+
+        internal VirtualTerminalSupport? EnableErrorColor()
+        {
+            if (Error == null && UseErrorColor == null)
+            {
+                var support = VirtualTerminal.EnableColor(StandardStream.Error);
+                UseErrorColor = support.IsSupported;
+                return support;
+            }
+
+            return null;
+        }
+
     }
 }
