@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,7 +15,7 @@ namespace Ookii.CommandLine.Validation
     {
         private readonly string? _argument;
         private readonly string[]? _arguments;
-        private bool _requires;
+        private readonly bool _requires;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DependencyValidationAttribute"/> class.
@@ -80,34 +81,59 @@ namespace Ookii.CommandLine.Validation
         /// Determines if the dependencies are met.
         /// </summary>
         /// <param name="argument">The argument being validated.</param>
-        /// <param name="value">
-        ///   The argument value. If not <see langword="null"/>, this must be an instance of
-        ///   <see cref="CommandLineArgument.ArgumentType"/>.
-        /// </param>
+        /// <param name="value">Not used</param>
         /// <returns>
         ///   <see langword="true"/> if the value is valid; otherwise, <see langword="false"/>.
         /// </returns>
+        /// <exception cref="InvalidOperationException">
+        ///   One of the argument names in the <see cref="Arguments"/> property refers to an
+        ///   argument that doesn't exist.
+        /// </exception>
         public sealed override bool IsValid(CommandLineArgument argument, object? value)
         {
-            if (_argument != null)
-            {
-                if (_requires)
-                    return argument.Parser.GetArgument(_argument)?.HasValue ?? false;
-                else
-                    return !argument.Parser.GetArgument(_argument)?.HasValue ?? false;
-            }
-
-            Debug.Assert(_arguments != null);
+            var args = GetArguments(argument.Parser);
             if (_requires)
             {
-                return _arguments
-                    .All(name => argument.Parser.GetArgument(name)?.HasValue ?? false);
+                return args.All(a => a.HasValue);
             }
             else
             {
-                return _arguments
-                    .Any(name => argument.Parser.GetArgument(name)?.HasValue ?? true);
+                return args.All(a => !a.HasValue);
             }
+        }
+
+        /// <summary>
+        /// Resolves the argument names in the <see cref="Arguments"/> property to their actual
+        /// <see cref="CommandLineArgument"/> property.
+        /// </summary>
+        /// <param name="parser">The <see cref="CommandLineParser"/> instance.</param>
+        /// <returns>A list of the arguments.</returns>
+        /// <exception cref="ArgumentNullException">
+        ///   <paramref name="parser"/> is <see langword="null"/>.
+        /// </exception>
+        /// <exception cref="InvalidOperationException">
+        ///   One of the argument names in the <see cref="Arguments"/> property refers to an
+        ///   argument that doesn't exist.
+        /// </exception>
+        public IEnumerable<CommandLineArgument> GetArguments(CommandLineParser parser)
+        {
+            if (parser == null)
+                throw new ArgumentNullException(nameof(parser));
+
+            if (_argument != null)
+            {
+                var arg = parser.GetArgument(_argument) ?? throw GetUnknownDependencyException(_argument);
+                return Enumerable.Repeat(arg, 1);
+            }
+
+            Debug.Assert(_arguments != null);
+            return _arguments
+                .Select(name => parser.GetArgument(name) ?? throw GetUnknownDependencyException(name));
+        }
+
+        private InvalidOperationException GetUnknownDependencyException(string name)
+        {
+            return new InvalidOperationException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.UnknownDependencyFormat, GetType().Name, name));
         }
     }
 }

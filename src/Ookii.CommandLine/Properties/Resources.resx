@@ -337,7 +337,7 @@
     <value>Must be at least {0}.</value>
   </data>
   <data name="ValidateRequiresAnyFailedFormat" xml:space="preserve">
-    <value>You must supply at least one of: {0}.</value>
+    <value>You must use at least one of: {0}.</value>
   </data>
   <data name="ValidateCountUsageHelpBothFormat" xml:space="preserve">
     <value>Must have between {0} and {1} items.</value>
@@ -368,5 +368,8 @@
   </data>
   <data name="ValidateStringLengthUsageHelpMinFormat" xml:space="preserve">
     <value>Must be at least {0} characters.</value>
+  </data>
+  <data name="UnknownDependencyFormat" xml:space="preserve">
+    <value>A {0} refers to an unknown argument '{1}'.</value>
   </data>
 </root>

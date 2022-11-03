@@ -63,10 +63,10 @@ namespace Ookii.CommandLine.Validation
         /// <param name="value">Not used.</param>
         /// <returns>The error message.</returns>
         public override string GetErrorMessage(CommandLineArgument argument, object? value)
-            => argument.Parser.StringProvider.ValidateProhibitsFailed(argument.MemberName, Arguments);
+            => argument.Parser.StringProvider.ValidateProhibitsFailed(argument.MemberName, GetArguments(argument.Parser));
 
         /// <inheritdoc/>
         protected override string GetUsageHelpCore(CommandLineArgument argument)
-            => argument.Parser.StringProvider.ProhibitsUsageHelp(this);
+            => argument.Parser.StringProvider.ProhibitsUsageHelp(GetArguments(argument.Parser));
     }
 }

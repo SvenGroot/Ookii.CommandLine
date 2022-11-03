@@ -538,6 +538,15 @@ namespace Ookii.CommandLine.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to A {0} refers to an unknown argument &apos;{1}&apos;..
+        /// </summary>
+        internal static string UnknownDependencyFormat {
+            get {
+                return ResourceManager.GetString("UnknownDependencyFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Unknown version..
         /// </summary>
         internal static string UnknownVersion {
@@ -718,7 +727,7 @@ namespace Ookii.CommandLine.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to You must supply at least one of: {0}..
+        ///   Looks up a localized string similar to You must use at least one of: {0}..
         /// </summary>
         internal static string ValidateRequiresAnyFailedFormat {
             get {

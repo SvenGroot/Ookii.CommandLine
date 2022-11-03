@@ -487,33 +487,36 @@ namespace Ookii.CommandLine
         /// <summary>
         /// Gets the usage help for the <see cref="ProhibitsAttribute"/> class.
         /// </summary>
-        /// <param name="attribute">The attribute instance.</param>
+        /// <param name="arguments">The prohibited arguments.</param>
         /// <returns>The string.</returns>
-        public virtual string ProhibitsUsageHelp(ProhibitsAttribute attribute)
-            => Format(Resources.ValidateProhibitsUsageHelpFormat, string.Join(ArgumentSeparator, attribute.Arguments));
+        public virtual string ProhibitsUsageHelp(IEnumerable<CommandLineArgument> arguments)
+            => Format(Resources.ValidateProhibitsUsageHelpFormat,
+                   string.Join(ArgumentSeparator,arguments.Select(a => a.ArgumentNameWithPrefix)));
 
         /// <summary>
         /// Gets the usage help for the <see cref="RequiresAttribute"/> class.
         /// </summary>
-        /// <param name="attribute">The attribute instance.</param>
+        /// <param name="arguments">The required arguments.</param>
         /// <returns>The string.</returns>
-        public virtual string RequiresUsageHelp(RequiresAttribute attribute)
-            => Format(Resources.ValidateRequiresUsageHelpFormat, string.Join(ArgumentSeparator, attribute.Arguments));
+        public virtual string RequiresUsageHelp(IEnumerable<CommandLineArgument> arguments)
+            => Format(Resources.ValidateRequiresUsageHelpFormat,
+                   string.Join(ArgumentSeparator, arguments.Select(a => a.ArgumentNameWithPrefix)));
 
         /// <summary>
         /// Gets an error message used if the <see cref="RequiresAnyAttribute"/> fails validation.
         /// </summary>
         /// <param name="arguments">The names of the arguments.</param>
         /// <returns>The error message.</returns>
-        public virtual string RequiresAnyUsageHelp(IEnumerable<string> arguments)
+        public virtual string RequiresAnyUsageHelp(IEnumerable<CommandLineArgument> arguments)
         {
             // This deliberately reuses the error messge.
-            return Format(Resources.ValidateRequiresAnyFailedFormat, string.Join(ArgumentSeparator, arguments));
+            return Format(Resources.ValidateRequiresAnyFailedFormat,
+                string.Join(ArgumentSeparator, arguments.Select(a => a.ArgumentNameWithPrefix)));
         }
 
-        #endregion
+            #endregion
 
-        private static int AppendAliases<T>(StringBuilder builder, string prefix, IEnumerable<T>? aliases, int count)
+            private static int AppendAliases<T>(StringBuilder builder, string prefix, IEnumerable<T>? aliases, int count)
         {
             if (aliases == null)
                 return count;

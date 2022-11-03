@@ -344,7 +344,7 @@ Usage: test [-arg1] <String> [[-other] <Number>] [[-notSwitch] <Boolean>] [[-Arg
 
         private static readonly string _expectedUsageDependencies = @"Usage: test [-Address <IPAddress>] [-Help] [-Path <String>] [-Port <Int16>] [-Protocol <Int32>] [-Throughput <Int32>] [-Version]
 
-You must supply at least one of: Address, Path.
+You must use at least one of: -Address, -Path.
 
     -Address <IPAddress>
         The address.
@@ -353,13 +353,13 @@ You must supply at least one of: Address, Path.
         Displays this help message.
 
     -Path <String>
-        The path. Cannot be used with: Address.
+        The path. Cannot be used with: -Address.
 
     -Port <Int16>
-        The port. Must be used with: Address. Default value: 5000.
+        The port. Must be used with: -Address. Default value: 5000.
 
     -Protocol <Int32>
-        The protocol. Must be used with: Address, Throughput.
+        The protocol. Must be used with: -Address, -Throughput.
 
     -Throughput <Int32>
         The throughput.

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -150,7 +151,7 @@ namespace Ookii.CommandLine.Validation
 
         /// <inheritdoc/>
         public override string GetErrorMessage(CommandLineParser parser)
-            => parser.StringProvider.ValidateRequiresAnyFailed(_arguments);
+            => parser.StringProvider.ValidateRequiresAnyFailed(GetArguments(parser));
 
         /// <summary>
         /// Gets the usage help message for this validator.
@@ -161,6 +162,33 @@ namespace Ookii.CommandLine.Validation
         /// property is <see langword="false"/>.
         /// </returns>
         public override string? GetUsageHelp(CommandLineParser parser)
-            => IncludeInUsageHelp ? parser.StringProvider.RequiresAnyUsageHelp(Arguments) : null;
+            => IncludeInUsageHelp ? parser.StringProvider.RequiresAnyUsageHelp(GetArguments(parser)) : null;
+
+        /// <summary>
+        /// Resolves the argument names in the <see cref="Arguments"/> property to their actual
+        /// <see cref="CommandLineArgument"/> property.
+        /// </summary>
+        /// <param name="parser">The <see cref="CommandLineParser"/> instance.</param>
+        /// <returns>A list of the arguments.</returns>
+        /// <exception cref="ArgumentNullException">
+        ///   <paramref name="parser"/> is <see langword="null"/>.
+        /// </exception>
+        /// <exception cref="InvalidOperationException">
+        ///   One of the argument names in the <see cref="Arguments"/> property refers to an
+        ///   argument that doesn't exist.
+        /// </exception>
+        public IEnumerable<CommandLineArgument> GetArguments(CommandLineParser parser)
+        {
+            if (parser == null)
+                throw new ArgumentNullException(nameof(parser));
+
+            return _arguments
+                .Select(name => parser.GetArgument(name) ?? throw GetUnknownDependencyException(name));
+        }
+
+        private InvalidOperationException GetUnknownDependencyException(string name)
+        {
+            return new InvalidOperationException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.UnknownDependencyFormat, GetType().Name, name));
+        }
     }
 }

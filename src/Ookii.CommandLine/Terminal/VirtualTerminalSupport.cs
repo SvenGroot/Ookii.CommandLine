@@ -16,7 +16,7 @@ namespace Ookii.CommandLine.Terminal
     public sealed class VirtualTerminalSupport : IDisposable
     {
         private readonly bool _supported;
-        private readonly IntPtr _handle;
+        private IntPtr _handle;
         private readonly NativeMethods.ConsoleModes _previousMode;
 
         internal VirtualTerminalSupport(bool supported)
@@ -61,6 +61,7 @@ namespace Ookii.CommandLine.Terminal
             if (_handle != IntPtr.Zero)
             {
                 NativeMethods.SetConsoleMode(_handle, _previousMode);
+                _handle = IntPtr.Zero;
             }
         }
     }
