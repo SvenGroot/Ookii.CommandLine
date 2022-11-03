@@ -103,11 +103,7 @@ namespace Ookii.CommandLine
                 !commands.Any(c => options.CommandNameComparer.Compare(c.Name, Properties.Resources.AutomaticVersionCommandName) == 0))
             {
                 var versionCommand = ShellCommandInfo.GetAutomaticVersionCommand(options.StringProvider);
-#if NET6_0_OR_GREATER
                 commands = commands.Append(versionCommand);
-#else
-                commands = commands.Concat(new[] { versionCommand });
-#endif
             }
 
             return commands.OrderBy(c => c.Name, options.CommandNameComparer);

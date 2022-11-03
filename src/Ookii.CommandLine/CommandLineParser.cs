@@ -320,11 +320,7 @@ namespace Ookii.CommandLine
                     throw new ArgumentException(Properties.Resources.EmptyArgumentNamePrefix, nameof(options));
 
                 var longInfo = new PrefixInfo { Prefix = _longArgumentNamePrefix, Short = false };
-#if NET6_0_OR_GREATER
                 prefixInfos = prefixInfos.Append(longInfo);
-#else
-                prefixInfos = prefixInfos.Concat(new[] { longInfo });
-#endif
                 _argumentsByShortName = new(comparer);
             }
 
