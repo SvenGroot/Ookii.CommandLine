@@ -298,8 +298,8 @@ namespace Ookii.CommandLine
                 return string.Empty;
 
             var result = new StringBuilder();
-            var count = AppendAliases(result, shortPrefix, shortAliases, 0);
-            count = AppendAliases(result, prefix, aliases, count);
+            var count = AppendAliases(result, shortPrefix, shortAliases, useColor, 0);
+            count = AppendAliases(result, prefix, aliases, useColor, count);
 
             if (count == 0)
                 return string.Empty;
@@ -516,7 +516,7 @@ namespace Ookii.CommandLine
 
             #endregion
 
-            private static int AppendAliases<T>(StringBuilder builder, string prefix, IEnumerable<T>? aliases, int count)
+        private int AppendAliases<T>(StringBuilder builder, string prefix, IEnumerable<T>? aliases, bool useColor, int count)
         {
             if (aliases == null)
                 return count;
@@ -526,8 +526,7 @@ namespace Ookii.CommandLine
                 if (count != 0)
                     builder.Append(ArgumentSeparator);
 
-                builder.Append(prefix);
-                builder.Append(alias);
+                builder.Append(ArgumentName(alias!.ToString()!, prefix, useColor));
                 ++count;
             }
 
