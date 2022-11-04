@@ -91,10 +91,14 @@ namespace Ookii.CommandLine
                 else
                 {
                     if (Indent > 0)
+                    {
                         WriteIndent(writer, Indent);
+                    }
 
                     if (Content != null)
+                    {
                         Content.Value.WriteTo(writer);
+                    }
                 }
             }
         }
@@ -136,16 +140,22 @@ namespace Ookii.CommandLine
             {
                 Debug.Assert(this[index] == '\r' || this[index] == '\n');
                 if (this[index] == '\r' && index + 1 < Length && this[index + 1] == '\n')
+                {
                     return index + 2; // Windows line ending
+                }
                 else
+                {
                     return index + 1;
+                }
             }
 
             private int IndexOfAny(char[] separators, int start)
             {
                 int index = Array.FindIndex(_value.Array!, _value.Offset + start, _value.Count - start, ch => separators.Contains(ch));
                 if (index >= 0)
+                {
                     index -= _value.Offset;
+                }
 
                 return index;
             }
@@ -175,7 +185,9 @@ namespace Ookii.CommandLine
                         }
 
                         if (separatorIndex > segmentStart)
+                        {
                             yield return new Segment(SegmentType.Text, this.Slice(segmentStart, separatorIndex - segmentStart));
+                        }
 
                         // Find the end of the sequence.
                         end = VirtualTerminal.FindSequenceEnd(Characters.Skip(separatorIndex + 1));
@@ -193,7 +205,9 @@ namespace Ookii.CommandLine
                     {
                         end = SkipLineBreak(separatorIndex);
                         if (separatorIndex > segmentStart)
+                        {
                             yield return new Segment(SegmentType.Text, this.Slice(segmentStart, separatorIndex - segmentStart));
+                        }
 
                         if (end == Length && this[end - 1] == '\r')
                         {
@@ -220,7 +234,9 @@ namespace Ookii.CommandLine
             {
                 int newOffset = _value.Offset + Math.Min(Length, offset);
                 if (newOffset + count > _value.Offset + Length)
+                {
                     count = Length - newOffset;
+                }
 
                 return new StringBuffer(_value.Array!, newOffset, count);
             }
@@ -233,14 +249,18 @@ namespace Ookii.CommandLine
             public (StringBuffer, StringBuffer, int)? BreakLine(int startIndex, bool force)
             {
                 if (force)
+                {
                     return (Slice(0, startIndex), Slice(startIndex), startIndex);
+                }
 
                 int count = startIndex + 1;
                 startIndex += _value.Offset;
 
                 int breakPoint = Array.FindLastIndex(_value.Array!, startIndex, count, ch => char.IsWhiteSpace(ch));
                 if (breakPoint < 0)
+                {
                     return null;
+                }
 
                 breakPoint -= _value.Offset;
                 return (Slice(0, breakPoint), Slice(breakPoint + 1), breakPoint);
@@ -380,21 +400,29 @@ namespace Ookii.CommandLine
                 {
                     var segment = _segments[segmentIndex];
                     if (segment.Type != SegmentType.Text || segment.Content == null)
+                    {
                         continue;
+                    }
 
                     currentLength -= segment.ContentLength;
                     if (index < currentLength)
+                    {
                         continue;
+                    }
 
                     splits = segment.Content.Value.BreakLine(index - currentLength, force);
                     if (splits != null)
+                    {
                         break;
+                    }
 
                     index = currentLength - 1;
                 }
 
                 if (splits == null)
+                {
                     return false;
+                }
 
                 var (lineEnd, lineStart, breakPoint) = splits.Value;
                 WriteSegments(writer, _segments.Take(segmentIndex));
@@ -498,7 +526,9 @@ namespace Ookii.CommandLine
             _disposeBaseWriter = disposeBaseWriter;
             _countFormatting = countFormatting;
             if (_maximumLineLength > 0)
+            {
                 _lineBuffer = new();
+            }
         }
 
 
@@ -566,7 +596,10 @@ namespace Ookii.CommandLine
             set
             {
                 if (value < 0 || (_maximumLineLength > 0 && value >= _maximumLineLength))
+                {
                     throw new ArgumentOutOfRangeException(nameof(value), Properties.Resources.IndentOutOfRange);
+                }
+
                 _indent = value;
             }
         }
@@ -618,7 +651,9 @@ namespace Ookii.CommandLine
                 Write(new[] { value }, 0, 1);
             }
             else
+            {
                 _baseWriter.Write(value);
+            }
         }
 
         /// <inheritdoc/>
@@ -634,13 +669,24 @@ namespace Ookii.CommandLine
         public override void Write(char[] buffer, int index, int count)
         {
             if (buffer == null)
+            {
                 throw new ArgumentNullException(nameof(buffer));
+            }
+
             if (index < 0)
+            {
                 throw new ArgumentOutOfRangeException(nameof(index), Properties.Resources.ValueMustBeNonNegative);
+            }
+
             if (count < 0)
+            {
                 throw new ArgumentOutOfRangeException(nameof(count), Properties.Resources.ValueMustBeNonNegative);
+            }
+
             if ((buffer.Length - index) < count)
+            {
                 throw new ArgumentException(Properties.Resources.IndexCountOutOfRange);
+            }
 
             // The array must be cloned because we'll store references to segments of it, which
             // would break if the caller changes the contents.
@@ -675,14 +721,20 @@ namespace Ookii.CommandLine
             if (_lineBuffer != null)
             {
                 if (!_lineBuffer.IsEmpty)
+                {
                     _lineBuffer.FlushTo(_baseWriter, 0);
+                }
                 else
+                {
                     _lineBuffer.ClearCurrentLine(0);
+                }
             }
             else
             {
                 if (!_indentNextWrite && _currentLineLength > 0)
+                {
                     _baseWriter.WriteLine();
+                }
 
                 _indentNextWrite = false;
             }
@@ -733,7 +785,9 @@ namespace Ookii.CommandLine
         private static void WriteIndent(TextWriter writer, int indent)
         {
             for (int x = 0; x < indent; ++x)
+            {
                 writer.Write(IndentChar);
+            }
         }
 
         private void WriteCore(StringBuffer buffer)
@@ -748,14 +802,18 @@ namespace Ookii.CommandLine
             {
                 bool hadPartialLineBreak = _lineBuffer.CheckAndRemovePartialLineBreak();
                 if (hadPartialLineBreak)
+                {
                     _lineBuffer.WriteLineTo(_baseWriter, _indent);
+                }
 
                 if (segment.Type == SegmentType.LineBreak)
                 {
                     // Check if this is just the end of a partial line break. If it is, it was
                     // already written above.
                     if (!hadPartialLineBreak || segment.Content!.Value.Length == 1 && segment.Content!.Value[0] != '\n')
+                    {
                         _lineBuffer.WriteLineTo(_baseWriter, _indent);
+                    }
                 }
                 else
                 {
@@ -763,7 +821,9 @@ namespace Ookii.CommandLine
                     while (_lineBuffer.ContentLength > _maximumLineLength)
                     {
                         if (!_lineBuffer.BreakLine(_baseWriter, _maximumLineLength, _indent, false))
+                        {
                             _lineBuffer.BreakLine(_baseWriter, _maximumLineLength, _indent, true);
+                        }
                     }
                 }
             }

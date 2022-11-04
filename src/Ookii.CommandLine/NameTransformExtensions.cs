@@ -23,11 +23,15 @@ namespace Ookii.CommandLine
         public static string Apply(this NameTransform transform, string name, string? suffixToStrip = null)
         {
             if (name == null)
+            {
                 throw new ArgumentNullException(nameof(name));
+            }
 
             int count = name.Length;
             if (transform != NameTransform.None && suffixToStrip != null && name.EndsWith(suffixToStrip))
+            {
                 count = name.Length - suffixToStrip.Length;
+            }
 
             return transform switch
             {

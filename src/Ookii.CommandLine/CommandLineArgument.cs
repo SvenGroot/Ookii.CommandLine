@@ -66,12 +66,16 @@ namespace Ookii.CommandLine
 
                 object? collection = property.GetValue(target, null);
                 if (collection == null)
+                {
                     throw new InvalidOperationException();
+                }
 
                 var list = (ICollection<T?>)collection;
                 list.Clear();
                 foreach (var value in _values)
+                {
                     list.Add(value);
+                }
             }
 
             public bool SetValue(CommandLineArgument argument, CultureInfo culture, object? value)
@@ -107,11 +111,15 @@ namespace Ookii.CommandLine
 
                 var dictionary = (IDictionary<TKey, TValue?>?)property.GetValue(target, null);
                 if (dictionary == null)
+                {
                     throw new InvalidOperationException();
+                }
 
                 dictionary.Clear();
                 foreach (var pair in _dictionary)
+                {
                     dictionary.Add(pair.Key, pair.Value);
+                }
             }
 
             public bool SetValue(CommandLineArgument argument, CultureInfo culture, object? value)
@@ -122,14 +130,20 @@ namespace Ookii.CommandLine
                 // With the KeyValuePairConverter, these should already be checked, but it's still
                 // checked here to deal with custom converters.
                 if (pair.Key == null || (!_allowNullValues && pair.Value == null))
+                {
                     throw argument._parser.StringProvider.CreateException(CommandLineArgumentErrorCategory.NullArgumentValue, argument);
+                }
 
                 try
                 {
                     if (_allowDuplicateKeys)
+                    {
                         _dictionary[pair.Key] = pair.Value;
+                    }
                     else
+                    {
                         _dictionary.Add(pair.Key, pair.Value);
+                    }
                 }
                 catch (ArgumentException ex)
                 {
@@ -169,9 +183,13 @@ namespace Ookii.CommandLine
 
                 var returnValue = info.Method.Invoke(null, parameters);
                 if (returnValue == null)
+                {
                     return true;
+                }
                 else
+                {
                     return (bool)returnValue;
+                }
             }
         }
 
@@ -255,25 +273,35 @@ namespace Ookii.CommandLine
                 if (info.Short)
                 {
                     if (info.ShortName != '\0')
+                    {
                         _shortName = info.ShortName;
+                    }
                     else
+                    {
                         _shortName = _argumentName[0];
+                    }
                 }
 
                 if (!HasLongName)
                 {
                     if (!HasShortName)
+                    {
                         throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.NoLongOrShortName, _argumentName));
+                    }
 
                     _argumentName = _shortName.ToString();
                 }
             }
 
             if (HasLongName && info.Aliases != null)
+            {
                 _aliases = new(info.Aliases.ToArray());
+            }
 
             if (HasShortName && info.ShortAliases != null)
+            {
                 _shortAliases = new(info.ShortAliases.ToArray());
+            }
 
             _argumentType = info.ArgumentType;
             _elementType = info.ArgumentType;
@@ -325,10 +353,14 @@ namespace Ookii.CommandLine
             }
 
             if (_valueDescription == null)
+            {
                 _valueDescription = info.ValueDescription ?? GetFriendlyTypeName(_elementType);
+            }
 
             if (_converter == null)
+            {
                 _converter = CreateConverter(converterType);
+            }
 
             _defaultValue = ConvertToArgumentTypeInvariant(info.DefaultValue);
         }
@@ -959,21 +991,29 @@ namespace Ookii.CommandLine
         public object? ConvertToArgumentType(CultureInfo culture, string? argumentValue)
         {
             if (culture == null)
+            {
                 throw new ArgumentNullException(nameof(culture));
+            }
 
             if (argumentValue == null)
             {
                 if (IsSwitch)
+                {
                     return true;
+                }
                 else
+                {
                     throw _parser.StringProvider.CreateException(CommandLineArgumentErrorCategory.MissingNamedArgumentValue, this);
+                }
             }
 
             try
             {
                 var converted = _converter.ConvertFrom(null, culture, argumentValue);
                 if (converted == null && (!_allowNull || IsDictionary))
+                {
                     throw _parser.StringProvider.CreateException(CommandLineArgumentErrorCategory.NullArgumentValue, this);
+                }
 
                 return converted;
             }
@@ -989,9 +1029,13 @@ namespace Ookii.CommandLine
             {
                 // Yeah, I don't like catching Exception, but unfortunately BaseNumberConverter (e.g. used for int) can *throw* a System.Exception (not a derived class) so there's nothing I can do about it.
                 if (ex.InnerException is FormatException)
+                {
                     throw _parser.StringProvider.CreateException(CommandLineArgumentErrorCategory.ArgumentValueConversion, ex, this, argumentValue);
+                }
                 else
+                {
                     throw;
+                }
             }
         }
 
@@ -1019,11 +1063,16 @@ namespace Ookii.CommandLine
         public object? ConvertToArgumentTypeInvariant(object? value)
         {
             if (value == null || _elementType.IsAssignableFrom(value.GetType()))
+            {
                 return value;
+            }
             else
             {
                 if (!_converter.CanConvertFrom(value.GetType()))
+                {
                     throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.TypeConversionErrorFormat, value.GetType().FullName, _argumentType.FullName, _argumentName));
+                }
+
                 return _converter.ConvertFrom(null, CultureInfo.InvariantCulture, value);
             }
         }
@@ -1058,18 +1107,26 @@ namespace Ookii.CommandLine
         internal bool HasInformation(WriteUsageOptions options)
         {
             if (!string.IsNullOrEmpty(Description))
+            {
                 return true;
+            }
 
             if (options.UseAbbreviatedSyntax && Position == null)
+            {
                 return true;
+            }
 
             if (options.UseShortNamesForSyntax)
             {
                 if (HasLongName)
+                {
                     return true;
+                }
             }
             else if (HasShortName)
+            {
                 return true;
+            }
 
             if (options.IncludeAliasInDescription &&
                 ((Aliases != null && Aliases.Count > 0) || (ShortAliases != null && ShortAliases.Count > 0)))
@@ -1078,7 +1135,9 @@ namespace Ookii.CommandLine
             }
 
             if (options.IncludeDefaultValueInDescription && DefaultValue != null)
+            {
                 return true;
+            }
 
             if (options.IncludeValidatorsInDescription &&
                 _validators.Any(v => !string.IsNullOrEmpty(v.GetUsageHelp(this))))
@@ -1092,7 +1151,9 @@ namespace Ookii.CommandLine
         internal bool SetValue(CultureInfo culture, string? value)
         {
             if (HasValue && !IsMultiValue && !_parser.AllowDuplicateArguments)
+            {
                 throw _parser.StringProvider.CreateException(CommandLineArgumentErrorCategory.DuplicateArgument, this);
+            }
 
             _valueHelper ??= CreateValueHelper();
 
@@ -1107,7 +1168,9 @@ namespace Ookii.CommandLine
                     var converted = ConvertToArgumentType(culture, separateValue);
                     continueParsing = _valueHelper.SetValue(this, culture, converted);
                     if (!continueParsing)
+                    {
                         break;
+                    }
 
                     Validate(converted, ValidationMode.AfterConversion);
                 }
@@ -1127,9 +1190,14 @@ namespace Ookii.CommandLine
         internal static CommandLineArgument Create(CommandLineParser parser, ParameterInfo parameter)
         {
             if (parser == null)
+            {
                 throw new ArgumentNullException(nameof(parser));
+            }
+
             if (parameter?.Name == null)
+            {
                 throw new ArgumentNullException(nameof(parameter));
+            }
 
             var typeConverterAttribute = parameter.GetCustomAttribute<TypeConverterAttribute>();
             var keyTypeConverterAttribute = parameter.GetCustomAttribute<KeyTypeConverterAttribute>();
@@ -1169,9 +1237,14 @@ namespace Ookii.CommandLine
         internal static CommandLineArgument Create(CommandLineParser parser, PropertyInfo property)
         {
             if (parser == null)
+            {
                 throw new ArgumentNullException(nameof(parser));
+            }
+
             if (property == null)
+            {
                 throw new ArgumentNullException(nameof(property));
+            }
 
             return Create(parser, property, null, property.PropertyType, DetermineAllowsNull(property));
         }
@@ -1179,13 +1252,20 @@ namespace Ookii.CommandLine
         internal static CommandLineArgument Create(CommandLineParser parser, MethodInfo method)
         {
             if (parser == null)
+            {
                 throw new ArgumentNullException(nameof(parser));
+            }
+
             if (method == null)
+            {
                 throw new ArgumentNullException(nameof(method));
+            }
 
             var infoTuple = DetermineMethodArgumentInfo(method);
             if (infoTuple == null)
+            {
                 throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.InvalidMethodSignatureFormat, method.Name));
+            }
 
             var (methodInfo, argumentType, allowsNull) = infoTuple.Value;
             return Create(parser, null, methodInfo, argumentType, allowsNull);
@@ -1197,7 +1277,9 @@ namespace Ookii.CommandLine
             var member = ((MemberInfo?)property ?? method?.Method)!;
             var attribute = member.GetCustomAttribute<CommandLineArgumentAttribute>();
             if (attribute == null)
+            {
                 throw new ArgumentException(Properties.Resources.MissingArgumentAttribute, nameof(method));
+            }
 
             var typeConverterAttribute = member.GetCustomAttribute<TypeConverterAttribute>();
             var keyTypeConverterAttribute = member.GetCustomAttribute<KeyTypeConverterAttribute>();
@@ -1239,7 +1321,9 @@ namespace Ookii.CommandLine
         internal static CommandLineArgument? CreateAutomaticHelp(CommandLineParser parser)
         {
             if (parser == null)
+            {
                 throw new ArgumentNullException(nameof(parser));
+            }
 
             var argumentName = DetermineArgumentName(null, parser.StringProvider.AutomaticHelpName(), parser.NameTransform);
             var shortName = parser.StringProvider.AutomaticHelpShortName();
@@ -1288,7 +1372,9 @@ namespace Ookii.CommandLine
         internal static CommandLineArgument? CreateAutomaticVersion(CommandLineParser parser)
         {
             if (parser == null)
+            {
                 throw new ArgumentNullException(nameof(parser));
+            }
 
             var argumentName = DetermineArgumentName(null, parser.StringProvider.AutomaticVersionName(), parser.NameTransform);
             if (parser.GetArgument(argumentName) != null)
@@ -1325,7 +1411,9 @@ namespace Ookii.CommandLine
         {
             // Do nothing for parameter-based values
             if (_property == null)
+            {
                 return;
+            }
 
             try
             {
@@ -1363,24 +1451,34 @@ namespace Ookii.CommandLine
 
             Console.WriteLine($"{friendlyName} {version}");
             if (copyRightAttribute != null)
+            {
                 Console.WriteLine(copyRightAttribute.Copyright);
+            }
         }
 
         internal void ValidateAfterParsing()
         {
             if (HasValue)
+            {
                 Validate(null, ValidationMode.AfterParsing);
+            }
             else if (IsRequired)
+            {
                 throw _parser.StringProvider.CreateException(CommandLineArgumentErrorCategory.MissingRequiredArgument, ArgumentName);
+            }
         }
 
         private static string? GetMultiValueSeparator(MultiValueSeparatorAttribute? attribute)
         {
             var separator = attribute?.Separator;
             if (string.IsNullOrEmpty(separator))
+            {
                 return null;
+            }
             else
+            {
                 return separator;
+            }
         }
 
         private static string GetFriendlyTypeName(Type type)
@@ -1390,7 +1488,9 @@ namespace Ookii.CommandLine
             {
                 // We print Nullable<T> as just T.
                 if (type.GetGenericTypeDefinition() == typeof(Nullable<>))
+                {
                     return GetFriendlyTypeName(type.GetGenericArguments()[0]);
+                }
                 else
                 {
                     StringBuilder name = new StringBuilder(type.FullName?.Length ?? 0);
@@ -1401,9 +1501,14 @@ namespace Ookii.CommandLine
                     foreach (Type typeArgument in type.GetGenericArguments())
                     {
                         if (first)
+                        {
                             first = false;
+                        }
                         else
+                        {
                             name.Append(", ");
+                        }
+
                         name.Append(GetFriendlyTypeName(typeArgument));
                     }
                     name.Append('>');
@@ -1411,14 +1516,18 @@ namespace Ookii.CommandLine
                 }
             }
             else
+            {
                 return type.Name;
+            }
         }
 
         private TypeConverter CreateConverter(Type? converterType)
         {
             var converter = converterType == null ? TypeDescriptor.GetConverter(_elementType) : (TypeConverter?)Activator.CreateInstance(converterType);
             if (converter == null || !converter.CanConvertFrom(typeof(string)))
+            {
                 throw new NotSupportedException(string.Format(System.Globalization.CultureInfo.CurrentCulture, Properties.Resources.NoTypeConverterForArgumentFormat, _argumentName, _elementType));
+            }
 
             return converter;
         }
@@ -1449,12 +1558,16 @@ namespace Ookii.CommandLine
         private static IEnumerable<string>? GetAliases(IEnumerable<AliasAttribute> aliasAttributes, string argumentName)
         {
             if (!aliasAttributes.Any())
+            {
                 return null;
+            }
 
             return aliasAttributes.Select(alias =>
             {
                 if (string.IsNullOrEmpty(alias.Alias))
+                {
                     throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.EmptyAliasFormat, argumentName));
+                }
 
                 return alias.Alias;
             });
@@ -1463,12 +1576,16 @@ namespace Ookii.CommandLine
         private static IEnumerable<char>? GetShortAliases(IEnumerable<ShortAliasAttribute> aliasAttributes, string argumentName)
         {
             if (!aliasAttributes.Any())
+            {
                 return null;
+            }
 
             return aliasAttributes.Select(alias =>
             {
                 if (alias.Alias == '\0')
+                {
                     throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.EmptyAliasFormat, argumentName));
+                }
 
                 return alias.Alias;
             });
@@ -1478,7 +1595,9 @@ namespace Ookii.CommandLine
         {
             var valueTypeNull = DetermineValueTypeNullable(type.GetGenericArguments()[1]);
             if (valueTypeNull != null)
+            {
                 return valueTypeNull.Value;
+            }
 
 #if NET6_0_OR_GREATER
             // Type is the IDictionary<,> implemented interface, not the actual type of the property
@@ -1494,9 +1613,13 @@ namespace Ookii.CommandLine
                 var context = new NullabilityInfoContext();
                 NullabilityInfo info;
                 if (property != null)
+                {
                     info = context.Create(property);
+                }
                 else
+                {
                     info = context.Create(parameter!);
+                }
 
                 return info.GenericTypeArguments[1].ReadState != NullabilityState.NotNull;
             }
@@ -1510,7 +1633,9 @@ namespace Ookii.CommandLine
             Type elementType = type.IsArray ? type.GetElementType()! : type.GetGenericArguments()[0];
             var valueTypeNull = DetermineValueTypeNullable(elementType);
             if (valueTypeNull != null)
+            {
                 return valueTypeNull.Value;
+            }
 
 #if NET6_0_OR_GREATER
             // Type is the ICollection<> implemented interface, not the actual type of the property
@@ -1525,14 +1650,22 @@ namespace Ookii.CommandLine
                 var context = new NullabilityInfoContext();
                 NullabilityInfo info;
                 if (property != null)
+                {
                     info = context.Create(property);
+                }
                 else
+                {
                     info = context.Create(parameter!);
+                }
 
                 if (actualType.IsArray)
+                {
                     return info.ElementType?.ReadState != NullabilityState.NotNull;
+                }
                 else
+                {
                     return info.GenericTypeArguments[0].ReadState != NullabilityState.NotNull;
+                }
             }
 #endif
 
@@ -1543,7 +1676,9 @@ namespace Ookii.CommandLine
         {
             var valueTypeNull = DetermineValueTypeNullable(parameter.ParameterType);
             if (valueTypeNull != null)
+            {
                 return valueTypeNull.Value;
+            }
 
 #if NET6_0_OR_GREATER
             var context = new NullabilityInfoContext();
@@ -1558,7 +1693,9 @@ namespace Ookii.CommandLine
         {
             var valueTypeNull = DetermineValueTypeNullable(property.PropertyType);
             if (valueTypeNull != null)
+            {
                 return valueTypeNull.Value;
+            }
 
 #if NET6_0_OR_GREATER
             var context = new NullabilityInfoContext();
@@ -1593,10 +1730,14 @@ namespace Ookii.CommandLine
             if (_argumentType.IsArray)
             {
                 if (_argumentType.GetArrayRank() != 1)
+                {
                     throw new NotSupportedException(Properties.Resources.InvalidArrayRank);
+                }
 
                 if (_property != null && _property.GetSetMethod() == null)
+                {
                     throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.PropertyIsReadOnlyFormat, _argumentName));
+                }
 
                 var elementType = _argumentType.GetElementType()!;
                 return (_argumentType, null, elementType);
@@ -1607,7 +1748,9 @@ namespace Ookii.CommandLine
             // Don't use CanWrite because that returns true for properties with a private set
             // accessor.
             if (_property == null || _property.GetSetMethod() != null)
+            {
                 return (null, null, null);
+            }
 
             var dictionaryType = TypeHelper.FindGenericInterface(_argumentType, typeof(IDictionary<,>));
             if (dictionaryType != null)
@@ -1644,7 +1787,9 @@ namespace Ookii.CommandLine
             {
                 argumentType = parameters[0].ParameterType;
                 if (parameters[1].ParameterType != typeof(CommandLineParser))
+                {
                     return null;
+                }
 
                 info.HasValueParameter = true;
                 info.HasParserParameter = true;
@@ -1686,7 +1831,9 @@ namespace Ookii.CommandLine
         private static string DetermineArgumentName(string? explicitName, string memberName, NameTransform transform)
         {
             if (explicitName != null)
+            {
                 return explicitName;
+            }
 
             return transform.Apply(memberName);
         }
@@ -1696,7 +1843,9 @@ namespace Ookii.CommandLine
             foreach (var validator in _validators)
             {
                 if (validator.Mode == mode)
+                {
                     validator.Validate(this, value);
+                }
             }
         }
     }

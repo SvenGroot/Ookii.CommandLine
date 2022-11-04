@@ -263,9 +263,13 @@ namespace Ookii.CommandLine
         internal IComparer<string> GetStringComparer()
         {
             if (CaseSensitive)
+            {
                 return StringComparer.Ordinal;
+            }
             else
+            {
                 return StringComparer.OrdinalIgnoreCase;
+            }
         }
     }
 }

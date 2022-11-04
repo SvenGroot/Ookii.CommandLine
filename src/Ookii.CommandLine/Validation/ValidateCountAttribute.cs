@@ -75,7 +75,9 @@ namespace Ookii.CommandLine.Validation
         public override bool IsValid(CommandLineArgument argument, object? value)
         {
             if (!argument.IsMultiValue)
+            {
                 return false;
+            }
 
             var count = ((ICollection)argument.Value!).Count;
             return count >= _minimum && count <= _maximum;

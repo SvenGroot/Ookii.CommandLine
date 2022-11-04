@@ -153,15 +153,24 @@ namespace Ookii.CommandLine
         public virtual string ArgumentSyntax(CommandLineArgument argument, WriteUsageOptions options)
         {
             if (argument == null)
+            {
                 throw new ArgumentNullException(nameof(argument));
+            }
+
             if (options == null)
+            {
                 throw new ArgumentNullException(nameof(options));
+            }
 
             string argumentName;
             if (argument.HasShortName && options.UseShortNamesForSyntax)
+            {
                 argumentName = argument.ShortName.ToString();
+            }
             else
+            {
                 argumentName = argument.ArgumentName;
+            }
 
             var prefix = argument.Parser.Mode != ParsingMode.LongShort || (argument.HasShortName && (options.UseShortNamesForSyntax || !argument.HasLongName))
                 ? argument.Parser.ArgumentNamePrefixes[0]
@@ -173,9 +182,13 @@ namespace Ookii.CommandLine
 
             bool useColor = options.UseColor ?? false;
             if (argument.Position == null)
+            {
                 argumentName = ArgumentName(argumentName, prefix, useColor);
+            }
             else
+            {
                 argumentName = OptionalArgumentName(argumentName, prefix, useColor);
+            }
 
             var result = argumentName;
             if (!argument.IsSwitch)
@@ -185,7 +198,9 @@ namespace Ookii.CommandLine
             }
 
             if (argument.IsMultiValue)
+            {
                 result += MultiValueSuffix(useColor);
+            }
 
             return result;
         }
@@ -292,14 +307,18 @@ namespace Ookii.CommandLine
         public virtual string Aliases(IEnumerable<string>? aliases, IEnumerable<char>? shortAliases, string prefix, string shortPrefix, bool useColor)
         {
             if (shortAliases == null && aliases == null)
+            {
                 return string.Empty;
+            }
 
             var result = new StringBuilder();
             var count = AppendAliases(result, shortPrefix, shortAliases, useColor, 0);
             count = AppendAliases(result, prefix, aliases, useColor, count);
 
             if (count == 0)
+            {
                 return string.Empty;
+            }
 
             return $" ({result})";
         }
@@ -417,7 +436,9 @@ namespace Ookii.CommandLine
 
             var result = string.Join(" ", messages);
             if (result.Length > 0)
+            {
                 result = " " + result;
+            }
 
             return result;
         }
@@ -430,9 +451,13 @@ namespace Ookii.CommandLine
         public virtual string ValidateCountUsageHelp(ValidateCountAttribute attribute)
         {
             if (attribute.Minimum <= 0)
+            {
                 return Format(Resources.ValidateCountUsageHelpMaxFormat, attribute.Maximum);
+            }
             else if (attribute.Maximum == int.MaxValue)
+            {
                 return Format(Resources.ValidateCountUsageHelpMinFormat, attribute.Minimum);
+            }
 
             return Format(Resources.ValidateCountUsageHelpBothFormat, attribute.Minimum, attribute.Maximum);
         }
@@ -459,9 +484,13 @@ namespace Ookii.CommandLine
         public virtual string ValidateRangeUsageHelp(ValidateRangeAttribute attribute)
         {
             if (attribute.Minimum == null)
+            {
                 return Format(Resources.ValidateRangeUsageHelpMaxFormat, attribute.Maximum);
+            }
             else if (attribute.Maximum == null)
+            {
                 return Format(Resources.ValidateRangeUsageHelpMinFormat, attribute.Minimum);
+            }
 
             return Format(Resources.ValidateRangeUsageHelpBothFormat, attribute.Minimum, attribute.Maximum);
         }
@@ -474,9 +503,13 @@ namespace Ookii.CommandLine
         public virtual string ValidateStringLengthUsageHelp(ValidateStringLengthAttribute attribute)
         {
             if (attribute.Minimum <= 0)
+            {
                 return Format(Resources.ValidateStringLengthUsageHelpMaxFormat, attribute.Maximum);
+            }
             else if (attribute.Maximum == int.MaxValue)
+            {
                 return Format(Resources.ValidateStringLengthUsageHelpMinFormat, attribute.Minimum);
+            }
 
             return Format(Resources.ValidateStringLengthUsageHelpBothFormat, attribute.Minimum, attribute.Maximum);
         }
@@ -516,12 +549,16 @@ namespace Ookii.CommandLine
         private int AppendAliases<T>(StringBuilder builder, string prefix, IEnumerable<T>? aliases, bool useColor, int count)
         {
             if (aliases == null)
+            {
                 return count;
+            }
 
             foreach (var alias in aliases)
             {
                 if (count != 0)
+                {
                     builder.Append(ArgumentSeparator);
+                }
 
                 builder.Append(ArgumentName(alias!.ToString()!, prefix, useColor));
                 ++count;

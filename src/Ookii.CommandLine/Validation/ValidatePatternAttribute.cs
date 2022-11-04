@@ -90,7 +90,9 @@ namespace Ookii.CommandLine.Validation
         public override bool IsValid(CommandLineArgument argument, object? value)
         {
             if (value is not string stringValue)
+            {
                 return false;
+            }
 
             return Pattern.IsMatch(stringValue);
         }
@@ -105,7 +107,9 @@ namespace Ookii.CommandLine.Validation
         public override string GetErrorMessage(CommandLineArgument argument, object? value)
         {
             if (ErrorMessage == null)
+            {
                 return base.GetErrorMessage(argument, value);
+            }
 
             return string.Format(CultureInfo.CurrentCulture, ErrorMessage, argument.ArgumentName, value, _pattern);
         }

@@ -31,10 +31,14 @@ namespace Ookii.CommandLine
         public KeyValueSeparatorAttribute(string separator)
         {
             if (separator == null)
+            {
                 throw new ArgumentNullException(nameof(separator));
+            }
 
             if (separator.Length == 0)
+            {
                 throw new ArgumentException(Properties.Resources.EmptyKeyValueSeparator, nameof(separator));
+            }
 
             _separator = separator;
         }

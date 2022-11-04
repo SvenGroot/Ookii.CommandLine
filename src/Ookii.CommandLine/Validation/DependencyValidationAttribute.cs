@@ -116,7 +116,9 @@ namespace Ookii.CommandLine.Validation
         public IEnumerable<CommandLineArgument> GetArguments(CommandLineParser parser)
         {
             if (parser == null)
+            {
                 throw new ArgumentNullException(nameof(parser));
+            }
 
             if (_argument != null)
             {

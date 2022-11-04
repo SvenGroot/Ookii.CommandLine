@@ -125,9 +125,14 @@ namespace Ookii.CommandLine.Commands
         public ICommand CreateInstance(string[] args, int index, ParseOptions? options = null)
         {
             if (args == null)
+            {
                 throw new ArgumentNullException(nameof(args));
+            }
+
             if (index < 0 || index > args.Length)
+            {
                 throw new ArgumentOutOfRangeException(nameof(index));
+            }
 
             options ??= new();
             if (UseCustomArgumentParsing)
@@ -160,7 +165,9 @@ namespace Ookii.CommandLine.Commands
         {
             var attribute = GetCommandAttribute(commandType);
             if (attribute == null)
+            {
                 return null;
+            }
 
             return new CommandInfo(commandType, attribute, options);
         }
@@ -188,10 +195,14 @@ namespace Ookii.CommandLine.Commands
         private static CommandAttribute? GetCommandAttribute(Type commandType)
         {
             if (commandType == null)
+            {
                 throw new ArgumentNullException(nameof(commandType));
+            }
 
             if (commandType.IsAbstract || !commandType.ImplementsInterface(typeof(ICommand)))
+            {
                 return null;
+            }
 
             return commandType.GetCustomAttribute<CommandAttribute>();
         }

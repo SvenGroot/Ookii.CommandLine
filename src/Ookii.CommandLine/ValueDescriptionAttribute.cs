@@ -33,7 +33,10 @@ namespace Ookii.CommandLine
         public ValueDescriptionAttribute(string valueDescription)
         {
             if (valueDescription == null)
+            {
                 throw new ArgumentNullException(nameof(valueDescription));
+            }
+
             _valueDescription = valueDescription;
         }
 

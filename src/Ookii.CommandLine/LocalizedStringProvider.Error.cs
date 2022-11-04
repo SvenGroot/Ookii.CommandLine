@@ -141,11 +141,17 @@ namespace Ookii.CommandLine
         public virtual string ValidateRangeFailed(string argumentName, ValidateRangeAttribute attribute)
         {
             if (attribute.Maximum == null)
+            {
                 return Format(Resources.ValidateRangeFailedMinFormat, argumentName, attribute.Minimum);
+            }
             else if (attribute.Minimum == null)
+            {
                 return Format(Resources.ValidateRangeFailedMaxFormat, argumentName, attribute.Maximum);
+            }
             else
+            {
                 return Format(Resources.ValidateRangeFailedBothFormat, argumentName, attribute.Minimum, attribute.Maximum);
+            }
         }
 
         /// <summary>
@@ -187,11 +193,17 @@ namespace Ookii.CommandLine
         public virtual string ValidateStringLengthFailed(string argumentName, ValidateStringLengthAttribute attribute)
         {
             if (attribute.Maximum == int.MaxValue)
+            {
                 return Format(Resources.ValidateRangeFailedMinFormat, argumentName, attribute.Minimum);
+            }
             else if (attribute.Minimum <= 0)
+            {
                 return Format(Resources.ValidateRangeFailedMaxFormat, argumentName, attribute.Maximum);
+            }
             else
+            {
                 return Format(Resources.ValidateRangeFailedBothFormat, argumentName, attribute.Minimum, attribute.Maximum);
+            }
         }
 
         /// <summary>
@@ -203,11 +215,17 @@ namespace Ookii.CommandLine
         public virtual string ValidateCountFailed(string argumentName, ValidateCountAttribute attribute)
         {
             if (attribute.Maximum == int.MaxValue)
+            {
                 return Format(Resources.ValidateCountMinFormat, argumentName, attribute.Minimum);
+            }
             else if (attribute.Minimum <= 0)
+            {
                 return Format(Resources.ValidateCountMaxFormat, argumentName, attribute.Maximum);
+            }
             else
+            {
                 return Format(Resources.ValidateCountBothFormat, argumentName, attribute.Minimum, attribute.Maximum);
+            }
         }
 
         /// <summary>

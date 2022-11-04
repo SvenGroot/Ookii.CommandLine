@@ -51,10 +51,14 @@ namespace Ookii.CommandLine.Validation
         public void Validate(CommandLineParser parser)
         {
             if (parser == null)
+            {
                 throw new ArgumentNullException(nameof(parser));
+            }
 
             if (!IsValid(parser))
+            {
                 throw new CommandLineArgumentException(GetErrorMessage(parser), null, ErrorCategory);
+            }
         }
 
         /// <summary>

@@ -56,9 +56,13 @@
         public override string GetErrorMessage(CommandLineArgument argument, object? value)
         {
             if (value == null)
+            {
                 return argument.Parser.StringProvider.NullArgumentValue(argument.ArgumentName);
+            }
             else
+            {
                 return argument.Parser.StringProvider.ValidateNotWhiteSpaceFailed(argument.ArgumentName);
+            }
         }
 
         /// <inheritdoc/>

@@ -144,33 +144,49 @@ namespace Ookii.CommandLine
                 if (x == null)
                 {
                     if (y == null)
+                    {
                         return 0;
+                    }
                     else
+                    {
                         return -1;
+                    }
                 }
                 else if (y == null)
+                {
                     return 1;
+                }
 
                 // Positional arguments come before non-positional ones, and must be sorted by position
                 if (x.Position != null)
                 {
                     if (y.Position != null)
+                    {
                         return x.Position.Value.CompareTo(y.Position.Value);
+                    }
                     else
+                    {
                         return -1;
+                    }
                 }
                 else if (y.Position != null)
+                {
                     return 1;
+                }
 
                 // Non-positional required arguments come before optional arguments
                 if (x.IsRequired)
                 {
                     if (!y.IsRequired)
+                    {
                         return -1;
+                    }
                     // If both are required, sort by name
                 }
                 else if (y.IsRequired)
+                {
                     return 1;
+                }
 
                 // Sort the rest by name
                 return _stringComparer.Compare(x.ArgumentName, y.ArgumentName);
@@ -316,7 +332,9 @@ namespace Ookii.CommandLine
                     DefaultLongArgumentNamePrefix;
 
                 if (string.IsNullOrWhiteSpace(_longArgumentNamePrefix))
+                {
                     throw new ArgumentException(Properties.Resources.EmptyArgumentNamePrefix, nameof(options));
+                }
 
                 var longInfo = new PrefixInfo { Prefix = _longArgumentNamePrefix, Short = false };
                 prefixInfos = prefixInfos.Append(longInfo);
@@ -648,15 +666,23 @@ namespace Ookii.CommandLine
 
             // Fall back if this returned the dotnet executable.
             if (Path.GetFileNameWithoutExtension(path) == "dotnet")
+            {
                 path = null;
+            }
 #endif
             path ??= Environment.GetCommandLineArgs().FirstOrDefault() ?? Assembly.GetEntryAssembly()?.Location;
             if (path == null)
+            {
                 path = string.Empty;
+            }
             else if (includeExtension)
+            {
                 path = Path.GetFileName(path);
+            }
             else
+            {
                 path = Path.GetFileNameWithoutExtension(path);
+            }
 
             return path;
         }
@@ -736,7 +762,9 @@ namespace Ookii.CommandLine
         public void WriteUsage(TextWriter writer, int maximumLineLength, WriteUsageOptions? options = null)
         {
             if (writer == null)
+            {
                 throw new ArgumentNullException(nameof(writer));
+            }
 
             options ??= new();
             using var lineWriter = DisposableWrapper.Create(writer as LineWrappingTextWriter,
@@ -1069,12 +1097,18 @@ namespace Ookii.CommandLine
         public CommandLineArgument? GetArgument(string name)
         {
             if (name == null)
+            {
                 throw new ArgumentNullException(nameof(name));
+            }
 
             if (_argumentsByName.TryGetValue(name, out var argument))
+            {
                 return argument;
+            }
             else
+            {
                 return null;
+            }
         }
 
         /// <summary>
@@ -1092,9 +1126,13 @@ namespace Ookii.CommandLine
         public CommandLineArgument? GetShortArgument(char shortName)
         {
             if (_argumentsByShortName != null && _argumentsByShortName.TryGetValue(shortName.ToString(), out var argument))
+            {
                 return argument;
+            }
             else
+            {
                 return null;
+            }
         }
 
         /// <summary>
@@ -1160,11 +1198,15 @@ namespace Ookii.CommandLine
                 using var errorVtSupport = options.EnableErrorColor();
                 using var error = DisposableWrapper.Create(options.Error, LineWrappingTextWriter.ForConsoleError);
                 if (options.UseErrorColor ?? false)
+                {
                     error.Inner.Write(options.ErrorColor);
+                }
 
                 error.Inner.Write(ex.Message);
                 if (options.UseErrorColor ?? false)
+                {
                     error.Inner.Write(options.UsageOptions.ColorReset);
+                }
 
                 error.Inner.WriteLine();
                 error.Inner.WriteLine();
@@ -1182,21 +1224,27 @@ namespace Ookii.CommandLine
 
         internal static bool ShouldIndent(LineWrappingTextWriter writer)
         {
-            return writer.MaximumLineLength == 0 || writer.MaximumLineLength >= MinimumLineWidthForIndent;
+            return writer.MaximumLineLength is 0 or >= MinimumLineWidthForIndent;
         }
 
         private static string[] DetermineArgumentNamePrefixes(IEnumerable<string>? namedArgumentPrefixes)
         {
             if (namedArgumentPrefixes == null)
+            {
                 return GetDefaultArgumentNamePrefixes();
+            }
             else
             {
                 var result = namedArgumentPrefixes.ToArray();
                 if (result.Length == 0)
+                {
                     throw new ArgumentException(Properties.Resources.EmptyArgumentNamePrefixes, nameof(namedArgumentPrefixes));
+                }
 
                 if (result.Any(prefix => string.IsNullOrWhiteSpace(prefix)))
+                {
                     throw new ArgumentException(Properties.Resources.EmptyArgumentNamePrefix, nameof(namedArgumentPrefixes));
+                }
 
                 return result;
             }
@@ -1247,7 +1295,9 @@ namespace Ookii.CommandLine
             {
                 var argument = CommandLineArgument.CreateAutomaticHelp(this);
                 if (argument != null)
+                {
                     AddNamedArgument(argument);
+                }
             }
 
             bool autoVersion = options?.AutoVersionArgument ?? optionsAttribute?.AutoVersionArgument ?? true;
@@ -1255,14 +1305,18 @@ namespace Ookii.CommandLine
             {
                 var argument = CommandLineArgument.CreateAutomaticVersion(this);
                 if (argument != null)
+                {
                     AddNamedArgument(argument);
+                }
             }
         }
 
         private void AddNamedArgument(CommandLineArgument argument)
         {
             if (argument.ArgumentName.Contains(NameValueSeparator))
+            {
                 throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.ArgumentNameContainsSeparatorFormat, argument.ArgumentName));
+            }
 
             if (argument.HasLongName)
             {
@@ -1270,7 +1324,9 @@ namespace Ookii.CommandLine
                 if (argument.Aliases != null)
                 {
                     foreach (string alias in argument.Aliases)
+                    {
                         _argumentsByName.Add(alias, argument);
+                    }
                 }
             }
 
@@ -1280,7 +1336,9 @@ namespace Ookii.CommandLine
                 if (argument.ShortAliases != null)
                 {
                     foreach (var alias in argument.ShortAliases)
+                    {
                         _argumentsByShortName.Add(alias.ToString(), argument);
+                    }
                 }
             }
 
@@ -1297,15 +1355,24 @@ namespace Ookii.CommandLine
                 CommandLineArgument argument = _arguments[x];
 
                 if (hasArrayArgument)
+                {
                     throw new NotSupportedException(Properties.Resources.ArrayNotLastArgument);
+                }
+
                 if (argument.IsRequired && hasOptionalArgument)
+                {
                     throw new NotSupportedException(Properties.Resources.InvalidOptionalArgumentOrder);
+                }
 
                 if (!argument.IsRequired)
+                {
                     hasOptionalArgument = true;
+                }
 
                 if (argument.IsMultiValue)
+                {
                     hasArrayArgument = true;
+                }
 
                 argument.Position = x;
             }
@@ -1314,13 +1381,20 @@ namespace Ookii.CommandLine
         private object? ParseCore(string[] args, int index)
         {
             if (args == null)
+            {
                 throw new ArgumentNullException(nameof(index));
+            }
+
             if (index < 0 || index > args.Length)
+            {
                 throw new ArgumentOutOfRangeException(nameof(index));
+            }
 
             // Reset all arguments to their default value.
             foreach (CommandLineArgument argument in _arguments)
+            {
                 argument.Reset();
+            }
 
             HelpRequested = false;
             int positionalArgumentIndex = 0;
@@ -1335,7 +1409,9 @@ namespace Ookii.CommandLine
                     // It returns -1 if parsing was canceled by the ArgumentParsed event handler or the CancelParsing property.
                     x = ParseNamedArgument(args, x, argumentNamePrefix.Value);
                     if (x < 0)
+                    {
                         return null;
+                    }
                 }
                 else
                 {
@@ -1350,12 +1426,16 @@ namespace Ookii.CommandLine
                     }
 
                     if (positionalArgumentIndex >= _positionalArgumentCount)
+                    {
                         throw StringProvider.CreateException(CommandLineArgumentErrorCategory.TooManyArguments);
+                    }
 
                     // ParseArgumentValue returns true if parsing was canceled by the ArgumentParsed event handler
                     // or the CancelParsing property.
                     if (ParseArgumentValue(_arguments[positionalArgumentIndex], arg))
+                    {
                         return null;
+                    }
                 }
             }
 
@@ -1373,7 +1453,9 @@ namespace Ookii.CommandLine
 
             var constructorArgumentValues = new object?[_constructorArgumentCount];
             for (int x = 0; x < _constructorArgumentCount; ++x)
+            {
                 constructorArgumentValues[x] = _arguments[x].Value;
+            }
 
             object commandLineArguments = CreateArgumentsTypeInstance(constructorArgumentValues);
             foreach (CommandLineArgument argument in _arguments)
@@ -1420,13 +1502,17 @@ namespace Ookii.CommandLine
                 argumentValue = arg.Substring(separatorIndex + 1);
             }
             else
+            {
                 argumentName = arg.Substring(prefix.Prefix.Length);
+            }
 
             CommandLineArgument? argument = null;
             if (_argumentsByShortName != null && prefix.Short)
             {
                 if (argumentName.Length == 1)
+                {
                     argument = GetShortArgumentOrThrow(argumentName);
+                }
                 else
                 {
                     // ParseShortArgument returns true if parsing was canceled by the
@@ -1436,7 +1522,9 @@ namespace Ookii.CommandLine
             }
 
             if (argument == null && !_argumentsByName.TryGetValue(argumentName, out argument))
+            {
                 throw StringProvider.CreateException(CommandLineArgumentErrorCategory.UnknownArgument, argumentName);
+            }
 
             if (argumentValue == null && !argument.IsSwitch && AllowWhiteSpaceValueSeparator && ++index < args.Length && CheckArgumentNamePrefix(args[index]) == null)
             {
@@ -1456,10 +1544,14 @@ namespace Ookii.CommandLine
             {
                 var arg = GetShortArgumentOrThrow(ch.ToString());
                 if (!arg.IsSwitch)
+                {
                     throw StringProvider.CreateException(CommandLineArgumentErrorCategory.CombinedShortNameNonSwitch, name);
+                }
 
                 if (ParseArgumentValue(arg, value))
+                {
                     return true;
+                }
             }
 
             return false;
@@ -1469,7 +1561,9 @@ namespace Ookii.CommandLine
         {
             Debug.Assert(shortName.Length == 1);
             if (_argumentsByShortName!.TryGetValue(shortName, out CommandLineArgument? argument))
+            {
                 return argument;
+            }
 
             throw StringProvider.CreateException(CommandLineArgumentErrorCategory.UnknownArgument, shortName);
         }
@@ -1478,12 +1572,16 @@ namespace Ookii.CommandLine
         {
             // Even if '-' is the argument name prefix, we consider an argument starting with dash followed by a digit as a value, because it could be a negative number.
             if (argument.Length >= 2 && argument[0] == '-' && char.IsDigit(argument, 1))
+            {
                 return null;
+            }
 
             foreach (var prefix in _sortedPrefixes)
             {
                 if (argument.StartsWith(prefix.Prefix, StringComparison.Ordinal))
+                {
                     return prefix;
+                }
             }
 
             return null;
@@ -1493,15 +1591,23 @@ namespace Ookii.CommandLine
         {
             ConstructorInfo[] ctors = _argumentsType.GetConstructors();
             if (ctors.Length < 1)
+            {
                 throw new NotSupportedException(Properties.Resources.NoConstructor);
+            }
             else if (ctors.Length == 1)
+            {
                 return ctors[0];
+            }
 
             var markedCtors = ctors.Where(c => Attribute.IsDefined(c, typeof(CommandLineConstructorAttribute)));
             if (!markedCtors.Any())
+            {
                 throw new NotSupportedException(Properties.Resources.NoMarkedConstructor);
+            }
             else if (markedCtors.Count() > 1)
+            {
                 throw new NotSupportedException(Properties.Resources.MultipleMarkedConstructors);
+            }
 
             return markedCtors.First();
         }
@@ -1509,7 +1615,9 @@ namespace Ookii.CommandLine
         private void WriteArgumentDescriptions(LineWrappingTextWriter writer, WriteUsageOptions options)
         {
             if (options.ArgumentDescriptionListFilter == DescriptionListFilterMode.None)
+            {
                 return;
+            }
 
             if (!ShouldIndent(writer))
             {
@@ -1546,7 +1654,9 @@ namespace Ookii.CommandLine
 
                 // Omit arguments that don't fit the filter.
                 if (!include)
+                {
                     continue;
+                }
 
                 writer.ResetIndent();
                 writer.WriteLine(StringProvider.ArgumentDescription(argument, options));
@@ -1577,7 +1687,9 @@ namespace Ookii.CommandLine
             foreach (CommandLineArgument argument in _arguments)
             {
                 if (argument.IsHidden)
+                {
                     continue;
+                }
 
                 writer.Write(" ");
                 if (options.UseAbbreviatedSyntax && argument.Position == null)
@@ -1596,7 +1708,9 @@ namespace Ookii.CommandLine
         private void WriteClassValidatorHelp(LineWrappingTextWriter writer, WriteUsageOptions options)
         {
             if (!options.IncludeValidatorsInDescription)
+            {
                 return;
+            }
 
             writer.Indent = 0;
             bool hasHelp = false;
@@ -1611,7 +1725,9 @@ namespace Ookii.CommandLine
             }
 
             if (hasHelp)
+            {
                 writer.WriteLine(); // Blank line.
+            }
         }
 
         private object CreateArgumentsTypeInstance(object?[] constructorArgumentValues)
@@ -1629,7 +1745,9 @@ namespace Ookii.CommandLine
         private static ParseOptions? CreateOptions(IEnumerable<string>? argumentNamePrefixes, IComparer<string>? argumentNameComparer)
         {
             if (argumentNamePrefixes == null && argumentNameComparer == null)
+            {
                 return null;
+            }
 
             return new ParseOptions()
             {

@@ -60,7 +60,9 @@ namespace Ookii.CommandLine
             _valueConverter = GetConverter(valueConverterType, typeof(TValue));
             _separator = separator ?? KeyValuePairConverter.DefaultSeparator;
             if (_separator.Length == 0)
+            {
                 throw new ArgumentException(Properties.Resources.EmptyKeyValueSeparator, nameof(separator));
+            }
         }
 
         /// <summary>
@@ -83,9 +85,13 @@ namespace Ookii.CommandLine
         public override bool CanConvertFrom(ITypeDescriptorContext? context, Type sourceType)
         {
             if (sourceType == typeof(string))
+            {
                 return true;
+            }
             else
+            {
                 return base.CanConvertFrom(context, sourceType);
+            }
         }
 
         /// <summary>
@@ -99,9 +105,13 @@ namespace Ookii.CommandLine
         public override bool CanConvertTo(ITypeDescriptorContext? context, Type? destinationType)
         {
             if (destinationType == typeof(string))
+            {
                 return true;
+            }
             else
+            {
                 return base.CanConvertTo(context, destinationType);
+            }
         }
 
         /// <summary>
@@ -123,14 +133,18 @@ namespace Ookii.CommandLine
             {
                 int index = stringValue.IndexOf(_separator);
                 if (index < 0)
+                {
                     throw new FormatException(_stringProvider.MissingKeyValuePairSeparator(_separator));
+                }
 
                 string key = stringValue.Substring(0, index);
                 string valueForKey = stringValue.Substring(index + _separator.Length);
                 object? convertedKey = _keyConverter.ConvertFromString(context, culture, key);
                 object? convertedValue = _valueConverter.ConvertFromString(context, culture, valueForKey);
                 if (convertedKey == null || (!_allowNullValues && convertedValue == null))
+                {
                     throw _stringProvider.CreateException(CommandLineArgumentErrorCategory.NullArgumentValue, _argumentName);
+                }
 
                 return new KeyValuePair<TKey, TValue?>((TKey)convertedKey, (TValue?)convertedValue);
             }
@@ -157,13 +171,20 @@ namespace Ookii.CommandLine
         public override object? ConvertTo(ITypeDescriptorContext? context, CultureInfo? culture, object? value, Type destinationType)
         {
             if (destinationType == null)
+            {
                 throw new ArgumentNullException(nameof(destinationType));
+            }
+
             if (value == null)
+            {
                 throw new ArgumentNullException(nameof(value));
+            }
 
             KeyValuePair<TKey, TValue> pair = (KeyValuePair<TKey, TValue>)value;
             if (destinationType == typeof(string))
+            {
                 return _keyConverter.ConvertToString(context, culture, pair.Key) + "=" + _valueConverter.ConvertToString(context, culture, pair.Value);
+            }
 
             return base.ConvertTo(context, culture, value, destinationType);
         }
@@ -172,7 +193,10 @@ namespace Ookii.CommandLine
         {
             TypeConverter converter = converterType == null ? TypeDescriptor.GetConverter(type) : (TypeConverter)Activator.CreateInstance(converterType)!;
             if (converter == null || !(converter.CanConvertFrom(typeof(string)) && converter.CanConvertTo(typeof(string))))
+            {
                 throw new NotSupportedException(string.Format(CultureInfo.InvariantCulture, Properties.Resources.NoTypeConverterFormat, type));
+            }
+
             return converter;
         }
     }

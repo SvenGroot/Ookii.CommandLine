@@ -23,16 +23,24 @@ namespace Ookii.CommandLine
         {
             _vtSupport?.Dispose();
             if (ResetUseColor)
+            {
                 _options.UsageOptions.UseColor = null;
+            }
 
             if (ResetUseErrorColor)
+            {
                 _options.UseErrorColor = null;
+            }
 
             if (ResetOut)
+            {
                 _options.Out = null;
+            }
 
             if (ResetCommandName)
+            {
                 _options.UsageOptions.CommandName = null;
+            }
         }
     }
 }

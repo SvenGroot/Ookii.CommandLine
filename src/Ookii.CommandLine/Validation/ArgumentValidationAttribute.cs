@@ -61,10 +61,14 @@ namespace Ookii.CommandLine.Validation
         public void Validate(CommandLineArgument argument, object? value)
         {
             if (argument == null)
+            {
                 throw new ArgumentNullException(nameof(argument));
+            }
 
             if (!IsValid(argument, value))
+            {
                 throw new CommandLineArgumentException(GetErrorMessage(argument, value), argument.ArgumentName, ErrorCategory);
+            }
         }
 
         /// <summary>

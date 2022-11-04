@@ -76,10 +76,14 @@ namespace Ookii.CommandLine.Validation
             var max = (IComparable?)argument.ConvertToArgumentTypeInvariant(Maximum);
 
             if (min != null && min.CompareTo(value) > 0)
+            {
                 return false;
+            }
 
             if (max != null && max.CompareTo(value) < 0)
+            {
                 return false;
+            }
 
             return true;
         }

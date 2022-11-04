@@ -70,10 +70,14 @@ namespace Ookii.CommandLine.Validation
         {
             // This constructor exists to avoid a warning about non-CLS compliant types.
             if (argument1 == null)
+            {
                 throw new ArgumentNullException(nameof(argument1));
+            }
 
             if (argument2 == null)
+            {
                 throw new ArgumentNullException(nameof(argument2));
+            }
 
             _arguments = new[] { argument1, argument2 };
         }
@@ -91,10 +95,14 @@ namespace Ookii.CommandLine.Validation
         public RequiresAnyAttribute(params string[] arguments)
         {
             if (_arguments == null || _arguments.Any(a => a == null))
+            {
                 throw new ArgumentNullException(nameof(arguments));
+            }
 
             if (_arguments.Length <= 1)
+            {
                 throw new ArgumentException(Properties.Resources.RequiresAnySingleArgument, nameof(arguments));
+            }
 
             _arguments = arguments;
         }
@@ -178,7 +186,9 @@ namespace Ookii.CommandLine.Validation
         public IEnumerable<CommandLineArgument> GetArguments(CommandLineParser parser)
         {
             if (parser == null)
+            {
                 throw new ArgumentNullException(nameof(parser));
+            }
 
             return _arguments
                 .Select(name => parser.GetArgument(name) ?? throw GetUnknownDependencyException(name));

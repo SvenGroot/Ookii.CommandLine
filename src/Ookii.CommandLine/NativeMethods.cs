@@ -11,23 +11,35 @@ namespace Ookii.CommandLine
         public static ConsoleModes? EnableVirtualTerminalSequences(StandardStream stream, bool enable)
         {
             if (stream == StandardStream.Input)
+            {
                 throw new ArgumentException(Properties.Resources.InvalidStandardStream, nameof(stream));
+            }
 
             var handle = GetStandardHandle(stream);
             if (handle == INVALID_HANDLE_VALUE)
+            {
                 return null;
+            }
 
             if (!GetConsoleMode(handle, out ConsoleModes mode))
+            {
                 return null;
+            }
 
             var oldMode = mode;
             if (enable)
+            {
                 mode |= ConsoleModes.ENABLE_VIRTUAL_TERMINAL_PROCESSING;
+            }
             else
+            {
                 mode &= ~ConsoleModes.ENABLE_VIRTUAL_TERMINAL_PROCESSING;
+            }
 
             if (!SetConsoleMode(handle, mode))
+            {
                 return null;
+            }
 
             return oldMode;
         }

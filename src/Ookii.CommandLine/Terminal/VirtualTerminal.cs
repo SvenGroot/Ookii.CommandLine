@@ -56,17 +56,23 @@ namespace Ookii.CommandLine.Terminal
             };
 
             if (!supported)
+            {
                 return new VirtualTerminalSupport(false);
+            }
 
             var term = Environment.GetEnvironmentVariable("TERM");
             if (term == "dumb")
+            {
                 return new VirtualTerminalSupport(false);
+            }
 
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 var previousMode = NativeMethods.EnableVirtualTerminalSequences(stream, true);
                 if (previousMode == null)
+                {
                     return new VirtualTerminalSupport(false);
+                }
 
                 return new VirtualTerminalSupport(NativeMethods.GetStandardHandle(stream), previousMode.Value);
             }
@@ -94,7 +100,9 @@ namespace Ookii.CommandLine.Terminal
         public static VirtualTerminalSupport EnableColor(StandardStream stream)
         {
             if (Environment.GetEnvironmentVariable("NO_COLOR") != null)
+            {
                 return new VirtualTerminalSupport(false);
+            }
 
             return EnableVirtualTerminalSequences(stream);
         }
@@ -131,7 +139,9 @@ namespace Ookii.CommandLine.Terminal
             foreach (var ch in value.Skip(1))
             {
                 if (!char.IsNumber(ch) && ch != ';' && ch != ' ')
+                {
                     return index + 2;
+                }
 
                 ++index;
             }
@@ -146,11 +156,19 @@ namespace Ookii.CommandLine.Terminal
             foreach (var ch in value.Skip(1))
             {
                 if (ch == 0x7)
+                {
                     return index + 2;
+                }
+
                 if (hasEscape && ch == '\\')
+                {
                     return index + 2;
+                }
+
                 if (ch == Escape)
+                {
                     hasEscape = true;
+                }
 
                 ++index;
             }

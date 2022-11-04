@@ -91,7 +91,9 @@ namespace Ookii.CommandLine.Commands
             _options = options ?? new();
 
             if (_assemblies.Any(a => a == null))
+            {
                 throw new ArgumentNullException(nameof(assemblies));
+            }
         }
 
         /// <summary>
@@ -140,13 +142,17 @@ namespace Ookii.CommandLine.Commands
         public CommandInfo? GetCommand(string commandName)
         {
             if (commandName == null)
+            {
                 throw new ArgumentNullException(nameof(commandName));
+            }
 
             var commands = GetCommandsUnsorted()
                 .Where(c => _options.CommandNameComparer.Compare(c.Name, commandName) == 0);
 
             if (commands.Any())
+            {
                 return commands.First();
+            }
 
             if (_options.AutoVersionCommand &&
                 _options.CommandNameComparer.Compare(commandName, _options.AutoVersionCommandName()) == 0)
@@ -201,9 +207,14 @@ namespace Ookii.CommandLine.Commands
         public ICommand? CreateCommand(string? commandName, string[] args, int index)
         {
             if (args == null)
+            {
                 throw new ArgumentNullException(nameof(args));
+            }
+
             if (index < 0 || index > args.Length)
+            {
                 throw new ArgumentOutOfRangeException(nameof(index));
+            }
 
             using var restorer = _options.EnableOutputColor() ?? new OptionsRestorer(_options, null);
             using var output = DisposableWrapper.Create(_options.Out, LineWrappingTextWriter.ForConsoleOut);
@@ -275,9 +286,14 @@ namespace Ookii.CommandLine.Commands
         public ICommand? CreateCommand(string[] args, int index = 0)
         {
             if (args == null)
+            {
                 throw new ArgumentNullException(nameof(args));
+            }
+
             if (index < 0 || index > args.Length)
+            {
                 throw new ArgumentOutOfRangeException(nameof(index));
+            }
 
             string? commandName = null;
             if (index < args.Length)
@@ -449,12 +465,16 @@ namespace Ookii.CommandLine.Commands
             writer.Inner.WriteLine(_options.StringProvider.AvailableCommandsHeader(useColor));
             writer.Inner.WriteLine();
             if (lineWriter != null)
+            {
                 lineWriter.Indent = CommandLineParser.ShouldIndent(lineWriter) ? _options.CommandDescriptionIndent : 0;
+            }
 
             foreach (var command in GetCommands())
             {
                 if (command.IsHidden)
+                {
                     continue;
+                }
 
                 lineWriter?.ResetIndent();
                 writer.Inner.WriteLine(_options.StringProvider.CommandDescription(command, _options));
