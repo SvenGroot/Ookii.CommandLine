@@ -457,8 +457,11 @@ namespace Ookii.CommandLine.Commands
                 colorEnd = _options.UsageOptions.ColorReset;
             }
 
-            var executableName = _options.UsageOptions.ExecutableName ??
-                CommandLineParser.GetExecutableName(_options.UsageOptions.IncludeExecutableExtension);
+            var executableName = _options.UsageOptions.GetExecutableName();
+            if (lineWriter != null)
+            {
+                lineWriter.Indent = CommandLineParser.ShouldIndent(lineWriter) ? _options.UsageOptions.Indent : 0;
+            }
 
             writer.Inner.WriteLine(_options.StringProvider.RootCommandUsageSyntax(executableName, usageColorStart, colorEnd));
             writer.Inner.WriteLine();
@@ -478,6 +481,20 @@ namespace Ookii.CommandLine.Commands
 
                 lineWriter?.ResetIndent();
                 writer.Inner.WriteLine(_options.StringProvider.CommandDescription(command, _options));
+            }
+
+            if (_options.ShowCommandHelpInstruction)
+            {
+                if (lineWriter != null)
+                {
+                    lineWriter.Indent = 0;
+                }
+
+                var prefix = _options.Mode == ParsingMode.LongShort
+                    ? (_options.LongArgumentNamePrefix ?? CommandLineParser.DefaultLongArgumentNamePrefix)
+                    : (_options.ArgumentNamePrefixes?.FirstOrDefault() ?? CommandLineParser.GetDefaultArgumentNamePrefixes()[0]);
+
+                writer.Inner.WriteLine(_options.StringProvider.CommandHelpInstruction(executableName, prefix, useColor));
             }
         }
 

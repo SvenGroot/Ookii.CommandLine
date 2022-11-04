@@ -1,6 +1,7 @@
 ﻿using Ookii.CommandLine.Commands;
 using Ookii.CommandLine.Properties;
 using System;
+using System.Linq;
 
 namespace Ookii.CommandLine
 {
@@ -94,6 +95,29 @@ namespace Ookii.CommandLine
         /// <returns>The string.</returns>
         public virtual string CommandUsagePrefix(string executableName, string commandName, string color, string colorReset)
             => $"{color}{Resources.DefaultUsagePrefix}{colorReset} {executableName} {commandName}";
+
+        /// <summary>
+        /// Gets a string that instructs the user how to get help on a command.
+        /// </summary>
+        /// <param name="executableName">The executable name of the application.</param>
+        /// <param name="argumentNamePrefix">The argument name prefix to use for a help argument.</param>
+        /// <param name="useColor">The value of <see cref="WriteUsageOptions.UseColor"/>.</param>
+        /// <returns>The string.</returns>
+        /// <remarks>
+        /// <para>
+        ///   This method is only used if the <see cref="CommandOptions.ShowCommandHelpInstruction"/>
+        ///   property is <see langword="true"/>.
+        /// </para>
+        /// <para>
+        ///   The default implementation assumes that every command has an argument with the name
+        ///   of the automatic help argument (returned by <see cref="AutomaticHelpName"/>, and that
+        ///   none of the commands override the <see cref="ParseOptions.Mode"/> property or the
+        ///   argument name prefixes, so that the <paramref name="argumentNamePrefix"/> is correct
+        ///   for all commands.
+        /// </para>
+        /// </remarks>
+        public virtual string CommandHelpInstruction(string executableName, string argumentNamePrefix, bool useColor)
+            => Format(Resources.CommandHelpInstructionFormat, executableName, argumentNamePrefix, AutomaticHelpName());
 
     }
 }

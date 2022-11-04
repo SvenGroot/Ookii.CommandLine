@@ -1653,7 +1653,7 @@ namespace Ookii.CommandLine
                 colorEnd = options.ColorReset;
             }
 
-            string executableName = options.ExecutableName ?? GetExecutableName(options.IncludeExecutableExtension);
+            string executableName = options.GetExecutableName();
             string prefix = options.CommandName == null
                 ? StringProvider.UsagePrefix(executableName, colorStart, colorEnd)
                 : StringProvider.CommandUsagePrefix(executableName, options.CommandName, colorStart, colorEnd);

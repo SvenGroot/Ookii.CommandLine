@@ -169,6 +169,15 @@ namespace Ookii.CommandLine.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Run &apos;{0} &lt;command&gt; {1}{2}&apos; for more information about a command..
+        /// </summary>
+        internal static string CommandHelpInstructionFormat {
+            get {
+                return ResourceManager.GetString("CommandHelpInstructionFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to An error occurred creating an instance of the arguments type: {0}.
         /// </summary>
         internal static string CreateArgumentsTypeErrorFormat {

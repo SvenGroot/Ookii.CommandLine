@@ -141,6 +141,24 @@ namespace Ookii.CommandLine.Commands
         /// </remarks>
         public bool AutoVersionCommand { get; set; } = true;
 
+        /// <summary>
+        /// Gets or sets a value that indicates whether a message is shown at the bottom of the
+        /// command list that instructs the user how to get help for individual commands.
+        /// </summary>
+        /// <value>
+        /// <see langword="true"/> to show the instruction; otherwise, <see langword="false"/>.
+        /// The default value is <see langword="false"/>.
+        /// </value>
+        /// <remarks>
+        /// <para>
+        ///   If set to <see langword="true"/>, the message is provided by <see cref="LocalizedStringProvider.CommandHelpInstruction"/>.
+        ///   The default implementation of that method assumes that all commands have a help
+        ///   argument, the same <see cref="ParsingMode"/>, and the same argument prefixes. For
+        ///   that reason, showing this message is not enabled by default.
+        /// </para>
+        /// </remarks>
+        public bool ShowCommandHelpInstruction { get; set; }
+
         internal string AutoVersionCommandName()
         {
             return CommandNameTransform.Apply(StringProvider.AutomaticVersionCommandName());

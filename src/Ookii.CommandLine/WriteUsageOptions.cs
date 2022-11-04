@@ -343,6 +343,11 @@ namespace Ookii.CommandLine
         /// </remarks>
         public bool? UseColor { get; set; }
 
+        internal string GetExecutableName()
+        {
+            return ExecutableName ?? CommandLineParser.GetExecutableName(IncludeExecutableExtension);
+        }
+
         internal string? CommandName { get; set; }
 
         internal VirtualTerminalSupport? EnableColor()

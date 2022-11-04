@@ -372,4 +372,7 @@
   <data name="UnknownDependencyFormat" xml:space="preserve">
     <value>A {0} refers to an unknown argument '{1}'.</value>
   </data>
+  <data name="CommandHelpInstructionFormat" xml:space="preserve">
+    <value>Run '{0} &lt;command&gt; {1}{2}' for more information about a command.</value>
+  </data>
 </root>
