@@ -44,7 +44,7 @@ namespace Ookii.CommandLine
     /// </para>
     /// <para>
     ///   Unlike using the <see cref="CancelParsing"/> or <see cref="CommandLineParser.ArgumentParsed"/>
-    ///   event, cancelling parsing with the return value does not automatically print the usage
+    ///   event, canceling parsing with the return value does not automatically print the usage
     ///   help when using the <see cref="CommandLineParser.Parse{T}(string[], int, ParseOptions?)"/>
     ///   method or the <see cref="CommandManager"/> class. Instead, it must be requested using by
     ///   setting the <see cref="CommandLineParser.HelpRequested"/> property to <see langword="true"/>.
@@ -178,7 +178,7 @@ namespace Ookii.CommandLine
         /// </para>
         /// <para>
         ///   If you have arguments defined by the type's constructor parameters, positional arguments defined by properties will
-        ///   always come after them; for example, if you have two contructor parameter arguments and one property positional argument with
+        ///   always come after them; for example, if you have two constructor parameter arguments and one property positional argument with
         ///   position 0, then that argument will actually be the third positional argument.
         /// </para>
         /// <para>
@@ -232,11 +232,11 @@ namespace Ookii.CommandLine
         public string? ValueDescription { get; set; }
 
         /// <summary>
-        /// Gets or sets a value that indicates whether argument parsing should be cancelled if
+        /// Gets or sets a value that indicates whether argument parsing should be canceled if
         /// this argument is encountered.
         /// </summary>
         /// <value>
-        /// <see langword="true"/> if argument parsing should be cancelled after this argument;
+        /// <see langword="true"/> if argument parsing should be canceled after this argument;
         /// otherwise, <see langword="false"/>. The default value is <see langword="false" />.
         /// </value>
         /// <remarks>
@@ -256,10 +256,10 @@ namespace Ookii.CommandLine
         /// </para>
         /// <para>
         ///   The <see cref="CommandLineParser.Parse{T}(string[], ParseOptions?)"/> static helper method will print
-        ///   usage information if parsing was cancelled through this method.
+        ///   usage information if parsing was canceled through this method.
         /// </para>
         /// <para>
-        ///   Cancelling parsing in this way is identical to handling the <see cref="CommandLineParser.ArgumentParsed"/>
+        ///   Canceling parsing in this way is identical to handling the <see cref="CommandLineParser.ArgumentParsed"/>
         ///   event and setting <see cref="System.ComponentModel.CancelEventArgs.Cancel"/> to
         ///   <see langword="true" />.
         /// </para>

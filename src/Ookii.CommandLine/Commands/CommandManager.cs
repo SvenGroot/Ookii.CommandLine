@@ -133,7 +133,7 @@ namespace Ookii.CommandLine.Commands
         /// <para>
         ///   A command's name is taken from the <see cref="CommandAttribute.CommandName"/> property. If
         ///   that property is <see langword="null"/>, the name is determined by taking the command
-        ///   type's name, and applying the transformatin specified by the <see cref="CommandOptions.CommandNameTransform"/>
+        ///   type's name, and applying the transformation specified by the <see cref="CommandOptions.CommandNameTransform"/>
         ///   property.
         /// </para>
         /// </remarks>

@@ -14,7 +14,7 @@ namespace Ookii.CommandLine
     ///   or you can use the <see cref="ParseOptionsAttribute"/> attribute.
     /// </para>
     /// <para>
-    ///   This attribute allows you to define your preferred parsing behavior declaritively, with
+    ///   This attribute allows you to define your preferred parsing behavior declaratively, with
     ///   the class that provides the arguments. Apply this attribute to the class to set the
     ///   properties.
     /// </para>
@@ -96,7 +96,7 @@ namespace Ookii.CommandLine
         public string[]? ArgumentNamePrefixes { get; set; }
 
         /// <summary>
-        /// Gets or sets the argument name prefix to se for long argument names.
+        /// Gets or sets the argument name prefix to use for long argument names.
         /// </summary>
         /// <remarks>
         /// <para>
@@ -222,7 +222,7 @@ namespace Ookii.CommandLine
         /// </para>
         /// <para>
         ///   If you already have an argument conflicting with the names or aliases above, the
-        ///   the automatic help argument will not be created even if this property is
+        ///   automatic help argument will not be created even if this property is
         ///   <see langword="true"/>.
         /// </para>
         /// <para>
@@ -247,7 +247,7 @@ namespace Ookii.CommandLine
         ///   showing usage help.
         /// </para>
         /// <para>
-        ///   If you already have an argument named "Version", the the automatic version argument
+        ///   If you already have an argument named "Version", the automatic version argument
         ///   will not be created even if this property is <see langword="true"/>.
         /// </para>
         /// <note>

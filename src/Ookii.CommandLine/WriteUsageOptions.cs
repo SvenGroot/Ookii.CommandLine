@@ -174,7 +174,7 @@ namespace Ookii.CommandLine
         /// </value>
         /// <remarks>
         /// <para>
-        ///   This property is used in place of tne <see cref="ArgumentDescriptionIndent"/> property
+        ///   This property is used in place of the <see cref="ArgumentDescriptionIndent"/> property
         ///   when the <see cref="CommandLineParser.Mode"/> property is <see cref="ParsingMode.LongShort"/>.
         /// </para>
         /// <para>

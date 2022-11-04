@@ -41,7 +41,7 @@ namespace Ookii.CommandLine
     /// </para>
     /// <para>
     ///   The <see cref="ResetIndent"/> property can be used to move the output position back to the beginning of the line. If the buffer is
-    ///   not empty, is is first flushed and indentation is reset to zero on the next line. After the next line break, indentation will again
+    ///   not empty, is first flushed and indentation is reset to zero on the next line. After the next line break, indentation will again
     ///   be set to the value of the <see cref="Indent"/> property.
     /// </para>
     /// </remarks>

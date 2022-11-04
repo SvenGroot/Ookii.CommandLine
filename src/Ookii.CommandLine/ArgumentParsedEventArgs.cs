@@ -56,7 +56,7 @@ namespace Ookii.CommandLine
         /// <para>
         ///   This property does not affect the <see cref="CancelEventArgs.Cancel"/> property.
         ///   If <see cref="CancelEventArgs.Cancel"/> is set to <see langword="true"/>, parsing
-        ///   is always cancelled regardless of the value of <see cref="OverrideCancelParsing"/>.
+        ///   is always canceled regardless of the value of <see cref="OverrideCancelParsing"/>.
         /// </para>
         /// </remarks>
         public bool OverrideCancelParsing { get; set; }

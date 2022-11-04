@@ -104,7 +104,7 @@ namespace Ookii.CommandLine
         public IEnumerable<string>? ArgumentNamePrefixes { get; set; }
 
         /// <summary>
-        /// Gets or sets the argument name prefix to se for long argument names.
+        /// Gets or sets the argument name prefix to use for long argument names.
         /// </summary>
         /// <remarks>
         /// <para>
@@ -142,7 +142,7 @@ namespace Ookii.CommandLine
 
         /// <summary>
         /// Gets or sets the output <see cref="TextWriter"/> used to print usage information if
-        /// argument parsing fails or is cancelled.
+        /// argument parsing fails or is canceled.
         /// </summary>
         /// <remarks>
         /// If argument parsing is successful, nothing will be written.
@@ -261,7 +261,7 @@ namespace Ookii.CommandLine
         /// </para>
         /// <para>
         ///   If you already have an argument conflicting with the names or aliases above, the
-        ///   the automatic help argument will not be created even if this property is
+        ///   automatic help argument will not be created even if this property is
         ///   <see langword="true"/>.
         /// </para>
         /// <para>
@@ -289,7 +289,7 @@ namespace Ookii.CommandLine
         ///   showing usage help.
         /// </para>
         /// <para>
-        ///   If you already have an argument named "Version", the the automatic version argument
+        ///   If you already have an argument named "Version", the automatic version argument
         ///   will not be created even if this property is <see langword="true"/>.
         /// </para>
         /// <para>
@@ -368,7 +368,7 @@ namespace Ookii.CommandLine
 
         /// <summary>
         /// Gets or sets the options to use to write usage information to <see cref="Out"/> when
-        /// parsing the arguments fails or is cancelled.
+        /// parsing the arguments fails or is canceled.
         /// </summary>
         /// <value>
         /// The usage options.

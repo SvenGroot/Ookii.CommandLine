@@ -62,7 +62,7 @@ namespace Ookii.CommandLine
         /// </summary>
         ValidationFailed,
         /// <summary>
-        /// An argument failed a depency check performed by the <see cref="Validation.RequiresAttribute"/>
+        /// An argument failed a dependency check performed by the <see cref="Validation.RequiresAttribute"/>
         /// or the <see cref="Validation.ProhibitsAttribute"/> class.
         /// </summary>
         DependencyFailed,

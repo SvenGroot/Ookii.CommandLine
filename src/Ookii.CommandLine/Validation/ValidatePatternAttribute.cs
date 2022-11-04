@@ -26,7 +26,7 @@ namespace Ookii.CommandLine.Validation
         /// Initializes a new instance of the <see cref="ValidatePatternAttribute"/> class.
         /// </summary>
         /// <param name="pattern">The regular expression to match against.</param>
-        /// <param name="options">A combinatino of <see cref="RegexOptions"/> values to use.</param>
+        /// <param name="options">A combination of <see cref="RegexOptions"/> values to use.</param>
         /// <remarks>
         /// <para>
         ///   This constructor does not validate if the regular expression specified in <paramref name="pattern"/>

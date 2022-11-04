@@ -492,7 +492,7 @@ namespace Ookii.CommandLine
         /// <remarks>
         /// <para>
         ///   If the <see cref="CommandLineParser.Mode"/> property is <see cref="ParsingMode.LongShort"/>,
-        ///   and the <see cref="HasLongName"/> proerty is <see langword="false"/>, this property
+        ///   and the <see cref="HasLongName"/> property is <see langword="false"/>, this property
         ///   will always return an empty collection .
         /// </para>
         /// </remarks>
@@ -871,11 +871,11 @@ namespace Ookii.CommandLine
         public bool AllowNull => _allowNull;
 
         /// <summary>
-        /// Gets a value that indicates whether argument parsing should be cancelled if this
+        /// Gets a value that indicates whether argument parsing should be canceled if this
         /// argument is encountered.
         /// </summary>
         /// <value>
-        /// <see langword="true"/> if argument parsing should be cancelled after this argument;
+        /// <see langword="true"/> if argument parsing should be canceled after this argument;
         /// otherwise, <see langword="false"/>. This value is determined using the <see cref="CommandLineArgumentAttribute.CancelParsing"/>
         /// property.
         /// </value>
@@ -896,10 +896,10 @@ namespace Ookii.CommandLine
         /// </para>
         /// <para>
         ///   The <see cref="CommandLineParser.Parse{T}(string[], ParseOptions?)"/> static helper method will print
-        ///   usage information if parsing was cancelled through this method.
+        ///   usage information if parsing was canceled through this method.
         /// </para>
         /// <para>
-        ///   Cancelling parsing in this way is identical to handling the <see cref="CommandLineParser.ArgumentParsed"/>
+        ///   Canceling parsing in this way is identical to handling the <see cref="CommandLineParser.ArgumentParsed"/>
         ///   event and setting <see cref="System.ComponentModel.CancelEventArgs.Cancel"/> to
         ///   <see langword="true" />.
         /// </para>
@@ -1214,7 +1214,7 @@ namespace Ookii.CommandLine
                 ShortName = attribute.ShortName,
                 ArgumentType = argumentType,
                 Description = member.GetCustomAttribute<DescriptionAttribute>()?.Description,
-                ValueDescription = attribute.ValueDescription,  // If null, the ctor will sort it out.
+                ValueDescription = attribute.ValueDescription,  // If null, the constructor will sort it out.
                 Position = attribute.Position < 0 ? null : attribute.Position,
                 AllowDuplicateDictionaryKeys = Attribute.IsDefined(member, typeof(AllowDuplicateDictionaryKeysAttribute)),
                 ConverterType = typeConverterAttribute == null ? null : Type.GetType(typeConverterAttribute.ConverterTypeName, true),
@@ -1396,7 +1396,7 @@ namespace Ookii.CommandLine
                     StringBuilder name = new StringBuilder(type.FullName?.Length ?? 0);
                     name.Append(type.Name, 0, type.Name.IndexOf("`", StringComparison.Ordinal));
                     name.Append('<');
-                    // If only I was targetting .Net 4, I could use string.Join for this.
+                    // If only I was targeting .Net 4, I could use string.Join for this.
                     bool first = true;
                     foreach (Type typeArgument in type.GetGenericArguments())
                     {
