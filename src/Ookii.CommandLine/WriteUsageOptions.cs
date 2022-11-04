@@ -191,13 +191,24 @@ namespace Ookii.CommandLine
         public int LongShortArgumentDescriptionIndent { get; set; } = 12;
 
         /// <summary>
-        /// Gets or sets a value that indicates which arguments should be included.
+        /// Gets or sets a value that indicates which arguments should be included in the list of
+        /// argument descriptions.
         /// </summary>
         /// <value>
-        /// One of the <see cref="DescriptionListFilterMode"/> values. The default is
-        /// <see cref="DescriptionListFilterMode.Information"/>.
+        /// One of the values of the <see cref="DescriptionListFilterMode"/> enumeration. The default
+        /// value is <see cref="DescriptionListFilterMode.Information"/>.
         /// </value>
         public DescriptionListFilterMode ArgumentDescriptionListFilter { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value that indicates the order of the arguments in the list of argument
+        /// descriptions.
+        /// </summary>
+        /// <value>
+        /// One of the values of the <see cref="DescriptionListSortMode"/> enumeration. The default
+        /// value is <see cref="DescriptionListSortMode.UsageOrder"/>.
+        /// </value>
+        public DescriptionListSortMode ArgumentDescriptionListOrder { get; set; }
 
         /// <summary>
         /// Gets or sets the color applied to the <see cref="LocalizedStringProvider.ArgumentDescription"/>.

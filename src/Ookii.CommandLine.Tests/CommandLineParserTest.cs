@@ -347,6 +347,50 @@ namespace Ookii.CommandLine.Tests
         }
 
         [TestMethod]
+        public void TestWriteUsageOrder()
+        {
+            var parser = new CommandLineParser<LongShortArguments>();
+            var options = new WriteUsageOptions()
+            {
+                ExecutableName = _executableName,
+                ArgumentDescriptionListOrder = DescriptionListSortMode.Alphabetical,
+            };
+
+            var usage = parser.GetUsage(0, options);
+            Assert.AreEqual(_expectedUsageAlphabeticalLongName, usage);
+
+            options.ArgumentDescriptionListOrder = DescriptionListSortMode.AlphabeticalDescending;
+            usage = parser.GetUsage(0, options);
+            Assert.AreEqual(_expectedUsageAlphabeticalLongNameDescending, usage);
+
+            options.ArgumentDescriptionListOrder = DescriptionListSortMode.AlphabeticalShortName;
+            usage = parser.GetUsage(0, options);
+            Assert.AreEqual(_expectedUsageAlphabeticalShortName, usage);
+
+            options.ArgumentDescriptionListOrder = DescriptionListSortMode.AlphabeticalShortNameDescending;
+            usage = parser.GetUsage(0, options);
+            Assert.AreEqual(_expectedUsageAlphabeticalShortNameDescending, usage);
+
+            parser = new CommandLineParser<LongShortArguments>(new ParseOptions() { Mode = ParsingMode.Default });
+            options.ArgumentDescriptionListOrder = DescriptionListSortMode.Alphabetical;
+            usage = parser.GetUsage(0, options);
+            Assert.AreEqual(_expectedUsageAlphabetical, usage);
+
+            options.ArgumentDescriptionListOrder = DescriptionListSortMode.AlphabeticalDescending;
+            usage = parser.GetUsage(0, options);
+            Assert.AreEqual(_expectedUsageAlphabeticalDescending, usage);
+
+            // ShortName versions work like regular if not in LongShortMode.
+            options.ArgumentDescriptionListOrder = DescriptionListSortMode.AlphabeticalShortName;
+            usage = parser.GetUsage(0, options);
+            Assert.AreEqual(_expectedUsageAlphabetical, usage);
+
+            options.ArgumentDescriptionListOrder = DescriptionListSortMode.AlphabeticalShortNameDescending;
+            usage = parser.GetUsage(0, options);
+            Assert.AreEqual(_expectedUsageAlphabeticalDescending, usage);
+        }
+
+        [TestMethod]
         public void TestStaticParse()
         {
             using var output = new StringWriter();
@@ -531,7 +575,7 @@ namespace Ookii.CommandLine.Tests
             Assert.AreSame(parser.GetArgument("foo"), parser.GetShortArgument('f'));
             Assert.AreSame(parser.GetArgument("arg2"), parser.GetShortArgument('a'));
             Assert.AreSame(parser.GetArgument("switch1"), parser.GetShortArgument('s'));
-            Assert.AreSame(parser.GetArgument("switch2"), parser.GetShortArgument('t'));
+            Assert.AreSame(parser.GetArgument("switch2"), parser.GetShortArgument('k'));
             Assert.IsNull(parser.GetArgument("switch3"));
             Assert.AreEqual("u", parser.GetShortArgument('u').ArgumentName);
             Assert.AreEqual('f', parser.GetArgument("foo").ShortName);

@@ -49,7 +49,7 @@ Usage: test [/arg1] <String> [[/other] <Number>] [[/notSwitch] <Boolean>] [[/Arg
 
 ".ReplaceLineEndings();
 
-        private static readonly string _expectedLongShortUsage = @"Usage: test [[--foo] <Int32>] [[--bar] <Int32>] [--Arg1 <Int32>] [--Arg2 <Int32>] [--Help] [--Switch1] [--Switch2] [-u] [--Version]
+        private static readonly string _expectedLongShortUsage = @"Usage: test [[--foo] <Int32>] [[--bar] <Int32>] [[--Arg2] <Int32>] [--Arg1 <Int32>] [--Help] [--Switch1] [--Switch2] [-u] [--Version]
 
     -f, --foo <Int32>
             Foo description. Default value: 0.
@@ -57,11 +57,11 @@ Usage: test [/arg1] <String> [[/other] <Number>] [[/notSwitch] <Boolean>] [[/Arg
         --bar <Int32>
             Bar description. Default value: 0.
 
-        --Arg1 <Int32>
-            Arg1 description.
-
     -a, --Arg2 <Int32> (-b, --baz)
             Arg2 description.
+
+        --Arg1 <Int32>
+            Arg1 description.
 
     -?, --Help [<Boolean>] (-h)
             Displays this help message.
@@ -69,7 +69,7 @@ Usage: test [/arg1] <String> [[/other] <Number>] [[/notSwitch] <Boolean>] [[/Arg
     -S, --Switch1 [<Boolean>]
             Switch1 description.
 
-    -t, --Switch2 [<Boolean>]
+    -k, --Switch2 [<Boolean>]
             Switch2 description.
 
     -u [<Boolean>]
@@ -80,7 +80,7 @@ Usage: test [/arg1] <String> [[/other] <Number>] [[/notSwitch] <Boolean>] [[/Arg
 
 ".ReplaceLineEndings();
 
-        private static readonly string _expectedLongShortUsageShortNameSyntax = @"Usage: test [[-f] <Int32>] [[--bar] <Int32>] [--Arg1 <Int32>] [-a <Int32>] [-?] [-S] [-t] [-u] [--Version]
+        private static readonly string _expectedLongShortUsageShortNameSyntax = @"Usage: test [[-f] <Int32>] [[--bar] <Int32>] [[-a] <Int32>] [--Arg1 <Int32>] [-?] [-S] [-k] [-u] [--Version]
 
     -f, --foo <Int32>
             Foo description. Default value: 0.
@@ -88,11 +88,11 @@ Usage: test [/arg1] <String> [[/other] <Number>] [[/notSwitch] <Boolean>] [[/Arg
         --bar <Int32>
             Bar description. Default value: 0.
 
-        --Arg1 <Int32>
-            Arg1 description.
-
     -a, --Arg2 <Int32> (-b, --baz)
             Arg2 description.
+
+        --Arg1 <Int32>
+            Arg1 description.
 
     -?, --Help [<Boolean>] (-h)
             Displays this help message.
@@ -100,7 +100,7 @@ Usage: test [/arg1] <String> [[/other] <Number>] [[/notSwitch] <Boolean>] [[/Arg
     -S, --Switch1 [<Boolean>]
             Switch1 description.
 
-    -t, --Switch2 [<Boolean>]
+    -k, --Switch2 [<Boolean>]
             Switch2 description.
 
     -u [<Boolean>]
@@ -111,7 +111,7 @@ Usage: test [/arg1] <String> [[/other] <Number>] [[/notSwitch] <Boolean>] [[/Arg
 
 ".ReplaceLineEndings();
 
-        private static readonly string _expectedLongShortUsageAbbreviated = @"Usage: test [[--foo] <Int32>] [[--bar] <Int32>] [arguments]
+        private static readonly string _expectedLongShortUsageAbbreviated = @"Usage: test [[--foo] <Int32>] [[--bar] <Int32>] [[--Arg2] <Int32>] [arguments]
 
     -f, --foo <Int32>
             Foo description. Default value: 0.
@@ -119,11 +119,11 @@ Usage: test [/arg1] <String> [[/other] <Number>] [[/notSwitch] <Boolean>] [[/Arg
         --bar <Int32>
             Bar description. Default value: 0.
 
-        --Arg1 <Int32>
-            Arg1 description.
-
     -a, --Arg2 <Int32> (-b, --baz)
             Arg2 description.
+
+        --Arg1 <Int32>
+            Arg1 description.
 
     -?, --Help [<Boolean>] (-h)
             Displays this help message.
@@ -131,7 +131,7 @@ Usage: test [/arg1] <String> [[/other] <Number>] [[/notSwitch] <Boolean>] [[/Arg
     -S, --Switch1 [<Boolean>]
             Switch1 description.
 
-    -t, --Switch2 [<Boolean>]
+    -k, --Switch2 [<Boolean>]
             Switch2 description.
 
     -u [<Boolean>]
@@ -276,7 +276,7 @@ Usage: test [-arg1] <String> [[-other] <Number>] [[-notSwitch] <Boolean>] [[-Arg
 
 ".ReplaceLineEndings();
 
-        private static readonly string _expectedLongShortUsageColor = @"[36mUsage:[0m test [[--foo] <Int32>] [[--bar] <Int32>] [--Arg1 <Int32>] [--Arg2 <Int32>] [--Help] [--Switch1] [--Switch2] [-u] [--Version]
+        private static readonly string _expectedLongShortUsageColor = @"[36mUsage:[0m test [[--foo] <Int32>] [[--bar] <Int32>] [[--Arg2] <Int32>] [--Arg1 <Int32>] [--Help] [--Switch1] [--Switch2] [-u] [--Version]
 
     [32m-f, --foo <Int32>[0m
             Foo description. Default value: 0.
@@ -284,11 +284,11 @@ Usage: test [-arg1] <String> [[-other] <Number>] [[-notSwitch] <Boolean>] [[-Arg
     [32m    --bar <Int32>[0m
             Bar description. Default value: 0.
 
-    [32m    --Arg1 <Int32>[0m
-            Arg1 description.
-
     [32m-a, --Arg2 <Int32> (-b, --baz)[0m
             Arg2 description.
+
+    [32m    --Arg1 <Int32>[0m
+            Arg1 description.
 
     [32m-?, --Help [<Boolean>] (-h)[0m
             Displays this help message.
@@ -296,7 +296,7 @@ Usage: test [-arg1] <String> [[-other] <Number>] [[-notSwitch] <Boolean>] [[-Arg
     [32m-S, --Switch1 [<Boolean>][0m
             Switch1 description.
 
-    [32m-t, --Switch2 [<Boolean>][0m
+    [32m-k, --Switch2 [<Boolean>][0m
             Switch2 description.
 
     [32m-u [<Boolean>][0m
@@ -393,6 +393,193 @@ You must use at least one of: -Address, -Path.
         Displays version information.
 
 ".ReplaceLineEndings();
+
+        private static readonly string _expectedUsageAlphabeticalLongName = @"Usage: test [[--foo] <Int32>] [[--bar] <Int32>] [[--Arg2] <Int32>] [--Arg1 <Int32>] [--Help] [--Switch1] [--Switch2] [-u] [--Version]
+
+        --Arg1 <Int32>
+            Arg1 description.
+
+    -a, --Arg2 <Int32> (-b, --baz)
+            Arg2 description.
+
+        --bar <Int32>
+            Bar description. Default value: 0.
+
+    -f, --foo <Int32>
+            Foo description. Default value: 0.
+
+    -?, --Help [<Boolean>] (-h)
+            Displays this help message.
+
+    -S, --Switch1 [<Boolean>]
+            Switch1 description.
+
+    -k, --Switch2 [<Boolean>]
+            Switch2 description.
+
+    -u [<Boolean>]
+            Switch3 description.
+
+        --Version [<Boolean>]
+            Displays version information.
+
+".ReplaceLineEndings();
+
+        private static readonly string _expectedUsageAlphabeticalLongNameDescending = @"Usage: test [[--foo] <Int32>] [[--bar] <Int32>] [[--Arg2] <Int32>] [--Arg1 <Int32>] [--Help] [--Switch1] [--Switch2] [-u] [--Version]
+
+        --Version [<Boolean>]
+            Displays version information.
+
+    -u [<Boolean>]
+            Switch3 description.
+
+    -k, --Switch2 [<Boolean>]
+            Switch2 description.
+
+    -S, --Switch1 [<Boolean>]
+            Switch1 description.
+
+    -?, --Help [<Boolean>] (-h)
+            Displays this help message.
+
+    -f, --foo <Int32>
+            Foo description. Default value: 0.
+
+        --bar <Int32>
+            Bar description. Default value: 0.
+
+    -a, --Arg2 <Int32> (-b, --baz)
+            Arg2 description.
+
+        --Arg1 <Int32>
+            Arg1 description.
+
+".ReplaceLineEndings();
+
+        private static readonly string _expectedUsageAlphabeticalShortName = @"Usage: test [[--foo] <Int32>] [[--bar] <Int32>] [[--Arg2] <Int32>] [--Arg1 <Int32>] [--Help] [--Switch1] [--Switch2] [-u] [--Version]
+
+    -?, --Help [<Boolean>] (-h)
+            Displays this help message.
+
+    -a, --Arg2 <Int32> (-b, --baz)
+            Arg2 description.
+
+        --Arg1 <Int32>
+            Arg1 description.
+
+        --bar <Int32>
+            Bar description. Default value: 0.
+
+    -f, --foo <Int32>
+            Foo description. Default value: 0.
+
+    -k, --Switch2 [<Boolean>]
+            Switch2 description.
+
+    -S, --Switch1 [<Boolean>]
+            Switch1 description.
+
+    -u [<Boolean>]
+            Switch3 description.
+
+        --Version [<Boolean>]
+            Displays version information.
+
+".ReplaceLineEndings();
+
+        private static readonly string _expectedUsageAlphabeticalShortNameDescending = @"Usage: test [[--foo] <Int32>] [[--bar] <Int32>] [[--Arg2] <Int32>] [--Arg1 <Int32>] [--Help] [--Switch1] [--Switch2] [-u] [--Version]
+
+        --Version [<Boolean>]
+            Displays version information.
+
+    -u [<Boolean>]
+            Switch3 description.
+
+    -S, --Switch1 [<Boolean>]
+            Switch1 description.
+
+    -k, --Switch2 [<Boolean>]
+            Switch2 description.
+
+    -f, --foo <Int32>
+            Foo description. Default value: 0.
+
+        --bar <Int32>
+            Bar description. Default value: 0.
+
+        --Arg1 <Int32>
+            Arg1 description.
+
+    -a, --Arg2 <Int32> (-b, --baz)
+            Arg2 description.
+
+    -?, --Help [<Boolean>] (-h)
+            Displays this help message.
+
+".ReplaceLineEndings();
+
+        private static readonly string _expectedUsageAlphabetical = @"Usage: test [[-foo] <Int32>] [[-bar] <Int32>] [[-Arg2] <Int32>] [-Arg1 <Int32>] [-Help] [-Switch1] [-Switch2] [-Switch3] [-Version]
+
+    -Arg1 <Int32>
+        Arg1 description.
+
+    -Arg2 <Int32> (-baz)
+        Arg2 description.
+
+    -bar <Int32>
+        Bar description. Default value: 0.
+
+    -foo <Int32>
+        Foo description. Default value: 0.
+
+    -Help [<Boolean>] (-?, -h)
+        Displays this help message.
+
+    -Switch1 [<Boolean>]
+        Switch1 description.
+
+    -Switch2 [<Boolean>]
+        Switch2 description.
+
+    -Switch3 [<Boolean>]
+        Switch3 description.
+
+    -Version [<Boolean>]
+        Displays version information.
+
+".ReplaceLineEndings();
+
+        private static readonly string _expectedUsageAlphabeticalDescending = @"Usage: test [[-foo] <Int32>] [[-bar] <Int32>] [[-Arg2] <Int32>] [-Arg1 <Int32>] [-Help] [-Switch1] [-Switch2] [-Switch3] [-Version]
+
+    -Version [<Boolean>]
+        Displays version information.
+
+    -Switch3 [<Boolean>]
+        Switch3 description.
+
+    -Switch2 [<Boolean>]
+        Switch2 description.
+
+    -Switch1 [<Boolean>]
+        Switch1 description.
+
+    -Help [<Boolean>] (-?, -h)
+        Displays this help message.
+
+    -foo <Int32>
+        Foo description. Default value: 0.
+
+    -bar <Int32>
+        Bar description. Default value: 0.
+
+    -Arg2 <Int32> (-baz)
+        Arg2 description.
+
+    -Arg1 <Int32>
+        Arg1 description.
+
+".ReplaceLineEndings();
+
 
     }
 }

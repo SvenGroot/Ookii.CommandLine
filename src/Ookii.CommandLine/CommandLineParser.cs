@@ -1525,7 +1525,19 @@ namespace Ookii.CommandLine
                     : options.ArgumentDescriptionIndent;
             }
 
-            foreach (var argument in _arguments)
+            var comparer = _argumentsByName.Comparer;
+            IEnumerable<CommandLineArgument> arguments = options.ArgumentDescriptionListOrder switch
+            {
+                DescriptionListSortMode.Alphabetical => _arguments.OrderBy(arg => arg.ArgumentName, comparer),
+                DescriptionListSortMode.AlphabeticalDescending => _arguments.OrderByDescending(arg => arg.ArgumentName, comparer),
+                DescriptionListSortMode.AlphabeticalShortName =>
+                    _arguments.OrderBy(arg => arg.HasShortName ? arg.ShortName.ToString() : arg.ArgumentName, comparer),
+                DescriptionListSortMode.AlphabeticalShortNameDescending =>
+                    _arguments.OrderByDescending(arg => arg.HasShortName ? arg.ShortName.ToString() : arg.ArgumentName, comparer),
+                _ => _arguments,
+            };
+
+            foreach (var argument in arguments)
             {
                 bool include = !argument.IsHidden && options.ArgumentDescriptionListFilter switch
                 {

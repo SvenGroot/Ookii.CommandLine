@@ -213,7 +213,7 @@ namespace Ookii.CommandLine.Tests
         [Description("Arg1 description.")]
         public int Arg1 { get; set; }
 
-        [CommandLineArgument(ShortName = 'a'), ShortAlias('b'), Alias("baz")]
+        [CommandLineArgument(ShortName = 'a', Position = 0), ShortAlias('b'), Alias("baz")]
         [Description("Arg2 description.")]
         public int Arg2 { get; set; }
 
@@ -221,7 +221,7 @@ namespace Ookii.CommandLine.Tests
         [Description("Switch1 description.")]
         public bool Switch1 { get; set; }
 
-        [CommandLineArgument(ShortName = 't')]
+        [CommandLineArgument(ShortName = 'k')]
         [Description("Switch2 description.")]
         public bool Switch2 { get; set; }
 
