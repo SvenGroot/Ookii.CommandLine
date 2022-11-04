@@ -22,8 +22,8 @@ namespace Ookii.CommandLine.Tests
 
             Assert.IsNotNull(commands);
             Assert.AreEqual(5, commands.Length);
-            Assert.AreEqual("AnotherCommand", commands[0].Name);
-            Assert.AreEqual(typeof(AnotherCommand), commands[0].CommandType);
+            Assert.AreEqual("AnotherSimpleCommand", commands[0].Name);
+            Assert.AreEqual(typeof(AnotherSimpleCommand), commands[0].CommandType);
             Assert.IsFalse(commands[0].UseCustomArgumentParsing);
             Assert.AreEqual("custom", commands[1].Name);
             Assert.AreEqual(typeof(CustomParsingCommand), commands[1].CommandType);
@@ -59,10 +59,10 @@ namespace Ookii.CommandLine.Tests
             command = manager2.GetCommand("Test");
             Assert.IsNull(command);
 
-            command = manager.GetCommand("AnotherCommand");
+            command = manager.GetCommand("AnotherSimpleCommand");
             Assert.IsNotNull(command);
-            Assert.AreEqual("AnotherCommand", command.Value.Name);
-            Assert.AreEqual(typeof(AnotherCommand), command.Value.CommandType);
+            Assert.AreEqual("AnotherSimpleCommand", command.Value.Name);
+            Assert.AreEqual(typeof(AnotherSimpleCommand), command.Value.CommandType);
         }
 
         [TestMethod]
@@ -100,7 +100,7 @@ namespace Ookii.CommandLine.Tests
             Assert.AreEqual("Bar", command.Argument);
             Assert.AreEqual("", writer.BaseWriter.ToString());
 
-            AnotherCommand command2 = (AnotherCommand)manager.CreateCommand("anothercommand", new[] { "skip", "-Value", "42" }, 1);
+            var command2 = (AnotherSimpleCommand)manager.CreateCommand("anothersimplecommand", new[] { "skip", "-Value", "42" }, 1);
             Assert.IsNotNull(command2);
             Assert.AreEqual(42, command2.Value);
             Assert.AreEqual("", writer.BaseWriter.ToString());
@@ -160,6 +160,42 @@ namespace Ookii.CommandLine.Tests
             Assert.AreEqual(_expectedUsageColor, writer.BaseWriter.ToString());
         }
 
+        [TestMethod]
+        public void TestCommandNameTransform()
+        {
+            var options = new CommandOptions()
+            {
+                CommandNameTransform = NameTransform.PascalCase
+            };
+
+            var info = new CommandInfo(typeof(AnotherSimpleCommand), options);
+            Assert.AreEqual("AnotherSimple", info.Name);
+
+            options.CommandNameTransform = NameTransform.CamelCase;
+            info = new CommandInfo(typeof(AnotherSimpleCommand), options);
+            Assert.AreEqual("anotherSimple", info.Name);
+
+            options.CommandNameTransform = NameTransform.SnakeCase;
+            info = new CommandInfo(typeof(AnotherSimpleCommand), options);
+            Assert.AreEqual("another_simple", info.Name);
+
+            options.CommandNameTransform = NameTransform.DashCase;
+            info = new CommandInfo(typeof(AnotherSimpleCommand), options);
+            Assert.AreEqual("another-simple", info.Name);
+
+            options.StripCommandNameSuffix = null;
+            info = new CommandInfo(typeof(AnotherSimpleCommand), options);
+            Assert.AreEqual("another-simple-command", info.Name);
+
+            options.StripCommandNameSuffix = "Command";
+            var manager = new CommandManager(_commandAssembly, options);
+            Assert.IsNotNull(manager.GetCommand("another-simple"));
+
+            // Check automatic command name is affected too.
+            options.CommandNameTransform = NameTransform.PascalCase;
+            Assert.AreEqual("Version", manager.GetCommand("Version")?.Name);
+        }
+
         #region Expected usage
 
         private const string _executableName = "test";
@@ -168,7 +204,7 @@ namespace Ookii.CommandLine.Tests
 
 The following commands are available:
 
-    AnotherCommand
+    AnotherSimpleCommand
 
 
     custom
@@ -186,7 +222,7 @@ The following commands are available:
 
 The following commands are available:
 
-    AnotherCommand
+    AnotherSimpleCommand
 
 
     custom
@@ -201,7 +237,7 @@ The following commands are available:
 
 The following commands are available:
 
-    [32mAnotherCommand[0m
+    [32mAnotherSimpleCommand[0m
 
 
     [32mcustom[0m

@@ -1691,78 +1691,7 @@ namespace Ookii.CommandLine
             if (explicitName != null)
                 return explicitName;
 
-            return transform switch
-            {
-                NameTransform.PascalCase => ToPascalOrCamelCase(memberName, true),
-                NameTransform.CamelCase => ToPascalOrCamelCase(memberName, false),
-                NameTransform.SnakeCase => ToSnakeOrDashCase(memberName, '_'),
-                NameTransform.DashCase => ToSnakeOrDashCase(memberName, '-'),
-                _ => memberName,
-            };
-        }
-
-        private static string ToPascalOrCamelCase(string name, bool pascalCase)
-        {
-            // Remove any underscores, and the first letter (if pascal case) and any letter after an
-            // underscore is converted to uppercase. Other letters are unchanged.
-            var toUpper = pascalCase;
-            var toLower = !pascalCase; // Only for the first character.
-            var first = true;
-            var builder = new StringBuilder(name.Length);
-            foreach (var ch in name)
-            {
-                if (ch == '_')
-                {
-                    toUpper = !first || pascalCase;
-                    continue;
-                }
-
-                first = false;
-                if (toUpper)
-                {
-                    builder.Append(char.ToUpperInvariant(ch));
-                    toUpper = false;
-                }
-                else if (toLower)
-                {
-                    builder.Append(char.ToLowerInvariant(ch));
-                    toLower = false;
-                }
-                else
-                {
-                    builder.Append(ch);
-                }
-            }
-
-            return builder.ToString();
-        }
-
-        private static string ToSnakeOrDashCase(string name, char separator)
-        {
-            var needSeparator = false;
-            var first = true;
-            // Add some leeway to add separators.
-            var builder = new StringBuilder(name.Length * 2);
-            foreach (var ch in name)
-            {
-                if (ch == '_')
-                {
-                    needSeparator = !first;
-                }
-                else
-                {
-                    if (needSeparator || (char.IsUpper(ch) && !first))
-                    {
-                        builder.Append(separator);
-                        needSeparator = false;
-                    }
-
-                    builder.Append(char.ToLowerInvariant(ch));
-                    first = false;
-                }
-            }
-
-            return builder.ToString();
+            return transform.Apply(memberName);
         }
 
         private void Validate(object? value, ValidationMode mode)

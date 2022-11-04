@@ -109,7 +109,7 @@ namespace Ookii.CommandLine.Commands
             if (_options.AutoVersionCommand &&
                 !commands.Any(c => _options.CommandNameComparer.Compare(c.Name, Properties.Resources.AutomaticVersionCommandName) == 0))
             {
-                var versionCommand = CommandInfo.GetAutomaticVersionCommand(_options.StringProvider);
+                var versionCommand = CommandInfo.GetAutomaticVersionCommand(_options);
                 commands = commands.Append(versionCommand);
             }
 
@@ -127,6 +127,19 @@ namespace Ookii.CommandLine.Commands
         /// <exception cref="ArgumentNullException">
         ///   <paramref name="commandName"/> is <see langword="null"/>.
         /// </exception>
+        /// <remarks>
+        /// <para>
+        ///   The command is located by searching all types in the assemblies for a command type
+        ///   whose command name matches the specified name. If there are multiple commands with
+        ///   the same name, the first matching one will be returned.
+        /// </para>
+        /// <para>
+        ///   A command's name is taken from the <see cref="CommandAttribute.CommandName"/> property. If
+        ///   that property is <see langword="null"/>, the name is determined by taking the command
+        ///   type's name, and applying the transformatin specified by the <see cref="CommandOptions.CommandNameTransform"/>
+        ///   property.
+        /// </para>
+        /// </remarks>
         public CommandInfo? GetCommand(string commandName)
         {
             if (commandName == null)
@@ -139,9 +152,9 @@ namespace Ookii.CommandLine.Commands
                 return commands.First();
 
             if (_options.AutoVersionCommand &&
-                _options.CommandNameComparer.Compare(commandName, _options.StringProvider.AutomaticVersionCommandName()) == 0)
+                _options.CommandNameComparer.Compare(commandName, _options.AutoVersionCommandName()) == 0)
             {
-                return CommandInfo.GetAutomaticVersionCommand(_options.StringProvider);
+                return CommandInfo.GetAutomaticVersionCommand(_options);
             }
 
             return null;
@@ -466,7 +479,7 @@ namespace Ookii.CommandLine.Commands
             }
 
             return from type in types
-                   let info = CommandInfo.CreateIfCommand(type)
+                   let info = CommandInfo.TryCreate(type, _options)
                    where info != null
                    select info.Value;
         }

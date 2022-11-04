@@ -13,7 +13,7 @@ namespace SubCommandSample
     /// the Run method is invoked to execute the command.
     /// Check the Program.cs file to see how this command is invoked.
     /// </summary>
-    [Command("read"), Description("Reads and displays data from a file using the specified encoding, wrapping the text to fit the console.")]
+    [Command, Description("Reads and displays data from a file using the specified encoding, wrapping the text to fit the console.")]
     class ReadCommand : ICommand
     {
         // Positional argument to specify the file name

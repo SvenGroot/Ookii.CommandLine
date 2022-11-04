@@ -22,7 +22,7 @@ namespace Ookii.CommandLine.Tests
     }
 
     [Command]
-    public class AnotherCommand : ICommand
+    public class AnotherSimpleCommand : ICommand
     {
         [CommandLineArgument]
         public int Value { get; set; }

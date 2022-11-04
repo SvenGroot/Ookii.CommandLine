@@ -16,6 +16,11 @@ namespace Ookii.CommandLine.Commands
     ///   This allows classes implementing <see cref="ICommand"/> but without the attribute to be
     ///   used as common base classes for other commands, without being commands themselves.
     /// </para>
+    /// <para>
+    ///   If a command has no explicit name, its name is determined by taking the type name
+    ///   and applying the transformation specified by the <see cref="CommandOptions.CommandNameTransform"/>
+    ///   property.
+    /// </para>
     /// </remarks>
     [AttributeUsage(AttributeTargets.Class)]
     public sealed class CommandAttribute : Attribute
@@ -23,8 +28,16 @@ namespace Ookii.CommandLine.Commands
         private readonly string? _commandName;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="CommandAttribute"/> class using the target's type name as the command name.
+        /// Initializes a new instance of the <see cref="CommandAttribute"/> class using the target's
+        /// type name as the command name.
         /// </summary>
+        /// <remarks>
+        /// <para>
+        ///   If a command has no explicit name, its name is determined by taking the type name
+        ///   and applying the transformation specified by the <see cref="CommandOptions.CommandNameTransform"/>
+        ///   property.
+        /// </para>
+        /// </remarks>
         public CommandAttribute()
         {
         }

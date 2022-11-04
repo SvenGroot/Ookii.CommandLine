@@ -25,6 +25,61 @@ namespace Ookii.CommandLine.Commands
         public IComparer<string> CommandNameComparer { get; set; } = StringComparer.OrdinalIgnoreCase;
 
         /// <summary>
+        /// Gets or sets a value that indicates how names are created for commands that don't have
+        /// an explicit name.
+        /// </summary>
+        /// <value>
+        /// One of the values of the <see cref="NameTransform"/> enumeration. The default value
+        /// is <see cref="NameTransform.None"/>.
+        /// </value>
+        /// <remarks>
+        /// <para>
+        ///   If a command hasn't set an explicit name using the <see cref="CommandAttribute"/>
+        ///   attribute, the name is derived from the type name of the command, applying the
+        ///   specified transformation.
+        /// </para>
+        /// <para>
+        ///   If this property is not <see cref="NameTransform.None"/>, the value specified by the
+        ///   <see cref="StripCommandNameSuffix"/> property will be removed from the end of the
+        ///   type name before applying the transformation.
+        /// </para>
+        /// <para>
+        ///   This transformation is also used for the name of the automatic version command if
+        ///   the <see cref="AutoVersionCommand"/> property is <see langword="true"/>.
+        /// </para>
+        /// <para>
+        ///   This transformation is not used for commands that have an explicit name.
+        /// </para>
+        /// </remarks>
+        public NameTransform CommandNameTransform { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value that will be removed from the end of a command name during name
+        /// transformation.
+        /// </summary>
+        /// <value>
+        /// The suffix to remove, or <see langword="null"/> to not remove any suffix. The default
+        /// value is "Command".
+        /// </value>
+        /// <remarks>
+        /// <para>
+        ///   This property is only used if the <see cref="CommandNameTransform"/> property is not 
+        ///   <see cref="NameTransform.None"/>, and is never used for commands with an explicit
+        ///   name.
+        /// </para>
+        /// <para>
+        ///   For example, if you have a subcommand class named "CreateFileCommand" and you use
+        ///   <see cref="NameTransform.DashCase"/> and the default value of "Command" for this
+        ///   property, the name of the command will be "create-file" without having to explicitly
+        ///   specify it.
+        /// </para>
+        /// <para>
+        ///   The suffix is case sensitive.
+        /// </para>
+        /// </remarks>
+        public string? StripCommandNameSuffix { get; set; } = "Command";
+
+        /// <summary>
         /// Gets or sets the color applied to the <see cref="LocalizedStringProvider.CommandDescription"/>.
         /// </summary>
         /// <value>
@@ -86,6 +141,11 @@ namespace Ookii.CommandLine.Commands
         /// </para>
         /// </remarks>
         public bool AutoVersionCommand { get; set; } = true;
+
+        internal string AutoVersionCommandName()
+        {
+            return CommandNameTransform.Apply(StringProvider.AutomaticVersionCommandName());
+        }
 
     }
 }

@@ -14,7 +14,7 @@ namespace SubCommandSample
     /// the Run method is invoked to execute the command.
     /// Check the Program.cs file to see how this command is invoked.
     /// </summary>
-    [Command("write"), Description("Writes lines to a file, wrapping them to the specified width.")]
+    [Command, Description("Writes lines to a file, wrapping them to the specified width.")]
     class WriteCommand : ICommand
     {
         // Positional argument to specify the file name

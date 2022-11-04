@@ -23,14 +23,18 @@ namespace Ookii.CommandLine.Commands
         /// Initializes a new instance of the <see cref="CommandInfo"/> struct.
         /// </summary>
         /// <param name="commandType">The type that implements the subcommand.</param>
+        /// <param name="options">
+        ///   The options used to determine a name for commands that don't have an explicit name,
+        ///   or <see langword="null"/> to use the default options.
+        /// </param>
         /// <exception cref="ArgumentNullException">
         ///   <paramref name="commandType"/> is <see langword="null"/>.
         /// </exception>
         /// <exception cref="ArgumentException">
         ///   <paramref name="commandType"/> is not a command type.
         /// </exception>
-        public CommandInfo(Type commandType)
-            : this(commandType, GetCommandAttributeOrThrow(commandType))
+        public CommandInfo(Type commandType, CommandOptions? options = null)
+            : this(commandType, GetCommandAttributeOrThrow(commandType), options)
         {
         }
 
@@ -43,9 +47,9 @@ namespace Ookii.CommandLine.Commands
             _attribute = attribute;
         }
 
-        private CommandInfo(Type commandType, CommandAttribute attribute)
+        private CommandInfo(Type commandType, CommandAttribute attribute, CommandOptions? options)
         {
-            _name = GetName(attribute, commandType);
+            _name = GetName(attribute, commandType, options);
             _commandType = commandType;
             _description = null;
             _attribute = attribute;
@@ -55,9 +59,16 @@ namespace Ookii.CommandLine.Commands
         /// Gets the name of the command.
         /// </summary>
         /// <value>
-        /// The name of the command, based on either the <see cref="CommandAttribute.CommandName"/>
-        /// property or the <see cref="CommandType"/>'s name.
+        /// The name of the command.
         /// </value>
+        /// <remarks>
+        /// <para>
+        ///   The name is taken from the <see cref="CommandAttribute.CommandName"/> property. If
+        ///   that property is <see langword="null"/>, the name is determined by taking the command
+        ///   type's name, and applying the transformatin specified by the <see cref="CommandOptions.CommandNameTransform"/>
+        ///   property.
+        /// </para>
+        /// </remarks>
         public string Name => _name;
 
         /// <summary>
@@ -112,7 +123,7 @@ namespace Ookii.CommandLine.Commands
         /// </param>
         /// <returns>An instance of the <see cref="CommandType"/>.</returns>
         /// <exception cref="ArgumentNullException">
-        ///   <paramref name="args"/>, or <paramref name="options"/> is <see langword="null"/>
+        ///   <paramref name="args"/> is <see langword="null"/>.
         /// </exception>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> does not fall inside the bounds of <paramref name="args"/>.</exception>
         public ICommand CreateInstance(string[] args, int index, ParseOptions? options = null)
@@ -138,17 +149,24 @@ namespace Ookii.CommandLine.Commands
         /// represents a command type.
         /// </summary>
         /// <param name="commandType">The type that implements the subcommand.</param>
+        /// <param name="options">
+        ///   The options used to determine a name for commands that don't have an explicit name,
+        ///   or <see langword="null"/> to use the default options.
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        ///   <paramref name="commandType"/> is <see langword="null"/>.
+        /// </exception>
         /// <returns>
         ///   A <see cref="CommandInfo"/> structure with information about the command, or
         ///   <see langword="null"/> if <paramref name="commandType"/> was not a command.
         /// </returns>
-        public static CommandInfo? CreateIfCommand(Type commandType)
+        public static CommandInfo? TryCreate(Type commandType, CommandOptions? options = null)
         {
             var attribute = GetCommandAttribute(commandType);
             if (attribute == null)
                 return null;
 
-            return new CommandInfo(commandType, attribute);
+            return new CommandInfo(commandType, attribute, options);
         }
 
         /// <summary>
@@ -164,10 +182,11 @@ namespace Ookii.CommandLine.Commands
             return GetCommandAttribute(commandType) != null;
         }
 
-        internal static CommandInfo GetAutomaticVersionCommand(LocalizedStringProvider stringProvider)
+        internal static CommandInfo GetAutomaticVersionCommand(CommandOptions options)
         {
-            return new CommandInfo(stringProvider.AutomaticVersionCommandName(),
-                typeof(AutomaticVersionCommand), stringProvider.AutomaticVersionCommandDescription());
+            var name = options.AutoVersionCommandName();
+            var description = options.StringProvider.AutomaticVersionCommandDescription();
+            return new CommandInfo(name, typeof(AutomaticVersionCommand), description);
         }
 
         private static CommandAttribute? GetCommandAttribute(Type commandType)
@@ -188,9 +207,11 @@ namespace Ookii.CommandLine.Commands
                     Properties.Resources.TypeIsNotCommandFormat, commandType.FullName));
         }
 
-        private static string GetName(CommandAttribute attribute, Type commandType)
+        private static string GetName(CommandAttribute attribute, Type commandType, CommandOptions? options)
         {
-            return attribute.CommandName ?? commandType.Name;
+            return attribute.CommandName ?? 
+                options?.CommandNameTransform.Apply(commandType.Name, options.StripCommandNameSuffix) ??
+                commandType.Name;
         }
 
         private string? GetCommandDescription()
