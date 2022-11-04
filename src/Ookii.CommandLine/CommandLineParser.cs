@@ -767,18 +767,7 @@ namespace Ookii.CommandLine
             }
 
             options ??= new();
-            using var lineWriter = DisposableWrapper.Create(writer as LineWrappingTextWriter,
-                () => new LineWrappingTextWriter(writer, maximumLineLength, false));
-
-            if (options.IncludeApplicationDescription && !string.IsNullOrEmpty(Description))
-            {
-                lineWriter.Inner.WriteLine(Description);
-                lineWriter.Inner.WriteLine();
-            }
-
-            WriteUsageSyntax(lineWriter.Inner, options);
-            WriteClassValidatorHelp(lineWriter.Inner, options);
-            WriteArgumentDescriptions(lineWriter.Inner, options);
+            WriteUsageCore(writer, maximumLineLength, options, UsageHelpRequest.Full);
         }
 
         /// <summary>
@@ -1164,6 +1153,7 @@ namespace Ookii.CommandLine
 
             using var vtSupport = options.EnableOutputColor();
             using var output = DisposableWrapper.Create(options.Out, LineWrappingTextWriter.ForConsoleOut);
+            var helpMode = UsageHelpRequest.Full;
             object? result = null;
             try
             {
@@ -1186,13 +1176,22 @@ namespace Ookii.CommandLine
 
                 error.Inner.WriteLine();
                 error.Inner.WriteLine();
+                helpMode = options.ShowUsageOnError;
             }
 
             if (parser.HelpRequested)
             {
-                // If we're writing this to the console, output should already be a
-                // LineWrappingTextWriter, so the max line length argument here is ignored.
-                parser.WriteUsage(output.Inner, 0, options.UsageOptions);
+                parser.WriteUsageCore(output.Inner, 0, options.UsageOptions, helpMode);
+                if (helpMode != UsageHelpRequest.Full)
+                {
+                    var moreInfo = parser.StringProvider.MoreInfoOnError(parser, options.UsageOptions.GetExecutableName(),
+                        options.UsageOptions.UseColor ?? false);
+
+                    if (moreInfo != null)
+                    {
+                        output.Inner.WriteLine(moreInfo);
+                    }
+                }
             }
 
             return result;
@@ -1586,6 +1585,30 @@ namespace Ookii.CommandLine
             }
 
             return markedCtors.First();
+        }
+
+        private void WriteUsageCore(TextWriter writer, int maximumLineLength, WriteUsageOptions options, UsageHelpRequest mode)
+        {
+            if (mode == UsageHelpRequest.None)
+            {
+                return;
+            }
+
+            using var lineWriter = DisposableWrapper.Create(writer as LineWrappingTextWriter,
+                () => new LineWrappingTextWriter(writer, maximumLineLength, false));
+
+            if (mode == UsageHelpRequest.Full && options.IncludeApplicationDescription && !string.IsNullOrEmpty(Description))
+            {
+                lineWriter.Inner.WriteLine(Description);
+                lineWriter.Inner.WriteLine();
+            }
+
+            WriteUsageSyntax(lineWriter.Inner, options);
+            if (mode == UsageHelpRequest.Full)
+            {
+                WriteClassValidatorHelp(lineWriter.Inner, options);
+                WriteArgumentDescriptions(lineWriter.Inner, options);
+            }
         }
 
         private void WriteArgumentDescriptions(LineWrappingTextWriter writer, WriteUsageOptions options)

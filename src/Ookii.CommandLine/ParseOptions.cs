@@ -367,6 +367,24 @@ namespace Ookii.CommandLine
         }
 
         /// <summary>
+        /// Gets or sets a value that indicates how usage is shown after a parsing error occurred.
+        /// </summary>
+        /// <value>
+        /// One of the values of the <see cref="UsageHelpRequest"/> enumeration. The default value
+        /// is <see cref="UsageHelpRequest.Full"/>.
+        /// </value>
+        /// <remarks>
+        /// <para>
+        ///   If the value of this property is not <see cref="UsageHelpRequest.Full"/>, the
+        ///   <see cref="CommandLineParser.Parse{T}(string[], int, ParseOptions?)"/> method and
+        ///   <see cref="CommandManager"/> class will write the message returned by the
+        ///   <see cref="LocalizedStringProvider.MoreInfoOnError(CommandLineParser, string)"/>
+        ///   method.
+        /// </para>
+        /// </remarks>
+        public UsageHelpRequest ShowUsageOnError { get; set; }
+
+        /// <summary>
         /// Gets or sets the options to use to write usage information to <see cref="Out"/> when
         /// parsing the arguments fails or is canceled.
         /// </summary>

@@ -247,6 +247,31 @@ namespace Ookii.CommandLine
         /// </remarks>
         public virtual string AbbreviatedRemainingArguments(bool useColor) => Resources.DefaultAbbreviatedRemainingArguments;
 
+        /// <summary>
+        /// Gets a string that tells the user how to get usage help after an error occurred if the
+        /// <see cref="ParseOptions.ShowUsageOnError"/> property is not <see cref="UsageHelpRequest.Full"/>.
+        /// </summary>
+        /// <param name="parser">The command line parser.</param>
+        /// <param name="executableName">The name of the application's executable.</param>
+        /// <param name="useColor">The value of <see cref="WriteUsageOptions.UseColor"/>.</param>
+        /// <returns>The string, or <see langword="null"/> to not show the message.</returns>
+        /// <remarks>
+        /// <para>
+        ///   The default implementation will only return a string if the <paramref name="parser"/>
+        ///   has an argument matching the name returned by <see cref="AutomaticHelpName"/>.
+        /// </para>
+        /// </remarks>
+        public virtual string? MoreInfoOnError(CommandLineParser parser, string executableName, bool useColor)
+        {
+            var arg = parser.GetArgument(AutomaticHelpName());
+            if (arg == null)
+            {
+                return null;
+            }
+
+            return Format(Resources.MoreInfoOnErrorFormat, executableName, arg.ArgumentNameWithPrefix);
+        }
+
         #endregion
 
         #region Usage descriptions

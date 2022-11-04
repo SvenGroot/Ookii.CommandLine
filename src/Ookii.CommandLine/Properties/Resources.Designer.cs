@@ -403,6 +403,15 @@ namespace Ookii.CommandLine.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Run &apos;{0} {1}&apos; for usage help..
+        /// </summary>
+        internal static string MoreInfoOnErrorFormat {
+            get {
+                return ResourceManager.GetString("MoreInfoOnErrorFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The command line arguments type has more than one constructor with the CommandLineConstructorAttribute attribute..
         /// </summary>
         internal static string MultipleMarkedConstructors {

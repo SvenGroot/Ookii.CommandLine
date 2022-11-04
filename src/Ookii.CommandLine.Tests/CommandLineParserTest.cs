@@ -405,11 +405,35 @@ namespace Ookii.CommandLine.Tests
             Assert.AreEqual(0, output.ToString().Length);
             Assert.AreEqual(0, error.ToString().Length);
 
-            result = CommandLineParser.Parse<TestArguments>(new string[0], options);
+            result = CommandLineParser.Parse<TestArguments>(Array.Empty<string>(), options);
             Assert.IsNull(result);
             Assert.IsTrue(error.ToString().Length > 0);
             Assert.AreEqual(_expectedDefaultUsage, output.ToString());
 
+            output.GetStringBuilder().Clear();
+            error.GetStringBuilder().Clear();
+            result = CommandLineParser.Parse<TestArguments>(new[] { "-Help" }, options);
+            Assert.IsNull(result);
+            Assert.AreEqual(0, error.ToString().Length);
+            Assert.AreEqual(_expectedDefaultUsage, output.ToString());
+
+            options.ShowUsageOnError = UsageHelpRequest.SyntaxOnly;
+            output.GetStringBuilder().Clear();
+            error.GetStringBuilder().Clear();
+            result = CommandLineParser.Parse<TestArguments>(Array.Empty<string>(), options);
+            Assert.IsNull(result);
+            Assert.IsTrue(error.ToString().Length > 0);
+            Assert.AreEqual(_expectedUsageSyntaxOnly, output.ToString());
+
+            options.ShowUsageOnError = UsageHelpRequest.None;
+            output.GetStringBuilder().Clear();
+            error.GetStringBuilder().Clear();
+            result = CommandLineParser.Parse<TestArguments>(Array.Empty<string>(), options);
+            Assert.IsNull(result);
+            Assert.IsTrue(error.ToString().Length > 0);
+            Assert.AreEqual(_expectedUsageMessageOnly, output.ToString());
+
+            // Still get full help with -Help arg.
             output.GetStringBuilder().Clear();
             error.GetStringBuilder().Clear();
             result = CommandLineParser.Parse<TestArguments>(new[] { "-Help" }, options);

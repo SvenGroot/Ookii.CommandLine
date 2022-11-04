@@ -82,6 +82,7 @@ namespace ParserSample
         {
             var options = new ParseOptions()
             {
+                ShowUsageOnError = UsageHelpRequest.None,
                 // UsageOptions are used to print usage information if there was an error parsing
                 // the command line or parsing was cancelled (by the -Help property above).
                 // By default, aliases and default values are not included in the usage descriptions;

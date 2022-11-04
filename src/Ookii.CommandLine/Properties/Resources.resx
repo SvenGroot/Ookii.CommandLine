@@ -375,4 +375,7 @@
   <data name="CommandHelpInstructionFormat" xml:space="preserve">
     <value>Run '{0} &lt;command&gt; {1}{2}' for more information about a command.</value>
   </data>
+  <data name="MoreInfoOnErrorFormat" xml:space="preserve">
+    <value>Run '{0} {1}' for usage help.</value>
+  </data>
 </root>
