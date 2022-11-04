@@ -53,6 +53,25 @@ namespace Ookii.CommandLine.Commands
         public NameTransform CommandNameTransform { get; set; }
 
         /// <summary>
+        /// Gets or sets a function that filters which commands to include.
+        /// </summary>
+        /// <value>
+        /// A function that filters the commands, or <see langword="null"/> to use no filter. The
+        /// default value is <see langword="null"/>.
+        /// </value>
+        /// <remarks>
+        /// <para>
+        ///   Use this to only use a subset of the commands defined in the assembly or assemblies.
+        ///   The remaining commands will not be possible to invoke by the user.
+        /// </para>
+        /// <note>
+        ///   The filter is not invoked for the automatic version command. Set the <see cref="AutoVersionCommand"/>
+        ///   property to <see langword="false"/> if you wish to exclude that command.
+        /// </note>
+        /// </remarks>
+        public Func<CommandInfo, bool>? CommandFilter { get; set; }
+
+        /// <summary>
         /// Gets or sets a value that will be removed from the end of a command name during name
         /// transformation.
         /// </summary>

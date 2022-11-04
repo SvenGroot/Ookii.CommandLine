@@ -212,6 +212,21 @@ namespace Ookii.CommandLine.Tests
             Assert.AreEqual("Version", manager.GetCommand("Version")?.Name);
         }
 
+        [TestMethod]
+        public void TestCommandFilter()
+        {
+            var options = new CommandOptions()
+            {
+                CommandFilter = cmd => !cmd.UseCustomArgumentParsing,
+            };
+
+            var manager = new CommandManager(_commandAssembly, options);
+            Assert.IsNull(manager.GetCommand("custom"));
+            Assert.IsNotNull(manager.GetCommand("test"));
+            Assert.IsNotNull(manager.GetCommand("AnotherSimpleCommand"));
+            Assert.IsNotNull(manager.GetCommand("HiddenCommand"));
+        }
+
         #region Expected usage
 
         private const string _executableName = "test";

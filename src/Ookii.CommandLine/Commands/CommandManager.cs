@@ -514,7 +514,7 @@ namespace Ookii.CommandLine.Commands
 
             return from type in types
                    let info = CommandInfo.TryCreate(type, _options)
-                   where info != null
+                   where info != null && (_options.CommandFilter?.Invoke(info.Value) ?? true)
                    select info.Value;
         }
     }
