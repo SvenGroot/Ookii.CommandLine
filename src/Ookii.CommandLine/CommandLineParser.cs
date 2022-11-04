@@ -782,30 +782,6 @@ namespace Ookii.CommandLine
         }
 
         /// <summary>
-        /// Gets command line usage help using the default options and no line wrapping.
-        /// </summary>
-        /// <returns>
-        ///   A string containing usage help for the command line options defined by the type
-        ///   specified by <see cref="ArgumentsType"/>.
-        /// </returns>
-        /// <remarks>
-        ///   <para>
-        ///     The usage help consists of first the <see cref="Description"/>, followed by the usage syntax, followed by a description of all the arguments.
-        ///   </para>
-        ///   <para>
-        ///     You can add descriptions to the usage text by applying the <see cref="DescriptionAttribute"/> attribute to your command line arguments type,
-        ///     and the constructor parameters and properties defining command line arguments.
-        ///   </para>
-        ///   <para>
-        ///     This method indents additional lines for the usage syntax and argument descriptions.
-        ///   </para>
-        /// </remarks>
-        public string GetUsage()
-        {
-            return GetUsage(0, new WriteUsageOptions());
-        }
-
-        /// <summary>
         /// Gets command line usage help.
         /// </summary>
         /// <param name="maximumLineLength">
