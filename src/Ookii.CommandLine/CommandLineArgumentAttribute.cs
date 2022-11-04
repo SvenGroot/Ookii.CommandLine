@@ -110,7 +110,7 @@ namespace Ookii.CommandLine
         /// </note>
         /// </remarks>
         public bool IsLong { get; set; } = true;
-        
+
         /// <summary>
         /// Gets or sets a value that indicates whether the argument has a short name.
         /// </summary>

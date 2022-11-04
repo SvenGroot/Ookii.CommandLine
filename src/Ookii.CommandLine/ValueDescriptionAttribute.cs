@@ -32,7 +32,7 @@ namespace Ookii.CommandLine
         /// <param name="valueDescription">The custom value description.</param>
         public ValueDescriptionAttribute(string valueDescription)
         {
-            if( valueDescription == null )
+            if (valueDescription == null)
                 throw new ArgumentNullException(nameof(valueDescription));
             _valueDescription = valueDescription;
         }

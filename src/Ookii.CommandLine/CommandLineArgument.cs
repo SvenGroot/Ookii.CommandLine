@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Drawing;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
@@ -325,7 +324,7 @@ namespace Ookii.CommandLine
                 _argumentKind = ArgumentKind.Method;
             }
 
-            if ( _valueDescription == null )
+            if (_valueDescription == null)
                 _valueDescription = info.ValueDescription ?? GetFriendlyTypeName(_elementType);
 
             if (_converter == null)
@@ -627,7 +626,7 @@ namespace Ookii.CommandLine
         {
             get { return _valueDescription; }
         }
-        
+
         /// <summary>
         /// Gets a value indicating whether this argument is a switch argument.
         /// </summary>
@@ -694,7 +693,6 @@ namespace Ookii.CommandLine
         ///   implements the <see cref="ICollection{T}"/> generic interface, or when the <see cref="IsDictionary"/> property is <see langword="true"/>.
         /// </para>
         /// </remarks>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Multi")]
         public bool IsMultiValue => _argumentKind == ArgumentKind.MultiValue || _argumentKind == ArgumentKind.Dictionary;
 
         /// <summary>
@@ -708,7 +706,6 @@ namespace Ookii.CommandLine
         ///   This property is only meaningful if the <see cref="IsMultiValue"/> property is <see langword="true"/>.
         /// </para>
         /// </remarks>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Multi")]
         public string? MultiValueSeparator
         {
             get { return _multiValueSeparator; }
@@ -961,7 +958,7 @@ namespace Ookii.CommandLine
         /// </exception>
         public object? ConvertToArgumentType(CultureInfo culture, string? argumentValue)
         {
-            if( culture == null )
+            if (culture == null)
                 throw new ArgumentNullException(nameof(culture));
 
             if (argumentValue == null)
@@ -980,18 +977,18 @@ namespace Ookii.CommandLine
 
                 return converted;
             }
-            catch( NotSupportedException ex )
+            catch (NotSupportedException ex)
             {
                 throw _parser.StringProvider.CreateException(CommandLineArgumentErrorCategory.ArgumentValueConversion, ex, this, argumentValue);
             }
-            catch( FormatException ex )
+            catch (FormatException ex)
             {
                 throw _parser.StringProvider.CreateException(CommandLineArgumentErrorCategory.ArgumentValueConversion, ex, this, argumentValue);
             }
-            catch( Exception ex )
+            catch (Exception ex)
             {
                 // Yeah, I don't like catching Exception, but unfortunately BaseNumberConverter (e.g. used for int) can *throw* a System.Exception (not a derived class) so there's nothing I can do about it.
-                if( ex.InnerException is FormatException )
+                if (ex.InnerException is FormatException)
                     throw _parser.StringProvider.CreateException(CommandLineArgumentErrorCategory.ArgumentValueConversion, ex, this, argumentValue);
                 else
                     throw;
@@ -1129,9 +1126,9 @@ namespace Ookii.CommandLine
 
         internal static CommandLineArgument Create(CommandLineParser parser, ParameterInfo parameter)
         {
-            if( parser == null )
+            if (parser == null)
                 throw new ArgumentNullException(nameof(parser));
-            if( parameter?.Name == null )
+            if (parameter?.Name == null)
                 throw new ArgumentNullException(nameof(parameter));
 
             var typeConverterAttribute = parameter.GetCustomAttribute<TypeConverterAttribute>();
@@ -1171,9 +1168,9 @@ namespace Ookii.CommandLine
 
         internal static CommandLineArgument Create(CommandLineParser parser, PropertyInfo property)
         {
-            if( parser == null )
+            if (parser == null)
                 throw new ArgumentNullException(nameof(parser));
-            if( property == null )
+            if (property == null)
                 throw new ArgumentNullException(nameof(property));
 
             return Create(parser, property, null, property.PropertyType, DetermineAllowsNull(property));
@@ -1337,7 +1334,7 @@ namespace Ookii.CommandLine
                     _valueHelper.ApplyValue(target, _property);
                 }
             }
-            catch( TargetInvocationException ex )
+            catch (TargetInvocationException ex)
             {
                 throw _parser.StringProvider.CreateException(CommandLineArgumentErrorCategory.ApplyValueError, ex.InnerException, this);
             }
@@ -1380,7 +1377,7 @@ namespace Ookii.CommandLine
         private static string? GetMultiValueSeparator(MultiValueSeparatorAttribute? attribute)
         {
             var separator = attribute?.Separator;
-            if( string.IsNullOrEmpty(separator) )
+            if (string.IsNullOrEmpty(separator))
                 return null;
             else
                 return separator;
@@ -1389,10 +1386,10 @@ namespace Ookii.CommandLine
         private static string GetFriendlyTypeName(Type type)
         {
             // This is used to generate a value description from a type name if no custom value description was supplied.
-            if( type.IsGenericType )
+            if (type.IsGenericType)
             {
                 // We print Nullable<T> as just T.
-                if( type.GetGenericTypeDefinition() == typeof(Nullable<>) )
+                if (type.GetGenericTypeDefinition() == typeof(Nullable<>))
                     return GetFriendlyTypeName(type.GetGenericArguments()[0]);
                 else
                 {
@@ -1401,9 +1398,9 @@ namespace Ookii.CommandLine
                     name.Append('<');
                     // If only I was targetting .Net 4, I could use string.Join for this.
                     bool first = true;
-                    foreach( Type typeArgument in type.GetGenericArguments() )
+                    foreach (Type typeArgument in type.GetGenericArguments())
                     {
-                        if( first )
+                        if (first)
                             first = false;
                         else
                             name.Append(", ");
@@ -1420,7 +1417,7 @@ namespace Ookii.CommandLine
         private TypeConverter CreateConverter(Type? converterType)
         {
             var converter = converterType == null ? TypeDescriptor.GetConverter(_elementType) : (TypeConverter?)Activator.CreateInstance(converterType);
-            if( converter == null || !converter.CanConvertFrom(typeof(string)) )
+            if (converter == null || !converter.CanConvertFrom(typeof(string)))
                 throw new NotSupportedException(string.Format(System.Globalization.CultureInfo.CurrentCulture, Properties.Resources.NoTypeConverterForArgumentFormat, _argumentName, _elementType));
 
             return converter;

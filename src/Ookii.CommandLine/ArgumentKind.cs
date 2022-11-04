@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Ookii.CommandLine
+﻿namespace Ookii.CommandLine
 {
     /// <summary>
     /// Specifies what kind of argument am instance of the <see cref="CommandLineArgument"/> class

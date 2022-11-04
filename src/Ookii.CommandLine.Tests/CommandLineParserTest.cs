@@ -1,15 +1,9 @@
 ﻿// Copyright (c) Sven Groot (Ookii.org)
-using Ookii.CommandLine;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using System.Linq;
-using System.Collections.Generic;
-using System.Globalization;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Diagnostics;
-using System.Reflection;
+using System.Globalization;
 using System.Net;
+using System.Reflection;
 
 namespace Ookii.CommandLine.Tests
 {
@@ -127,7 +121,7 @@ namespace Ookii.CommandLine.Tests
             // Some position arguments using names, out of order (also uses : and - for one of them to mix things up)
             TestParse(target, "-other 2 val1 -arg5:5.5 true 4 -arg6 arg6", "val1", 2, true, arg4: 4, arg5: 5.5f, arg6: "arg6");
             // All arguments
-            TestParse(target, "val1 2 true -arg3 val3 -other2:4 5.5 -arg6 val6 -arg7 -arg8 Monday -arg8 Tuesday -arg9 9 -arg10 -arg10 -arg10:false -arg11:false -arg12 12 -arg12 13 -arg13 foo=13 -arg13 bar=14 -arg14 hello=1 -arg14 bye=2 -arg15 something=5", "val1", 2, true, "val3", 4, 5.5f, "val6", true, new[] { DayOfWeek.Monday, DayOfWeek.Tuesday }, 9, new[] { true, true, false }, false, new[] { 12, 13 }, new Dictionary<string,int>() { { "foo", 13 }, { "bar", 14 } }, new Dictionary<string,int>() { { "hello", 1 }, { "bye", 2 } }, new KeyValuePair<string,int>("something", 5));
+            TestParse(target, "val1 2 true -arg3 val3 -other2:4 5.5 -arg6 val6 -arg7 -arg8 Monday -arg8 Tuesday -arg9 9 -arg10 -arg10 -arg10:false -arg11:false -arg12 12 -arg12 13 -arg13 foo=13 -arg13 bar=14 -arg14 hello=1 -arg14 bye=2 -arg15 something=5", "val1", 2, true, "val3", 4, 5.5f, "val6", true, new[] { DayOfWeek.Monday, DayOfWeek.Tuesday }, 9, new[] { true, true, false }, false, new[] { 12, 13 }, new Dictionary<string, int>() { { "foo", 13 }, { "bar", 14 } }, new Dictionary<string, int>() { { "hello", 1 }, { "bye", 2 } }, new KeyValuePair<string, int>("something", 5));
             // Using aliases
             TestParse(target, "val1 2 -alias1 valalias6 -alias3", "val1", 2, arg6: "valalias6", arg7: true);
             // Long prefix cannot be used
@@ -175,7 +169,7 @@ namespace Ookii.CommandLine.Tests
             Type argumentsType = typeof(MultipleConstructorsArguments);
             CommandLineParser target = new CommandLineParser(argumentsType, new[] { "/", "-" });
 
-            CheckThrows(() => target.Parse(new[] { "invalid" }), 
+            CheckThrows(() => target.Parse(new[] { "invalid" }),
                 target,
                 CommandLineArgumentErrorCategory.CreateArgumentsTypeError,
                 null,
@@ -194,7 +188,7 @@ namespace Ookii.CommandLine.Tests
             Assert.AreEqual(3, args.DuplicateKeys["Foo"]);
             Assert.AreEqual(2, args.DuplicateKeys["Bar"]);
 
-            CheckThrows(() => target.Parse(new[] { "-NoDuplicateKeys", "Foo=1", "-NoDuplicateKeys", "Bar=2", "-NoDuplicateKeys", "Foo=3" }), 
+            CheckThrows(() => target.Parse(new[] { "-NoDuplicateKeys", "Foo=1", "-NoDuplicateKeys", "Bar=2", "-NoDuplicateKeys", "Foo=3" }),
                 target,
                 CommandLineArgumentErrorCategory.InvalidDictionaryValue,
                 "NoDuplicateKeys",
@@ -219,11 +213,11 @@ namespace Ookii.CommandLine.Tests
             Type argumentsType = typeof(SimpleArguments);
             CommandLineParser target = new CommandLineParser(argumentsType, new[] { "/", "-" });
             Assert.AreEqual(CommandLineParser.DefaultNameValueSeparator, target.NameValueSeparator);
-            SimpleArguments args =  (SimpleArguments)target.Parse(new[] { "-Argument1:test", "-Argument2:foo:bar" });
+            SimpleArguments args = (SimpleArguments)target.Parse(new[] { "-Argument1:test", "-Argument2:foo:bar" });
             Assert.IsNotNull(args);
             Assert.AreEqual("test", args.Argument1);
             Assert.AreEqual("foo:bar", args.Argument2);
-            CheckThrows(() => target.Parse(new[] { "-Argument1=test" }), 
+            CheckThrows(() => target.Parse(new[] { "-Argument1=test" }),
                 target,
                 CommandLineArgumentErrorCategory.UnknownArgument,
                 "Argument1=test");
@@ -956,16 +950,16 @@ namespace Ookii.CommandLine.Tests
             Assert.AreEqual(arg9, result.Arg9);
             CollectionAssert.AreEqual(arg10, result.Arg10);
             Assert.AreEqual(arg11, result.Arg11);
-            if( arg12 == null )
+            if (arg12 == null)
                 Assert.AreEqual(0, result.Arg12.Count);
             else
                 CollectionAssert.AreEqual(arg12, result.Arg12);
             CollectionAssert.AreEqual(arg13, result.Arg13);
-            if( arg14 == null )
+            if (arg14 == null)
                 Assert.AreEqual(0, result.Arg14.Count);
             else
                 CollectionAssert.AreEqual(arg14, (System.Collections.ICollection)result.Arg14);
-            if( arg15 == null )
+            if (arg15 == null)
                 Assert.AreEqual(default(KeyValuePair<string, int>), result.Arg15);
             else
                 Assert.AreEqual(arg15.Value, result.Arg15);

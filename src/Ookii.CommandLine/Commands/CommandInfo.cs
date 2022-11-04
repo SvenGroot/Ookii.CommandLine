@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Ookii.CommandLine.Commands
 {
@@ -202,14 +198,14 @@ namespace Ookii.CommandLine.Commands
 
         private static CommandAttribute GetCommandAttributeOrThrow(Type commandType)
         {
-            return GetCommandAttribute(commandType) ?? 
-                throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, 
+            return GetCommandAttribute(commandType) ??
+                throw new ArgumentException(string.Format(CultureInfo.CurrentCulture,
                     Properties.Resources.TypeIsNotCommandFormat, commandType.FullName));
         }
 
         private static string GetName(CommandAttribute attribute, Type commandType, CommandOptions? options)
         {
-            return attribute.CommandName ?? 
+            return attribute.CommandName ??
                 options?.CommandNameTransform.Apply(commandType.Name, options.StripCommandNameSuffix) ??
                 commandType.Name;
         }

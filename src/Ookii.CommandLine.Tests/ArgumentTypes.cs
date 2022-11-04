@@ -1,15 +1,8 @@
-﻿using Ookii.CommandLine;
-using Ookii.CommandLine.Properties;
-using Ookii.CommandLine.Validation;
-using System;
-using System.Collections.Generic;
+﻿using Ookii.CommandLine.Validation;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Globalization;
-using System.Linq;
 using System.Net;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Ookii.CommandLine.Tests
 {
@@ -203,7 +196,7 @@ namespace Ookii.CommandLine.Tests
     class LongShortArguments
     {
         public LongShortArguments([ArgumentName(Short = true), Description("Foo description.")] int foo = 0,
-            [Description("Bar description.")]int bar = 0)
+            [Description("Bar description.")] int bar = 0)
         {
             Foo = foo;
             Bar = bar;
@@ -300,12 +293,12 @@ namespace Ookii.CommandLine.Tests
         }
 
         [CommandLineArgument]
-        private static void NotPublic() 
-        { 
+        private static void NotPublic()
+        {
         }
 
         public static void NotAnArgument()
-        { 
+        {
         }
     }
 

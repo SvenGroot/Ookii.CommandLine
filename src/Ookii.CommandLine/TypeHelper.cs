@@ -1,8 +1,6 @@
 ﻿// Copyright (c) Sven Groot (Ookii.org)
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 
 namespace Ookii.CommandLine
 {
@@ -10,14 +8,14 @@ namespace Ookii.CommandLine
     {
         public static Type? FindGenericInterface(this Type type, Type interfaceType)
         {
-            if( type == null )
+            if (type == null)
                 throw new ArgumentNullException(nameof(type));
-            if( interfaceType == null )
+            if (interfaceType == null)
                 throw new ArgumentNullException(nameof(interfaceType));
-            if( !(interfaceType.IsInterface && interfaceType.IsGenericTypeDefinition) )
+            if (!(interfaceType.IsInterface && interfaceType.IsGenericTypeDefinition))
                 throw new ArgumentException(Properties.Resources.TypeNotGenericDefinition, nameof(interfaceType));
 
-            if( type.IsInterface && type.IsGenericType && type.GetGenericTypeDefinition() == interfaceType )
+            if (type.IsInterface && type.IsGenericType && type.GetGenericTypeDefinition() == interfaceType)
                 return type;
 
             return type.GetInterfaces().FirstOrDefault(i => i.IsGenericType && i.GetGenericTypeDefinition() == interfaceType);

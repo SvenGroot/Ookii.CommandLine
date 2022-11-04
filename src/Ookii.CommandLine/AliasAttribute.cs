@@ -1,8 +1,5 @@
 ﻿// Copyright (c) Sven Groot (Ookii.org)
 using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Text;
 
 namespace Ookii.CommandLine
 {
@@ -31,7 +28,7 @@ namespace Ookii.CommandLine
     ///   this is applied to does not have a long name, this attribute is ignored.
     /// </note>
     /// </remarks>
-    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Parameter, AllowMultiple=true)]
+    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Parameter, AllowMultiple = true)]
     public sealed class AliasAttribute : Attribute
     {
         private readonly string _alias;

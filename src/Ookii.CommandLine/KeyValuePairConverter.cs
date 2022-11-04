@@ -82,7 +82,7 @@ namespace Ookii.CommandLine
         /// </returns>
         public override bool CanConvertFrom(ITypeDescriptorContext? context, Type sourceType)
         {
-            if( sourceType == typeof(string) )
+            if (sourceType == typeof(string))
                 return true;
             else
                 return base.CanConvertFrom(context, sourceType);
@@ -98,7 +98,7 @@ namespace Ookii.CommandLine
         /// </returns>
         public override bool CanConvertTo(ITypeDescriptorContext? context, Type? destinationType)
         {
-            if( destinationType == typeof(string) )
+            if (destinationType == typeof(string))
                 return true;
             else
                 return base.CanConvertTo(context, destinationType);
@@ -119,10 +119,10 @@ namespace Ookii.CommandLine
         public override object? ConvertFrom(ITypeDescriptorContext? context, System.Globalization.CultureInfo? culture, object value)
         {
             var stringValue = value as string;
-            if( stringValue != null )
+            if (stringValue != null)
             {
                 int index = stringValue.IndexOf(_separator);
-                if( index < 0 )
+                if (index < 0)
                     throw new FormatException(_stringProvider.MissingKeyValuePairSeparator(_separator));
 
                 string key = stringValue.Substring(0, index);
@@ -156,13 +156,13 @@ namespace Ookii.CommandLine
         ///   </exception>
         public override object? ConvertTo(ITypeDescriptorContext? context, CultureInfo? culture, object? value, Type destinationType)
         {
-            if( destinationType == null )
+            if (destinationType == null)
                 throw new ArgumentNullException(nameof(destinationType));
             if (value == null)
                 throw new ArgumentNullException(nameof(value));
 
             KeyValuePair<TKey, TValue> pair = (KeyValuePair<TKey, TValue>)value;
-            if( destinationType == typeof(string) )
+            if (destinationType == typeof(string))
                 return _keyConverter.ConvertToString(context, culture, pair.Key) + "=" + _valueConverter.ConvertToString(context, culture, pair.Value);
 
             return base.ConvertTo(context, culture, value, destinationType);
@@ -171,9 +171,9 @@ namespace Ookii.CommandLine
         private static TypeConverter GetConverter(Type? converterType, Type type)
         {
             TypeConverter converter = converterType == null ? TypeDescriptor.GetConverter(type) : (TypeConverter)Activator.CreateInstance(converterType)!;
-            if( converter == null || !(converter.CanConvertFrom(typeof(string)) && converter.CanConvertTo(typeof(string))) )
+            if (converter == null || !(converter.CanConvertFrom(typeof(string)) && converter.CanConvertTo(typeof(string))))
                 throw new NotSupportedException(string.Format(CultureInfo.InvariantCulture, Properties.Resources.NoTypeConverterFormat, type));
             return converter;
-        }    
+        }
     }
 }

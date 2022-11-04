@@ -3,11 +3,7 @@ using Ookii.CommandLine.Validation;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Ookii.CommandLine
 {
@@ -135,7 +131,7 @@ namespace Ookii.CommandLine
         /// </summary>
         /// <returns>The error message.</returns>
         public virtual string ClassValidationFailed() => Resources.ClassValidationFailed;
-        
+
         /// <summary>
         /// Gets an error message used if the <see cref="ValidateRangeAttribute"/> fails validation.
         /// </summary>
@@ -240,7 +236,7 @@ namespace Ookii.CommandLine
         /// <param name="arguments">The names of the arguments.</param>
         /// <returns>The error message.</returns>
         public virtual string ValidateRequiresAnyFailed(IEnumerable<CommandLineArgument> arguments)
-            => Format(Resources.ValidateRequiresAnyFailedFormat, 
+            => Format(Resources.ValidateRequiresAnyFailedFormat,
                    string.Join(ArgumentSeparator, arguments.Select(a => a.ArgumentNameWithPrefix)));
 
         internal CommandLineArgumentException CreateException(CommandLineArgumentErrorCategory category, Exception? inner, CommandLineArgument argument, string? value = null)

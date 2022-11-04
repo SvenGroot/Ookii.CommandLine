@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Ookii.CommandLine
+﻿namespace Ookii.CommandLine
 {
     /// <summary>
     /// Indicates which arguments should be included in the description list when printing usage.

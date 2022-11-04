@@ -72,7 +72,7 @@ namespace Ookii.CommandLine
             public SegmentType Type { get; set; }
             public int Indent { get; set; }
 
-            public int ContentLength => 
+            public int ContentLength =>
                 Type switch
                 {
                     SegmentType.Formatting or SegmentType.PartialFormatting => 0,
@@ -108,12 +108,12 @@ namespace Ookii.CommandLine
 
             public StringBuffer(char[] value)
                 : this(new ArraySegment<char>(value))
-            { 
+            {
             }
 
             public StringBuffer(char[] value, int offset, int length)
                 : this(new ArraySegment<char>(value, offset, length))
-            { 
+            {
             }
 
             public StringBuffer(ArraySegment<char> value)
@@ -514,7 +514,7 @@ namespace Ookii.CommandLine
         }
 
         /// <inheritdoc/>
-        public override Encoding Encoding 
+        public override Encoding Encoding
         {
             get { return _baseWriter.Encoding; }
         }
@@ -524,7 +524,7 @@ namespace Ookii.CommandLine
         [AllowNull]
 #endif
         public override string NewLine
-        { 
+        {
             get => _baseWriter.NewLine;
             set
             {
@@ -563,9 +563,9 @@ namespace Ookii.CommandLine
         public int Indent
         {
             get { return _indent; }
-            set 
+            set
             {
-                if( value < 0 || (_maximumLineLength > 0 && value >= _maximumLineLength) )
+                if (value < 0 || (_maximumLineLength > 0 && value >= _maximumLineLength))
                     throw new ArgumentOutOfRangeException(nameof(value), Properties.Resources.IndentOutOfRange);
                 _indent = value;
             }
@@ -612,7 +612,7 @@ namespace Ookii.CommandLine
         /// <inheritdoc/>
         public override void Write(char value)
         {
-            if( _maximumLineLength > 0 )
+            if (_maximumLineLength > 0)
             {
                 // This is not exactly optimal but it will do.
                 Write(new[] { value }, 0, 1);
@@ -624,7 +624,7 @@ namespace Ookii.CommandLine
         /// <inheritdoc/>
         public override void Write(string? value)
         {
-            if( value != null )
+            if (value != null)
             {
                 WriteCore(new StringBuffer(value));
             }
@@ -633,13 +633,13 @@ namespace Ookii.CommandLine
         /// <inheritdoc/>
         public override void Write(char[] buffer, int index, int count)
         {
-            if( buffer == null )
+            if (buffer == null)
                 throw new ArgumentNullException(nameof(buffer));
-            if( index < 0 )
+            if (index < 0)
                 throw new ArgumentOutOfRangeException(nameof(index), Properties.Resources.ValueMustBeNonNegative);
-            if( count < 0 )
+            if (count < 0)
                 throw new ArgumentOutOfRangeException(nameof(count), Properties.Resources.ValueMustBeNonNegative);
-            if( (buffer.Length - index) < count )
+            if ((buffer.Length - index) < count)
                 throw new ArgumentException(Properties.Resources.IndexCountOutOfRange);
 
             // The array must be cloned because we'll store references to segments of it, which
@@ -693,7 +693,7 @@ namespace Ookii.CommandLine
         {
             Flush();
             base.Dispose(disposing);
-            if( disposing && _disposeBaseWriter )
+            if (disposing && _disposeBaseWriter)
             {
                 _baseWriter.Dispose();
             }
@@ -775,7 +775,7 @@ namespace Ookii.CommandLine
             {
                 return Console.WindowWidth - 1;
             }
-            catch( IOException )
+            catch (IOException)
             {
                 return 0;
             }

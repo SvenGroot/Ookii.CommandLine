@@ -2,7 +2,6 @@
 using Ookii.CommandLine.Terminal;
 using System;
 using System.Collections.Generic;
-using System.IO;
 
 namespace Ookii.CommandLine.Commands
 {

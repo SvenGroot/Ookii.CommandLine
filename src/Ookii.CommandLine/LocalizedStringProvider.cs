@@ -1,12 +1,5 @@
 ﻿using Ookii.CommandLine.Properties;
-using Ookii.CommandLine.Validation;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Ookii.CommandLine
 {
@@ -81,8 +74,5 @@ namespace Ookii.CommandLine
 
         private static string Format(string format, object? arg0, object? arg1, object? arg2)
             => string.Format(CultureInfo.CurrentCulture, format, arg0, arg1, arg2);
-
-        private static string Format(string format, params object?[] args)
-            => string.Format(CultureInfo.CurrentCulture, format, args);
     }
 }

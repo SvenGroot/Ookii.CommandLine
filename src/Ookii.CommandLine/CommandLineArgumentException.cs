@@ -1,7 +1,5 @@
 ﻿// Copyright (c) Sven Groot (Ookii.org)
 using System;
-using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
 using System.Security.Permissions;
 
 namespace Ookii.CommandLine
@@ -43,8 +41,8 @@ namespace Ookii.CommandLine
         /// </summary>
         /// <param name="message">The message that describes the error.</param>
         /// <param name="category">The category of this error.</param>
-        public CommandLineArgumentException(string? message, CommandLineArgumentErrorCategory category) 
-            : base(message) 
+        public CommandLineArgumentException(string? message, CommandLineArgumentErrorCategory category)
+            : base(message)
         {
             _category = category;
         }
@@ -101,7 +99,7 @@ namespace Ookii.CommandLine
         /// <param name="info">The <see cref="System.Runtime.Serialization.SerializationInfo"/> that holds the serialized object data about the <see cref="CommandLineArgumentException"/> being thrown.</param>
         /// <param name="context">The <see cref="System.Runtime.Serialization.StreamingContext"/> that contains contextual information about the source or destination.</param>
         protected CommandLineArgumentException(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context)
-            : base(info, context) 
+            : base(info, context)
         {
             _argumentName = info.GetString("ArgumentName");
             _category = (CommandLineArgumentErrorCategory?)info.GetValue("Category", typeof(CommandLineArgumentErrorCategory)) ?? CommandLineArgumentErrorCategory.Unspecified;
@@ -136,11 +134,11 @@ namespace Ookii.CommandLine
         /// <param name="context">The contextual information about the source or destination.</param>
         /// <exception cref="ArgumentNullException"><paramref name="info"/> is <see langword="null"/>.</exception>
 #if !NET6_0_OR_GREATER
-        [SecurityPermission(SecurityAction.LinkDemand, Flags=SecurityPermissionFlag.SerializationFormatter)]
+        [SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.SerializationFormatter)]
 #endif
         public override void GetObjectData(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context)
         {
-            if( info == null )
+            if (info == null)
                 throw new ArgumentNullException(nameof(info));
             base.GetObjectData(info, context);
 

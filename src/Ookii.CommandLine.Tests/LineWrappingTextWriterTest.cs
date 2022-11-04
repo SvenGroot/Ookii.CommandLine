@@ -1,9 +1,5 @@
 ﻿// Copyright (c) Sven Groot (Ookii.org)
-using Ookii.CommandLine;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using System.IO;
-using System.Globalization;
 
 namespace Ookii.CommandLine.Tests
 {
@@ -154,8 +150,8 @@ namespace Ookii.CommandLine.Tests
         {
             int maximumLineLength = 85;
             bool disposeBaseWriter = true;
-            using( TextWriter baseWriter = new StringWriter() )
-            using( LineWrappingTextWriter target = new LineWrappingTextWriter(baseWriter, maximumLineLength, disposeBaseWriter) )
+            using (TextWriter baseWriter = new StringWriter())
+            using (LineWrappingTextWriter target = new LineWrappingTextWriter(baseWriter, maximumLineLength, disposeBaseWriter))
             {
                 Assert.AreEqual(baseWriter, target.BaseWriter);
                 Assert.AreEqual(maximumLineLength, target.MaximumLineLength);
@@ -176,9 +172,9 @@ namespace Ookii.CommandLine.Tests
         [TestMethod()]
         public void TestDisposeBaseWriterTrue()
         {
-            using( TextWriter baseWriter = new StringWriter() )
+            using (TextWriter baseWriter = new StringWriter())
             {
-                using( LineWrappingTextWriter target = new LineWrappingTextWriter(baseWriter, 80, true) )
+                using (LineWrappingTextWriter target = new LineWrappingTextWriter(baseWriter, 80, true))
                 {
                     target.Write("test");
                 }
@@ -188,7 +184,7 @@ namespace Ookii.CommandLine.Tests
                     baseWriter.Write("foo");
                     Assert.Fail("base writer not disposed");
                 }
-                catch( ObjectDisposedException )
+                catch (ObjectDisposedException)
                 {
                 }
 
@@ -199,9 +195,9 @@ namespace Ookii.CommandLine.Tests
         [TestMethod]
         public void TestDisposeBaseWriterFalse()
         {
-            using( TextWriter baseWriter = new StringWriter() )
+            using (TextWriter baseWriter = new StringWriter())
             {
-                using( LineWrappingTextWriter target = new LineWrappingTextWriter(baseWriter, 80, false) )
+                using (LineWrappingTextWriter target = new LineWrappingTextWriter(baseWriter, 80, false))
                 {
                     target.Write("test");
                 }
@@ -217,7 +213,7 @@ namespace Ookii.CommandLine.Tests
         [ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void TestIndentTooSmall()
         {
-            using( LineWrappingTextWriter target = LineWrappingTextWriter.ForStringWriter(80) )
+            using (LineWrappingTextWriter target = LineWrappingTextWriter.ForStringWriter(80))
             {
                 target.Indent = -1;
             }
@@ -227,7 +223,7 @@ namespace Ookii.CommandLine.Tests
         [ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void TestIndentTooLarge()
         {
-            using( LineWrappingTextWriter target = LineWrappingTextWriter.ForStringWriter(80) )
+            using (LineWrappingTextWriter target = LineWrappingTextWriter.ForStringWriter(80))
             {
                 target.Indent = target.MaximumLineLength;
             }

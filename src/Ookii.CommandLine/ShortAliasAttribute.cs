@@ -1,7 +1,5 @@
 ﻿// Copyright (c) Sven Groot (Ookii.org)
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Ookii.CommandLine
 {
@@ -31,7 +29,7 @@ namespace Ookii.CommandLine
     ///   property to <see langword="true"/>.
     /// </para>
     /// </remarks>
-    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Parameter, AllowMultiple=true)]
+    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Parameter, AllowMultiple = true)]
     public sealed class ShortAliasAttribute : Attribute
     {
         private readonly char _alias;

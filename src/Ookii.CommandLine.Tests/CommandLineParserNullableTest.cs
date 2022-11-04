@@ -1,13 +1,8 @@
 ﻿// Copyright (c) Sven Groot (Ookii.org)
 #nullable enable
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Ookii.CommandLine.Tests
 {

@@ -2,11 +2,8 @@
 using Ookii.CommandLine.Validation;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Ookii.CommandLine
 {
@@ -365,7 +362,7 @@ namespace Ookii.CommandLine
                 ? OptionalValueDescription(argument.ValueDescription, useColor)
                 : ValueDescription(argument.ValueDescription, useColor);
 
-            string defaultValue = options.IncludeDefaultValueInDescription && argument.DefaultValue != null 
+            string defaultValue = options.IncludeDefaultValueInDescription && argument.DefaultValue != null
                 ? DefaultValue(argument.DefaultValue, useColor)
                 : string.Empty;
 
@@ -491,7 +488,7 @@ namespace Ookii.CommandLine
         /// <returns>The string.</returns>
         public virtual string ProhibitsUsageHelp(IEnumerable<CommandLineArgument> arguments)
             => Format(Resources.ValidateProhibitsUsageHelpFormat,
-                   string.Join(ArgumentSeparator,arguments.Select(a => a.ArgumentNameWithPrefix)));
+                   string.Join(ArgumentSeparator, arguments.Select(a => a.ArgumentNameWithPrefix)));
 
         /// <summary>
         /// Gets the usage help for the <see cref="RequiresAttribute"/> class.
@@ -514,7 +511,7 @@ namespace Ookii.CommandLine
                 string.Join(ArgumentSeparator, arguments.Select(a => a.ArgumentNameWithPrefix)));
         }
 
-            #endregion
+        #endregion
 
         private int AppendAliases<T>(StringBuilder builder, string prefix, IEnumerable<T>? aliases, bool useColor, int count)
         {

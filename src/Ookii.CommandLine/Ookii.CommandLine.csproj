@@ -27,6 +27,7 @@
 
   <PropertyGroup>
     <DocumentationFile>Ookii.CommandLine.xml</DocumentationFile>
+    <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
   </PropertyGroup>
 
   <ItemGroup>

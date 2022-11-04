@@ -1,6 +1,5 @@
 ﻿// Copyright (c) Sven Groot (Ookii.org)
 using Ookii.CommandLine.Commands;
-using Ookii.CommandLine.Terminal;
 using Ookii.CommandLine.Validation;
 using System;
 using System.Collections.Generic;
@@ -12,8 +11,6 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading;
 
 namespace Ookii.CommandLine
 {
@@ -144,35 +141,35 @@ namespace Ookii.CommandLine
 
             public int Compare(CommandLineArgument? x, CommandLineArgument? y)
             {
-                if( x == null )
+                if (x == null)
                 {
-                    if( y == null )
+                    if (y == null)
                         return 0;
                     else
                         return -1;
                 }
-                else if( y == null )
+                else if (y == null)
                     return 1;
 
                 // Positional arguments come before non-positional ones, and must be sorted by position
-                if( x.Position != null )
+                if (x.Position != null)
                 {
-                    if( y.Position != null )
+                    if (y.Position != null)
                         return x.Position.Value.CompareTo(y.Position.Value);
                     else
                         return -1;
                 }
-                else if( y.Position != null )
+                else if (y.Position != null)
                     return 1;
 
                 // Non-positional required arguments come before optional arguments
-                if( x.IsRequired )
+                if (x.IsRequired)
                 {
-                    if( !y.IsRequired )
+                    if (!y.IsRequired)
                         return -1;
                     // If both are required, sort by name
                 }
-                else if( y.IsRequired )
+                else if (y.IsRequired)
                     return 1;
 
                 // Sort the rest by name
@@ -192,7 +189,7 @@ namespace Ookii.CommandLine
         internal const int MinimumLineWidthForIndent = 30;
 
         private readonly Type _argumentsType;
-        private readonly List<CommandLineArgument> _arguments = new ();
+        private readonly List<CommandLineArgument> _arguments = new();
         private readonly SortedDictionary<string, CommandLineArgument> _argumentsByName;
         // Uses string, even though short names are single char, so it can use the same comparer
         // as _argumentsByName.
@@ -315,7 +312,7 @@ namespace Ookii.CommandLine
             var prefixInfos = _argumentNamePrefixes.Select(p => new PrefixInfo { Prefix = p, Short = true });
             if (_mode == ParsingMode.LongShort)
             {
-                _longArgumentNamePrefix = options?.LongArgumentNamePrefix ?? optionsAttribute?.LongArgumentNamePrefix ?? 
+                _longArgumentNamePrefix = options?.LongArgumentNamePrefix ?? optionsAttribute?.LongArgumentNamePrefix ??
                     DefaultLongArgumentNamePrefix;
 
                 if (string.IsNullOrWhiteSpace(_longArgumentNamePrefix))
@@ -394,7 +391,7 @@ namespace Ookii.CommandLine
         ///   to get the prefix for long argument names.
         /// </para>
         /// </remarks>
-        public ReadOnlyCollection<string> ArgumentNamePrefixes => 
+        public ReadOnlyCollection<string> ArgumentNamePrefixes =>
             _argumentNamePrefixesReadOnlyWrapper ??= new(_argumentNamePrefixes);
 
         /// <summary>
@@ -481,7 +478,7 @@ namespace Ookii.CommandLine
         /// is <see cref="CultureInfo.InvariantCulture"/>.
         /// </value>
         public CultureInfo Culture { get; set; } = CultureInfo.InvariantCulture;
-        
+
 
         /// <summary>
         /// Gets or sets a value indicating whether duplicate arguments are allowed.
@@ -699,7 +696,7 @@ namespace Ookii.CommandLine
 
             WriteUsage(Console.Out, Console.WindowWidth - 1, options);
         }
-        
+
         /// <summary>
         /// Writes command line usage help to the specified <see cref="TextWriter"/> using the specified options.
         /// </summary>
@@ -738,14 +735,14 @@ namespace Ookii.CommandLine
         /// </remarks>
         public void WriteUsage(TextWriter writer, int maximumLineLength, WriteUsageOptions? options = null)
         {
-            if( writer == null )
+            if (writer == null)
                 throw new ArgumentNullException(nameof(writer));
 
             options ??= new();
             using var lineWriter = DisposableWrapper.Create(writer as LineWrappingTextWriter,
                 () => new LineWrappingTextWriter(writer, maximumLineLength, false));
 
-            if( options.IncludeApplicationDescription && !string.IsNullOrEmpty(Description) )
+            if (options.IncludeApplicationDescription && !string.IsNullOrEmpty(Description))
             {
                 lineWriter.Inner.WriteLine(Description);
                 lineWriter.Inner.WriteLine();
@@ -1136,7 +1133,7 @@ namespace Ookii.CommandLine
                 ? new[] { "-", "/" }
                 : new[] { "-" };
         }
-        
+
         /// <summary>
         /// Raises the <see cref="ArgumentParsed"/> event.
         /// </summary>
@@ -1190,7 +1187,7 @@ namespace Ookii.CommandLine
 
         private static string[] DetermineArgumentNamePrefixes(IEnumerable<string>? namedArgumentPrefixes)
         {
-            if( namedArgumentPrefixes == null )
+            if (namedArgumentPrefixes == null)
                 return GetDefaultArgumentNamePrefixes();
             else
             {
@@ -1208,7 +1205,7 @@ namespace Ookii.CommandLine
         private void DetermineConstructorArguments()
         {
             ParameterInfo[] parameters = _commandLineConstructor.GetParameters();
-            foreach( ParameterInfo parameter in parameters )
+            foreach (ParameterInfo parameter in parameters)
             {
                 CommandLineArgument argument = CommandLineArgument.Create(this, parameter);
                 AddNamedArgument(argument);
@@ -1233,7 +1230,7 @@ namespace Ookii.CommandLine
                     };
 
                     AddNamedArgument(argument);
-                    if( argument.Position != null )
+                    if (argument.Position != null)
                     {
                         ++additionalPositionalArgumentCount;
                     }
@@ -1295,19 +1292,19 @@ namespace Ookii.CommandLine
             bool hasOptionalArgument = false;
             bool hasArrayArgument = false;
 
-            for( int x = 0; x < _positionalArgumentCount; ++x )
+            for (int x = 0; x < _positionalArgumentCount; ++x)
             {
                 CommandLineArgument argument = _arguments[x];
 
-                if( hasArrayArgument )
+                if (hasArrayArgument)
                     throw new NotSupportedException(Properties.Resources.ArrayNotLastArgument);
-                if( argument.IsRequired && hasOptionalArgument )
+                if (argument.IsRequired && hasOptionalArgument)
                     throw new NotSupportedException(Properties.Resources.InvalidOptionalArgumentOrder);
 
-                if( !argument.IsRequired )
+                if (!argument.IsRequired)
                     hasOptionalArgument = true;
 
-                if( argument.IsMultiValue )
+                if (argument.IsMultiValue)
                     hasArrayArgument = true;
 
                 argument.Position = x;
@@ -1417,7 +1414,7 @@ namespace Ookii.CommandLine
             // Extract the argument name
             // We don't use Split because if there's more than one separator we want to ignore the others.
             int separatorIndex = arg.IndexOf(NameValueSeparator);
-            if( separatorIndex >= 0 )
+            if (separatorIndex >= 0)
             {
                 argumentName = arg.Substring(prefix.Prefix.Length, separatorIndex - prefix.Prefix.Length);
                 argumentValue = arg.Substring(separatorIndex + 1);
@@ -1480,18 +1477,18 @@ namespace Ookii.CommandLine
         private PrefixInfo? CheckArgumentNamePrefix(string argument)
         {
             // Even if '-' is the argument name prefix, we consider an argument starting with dash followed by a digit as a value, because it could be a negative number.
-            if( argument.Length >= 2 && argument[0] == '-' && char.IsDigit(argument, 1) )
+            if (argument.Length >= 2 && argument[0] == '-' && char.IsDigit(argument, 1))
                 return null;
 
-            foreach( var prefix in _sortedPrefixes )
+            foreach (var prefix in _sortedPrefixes)
             {
-                if( argument.StartsWith(prefix.Prefix, StringComparison.Ordinal) )
+                if (argument.StartsWith(prefix.Prefix, StringComparison.Ordinal))
                     return prefix;
             }
 
             return null;
         }
-        
+
         private ConstructorInfo GetCommandLineConstructor()
         {
             ConstructorInfo[] ctors = _argumentsType.GetConstructors();
@@ -1577,7 +1574,7 @@ namespace Ookii.CommandLine
 
             writer.Write(prefix);
 
-            foreach( CommandLineArgument argument in _arguments )
+            foreach (CommandLineArgument argument in _arguments)
             {
                 if (argument.IsHidden)
                     continue;
@@ -1623,7 +1620,7 @@ namespace Ookii.CommandLine
             {
                 return _commandLineConstructor.Invoke(constructorArgumentValues);
             }
-            catch( TargetInvocationException ex )
+            catch (TargetInvocationException ex)
             {
                 throw StringProvider.CreateException(CommandLineArgumentErrorCategory.CreateArgumentsTypeError, ex.InnerException);
             }

@@ -1,10 +1,10 @@
-﻿using System;
+﻿using Ookii.CommandLine;
+using Ookii.CommandLine.Commands;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Text;
-using Ookii.CommandLine;
-using Ookii.CommandLine.Commands;
 
 namespace SubCommandSample
 {
@@ -45,7 +45,7 @@ namespace SubCommandSample
             try
             {
                 // Check if we're allowed to overwrite the file.
-                if( !Overwrite && File.Exists(FileName) )
+                if (!Overwrite && File.Exists(FileName))
                 {
                     // The Main method will return the exit status to the operating system. The numbers are made up for the sample, they don't mean anything.
                     // Usually, 0 means success, and any other value indicates an error.
@@ -67,17 +67,17 @@ namespace SubCommandSample
 
                 return 0;
             }
-            catch( ArgumentException ex ) // Happens if the encoding name is invalid
+            catch (ArgumentException ex) // Happens if the encoding name is invalid
             {
                 Program.WriteErrorMessage(ex.Message);
                 return 2;
             }
-            catch( IOException ex )
+            catch (IOException ex)
             {
                 Program.WriteErrorMessage(ex.Message);
                 return 2;
             }
-            catch ( UnauthorizedAccessException ex )
+            catch (UnauthorizedAccessException ex)
             {
                 Program.WriteErrorMessage(ex.Message);
                 return 2;
@@ -87,7 +87,7 @@ namespace SubCommandSample
         private IEnumerable<string> GetLines()
         {
             // Some magic to choose between the specified lines or standard input.
-            if( Lines == null || Lines.Length == 0 )
+            if (Lines == null || Lines.Length == 0)
                 return EnumerateStandardInput();
             else
                 return Lines;
@@ -97,7 +97,7 @@ namespace SubCommandSample
         {
             // Read from standard input. You can pipe a file to the input, or use it interactively (in that case, press CTRL-Z to send an EOF character and stop writing).
             string line;
-            while( (line = Console.ReadLine()) != null )
+            while ((line = Console.ReadLine()) != null)
             {
                 yield return line;
             }

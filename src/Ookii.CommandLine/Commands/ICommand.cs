@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Ookii.CommandLine.Commands
+﻿namespace Ookii.CommandLine.Commands
 {
     /// <summary>
     /// Represents a subcommand of the application.

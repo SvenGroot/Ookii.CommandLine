@@ -1,7 +1,6 @@
 ﻿// Copyright (c) Sven Groot (Ookii.org)
 using Ookii.CommandLine.Commands;
 using Ookii.CommandLine.Terminal;
-using System;
 
 namespace Ookii.CommandLine
 {

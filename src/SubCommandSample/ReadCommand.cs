@@ -1,9 +1,9 @@
-﻿using System;
+﻿using Ookii.CommandLine;
+using Ookii.CommandLine.Commands;
+using System;
 using System.ComponentModel;
 using System.IO;
 using System.Text;
-using Ookii.CommandLine;
-using Ookii.CommandLine.Commands;
 
 namespace SubCommandSample
 {
@@ -23,7 +23,7 @@ namespace SubCommandSample
         // A named argument to specify the encoding.
         // Because Encoding doesn't have a TypeConverter, we simple accept the name of the encoding as a string and
         // instantiate the Encoding class ourselves in the run method.
-        [CommandLineArgument("Encoding", DefaultValue="utf-8"), Description("The encoding to use to read the file.")]
+        [CommandLineArgument("Encoding", DefaultValue = "utf-8"), Description("The encoding to use to read the file.")]
         public string EncodingName { get; set; }
 
         public int Run()
@@ -45,17 +45,17 @@ namespace SubCommandSample
                 // Usually, 0 means success, and any other value indicates an error.
                 return 0;
             }
-            catch( ArgumentException ex ) // Happens if the encoding name is invalid
+            catch (ArgumentException ex) // Happens if the encoding name is invalid
             {
                 Program.WriteErrorMessage(ex.Message);
                 return 2;
             }
-            catch( IOException ex )
+            catch (IOException ex)
             {
                 Program.WriteErrorMessage(ex.Message);
                 return 2;
             }
-            catch( UnauthorizedAccessException ex )
+            catch (UnauthorizedAccessException ex)
             {
                 Program.WriteErrorMessage(ex.Message);
                 return 2;

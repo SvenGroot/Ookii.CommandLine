@@ -1,7 +1,6 @@
-﻿using System;
+﻿using Ookii.CommandLine;
+using System;
 using System.ComponentModel;
-using System.Globalization;
-using Ookii.CommandLine;
 
 namespace ParserSample
 {

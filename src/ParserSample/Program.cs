@@ -1,6 +1,4 @@
-﻿using System;
-using System.Reflection;
-using Ookii.CommandLine;
+﻿using Ookii.CommandLine;
 
 namespace ParserSample
 {
@@ -10,7 +8,7 @@ namespace ParserSample
         {
             var arguments = ProgramArguments.Create();
             // No need to do anything when the value is null; Create already printed errors and usage to the console
-            if( arguments == null )
+            if (arguments == null)
             {
                 return;
             }

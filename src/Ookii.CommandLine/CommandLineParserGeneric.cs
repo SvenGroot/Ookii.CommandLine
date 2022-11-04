@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Ookii.CommandLine
+﻿namespace Ookii.CommandLine
 {
     /// <summary>
     /// A convenience wrapper around <see cref="CommandLineParser"/> that lets you specify the
@@ -41,7 +35,7 @@ namespace Ookii.CommandLine
         /// </remarks>
         public CommandLineParser(ParseOptions? options = null)
             : base(typeof(T), options)
-        { 
+        {
         }
 
         /// <inheritdoc cref="CommandLineParser.Parse()"/>

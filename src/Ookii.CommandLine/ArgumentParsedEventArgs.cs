@@ -26,7 +26,7 @@ namespace Ookii.CommandLine
         /// <exception cref="ArgumentNullException"><paramref name="argument"/> is <see langword="null"/>.</exception>
         public ArgumentParsedEventArgs(CommandLineArgument argument)
         {
-            if( argument == null )
+            if (argument == null)
                 throw new ArgumentNullException(nameof(argument));
 
             _argument = argument;

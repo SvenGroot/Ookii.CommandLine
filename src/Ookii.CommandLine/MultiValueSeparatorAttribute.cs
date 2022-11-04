@@ -1,7 +1,5 @@
 ﻿// Copyright (c) Sven Groot (Ookii.org)
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Ookii.CommandLine
 {
@@ -27,7 +25,6 @@ namespace Ookii.CommandLine
     ///   <c>-Sample Value1,Value2 -Sample Value3</c> will mean the argument "Sample" has three values.
     /// </para>
     /// </remarks>
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Multi"), System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1813:AvoidUnsealedAttributes", Justification = "It's allowed to derive from this attribute to allow custom determination of the separator.")]
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Parameter)]
     public class MultiValueSeparatorAttribute : Attribute
     {
