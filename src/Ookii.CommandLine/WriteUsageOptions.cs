@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Sven Groot (Ookii.org)
 using Ookii.CommandLine.Commands;
 using Ookii.CommandLine.Terminal;
+using System;
+using System.Collections.Generic;
 
 namespace Ookii.CommandLine
 {

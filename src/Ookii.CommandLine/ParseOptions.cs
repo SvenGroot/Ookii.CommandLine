@@ -385,6 +385,22 @@ namespace Ookii.CommandLine
         public UsageHelpRequest ShowUsageOnError { get; set; }
 
         /// <summary>
+        /// Gets or sets a dictionary containing default value descriptions for types.
+        /// </summary>
+        /// <value>
+        /// A dictionary containing default value descriptions for types, or <see langword="null"/>.
+        /// </value>
+        /// <remarks>
+        /// <para>
+        ///   If an argument doesn't have the <see cref="CommandLineArgumentAttribute.ValueDescription"/>
+        ///   property set or the <see cref="ValueDescriptionAttribute"/> attribute applied, the
+        ///   value description will be determined by first checking this dictionary. If the type
+        ///   of the argument isn't in the dictionary, the type name is used.
+        /// </para>
+        /// </remarks>
+        public IDictionary<Type, string>? DefaultValueDescriptions { get; set; }
+
+        /// <summary>
         /// Gets or sets the options to use to write usage information to <see cref="Out"/> when
         /// parsing the arguments fails or is canceled.
         /// </summary>

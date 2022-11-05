@@ -896,6 +896,24 @@ namespace Ookii.CommandLine.Tests
             Assert.AreEqual(_expectedUsageDependenciesDisabled, parser.GetUsage(0, options));
         }
 
+        [TestMethod]
+        public void TestDefaultValueDescriptions()
+        {
+            var options = new ParseOptions()
+            {
+                DefaultValueDescriptions = new Dictionary<Type, string>()
+                {
+                    { typeof(bool), "Switch" },
+                    { typeof(int), "Number" },
+                },
+            };
+
+            var parser = new CommandLineParser<TestArguments>(options);
+            Assert.AreEqual("Switch", parser.GetArgument("Arg7").ValueDescription);
+            Assert.AreEqual("Number", parser.GetArgument("Arg9").ValueDescription);
+            Assert.AreEqual("String=Number", parser.GetArgument("Arg13").ValueDescription);
+        }
+
         private record class ExpectedArgument
         {
             public ExpectedArgument(string name, Type type, ArgumentKind kind = ArgumentKind.SingleValue)

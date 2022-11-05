@@ -221,6 +221,10 @@ namespace Ookii.CommandLine
         ///   array's element type is used. If the type is a nullable type, the nullable type's underlying type is used.
         /// </para>
         /// <para>
+        ///   If you want to override the value description for all arguments of a specific type, 
+        ///   use the <see cref="ParseOptions.DefaultValueDescriptions"/> property.
+        /// </para>
+        /// <para>
         ///   The value description is used when printing usage. For example, the usage for an argument named Sample with
         ///   a value description of String would look like "-Sample &lt;String&gt;".
         /// </para>

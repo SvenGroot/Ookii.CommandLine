@@ -259,7 +259,7 @@ namespace Ookii.CommandLine
         private readonly IEnumerable<ArgumentValidationAttribute> _validators;
         private IValueHelper? _valueHelper;
 
-        private CommandLineArgument(ArgumentInfo info)
+        private CommandLineArgument(ArgumentInfo info, IDictionary<Type, string>? defaultValueDescriptions)
         {
             // If this method throws anything other than a NotSupportedException, it constitutes a bug in the Ookii.CommandLine library.
             _parser = info.Parser;
@@ -335,9 +335,15 @@ namespace Ookii.CommandLine
                         _converter = (TypeConverter)Activator.CreateInstance(converterType, _parser.StringProvider, _argumentName, _allowNull, info.KeyConverterType, info.ValueConverterType, _keyValueSeparator)!;
                     }
 
-                    _valueDescription = info.ValueDescription ??
-                        string.Format(CultureInfo.CurrentCulture, "{0}{1}{2}",
-                            GetFriendlyTypeName(genericArguments[0]), _keyValueSeparator, GetFriendlyTypeName(genericArguments[1]));
+                    var valueDescription = info.ValueDescription ?? GetDefaultValueDescription(elementType!, defaultValueDescriptions);
+                    if (valueDescription == null)
+                    {
+                        var key = DetermineValueDescription(genericArguments[0], defaultValueDescriptions);
+                        var value = DetermineValueDescription(genericArguments[1], defaultValueDescriptions);
+                        valueDescription = $"{key}{_keyValueSeparator}{value}";
+                    }
+
+                    _valueDescription = valueDescription;
                 }
                 else if (collectionType != null)
                 {
@@ -354,7 +360,7 @@ namespace Ookii.CommandLine
 
             if (_valueDescription == null)
             {
-                _valueDescription = info.ValueDescription ?? GetFriendlyTypeName(_elementType);
+                _valueDescription = info.ValueDescription ?? DetermineValueDescription(_elementType, defaultValueDescriptions);
             }
 
             if (_converter == null)
@@ -1187,7 +1193,7 @@ namespace Ookii.CommandLine
             return continueParsing;
         }
 
-        internal static CommandLineArgument Create(CommandLineParser parser, ParameterInfo parameter)
+        internal static CommandLineArgument Create(CommandLineParser parser, ParameterInfo parameter, IDictionary<Type, string>? defaultValueDescriptions)
         {
             if (parser == null)
             {
@@ -1231,10 +1237,10 @@ namespace Ookii.CommandLine
                 Validators = parameter.GetCustomAttributes<ArgumentValidationAttribute>(),
             };
 
-            return new CommandLineArgument(info);
+            return new CommandLineArgument(info, defaultValueDescriptions);
         }
 
-        internal static CommandLineArgument Create(CommandLineParser parser, PropertyInfo property)
+        internal static CommandLineArgument Create(CommandLineParser parser, PropertyInfo property, IDictionary<Type, string>? defaultValueDescriptions)
         {
             if (parser == null)
             {
@@ -1246,10 +1252,10 @@ namespace Ookii.CommandLine
                 throw new ArgumentNullException(nameof(property));
             }
 
-            return Create(parser, property, null, property.PropertyType, DetermineAllowsNull(property));
+            return Create(parser, property, null, property.PropertyType, DetermineAllowsNull(property), defaultValueDescriptions);
         }
 
-        internal static CommandLineArgument Create(CommandLineParser parser, MethodInfo method)
+        internal static CommandLineArgument Create(CommandLineParser parser, MethodInfo method, IDictionary<Type, string>? defaultValueDescriptions)
         {
             if (parser == null)
             {
@@ -1268,11 +1274,11 @@ namespace Ookii.CommandLine
             }
 
             var (methodInfo, argumentType, allowsNull) = infoTuple.Value;
-            return Create(parser, null, methodInfo, argumentType, allowsNull);
+            return Create(parser, null, methodInfo, argumentType, allowsNull, defaultValueDescriptions);
         }
 
         private static CommandLineArgument Create(CommandLineParser parser, PropertyInfo? property, MethodArgumentInfo? method,
-            Type argumentType, bool allowsNull)
+            Type argumentType, bool allowsNull, IDictionary<Type, string>? defaultValueDescriptions)
         {
             var member = ((MemberInfo?)property ?? method?.Method)!;
             var attribute = member.GetCustomAttribute<CommandLineArgumentAttribute>();
@@ -1315,10 +1321,10 @@ namespace Ookii.CommandLine
                 Validators = member.GetCustomAttributes<ArgumentValidationAttribute>(),
             };
 
-            return new CommandLineArgument(info);
+            return new CommandLineArgument(info, defaultValueDescriptions);
         }
 
-        internal static CommandLineArgument? CreateAutomaticHelp(CommandLineParser parser)
+        internal static CommandLineArgument? CreateAutomaticHelp(CommandLineParser parser, IDictionary<Type, string>? defaultValueDescriptions)
         {
             if (parser == null)
             {
@@ -1366,10 +1372,10 @@ namespace Ookii.CommandLine
                 info.Aliases = new[] { shortName.ToString(), shortAlias.ToString() };
             }
 
-            return new CommandLineArgument(info);
+            return new CommandLineArgument(info, defaultValueDescriptions);
         }
 
-        internal static CommandLineArgument? CreateAutomaticVersion(CommandLineParser parser)
+        internal static CommandLineArgument? CreateAutomaticVersion(CommandLineParser parser, IDictionary<Type, string>? defaultValueDescriptions)
         {
             if (parser == null)
             {
@@ -1399,7 +1405,7 @@ namespace Ookii.CommandLine
                 Validators = Enumerable.Empty<ArgumentValidationAttribute>(),
             };
 
-            return new CommandLineArgument(info);
+            return new CommandLineArgument(info, defaultValueDescriptions);
         }
 
         internal object? GetConstructorParameterValue()
@@ -1847,6 +1853,31 @@ namespace Ookii.CommandLine
                     validator.Validate(this, value);
                 }
             }
+        }
+
+        private static string? GetDefaultValueDescription(Type type, IDictionary<Type, string>? defaultValueDescriptions)
+        {
+            if (defaultValueDescriptions == null)
+            {
+                return null;
+            }
+
+            if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
+            {
+                type = type.GetGenericArguments()[0];
+            }
+
+            if (defaultValueDescriptions.TryGetValue(type, out string? value))
+            {
+                return value;
+            }
+
+            return null;
+        }
+
+        private static string DetermineValueDescription(Type type, IDictionary<Type, string>? defaultValueDescriptions)
+        {
+            return GetDefaultValueDescription(type, defaultValueDescriptions) ?? GetFriendlyTypeName(type);
         }
     }
 }
