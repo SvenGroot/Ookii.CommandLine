@@ -376,22 +376,11 @@ namespace Ookii.CommandLine.Tests
         public string[] Arg4 { get; set; }
     }
 
-    class IPAddressTypeConverter : TypeConverter
+    class IPAddressTypeConverter : TypeConverterBase<IPAddress>
     {
-        public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
+        protected override IPAddress Convert(ITypeDescriptorContext context, CultureInfo culture, string value)
         {
-            if (sourceType == typeof(string))
-                return true;
-
-            return base.CanConvertFrom(context, sourceType);
-        }
-
-        public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
-        {
-            if (value is string stringValue)
-                return IPAddress.Parse(stringValue);
-
-            return base.ConvertFrom(context, culture, value);
+            return IPAddress.Parse(value);
         }
     }
 
@@ -421,6 +410,6 @@ namespace Ookii.CommandLine.Tests
         [CommandLineArgument]
         [Description("The path.")]
         [Prohibits("Address")]
-        public string Path { get; set; }
+        public FileInfo Path { get; set; }
     }
 }

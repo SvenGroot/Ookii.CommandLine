@@ -78,6 +78,13 @@ namespace Ookii.CommandLine
             var converter = (TypeConverter?)converterType?.CreateInstance() ?? TypeDescriptor.GetConverter(type);
             if (converter == null || !(converter.CanConvertFrom(typeof(string)) && converter.CanConvertTo(typeof(string))))
             {
+                // If no explicit converter and the default one can't converter from string, see if
+                // there's a ctor we can use.
+                if (converterType == null && type.GetConstructor(new[] { typeof(string) }) != null)
+                {
+                    return new ConstructorTypeConverter(type);
+                }
+                
                 throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.NoTypeConverterFormat, type));
             }
 

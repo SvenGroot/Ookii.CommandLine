@@ -24,6 +24,7 @@ namespace ParserSample
             writer.WriteLine("Count: {0}", arguments.Count);
             writer.WriteLine("Verbose: {0}", arguments.Verbose);
             writer.WriteLine("Values: {0}", arguments.Values == null ? "(null)" : "{ " + string.Join(", ", arguments.Values) + " }");
+            writer.WriteLine($"Path: {arguments.Path}; is existing file: {arguments.Path?.Exists}");
             writer.WriteLine("Help: {0}", arguments.Help);
         }
     }

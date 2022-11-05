@@ -39,6 +39,7 @@ namespace Ookii.CommandLine
         /// <summary>
         /// Initializes a new instance of the <see cref="KeyValuePairConverter{TKey, TValue}"/> class.
         /// </summary>
+        /// <param name="stringProvider">Provides a <see cref="LocalizedStringProvider"/> to get error messages.</param>
         /// <param name="argumentName">The name of the argument that this converter is for.</param>
         /// <param name="allowNullValues">Indicates whether the value type accepts <see langword="null"/> values.</param>
         /// <param name="keyConverterType">Provides an optional <see cref="TypeConverter"/> type to use to convert keys.
@@ -47,7 +48,6 @@ namespace Ookii.CommandLine
         /// If <see langword="null"/>, the default converter for <typeparamref name="TValue"/> is used.</param>
         /// <param name="separator">Provides an optional custom key/value separator. If <see langword="null" />, the value
         /// of <see cref="KeyValuePairConverter.DefaultSeparator"/> is used.</param>
-        /// <param name="stringProvider">Provides a <see cref="LocalizedStringProvider"/> to get error messages.</param>
         /// <exception cref="ArgumentNullException"><paramref name="stringProvider"/> or <paramref name="argumentName"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentException"><paramref name="separator"/> is an empty string.</exception>
         /// <exception cref="NotSupportedException">Either the key or value <see cref="TypeConverter"/> does not support converting from a string.</exception>

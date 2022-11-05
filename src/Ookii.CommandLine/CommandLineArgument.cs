@@ -365,7 +365,7 @@ namespace Ookii.CommandLine
 
             if (_converter == null)
             {
-                _converter = CreateConverter(converterType);
+                _converter = _elementType.GetStringConverter(converterType);
             }
 
             _defaultValue = ConvertToArgumentTypeInvariant(info.DefaultValue);
@@ -1525,17 +1525,6 @@ namespace Ookii.CommandLine
             {
                 return type.Name;
             }
-        }
-
-        private TypeConverter CreateConverter(Type? converterType)
-        {
-            var converter = converterType == null ? TypeDescriptor.GetConverter(_elementType) : (TypeConverter?)Activator.CreateInstance(converterType);
-            if (converter == null || !converter.CanConvertFrom(typeof(string)))
-            {
-                throw new NotSupportedException(string.Format(System.Globalization.CultureInfo.CurrentCulture, Properties.Resources.NoTypeConverterForArgumentFormat, _argumentName, _elementType));
-            }
-
-            return converter;
         }
 
         private IValueHelper CreateValueHelper()

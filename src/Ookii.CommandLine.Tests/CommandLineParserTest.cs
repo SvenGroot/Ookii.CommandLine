@@ -865,7 +865,7 @@ namespace Ookii.CommandLine.Tests
             var parser = new CommandLineParser<DependencyArguments>();
 
             var result = parser.Parse(new[] { "-Path", "test" });
-            Assert.AreEqual("test", result.Path);
+            Assert.AreEqual("test", result.Path.Name);
             CheckThrows(() => parser.Parse(new[] { "-Path", "test", "-Address", "127.0.0.1" }), parser, CommandLineArgumentErrorCategory.DependencyFailed, "Path");
         }
 

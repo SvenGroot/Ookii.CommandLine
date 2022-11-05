@@ -336,7 +336,7 @@ Usage: test [-arg1] <String> [[-other] <Number>] [[-notSwitch] <Boolean>] [[-Arg
 
 ".ReplaceLineEndings();
 
-        private static readonly string _expectedUsageDependencies = @"Usage: test [-Address <IPAddress>] [-Help] [-Path <String>] [-Port <Int16>] [-Protocol <Int32>] [-Throughput <Int32>] [-Version]
+        private static readonly string _expectedUsageDependencies = @"Usage: test [-Address <IPAddress>] [-Help] [-Path <FileInfo>] [-Port <Int16>] [-Protocol <Int32>] [-Throughput <Int32>] [-Version]
 
 You must use at least one of: -Address, -Path.
 
@@ -346,7 +346,7 @@ You must use at least one of: -Address, -Path.
     -Help [<Boolean>] (-?, -h)
         Displays this help message.
 
-    -Path <String>
+    -Path <FileInfo>
         The path. Cannot be used with: -Address.
 
     -Port <Int16>
@@ -363,7 +363,7 @@ You must use at least one of: -Address, -Path.
 
 ".ReplaceLineEndings();
 
-        private static readonly string _expectedUsageDependenciesDisabled = @"Usage: test [-Address <IPAddress>] [-Help] [-Path <String>] [-Port <Int16>] [-Protocol <Int32>] [-Throughput <Int32>] [-Version]
+        private static readonly string _expectedUsageDependenciesDisabled = @"Usage: test [-Address <IPAddress>] [-Help] [-Path <FileInfo>] [-Port <Int16>] [-Protocol <Int32>] [-Throughput <Int32>] [-Version]
 
     -Address <IPAddress>
         The address.
@@ -371,7 +371,7 @@ You must use at least one of: -Address, -Path.
     -Help [<Boolean>] (-?, -h)
         Displays this help message.
 
-    -Path <String>
+    -Path <FileInfo>
         The path.
 
     -Port <Int16>
