@@ -75,6 +75,9 @@ namespace ParserSample
         [CommandLineArgument(CancelParsing = true), Alias("?"), Description("Displays this help message.")]
         public bool Help { get; set; }
 
+        [CommandLineArgument]
+        public System.IO.FileInfo? Path { get; set; }
+
         // Using a static creation function for a command line arguments class is not required, but it's a convenient
         // way to place all command-line related functionality in one place. To parse the arguments (eg. from the Main method)
         // you then only need to call this function.

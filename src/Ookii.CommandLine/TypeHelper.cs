@@ -1,5 +1,7 @@
 ﻿// Copyright (c) Sven Groot (Ookii.org)
 using System;
+using System.ComponentModel;
+using System.Globalization;
 using System.Linq;
 
 namespace Ookii.CommandLine
@@ -44,6 +46,42 @@ namespace Ookii.CommandLine
             }
 
             return type.GetInterfaces().Any(i => i == interfaceType);
+        }
+
+        public static object? CreateInstance(this Type type)
+        {
+            if (type == null)
+            {
+                throw new ArgumentNullException(nameof(type));
+            }
+
+            return Activator.CreateInstance(type);
+        }
+
+        public static object? CreateInstance(this Type type, params object?[]? args)
+        {
+            if (type == null)
+            {
+                throw new ArgumentNullException(nameof(type));
+            }
+
+            return Activator.CreateInstance(type, args);
+        }
+
+        public static TypeConverter GetStringConverter(this Type type, Type? converterType)
+        {
+            if (type == null)
+            {
+                throw new ArgumentNullException(nameof(type));
+            }
+
+            var converter = (TypeConverter?)converterType?.CreateInstance() ?? TypeDescriptor.GetConverter(type);
+            if (converter == null || !(converter.CanConvertFrom(typeof(string)) && converter.CanConvertTo(typeof(string))))
+            {
+                throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.NoTypeConverterFormat, type));
+            }
+
+            return converter;
         }
     }
 }
