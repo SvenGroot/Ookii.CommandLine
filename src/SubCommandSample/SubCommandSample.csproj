@@ -5,7 +5,7 @@
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>disable</ImplicitUsings>
     <Nullable>disable</Nullable>
-    <Description>Subcommand sample for Ookii.CommandLine</Description>
+    <Description>Subcommand sample for Ookii.CommandLine.</Description>
   </PropertyGroup>
 
   <ItemGroup>

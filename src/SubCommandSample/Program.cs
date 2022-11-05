@@ -17,6 +17,8 @@ namespace SubCommandSample
                 // Since all the commands have an automatic "-Help" argument, show the instruction
                 // how to get help on a command.
                 ShowCommandHelpInstruction = true,
+                // Show the assembly description before the command list.
+                IncludeApplicationDescriptionBeforeCommandList = true,
             };
 
             // Create a CommandManager for the commands in the current assembly.

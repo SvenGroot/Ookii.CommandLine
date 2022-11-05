@@ -1599,7 +1599,7 @@ namespace Ookii.CommandLine
 
             if (mode == UsageHelpRequest.Full && options.IncludeApplicationDescription && !string.IsNullOrEmpty(Description))
             {
-                lineWriter.Inner.WriteLine(Description);
+                lineWriter.Inner.WriteLine(StringProvider.ApplicationDescription(Description, options.UseColor ?? false));
                 lineWriter.Inner.WriteLine();
             }
 

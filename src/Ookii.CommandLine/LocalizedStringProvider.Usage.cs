@@ -435,6 +435,25 @@ namespace Ookii.CommandLine
             }
         }
 
+        /// <summary>
+        /// Gets a formatted string containing the application description to be printed before the
+        /// usage help.
+        /// </summary>
+        /// <param name="description">The description.</param>
+        /// <param name="useColor">The value of <see cref="WriteUsageOptions.UseColor"/>.</param>
+        /// <returns>The string</returns>
+        /// <remarks>
+        /// <para>
+        ///   This function is also used to show the command description of a subcommand when
+        ///   creating the usage help for that command.
+        /// </para>
+        /// <para>
+        ///   This property is only used if the <see cref="WriteUsageOptions.IncludeApplicationDescription"/>
+        ///   property is <see langword="true"/>.
+        /// </para>
+        /// </remarks>
+        public virtual string ApplicationDescription(string description, bool useColor) => description;
+
         #endregion
 
         #region Validators

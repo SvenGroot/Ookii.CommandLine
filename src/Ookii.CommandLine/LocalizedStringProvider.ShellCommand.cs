@@ -2,6 +2,7 @@
 using Ookii.CommandLine.Properties;
 using System;
 using System.Linq;
+using System.Reflection;
 
 namespace Ookii.CommandLine
 {
@@ -119,5 +120,22 @@ namespace Ookii.CommandLine
         public virtual string CommandHelpInstruction(string executableName, string argumentNamePrefix, bool useColor)
             => Format(Resources.CommandHelpInstructionFormat, executableName, argumentNamePrefix, AutomaticHelpName());
 
+        /// <summary>
+        /// Gets a formatted string containing the application description to be printed before the
+        /// command list usage help.
+        /// </summary>
+        /// <param name="description">The description.</param>
+        /// <param name="useColor">The value of <see cref="WriteUsageOptions.UseColor"/>.</param>
+        /// <returns>The string</returns>
+        /// <remarks>
+        /// <para>
+        ///   The description is taken from the <see cref="AssemblyDescriptionAttribute"/> attribute.
+        /// </para>
+        /// <para>
+        ///   This property is only used if the <see cref="CommandOptions.IncludeApplicationDescriptionBeforeCommandList"/>
+        ///   property is <see langword="true"/>.
+        /// </para>
+        /// </remarks>
+        public virtual string CommandListApplicationDescription(string description, bool useColor) => description;
     }
 }

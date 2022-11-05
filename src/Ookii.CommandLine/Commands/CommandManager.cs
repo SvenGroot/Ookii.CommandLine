@@ -457,6 +457,16 @@ namespace Ookii.CommandLine.Commands
                 colorEnd = _options.UsageOptions.ColorReset;
             }
 
+            if (_options.IncludeApplicationDescriptionBeforeCommandList)
+            {
+                var description = GetDescription();
+                if (description != null)
+                {
+                    writer.Inner.WriteLine(_options.StringProvider.CommandListApplicationDescription(description, useColor));
+                    writer.Inner.WriteLine();
+                }
+            }
+
             var executableName = _options.UsageOptions.GetExecutableName();
             if (lineWriter != null)
             {
@@ -497,6 +507,9 @@ namespace Ookii.CommandLine.Commands
                 writer.Inner.WriteLine(_options.StringProvider.CommandHelpInstruction(executableName, prefix, useColor));
             }
         }
+
+        private string? GetDescription() 
+            => (_assembly ?? _assemblies?.FirstOrDefault())?.GetCustomAttribute<AssemblyDescriptionAttribute>()?.Description;
 
         // Return value does not include the automatic version command.
         private IEnumerable<CommandInfo> GetCommandsUnsorted()

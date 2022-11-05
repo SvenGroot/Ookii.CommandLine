@@ -378,7 +378,7 @@ namespace Ookii.CommandLine
         ///   If the value of this property is not <see cref="UsageHelpRequest.Full"/>, the
         ///   <see cref="CommandLineParser.Parse{T}(string[], int, ParseOptions?)"/> method and
         ///   <see cref="CommandManager"/> class will write the message returned by the
-        ///   <see cref="LocalizedStringProvider.MoreInfoOnError(CommandLineParser, string)"/>
+        ///   <see cref="LocalizedStringProvider.MoreInfoOnError"/>
         ///   method.
         /// </para>
         /// </remarks>

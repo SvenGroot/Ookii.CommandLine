@@ -2,6 +2,7 @@
 using Ookii.CommandLine.Terminal;
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 
 namespace Ookii.CommandLine.Commands
 {
@@ -177,6 +178,23 @@ namespace Ookii.CommandLine.Commands
         /// </para>
         /// </remarks>
         public bool ShowCommandHelpInstruction { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value that indicates whether to show the application description before
+        /// the command list in the usage help.
+        /// </summary>
+        /// <value>
+        /// <see langword="true"/> to show the description; otherwise, <see langword="false"/>. The
+        /// default value is <see langword="false"/>.
+        /// </value>
+        /// <remarks>
+        /// <para>
+        ///   The description to show is taken from the <see cref="AssemblyDescriptionAttribute"/>
+        ///   of the first assembly passed to the <see cref="CommandManager"/> class. If the
+        ///   assembly has no description, nothing is written.
+        /// </para>
+        /// </remarks>
+        public bool IncludeApplicationDescriptionBeforeCommandList { get; set; }
 
         internal string AutoVersionCommandName()
         {

@@ -177,6 +177,26 @@ namespace Ookii.CommandLine.Tests
         }
 
         [TestMethod]
+        public void TestWriteUsageApplicationDescription()
+        {
+            using var writer = LineWrappingTextWriter.ForStringWriter(0);
+            var options = new CommandOptions()
+            {
+                Out = writer,
+                Error = writer,
+                IncludeApplicationDescriptionBeforeCommandList = true,
+                UsageOptions = new WriteUsageOptions()
+                {
+                    ExecutableName = _executableName,
+                }
+            };
+
+            var manager = new CommandManager(_commandAssembly, options);
+            manager.WriteUsage();
+            Assert.AreEqual(_expectedUsageWithDescription, writer.BaseWriter.ToString());
+        }
+
+        [TestMethod]
         public void TestCommandNameTransform()
         {
             var options = new CommandOptions()
@@ -301,6 +321,25 @@ The following commands are available:
 Run 'test <command> -Help' for more information about a command.
 ".ReplaceLineEndings();
 
+        public static readonly string _expectedUsageWithDescription = @"Tests for Ookii.CommandLine.
+
+Usage: test <command> [arguments]
+
+The following commands are available:
+
+    AnotherSimpleCommand
+
+
+    custom
+        Custom parsing command.
+
+    test
+        Test command description.
+
+    version
+        Displays version information.
+
+".ReplaceLineEndings();
 
         #endregion
     }
