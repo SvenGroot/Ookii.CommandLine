@@ -5,43 +5,36 @@
       <SnippetTypes>
         <SnippetType>Expansion</SnippetType>
       </SnippetTypes>
-      <Title>clargdict</Title>
+      <Title>clcmd</Title>
       <Author>Sven Groot (Ookii.org)</Author>
       <Description>
-        Snippet for creating a dictionary command line argument for use with Ookii.CommandLine.
+        Snippet for creating a subcommand class for use with Ookii.CommandLine.
       </Description>
       <HelpUrl>
         https://github.com/SvenGroot/ookii.commandline
       </HelpUrl>
-      <Shortcut>clargdict</Shortcut>
+      <Shortcut>clcmd</Shortcut>
     </Header>
     <Snippet>
       <Declarations>
         <Literal Editable="true">
+          <ID>CommandName</ID>
+          <ToolTip>Command name</ToolTip>
+          <Default>"sample"</Default>
+          <Function>
+          </Function>
+        </Literal>
+        <Literal Editable="true">
           <ID>Name</ID>
-          <ToolTip>Property and argument name</ToolTip>
-          <Default>MyArgument</Default>
-          <Function>
-          </Function>
-        </Literal>
-        <Literal Editable="true">
-          <ID>KeyType</ID>
-          <ToolTip>Dictionary key type</ToolTip>
-          <Default>string</Default>
-          <Function>
-          </Function>
-        </Literal>
-        <Literal Editable="true">
-          <ID>ValueType</ID>
-          <ToolTip>Dictionary value type</ToolTip>
-          <Default>int</Default>
+          <ToolTip>Class name</ToolTip>
+          <Default>SampleCommand</Default>
           <Function>
           </Function>
         </Literal>
         <Literal Editable="true">
           <ID>Description</ID>
-          <ToolTip>The argument description</ToolTip>
-          <Default>Argument description.</Default>
+          <ToolTip>The command description</ToolTip>
+          <Default>Command description.</Default>
           <Function>
           </Function>
         </Literal>
@@ -54,18 +47,29 @@
       </References>
       <Imports>
         <Import>
-          <Namespace>System.Collections.Generic</Namespace>
+          <Namespace>Ookii.CommandLine</Namespace>
         </Import>
         <Import>
-          <Namespace>Ookii.CommandLine</Namespace>
+          <Namespace>Ookii.CommandLine.Commands</Namespace>
         </Import>
         <Import>
           <Namespace>System.ComponentModel</Namespace>
         </Import>
       </Imports>
-      <Code Language="csharp"><![CDATA[[CommandLineArgument]
+      <Code Language="csharp"><![CDATA[[Command($CommandName$)]
 [Description("$Description$")]
-public Dictionary<$KeyType$, $ValueType$>? $Name$ { get; set; }]]></Code>
+class $Name$ : ICommand
+{
+    // [CommandLineArgument(Position = 0, IsRequired = true)]
+    // [Description("Argument description.")]
+    // public string SampleArgument { get; set; }
+
+    public int Run()
+    {
+        $end$
+        return 0;
+    }
+}]]></Code>
     </Snippet>
   </CodeSnippet>
 </CodeSnippets>

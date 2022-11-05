@@ -11,7 +11,7 @@
         Snippet for creating a command line arguments class for use with Ookii.CommandLine.
       </Description>
       <HelpUrl>
-        http://ookiicommandline.codeplex.com
+        https://github.com/SvenGroot/ookii.commandline
       </HelpUrl>
       <Shortcut>clargclass</Shortcut>
     </Header>
@@ -24,33 +24,41 @@
           <Function>
           </Function>
         </Literal>
+        <Literal Editable="true">
+          <ID>Description</ID>
+          <ToolTip>The application description</ToolTip>
+          <Default>Application description.</Default>
+          <Function>
+          </Function>
+        </Literal>
       </Declarations>
       <References>
         <Reference>
           <Assembly>Ookii.CommandLine.dll</Assembly>
-          <Url>http://ookiicommandline.codeplex.com</Url>
+          <Url>https://github.com/SvenGroot/ookii.commandline</Url>
         </Reference>
       </References>
       <Imports>
         <Import>
           <Namespace>Ookii.CommandLine</Namespace>
         </Import>
+        <Import>
+          <Namespace>System.ComponentModel</Namespace>
+        </Import>
       </Imports>
-      <Code Language="csharp">
-        <![CDATA[class $Name$
+      <Code Language="csharp"><![CDATA[// Customize the parsing behavior by changing the options.
+[ParseOptions(NameTransform = NameTransform.PascalCase)]
+[Description("$Description$")]
+class $Name$
 {
-    //[CommandLineArgument(Position = 0, IsRequired = true)]
-    //public string SampleArgument { get; set; }
+    // [CommandLineArgument(Position = 0, IsRequired = true)]
+    // [Description("Argument description.")]
+    // public string SampleArgument { get; set; }
 
-    public static $Name$ Create(string[] args)
+    public static $Name$? Parse()
     {
-        // Customize the parsing behavior by changing the options.
-        var options = new ParseOptions()
-        {
-            Culture = System.Globalization.CultureInfo.CurrentCulture
-        };
-
-        return CommandLineParser.Parse<$Name$>(args, options);
+        // Parse the arguments from Environment.GetCommandLineArgs().
+        return CommandLineParser.Parse<$Name$>();
     }
 }]]></Code>
     </Snippet>

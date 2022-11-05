@@ -5,15 +5,15 @@
       <SnippetTypes>
         <SnippetType>Expansion</SnippetType>
       </SnippetTypes>
-      <Title>clarg</Title>
+      <Title>clargswitch</Title>
       <Author>Sven Groot (Ookii.org)</Author>
       <Description>
-        Snippet for creating a command line argument for use with Ookii.CommandLine.
+        Snippet for creating a switch argument for use with Ookii.CommandLine.
       </Description>
       <HelpUrl>
         https://github.com/SvenGroot/ookii.commandline
       </HelpUrl>
-      <Shortcut>clarg</Shortcut>
+      <Shortcut>clargswitch</Shortcut>
     </Header>
     <Snippet>
       <Declarations>
@@ -25,9 +25,9 @@
           </Function>
         </Literal>
         <Literal Editable="true">
-          <ID>Type</ID>
-          <ToolTip>Property and argument type</ToolTip>
-          <Default>String</Default>
+          <ID>Description</ID>
+          <ToolTip>The argument description</ToolTip>
+          <Default>Argument description.</Default>
           <Function>
           </Function>
         </Literal>
@@ -42,9 +42,13 @@
         <Import>
           <Namespace>Ookii.CommandLine</Namespace>
         </Import>
+        <Import>
+          <Namespace>System.ComponentModel</Namespace>
+        </Import>
       </Imports>
-      <Code Language="VB"><![CDATA[<CommandLineArgument>
-Public Property $Name$ As $Type$]]></Code>
+      <Code Language="VB"><![CDATA[[CommandLineArgument]
+[Description("$Description$")]
+Public Property $Name$ As Boolean]]></Code>
     </Snippet>
   </CodeSnippet>
 </CodeSnippets>
