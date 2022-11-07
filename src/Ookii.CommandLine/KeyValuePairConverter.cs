@@ -74,6 +74,11 @@ namespace Ookii.CommandLine
         {
         }
 
+        /// <inheritdoc />
+        /// <summary>
+        /// Converts from a string to the type of this converter.
+        /// </summary>
+        /// <exception cref="FormatException">The <paramref name="value"/> could not be converted.</exception>
         protected override KeyValuePair<TKey, TValue?> Convert(ITypeDescriptorContext? context, CultureInfo? culture, string value)
         {
             int index = value.IndexOf(_separator);
@@ -94,6 +99,10 @@ namespace Ookii.CommandLine
             return new((TKey)convertedKey, (TValue?)convertedValue);
         }
 
+        /// <inheritdoc/>
+        /// <returns>
+        /// A string representing the object.
+        /// </returns>
         protected override string? Convert(ITypeDescriptorContext? context, CultureInfo? culture, KeyValuePair<TKey, TValue?> value)
         {
             var key = _keyConverter.ConvertToString(context, culture, value.Key);

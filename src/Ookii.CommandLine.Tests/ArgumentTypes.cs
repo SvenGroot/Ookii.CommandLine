@@ -376,21 +376,12 @@ namespace Ookii.CommandLine.Tests
         public string[] Arg4 { get; set; }
     }
 
-    class IPAddressTypeConverter : TypeConverterBase<IPAddress>
-    {
-        protected override IPAddress Convert(ITypeDescriptorContext context, CultureInfo culture, string value)
-        {
-            return IPAddress.Parse(value);
-        }
-    }
-
     // N.B. nameof is only safe if the argument name matches the property name.
     [RequiresAny(nameof(Address), nameof(Path))]
     class DependencyArguments
     {
         [CommandLineArgument]
         [Description("The address.")]
-        [TypeConverter(typeof(IPAddressTypeConverter))]
         public IPAddress Address { get; set; }
 
         [CommandLineArgument(DefaultValue = (short)5000)]

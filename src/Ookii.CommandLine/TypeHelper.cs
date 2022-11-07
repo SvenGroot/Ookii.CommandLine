@@ -3,11 +3,14 @@ using System;
 using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
+using System.Reflection;
 
 namespace Ookii.CommandLine
 {
     static class TypeHelper
     {
+        private const string ParseMethodName = "Parse";
+
         public static Type? FindGenericInterface(this Type type, Type interfaceType)
         {
             if (type == null)
@@ -76,19 +79,40 @@ namespace Ookii.CommandLine
             }
 
             var converter = (TypeConverter?)converterType?.CreateInstance() ?? TypeDescriptor.GetConverter(type);
-            if (converter == null || !(converter.CanConvertFrom(typeof(string)) && converter.CanConvertTo(typeof(string))))
+            if (converter != null && converter.CanConvertFrom(typeof(string)))
+            {
+                return converter;
+            }
+
+            if (converterType == null)
             {
                 // If no explicit converter and the default one can't converter from string, see if
-                // there's a ctor we can use.
-                if (converterType == null && type.GetConstructor(new[] { typeof(string) }) != null)
+                // there's a Parse method we can use.
+                var method = type.GetMethod(ParseMethodName, BindingFlags.Static | BindingFlags.Public,
+                    null, new[] { typeof(string), typeof(CultureInfo) }, null);
+
+                if (method != null && method.ReturnType == type)
+                {
+                    return new ParseTypeConverter(method, true);
+                }
+
+                // Check for Parse without a culture arguments.
+                method = type.GetMethod(ParseMethodName, BindingFlags.Static | BindingFlags.Public, null,
+                    new[] { typeof(string) }, null);
+
+                if (method != null && method.ReturnType == type)
+                {
+                    return new ParseTypeConverter(method, false);
+                }
+
+                // Check for a constructor with a string argument.
+                if (type.GetConstructor(new[] { typeof(string) }) != null)
                 {
                     return new ConstructorTypeConverter(type);
                 }
-                
-                throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.NoTypeConverterFormat, type));
             }
 
-            return converter;
+            throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.NoTypeConverterFormat, type));
         }
     }
 }
