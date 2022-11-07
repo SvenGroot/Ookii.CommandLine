@@ -17,6 +17,7 @@ namespace Ookii.CommandLine.Tests
     }
 
     [Command]
+    [Alias("alias")]
     public class AnotherSimpleCommand : ICommand
     {
         [CommandLineArgument]

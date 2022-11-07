@@ -18,20 +18,12 @@ namespace Ookii.CommandLine.Tests
 
             Assert.IsNotNull(commands);
             Assert.AreEqual(5, commands.Length);
-            Assert.AreEqual("AnotherSimpleCommand", commands[0].Name);
-            Assert.AreEqual(typeof(AnotherSimpleCommand), commands[0].CommandType);
-            Assert.IsFalse(commands[0].UseCustomArgumentParsing);
-            Assert.AreEqual("custom", commands[1].Name);
-            Assert.AreEqual(typeof(CustomParsingCommand), commands[1].CommandType);
-            Assert.IsTrue(commands[1].UseCustomArgumentParsing);
-            Assert.AreEqual("HiddenCommand", commands[2].Name);
-            Assert.IsFalse(commands[2].UseCustomArgumentParsing);
-            Assert.AreEqual(typeof(HiddenCommand), commands[2].CommandType);
-            Assert.AreEqual("test", commands[3].Name);
-            Assert.IsFalse(commands[3].UseCustomArgumentParsing);
-            Assert.AreEqual(typeof(TestCommand), commands[3].CommandType);
-            Assert.AreEqual("version", commands[4].Name);
-            Assert.IsFalse(commands[4].UseCustomArgumentParsing);
+
+            VerifyCommand(commands[0], "AnotherSimpleCommand", typeof(AnotherSimpleCommand), false, new[] { "alias" });
+            VerifyCommand(commands[1], "custom", typeof(CustomParsingCommand), true);
+            VerifyCommand(commands[2], "HiddenCommand", typeof(HiddenCommand));
+            VerifyCommand(commands[3], "test", typeof(TestCommand));
+            VerifyCommand(commands[4], "version", null);
         }
 
         [TestMethod]
@@ -56,6 +48,11 @@ namespace Ookii.CommandLine.Tests
             Assert.IsNull(command);
 
             command = manager.GetCommand("AnotherSimpleCommand");
+            Assert.IsNotNull(command);
+            Assert.AreEqual("AnotherSimpleCommand", command.Value.Name);
+            Assert.AreEqual(typeof(AnotherSimpleCommand), command.Value.CommandType);
+
+            command = manager.GetCommand("alias");
             Assert.IsNotNull(command);
             Assert.AreEqual("AnotherSimpleCommand", command.Value.Name);
             Assert.AreEqual(typeof(AnotherSimpleCommand), command.Value.CommandType);
@@ -247,6 +244,18 @@ namespace Ookii.CommandLine.Tests
             Assert.IsNotNull(manager.GetCommand("HiddenCommand"));
         }
 
+        private static void VerifyCommand(CommandInfo command, string name, Type type, bool customParsing = false, string[] aliases = null)
+        {
+            Assert.AreEqual(name, command.Name);
+            if (type != null)
+            {
+                Assert.AreEqual(type, command.CommandType);
+            }
+
+            Assert.AreEqual(customParsing, command.UseCustomArgumentParsing);
+            CollectionAssert.AreEqual(aliases ?? Array.Empty<string>(), command.Aliases.ToArray());
+        }
+
         #region Expected usage
 
         private const string _executableName = "test";
@@ -255,7 +264,7 @@ namespace Ookii.CommandLine.Tests
 
 The following commands are available:
 
-    AnotherSimpleCommand
+    AnotherSimpleCommand, alias
 
 
     custom
@@ -273,7 +282,7 @@ The following commands are available:
 
 The following commands are available:
 
-    AnotherSimpleCommand
+    AnotherSimpleCommand, alias
 
 
     custom
@@ -288,7 +297,7 @@ The following commands are available:
 
 The following commands are available:
 
-    [32mAnotherSimpleCommand[0m
+    [32mAnotherSimpleCommand, alias[0m
 
 
     [32mcustom[0m
@@ -306,7 +315,7 @@ The following commands are available:
 
 The following commands are available:
 
-    AnotherSimpleCommand
+    AnotherSimpleCommand, alias
 
 
     custom
@@ -327,7 +336,7 @@ Usage: test <command> [arguments]
 
 The following commands are available:
 
-    AnotherSimpleCommand
+    AnotherSimpleCommand, alias
 
 
     custom

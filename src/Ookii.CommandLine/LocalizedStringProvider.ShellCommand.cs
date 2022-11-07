@@ -62,7 +62,11 @@ namespace Ookii.CommandLine
                 colorEnd = options.UsageOptions.ColorReset;
             }
 
-            return $"    {colorStart}{command.Name}{colorEnd}{Environment.NewLine}{command.Description ?? string.Empty}{Environment.NewLine}";
+            string alias = options.IncludeCommandAliasInCommandList && command.Aliases.Any()
+                ? ArgumentSeparator + string.Join(ArgumentSeparator, command.Aliases)
+                : string.Empty;
+
+            return $"    {colorStart}{command.Name}{alias}{colorEnd}{Environment.NewLine}{command.Description ?? string.Empty}{Environment.NewLine}";
         }
 
         /// <summary>

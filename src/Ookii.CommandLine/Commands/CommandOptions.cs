@@ -196,6 +196,16 @@ namespace Ookii.CommandLine.Commands
         /// </remarks>
         public bool IncludeApplicationDescriptionBeforeCommandList { get; set; }
 
+        /// <summary>
+        /// Gets or sets a value that indicates whether to show a command's aliases as part of the
+        /// command list usage help.
+        /// </summary>
+        /// <value>
+        /// <see langword="true"/> to show the command's aliases; otherwise, <see langword="false"/>.
+        /// The default value is <see langword="true"/>.
+        /// </value>
+        public bool IncludeCommandAliasInCommandList { get; set; } = true;
+
         internal string AutoVersionCommandName()
         {
             return CommandNameTransform.Apply(StringProvider.AutomaticVersionCommandName());

@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
+using System.Linq;
 using System.Reflection;
 
 namespace Ookii.CommandLine.Commands
@@ -109,6 +111,20 @@ namespace Ookii.CommandLine.Commands
         public bool IsHidden => _attribute.IsHidden;
 
         /// <summary>
+        /// Gets the alternative names of this command.
+        /// </summary>
+        /// <value>
+        /// A list of aliases.
+        /// </value>
+        /// <remarks>
+        /// <para>
+        ///   Aliases for a command are specified by using the <see cref="AliasAttribute"/> on a
+        ///   class implementing the <see cref="ICommand"/> interface.
+        /// </para>
+        /// </remarks>
+        public IEnumerable<string> Aliases => _commandType.GetCustomAttributes<AliasAttribute>().Select(a => a.Alias);
+
+        /// <summary>
         /// Creates an instance of the command type.
         /// </summary>
         /// <param name="args">The arguments to the command.</param>
@@ -143,6 +159,37 @@ namespace Ookii.CommandLine.Commands
             }
 
             return (ICommand)CommandLineParser.ParseInternal(CommandType, args, index, options)!;
+        }
+
+        /// <summary>
+        /// Checks whether the command's name or aliases match the specified name.
+        /// </summary>
+        /// <param name="name">The name to check for.</param>
+        /// <param name="comparer">
+        /// The <see cref="IComparer{T}"/> to use for the comparisons, or <see langword="null"/>
+        /// to use the default comparison, which is <see cref="StringComparer.OrdinalIgnoreCase"/>.
+        /// </param>
+        /// <returns>
+        /// <see langword="true"/> if the <paramref name="name"/> matches <see cref="Name"/> or any
+        /// of the items in the <see cref="Aliases"/> property.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="name"/> is <see langword="null"/>.
+        /// </exception>
+        public bool MatchesName(string name, IComparer<string>? comparer = null)
+        {
+            if (name == null)
+            {
+                throw new ArgumentNullException(nameof(name));
+            }
+
+            comparer ??= StringComparer.OrdinalIgnoreCase;
+            if (comparer.Compare(name, _name) == 0)
+            {
+                return true;
+            }
+
+            return Aliases.Any(alias => comparer.Compare(name, alias) == 0);
         }
 
         /// <summary>

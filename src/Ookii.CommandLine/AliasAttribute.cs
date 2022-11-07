@@ -4,7 +4,7 @@ using System;
 namespace Ookii.CommandLine
 {
     /// <summary>
-    /// Defines an alternative name for a command line argument.
+    /// Defines an alternative name for a command line argument or a subcommand.
     /// </summary>
     /// <remarks>
     /// <note>
@@ -27,8 +27,14 @@ namespace Ookii.CommandLine
     ///   If the <see cref="CommandLineParser.Mode"/> property is <see cref="ParsingMode.LongShort"/>, and the argument
     ///   this is applied to does not have a long name, this attribute is ignored.
     /// </note>
+    /// <para>
+    ///   This attribute can also be applied to classes that implement the <see cref="Commands.ICommand"/>
+    ///   interface to specify an alias for that command. In that case, inclusion of the aliases in
+    ///   the command list usage help is controlled by the <see cref="Commands.CommandOptions.IncludeCommandAliasInCommandList"/>
+    ///   property.
+    /// </para>
     /// </remarks>
-    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Parameter, AllowMultiple = true)]
+    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Parameter | AttributeTargets.Class, AllowMultiple = true)]
     public sealed class AliasAttribute : Attribute
     {
         private readonly string _alias;
@@ -36,17 +42,17 @@ namespace Ookii.CommandLine
         /// <summary>
         /// Initializes a new instance of the <see cref="AliasAttribute"/> class.
         /// </summary>
-        /// <param name="alias">The alternative name for the command line argument.</param>
+        /// <param name="alias">The alternative name for the command line argument or subcommand.</param>
         public AliasAttribute(string alias)
         {
-            _alias = alias;
+            _alias = alias ?? throw new ArgumentNullException(nameof(alias));
         }
 
         /// <summary>
-        /// Gets the alternative name for the command line argument.
+        /// Gets the alternative name for the command line argument or subcommand.
         /// </summary>
         /// <value>
-        /// The alternative name for the command line argument.
+        /// The alternative name.
         /// </value>
         public string Alias
         {

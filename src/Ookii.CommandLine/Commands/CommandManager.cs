@@ -147,7 +147,7 @@ namespace Ookii.CommandLine.Commands
             }
 
             var commands = GetCommandsUnsorted()
-                .Where(c => _options.CommandNameComparer.Compare(c.Name, commandName) == 0);
+                .Where(c => c.MatchesName(commandName, _options.CommandNameComparer));
 
             if (commands.Any())
             {
