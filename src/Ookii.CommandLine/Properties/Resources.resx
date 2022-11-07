@@ -121,7 +121,7 @@
     <value>The value '{0}' provided for argument '{1}' could not be interpreted as a '{2}'.</value>
   </data>
   <data name="ArrayNotLastArgument" xml:space="preserve">
-    <value>A positional array argument must be the last positional argument.</value>
+    <value>A positional multi-value argument must be the last positional argument.</value>
   </data>
   <data name="DefaultArraySuffix" xml:space="preserve">
     <value>...</value>

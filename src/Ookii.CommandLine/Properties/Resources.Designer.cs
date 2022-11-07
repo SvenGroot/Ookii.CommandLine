@@ -79,7 +79,7 @@ namespace Ookii.CommandLine.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to A positional array argument must be the last positional argument..
+        ///   Looks up a localized string similar to A positional multi-value argument must be the last positional argument..
         /// </summary>
         internal static string ArrayNotLastArgument {
             get {

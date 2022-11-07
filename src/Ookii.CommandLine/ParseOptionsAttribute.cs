@@ -142,7 +142,7 @@ namespace Ookii.CommandLine
         /// Gets or sets a value indicating whether duplicate arguments are allowed.
         /// </summary>
         /// <value>
-        ///   <see langword="true"/> if it is allowed to supply non-array arguments more than once;
+        ///   <see langword="true"/> if it is allowed to supply non-multi-value arguments more than once;
         ///   otherwise, <see langword="false"/>. The default value is <see langword="false"/>.
         /// </value>
         /// <remarks>

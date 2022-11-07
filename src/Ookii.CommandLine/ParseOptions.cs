@@ -172,7 +172,7 @@ namespace Ookii.CommandLine
         /// Gets or sets a value indicating whether duplicate arguments are allowed.
         /// </summary>
         /// <value>
-        ///   <see langword="true"/> if it is allowed to supply non-array arguments more than once;
+        ///   <see langword="true"/> if it is allowed to supply non-multi-value arguments more than once;
         ///   <see langword="false"/> if it is not allowed, or <see langword="null" /> to use the
         ///   value from the <see cref="ParseOptionsAttribute.AllowDuplicateArguments"/> property,
         ///   or if the <see cref="ParseOptionsAttribute"/> is not present, the default option

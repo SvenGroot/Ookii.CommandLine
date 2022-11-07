@@ -97,9 +97,9 @@ namespace Ookii.CommandLine
     /// </para>
     /// <para>
     ///   If an argument has an array type, it can be specified more than once, and the value for each time is it specified
-    ///   is added to the array. Given an array argument named "sample", the command line <c>-sample 1 -sample 2 -sample 3</c>
-    ///   would set the value of "sample" to an array holding the values 1, 2 and 3. A required array argument must have at
-    ///   least one value. A positional array argument must be the last positional argument.
+    ///   is added to the array. Given a multi-value argument named "sample", the command line <c>-sample 1 -sample 2 -sample 3</c>
+    ///   would set the value of "sample" to an array holding the values 1, 2 and 3. A required multi-value argument must have at
+    ///   least one value. A positional multi-value argument must be the last positional argument.
     /// </para>
     /// <para>
     ///   To specify which arguments are accepted by the <see cref="CommandLineParser"/> class, you can use either constructor
@@ -283,7 +283,7 @@ namespace Ookii.CommandLine
         /// </exception>
         /// <exception cref="NotSupportedException">
         ///   The <see cref="CommandLineParser"/> cannot use <paramref name="argumentsType"/> as the command line arguments type, because it defines a required
-        ///   positional argument after an optional positional argument, it defines a positional array argument that is not the last positional argument, it defines an argument with an invalid name,
+        ///   positional argument after an optional positional argument, it defines a positional multi-value argument that is not the last positional argument, it defines an argument with an invalid name,
         ///   it defines two arguments with the same name, or it has two properties with the same <see cref="CommandLineArgumentAttribute.Position"/> property value.
         /// </exception>
         /// <remarks>
@@ -502,7 +502,7 @@ namespace Ookii.CommandLine
         /// Gets or sets a value indicating whether duplicate arguments are allowed.
         /// </summary>
         /// <value>
-        ///   <see langword="true"/> if it is allowed to supply non-array arguments more than once; otherwise, <see langword="false"/>.
+        ///   <see langword="true"/> if it is allowed to supply non-multi-value arguments more than once; otherwise, <see langword="false"/>.
         ///   The default value is <see langword="false"/>.
         /// </value>
         /// <remarks>
@@ -1406,7 +1406,7 @@ namespace Ookii.CommandLine
                 }
                 else
                 {
-                    // If this is an array argument is must be the last argument.
+                    // If this is a multi-value argument is must be the last argument.
                     if (positionalArgumentIndex < _positionalArgumentCount && !_arguments[positionalArgumentIndex].IsMultiValue)
                     {
                         // Skip named positional arguments that have already been specified by name.
