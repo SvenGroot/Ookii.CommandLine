@@ -1,4 +1,6 @@
-﻿using Ookii.CommandLine.Validation;
+﻿using Ookii.CommandLine;
+using Ookii.CommandLine.Validation;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Globalization;
@@ -411,5 +413,28 @@ namespace Ookii.CommandLine.Tests
         [Description("The path.")]
         [Prohibits("Address")]
         public FileInfo Path { get; set; }
+    }
+
+    class MultiValueWhiteSpaceArguments
+    {
+
+        [CommandLineArgument(Position = 0)]
+        public int Arg1 { get; set; }
+
+        [CommandLineArgument(Position = 1)]
+        public int Arg2 { get; set; }
+
+        [CommandLineArgument]
+        [MultiValueSeparator]
+        public int[] Multi { get; set; }
+
+        [CommandLineArgument]
+        [MultiValueSeparator]
+        public int Other { get; set; }
+
+
+        [CommandLineArgument]
+        [MultiValueSeparator]
+        public bool[] MultiSwitch { get; set; }
     }
 }

@@ -932,6 +932,29 @@ namespace Ookii.CommandLine.Tests
             Assert.AreEqual("String=Number", parser.GetArgument("Arg13").ValueDescription);
         }
 
+        [TestMethod]
+        public void TestMultiValueWhiteSpaceSeparator()
+        {
+            var parser = new CommandLineParser<MultiValueWhiteSpaceArguments>();
+            Assert.IsTrue(parser.GetArgument("Multi").AllowMultiValueWhiteSpaceSeparator);
+            Assert.IsFalse(parser.GetArgument("MultiSwitch").AllowMultiValueWhiteSpaceSeparator);
+            Assert.IsFalse(parser.GetArgument("Other").AllowMultiValueWhiteSpaceSeparator);
+
+            var result = parser.Parse(new[] { "1", "-Multi", "2", "3", "4", "-Other", "5", "6" });
+            Assert.AreEqual(result.Arg1, 1);
+            Assert.AreEqual(result.Arg2, 6);
+            Assert.AreEqual(result.Other, 5);
+            CollectionAssert.AreEqual(new[] { 2, 3, 4 }, result.Multi);
+
+            result = parser.Parse(new[] { "-Multi", "1", "-Multi", "2" });
+            CollectionAssert.AreEqual(new[] { 1, 2 }, result.Multi);
+
+            CheckThrows(() => parser.Parse(new[] { "1", "-Multi", "-Other", "5", "6" }), parser, CommandLineArgumentErrorCategory.MissingNamedArgumentValue, "Multi");
+            CheckThrows(() => parser.Parse(new[] { "-MultiSwitch", "true", "false" }), parser, CommandLineArgumentErrorCategory.ArgumentValueConversion, "Arg1", typeof(ArgumentException));
+            parser.AllowWhiteSpaceValueSeparator = false;
+            CheckThrows(() => parser.Parse(new[] { "1", "-Multi:2", "2", "3", "4", "-Other", "5", "6" }), parser, CommandLineArgumentErrorCategory.TooManyArguments);
+        }
+
         private record class ExpectedArgument
         {
             public ExpectedArgument(string name, Type type, ArgumentKind kind = ArgumentKind.SingleValue)
@@ -976,6 +999,7 @@ namespace Ookii.CommandLine.Tests
             Assert.AreEqual(expected.IsSwitch, argument.IsSwitch);
             Assert.AreEqual(expected.DefaultValue, argument.DefaultValue);
             Assert.AreEqual(expected.IsHidden, argument.IsHidden);
+            Assert.IsFalse(argument.AllowMultiValueWhiteSpaceSeparator);
             Assert.IsNull(argument.Value);
             Assert.IsFalse(argument.HasValue);
             CollectionAssert.AreEqual(expected.Aliases, argument.Aliases);

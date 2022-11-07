@@ -1480,22 +1480,7 @@ namespace Ookii.CommandLine
 
         private int ParseNamedArgument(string[] args, int index, PrefixInfo prefix)
         {
-            string argumentName;
-            string? argumentValue = null;
-
-            string arg = args[index];
-            // Extract the argument name
-            // We don't use Split because if there's more than one separator we want to ignore the others.
-            int separatorIndex = arg.IndexOf(NameValueSeparator);
-            if (separatorIndex >= 0)
-            {
-                argumentName = arg.Substring(prefix.Prefix.Length, separatorIndex - prefix.Prefix.Length);
-                argumentValue = arg.Substring(separatorIndex + 1);
-            }
-            else
-            {
-                argumentName = arg.Substring(prefix.Prefix.Length);
-            }
+            var (argumentName, argumentValue) = args[index].SplitOnce(NameValueSeparator, prefix.Prefix.Length);
 
             CommandLineArgument? argument = null;
             if (_argumentsByShortName != null && prefix.Short)
@@ -1517,15 +1502,38 @@ namespace Ookii.CommandLine
                 throw StringProvider.CreateException(CommandLineArgumentErrorCategory.UnknownArgument, argumentName);
             }
 
-            if (argumentValue == null && !argument.IsSwitch && AllowWhiteSpaceValueSeparator && ++index < args.Length && CheckArgumentNamePrefix(args[index]) == null)
+            argument.UsedArgumentName = argumentName;
+            if (argumentValue == null && !argument.IsSwitch && AllowWhiteSpaceValueSeparator)
             {
-                // No separator was present but a value is required. We take the next argument as its value.
-                argumentValue = args[index];
+                // No separator was present but a value is required. We take the next argument as
+                // its value. For multi-value arguments that can consume multiple values, we keep
+                // going until we hit another argument name.
+                while (index + 1 < args.Length && CheckArgumentNamePrefix(args[index + 1]) == null)
+                {
+                    ++index;
+                    argumentValue = args[index];
+
+                    // ParseArgumentValue returns true if parsing was canceled by the ArgumentParsed
+                    // event handler or the CancelParsing property.
+                    if (ParseArgumentValue(argument, argumentValue))
+                    {
+                        return -1;
+                    }
+
+                    if (!argument.AllowMultiValueWhiteSpaceSeparator)
+                    {
+                        break;
+                    }
+                }
+
+                if (argumentValue != null)
+                {
+                    return index;
+                }
             }
 
             // ParseArgumentValue returns true if parsing was canceled by the ArgumentParsed event handler
             // or the CancelParsing property.
-            argument.UsedArgumentName = argumentName;
             return ParseArgumentValue(argument, argumentValue) ? -1 : index;
         }
 

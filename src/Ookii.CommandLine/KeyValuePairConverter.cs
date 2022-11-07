@@ -81,14 +81,12 @@ namespace Ookii.CommandLine
         /// <exception cref="FormatException">The <paramref name="value"/> could not be converted.</exception>
         protected override KeyValuePair<TKey, TValue?> Convert(ITypeDescriptorContext? context, CultureInfo? culture, string value)
         {
-            int index = value.IndexOf(_separator);
-            if (index < 0)
+            var (key, valueForKey) = value.SplitOnce(_separator);
+            if (valueForKey == null)
             {
                 throw new FormatException(_stringProvider.MissingKeyValuePairSeparator(_separator));
             }
 
-            string key = value.Substring(0, index);
-            string valueForKey = value.Substring(index + _separator.Length);
             object? convertedKey = _keyConverter.ConvertFromString(context, culture, key);
             object? convertedValue = _valueConverter.ConvertFromString(context, culture, valueForKey);
             if (convertedKey == null || (!_allowNullValues && convertedValue == null))

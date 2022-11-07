@@ -216,6 +216,7 @@ namespace Ookii.CommandLine
             public string? Description { get; set; }
             public string? ValueDescription { get; set; }
             public string? MultiValueSeparator { get; set; }
+            public bool AllowMultiValueWhiteSpaceSeparator { get; set; }
             public string? KeyValueSeparator { get; set; }
             public bool AllowDuplicateDictionaryKeys { get; set; }
             public bool AllowNull { get; set; }
@@ -254,6 +255,7 @@ namespace Ookii.CommandLine
         private readonly ArgumentKind _argumentKind;
         private readonly bool _allowDuplicateDictionaryKeys;
         private readonly string? _multiValueSeparator;
+        private readonly bool _allowMultiValueWhiteSpaceSeparator;
         private readonly string? _keyValueSeparator;
         private readonly bool _allowNull;
         private readonly bool _cancelParsing;
@@ -309,7 +311,6 @@ namespace Ookii.CommandLine
             _elementType = info.ArgumentType;
             _description = info.Description;
             _isRequired = info.IsRequired;
-            _multiValueSeparator = info.MultiValueSeparator;
             _allowNull = info.AllowNull;
             _cancelParsing = info.CancelParsing;
             _validators = info.Validators;
@@ -364,6 +365,12 @@ namespace Ookii.CommandLine
             else
             {
                 _argumentKind = ArgumentKind.Method;
+            }
+
+            if (IsMultiValue)
+            {
+                _multiValueSeparator = info.MultiValueSeparator;
+                _allowMultiValueWhiteSpaceSeparator = !IsSwitch && info.AllowMultiValueWhiteSpaceSeparator;
             }
 
             if (_valueDescription == null)
@@ -750,13 +757,37 @@ namespace Ookii.CommandLine
         /// </value>
         /// <remarks>
         /// <para>
-        ///   This property is only meaningful if the <see cref="IsMultiValue"/> property is <see langword="true"/>.
+        ///   If the <see cref="IsMultiValue"/> property is <see langword="false"/>, this property
+        ///   is always <see langword="null"/>.
         /// </para>
         /// </remarks>
+        /// <seealso cref="MultiValueSeparatorAttribute"/>
         public string? MultiValueSeparator
         {
             get { return _multiValueSeparator; }
         }
+
+        /// <summary>
+        /// Gets a value that indicates whether or not a multi-value argument can consume multiple
+        /// following values.
+        /// </summary>
+        /// <value>
+        /// <see langword="true"/> if a multi-value argument can consume multiple following values;
+        /// otherwise, <see langword="false"/>.
+        /// </value>
+        /// <remarks>
+        /// <para>
+        ///   A multi-value argument that allows white-space separators is able to consume multiple
+        ///   values from the command line that follow it. All values that follow the name, up until
+        ///   the next argument name, are considered values for this argument.
+        /// </para>
+        /// <para>
+        ///   If the <see cref="IsMultiValue"/> property is <see langword="false"/>, this property
+        ///   is always <see langword="false"/>.
+        /// </para>
+        /// </remarks>
+        /// <seealso cref="MultiValueSeparatorAttribute"/>
+        public bool AllowMultiValueWhiteSpaceSeparator => _allowMultiValueWhiteSpaceSeparator;
 
         /// <summary>
         /// Gets the separator for key/value pairs if this argument is a dictionary argument.
@@ -1218,6 +1249,7 @@ namespace Ookii.CommandLine
             var keyTypeConverterAttribute = parameter.GetCustomAttribute<KeyTypeConverterAttribute>();
             var valueTypeConverterAttribute = parameter.GetCustomAttribute<ValueTypeConverterAttribute>();
             var argumentNameAttribute = parameter.GetCustomAttribute<ArgumentNameAttribute>();
+            var multiValueSeparatorAttribute = parameter.GetCustomAttribute<MultiValueSeparatorAttribute>();
             var argumentName = DetermineArgumentName(argumentNameAttribute?.ArgumentName, parameter.Name, parser.NameTransform);
             var info = new ArgumentInfo()
             {
@@ -1235,7 +1267,8 @@ namespace Ookii.CommandLine
                 ConverterType = typeConverterAttribute == null ? null : Type.GetType(typeConverterAttribute.ConverterTypeName, true),
                 KeyConverterType = keyTypeConverterAttribute == null ? null : Type.GetType(keyTypeConverterAttribute.ConverterTypeName, true),
                 ValueConverterType = valueTypeConverterAttribute == null ? null : Type.GetType(valueTypeConverterAttribute.ConverterTypeName, true),
-                MultiValueSeparator = GetMultiValueSeparator(parameter.GetCustomAttribute<MultiValueSeparatorAttribute>()),
+                MultiValueSeparator = GetMultiValueSeparator(multiValueSeparatorAttribute),
+                AllowMultiValueWhiteSpaceSeparator = multiValueSeparatorAttribute != null && multiValueSeparatorAttribute.Separator == null,
                 KeyValueSeparator = parameter.GetCustomAttribute<KeyValueSeparatorAttribute>()?.Separator,
                 Aliases = GetAliases(parameter.GetCustomAttributes<AliasAttribute>(), argumentName),
                 ShortAliases = GetShortAliases(parameter.GetCustomAttributes<ShortAliasAttribute>(), argumentName),
@@ -1301,6 +1334,7 @@ namespace Ookii.CommandLine
             var typeConverterAttribute = member.GetCustomAttribute<TypeConverterAttribute>();
             var keyTypeConverterAttribute = member.GetCustomAttribute<KeyTypeConverterAttribute>();
             var valueTypeConverterAttribute = member.GetCustomAttribute<ValueTypeConverterAttribute>();
+            var multiValueSeparatorAttribute = member.GetCustomAttribute<MultiValueSeparatorAttribute>();
             var argumentName = DetermineArgumentName(attribute.ArgumentName, member.Name, parser.NameTransform);
             var info = new ArgumentInfo()
             {
@@ -1319,7 +1353,8 @@ namespace Ookii.CommandLine
                 ConverterType = typeConverterAttribute == null ? null : Type.GetType(typeConverterAttribute.ConverterTypeName, true),
                 KeyConverterType = keyTypeConverterAttribute == null ? null : Type.GetType(keyTypeConverterAttribute.ConverterTypeName, true),
                 ValueConverterType = valueTypeConverterAttribute == null ? null : Type.GetType(valueTypeConverterAttribute.ConverterTypeName, true),
-                MultiValueSeparator = GetMultiValueSeparator(member.GetCustomAttribute<MultiValueSeparatorAttribute>()),
+                MultiValueSeparator = GetMultiValueSeparator(multiValueSeparatorAttribute),
+                AllowMultiValueWhiteSpaceSeparator = multiValueSeparatorAttribute != null && multiValueSeparatorAttribute.Separator == null,
                 KeyValueSeparator = member.GetCustomAttribute<KeyValueSeparatorAttribute>()?.Separator,
                 Aliases = GetAliases(member.GetCustomAttributes<AliasAttribute>(), argumentName),
                 ShortAliases = GetShortAliases(member.GetCustomAttributes<ShortAliasAttribute>(), argumentName),
