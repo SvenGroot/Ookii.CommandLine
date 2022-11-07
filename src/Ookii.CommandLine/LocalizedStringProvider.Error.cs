@@ -194,15 +194,15 @@ namespace Ookii.CommandLine
         {
             if (attribute.Maximum == int.MaxValue)
             {
-                return Format(Resources.ValidateRangeFailedMinFormat, argumentName, attribute.Minimum);
+                return Format(Resources.ValidateStringLengthMinFormat, argumentName, attribute.Minimum);
             }
             else if (attribute.Minimum <= 0)
             {
-                return Format(Resources.ValidateRangeFailedMaxFormat, argumentName, attribute.Maximum);
+                return Format(Resources.ValidateStringLengthMaxFormat, argumentName, attribute.Maximum);
             }
             else
             {
-                return Format(Resources.ValidateRangeFailedBothFormat, argumentName, attribute.Minimum, attribute.Maximum);
+                return Format(Resources.ValidateStringLengthBothFormat, argumentName, attribute.Minimum, attribute.Maximum);
             }
         }
 

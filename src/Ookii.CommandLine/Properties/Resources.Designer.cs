@@ -106,15 +106,6 @@ namespace Ookii.CommandLine.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to h.
-        /// </summary>
-        internal static string AutomaticHelpShortAlias {
-            get {
-                return ResourceManager.GetString("AutomaticHelpShortAlias", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to ?.
         /// </summary>
         internal static string AutomaticHelpShortName {
@@ -264,15 +255,6 @@ namespace Ookii.CommandLine.Properties {
         internal static string EmptyAliasFormat {
             get {
                 return ResourceManager.GetString("EmptyAliasFormat", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The argument name cannot be empty..
-        /// </summary>
-        internal static string EmptyArgumentName {
-            get {
-                return ResourceManager.GetString("EmptyArgumentName", resourceCulture);
             }
         }
         
@@ -457,16 +439,7 @@ namespace Ookii.CommandLine.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The argument &apos;{0}&apos; has type &apos;{1}&apos;, which does not have a TypeConverter that can convert from a string. Use the TypeConverterAttribute to specify a custom TypeConverter..
-        /// </summary>
-        internal static string NoTypeConverterForArgumentFormat {
-            get {
-                return ResourceManager.GetString("NoTypeConverterForArgumentFormat", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to No type converter that can convert to and from a string exists for type &apos;{0}&apos;..
+        ///   Looks up a localized string similar to No type converter that can convert to and from a string exists for type &apos;{0}&apos;. Use the TypeConverterAttribute to specify a custom TypeConverter..
         /// </summary>
         internal static string NoTypeConverterFormat {
             get {

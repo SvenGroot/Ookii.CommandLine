@@ -35,8 +35,16 @@ namespace Ookii.CommandLine.Validation
         ///   argument type using its <see cref="TypeConverter"/>.
         /// </para>
         /// </remarks>
+        /// <exception cref="ArgumentException">
+        /// <paramref name="minimum"/> and <paramref name="maximum"/> are both <see langword="null"/>.
+        /// </exception>
         public ValidateRangeAttribute(object? minimum, object? maximum)
         {
+            if (_minimum == null && _maximum == null)
+            {
+                throw new ArgumentException(Properties.Resources.MinMaxBothNull);
+            }
+
             _minimum = minimum;
             _maximum = maximum;
         }

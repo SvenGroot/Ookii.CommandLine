@@ -141,9 +141,6 @@
   <data name="DuplicateArgumentPositionFormat" xml:space="preserve">
     <value>The argument '{0}' has the same position value as the argument '{1}'.</value>
   </data>
-  <data name="EmptyArgumentName" xml:space="preserve">
-    <value>The argument name cannot be empty.</value>
-  </data>
   <data name="EmptyArgumentNamePrefixes" xml:space="preserve">
     <value>You must specify at least one argument name prefix.</value>
   </data>
@@ -183,9 +180,6 @@
   <data name="NoMarkedConstructor" xml:space="preserve">
     <value>The command line arguments type has more than one constructor, none of which has the CommandLineConstructorAttribute attribute.</value>
   </data>
-  <data name="NoTypeConverterForArgumentFormat" xml:space="preserve">
-    <value>The argument '{0}' has type '{1}', which does not have a TypeConverter that can convert from a string. Use the TypeConverterAttribute to specify a custom TypeConverter.</value>
-  </data>
   <data name="TooManyArguments" xml:space="preserve">
     <value>Too many arguments were supplied.</value>
   </data>
@@ -211,7 +205,7 @@
     <value>A key/value pair must contain "{0}" as a separator.</value>
   </data>
   <data name="NoTypeConverterFormat" xml:space="preserve">
-    <value>No type converter that can convert to and from a string exists for type '{0}'.</value>
+    <value>No type converter that can convert to and from a string exists for type '{0}'. Use the TypeConverterAttribute to specify a custom TypeConverter.</value>
   </data>
   <data name="CreateArgumentsTypeErrorFormat" xml:space="preserve">
     <value>An error occurred creating an instance of the arguments type: {0}</value>
@@ -254,9 +248,6 @@
   </data>
   <data name="InvalidMethodSignatureFormat" xml:space="preserve">
     <value>The method '{0}' has an unsupported signature.</value>
-  </data>
-  <data name="AutomaticHelpShortAlias" xml:space="preserve">
-    <value>h</value>
   </data>
   <data name="AutomaticVersionDescription" xml:space="preserve">
     <value>Displays version information.</value>
