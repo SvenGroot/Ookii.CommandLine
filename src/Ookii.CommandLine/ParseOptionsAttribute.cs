@@ -260,6 +260,27 @@ namespace Ookii.CommandLine
         /// </remarks>
         public bool? AutoVersionArgument { get; set; } = true;
 
+        /// <summary>
+        /// Gets or sets a value that indicates how value descriptions derived from type names
+        /// are transformed.
+        /// </summary>
+        /// <value>
+        /// One of the members of the <see cref="NameTransform"/> enumeration. The default value is
+        /// <see cref="NameTransform.None"/>.
+        /// </value>
+        /// <remarks>
+        /// <para>
+        ///   This property has no effect on explicit value description specified with the
+        ///   <see cref="CommandLineArgument.ValueDescription"/> property, the <see cref="ValueDescriptionAttribute"/>
+        ///   attribute, or the <see cref="ParseOptions.DefaultValueDescriptions"/> property.
+        /// </para>
+        /// <para>
+        ///   This value can be overridden by the <see cref="ParseOptions.ValueDescriptionTransform"/>
+        ///   property.
+        /// </para>
+        /// </remarks>
+        public NameTransform ValueDescriptionTransform { get; set; }
+
         internal IComparer<string> GetStringComparer()
         {
             if (CaseSensitive)

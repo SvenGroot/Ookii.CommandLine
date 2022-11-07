@@ -796,6 +796,24 @@ namespace Ookii.CommandLine.Tests
         }
 
         [TestMethod]
+        public void TestValueDescriptionTransform()
+        {
+            var options = new ParseOptions
+            {
+                ValueDescriptionTransform = NameTransform.DashCase
+            };
+
+            var parser = new CommandLineParser<ValueDescriptionTransformArguments>(options);
+            TestArguments(parser.Arguments, new[]
+            {
+                new ExpectedArgument("Arg1", typeof(FileInfo)) { ValueDescription = "file-info" },
+                new ExpectedArgument("Arg2", typeof(int)) { ValueDescription = "int32" },
+                new ExpectedArgument("Help", typeof(bool), ArgumentKind.Method) { ValueDescription = "boolean", MemberName = "AutomaticHelp", Description = "Displays this help message.", IsSwitch = true, Aliases = new[] { "?", "h" } },
+                new ExpectedArgument("Version", typeof(bool), ArgumentKind.Method) { ValueDescription = "boolean", MemberName = "AutomaticVersion", Description = "Displays version information.", IsSwitch = true },
+            });
+        }
+
+        [TestMethod]
         public void TestValidation()
         {
             var parser = new CommandLineParser<ValidationArguments>();

@@ -59,6 +59,14 @@ namespace Ookii.CommandLine
                     toUpper = !first || pascalCase;
                     continue;
                 }
+                else if (!char.IsLetter(ch))
+                {
+                    // Also uppercase/lowercase after non-letters.
+                    builder.Append(ch);
+                    toUpper = pascalCase;
+                    toLower = !pascalCase;
+                    continue;
+                }
 
                 first = false;
                 if (toUpper)
@@ -92,6 +100,12 @@ namespace Ookii.CommandLine
                 if (ch == '_')
                 {
                     needSeparator = !first;
+                }
+                else if (!char.IsLetter(ch))
+                {
+                    needSeparator = false;
+                    first = true;
+                    builder.Append(ch);
                 }
                 else
                 {

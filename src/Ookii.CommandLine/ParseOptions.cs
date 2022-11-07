@@ -401,6 +401,28 @@ namespace Ookii.CommandLine
         public IDictionary<Type, string>? DefaultValueDescriptions { get; set; }
 
         /// <summary>
+        /// Gets or sets a value that indicates how value descriptions derived from type names
+        /// are transformed.
+        /// </summary>
+        /// <value>
+        /// One of the members of the <see cref="NameTransform"/> enumeration, or <see langword="null"/>
+        /// to use the value of the <see cref="ParseOptionsAttribute.ValueDescriptionTransform"/>
+        /// attribute. The default value is <see langword="null"/>.
+        /// </value>
+        /// <remarks>
+        /// <para>
+        ///   This property has no effect on explicit value description specified with the
+        ///   <see cref="CommandLineArgument.ValueDescription"/> property, the <see cref="ValueDescriptionAttribute"/>
+        ///   attribute, or the <see cref="ParseOptions.DefaultValueDescriptions"/> property.
+        /// </para>
+        /// <para>
+        ///   If not <see langword="null"/>, this property overrides the <see cref="ParseOptionsAttribute.ValueDescriptionTransform"/>
+        ///   property.
+        /// </para>
+        /// </remarks>
+        public NameTransform? ValueDescriptionTransform { get; set; }
+
+        /// <summary>
         /// Gets or sets the options to use to write usage information to <see cref="Out"/> when
         /// parsing the arguments fails or is canceled.
         /// </summary>

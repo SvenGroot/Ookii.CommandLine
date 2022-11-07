@@ -347,9 +347,9 @@ namespace Ookii.CommandLine
 
             _commandLineConstructor = GetCommandLineConstructor();
 
-            DetermineConstructorArguments(options);
+            DetermineConstructorArguments(options, optionsAttribute);
             _constructorArgumentCount = _arguments.Count;
-            _positionalArgumentCount = _constructorArgumentCount + DetermineMemberArguments(options);
+            _positionalArgumentCount = _constructorArgumentCount + DetermineMemberArguments(options, optionsAttribute);
             DetermineAutomaticArguments(options, optionsAttribute);
             if (_arguments.Count > _constructorArgumentCount)
             {
@@ -1225,20 +1225,27 @@ namespace Ookii.CommandLine
             }
         }
 
-        private void DetermineConstructorArguments(ParseOptions? options)
+        private void DetermineConstructorArguments(ParseOptions? options, ParseOptionsAttribute? optionsAttribute)
         {
             ParameterInfo[] parameters = _commandLineConstructor.GetParameters();
+            var valueDescriptionTransform = options?.ValueDescriptionTransform ?? optionsAttribute?.ValueDescriptionTransform
+                ?? NameTransform.None;
+
             foreach (ParameterInfo parameter in parameters)
             {
-                CommandLineArgument argument = CommandLineArgument.Create(this, parameter, options?.DefaultValueDescriptions);
+                var argument = CommandLineArgument.Create(this, parameter, options?.DefaultValueDescriptions,
+                    valueDescriptionTransform);
+
                 AddNamedArgument(argument);
             }
         }
 
-        private int DetermineMemberArguments(ParseOptions? options)
+        private int DetermineMemberArguments(ParseOptions? options, ParseOptionsAttribute? optionsAttribute)
         {
-            int additionalPositionalArgumentCount = 0;
+            var valueDescriptionTransform = options?.ValueDescriptionTransform ?? optionsAttribute?.ValueDescriptionTransform
+                ?? NameTransform.None;
 
+            int additionalPositionalArgumentCount = 0;
             MemberInfo[] properties = _argumentsType.GetProperties(BindingFlags.Public | BindingFlags.Instance);
             MethodInfo[] methods = _argumentsType.GetMethods(BindingFlags.Public | BindingFlags.Static);
             foreach (var member in properties.Concat(methods))
@@ -1247,8 +1254,10 @@ namespace Ookii.CommandLine
                 {
                     var argument = member switch
                     {
-                        PropertyInfo prop => CommandLineArgument.Create(this, prop, options?.DefaultValueDescriptions),
-                        MethodInfo method => CommandLineArgument.Create(this, method, options?.DefaultValueDescriptions),
+                        PropertyInfo prop => CommandLineArgument.Create(this, prop, options?.DefaultValueDescriptions,
+                            valueDescriptionTransform),
+                        MethodInfo method => CommandLineArgument.Create(this, method, options?.DefaultValueDescriptions,
+                            valueDescriptionTransform),
                         _ => throw new InvalidOperationException(),
                     };
 
@@ -1265,10 +1274,15 @@ namespace Ookii.CommandLine
 
         private void DetermineAutomaticArguments(ParseOptions? options, ParseOptionsAttribute? optionsAttribute)
         {
+            var valueDescriptionTransform = options?.ValueDescriptionTransform ?? optionsAttribute?.ValueDescriptionTransform
+                ?? NameTransform.None;
+
             bool autoHelp = options?.AutoHelpArgument ?? optionsAttribute?.AutoHelpArgument ?? true;
             if (autoHelp)
             {
-                var argument = CommandLineArgument.CreateAutomaticHelp(this, options?.DefaultValueDescriptions);
+                var argument = CommandLineArgument.CreateAutomaticHelp(this, options?.DefaultValueDescriptions,
+                    valueDescriptionTransform);
+
                 if (argument != null)
                 {
                     AddNamedArgument(argument);
@@ -1278,7 +1292,9 @@ namespace Ookii.CommandLine
             bool autoVersion = options?.AutoVersionArgument ?? optionsAttribute?.AutoVersionArgument ?? true;
             if (autoVersion && !CommandInfo.IsCommand(_argumentsType))
             {
-                var argument = CommandLineArgument.CreateAutomaticVersion(this, options?.DefaultValueDescriptions);
+                var argument = CommandLineArgument.CreateAutomaticVersion(this, options?.DefaultValueDescriptions,
+                    valueDescriptionTransform);
+
                 if (argument != null)
                 {
                     AddNamedArgument(argument);

@@ -343,6 +343,15 @@ namespace Ookii.CommandLine.Tests
         public int Explicit { get; set; }
     }
 
+    class ValueDescriptionTransformArguments
+    {
+        [CommandLineArgument]
+        public FileInfo Arg1 { get; set; }
+
+        [CommandLineArgument]
+        public int Arg2 { get; set; }
+    }
+
     class ValidationArguments
     {
         public static int Arg3Value { get; set; }
