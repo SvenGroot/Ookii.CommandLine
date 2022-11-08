@@ -30,10 +30,10 @@ namespace Ookii.CommandLine
         /// </summary>
         public CommandLineArgumentException() { }
 
+        /// <inheritdoc/>
         /// <summary>
         /// Initializes a new instance of the <see cref="CommandLineArgumentException"/> class with a specified error message.
         /// </summary>
-        /// <param name="message">The message that describes the error.</param>
         public CommandLineArgumentException(string? message) : base(message) { }
 
         /// <summary>
@@ -48,7 +48,8 @@ namespace Ookii.CommandLine
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="CommandLineArgumentException"/> class with a specified error message and argument name.
+        /// Initializes a new instance of the <see cref="CommandLineArgumentException"/> class with
+        /// a specified error message, argument name and category.
         /// </summary>
         /// <param name="message">The message that describes the error.</param>
         /// <param name="argumentName">The name of the argument that was invalid.</param>
@@ -61,18 +62,28 @@ namespace Ookii.CommandLine
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="CommandLineArgumentException"/> class with a specified error message and a reference to the inner <see cref="Exception"/> that is the cause of this <see cref="CommandLineArgumentException"/>. 
+        /// Initializes a new instance of the <see cref="CommandLineArgumentException"/> class with
+        /// a specified error message and a reference to the inner <see cref="Exception"/> that is
+        /// the cause of this <see cref="CommandLineArgumentException"/>. 
         /// </summary>
-        /// <param name="message">The error message that explains the reason for the <see cref="CommandLineArgumentException"/>.</param>
-        /// <param name="inner">The <see cref="Exception"/> that is the cause of the current <see cref="CommandLineArgumentException"/>, or a <see langword="null"/> if no inner <see cref="Exception"/> is specified.</param>
+        /// <param name="message">The message that describes the error.</param>
+        /// <param name="inner">
+        /// The <see cref="Exception"/> that is the cause of the current <see cref="CommandLineArgumentException"/>,
+        /// or <see langword="null"/> if no inner <see cref="Exception"/> is specified.
+        /// </param>
         public CommandLineArgumentException(string? message, Exception? inner) : base(message, inner) { }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="CommandLineArgumentException"/> class with a specified error message and a reference to the inner <see cref="Exception"/> that is the cause of this <see cref="CommandLineArgumentException"/>. 
+        /// Initializes a new instance of the <see cref="CommandLineArgumentException"/> class with
+        /// a specified error message, category, and a reference to the inner <see cref="Exception"/> that is
+        /// the cause of this <see cref="CommandLineArgumentException"/>. 
         /// </summary>
         /// <param name="message">The error message that explains the reason for the <see cref="CommandLineArgumentException"/>.</param>
-        /// <param name="inner">The <see cref="Exception"/> that is the cause of the current <see cref="CommandLineArgumentException"/>, or a <see langword="null"/> if no inner <see cref="Exception"/> is specified.</param>
         /// <param name="category">The category of this error.</param>
+        /// <param name="inner">
+        /// The <see cref="Exception"/> that is the cause of the current <see cref="CommandLineArgumentException"/>,
+        /// or a <see langword="null"/> if no inner <see cref="Exception"/> is specified.
+        /// </param>
         public CommandLineArgumentException(string? message, CommandLineArgumentErrorCategory category, Exception? inner)
             : base(message, inner)
         {
@@ -80,12 +91,17 @@ namespace Ookii.CommandLine
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="CommandLineArgumentException"/> class with a specified error message and argument name, and a reference to the inner <see cref="Exception"/> that is the cause of this <see cref="CommandLineArgumentException"/>. 
+        /// Initializes a new instance of the <see cref="CommandLineArgumentException"/> class with
+        /// a specified error message, argument name, category, and a reference to the inner
+        /// <see cref="Exception"/> that is the cause of this <see cref="CommandLineArgumentException"/>. 
         /// </summary>
         /// <param name="message">The error message that explains the reason for the <see cref="CommandLineArgumentException"/>.</param>
         /// <param name="argumentName">The name of the argument that was invalid.</param>
         /// <param name="category">The category of this error.</param>
-        /// <param name="inner">The <see cref="Exception"/> that is the cause of the current <see cref="CommandLineArgumentException"/>, or a <see langword="null"/> if no inner <see cref="Exception"/> is specified.</param>
+        /// <param name="inner">
+        /// The <see cref="Exception"/> that is the cause of the current <see cref="CommandLineArgumentException"/>,
+        /// or a <see langword="null"/> if no inner <see cref="Exception"/> is specified.
+        /// </param>
         public CommandLineArgumentException(string? message, string? argumentName, CommandLineArgumentErrorCategory category, Exception? inner)
             : base(message, inner)
         {
@@ -93,11 +109,10 @@ namespace Ookii.CommandLine
             _category = category;
         }
 
+        /// <inheritdoc/>
         /// <summary>
         /// Initializes a new instance of the <see cref="CommandLineArgumentException"/> class with serialized data. 
         /// </summary>
-        /// <param name="info">The <see cref="System.Runtime.Serialization.SerializationInfo"/> that holds the serialized object data about the <see cref="CommandLineArgumentException"/> being thrown.</param>
-        /// <param name="context">The <see cref="System.Runtime.Serialization.StreamingContext"/> that contains contextual information about the source or destination.</param>
         protected CommandLineArgumentException(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context)
             : base(info, context)
         {

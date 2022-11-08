@@ -16,6 +16,7 @@ namespace Ookii.CommandLine
     /// Provides information about command line arguments that are recognized by a <see cref="CommandLineParser"/>.
     /// </summary>
     /// <threadsafety static="true" instance="false"/>
+    /// <seealso cref="CommandLineArgumentAttribute"/>
     public sealed class CommandLineArgument
     {
         #region Nested types
@@ -396,10 +397,10 @@ namespace Ookii.CommandLine
         public CommandLineParser Parser => _parser;
 
         /// <summary>
-        /// Gets the name of the property or constructor parameter that defined this command line argument.
+        /// Gets the name of the property, method, or constructor parameter that defined this command line argument.
         /// </summary>
         /// <value>
-        /// The name of the property or constructor parameter that defined this command line argument.
+        /// The name of the property, method, or constructor parameter that defined this command line argument.
         /// </value>
         public string MemberName
         {
@@ -420,9 +421,11 @@ namespace Ookii.CommandLine
         /// <para>
         ///   If the <see cref="CommandLineParser.Mode"/> property is <see cref="ParsingMode.LongShort"/>,
         ///   and the <see cref="HasLongName"/> property is <see langword="false"/>, this returns
-        ///   the long name of the argument.
+        ///   the short name of the argument. Otherwise, it returns the long name.
         /// </para>
         /// </remarks>
+        /// <seealso cref="CommandLineArgumentAttribute.ArgumentName"/>
+        /// <seealso cref="ArgumentNameAttribute"/>
         public string ArgumentName => _argumentName;
 
         /// <summary>
@@ -436,6 +439,8 @@ namespace Ookii.CommandLine
         ///   The short name is only used if the parser is using <see cref="ParsingMode.LongShort"/>.
         /// </para>
         /// </remarks>
+        /// <seealso cref="CommandLineArgumentAttribute.ShortName"/>
+        /// <seealso cref="ArgumentNameAttribute.ShortName"/>
         public char ShortName => _shortName;
 
         /// <summary>
@@ -490,7 +495,7 @@ namespace Ookii.CommandLine
         /// </summary>
         /// <value>
         /// The short argument name with its prefix, or <see langword="null"/> if the <see cref="CommandLineParser.Mode"/>
-        /// property is not <see cref="ParsingMode.LongShort"/> or the <see cref="HasLongName"/>
+        /// property is not <see cref="ParsingMode.LongShort"/> or the <see cref="HasShortName"/>
         /// property is <see langword="false"/>.
         /// </value>
         /// <remarks>
@@ -518,9 +523,11 @@ namespace Ookii.CommandLine
         /// <remarks>
         /// <para>
         ///   The short name is only used if the parser is using <see cref="ParsingMode.LongShort"/>.
-        ///   Otherwise, this property always returns <see langword="false"/>.
+        ///   Otherwise, this property is always <see langword="false"/>.
         /// </para>
         /// </remarks>
+        /// <seealso cref="CommandLineArgumentAttribute.IsShort"/>
+        /// <seealso cref="ArgumentNameAttribute.IsShort"/>
         public bool HasShortName => _shortName != '\0';
 
         /// <summary>
@@ -532,9 +539,11 @@ namespace Ookii.CommandLine
         /// <remarks>
         /// <para>
         ///   If the <see cref="CommandLineParser.Mode"/> property is not <see cref="ParsingMode.LongShort"/>,
-        ///   this property is not used and always returns <see langword="true"/>.
+        ///   this property is always <see langword="true"/>.
         /// </para>
         /// </remarks>
+        /// <seealso cref="CommandLineArgumentAttribute.IsLong"/>
+        /// <seealso cref="ArgumentNameAttribute.IsLong"/>
         public bool HasLongName => _hasLongName;
 
         /// <summary>
@@ -547,9 +556,10 @@ namespace Ookii.CommandLine
         /// <para>
         ///   If the <see cref="CommandLineParser.Mode"/> property is <see cref="ParsingMode.LongShort"/>,
         ///   and the <see cref="HasLongName"/> property is <see langword="false"/>, this property
-        ///   will always return an empty collection .
+        ///   will always return an empty collection.
         /// </para>
         /// </remarks>
+        /// <seealso cref="AliasAttribute"/>
         public ReadOnlyCollection<string>? Aliases => _aliases;
 
         /// <summary>
@@ -562,13 +572,14 @@ namespace Ookii.CommandLine
         /// <para>
         ///   If the <see cref="CommandLineParser.Mode"/> property is not <see cref="ParsingMode.LongShort"/>,
         ///   or the <see cref="HasShortName"/> property is <see langword="false"/>, this property
-        ///   will always return an empty collection .
+        ///   will always return an empty collection.
         /// </para>
         /// </remarks>
+        /// <seealso cref="ShortAliasAttribute"/>
         public ReadOnlyCollection<char>? ShortAliases => _shortAliases;
 
         /// <summary>
-        /// Gets the type of the argument.
+        /// Gets the type of the argument's value.
         /// </summary>
         /// <value>
         /// The <see cref="Type"/> of the argument.
@@ -579,10 +590,12 @@ namespace Ookii.CommandLine
         }
 
         /// <summary>
-        /// Gets the element type of the argument.
+        /// Gets the type of the elements of the argument value.
         /// </summary>
         /// <value>
-        /// If the <see cref="IsMultiValue"/> property is <see langword="true"/>, the <see cref="Type"/> of each individual value; otherwise, the same value as <see cref="ArgumentType"/>.
+        /// If the <see cref="IsMultiValue"/> property is <see langword="true"/>, the <see cref="Type"/>
+        /// of each individual value; otherwise, the same value as the <see cref="ArgumentType"/>
+        /// property.
         /// </value>
         public Type ElementType
         {
@@ -598,12 +611,11 @@ namespace Ookii.CommandLine
         /// <remarks>
         /// <para>
         ///   A positional argument is created either using a constructor parameter on the command line arguments type,
-        ///   or by using the <see cref="CommandLineArgumentAttribute.Position"/> property to create a named
-        ///   positional argument.
+        ///   or by using the <see cref="CommandLineArgumentAttribute.Position"/> property.
         /// </para>
         /// <para>
         ///   The <see cref="Position"/> property reflects the actual position of the positional argument. For positional
-        ///   arguments created from properties this doesn't need to match the value of the <see cref="CommandLineArgumentAttribute.Position"/> property.
+        ///   arguments created from properties this doesn't need to match the original value of the <see cref="CommandLineArgumentAttribute.Position"/> property.
         /// </para>
         /// </remarks>
         public int? Position { get; internal set; }
@@ -614,6 +626,13 @@ namespace Ookii.CommandLine
         /// <value>
         ///   <see langword="true"/> if the argument's value must be specified on the command line; <see langword="false"/> if the argument may be omitted.
         /// </value>
+        /// <remarks>
+        /// <para>
+        ///   An argument defined by a constructor parameter is required if the parameter does not
+        ///   have a default value. An argument defined by a property or method is required if its
+        ///   <see cref="CommandLineArgumentAttribute.IsRequired"/> property is <see langword="true"/>.
+        /// </para>
+        /// </remarks>
         public bool IsRequired
         {
             get { return _isRequired; }
@@ -626,6 +645,11 @@ namespace Ookii.CommandLine
         /// The default value of the argument.
         /// </value>
         /// <remarks>
+        /// <para>
+        ///   The default value of an argument defined by a constructor parameter is specified by
+        ///   the default value of that parameter. For an argument defined by a property, the default
+        ///   value is set by the <see cref="CommandLineArgumentAttribute.DefaultValue"/> property.
+        /// </para>
         /// <para>
         ///   This value is only used if <see cref="IsRequired"/> is <see langword="false"/>.
         /// </para>
@@ -646,8 +670,8 @@ namespace Ookii.CommandLine
         ///   This property is used only when generating usage information using <see cref="CommandLineParser.WriteUsage(System.IO.TextWriter,int,WriteUsageOptions)"/>.
         /// </para>
         /// <para>
-        ///   To set the description of an argument, apply the <see cref="System.ComponentModel.DescriptionAttribute"/> attribute to the constructor parameter 
-        ///   or the property that defines the argument.
+        ///   To set the description of an argument, apply the <see cref="System.ComponentModel.DescriptionAttribute"/>
+        ///   attribute to the constructor parameter, property, or method that defines the argument.
         /// </para>
         /// </remarks>
         public string Description
@@ -656,19 +680,22 @@ namespace Ookii.CommandLine
         }
 
         /// <summary>
-        /// Gets the description of the property's value to use when printing usage information.
+        /// Gets the short description of the argument's value to use when printing usage information.
         /// </summary>
         /// <value>
         /// The description of the value.
         /// </value>
         /// <remarks>
         /// <para>
-        ///   The value description is a short (typically one word) description that indicates the type of value that
-        ///   the user should supply. By default the type of the property is used. If the type is an array type, the
-        ///   array's element type is used. If the type is a nullable type, its underlying type is used.
+        ///   The value description is a short, typically one-word description that indicates the type of value that
+        ///   the user should supply. By default, the type of the property is used, applying the <see cref="NameTransform"/>
+        ///   specified by the <see cref="ParseOptions.ValueDescriptionTransform"/> property or the
+        ///   <see cref="ParseOptionsAttribute.ValueDescriptionTransform"/> property. If this is a
+        ///   multi-value argument, the <see cref="ElementType"/> is used. If the type is a nullable
+        ///   value type, its underlying type is used.
         /// </para>
         /// <para>
-        ///   The value description is used when printing usage. For example, the usage for an argument named Sample with
+        ///   The value description is used only when generating usage help. For example, the usage for an argument named Sample with
         ///   a value description of String would look like "-Sample &lt;String&gt;".
         /// </para>
         /// <note>
@@ -676,6 +703,7 @@ namespace Ookii.CommandLine
         ///   using the <see cref="Description"/> property.
         /// </note>
         /// </remarks>
+        /// <seealso cref="CommandLineArgumentAttribute.ValueDescription"/>
         public string ValueDescription
         {
             get { return _valueDescription; }
@@ -685,7 +713,7 @@ namespace Ookii.CommandLine
         /// Gets a value indicating whether this argument is a switch argument.
         /// </summary>
         /// <value>
-        /// 	<see langword="true"/> if the argument is a switch argument; otherwise, <see langword="false"/>.
+        ///   <see langword="true"/> if the argument is a switch argument; otherwise, <see langword="false"/>.
         /// </value>
         /// <remarks>
         /// <para>
@@ -693,7 +721,8 @@ namespace Ookii.CommandLine
         ///   <see langword="false"/> depending on whether the argument is present on the command line.
         /// </para>
         /// <para>
-        ///   A argument is a switch argument when it is not positional, and its <see cref="CommandLineArgument.ElementType"/> is either <see cref="Boolean"/> or a nullable <see cref="Boolean"/>.
+        ///   A argument is a switch argument when it is not positional, and its <see cref="ElementType"/>
+        ///   is either <see cref="bool"/> or a <see cref="Nullable{T}"/> of <see cref="bool"/>.
         /// </para>
         /// </remarks>
         public bool IsSwitch
@@ -724,30 +753,26 @@ namespace Ookii.CommandLine
         /// </para>
         /// <para>
         ///   An argument is <see cref="ArgumentKind.Method"/> if it is backed by a method instead
-        ///   of a property, which will be invoked when the argument is set.
+        ///   of a property, which will be invoked when the argument is set. Method arguments
+        ///   cannot be multi-value or dictionary arguments.
         /// </para>
         /// <para>
         ///   Otherwise, the value will be <see cref="ArgumentKind.SingleValue"/>.
         /// </para>
         /// </remarks>
+        /// <seealso cref="MultiValueSeparator"/>
         public ArgumentKind Kind => _argumentKind;
 
         /// <summary>
         /// Gets a value indicating whether this argument is a multi-value argument.
         /// </summary>
         /// <value>
-        /// 	<see langword="true"/> if the argument is a multi-value argument; otherwise, <see langword="false"/>.
+        ///   <see langword="true"/> if the <see cref="Kind"/> property is <see cref="ArgumentKind.MultiValue"/>
+        ///   or <see cref="ArgumentKind.Dictionary"/>; otherwise, <see langword="false"/>.
         /// </value>
-        /// <remarks>
-        /// <para>
-        ///   A multi-value argument can accept multiple values by having the argument supplied more than once.
-        /// </para>
-        /// <para>
-        ///   An argument is a multi-value argument if its <see cref="ArgumentType"/> is an array or the argument was defined by a read-only property whose type
-        ///   implements the <see cref="ICollection{T}"/> generic interface, or when the <see cref="IsDictionary"/> property is <see langword="true"/>.
-        /// </para>
-        /// </remarks>
-        public bool IsMultiValue => _argumentKind == ArgumentKind.MultiValue || _argumentKind == ArgumentKind.Dictionary;
+        /// <seealso cref="MultiValueSeparator"/>
+        /// <seealso cref="Kind"/>
+        public bool IsMultiValue => _argumentKind is ArgumentKind.MultiValue or ArgumentKind.Dictionary;
 
         /// <summary>
         /// Gets the separator for the values if this argument is a multi-value argument
@@ -769,7 +794,7 @@ namespace Ookii.CommandLine
 
         /// <summary>
         /// Gets a value that indicates whether or not a multi-value argument can consume multiple
-        /// following values.
+        /// following argument values.
         /// </summary>
         /// <value>
         /// <see langword="true"/> if a multi-value argument can consume multiple following values;
@@ -798,39 +823,33 @@ namespace Ookii.CommandLine
         /// </value>
         /// <remarks>
         /// <para>
-        ///   This property is only meaningful if the <see cref="IsDictionary"/> property is <see langword="true"/>.
+        ///   This property is only meaningful if the <see cref="Kind"/> property is <see cref="ArgumentKind.Dictionary"/>.
         /// </para>
         /// </remarks>
+        /// <seealso cref="KeyValueSeparatorAttribute"/>
         public string? KeyValueSeparator => _keyValueSeparator;
 
         /// <summary>
         /// Gets a value indicating whether this argument is a dictionary argument.
         /// </summary>
         /// <value>
-        /// 	<see langword="true"/> if this argument is a dictionary argument; otherwise, <see langword="false"/>.
+        ///   <see langword="true"/> if this the <see cref="Kind"/> property is <see cref="ArgumentKind.Dictionary"/>;
+        ///   otherwise, <see langword="false"/>.
         /// </value>
-        /// <remarks>
-        /// <para>
-        ///   A dictionary argument is an argument whose values have the form "key=value", which get added to a dictionary based on the key.
-        /// </para>
-        /// <para>
-        ///   An argument is a dictionary argument when its <see cref="ArgumentType"/> is <see cref="Dictionary{TKey,TValue}"/>, or it was defined by
-        ///   a read-only property whose type implements the <see cref="IDictionary{TKey,TValue}"/> property.
-        /// </para>
-        /// </remarks>
         public bool IsDictionary => _argumentKind == ArgumentKind.Dictionary;
 
         /// <summary>
         /// Gets a value indicating whether this argument, if it is a dictionary argument, allows duplicate keys.
         /// </summary>
         /// <value>
-        /// 	<see langword="true"/> if this argument allows duplicate keys; otherwise, <see langword="false"/>.
+        ///   <see langword="true"/> if this argument allows duplicate keys; otherwise, <see langword="false"/>.
         /// </value>
         /// <remarks>
         /// <para>
-        ///   This property is only meaningful if the <see cref="IsDictionary"/> property is <see langword="true"/>.
+        ///   This property is only meaningful if the <see cref="Kind"/> property is <see cref="ArgumentKind.Dictionary"/>.
         /// </para>
         /// </remarks>
+        /// <seealso cref="AllowDuplicateDictionaryKeysAttribute"/>
         public bool AllowsDuplicateDictionaryKeys
         {
             get { return _allowDuplicateDictionaryKeys; }
@@ -857,12 +876,12 @@ namespace Ookii.CommandLine
         ///   the <see cref="DefaultValue"/> property, and <see cref="HasValue"/> will be <see langword="false"/>.
         /// </para>
         /// <para>
-        ///   If the <see cref="IsMultiValue"/> property is <see langword="true"/>, the <see cref="Value"/> property will
+        ///   If the <see cref="Kind"/> property is <see cref="ArgumentKind.MultiValue"/>, the <see cref="Value"/> property will
         ///   return an array with all the values, even if the argument type is a collection type rather than
         ///   an array.
         /// </para>
         /// <para>
-        ///   If the <see cref="IsDictionary"/> property is <see langword="true"/>, the <see cref="Value"/> property will
+        ///   If the <see cref="Kind"/> property is <see cref="ArgumentKind.Dictionary"/>, the <see cref="Value"/> property will
         ///   return a <see cref="Dictionary{TKey, TValue}"/> with all the values, even if the argument type is a different type.
         /// </para>
         /// </remarks>
@@ -873,7 +892,7 @@ namespace Ookii.CommandLine
         /// call to <see cref="CommandLineParser.Parse(string[],int)"/>.
         /// </summary>
         /// <value>
-        /// 	<see langword="true"/> if this argument's value was supplied on the command line when the arguments were parsed; otherwise, <see langword="false"/>.
+        ///   <see langword="true"/> if this argument's value was supplied on the command line when the arguments were parsed; otherwise, <see langword="false"/>.
         /// </value>
         /// <remarks>
         /// <para>
@@ -901,6 +920,10 @@ namespace Ookii.CommandLine
         /// </value>
         /// <remarks>
         /// <para>
+        ///   This property can be the value of the <see cref="ArgumentName"/> property, the <see cref="ShortName"/> property,
+        ///   or any of the values in the <see cref="Aliases"/> and <see cref="ShortAliases"/> properties.
+        /// </para>
+        /// <para>
         ///   If the argument names are case-insensitive, the value of this property uses the casing as specified on the command line, not the original casing of the argument name or alias.
         /// </para>
         /// </remarks>
@@ -910,13 +933,13 @@ namespace Ookii.CommandLine
         /// Gets a value that indicates whether or not this argument accepts <see langword="null" /> values.
         /// </summary>
         /// <value>
-        ///   <see langword="true" /> if the <see cref="ArgumentType"/> is a nullable reference type; <see langword="false" />
-        ///   if the argument is a value type (except for <see cref="Nullable{T}"/> or (.Net 6.0 and later only) a 
-        ///   non-nullable reference type.
+        ///   <see langword="true" /> if the <see cref="ArgumentType"/> is a nullable reference type
+        ///   or <see cref="Nullable{T}"/>; <see langword="false" /> if the argument is any other
+        ///   value type or, for .Net 6.0 and later only, a non-nullable reference type.
         /// </value>
         /// <remarks>
         /// <para>
-        ///   For a multi-value argument (array or collection), this value indicates whether the element type can be
+        ///   For a multi-value argument, this value indicates whether the element type can be
         ///   <see langword="null" />.
         /// </para>
         /// <para>
@@ -940,7 +963,7 @@ namespace Ookii.CommandLine
         /// <para>
         ///   If the project containing the command line argument type does not use nullable reference types, or does
         ///   not support them (e.g. on older .Net versions), this property will only be <see langword="false" /> for
-        ///   value types (other than <see cref="Nullable{T}"/>. Only on .Net 6.0 and later will the property be
+        ///   value types other than <see cref="Nullable{T}"/>. Only on .Net 6.0 and later will the property be
         ///   <see langword="false"/> for non-nullable reference types. Although nullable reference types are available
         ///   on .Net Core 3.x, only .Net 6.0 and later will get this behavior due to the necessary runtime support to
         ///   determine nullability of a property or constructor argument.
@@ -954,10 +977,13 @@ namespace Ookii.CommandLine
         /// </summary>
         /// <value>
         /// <see langword="true"/> if argument parsing should be canceled after this argument;
-        /// otherwise, <see langword="false"/>. This value is determined using the <see cref="CommandLineArgumentAttribute.CancelParsing"/>
-        /// property.
+        /// otherwise, <see langword="false"/>.
         /// </value>
         /// <remarks>
+        /// <para>
+        ///   This value is determined using the <see cref="CommandLineArgumentAttribute.CancelParsing"/>
+        ///   property.
+        /// </para>
         /// <para>
         ///   If this property is <see langword="true"/>, the <see cref="CommandLineParser"/> will
         ///   stop parsing the command line arguments after seeing this argument, and return
@@ -978,8 +1004,7 @@ namespace Ookii.CommandLine
         /// </para>
         /// <para>
         ///   Canceling parsing in this way is identical to handling the <see cref="CommandLineParser.ArgumentParsed"/>
-        ///   event and setting <see cref="System.ComponentModel.CancelEventArgs.Cancel"/> to
-        ///   <see langword="true" />.
+        ///   event and setting <see cref="CancelEventArgs.Cancel"/> to <see langword="true" />.
         /// </para>
         /// <para>
         ///   It's possible to prevent cancellation when an argument has this property set by
@@ -1000,7 +1025,8 @@ namespace Ookii.CommandLine
         /// <remarks>
         /// <para>
         ///   A hidden argument will not be included in the usage syntax or the argument description
-        ///   list, even if <see cref="DescriptionListFilterMode.All"/> is used.
+        ///   list, even if <see cref="DescriptionListFilterMode.All"/> is used. It does not
+        ///   affect whether the argument can be used.
         /// </para>
         /// <para>
         ///   This property is always <see langword="false"/> for positional or required arguments,
@@ -1018,14 +1044,20 @@ namespace Ookii.CommandLine
         public IEnumerable<ArgumentValidationAttribute> Validators => _validators;
 
         /// <summary>
-        /// Converts the specified string to the argument type, as specified in the <see cref="ArgumentType"/> property.
+        /// Converts the specified string to the <see cref="ElementType"/>.
         /// </summary>
-        /// <param name="culture">The culture to use to convert the argument.</param>
+        /// <param name="culture">The culture to use for conversion.</param>
         /// <param name="argumentValue">The string to convert.</param>
-        /// <returns>The argument, converted to the type specified by the <see cref="ArgumentType"/> property.</returns>
+        /// <returns>The converted value.</returns>
         /// <remarks>
         /// <para>
-        ///   The <see cref="TypeConverter"/> for the type specified by <see cref="ArgumentType"/> is used to do the conversion.
+        ///   Conversion is done by one of several methods. First, if a <see cref="TypeConverterAttribute"/>
+        ///   was present on the constructor parameter, property, or method that defined the
+        ///   property, the specified <see cref="TypeConverter"/> is used. Otherwise, if the
+        ///   default <see cref="TypeConverter"/> for the <see cref="ElementType"/> can convert
+        ///   from a string, it is used. Otherwise, a static Parse(<see cref="string"/>, <see cref="IFormatProvider"/>) or
+        ///   Parse(<see cref="string"/>) method on the type is used. Finally, a constructor that
+        ///   takes a single parameter of type <see cref="string"/> will be used.
         /// </para>
         /// </remarks>
         /// <exception cref="ArgumentNullException">
@@ -1086,7 +1118,7 @@ namespace Ookii.CommandLine
         }
 
         /// <summary>
-        /// Converts any type to the argument value.
+        /// Converts any type to the argument's <see cref="ElementType"/>.
         /// </summary>
         /// <param name="value">The value to convert.</param>
         /// <returns>The converted value.</returns>
@@ -1097,8 +1129,10 @@ namespace Ookii.CommandLine
         /// <remarks>
         /// <para>
         ///   If the type of <paramref name="value"/> is directly assignable to <see cref="ArgumentType"/>,
-        ///   no conversion is done. Otherwise, the <see cref="TypeConverter"/> for the argument
-        ///   is used.
+        ///   no conversion is done. If the <paramref name="value"/> is a <see cref="string"/>,
+        ///   the same rules apply as for the <see cref="ConvertToArgumentType(CultureInfo, string?)"/>
+        ///   method, using <see cref="CultureInfo.InvariantCulture"/>. Otherwise, the
+        ///   <see cref="TypeConverter"/> for the argument is used to convert between the source.
         /// </para>
         /// <para>
         ///   This method is used to convert the <see cref="CommandLineArgumentAttribute.DefaultValue"/>
@@ -1106,27 +1140,21 @@ namespace Ookii.CommandLine
         ///   <see cref="ArgumentValidationAttribute"/> class to convert values when needed.
         /// </para>
         /// </remarks>
+        /// <exception cref="NotSupportedException">The conversion is not supported.</exception>
         public object? ConvertToArgumentTypeInvariant(object? value)
         {
             if (value == null || _elementType.IsAssignableFrom(value.GetType()))
             {
                 return value;
             }
-            else
-            {
-                if (!_converter.CanConvertFrom(value.GetType()))
-                {
-                    throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.TypeConversionErrorFormat, value.GetType().FullName, _argumentType.FullName, _argumentName));
-                }
 
-                return _converter.ConvertFrom(null, CultureInfo.InvariantCulture, value);
-            }
+            return _converter.ConvertFrom(null, CultureInfo.InvariantCulture, value);
         }
 
         /// <summary>
-        /// Returns a <see cref="String"/> that represents the current <see cref="CommandLineArgument"/>.
+        /// Returns a <see cref="string"/> that represents the current <see cref="CommandLineArgument"/>.
         /// </summary>
-        /// <returns>A <see cref="String"/> that represents the current <see cref="CommandLineArgument"/>.</returns>
+        /// <returns>A <see cref="string"/> that represents the current <see cref="CommandLineArgument"/>.</returns>
         /// <remarks>
         /// <para>
         ///   The string value matches the way the argument is displayed in the usage help's command line syntax
@@ -1256,8 +1284,8 @@ namespace Ookii.CommandLine
                 Parser = parser,
                 Parameter = parameter,
                 ArgumentName = argumentName,
-                Long = argumentNameAttribute?.Long ?? true,
-                Short = argumentNameAttribute?.Short ?? false,
+                Long = argumentNameAttribute?.IsLong ?? true,
+                Short = argumentNameAttribute?.IsShort ?? false,
                 ShortName = argumentNameAttribute?.ShortName ?? '\0',
                 ArgumentType = parameter.ParameterType,
                 Description = parameter.GetCustomAttribute<DescriptionAttribute>()?.Description,

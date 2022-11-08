@@ -15,117 +15,68 @@ using System.Runtime.InteropServices;
 namespace Ookii.CommandLine
 {
     /// <summary>
-    /// Parses command line arguments into a class of the specified type.
+    /// Parses command line arguments defined by a class of the specified type.
     /// </summary>
     /// <remarks>
     /// <para>
-    ///   The <see cref="CommandLineParser"/> class can parse a set of command line arguments into values. Which arguments are
-    ///   accepted is determined from the constructor parameters and properties of the type passed to the <see cref="CommandLineParser.CommandLineParser(Type, IEnumerable{string}?, IComparer{string}?)"/>
-    ///   constructor. The result of a parsing operation is an instance of that type that was constructed using the constructor parameters and
-    ///   property values from their respective command line arguments.
+    ///   The <see cref="CommandLineParser"/> class can parse a set of command line arguments into
+    ///   values. Which arguments are accepted is determined from the constructor parameters,
+    ///   properties, and methods of the type passed to the <see cref="CommandLineParser.CommandLineParser(Type, ParseOptions)"/>
+    ///   constructor. The result of a parsing operation is an instance of that type, created using
+    ///   the values that were supplied on the command line.
     /// </para>
     /// <para>
-    ///   The <see cref="CommandLineParser"/> class can parse a command line and can generate usage help for arguments defined by the type
-    ///   passed to its constructor. This usage help can be presented to the user to provide information about how to invoke your application
-    ///   from the command line.
+    ///   An argument defined by a constructor parameter is always positional, and is required if
+    ///   the parameter has no default value. If your type has multiple constructors, use the
+    ///   <see cref="CommandLineConstructorAttribute"/> attribute to indicate which one to use.
     /// </para>
     /// <para>
-    ///   The <see cref="Parse{T}(string[], ParseOptions)"/> method is a helper that will parse arguments and print error and
-    ///   usage information if required. For most use cases, this is all you need in addition to a class that defines arguments.
+    ///   A property defines a command line argument if it is <see langword="public"/>, not
+    ///   <see langword="static"/>, and has the <see cref="CommandLineArgumentAttribute"/> attribute
+    ///   defined. The properties of the argument are determined by the properties of the
+    ///   <see cref="CommandLineArgumentAttribute"/> class.
     /// </para>
     /// <para>
-    ///   The command line arguments are parsed using the parsing rules described below. A command line consists of a series of
-    ///   argument values; each value is assigned to the appropriate argument based on either the name or the position of the argument.
+    ///   A method defines a command line argument if it is <see langword="public"/>, <see langword="static"/>,
+    ///   has the <see cref="CommandLineArgumentAttribute"/> attribute applied, and one of the
+    ///   signatures shown in the documentation for the <see cref="CommandLineArgumentAttribute"/>
+    ///   attribute.
     /// </para>
     /// <para>
-    ///   Every argument has a name, and can have its value specified by name. To specify an argument name on the command line it must
-    ///   be preceded by a special prefix. On Windows, the argument name prefix is typically a forward
-    ///   slash (/), while on Unix platforms it is usually a single dash (-) or double dash (--). Which prefixes
-    ///   are accepted by the <see cref="CommandLineParser"/> class can be specified by using the <see cref="CommandLineParser.CommandLineParser(Type, IEnumerable{string}?, IComparer{string}?)"/>
-    ///   constructor. By default, it will accept both "/" and "-" on Windows, and only a "-" on all other platforms (other platforms are
-    ///   supported via <a href="http://www.mono-project.com">Mono</a>).
-    /// </para>
-    /// <note>
-    ///   Although almost any argument name is allowed as long as it isn't empty and doesn't contain the character
-    ///   specified in the <see cref="NameValueSeparator"/> property, certain argument names may not be advisable.
-    ///   Particularly, avoid argument names that start with a number, as they it will not be possible to specify
-    ///   them by name if the argument name prefix is a single dash; arguments starting with a single dash followed
-    ///   by a digit are always considered values during parsing, even if there is an argument with that name.
-    /// </note>
-    /// <para>
-    ///   The name of the argument must be followed by its value. The value can be either in the next argument (separated from the name
-    ///   by white space), or separated by  the character specified in the <see cref="NameValueSeparator"/> property. For example,
-    ///   to assign the value "foo" to the argument "sample", you can use either <c>-sample foo</c> or <c>-sample:foo</c>.
+    ///   To parse arguments, invoke the <see cref="Parse()"/> method or one of its overloads.
+    ///   The static <see cref="Parse{T}(ParseOptions)"/> method is a helper that will
+    ///   parse arguments and print error and usage information if required. Calling this method
+    ///   will be sufficient for most use cases.
     /// </para>
     /// <para>
-    ///   If an argument has a type of <see cref="Boolean"/> (and is not a positional argument as described below), it is a switch argument, and doesn't require a value. Its value is determined
-    ///   by its presence on the command line; if it is absent the value is <see langword="false"/>; if it is present the value is
-    ///   <see langword="true"/>. For example, to set a switch argument named "verbose" to true, you can simply use the command line
-    ///   <c>-verbose</c>. You can still explicitly specify the value of a switch argument, for example <c>-verbose:true</c>.
-    ///   Note that you cannot use white space to separate a switch argument name and value; you must use the character
-    ///   specified in the <see cref="NameValueSeparator"/> property.
+    ///   The derived type <see cref="CommandLineParser{T}"/> also provides strongly-typed instance
+    ///   <see cref="CommandLineParser{T}.Parse()"/> methods, if you don't wish to use the static
+    ///   method.
     /// </para>
     /// <para>
-    ///   If the type of the argument is <see cref="Nullable{T}"/> of <see cref="Boolean"/>, its value will be <see langword="null"/> if it is not supplied, <see langword="true"/> if it is supplied without
-    ///   an explicit value (or with an explicit value of <see langword="true"/>), and <see langword="false"/> only if its value was explicitly specified as <see langword="false"/>.
+    ///   The <see cref="CommandLineParser"/> class can generate detailed usage help for the
+    ///   defined arguments, which can be shown to the user to provide information about how to
+    ///   invoke your application from the command line. This usage is shown automatically by the
+    ///   <see cref="Parse{T}(ParseOptions?)"/> method and the <see cref="CommandManager"/> class,
+    ///   or you can use the <see cref="WriteUsage"/> and <see cref="GetUsage"/> methods to generate
+    ///   it manually.
     /// </para>
     /// <para>
-    ///   An argument value can also refer to an argument by position. A positional argument is an argument that can be set both by
-    ///   name and position. When specified by name, it can appear in any position on the command line, but when specified by
-    ///   position, it must appear in the correct position.
+    ///   The <see cref="CommandLineParser"/> class is for applications with a single (root) command.
+    ///   If you wish to create an application with subcommands, use the <see cref="Commands.CommandManager"/>
+    ///   class instead.
     /// </para>
     /// <para>
-    ///   For example, if you have two arguments named "foo" and "bar" which have positions 0 and 1 respectively, you could
-    ///   specify their values using <c>value1 value2</c>, which assigns "value1" to "foo" and "value2" to "bar".
-    ///   However, you could also use <c>-bar value2 -foo value1</c> to achieve the same effect.
-    /// </para>
-    /// <para>
-    ///   If a positional argument was already specified by name, it is no longer considered as a target for positional argument values.
-    ///   In the previous example, if the command line <c>-foo value1 value2</c> is used, "value2" is the first positional argument value,
-    ///   but is assigned to "bar", the second positional argument, because "foo" had already been assigned a value by name.
-    /// </para>
-    /// <para>
-    ///   Arguments can either be required or optional. If an argument is required, the <see cref="CommandLineParser.Parse(string[], int)"/>
-    ///   method will throw a <see cref="CommandLineArgumentException"/> if it is not supplied on the command line. For positional
-    ///   arguments, it is not allowed to have a required argument following a positional argument.
-    /// </para>
-    /// <para>
-    ///   If an argument has a type other than <see cref="String"/>, the <see cref="CommandLineParser"/> class will use the
-    ///   <see cref="TypeDescriptor"/> class to get a <see cref="TypeConverter"/> for that type to convert the supplied string value
-    ///   to the correct type. You can also use the <see cref="TypeConverterAttribute"/> on the property or constructor parameter
-    ///   that defines the attribute to specify a custom type converter.
-    /// </para>
-    /// <para>
-    ///   If an argument has an array type, it can be specified more than once, and the value for each time is it specified
-    ///   is added to the array. Given a multi-value argument named "sample", the command line <c>-sample 1 -sample 2 -sample 3</c>
-    ///   would set the value of "sample" to an array holding the values 1, 2 and 3. A required multi-value argument must have at
-    ///   least one value. A positional multi-value argument must be the last positional argument.
-    /// </para>
-    /// <para>
-    ///   To specify which arguments are accepted by the <see cref="CommandLineParser"/> class, you can use either constructor
-    ///   parameters or properties on the type holding the argument values.
-    /// </para>
-    /// <para>
-    ///   If the arguments type has only one constructor, its parameters are automatically used. If it has more than one
-    ///   constructor, one of the constructors must be marked using the <see cref="CommandLineConstructorAttribute"/> attribute.
-    /// </para>
-    /// <para>
-    ///   Arguments for constructor parameters are always positional arguments, so can be specified by both name and position. The
-    ///   position of the command line argument will match the position of the constructor parameter. By default, the name of the
-    ///   argument matches the name of the parameter, but this can be overridden using the <see cref="ArgumentNameAttribute"/> attribute.
-    ///   The argument is optional if the parameter has the <see cref="System.Runtime.InteropServices.OptionalAttribute"/> attribute applied,
-    ///   and its default value can be specified using the <see cref="System.Runtime.InteropServices.DefaultParameterValueAttribute"/> attribute.
-    ///   With Visual Basic and C# 4.0, you can use the built-in syntax for optional parameters to create an optional command line argument and
-    ///   specify the default value.
-    /// </para>
-    /// <para>
-    ///   A property defines a command line argument if it is <see langword="public"/>, not <see langword="static"/>, and has the
-    ///   <see cref="CommandLineArgumentAttribute"/> attribute defined. The argument will only be positional if the <see cref="CommandLineArgumentAttribute.Position"/>
-    ///   property is set to a non-negative value, and will be required only if the <see cref="CommandLineArgumentAttribute.IsRequired"/>
-    ///   property is set to <see langword="true"/>.
+    ///   The <see cref="CommandLineParser"/> supports two sets of rules for how to parse arguments;
+    ///   <see cref="ParsingMode.Default"/> mode and <see cref="ParsingMode.LongShort"/> mode. For
+    ///   more details on these rules, please see
+    ///   <see href="https://www.github.com/SvenGroot/ookii.commandline">the documentation on GitHub</see>.
     /// </para>
     /// </remarks>
     /// <threadsafety static="true" instance="false"/>
+    /// <seealso cref="CommandLineParser{T}"/>
+    /// <seealso cref="CommandManager"/>
+    /// <seealso href="https://www.github.com/SvenGroot/ookii.commandline"/>
     public class CommandLineParser
     {
         #region Nested types
@@ -202,7 +153,7 @@ namespace Ookii.CommandLine
         #endregion
 
         // Don't apply indentation to console output if the line width is less than this.
-        internal const int MinimumLineWidthForIndent = 30;
+        private const int MinimumLineWidthForIndent = 30;
 
         private readonly Type _argumentsType;
         private readonly List<CommandLineArgument> _arguments = new();
@@ -231,12 +182,22 @@ namespace Ookii.CommandLine
         /// <remarks>
         /// This constant is used as the default value of the <see cref="NameValueSeparator"/> property.
         /// </remarks>
+        /// <seealso cref="AllowWhiteSpaceValueSeparator"/>
         public const char DefaultNameValueSeparator = ':';
 
         /// <summary>
         /// Gets the default prefix used for long argument names if <see cref="Mode"/> is
         /// <see cref="ParsingMode.LongShort"/>.
         /// </summary>
+        /// <value>
+        /// The default long argument name prefix, which is '--'.
+        /// </value>
+        /// <remarks>
+        /// <para>
+        /// This constant is used as the default value of the <see cref="LongArgumentNamePrefix"/>
+        /// property.
+        /// </para>
+        /// </remarks>
         public const string DefaultLongArgumentNamePrefix = "--";
 
         /// <summary>
@@ -245,7 +206,7 @@ namespace Ookii.CommandLine
         /// <remarks>
         /// <para>
         ///   If the event handler sets the <see cref="CancelEventArgs.Cancel"/> property to <see langword="true"/>, command line processing will stop immediately,
-        ///   and the <see cref="CommandLineParser.Parse(string[],int)"/> method will return <see langword="null"/>. The
+        ///   and the <see cref="Parse(string[],int)"/> method will return <see langword="null"/>. The
         ///   <see cref="HelpRequested"/> property will be set to <see langword="true"/> automatically.
         /// </para>
         /// <para>
@@ -261,14 +222,14 @@ namespace Ookii.CommandLine
         public event EventHandler<ArgumentParsedEventArgs>? ArgumentParsed;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="CommandLineParser"/> class using the specified arguments type, the specified argument name prefixes,
-        /// and the specified <see cref="IComparer{T}"/> for comparing argument names.
+        /// Initializes a new instance of the <see cref="CommandLineParser"/> class using the specified arguments type, argument name prefixes,
+        /// and <see cref="IComparer{T}"/> instance for comparing argument names.
         /// </summary>
         /// <param name="argumentsType">The <see cref="Type"/> of the class that defines the command line arguments.</param>
         /// <param name="argumentNamePrefixes">
         ///   Optional prefixes that are used to indicate argument names on the command line, or
-        ///   <see langword="null"/> to use the prefixes from <see cref="ParseOptionsAttribute.ArgumentNamePrefixes"/>
-        ///   or the default prefixes for the current platform.
+        ///   <see langword="null"/> to use the prefixes from the <see cref="ParseOptionsAttribute.ArgumentNamePrefixes"/>
+        ///   property, or the default prefixes for the current platform.
         /// </param>
         /// <param name="argumentNameComparer">
         ///   An optional <see cref="IComparer{T}"/> that is used to match the names of arguments, or
@@ -282,9 +243,9 @@ namespace Ookii.CommandLine
         ///   <paramref name="argumentNamePrefixes"/> contains no elements or contains a <see langword="null"/> or empty string value.
         /// </exception>
         /// <exception cref="NotSupportedException">
-        ///   The <see cref="CommandLineParser"/> cannot use <paramref name="argumentsType"/> as the command line arguments type, because it defines a required
-        ///   positional argument after an optional positional argument, it defines a positional multi-value argument that is not the last positional argument, it defines an argument with an invalid name,
-        ///   it defines two arguments with the same name, or it has two properties with the same <see cref="CommandLineArgumentAttribute.Position"/> property value.
+        ///   The <see cref="CommandLineParser"/> cannot use <paramref name="argumentsType"/> as the command line arguments type,
+        ///   because it violates one of the rules concerning argument names or positions, or has an argument type that cannot
+        ///   be parsed.
         /// </exception>
         /// <remarks>
         /// <para>
@@ -307,6 +268,11 @@ namespace Ookii.CommandLine
         /// </param>
         /// <exception cref="ArgumentNullException">
         ///   <paramref name="argumentsType"/> is <see langword="null"/>.
+        /// </exception>
+        /// <exception cref="NotSupportedException">
+        ///   The <see cref="CommandLineParser"/> cannot use <paramref name="argumentsType"/> as the command line arguments type,
+        ///   because it violates one of the rules concerning argument names or positions, or has an argument type that cannot
+        ///   be parsed.
         /// </exception>
         /// <remarks>
         /// <para>
@@ -373,6 +339,8 @@ namespace Ookii.CommandLine
         /// The <see cref="Ookii.CommandLine.ParsingMode"/> for this parser. The default is
         /// <see cref="ParsingMode.Default"/>.
         /// </value>
+        /// <seealso cref="ParseOptionsAttribute.Mode"/>
+        /// <seealso cref="ParseOptions.Mode"/>
         public ParsingMode Mode => _mode;
 
         /// <summary>
@@ -385,12 +353,14 @@ namespace Ookii.CommandLine
         /// <remarks>
         /// <para>
         ///   If an argument didn't have the <see cref="CommandLineArgumentAttribute.ArgumentName"/>
-        ///   property set (or doesn't have an <see cref="ArgumentNameAttribute"/> attribute for
-        ///   constructor parameters), the argument name was determined by taking the name of the
-        ///   property, constructor parameter, or method that defines it, and applying the specified
+        ///   property set, or doesn't have an <see cref="ArgumentNameAttribute"/> attribute for
+        ///   constructor parameters, the argument name was determined by taking the name of the
+        ///   property, constructor parameter, or method that defined it, and applying the specified
         ///   transform.
         /// </para>
         /// </remarks>
+        /// <seealso cref="ParseOptionsAttribute.NameTransform"/>
+        /// <seealso cref="ParseOptions.NameTransform"/>
         public NameTransform NameTransform => _nameTransform;
 
         /// <summary>
@@ -409,6 +379,8 @@ namespace Ookii.CommandLine
         ///   to get the prefix for long argument names.
         /// </para>
         /// </remarks>
+        /// <seealso cref="ParseOptionsAttribute.ArgumentNamePrefixes"/>
+        /// <seealso cref="ParseOptions.ArgumentNamePrefixes"/>
         public ReadOnlyCollection<string> ArgumentNamePrefixes =>
             _argumentNamePrefixesReadOnlyWrapper ??= new(_argumentNamePrefixes);
 
@@ -426,13 +398,15 @@ namespace Ookii.CommandLine
         ///   get the prefixes for short argument names.
         /// </para>
         /// </remarks>
+        /// <seealso cref="ParseOptionsAttribute.LongArgumentNamePrefix"/>
+        /// <seealso cref="ParseOptions.LongArgumentNamePrefix"/>
         public string? LongArgumentNamePrefix => _longArgumentNamePrefix;
 
         /// <summary>
         /// Gets the type that was used to define the arguments.
         /// </summary>
         /// <value>
-        /// The type that was used to define the arguments.
+        /// The <see cref="Type"/> that was used to define the arguments.
         /// </value>
         public Type ArgumentsType
         {
@@ -475,18 +449,13 @@ namespace Ookii.CommandLine
         /// </value>
         /// <remarks>
         /// <para>
-        ///   This description will be added to the usage returned by the <see cref="CommandLineParser.WriteUsage(TextWriter, int, WriteUsageOptions)"/> property. This description can be set by applying
-        ///   the <see cref="DescriptionAttribute"/> to the command line arguments type.
+        ///   This description will be added to the usage returned by the <see cref="WriteUsage(TextWriter, int, WriteUsageOptions)"/>
+        ///   method. This description can be set by applying the <see cref="DescriptionAttribute"/>
+        ///   to the command line arguments type.
         /// </para>
         /// </remarks>
         public string Description
-        {
-            get
-            {
-                var description = (DescriptionAttribute?)Attribute.GetCustomAttribute(_argumentsType, typeof(DescriptionAttribute));
-                return description?.Description ?? string.Empty;
-            }
-        }
+            => _argumentsType.GetCustomAttribute<DescriptionAttribute>()?.Description ?? string.Empty;
 
         /// <summary>
         /// Gets or sets the culture used to convert command line argument values from their string representation to the argument type.
@@ -495,8 +464,8 @@ namespace Ookii.CommandLine
         /// The culture used to convert command line argument values from their string representation to the argument type. The default value
         /// is <see cref="CultureInfo.InvariantCulture"/>.
         /// </value>
+        /// <seealso cref="ParseOptions.Culture"/>
         public CultureInfo Culture { get; set; } = CultureInfo.InvariantCulture;
-
 
         /// <summary>
         /// Gets or sets a value indicating whether duplicate arguments are allowed.
@@ -514,45 +483,51 @@ namespace Ookii.CommandLine
         ///   If the <see cref="AllowDuplicateArguments"/> property is <see langword="true"/>, the last value supplied for the argument is used if it is supplied multiple times.
         /// </para>
         /// <para>
-        ///   The <see cref="AllowDuplicateArguments"/> property has no effect on arguments whose <see cref="CommandLineArgument.ArgumentType"/> is an array, which can
-        ///   always be supplied multiple times.
+        ///   The <see cref="AllowDuplicateArguments"/> property has no effect on multi-value or
+        ///   dictionary arguments, which can always be supplied multiple times.
         /// </para>
         /// </remarks>
+        /// <see cref="ParseOptionsAttribute.AllowDuplicateArguments"/>
+        /// <see cref="ParseOptions.AllowDuplicateArguments"/>
         public bool AllowDuplicateArguments { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether the value of arguments may be separated from the name by white space.
+        /// Gets or sets a value indicating whether the value of an argument may be in a separate
+        /// argument from its name.
         /// </summary>
         /// <value>
-        ///   <see langword="true"/> if white space is allowed to separate an argument name and its value; <see langword="false"/> if only the character
-        ///   specified in the <see cref="NameValueSeparator"/> property is allowed.
-        ///   The default value is <see langword="true"/>.
+        ///   <see langword="true"/> if names and values can be in separate arguments; <see langword="false"/> if the character
+        ///   specified in the <see cref="NameValueSeparator"/> property must be used. The default
+        ///   value is <see langword="true"/>.
         /// </value>
         /// <remarks>
         /// <para>
         ///   If the <see cref="AllowWhiteSpaceValueSeparator"/> property is <see langword="true"/>,
-        ///   the value of an argument can be separated from its name either by using  the character
-        ///   specified in the <see cref="NameValueSeparator"/> property or by using white space.
-        ///   Given a named argument named "sample", the command lines <c>-sample:value</c> and <c>-sample value</c>
+        ///   the value of an argument can be separated from its name either by using the character
+        ///   specified in the <see cref="NameValueSeparator"/> property or by using white space (i.e.
+        ///   by having a second argument that has the value). Given a named argument named "Sample",
+        ///   the command lines <c>-Sample:value</c> and <c>-Sample value</c>
         ///   are both valid and will assign the value "value" to the argument.
         /// </para>
         /// <para>
         ///   If the <see cref="AllowWhiteSpaceValueSeparator"/> property is <see langword="false"/>, only the character
         ///   specified in the <see cref="NameValueSeparator"/> property is allowed to separate the value from the name.
-        ///   The command line <c>-sample:value</c> still assigns the value "value" to the argument, but for the command line "-sample value" the argument 
+        ///   The command line <c>-Sample:value</c> still assigns the value "value" to the argument, but for the command line "-Sample value" the argument 
         ///   is considered not to have a value (which is only valid if <see cref="CommandLineArgument.IsSwitch"/> is <see langword="true"/>), and
         ///   "value" is considered to be the value for the next positional argument.
         /// </para>
         /// <para>
         ///   For switch arguments (<see cref="CommandLineArgument.IsSwitch"/> is <see langword="true"/>),
-        ///   only  the character specified in the <see cref="NameValueSeparator"/> property is allowed
+        ///   only the character specified in the <see cref="NameValueSeparator"/> property is allowed
         ///   to specify an explicit value regardless of the value of the <see cref="AllowWhiteSpaceValueSeparator"/>
-        ///   property. Given a switch argument named "switch"  the command line <c>-switch false</c>
-        ///   is interpreted to mean that the value of "switch" is <see langword="true"/> and the value of the
+        ///   property. Given a switch argument named "Switch"  the command line <c>-Switch false</c>
+        ///   is interpreted to mean that the value of "Switch" is <see langword="true"/> and the value of the
         ///   next positional argument is "false", even if the <see cref="AllowWhiteSpaceValueSeparator"/>
         ///   property is <see langword="true"/>.
         /// </para>
         /// </remarks>
+        /// <seealso cref="ParseOptionsAttribute.AllowWhiteSpaceValueSeparator"/>
+        /// <seealso cref="ParseOptions.AllowWhiteSpaceValueSeparator"/>
         public bool AllowWhiteSpaceValueSeparator { get; set; }
 
         /// <summary>

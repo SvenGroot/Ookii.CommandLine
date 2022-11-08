@@ -1,7 +1,7 @@
 ﻿namespace Ookii.CommandLine
 {
     /// <summary>
-    /// Specifies what kind of argument am instance of the <see cref="CommandLineArgument"/> class
+    /// Specifies what kind of argument an instance of the <see cref="CommandLineArgument"/> class
     /// represents.
     /// </summary>
     public enum ArgumentKind

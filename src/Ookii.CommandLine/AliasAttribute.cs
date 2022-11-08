@@ -34,6 +34,8 @@ namespace Ookii.CommandLine
     ///   property.
     /// </para>
     /// </remarks>
+    /// <threadsafety static="true" instance="false"/>
+    /// <seealso cref="CommandLineArgument.Aliases"/>
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Parameter | AttributeTargets.Class, AllowMultiple = true)]
     public sealed class AliasAttribute : Attribute
     {
@@ -43,6 +45,9 @@ namespace Ookii.CommandLine
         /// Initializes a new instance of the <see cref="AliasAttribute"/> class.
         /// </summary>
         /// <param name="alias">The alternative name for the command line argument or subcommand.</param>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="alias"/> is <see langword="null"/>.
+        /// </exception>
         public AliasAttribute(string alias)
         {
             _alias = alias ?? throw new ArgumentNullException(nameof(alias));

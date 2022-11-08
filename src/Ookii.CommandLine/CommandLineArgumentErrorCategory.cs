@@ -36,7 +36,8 @@ namespace Ookii.CommandLine
         /// </summary>
         MissingRequiredArgument,
         /// <summary>
-        /// Invalid value for a dictionary argument; typically the result of a duplicate key.
+        /// Invalid value for a dictionary argument; typically the result of a duplicate key or
+        /// a value without a key/value separator.
         /// </summary>
         InvalidDictionaryValue,
         /// <summary>

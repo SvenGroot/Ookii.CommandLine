@@ -14,10 +14,16 @@ namespace Ookii.CommandLine
     /// </para>
     /// <para>
     ///   If no argument name is specified, the parameter name will be used, applying the
-    ///   <see cref="NameTransform"/> that is being used.
+    ///   <see cref="NameTransform"/> specified by the <see cref="ParseOptions.NameTransform"/>
+    ///   property or the <see cref="ParseOptionsAttribute.NameTransform"/> property.
     /// </para>
     /// <para>
-    ///   The <see cref="NameTransform"/> will not be applied to explicitly specified names.
+    ///   The <see cref="NameTransform"/> will not be applied to names specified with this
+    ///   attribute.
+    /// </para>
+    /// <para>
+    ///   For arguments defined using properties or methods, use the <see cref="CommandLineArgumentAttribute"/>
+    ///   attribute.
     /// </para>
     /// </remarks>
     /// <threadsafety static="true" instance="false"/>
@@ -38,6 +44,10 @@ namespace Ookii.CommandLine
         /// <para>
         ///   The <see cref="NameTransform"/> will not be applied to explicitly specified names.
         /// </para>
+        /// <para>
+        ///   If the <see cref="CommandLineParser.Mode"/> property is <see cref="ParsingMode.LongShort"/>,
+        ///   <paramref name="argumentName"/> is the long name of the attribute.
+        /// </para>
         /// </remarks>
         public ArgumentNameAttribute(string? argumentName = null)
         {
@@ -50,6 +60,18 @@ namespace Ookii.CommandLine
         /// <value>
         /// The name of the argument.
         /// </value>
+        /// <remarks>
+        /// <para>
+        ///   If the <see cref="CommandLineParser.Mode"/> property is <see cref="ParsingMode.LongShort"/>,
+        ///   this is the long name of the attribute.
+        /// </para>
+        /// <para>
+        ///   If the <see cref="CommandLineParser.Mode"/> property is <see cref="ParsingMode.LongShort"/>,
+        ///   and the <see cref="IsLong"/> property is <see langword="false"/>, this property will
+        ///   not be used.
+        /// </para>
+        /// </remarks>
+        /// <seealso cref="CommandLineArgument.ArgumentName"/>
         public string? ArgumentName => _argumentName;
 
         /// <summary>
@@ -60,12 +82,18 @@ namespace Ookii.CommandLine
         /// The default value is <see langword="true"/>.
         /// </value>
         /// <remarks>
-        /// <note>
+        /// <para>
         ///   This property is ignored if <see cref="CommandLineParser.Mode"/> is not
         ///   <see cref="ParsingMode.LongShort"/>.
-        /// </note>
+        /// </para>
+        /// <para>
+        ///   If the <see cref="CommandLineParser.Mode"/> property is <see cref="ParsingMode.LongShort"/>,
+        ///   and this property is <see langword="false"/>, the <see cref="ArgumentName"/> property
+        ///   will not be used.
+        /// </para>
         /// </remarks>
-        public bool Long { get; set; } = true;
+        /// <seealso cref="CommandLineArgument.HasLongName"/>
+        public bool IsLong { get; set; } = true;
 
         /// <summary>
         /// Gets or sets a value that indicates whether the argument has a short name.
@@ -80,11 +108,13 @@ namespace Ookii.CommandLine
         ///   <see cref="ParsingMode.LongShort"/>.
         /// </note>
         /// <para>
-        ///   If <see cref="ShortName"/> is not set but this property is set to <see langword="true"/>,
-        ///   the short name will be derived using the first character of the long name.
+        ///   If the <see cref="ShortName"/> property is not set but this property is set to
+        ///   <see langword="true"/>, the short name will be derived using the first character of
+        ///   the long name.
         /// </para>
         /// </remarks>
-        public bool Short
+        /// /// <seealso cref="CommandLineArgument.HasShortName"/>
+        public bool IsShort
         {
             get => _short || ShortName != '\0';
             set => _short = value;
@@ -98,7 +128,12 @@ namespace Ookii.CommandLine
         ///   This property is ignored if <see cref="CommandLineParser.Mode"/> is not
         ///   <see cref="ParsingMode.LongShort"/>.
         /// </para>
+        /// <para>
+        ///   If this property is not set but the <see cref="IsShort"/> property is set to <see langword="true"/>,
+        ///   the short name will be derived using the first character of the long name.
+        /// </para>
         /// </remarks>
+        /// /// <seealso cref="CommandLineArgument.ShortName"/>
         public char ShortName { get; set; }
     }
 }

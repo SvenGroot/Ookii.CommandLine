@@ -20,6 +20,8 @@ namespace Ookii.CommandLine
     ///   The <see cref="AllowDuplicateDictionaryKeysAttribute"/> is ignored if it is applied to any other type of argument.
     /// </para>
     /// </remarks>
+    /// <threadsafety static="true" instance="false"/>
+    /// <seealso cref="CommandLineArgument.AllowsDuplicateDictionaryKeys"/>
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Parameter)]
     public sealed class AllowDuplicateDictionaryKeysAttribute : Attribute
     {

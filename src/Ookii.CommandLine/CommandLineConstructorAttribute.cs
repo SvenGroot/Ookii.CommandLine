@@ -15,11 +15,5 @@ namespace Ookii.CommandLine
     [AttributeUsage(AttributeTargets.Constructor)]
     public sealed class CommandLineConstructorAttribute : Attribute
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="CommandLineConstructorAttribute"/> class.
-        /// </summary>
-        public CommandLineConstructorAttribute()
-        {
-        }
     }
 }

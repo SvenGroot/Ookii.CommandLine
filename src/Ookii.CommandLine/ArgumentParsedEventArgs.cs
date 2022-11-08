@@ -11,10 +11,13 @@ namespace Ookii.CommandLine
     /// <para>
     ///   If the event handler sets the <see cref="CancelEventArgs.Cancel"/> property to <see langword="true"/>, command line processing will stop immediately,
     ///   and the <see cref="CommandLineParser.Parse(string[],int)"/> method will return <see langword="null"/>, even if all the required positional parameters have already
-    ///   been parsed. You can use this for instance to implement a "/?" argument that will display usage and quit regardless of the other command line arguments.
+    ///   been parsed.
     /// </para>
     /// </remarks>
     /// <threadsafety static="true" instance="false"/>
+    /// <seealso cref="CommandLineArgument.CancelParsing"/>
+    /// <seealso cref="ParseOptions.AutoHelpArgument"/>
+    /// <seealso cref="ParseOptions.AutoVersionArgument"/>
     public class ArgumentParsedEventArgs : CancelEventArgs
     {
         private readonly CommandLineArgument _argument;
@@ -22,16 +25,11 @@ namespace Ookii.CommandLine
         /// <summary>
         /// Initializes a new instance of the <see cref="ArgumentParsedEventArgs"/> class.
         /// </summary>
-        /// <param name="argument">The information about the argument that has been parsed.</param>
+        /// <param name="argument">The argument that has been parsed.</param>
         /// <exception cref="ArgumentNullException"><paramref name="argument"/> is <see langword="null"/>.</exception>
         public ArgumentParsedEventArgs(CommandLineArgument argument)
         {
-            if (argument == null)
-            {
-                throw new ArgumentNullException(nameof(argument));
-            }
-
-            _argument = argument;
+            _argument = argument ?? throw new ArgumentNullException(nameof(argument));
         }
 
         /// <summary>

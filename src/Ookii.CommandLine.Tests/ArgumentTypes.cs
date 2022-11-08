@@ -197,7 +197,7 @@ namespace Ookii.CommandLine.Tests
     [ParseOptions(Mode = ParsingMode.LongShort)]
     class LongShortArguments
     {
-        public LongShortArguments([ArgumentName(Short = true), Description("Foo description.")] int foo = 0,
+        public LongShortArguments([ArgumentName(IsShort = true), Description("Foo description.")] int foo = 0,
             [Description("Bar description.")] int bar = 0)
         {
             Foo = foo;

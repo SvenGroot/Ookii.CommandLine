@@ -1,4 +1,6 @@
-﻿namespace Ookii.CommandLine
+﻿using System;
+
+namespace Ookii.CommandLine
 {
     /// <summary>
     /// A convenience wrapper around <see cref="CommandLineParser"/> that lets you specify the
@@ -27,6 +29,11 @@
         ///   The options that control parsing behavior, or <see langword="null"/> to use the
         ///   default options.
         /// </param>
+        /// <exception cref="NotSupportedException">
+        ///   The <see cref="CommandLineParser"/> cannot use <typeparamref name="T"/> as the command
+        ///   line arguments type, because it violates one of the rules concerning argument names or
+        ///   positions, or has an argument type that cannot be parsed.
+        /// </exception>
         /// <remarks>
         /// <para>
         ///   The <see cref="ParseOptions.UsageOptions"/> are not used here. If you want those to

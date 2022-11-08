@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Sven Groot (Ookii.org)
 using Ookii.CommandLine.Commands;
 using System;
+using System.ComponentModel;
 
 namespace Ookii.CommandLine
 {
@@ -32,7 +33,7 @@ namespace Ookii.CommandLine
     /// public static void Method();
     /// </code>
     /// <para>
-    ///   The <c>ArgumentType</c> type determines the type of values the argument accepts. If there
+    ///   In this case, the <c>ArgumentType</c> type determines the type of values the argument accepts. If there
     ///   is no <c>value</c> parameter, the argument will be a switch argument, and the method will
     ///   be invoked if the switch is present, even if it was explicitly set to <see langword="false"/>.
     /// </para>
@@ -51,6 +52,8 @@ namespace Ookii.CommandLine
     /// </para>
     /// </remarks>
     /// <threadsafety static="true" instance="false"/>
+    /// <seealso cref="CommandLineParser"/>
+    /// <seealso cref="CommandLineArgument"/>
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Method)]
     public sealed class CommandLineArgumentAttribute : Attribute
     {
@@ -58,39 +61,52 @@ namespace Ookii.CommandLine
         private bool _short;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="CommandLineArgumentAttribute"/> class using
-        /// the property or method name as the argument name, applying the <see cref="NameTransform"/>
-        /// that is being used.
-        /// </summary>
-        public CommandLineArgumentAttribute()
-            : this(null)
-        {
-        }
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="CommandLineArgumentAttribute"/> class using the specified argument name.
         /// </summary>
         /// <param name="argumentName">
-        ///   The name of the argument, or <see langword="null"/> to indicate the property name
-        ///   should be used (applying the <see cref="NameTransform"/> that is being used).
+        ///   The name of the argument, or <see langword="null"/> to indicate the member name
+        ///   should be used, applying the <see cref="NameTransform"/> specified by the
+        ///   <see cref="ParseOptions.NameTransform"/> property or the <see cref="ParseOptionsAttribute.NameTransform"/>
+        ///   property.
         /// </param>
+        /// <para>
+        ///   If the <see cref="CommandLineParser.Mode"/> property is <see cref="ParsingMode.LongShort"/>,
+        ///   the <paramref name="argumentName"/> parameter is the long name of the argument.
+        /// </para>
+        /// <para>
+        ///   If the <see cref="CommandLineParser.Mode"/> property is <see cref="ParsingMode.LongShort"/>
+        ///   and the <see cref="IsLong"/> property is <see langword="false"/>, the <paramref name="argumentName"/>
+        ///   parameter will not be used.
+        /// </para>
         /// <remarks>
         /// <para>
         ///   The <see cref="NameTransform"/> will not be applied to explicitly specified names.
         /// </para>
         /// </remarks>
-        public CommandLineArgumentAttribute(string? argumentName)
+        public CommandLineArgumentAttribute(string? argumentName = null)
         {
-            Position = -1;
             _argumentName = argumentName;
         }
 
         /// <summary>
-        /// Gets the name of the argument's command switch.
+        /// Gets the name of the argument.
         /// </summary>
         /// <value>
-        /// The name of the command switch used to set the argument, or <see langword="null"/> if the property name should be used.
+        /// The name that can be used to supply the argument, or <see langword="null"/> if the
+        /// member name should be used.
         /// </value>
+        /// <remarks>
+        /// <para>
+        ///   If the <see cref="CommandLineParser.Mode"/> property is <see cref="ParsingMode.LongShort"/>,
+        ///   this is the long name of the argument.
+        /// </para>
+        /// <para>
+        ///   If the <see cref="CommandLineParser.Mode"/> property is <see cref="ParsingMode.LongShort"/>
+        ///   and the <see cref="IsLong"/> property is <see langword="false"/>, the <see cref="ArgumentName"/>
+        ///   property is ignored.
+        /// </para>
+        /// </remarks>
+        /// <seealso cref="CommandLineArgument.ArgumentName"/>
         public string? ArgumentName
         {
             get { return _argumentName; }
@@ -104,11 +120,17 @@ namespace Ookii.CommandLine
         /// The default value is <see langword="true"/>.
         /// </value>
         /// <remarks>
-        /// <note>
+        /// <para>
         ///   This property is ignored if <see cref="CommandLineParser.Mode"/> is not
         ///   <see cref="ParsingMode.LongShort"/>.
-        /// </note>
+        /// </para>
+        /// <para>
+        ///   If the <see cref="CommandLineParser.Mode"/> property is <see cref="ParsingMode.LongShort"/>
+        ///   and the <see cref="IsLong"/> property is <see langword="false"/>, the <see cref="ArgumentName"/>
+        ///   property is ignored.
+        /// </para>
         /// </remarks>
+        /// <seealso cref="CommandLineArgument.HasLongName"/>
         public bool IsLong { get; set; } = true;
 
         /// <summary>
@@ -124,10 +146,11 @@ namespace Ookii.CommandLine
         ///   <see cref="ParsingMode.LongShort"/>.
         /// </note>
         /// <para>
-        ///   If <see cref="ShortName"/> is not set but this property is set to <see langword="true"/>,
+        ///   If the <see cref="ShortName"/> property is not set but this property is set to <see langword="true"/>,
         ///   the short name will be derived using the first character of the long name.
         /// </para>
         /// </remarks>
+        /// <seealso cref="CommandLineArgument.HasShortName"/>
         public bool IsShort
         {
             get => _short || ShortName != '\0';
@@ -144,7 +167,7 @@ namespace Ookii.CommandLine
         ///   <see cref="ParsingMode.LongShort"/>.
         /// </note>
         /// <para>
-        ///   Setting this property implies <see cref="IsShort"/> is <see langword="true"/>.
+        ///   Setting this property implies the <see cref="IsShort"/> property is <see langword="true"/>.
         /// </para>
         /// <para>
         ///   To derive the short name from the first character of the long name, set the
@@ -152,15 +175,17 @@ namespace Ookii.CommandLine
         ///   <see cref="ShortName"/> property.
         /// </para>
         /// </remarks>
+        /// <see cref="CommandLineArgument.ShortName"/>
         public char ShortName { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether the named argument is required.
+        /// Gets or sets a value indicating whether the argument is required.
         /// </summary>
         /// <value>
-        ///   <see langword="true"/> if the named argument must be supplied on the command line; otherwise, <see langword="false"/>.
+        ///   <see langword="true"/> if the argument must be supplied on the command line; otherwise, <see langword="false"/>.
         ///   The default value is <see langword="false"/>.
         /// </value>
+        /// <see cref="CommandLineArgument.IsRequired"/>
         public bool IsRequired { get; set; }
 
         /// <summary>
@@ -171,10 +196,12 @@ namespace Ookii.CommandLine
         /// </value>
         /// <remarks>
         /// <para>
-        ///   The <see cref="Position"/> property specifies the relative position of the positional arguments created by properties. If
-        ///   you skip any numbers, they will be ignored; if you have only two positional arguments with positions set to
-        ///   4 and 7, they will be the first and second positional arguments, not the 4th and 7th. It is an error
-        ///   to use the same number more than once.
+        ///   The <see cref="Position"/> property specifies the relative position of the positional
+        ///   arguments created by properties. The actual numbers are not important, only their
+        ///   order is. For example, if you have two positional arguments with positions set to
+        ///   4 and 7, and no other positional arguments, they will be the first and second
+        ///   positional arguments, not the forth and seventh. It is an error to use the same number
+        ///   more than once.
         /// </para>
         /// <para>
         ///   If you have arguments defined by the type's constructor parameters, positional arguments defined by properties will
@@ -186,13 +213,15 @@ namespace Ookii.CommandLine
         ///   which may not match the value of the <see cref="Position"/> property.
         /// </para>
         /// </remarks>
-        public int Position { get; set; }
+        /// <seealso cref="CommandLineArgument.Position"/>
+        public int Position { get; set; } = -1;
 
         /// <summary>
         /// Gets or sets the default value to be assigned to the property if the argument is not supplied on the command line.
         /// </summary>
         /// <value>
-        /// The default value for the argument. The default value is <see langword="null"/>.
+        /// The default value for the argument, or <see langword="null"/> to not set the property
+        /// if the argument is not supplied. The default value is <see langword="null"/>.
         /// </value>
         /// <remarks>
         /// <para>
@@ -206,33 +235,37 @@ namespace Ookii.CommandLine
         ///   property to <see langword="true"/>.
         /// </para>
         /// </remarks>
+        /// <seealso cref="CommandLineArgument.DefaultValue"/>
         public object? DefaultValue { get; set; }
 
         /// <summary>
-        /// Gets or sets the description of the property's value to use when printing usage information.
+        /// Gets or sets a short description of the property's value to use when printing usage information.
         /// </summary>
         /// <value>
-        /// The description of the value, or <see langword="null"/> to indicate that the property's type name should be used.
+        /// The description of the value, or <see langword="null"/> to indicate that the property's
+        /// type name should be used, applying the <see cref="NameTransform"/> specified by the
+        /// <see cref="ParseOptions.ValueDescriptionTransform"/> or <see cref="ParseOptionsAttribute.ValueDescriptionTransform"/>
+        /// property.
         /// </value>
         /// <remarks>
         /// <para>
-        ///   The value description is a short (typically one word) description that indicates the type of value that
-        ///   the user should supply. By default the type of the property is used. If the type is an array type, the
-        ///   array's element type is used. If the type is a nullable type, the nullable type's underlying type is used.
+        ///   The value description is a short, typically one-word description that indicates the type of value that
+        ///   the user should supply. By default, the type of the property is used, applying the <see cref="NameTransform"/>
+        ///   specified by the <see cref="ParseOptions.ValueDescriptionTransform"/> property or the
+        ///   <see cref="ParseOptionsAttribute.ValueDescriptionTransform"/> property. If this is a
+        ///   multi-value argument, the element type is used. If the type is a nullable
+        ///   value type, its underlying type is used.
         /// </para>
         /// <para>
-        ///   If you want to override the value description for all arguments of a specific type, 
-        ///   use the <see cref="ParseOptions.DefaultValueDescriptions"/> property.
-        /// </para>
-        /// <para>
-        ///   The value description is used when printing usage. For example, the usage for an argument named Sample with
+        ///   The value description is used only when generating usage help. For example, the usage for an argument named Sample with
         ///   a value description of String would look like "-Sample &lt;String&gt;".
         /// </para>
         /// <note>
-        ///   This is not the long description used to describe the purpose of the argument. That should be specified
-        ///   using the <see cref="System.ComponentModel.DescriptionAttribute"/> attribute.
+        ///   This is not the long description used to describe the purpose of the argument. That can be set
+        ///   using the <see cref="DescriptionAttribute"/> attribute.
         /// </note>
         /// </remarks>
+        /// <seealso cref="CommandLineArgument.ValueDescription"/>
         public string? ValueDescription { get; set; }
 
         /// <summary>
@@ -274,6 +307,7 @@ namespace Ookii.CommandLine
         ///   <see langword="true"/>.
         /// </para>
         /// </remarks>
+        /// <seealso cref="CommandLineArgument.CancelParsing"/>
         public bool CancelParsing { get; set; }
 
         /// <summary>
@@ -293,6 +327,7 @@ namespace Ookii.CommandLine
         ///   hidden.
         /// </para>
         /// </remarks>
+        /// <seealso cref="CommandLineArgument.IsHidden"/>
         public bool IsHidden { get; set; }
     }
 }
