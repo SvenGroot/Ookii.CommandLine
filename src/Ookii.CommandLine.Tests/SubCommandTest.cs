@@ -17,13 +17,15 @@ namespace Ookii.CommandLine.Tests
             var commands = manager.GetCommands().ToArray();
 
             Assert.IsNotNull(commands);
-            Assert.AreEqual(5, commands.Length);
+            Assert.AreEqual(6, commands.Length);
 
-            VerifyCommand(commands[0], "AnotherSimpleCommand", typeof(AnotherSimpleCommand), false, new[] { "alias" });
-            VerifyCommand(commands[1], "custom", typeof(CustomParsingCommand), true);
-            VerifyCommand(commands[2], "HiddenCommand", typeof(HiddenCommand));
-            VerifyCommand(commands[3], "test", typeof(TestCommand));
-            VerifyCommand(commands[4], "version", null);
+            int index = 0;
+            VerifyCommand(commands[index++], "AnotherSimpleCommand", typeof(AnotherSimpleCommand), false, new[] { "alias" });
+            VerifyCommand(commands[index++], "AsyncCommand", typeof(AsyncCommand));
+            VerifyCommand(commands[index++], "custom", typeof(CustomParsingCommand), true);
+            VerifyCommand(commands[index++], "HiddenCommand", typeof(HiddenCommand));
+            VerifyCommand(commands[index++], "test", typeof(TestCommand));
+            VerifyCommand(commands[index++], "version", null);
         }
 
         [TestMethod]
@@ -242,6 +244,22 @@ namespace Ookii.CommandLine.Tests
             Assert.IsNotNull(manager.GetCommand("test"));
             Assert.IsNotNull(manager.GetCommand("AnotherSimpleCommand"));
             Assert.IsNotNull(manager.GetCommand("HiddenCommand"));
+        }
+
+        [TestMethod]
+        public async Task TestAsyncCommand()
+        {
+            var manager = new CommandManager(_commandAssembly);
+            var result = await manager.RunCommandAsync(new[] { "AsyncCommand", "5" });
+            Assert.AreEqual(5, result);
+
+            // RunCommand works but calls Run.
+            result = manager.RunCommand(new[] { "AsyncCommand", "5" });
+            Assert.AreEqual(6, result);
+
+            // RunCommandAsync works on non-async tasks.
+            result = await manager.RunCommandAsync(new[] { "AnotherSimpleCommand", "-Value", "5" });
+            Assert.AreEqual(5, result);
         }
 
         private static void VerifyCommand(CommandInfo command, string name, Type type, bool customParsing = false, string[] aliases = null)

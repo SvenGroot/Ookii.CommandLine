@@ -25,7 +25,7 @@ namespace Ookii.CommandLine.Tests
 
         public int Run()
         {
-            throw new NotImplementedException();
+            return Value;
         }
     }
 
@@ -52,6 +52,26 @@ namespace Ookii.CommandLine.Tests
         public int Run()
         {
             throw new NotImplementedException();
+        }
+    }
+
+    // Hidden so I don't have to update the expected usage.
+    [Command(IsHidden = true)]
+    class AsyncCommand : IAsyncCommand
+    {
+        [CommandLineArgument(Position = 0)]
+        public int Value { get; set; }
+
+        public int Run()
+        {
+            // Do somehting different than RunAsync so the test can differentiate which one was
+            // called.
+            return Value + 1;
+        }
+
+        public Task<int> RunAsync()
+        {
+            return Task.FromResult(Value);
         }
     }
 

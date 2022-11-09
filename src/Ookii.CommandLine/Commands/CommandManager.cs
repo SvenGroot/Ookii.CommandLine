@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 
 namespace Ookii.CommandLine.Commands
 {
@@ -381,6 +382,84 @@ namespace Ookii.CommandLine.Commands
         {
             // Skip the first argument, it's the application name.
             return RunCommand(Environment.GetCommandLineArgs(), 1);
+        }
+
+        /// <inheritdoc cref="RunCommand(string?, string[], int)"/>
+        /// <summary>
+        /// Finds and instantiates the subcommand with the specified name, and if it succeeds,
+        /// runs it asynchronously. If it fails, writes error and usage information.
+        /// </summary>
+        /// <returns>
+        ///   A task representing the asynchronous run operation. The result is the value returned
+        ///   by <see cref="IAsyncCommand.RunAsync"/>, or <see langword="null"/> if the command
+        ///   could not be created.
+        /// </returns>
+        /// <remarks>
+        /// <para>
+        ///   This function creates the command by invoking the <see cref="CreateCommand(string?, string[], int)"/>,
+        ///   method. If the command implements the <see cref="IAsyncCommand"/> interface, it
+        ///   invokes the <see cref="IAsyncCommand.RunAsync"/> method; otherwise, it invokes the
+        ///   <see cref="ICommand.Run"/> method on the command.
+        /// </para>
+        /// </remarks>
+        public async Task<int?> RunCommandAsync(string? commandName, string[] args, int index)
+        {
+            var command = CreateCommand(commandName, args, index);
+            if (command is IAsyncCommand asyncCommand)
+            {
+                return await asyncCommand.RunAsync();
+            }
+
+            return command?.Run();
+        }
+
+        /// <inheritdoc cref="RunCommandAsync(string?, string[], int)"/>
+        /// <summary>
+        /// Finds and instantiates the subcommand with the specified name, and if it succeeds,
+        /// runs it asynchronously. If it fails, writes error and usage information.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        ///   This function creates the command by invoking the <see cref="CreateCommand(string[], int)"/>,
+        ///   method. If the command implements the <see cref="IAsyncCommand"/> interface, it
+        ///   invokes the <see cref="IAsyncCommand.RunAsync"/> method; otherwise, it invokes the
+        ///   <see cref="ICommand.Run"/> method on the command.
+        /// </para>
+        /// </remarks>
+        public async Task<int?> RunCommandAsync(string[] args, int index = 0)
+        {
+            var command = CreateCommand(args, index);
+            if (command is IAsyncCommand asyncCommand)
+            {
+                return await asyncCommand.RunAsync();
+            }
+
+            return command?.Run();
+        }
+
+        /// <inheritdoc cref="RunCommand(string?, string[], int)"/>
+        /// <summary>
+        /// Finds and instantiates the subcommand using the arguments from the <see cref="Environment.GetCommandLineArgs"/>
+        /// method, using the first argument as the command name. If it succeeds, runs the command
+        /// asynchronously. If it fails, writes error and usage information.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        ///   This function creates the command by invoking the <see cref="CreateCommand()"/>,
+        ///   method. If the command implements the <see cref="IAsyncCommand"/> interface, it
+        ///   invokes the <see cref="IAsyncCommand.RunAsync"/> method; otherwise, it invokes the
+        ///   <see cref="ICommand.Run"/> method on the command.
+        /// </para>
+        /// </remarks>
+        public async Task<int?> RunCommandAsync()
+        {
+            var command = CreateCommand();
+            if (command is IAsyncCommand asyncCommand)
+            {
+                return await asyncCommand.RunAsync();
+            }
+
+            return command?.Run();
         }
 
         /// <summary>
