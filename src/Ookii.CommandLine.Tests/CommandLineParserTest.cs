@@ -385,6 +385,23 @@ namespace Ookii.CommandLine.Tests
         }
 
         [TestMethod]
+        public void TestWriteUsageSeparator()
+        {
+            var options = new ParseOptions()
+            {
+                ArgumentNamePrefixes = new[] { "/", "-" },
+                UsageOptions = new WriteUsageOptions()
+                {
+                    ExecutableName = _executableName,
+                    UseWhiteSpaceValueSeparator = false,
+                }
+            };
+            var target = new CommandLineParser<TestArguments>(options);
+            string actual = target.GetUsage(0, options.UsageOptions);
+            Assert.AreEqual(_expectedUsageSeparator, actual);
+        }
+
+        [TestMethod]
         public void TestStaticParse()
         {
             using var output = new StringWriter();

@@ -40,7 +40,7 @@ namespace Ookii.CommandLine.Validation
         /// </exception>
         public ValidateRangeAttribute(object? minimum, object? maximum)
         {
-            if (_minimum == null && _maximum == null)
+            if (minimum == null && maximum == null)
             {
                 throw new ArgumentException(Properties.Resources.MinMaxBothNull);
             }

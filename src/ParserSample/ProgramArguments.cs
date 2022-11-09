@@ -94,6 +94,7 @@ namespace ParserSample
                 {
                     IncludeDefaultValueInDescription = true,
                     IncludeAliasInDescription = true,
+                    UseWhiteSpaceValueSeparator = false,
                 }
             };
 

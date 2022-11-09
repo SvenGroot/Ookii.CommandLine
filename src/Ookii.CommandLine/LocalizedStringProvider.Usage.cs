@@ -92,6 +92,10 @@ namespace Ookii.CommandLine
         ///   property, depending on <see cref="CommandLineParser.Mode"/> and the value of
         ///   <see cref="WriteUsageOptions.UseShortNamesForSyntax"/>.
         /// </param>
+        /// <param name="separator">
+        /// The argument separator to include as optional, or <see langword="null"/> if the
+        /// white-space separator is being used.
+        /// </param>
         /// <param name="useColor">The value of <see cref="WriteUsageOptions.UseColor"/>.</param>
         /// <returns>The string.</returns>
         /// <remarks>
@@ -105,8 +109,8 @@ namespace Ookii.CommandLine
         ///   called.
         /// </para>
         /// </remarks>
-        public virtual string OptionalArgumentName(string argumentName, string prefix, bool useColor)
-            => $"[{ArgumentName(argumentName, prefix, useColor)}]";
+        public virtual string OptionalArgumentName(string argumentName, string prefix, char? separator, bool useColor)
+            => $"[{ArgumentName(argumentName, prefix, useColor)}{separator}]";
 
         /// <summary>
         /// Gets a suffix to add to multi-value arguments, similar to "...".
@@ -135,10 +139,9 @@ namespace Ookii.CommandLine
         /// <remarks>
         /// <para>
         ///   The default implementation calls the <see cref="ArgumentName(string, string, bool)"/>,
-        ///   <see cref="OptionalArgumentName(string, string, bool)"/>,
-        ///   <see cref="ValueDescription(string, bool)"/> and <see cref="MultiValueSuffix(bool)"/>
-        ///   methods, so you do not need to override this method if you only want to customize
-        ///   those elements.
+        ///   <see cref="OptionalArgumentName"/>, <see cref="ValueDescription(string, bool)"/> and
+        ///   <see cref="MultiValueSuffix(bool)"/> methods, so you do not need to override this
+        ///   method if you only want to customize those elements.
         /// </para>
         /// <para>
         ///   This string doesn't have any predefined colors in the <see cref="WriteUsageOptions"/>
@@ -176,8 +179,8 @@ namespace Ookii.CommandLine
                 ? argument.Parser.ArgumentNamePrefixes[0]
                 : argument.Parser.LongArgumentNamePrefix!;
 
-            var separator = argument.Parser.AllowWhiteSpaceValueSeparator && options.UseWhiteSpaceValueSeparator
-                ? ' '
+            char? separator = argument.Parser.AllowWhiteSpaceValueSeparator && options.UseWhiteSpaceValueSeparator
+                ? null
                 : argument.Parser.NameValueSeparator;
 
             bool useColor = options.UseColor ?? false;
@@ -187,14 +190,22 @@ namespace Ookii.CommandLine
             }
             else
             {
-                argumentName = OptionalArgumentName(argumentName, prefix, useColor);
+                argumentName = OptionalArgumentName(argumentName, prefix, separator, useColor);
             }
 
             var result = argumentName;
             if (!argument.IsSwitch)
             {
                 string argumentValue = ValueDescription(argument.ValueDescription, useColor);
-                result = argumentName + separator + argumentValue;
+                if (argument.Position != null && separator != null)
+                {
+                    // The separator was included in the optional name.
+                    result = argumentName + argumentValue;
+                }
+                else
+                {
+                    result = argumentName + (separator ?? ' ') + argumentValue;
+                }
             }
 
             if (argument.IsMultiValue)
@@ -214,10 +225,9 @@ namespace Ookii.CommandLine
         /// <remarks>
         /// <para>
         ///   The default implementation calls the <see cref="ArgumentName(string, string, bool)"/>,
-        ///   <see cref="OptionalArgumentName(string, string, bool)"/>,
-        ///   <see cref="ValueDescription(string, bool)"/> and <see cref="MultiValueSuffix(bool)"/>
-        ///   methods, so you do not need to override this method if you only want to customize
-        ///   those elements.
+        ///   <see cref="OptionalArgumentName"/>, <see cref="ValueDescription(string, bool)"/> and
+        ///   <see cref="MultiValueSuffix(bool)"/> methods, so you do not need to override this
+        ///   method if you only want to customize those elements.
         /// </para>
         /// <para>
         ///   This string doesn't have any predefined colors in the <see cref="WriteUsageOptions"/>
