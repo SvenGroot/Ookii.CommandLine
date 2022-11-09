@@ -187,19 +187,31 @@ namespace Ookii.CommandLine
         /// Gets or sets a value indicating whether duplicate arguments are allowed.
         /// </summary>
         /// <value>
-        ///   <see langword="true"/> if it is allowed to supply non-multi-value arguments more than once;
-        ///   <see langword="false"/> if it is not allowed, or <see langword="null" /> to use the
-        ///   value from the <see cref="ParseOptionsAttribute"/> attribute, or if that attribute
-        ///   is not present, <see langword="false"/>. The default value is <see langword="null"/>.
+        /// One of the values of the <see cref="ErrorMode"/> enumeration, or <see langword="null"/>
+        /// to use the value from the <see cref="ParseOptionsAttribute"/> attribute, or if that
+        /// attribute is not present, <see cref="ErrorMode.Error"/>. The default value is
+        /// <see langword="null"/>.
         /// </value>
         /// <remarks>
         /// <para>
+        ///   If set to <see cref="ErrorMode.Error"/>, supplying a non-multi-value argument more
+        ///   than once will cause an exception. If set to <see cref="ErrorMode.Allow"/>, the
+        ///   last value supplied will be used.
+        /// </para>
+        /// <para>
+        ///   If set to <see cref="ErrorMode.Warning"/>, the static <see cref="CommandLineParser.Parse{T}(ParseOptions?)"/>
+        ///   method and the <see cref="CommandManager"/> class will print a warning to
+        ///   the <see cref="Error"/> stream when a duplicate argument is found. If
+        ///   you are not using these methods, <see cref="ErrorMode.Warning"/> is identical to
+        ///   <see cref="ErrorMode.Allow"/> and no warning is displayed.
+        /// </para>
+        /// <para>
         ///   If not <see langword="null"/>, this property overrides the value of the
-        ///   <see cref="ParseOptionsAttribute.CaseSensitive"/> property.
+        ///   <see cref="ParseOptionsAttribute.DuplicateArguments"/> property.
         /// </para>
         /// </remarks>
         /// <seealso cref="CommandLineParser.AllowDuplicateArguments"/>
-        public bool? AllowDuplicateArguments { get; set; }
+        public ErrorMode? DuplicateArguments { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether the value of arguments may be separated from the name by white space.
@@ -345,6 +357,34 @@ namespace Ookii.CommandLine
         /// </para>
         /// </remarks>
         public string ErrorColor { get; set; } = TextFormat.ForegroundRed;
+
+        /// <summary>
+        /// Gets or sets the color applied to warning messages.
+        /// </summary>
+        /// <value>
+        ///   The virtual terminal sequence for a color. The default value is
+        ///   <see cref="TextFormat.ForegroundYellow"/>.
+        /// </value>
+        /// <remarks>
+        /// <para>
+        ///   The color will only be used if the <see cref="UseErrorColor"/> property is
+        ///   <see langword="true"/>; otherwise, it will be replaced with an empty string.
+        /// </para>
+        /// <para>
+        ///   This color is used for the warning emitted if the <see cref="DuplicateArguments"/>
+        ///   property is <see cref="ErrorMode.Warning"/>.
+        /// </para>
+        /// <para>
+        ///   If the string contains anything other than virtual terminal sequences, those parts
+        ///   will be included in the output, but only when the <see cref="UseErrorColor"/> property is
+        ///   <see langword="true"/>.
+        /// </para>
+        /// <para>
+        ///   After the warning message, the value of the <see cref="WriteUsageOptions.ColorReset"/>
+        ///   property will be written to undo the color change.
+        /// </para>
+        /// </remarks>
+        public string WarningColor { get; set; } = TextFormat.ForegroundYellow;
 
         /// <summary>
         /// Gets or sets a value that indicates whether error messages should use color.

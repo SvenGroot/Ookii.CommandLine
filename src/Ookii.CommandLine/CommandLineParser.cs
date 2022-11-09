@@ -178,6 +178,7 @@ namespace Ookii.CommandLine
         private readonly NameTransform _nameTransform;
         private readonly LocalizedStringProvider _stringProvider;
         private int _injectionIndex = -1;
+        private ErrorMode _duplicateArgumentsMode;
 
         /// <summary>
         /// Gets the default character used to separate the name and the value of an argument.
@@ -348,7 +349,7 @@ namespace Ookii.CommandLine
 
             VerifyPositionalArgumentRules();
 
-            AllowDuplicateArguments = options?.AllowDuplicateArguments ?? optionsAttribute?.AllowDuplicateArguments ?? false;
+            _duplicateArgumentsMode = options?.DuplicateArguments ?? optionsAttribute?.DuplicateArguments ?? ErrorMode.Error;
             AllowWhiteSpaceValueSeparator = options?.AllowWhiteSpaceValueSeparator ?? optionsAttribute?.AllowWhiteSpaceValueSeparator ?? true;
             NameValueSeparator = options?.NameValueSeparator ?? optionsAttribute?.NameValueSeparator ?? DefaultNameValueSeparator;
             Culture = options?.Culture ?? CultureInfo.InvariantCulture;
@@ -509,9 +510,13 @@ namespace Ookii.CommandLine
         ///   dictionary arguments, which can always be supplied multiple times.
         /// </para>
         /// </remarks>
-        /// <see cref="ParseOptionsAttribute.AllowDuplicateArguments"/>
-        /// <see cref="ParseOptions.AllowDuplicateArguments"/>
-        public bool AllowDuplicateArguments { get; set; }
+        /// <see cref="ParseOptionsAttribute.DuplicateArguments"/>
+        /// <see cref="ParseOptions.DuplicateArguments"/>
+        public bool AllowDuplicateArguments
+        {
+            get => _duplicateArgumentsMode != ErrorMode.Error;
+            set => _duplicateArgumentsMode = value ? ErrorMode.Allow : ErrorMode.Error;
+        }
 
         /// <summary>
         /// Gets or sets a value indicating whether the value of an argument may be in a separate
@@ -1123,6 +1128,15 @@ namespace Ookii.CommandLine
             options ??= new();
             var parser = new CommandLineParser(argumentsType, options);
 
+            if (parser._duplicateArgumentsMode == ErrorMode.Warning)
+            {
+                parser.DuplicateArgument += (sender, e) =>
+                {
+                    var warning = parser.StringProvider.DuplicateArgumentWarning(e.Argument.ArgumentName);
+                    WriteError(options, warning, options.WarningColor);
+                };
+            }
+
             using var vtSupport = options.EnableOutputColor();
             using var output = DisposableWrapper.Create(options.Out, LineWrappingTextWriter.ForConsoleOut);
             var helpMode = UsageHelpRequest.Full;
@@ -1133,21 +1147,7 @@ namespace Ookii.CommandLine
             }
             catch (CommandLineArgumentException ex)
             {
-                using var errorVtSupport = options.EnableErrorColor();
-                using var error = DisposableWrapper.Create(options.Error, LineWrappingTextWriter.ForConsoleError);
-                if (options.UseErrorColor ?? false)
-                {
-                    error.Inner.Write(options.ErrorColor);
-                }
-
-                error.Inner.Write(ex.Message);
-                if (options.UseErrorColor ?? false)
-                {
-                    error.Inner.Write(options.UsageOptions.ColorReset);
-                }
-
-                error.Inner.WriteLine();
-                error.Inner.WriteLine();
+                WriteError(options, ex.Message, options.ErrorColor, true);
                 helpMode = options.ShowUsageOnError;
             }
 
@@ -1172,6 +1172,28 @@ namespace Ookii.CommandLine
         internal static bool ShouldIndent(LineWrappingTextWriter writer)
         {
             return writer.MaximumLineLength is 0 or >= MinimumLineWidthForIndent;
+        }
+
+        private static void WriteError(ParseOptions options, string message, string color, bool blankLine = false)
+        {
+            using var errorVtSupport = options.EnableErrorColor();
+            using var error = DisposableWrapper.Create(options.Error, LineWrappingTextWriter.ForConsoleError);
+            if (options.UseErrorColor ?? false)
+            {
+                error.Inner.Write(color);
+            }
+
+            error.Inner.Write(message);
+            if (options.UseErrorColor ?? false)
+            {
+                error.Inner.Write(options.UsageOptions.ColorReset);
+            }
+
+            error.Inner.WriteLine();
+            if (blankLine)
+            {
+                error.Inner.WriteLine();
+            }
         }
 
         private static string[] DetermineArgumentNamePrefixes(IEnumerable<string>? namedArgumentPrefixes)

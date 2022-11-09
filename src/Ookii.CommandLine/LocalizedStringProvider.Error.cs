@@ -54,6 +54,14 @@ namespace Ookii.CommandLine
         public virtual string DuplicateArgument(string argumentName) => Format(Resources.DuplicateArgumentFormat, argumentName);
 
         /// <summary>
+        /// Gets the warning message used if the <see cref="ParseOptionsAttribute.DuplicateArguments"/>
+        /// or <see cref="ParseOptions.DuplicateArguments"/> property is <see cref="ErrorMode.Warning"/>.
+        /// </summary>
+        /// <param name="argumentName">The name of the argument.</param>
+        /// <returns>The error message.</returns>
+        public virtual string DuplicateArgumentWarning(string argumentName) => Format(Resources.DuplicateArgumentWarningFormat, argumentName);
+
+        /// <summary>
         /// Gets the error message for <see cref="CommandLineArgumentErrorCategory.TooManyArguments"/>.
         /// </summary>
         /// <returns>The error message.</returns>

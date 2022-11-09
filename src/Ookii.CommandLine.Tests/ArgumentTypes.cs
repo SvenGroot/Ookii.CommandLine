@@ -174,7 +174,7 @@ namespace Ookii.CommandLine.Tests
 
     [ParseOptions(
         Mode = ParsingMode.LongShort,
-        AllowDuplicateArguments = true,
+        DuplicateArguments = ErrorMode.Allow,
         AllowWhiteSpaceValueSeparator = false,
         ArgumentNamePrefixes = new[] { "--", "-" },
         LongArgumentNamePrefix = "---",

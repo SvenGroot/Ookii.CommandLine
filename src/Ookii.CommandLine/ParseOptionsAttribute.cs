@@ -146,17 +146,29 @@ namespace Ookii.CommandLine
         /// Gets or sets a value indicating whether duplicate arguments are allowed.
         /// </summary>
         /// <value>
-        ///   <see langword="true"/> if it is allowed to supply non-multi-value arguments more than once;
-        ///   otherwise, <see langword="false"/>. The default value is <see langword="false"/>.
+        /// One of the values of the <see cref="ErrorMode"/> enumeration. The default value is
+        /// <see cref="ErrorMode.Error"/>.
         /// </value>
         /// <remarks>
         /// <para>
-        ///   This value can be overridden by the <see cref="ParseOptions.AllowDuplicateArguments"/>
+        ///   If set to <see cref="ErrorMode.Error"/>, supplying a non-multi-value argument more
+        ///   than once will cause an exception. If set to <see cref="ErrorMode.Allow"/>, the
+        ///   last value supplied will be used.
+        /// </para>
+        /// <para>
+        ///   If set to <see cref="ErrorMode.Warning"/>, the static <see cref="CommandLineParser.Parse{T}(ParseOptions?)"/>
+        ///   method and the <see cref="Commands.CommandManager"/> class will print a warning to
+        ///   the <see cref="ParseOptions.Error"/> stream when a duplicate argument is found. If
+        ///   you are not using these methods, <see cref="ErrorMode.Warning"/> is identical to
+        ///   <see cref="ErrorMode.Allow"/> and no warning is displayed.
+        /// </para>
+        /// <para>
+        ///   This value can be overridden by the <see cref="ParseOptions.DuplicateArguments"/>
         ///   property.
         /// </para>
         /// </remarks>
         /// <seealso cref="CommandLineParser.AllowDuplicateArguments"/>
-        public bool AllowDuplicateArguments { get; set; }
+        public ErrorMode DuplicateArguments { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether the value of arguments may be separated from

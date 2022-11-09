@@ -250,6 +250,15 @@ namespace Ookii.CommandLine.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Warning: the argument &apos;{0}&apos; was supplied more than once..
+        /// </summary>
+        internal static string DuplicateArgumentWarningFormat {
+            get {
+                return ResourceManager.GetString("DuplicateArgumentWarningFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The argument &apos;{0}&apos; cannot have an empty alias..
         /// </summary>
         internal static string EmptyAliasFormat {
@@ -385,7 +394,7 @@ namespace Ookii.CommandLine.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Run &apos;{0} {1}&apos; for usage help..
+        ///   Looks up a localized string similar to Run &apos;{0} {1}&apos; for more information..
         /// </summary>
         internal static string MoreInfoOnErrorFormat {
             get {

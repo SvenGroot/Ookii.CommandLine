@@ -565,7 +565,7 @@ namespace Ookii.CommandLine.Tests
                 Mode = ParsingMode.Default,
                 ArgumentNameComparer = StringComparer.OrdinalIgnoreCase,
                 AllowWhiteSpaceValueSeparator = true,
-                AllowDuplicateArguments = false,
+                DuplicateArguments = ErrorMode.Error,
                 NameValueSeparator = ';',
                 ArgumentNamePrefixes = new[] { "+" },
                 AutoHelpArgument = true,

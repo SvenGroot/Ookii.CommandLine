@@ -367,6 +367,9 @@
     <value>Run '{0} &lt;command&gt; {1}{2}' for more information about a command.</value>
   </data>
   <data name="MoreInfoOnErrorFormat" xml:space="preserve">
-    <value>Run '{0} {1}' for usage help.</value>
+    <value>Run '{0} {1}' for more information.</value>
+  </data>
+  <data name="DuplicateArgumentWarningFormat" xml:space="preserve">
+    <value>Warning: the argument '{0}' was supplied more than once.</value>
   </data>
 </root>
