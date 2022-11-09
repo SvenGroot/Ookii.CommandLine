@@ -30,7 +30,8 @@ namespace Ookii.CommandLine
             => $"{color}{Resources.DefaultUsagePrefix}{colorReset} {executableName}";
 
         /// <summary>
-        /// Gets a formatted value description, similar to "&lt;value&gt;".
+        /// Gets a formatted value description, similar to "&lt;value&gt;", for use with the
+        /// <see cref="ArgumentSyntax"/> method.
         /// </summary>
         /// <param name="valueDescription">The argument's value description.</param>
         /// <param name="useColor">The value of <see cref="WriteUsageOptions.UseColor"/>.</param>
@@ -42,18 +43,20 @@ namespace Ookii.CommandLine
         ///   manually add colors if desired.
         /// </para>
         /// <para>
-        ///   If you override the <see cref="ArgumentSyntax"/> method and the <see cref="ArgumentDescription"/>
-        ///   method, this method will not be called.
+        ///   If you override the <see cref="ArgumentSyntax"/> method, this method will not be
+        ///   called.
         /// </para>
         /// </remarks>
+        /// <seealso cref="ValueDescriptionForDescription(string, bool)"/>
         public virtual string ValueDescription(string valueDescription, bool useColor)
             => $"<{valueDescription}>";
 
         /// <summary>
-        /// Gets a formatted argument name, similar to "-Name".
+        /// Gets a formatted argument name, similar to "-Name", for use with the
+        /// <see cref="ArgumentSyntax"/> method.
         /// </summary>
         /// <param name="argumentName">
-        ///   The name of the argument.  This will either be long or the short name, depending on
+        ///   The name of the argument. This will either be long or the short name, depending on
         ///   <see cref="CommandLineParser.Mode"/> and the value of
         ///   <see cref="WriteUsageOptions.UseShortNamesForSyntax"/>.
         /// </param>
@@ -72,10 +75,11 @@ namespace Ookii.CommandLine
         ///   manually add colors if desired.
         /// </para>
         /// <para>
-        ///   If you override the <see cref="ArgumentSyntax"/> method and the <see cref="ArgumentDescription"/>
-        ///   method, this method will not be called.
+        ///   If you override the <see cref="ArgumentSyntax"/> method, this method will not be
+        ///   called.
         /// </para>
         /// </remarks>
+        /// <seealso cref="ArgumentNameForDescription(string, string, bool)"/>
         public virtual string ArgumentName(string argumentName, string prefix, bool useColor) => prefix + argumentName;
 
         /// <summary>
@@ -287,6 +291,59 @@ namespace Ookii.CommandLine
         #region Usage descriptions
 
         /// <summary>
+        /// Gets a formatted value description, similar to "&lt;value&gt;", for use with the
+        /// <see cref="ArgumentDescription"/> method.
+        /// </summary>
+        /// <param name="valueDescription">The argument's value description.</param>
+        /// <param name="useColor">The value of <see cref="WriteUsageOptions.UseColor"/>.</param>
+        /// <returns>The string.</returns>
+        /// <remarks>
+        /// <para>
+        ///   This string doesn't have any predefined colors in the <see cref="WriteUsageOptions"/>
+        ///   class, so the <paramref name="useColor"/> parameter is provided to allow you to
+        ///   manually add colors if desired.
+        /// </para>
+        /// <para>
+        ///   If you override the <see cref="ArgumentDescription"/> method, this method will not be
+        ///   called.
+        /// </para>
+        /// </remarks>
+        /// <seealso cref="ValueDescription"/>
+        public virtual string ValueDescriptionForDescription(string valueDescription, bool useColor)
+            => $"<{valueDescription}>";
+
+        /// <summary>
+        /// Gets a formatted argument name, similar to "-Name", for use with the
+        /// <see cref="ArgumentDescription"/> method.
+        /// </summary>
+        /// <param name="argumentName">
+        ///   The name of the argument. This will either be long or the short name, depending on
+        ///   <see cref="CommandLineParser.Mode"/> and the value of
+        ///   <see cref="WriteUsageOptions.UseShortNamesForSyntax"/>.
+        /// </param>
+        /// <param name="prefix">
+        ///   The argument name prefix. This will either be first element of the <see cref="CommandLineParser.ArgumentNamePrefixes"/>
+        ///   property, or the value of the <see cref="CommandLineParser.LongArgumentNamePrefix"/>
+        ///   property, depending on <see cref="CommandLineParser.Mode"/> and the value of
+        ///   <see cref="WriteUsageOptions.UseShortNamesForSyntax"/>.
+        /// </param>
+        /// <param name="useColor">The value of <see cref="WriteUsageOptions.UseColor"/>.</param>
+        /// <returns>The string.</returns>
+        /// <remarks>
+        /// <para>
+        ///   This string doesn't have any predefined colors in the <see cref="WriteUsageOptions"/>
+        ///   class, so the <paramref name="useColor"/> parameter is provided to allow you to
+        ///   manually add colors if desired.
+        /// </para>
+        /// <para>
+        ///   If you override the <see cref="ArgumentDescription"/> method, this method will not be
+        ///   called.
+        /// </para>
+        /// </remarks>
+        /// <seealso cref="ArgumentName"/>
+        public virtual string ArgumentNameForDescription(string argumentName, string prefix, bool useColor) => prefix + argumentName;
+
+        /// <summary>
         /// Gets a formatted default, similar to " Default value: value".
         /// </summary>
         /// <param name="defaultValue">The argument's default value.</param>
@@ -378,7 +435,7 @@ namespace Ookii.CommandLine
         /// </para>
         /// </remarks>
         public virtual string OptionalValueDescription(string valueDescription, bool useColor)
-            => $"[{ValueDescription(valueDescription, useColor)}]";
+            => $"[{ValueDescriptionForDescription(valueDescription, useColor)}]";
 
         /// <summary>
         /// Gets the usage description for an argument.
@@ -388,8 +445,8 @@ namespace Ookii.CommandLine
         /// <returns>The string.</returns>
         /// <remarks>
         /// <para>
-        ///   The default implementation calls the <see cref="ArgumentName(string, string, bool)"/>,
-        ///   <see cref="ValueDescription(string, bool)"/>,
+        ///   The default implementation calls the <see cref="ArgumentNameForDescription(string, string, bool)"/>,
+        ///   <see cref="ValueDescriptionForDescription(string, bool)"/>,
         ///   <see cref="OptionalValueDescription(string, bool)"/>, <see cref="DefaultValue(object, bool)"/>,
         ///   <see cref="Aliases(IEnumerable{string}?, IEnumerable{char}?, string, string, bool)"/>,
         ///   and <see cref="ValidatorDescriptions(CommandLineArgument)"/> methods, so you do not
@@ -414,7 +471,7 @@ namespace Ookii.CommandLine
 
             string valueDescription = argument.IsSwitch
                 ? OptionalValueDescription(argument.ValueDescription, useColor)
-                : ValueDescription(argument.ValueDescription, useColor);
+                : ValueDescriptionForDescription(argument.ValueDescription, useColor);
 
             string defaultValue = options.IncludeDefaultValueInDescription && argument.DefaultValue != null
                 ? DefaultValue(argument.DefaultValue, useColor)
@@ -431,16 +488,16 @@ namespace Ookii.CommandLine
             if (argument.Parser.Mode == ParsingMode.LongShort)
             {
                 var shortName = argument.HasShortName
-                    ? ArgumentName(argument.ShortName.ToString(), shortPrefix, useColor)
+                    ? ArgumentNameForDescription(argument.ShortName.ToString(), shortPrefix, useColor)
                     : new string(' ', shortPrefix.Length + 3);
 
-                var longName = argument.HasLongName ? ArgumentName(argument.ArgumentName, prefix, useColor) : string.Empty;
+                var longName = argument.HasLongName ? ArgumentNameForDescription(argument.ArgumentName, prefix, useColor) : string.Empty;
                 var separator = argument.HasShortName && argument.HasLongName ? ArgumentSeparator : string.Empty;
                 return $"    {colorStart}{shortName}{separator}{longName} {valueDescription}{alias}{colorEnd}{Environment.NewLine}{argument.Description}{defaultValue}{Environment.NewLine}";
             }
             else
             {
-                var name = ArgumentName(argument.ArgumentName, prefix, useColor);
+                var name = ArgumentNameForDescription(argument.ArgumentName, prefix, useColor);
                 return $"    {colorStart}{name} {valueDescription}{alias}{colorEnd}{Environment.NewLine}{argument.Description}{validators}{defaultValue}{Environment.NewLine}";
             }
         }
