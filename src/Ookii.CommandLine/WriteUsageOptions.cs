@@ -7,21 +7,49 @@ using System.Collections.Generic;
 namespace Ookii.CommandLine
 {
     /// <summary>
-    /// Options for the <see cref="CommandLineParser.WriteUsage(System.IO.TextWriter, int, WriteUsageOptions)"/> method.
+    /// Options that control the formatting of usage help.
     /// </summary>
+    /// <remarks>
+    /// <para>
+    ///   This class provides options used by various methods of the <see cref="CommandLineParser"/>
+    ///   and <see cref="CommandManager"/> classes that provide usage for the user.
+    /// </para>
+    /// <para>
+    ///   If you wish to customize the various strings and formats used in the usage help, this
+    ///   must be done by deriving a class from the <see cref="LocalizedStringProvider"/> class
+    ///   and using the <see cref="ParseOptions.StringProvider"/> property.
+    /// </para>
+    /// </remarks>
     public sealed class WriteUsageOptions
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="WriteUsageOptions"/> class.
+        /// The default indentation for the usage syntax.
         /// </summary>
-        public WriteUsageOptions()
-        {
-            UseWhiteSpaceValueSeparator = true;
-            // These indent values are suitable for the default format strings.
-            Indent = 3;
-            ArgumentDescriptionIndent = 8;
-            IncludeApplicationDescription = true;
-        }
+        /// <value>
+        /// The default indentation, which is three characters.
+        /// </value>
+        /// <seealso cref="SyntaxIndent"/>
+        public const int DefaultSyntaxIndent = 3;
+
+        /// <summary>
+        /// The default indentation for the argument descriptions for the <see cref="ParsingMode.Default"/>
+        /// mode.
+        /// </summary>
+        /// <value>
+        /// The default indentation, which is eight characters.
+        /// </value>
+        /// <seealso cref="ArgumentDescriptionIndent"/>
+        public const int DefaultArgumentDescriptionIndent = 8;
+
+        /// <summary>
+        /// The default indentation for the argument descriptions for the <see cref="ParsingMode.LongShort"/>
+        /// mode.
+        /// </summary>
+        /// <value>
+        /// The default indentation, which is twelve characters.
+        /// </value>
+        /// <seealso cref="LongShortArgumentDescriptionIndent"/>
+        public const int DefaultLongShortArgumentDescriptionIndent = 12;
 
         /// <summary>
         /// Gets or sets a value indicating whether the value of the <see cref="CommandLineParser.Description"/> property
@@ -31,16 +59,17 @@ namespace Ookii.CommandLine
         ///   <see langword="true"/> if the value of the <see cref="CommandLineParser.Description"/> property
         ///   is written before the syntax; otherwise, <see langword="false"/>. The default value is <see langword="true"/>.
         /// </value>
-        public bool IncludeApplicationDescription { get; set; }
+        public bool IncludeApplicationDescription { get; set; } = true;
 
         /// <summary>
         /// Gets or sets a value that overrides the default application executable name used in the
         /// usage syntax.
         /// </summary>
         /// <value>
-        /// The application executable name, or <see langword="null"/> to use the default value.
+        /// The application executable name, or <see langword="null"/> to use the default value,
+        /// determined by calling <see cref="CommandLineParser.GetExecutableName(bool)"/>.
         /// </value>
-        /// <seealso cref="CommandLineParser.GetExecutableName(bool)"/>
+        /// <seealso cref="IncludeExecutableExtension"/>
         public string? ExecutableName { get; set; }
 
         /// <summary>
@@ -52,6 +81,11 @@ namespace Ookii.CommandLine
         /// The default value is <see langword="false"/>.
         /// </value>
         /// <remarks>
+        /// <para>
+        ///   If the <see cref="ExecutableName"/> property is <see langword="null"/>, the executable
+        ///   name is determined by calling <see cref="CommandLineParser.GetExecutableName(bool)"/>,
+        ///   passing the value of this property as the argument.
+        /// </para>
         /// <para>
         ///   This property is not used if the <see cref="ExecutableName"/> property is not
         ///   <see langword="null"/>.
@@ -81,7 +115,7 @@ namespace Ookii.CommandLine
         /// </para>
         /// <para>
         ///   With the default value, only the "Usage:" portion of the string has color; the
-        ///   application name does not.
+        ///   executable name does not.
         /// </para>
         /// </remarks>
         public string UsagePrefixColor { get; set; } = TextFormat.ForegroundCyan;
@@ -90,7 +124,8 @@ namespace Ookii.CommandLine
         /// Gets or sets the number of characters by which to indent all except the first line of the command line syntax of the usage help.
         /// </summary>
         /// <value>
-        /// The number of characters by which to indent all except the first line of the command line usage. The default value is 3.
+        /// The number of characters by which to indent the usage syntax. The default value is the
+        /// value of the <see cref="DefaultSyntaxIndent"/> constant.
         /// </value>
         /// <remarks>
         /// <para>
@@ -104,7 +139,7 @@ namespace Ookii.CommandLine
         ///   is being written is less than 30.
         /// </para>
         /// </remarks>
-        public int Indent { get; set; }
+        public int SyntaxIndent { get; set; } = DefaultSyntaxIndent;
 
         /// <summary>
         /// Gets or sets a value that indicates whether the usage syntax should use short names
@@ -124,8 +159,8 @@ namespace Ookii.CommandLine
         public bool UseShortNamesForSyntax { get; set; }
 
         /// <summary>
-        /// Gets or sets a value that indicates whether to use a shorter version of the usage
-        /// syntax.
+        /// Gets or sets a value that indicates whether to list only positional arguments in the
+        /// usage syntax.
         /// </summary>
         /// <value>
         /// <see langword="true"/> to abbreviate the syntax; otherwise, <see langword="false"/>.
@@ -134,9 +169,10 @@ namespace Ookii.CommandLine
         /// <remarks>
         /// <para>
         ///   Abbreviated usage syntax only lists the positional arguments explicitly. After that,
-        ///   if there are any more arguments, it will just print the value of the <see cref="LocalizedStringProvider.AbbreviatedRemainingArguments(bool)"/>
-        ///   method. The user will have to refer to the description list to see the remaining
-        ///   possible arguments.
+        ///   if there are any more arguments, it will just print the value returned by the
+        ///   <see cref="LocalizedStringProvider.AbbreviatedRemainingArguments(bool)"/> method.
+        ///   The user will have to refer to the description list to see the remaining possible
+        ///   arguments.
         /// </para>
         /// <para>
         ///   Use this if your application has a very large number of arguments.
@@ -145,12 +181,13 @@ namespace Ookii.CommandLine
         public bool UseAbbreviatedSyntax { get; set; }
 
         /// <summary>
-        /// Gets or sets the number of characters by which to indent the all but the first line of
-        /// argument descriptions if the <see cref="CommandLineParser.Mode"/> property is
+        /// Gets or sets the number of characters by which to indent all but the first line of each
+        /// argument's description, if the <see cref="CommandLineParser.Mode"/> property is
         /// <see cref="ParsingMode.Default"/>.
         /// </summary>
         /// <value>
-        /// The number of characters by which to indent the all but the first line of argument descriptions. The default value is 8.
+        /// The number of characters by which to indent the argument descriptions. The default
+        /// value is the value of the <see cref="DefaultArgumentDescriptionIndent"/> constant.
         /// </value>
         /// <remarks>
         /// <para>
@@ -163,16 +200,17 @@ namespace Ookii.CommandLine
         ///   is being written is less than 30.
         /// </para>
         /// </remarks>
-        public int ArgumentDescriptionIndent { get; set; }
+        public int ArgumentDescriptionIndent { get; set; } = DefaultArgumentDescriptionIndent;
 
         /// <summary>
-        /// Gets or sets the number of characters by which to indent the all but the first line of
-        /// argument descriptions if the <see cref="CommandLineParser.Mode"/> property is
+        /// Gets or sets the number of characters by which to indent all but the first line of each
+        /// argument's description, if the <see cref="CommandLineParser.Mode"/> property is
         /// <see cref="ParsingMode.LongShort"/>.
         /// </summary>
         /// <value>
-        /// The number of characters by which to indent the all but the first line of argument
-        /// descriptions. The default value is 12.
+        /// The number of characters by which to indent the argument descriptions. The default
+        /// value is the value of the <see cref="DefaultLongShortArgumentDescriptionIndent"/>
+        /// constant.
         /// </value>
         /// <remarks>
         /// <para>
@@ -232,15 +270,16 @@ namespace Ookii.CommandLine
         ///   The portion of the string that has color will end with the <see cref="ColorReset"/>.
         /// </para>
         /// <para>
-        ///   With the default value, only the argument name, value description and aliases
+        ///   With the default format, only the argument name, value description and aliases
         ///   portion of the string has color; the actual argument description does not.
         /// </para>
         /// </remarks>
         public string ArgumentDescriptionColor { get; set; } = TextFormat.ForegroundGreen;
 
         /// <summary>
-        /// Gets or sets a value indicating whether white space, rather than a colon, is used to separate named arguments and their values
-        /// in the command line syntax.
+        /// Gets or sets a value indicating whether white space, rather than the value of the
+        /// <see cref="CommandLineParser.NameValueSeparator"/> property, is used to separate
+        /// arguments and their values in the command line syntax.
         /// </summary>
         /// <value>
         ///   <see langword="true"/> if the command line syntax uses a white space value separator; <see langword="false"/> if it uses a colon.
@@ -257,7 +296,7 @@ namespace Ookii.CommandLine
         ///   and the <see cref="UseWhiteSpaceValueSeparator"/> property are true.
         /// </para>
         /// </remarks>
-        public bool UseWhiteSpaceValueSeparator { get; set; }
+        public bool UseWhiteSpaceValueSeparator { get; set; } = true;
 
         /// <summary>
         /// Gets or sets a value indicating whether the alias or aliases of an argument should be included in the argument description..

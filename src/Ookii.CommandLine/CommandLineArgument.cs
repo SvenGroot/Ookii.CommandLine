@@ -1441,13 +1441,20 @@ namespace Ookii.CommandLine
                 ValueDescriptionTransform = valueDescriptionTransform,
             };
 
+            var shortNameString = shortName.ToString();
+            var shortAliasString = shortAlias.ToString();
             if (parser.Mode == ParsingMode.LongShort)
             {
-                info.ShortAliases = new[] { shortAlias };
+                if (parser.ArgumentNameComparer.Compare(shortAliasString, shortNameString) != 0)
+                {
+                    info.ShortAliases = new[] { shortAlias };
+                }
             }
             else
             {
-                info.Aliases = new[] { shortName.ToString(), shortAlias.ToString() };
+                info.Aliases = parser.ArgumentNameComparer.Compare(shortAliasString, shortNameString) == 0
+                    ? new[] { shortNameString }
+                    : new[] { shortNameString, shortAliasString };
             }
 
             return new CommandLineArgument(info);

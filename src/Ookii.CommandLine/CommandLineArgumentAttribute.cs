@@ -249,12 +249,20 @@ namespace Ookii.CommandLine
         /// </value>
         /// <remarks>
         /// <para>
-        ///   The value description is a short, typically one-word description that indicates the type of value that
-        ///   the user should supply. By default, the type of the property is used, applying the <see cref="NameTransform"/>
-        ///   specified by the <see cref="ParseOptions.ValueDescriptionTransform"/> property or the
-        ///   <see cref="ParseOptionsAttribute.ValueDescriptionTransform"/> property. If this is a
-        ///   multi-value argument, the element type is used. If the type is a nullable
-        ///   value type, its underlying type is used.
+        ///   The value description is a short, typically one-word description that indicates the
+        ///   type of value that the user should supply.
+        /// </para>
+        /// <para>
+        ///   If not specified here, it is retrieved from the <see cref="ParseOptions.DefaultValueDescriptions"/>
+        ///   property, and if not found there, the type of the property is used, applying the
+        ///   <see cref="NameTransform"/> specified by the <see cref="ParseOptions.ValueDescriptionTransform"/>
+        ///   property or the <see cref="ParseOptionsAttribute.ValueDescriptionTransform"/> property.
+        ///   If this is a multi-value argument, the element type is used. If the type is <see cref="Nullable{T}"/>,
+        ///   its underlying type is used.
+        /// </para>
+        /// <para>
+        ///   If you want to override the value description for all arguments of a specific type, 
+        ///   use the <see cref="ParseOptions.DefaultValueDescriptions"/> property.
         /// </para>
         /// <para>
         ///   The value description is used only when generating usage help. For example, the usage for an argument named Sample with

@@ -11,8 +11,8 @@ using System.Text;
 namespace Ookii.CommandLine
 {
     /// <summary>
-    /// Implements a <see cref="TextWriter"/> that writes text to another <see cref="TextWriter"/>, wrapping
-    /// lines at word boundaries at a specific maximum line length.
+    /// Implements a <see cref="TextWriter"/> that writes text to another <see cref="TextWriter"/>,
+    /// white-space wrapping lines at the specified maximum line length, and supporting indentation.
     /// </summary>
     /// <remarks>
     /// <para>
@@ -20,10 +20,12 @@ namespace Ookii.CommandLine
     ///   the length of the buffered data exceeds the value of the <see cref="MaximumLineLength"/> property.
     /// </para>
     /// <para>
-    ///   If the length of the buffered data exceeds the value of the <see cref="MaximumLineLength"/> property, the
-    ///   <see cref="LineWrappingTextWriter"/> will attempt to find a white space character to break the line at. If such a white space character
-    ///   is found, everything before that character is output to the <see cref="BaseWriter"/>, and everything after that character is kept
-    ///   in the buffer. The white space character itself is not written to the output.
+    ///   If the length of the buffered data exceeds the value of the <see cref="MaximumLineLength"/>
+    ///   property, the <see cref="LineWrappingTextWriter"/> will attempt to find a white-space
+    ///   character to break the line at. If such a white-space character is found, everything
+    ///   before that character is output to the <see cref="BaseWriter"/> followed by a line ending,
+    ///   and everything after that character is kept in the buffer. The white-space character
+    ///   itself is not written to the output.
     /// </para>
     /// <para>
     ///   If no suitable place to break the line could be found, the line is broken at the maximum line length. This may occur in the middle
@@ -43,6 +45,10 @@ namespace Ookii.CommandLine
     ///   The <see cref="ResetIndent"/> property can be used to move the output position back to the beginning of the line. If the buffer is
     ///   not empty, is first flushed and indentation is reset to zero on the next line. After the next line break, indentation will again
     ///   be set to the value of the <see cref="Indent"/> property.
+    /// </para>
+    /// <para>
+    ///   If there is no maximum line length, output is written directly to the <see cref="BaseWriter"/>
+    ///   and buffering does not occur. Indentation is still inserted as appropriate.
     /// </para>
     /// </remarks>
     public class LineWrappingTextWriter : TextWriter
@@ -494,7 +500,7 @@ namespace Ookii.CommandLine
         /// <param name="countFormatting">
         ///   If set to <see langword="false"/>, virtual terminal sequences used to format the text
         ///   will not be counted as part of the line length, and will therefore not affect where
-        ///   the text is wrapped. The default value is <see langword="true"/>.
+        ///   the text is wrapped. The default value is <see langword="false"/>.
         /// </param>
         /// <exception cref="ArgumentNullException">
         ///   <paramref name="baseWriter"/> is <see langword="null" />.
@@ -502,7 +508,7 @@ namespace Ookii.CommandLine
         /// <remarks>
         /// <para>
         ///   The largest <paramref name="maximumLineLength"/> value supported is 65535. Above that, line length is considered to be unbounded. This is done
-        ///   to avoid having to allocate very large buffers to support these long line lengths.
+        ///   to avoid having to buffer large amounts of data to support these long line lengths.
         /// </para>
         /// <para>
         ///   If you want to write to the console, use <see cref="Console.Out"/> or <see cref="Console.Error"/> as the <paramref name="baseWriter"/> and
@@ -510,19 +516,14 @@ namespace Ookii.CommandLine
         ///   subtract one from the window width, additional empty lines can be printed if a line is exactly the width of the console. You can easily create a <see cref="LineWrappingTextWriter"/>
         ///   that writes to the console by using the <see cref="ForConsoleOut"/> and <see cref="ForConsoleError"/> methods.
         /// </para>
-        /// <para>
-        ///   When the console output is redirected to a file, Microsoft .Net will still report the console's actual window width, but on Mono
-        ///   the value of <see cref="Console.WindowWidth"/> will be 0. In that case, the <see cref="LineWrappingTextWriter"/> will use no
-        ///   line limit.
-        /// </para>
         /// </remarks>
         public LineWrappingTextWriter(TextWriter baseWriter, int maximumLineLength, bool disposeBaseWriter = true, bool countFormatting = false)
             : base(baseWriter?.FormatProvider)
         {
             _baseWriter = baseWriter ?? throw new ArgumentNullException(nameof(baseWriter));
             base.NewLine = baseWriter.NewLine;
-            // We interpret anything larger than 65535 to mean infinite length to avoid allocating a buffer that size.
-            _maximumLineLength = (maximumLineLength < 1 || maximumLineLength > ushort.MaxValue) ? 0 : maximumLineLength;
+            // We interpret anything larger than 65535 to mean infinite length to avoid buffering that much.
+            _maximumLineLength = (maximumLineLength is < 1 or > ushort.MaxValue) ? 0 : maximumLineLength;
             _disposeBaseWriter = disposeBaseWriter;
             _countFormatting = countFormatting;
             if (_maximumLineLength > 0)
@@ -605,7 +606,8 @@ namespace Ookii.CommandLine
         }
 
         /// <summary>
-        /// Gets a <see cref="LineWrappingTextWriter"/> that writes to the standard output stream.
+        /// Gets a <see cref="LineWrappingTextWriter"/> that writes to the standard output stream,
+        /// using <see cref="Console.WindowWidth"/> as the maximum line length.
         /// </summary>
         /// <returns>A <see cref="LineWrappingTextWriter"/> that writes to the standard output stream.</returns>
         public static LineWrappingTextWriter ForConsoleOut()
@@ -614,7 +616,8 @@ namespace Ookii.CommandLine
         }
 
         /// <summary>
-        /// Gets a <see cref="LineWrappingTextWriter"/> that writes to the standard error stream.
+        /// Gets a <see cref="LineWrappingTextWriter"/> that writes to the standard error stream,
+        /// using <see cref="Console.WindowWidth"/> as the maximum line length.
         /// </summary>
         /// <returns>A <see cref="LineWrappingTextWriter"/> that writes to the standard error stream.</returns>
         public static LineWrappingTextWriter ForConsoleError()
@@ -623,14 +626,14 @@ namespace Ookii.CommandLine
         }
 
         /// <summary>
-        /// Gets a <see cref="LineWrappingTextWriter"/> that writes to a <see cref="StringWriter"/> using the specified format provider.
+        /// Gets a <see cref="LineWrappingTextWriter"/> that writes to a <see cref="StringWriter"/>.
         /// </summary>
         /// <param name="maximumLineLength">The maximum length of a line, in characters.</param>
         /// <param name="formatProvider">An <see cref="IFormatProvider"/> that controls formatting.</param>
         /// <param name="countFormatting">
         ///   If set to <see langword="false"/>, virtual terminal sequences used to format the text
         ///   will not be counted as part of the line length, and will therefore not affect where
-        ///   the text is wrapped. The default value is <see langword="true"/>.
+        ///   the text is wrapped. The default value is <see langword="false"/>.
         /// </param>
         /// <returns>A <see cref="LineWrappingTextWriter"/> that writes to a <see cref="StringWriter"/>.</returns>
         /// <remarks>

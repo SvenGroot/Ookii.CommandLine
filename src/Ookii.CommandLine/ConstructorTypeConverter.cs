@@ -4,6 +4,9 @@ using System.Globalization;
 
 namespace Ookii.CommandLine
 {
+    /// <summary>
+    /// Type converter used to instantiate argument types with a string constructor.
+    /// </summary>
     internal class ConstructorTypeConverter : TypeConverterBase<object>
     {
         private readonly Type _type;

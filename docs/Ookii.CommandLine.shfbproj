@@ -41,7 +41,7 @@
     <PresentationStyle>VS2013</PresentationStyle>
     <SyntaxFilters>C#, Visual Basic, Visual Basic Usage, Managed C++</SyntaxFilters>
     <SdkLinkTarget>Blank</SdkLinkTarget>
-    <RootNamespaceContainer>False</RootNamespaceContainer>
+    <RootNamespaceContainer>True</RootNamespaceContainer>
     <Preliminary>False</Preliminary>
     <ContentPlacement>AboveNamespaces</ContentPlacement>
     <CleanIntermediates>True</CleanIntermediates>
@@ -66,6 +66,7 @@
       <Argument Key="baseSourceCodeUrl" Value="" xmlns="" />
       <Argument Key="requestExampleUrl" Value="" xmlns="" />
     </TransformComponentArguments>
+    <ProjectSummary>Test.</ProjectSummary>
   </PropertyGroup>
   <!-- There are no properties for these groups.  AnyCPU needs to appear in
        order for Visual Studio to perform the build.  The others are optional

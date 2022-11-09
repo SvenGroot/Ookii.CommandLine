@@ -51,7 +51,6 @@ namespace Ookii.CommandLine
             return base.ConvertFrom(context, culture, value);
         }
 
-
         /// <inheritdoc/>
         /// <remarks>
         /// <para>

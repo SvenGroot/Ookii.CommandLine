@@ -14,7 +14,7 @@ namespace Ookii.CommandLine
     ///   or you can use the <see cref="ParseOptionsAttribute"/> attribute.
     /// </para>
     /// <para>
-    ///   This attribute allows you to define your preferred parsing behavior declaratively, with
+    ///   This attribute allows you to define your preferred parsing behavior declaratively, on
     ///   the class that provides the arguments. Apply this attribute to the class to set the
     ///   properties.
     /// </para>
@@ -34,7 +34,7 @@ namespace Ookii.CommandLine
         /// Gets or sets a value that indicates the command line argument parsing rules to use.
         /// </summary>
         /// <value>
-        /// The <see cref="Ookii.CommandLine.ParsingMode"/> to use. The default is <see cref="ParsingMode.Default"/>.
+        /// The <see cref="ParsingMode"/> to use. The default is <see cref="ParsingMode.Default"/>.
         /// </value>
         /// <remarks>
         /// <para>
@@ -42,6 +42,7 @@ namespace Ookii.CommandLine
         ///   property.
         /// </para>
         /// </remarks>
+        /// <seealso cref="CommandLineParser.Mode"/>
         public ParsingMode Mode { get; set; }
 
         /// <summary>
@@ -58,10 +59,10 @@ namespace Ookii.CommandLine
         ///   property set (or doesn't have an <see cref="ArgumentNameAttribute"/> attribute for
         ///   constructor parameters), the argument name is determined by taking the name of the
         ///   property, constructor parameter, or method that defines it, and applying the specified
-        ///   transform.
+        ///   transformation.
         /// </para>
         /// <para>
-        ///   The name transform will also be applied to the names of the automatically added
+        ///   The name transformation will also be applied to the names of the automatically added
         ///   help and version attributes.
         /// </para>
         /// <para>
@@ -93,6 +94,7 @@ namespace Ookii.CommandLine
         ///   constructor.
         /// </para>
         /// </remarks>
+        /// <seealso cref="CommandLineParser.ArgumentNamePrefixes"/>
         public string[]? ArgumentNamePrefixes { get; set; }
 
         /// <summary>
@@ -113,6 +115,7 @@ namespace Ookii.CommandLine
         ///   property.
         /// </para>
         /// </remarks>
+        /// <seealso cref="CommandLineParser.LongArgumentNamePrefix"/>
         public string? LongArgumentNamePrefix { get; set; }
 
         /// <summary>
@@ -136,6 +139,7 @@ namespace Ookii.CommandLine
         ///   constructor.
         /// </para>
         /// </remarks>
+        /// <seealso cref="CommandLineParser.ArgumentNameComparer"/>
         public bool CaseSensitive { get; set; }
 
         /// <summary>
@@ -160,8 +164,8 @@ namespace Ookii.CommandLine
         /// </summary>
         /// <value>
         ///   <see langword="true"/> if white space is allowed to separate an argument name and its
-        ///   value; <see langword="false"/> if only the colon (:) is allowed. The default value is
-        ///   <see langword="true"/>.
+        ///   value; <see langword="false"/> if only the value from <see cref="NameValueSeparator"/>
+        ///   is allowed. The default value is <see langword="true"/>.
         /// </value>
         /// <remarks>
         /// <para>
@@ -226,10 +230,16 @@ namespace Ookii.CommandLine
         ///   <see langword="true"/>.
         /// </para>
         /// <para>
+        ///   The name, aliases and description can be customized by using a custom <see cref="LocalizedStringProvider"/>.
+        /// </para>
+        /// <para>
         ///   This value can be overridden by the <see cref="ParseOptions.AutoHelpArgument"/>
         ///   property.
         /// </para>
         /// </remarks>
+        /// <seealso cref="LocalizedStringProvider.AutomaticHelpName"/>
+        /// <seealso cref="LocalizedStringProvider.AutomaticHelpDescription"/>
+        /// <seealso cref="LocalizedStringProvider.AutomaticHelpShortName"/>
         public bool AutoHelpArgument { get; set; } = true;
 
         /// <summary>
@@ -254,10 +264,15 @@ namespace Ookii.CommandLine
         ///   The automatic version argument will never be created for subcommands.
         /// </note>
         /// <para>
+        ///   The name and description can be customized by using a custom <see cref="LocalizedStringProvider"/>.
+        /// </para>
+        /// <para>
         ///   This value can be overridden by the <see cref="ParseOptions.AutoVersionArgument"/>
         ///   property.
         /// </para>
         /// </remarks>
+        /// <seealso cref="LocalizedStringProvider.AutomaticVersionName"/>
+        /// <seealso cref="LocalizedStringProvider.AutomaticVersionDescription"/>
         public bool? AutoVersionArgument { get; set; } = true;
 
         /// <summary>
@@ -279,6 +294,7 @@ namespace Ookii.CommandLine
         ///   property.
         /// </para>
         /// </remarks>
+        /// <seealso cref="CommandLineArgument.ValueDescription"/>
         public NameTransform ValueDescriptionTransform { get; set; }
 
         internal IComparer<string> GetStringComparer()

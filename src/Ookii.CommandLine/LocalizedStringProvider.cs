@@ -4,7 +4,7 @@ using System.Globalization;
 namespace Ookii.CommandLine
 {
     /// <summary>
-    /// Provides localized strings for error messages and usage help.
+    /// Provides custom localized strings for error messages and usage help.
     /// </summary>
     /// <remarks>
     /// <para>
@@ -12,17 +12,17 @@ namespace Ookii.CommandLine
     ///   strings. You can specify the implementation to use using <see cref="ParseOptions.StringProvider"/>.
     /// </para>
     /// <note>
-    ///   This only lets you customize error messages for the <see cref="CommandLineArgumentException"/>
-    ///   class. Other exceptions thrown by this library, such as for invalid argument definitions,
-    ///   constitute bugs and should not occur in a correct program, and should therefore not be
-    ///   shown to the user.
+    ///   For error messages, this only lets you customize error messages for the
+    ///   <see cref="CommandLineArgumentException"/> class. Other exceptions thrown by this library,
+    ///   such as for invalid argument definitions, constitute bugs and should not occur in a
+    ///   correct program, and should therefore not be shown to the user.
     /// </note>
     /// </remarks>
     public partial class LocalizedStringProvider
     {
         /// <summary>
         /// Gets the name of the help argument created if the <see cref="ParseOptions.AutoHelpArgument"/>
-        /// property is <see langword="true"/>.
+        /// or <see cref="ParseOptionsAttribute.AutoHelpArgument"/> property is <see langword="true"/>.
         /// </summary>
         /// <returns>The string.</returns>
         public virtual string AutomaticHelpName() => Resources.AutomaticHelpName;
@@ -35,8 +35,8 @@ namespace Ookii.CommandLine
         /// <remarks>
         /// <para>
         ///   The argument will automatically have a short alias that is the lower case first
-        ///   character of the value returned by <see cref="AutomaticHelpName"/>, so this character
-        ///   should be different.
+        ///   character of the value returned by <see cref="AutomaticHelpName"/>. If this character
+        ///   is the same according to the argument name comparer, then no alias is added.
         /// </para>
         /// <para>
         ///   If <see cref="CommandLineParser.Mode"/> is not <see cref="ParsingMode.LongShort"/>,

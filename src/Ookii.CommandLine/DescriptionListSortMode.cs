@@ -3,6 +3,7 @@
     /// <summary>
     /// Indicates how the arguments in the description list should be sorted.
     /// </summary>
+    /// <seealso cref="WriteUsageOptions.ArgumentDescriptionListOrder"/>
     public enum DescriptionListSortMode
     {
         /// <summary>

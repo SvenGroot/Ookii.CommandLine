@@ -10,6 +10,9 @@ namespace Ookii.CommandLine.Commands
     /// <summary>
     /// Provides information about a subcommand.
     /// </summary>
+    /// <seealso cref="CommandManager"/>
+    /// <seealso cref="ICommand"/>
+    /// <seealso cref="CommandAttribute"/>
     public struct CommandInfo
     {
         private readonly string _name;
@@ -105,9 +108,10 @@ namespace Ookii.CommandLine.Commands
         /// <remarks>
         /// <para>
         ///   A hidden command will not be included in the command list when usage help is
-        ///   displayed.
+        ///   displayed, but can still be invoked from the command line.
         /// </para>
         /// </remarks>
+        /// <seealso cref="CommandAttribute.IsHidden"/>
         public bool IsHidden => _attribute.IsHidden;
 
         /// <summary>
@@ -170,8 +174,8 @@ namespace Ookii.CommandLine.Commands
         /// to use the default comparison, which is <see cref="StringComparer.OrdinalIgnoreCase"/>.
         /// </param>
         /// <returns>
-        /// <see langword="true"/> if the <paramref name="name"/> matches <see cref="Name"/> or any
-        /// of the items in the <see cref="Aliases"/> property.
+        /// <see langword="true"/> if the <paramref name="name"/> matches the <see cref="Name"/>
+        /// property or any of the items in the <see cref="Aliases"/> property.
         /// </returns>
         /// <exception cref="ArgumentNullException">
         /// <paramref name="name"/> is <see langword="null"/>.
@@ -227,6 +231,9 @@ namespace Ookii.CommandLine.Commands
         /// <see langword="true"/> if the type implements the <see cref="ICommand"/> interface and
         /// has the <see cref="CommandAttribute"/> applied; otherwise, <see langword="false"/>.
         /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="commandType"/> is <see langword="null"/>.
+        /// </exception>
         public static bool IsCommand(Type commandType)
         {
             return GetCommandAttribute(commandType) != null;

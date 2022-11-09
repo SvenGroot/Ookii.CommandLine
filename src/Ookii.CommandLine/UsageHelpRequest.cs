@@ -3,6 +3,7 @@
     /// <summary>
     /// Indicates if and how usage is shown if an error occurred parsing the command line.
     /// </summary>
+    /// <seealso cref="ParseOptions.ShowUsageOnError"/>
     public enum UsageHelpRequest
     {
         /// <summary>

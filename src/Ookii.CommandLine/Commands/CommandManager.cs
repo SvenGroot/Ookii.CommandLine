@@ -12,7 +12,7 @@ namespace Ookii.CommandLine.Commands
     /// </summary>
     /// <remarks>
     /// <para>
-    ///   Subcommands can be used to create shell utilities that perform more than one operation,
+    ///   Subcommands can be used to create applications that perform more than one operation,
     ///   where each operation has its own set of command line arguments. For example, think of
     ///   the <c>dotnet</c> executable, which has subcommands such as <c>dotnet build</c> and
     ///   <c>dotnet run</c>.
@@ -38,6 +38,8 @@ namespace Ookii.CommandLine.Commands
     ///   Commands can be defined in a single assembly, or multiple assemblies.
     /// </para>
     /// </remarks>
+    /// <seealso cref="CommandLineParser"/>
+    /// <seealso href="https://www.github.com/SvenGroot/ookii.commandline"/>
     public class CommandManager
     {
         private readonly Assembly? _assembly;
@@ -102,6 +104,16 @@ namespace Ookii.CommandLine.Commands
         /// <returns>
         /// Information about every subcommand defined in the assemblies, ordered by command name.
         /// </returns>
+        /// <remarks>
+        /// <para>
+        ///   Commands that don't meet the criteria of the <see cref="CommandOptions.CommandFilter"/>
+        ///   predicate are not returned.
+        /// </para>
+        /// <para>
+        ///   The automatic version command is added if the <see cref="CommandOptions.AutoVersionCommand"/>
+        ///   property is <see langword="true"/> and there is no command with a conflicting name.
+        /// </para>
+        /// </remarks>
         public IEnumerable<CommandInfo> GetCommands()
         {
             var commands = GetCommandsUnsorted();
@@ -137,6 +149,15 @@ namespace Ookii.CommandLine.Commands
         ///   that property is <see langword="null"/>, the name is determined by taking the command
         ///   type's name, and applying the transformation specified by the <see cref="CommandOptions.CommandNameTransform"/>
         ///   property.
+        /// </para>
+        /// <para>
+        ///   Commands that don't meet the criteria of the <see cref="CommandOptions.CommandFilter"/>
+        ///   predicate are not returned.
+        /// </para>
+        /// <para>
+        ///   The automatic version command is returned if the <see cref="CommandOptions.AutoVersionCommand"/>
+        ///   property is <see langword="true"/> and the <paramref name="commandName"/> matches the
+        ///   name of the automatic version command, and not any other command name.
         /// </para>
         /// </remarks>
         public CommandInfo? GetCommand(string commandName)
@@ -203,6 +224,15 @@ namespace Ookii.CommandLine.Commands
         ///   <see cref="CommandOptions"/>, unless the <see cref="LineWrappingTextWriter.MaximumLineLength"/>
         ///   property is less than 30.
         /// </para>
+        /// <para>
+        ///   Commands that don't meet the criteria of the <see cref="CommandOptions.CommandFilter"/>
+        ///   predicate are not returned.
+        /// </para>
+        /// <para>
+        ///   The automatic version command is returned if the <see cref="CommandOptions.AutoVersionCommand"/>
+        ///   property is <see langword="true"/> and the command name matches the name of the
+        ///   automatic version command, and not any other command name.
+        /// </para>
         /// </remarks>
         public ICommand? CreateCommand(string? commandName, string[] args, int index)
         {
@@ -243,46 +273,11 @@ namespace Ookii.CommandLine.Commands
             return commandInfo.Value.CreateInstance(args, index, _options);
         }
 
+        /// <inheritdoc cref="CreateCommand(string?, string[], int)"/>
         /// <summary>
         /// Finds and instantiates the subcommand with the name from the first argument, or if that
-        /// failed, writes error and usage information.
+        /// fails, writes error and usage information.
         /// </summary>
-        /// <param name="args">The arguments to the command.</param>
-        /// <param name="index">The index in <paramref name="args"/> at which to start parsing the arguments.</param>
-        /// <returns>
-        ///   An instance a class implement the <see cref="ICommand"/> interface, or
-        ///   <see langword="null"/> if the command was not found or an error occurred parsing the arguments.
-        /// </returns>
-        /// <exception cref="ArgumentNullException">
-        ///   <paramref name="args"/> is <see langword="null"/>
-        /// </exception>
-        /// <exception cref="ArgumentOutOfRangeException">
-        ///   <paramref name="index"/> does not fall inside the bounds of <paramref name="args"/>.
-        /// </exception>
-        /// <remarks>
-        /// <para>
-        ///   If the command could not be found, a list of possible commands is written to 
-        ///   <see cref="ParseOptions.Out"/>. If an error occurs parsing the command's arguments,
-        ///   the error message is written to <see cref="ParseOptions.Error"/>, and the shell
-        ///   command's usage information is written to <see cref="ParseOptions.Out"/>.
-        /// </para>
-        /// <para>
-        ///   If the <see cref="ParseOptions.Out"/> property or <see cref="ParseOptions.Error"/>
-        ///   property is <see langword="null"/>, output is written to a <see cref="LineWrappingTextWriter"/>
-        ///   for the standard output and error streams respectively, wrapping at the console's
-        ///   window width. When the console output is redirected to a file, Microsoft .Net will
-        ///   still report the console's actual window width, but on Mono the value of the
-        ///   <see cref="Console.WindowWidth"/> property will be 0. In that case, the usage
-        ///   information will not be wrapped.
-        /// </para>
-        /// <para>
-        ///   If the <see cref="ParseOptions.Out"/> property is instance of the
-        ///   <see cref="LineWrappingTextWriter"/> class, this method indents additional lines for
-        ///   the usage syntax and argument descriptions according to the values specified by the
-        ///   <see cref="CommandOptions"/>, unless the <see cref="LineWrappingTextWriter.MaximumLineLength"/>
-        ///   property is less than 30.
-        /// </para>
-        /// </remarks>
         public ICommand? CreateCommand(string[] args, int index = 0)
         {
             if (args == null)
@@ -306,40 +301,14 @@ namespace Ookii.CommandLine.Commands
         }
 
         /// <summary>
-        /// Finds and instantiates the subcommand with the name from the first argument, or if that
-        /// failed, writes error and usage information.
+        /// Finds and instantiates the subcommand using the arguments from <see cref="Environment.GetCommandLineArgs"/>,
+        /// using the first argument for the command name. If that fails, writes error and usage information.
         /// </summary>
         /// <returns>
-        ///   An instance a class implement the <see cref="ICommand"/> interface, or
-        ///   <see langword="null"/> if the command was not found or an error occurred parsing the arguments.
+        /// <inheritdoc cref="CreateCommand(string?, string[], int)"/>
         /// </returns>
         /// <remarks>
-        /// <para>
-        ///   If the command could not be found, a list of possible commands is written to 
-        ///   <see cref="ParseOptions.Out"/>. If an error occurs parsing the command's arguments,
-        ///   the error message is written to <see cref="ParseOptions.Error"/>, and the shell
-        ///   command's usage information is written to <see cref="ParseOptions.Out"/>.
-        /// </para>
-        /// <para>
-        ///   If the <see cref="ParseOptions.Out"/> property or <see cref="ParseOptions.Error"/>
-        ///   property is <see langword="null"/>, output is written to a <see cref="LineWrappingTextWriter"/>
-        ///   for the standard output and error streams respectively, wrapping at the console's
-        ///   window width. When the console output is redirected to a file, Microsoft .Net will
-        ///   still report the console's actual window width, but on Mono the value of the
-        ///   <see cref="Console.WindowWidth"/> property will be 0. In that case, the usage
-        ///   information will not be wrapped.
-        /// </para>
-        /// <para>
-        ///   If the <see cref="ParseOptions.Out"/> property is instance of the
-        ///   <see cref="LineWrappingTextWriter"/> class, this method indents additional lines for
-        ///   the usage syntax and argument descriptions according to the values specified by the
-        ///   <see cref="CommandOptions"/>, unless the <see cref="LineWrappingTextWriter.MaximumLineLength"/>
-        ///   property is less than 30.
-        /// </para>
-        /// <para>
-        ///   The arguments are retrieved using the <see cref="Environment.GetCommandLineArgs"/>
-        ///   method.
-        /// </para>
+        /// <inheritdoc cref="CreateCommand(string?, string[], int)"/>
         /// </remarks>
         public ICommand? CreateCommand()
         {
@@ -349,8 +318,8 @@ namespace Ookii.CommandLine.Commands
 
 
         /// <summary>
-        /// Finds and instantiates the subcommand with the specified name, and if it succeeded,
-        /// runs it. If it failed, writes error and usage information.
+        /// Finds and instantiates the subcommand with the specified name, and if it succeeds,
+        /// runs it. If it fails, writes error and usage information.
         /// </summary>
         /// <param name="commandName">The name of the command.</param>
         /// <param name="args">The arguments to the command.</param>
@@ -377,22 +346,11 @@ namespace Ookii.CommandLine.Commands
             return command?.Run();
         }
 
+        /// <inheritdoc cref="RunCommand(string?, string[], int)"/>
         /// <summary>
         /// Finds and instantiates the subcommand with the name from the first argument, and if it
-        /// succeeded, runs it. If it failed, writes error and usage information.
+        /// succeeds, runs it. If it fails, writes error and usage information.
         /// </summary>
-        /// <param name="args">The arguments to the command.</param>
-        /// <param name="index">The index in <paramref name="args"/> at which to start parsing the arguments.</param>
-        /// <returns>
-        ///   The value returned by <see cref="ICommand.Run"/>, or <see langword="null"/> if
-        ///   the command could not be created.
-        /// </returns>
-        /// <exception cref="ArgumentNullException">
-        ///   <paramref name="args"/> is <see langword="null"/>
-        /// </exception>
-        /// <exception cref="ArgumentOutOfRangeException">
-        ///   <paramref name="index"/> does not fall inside the bounds of <paramref name="args"/>.
-        /// </exception>
         /// <remarks>
         /// <para>
         ///   This function creates the command by invoking the <see cref="CreateCommand(string[], int)"/>,
@@ -406,21 +364,17 @@ namespace Ookii.CommandLine.Commands
         }
 
         /// <summary>
-        /// Finds and instantiates the subcommand with the name from the first argument, and if it
-        /// succeeded, runs it. If it failed, writes error and usage information.
+        /// Finds and instantiates the subcommand using the arguments from the <see cref="Environment.GetCommandLineArgs"/>
+        /// method, using the first argument as the command name. If it succeeds, runs the command.
+        /// If it fails, writes error and usage information.
         /// </summary>
         /// <returns>
-        ///   The value returned by <see cref="ICommand.Run"/>, or <see langword="null"/> if
-        ///   the command could not be created.
+        /// <inheritdoc cref="RunCommand(string?, string[], int)"/>
         /// </returns>
         /// <remarks>
         /// <para>
-        ///   This function creates the command by invoking the <see cref="CreateCommand(string[], int)"/>,
+        ///   This function creates the command by invoking the <see cref="CreateCommand()"/>,
         ///   method and then invokes the <see cref="ICommand.Run"/> method on the command.
-        /// </para>
-        /// <para>
-        ///   The arguments are retrieved using the <see cref="Environment.GetCommandLineArgs"/>
-        ///   method.
         /// </para>
         /// </remarks>
         public int? RunCommand()
@@ -470,7 +424,7 @@ namespace Ookii.CommandLine.Commands
             var executableName = _options.UsageOptions.GetExecutableName();
             if (lineWriter != null)
             {
-                lineWriter.Indent = CommandLineParser.ShouldIndent(lineWriter) ? _options.UsageOptions.Indent : 0;
+                lineWriter.Indent = CommandLineParser.ShouldIndent(lineWriter) ? _options.UsageOptions.SyntaxIndent : 0;
             }
 
             writer.Inner.WriteLine(_options.StringProvider.RootCommandUsageSyntax(executableName, usageColorStart, colorEnd));
@@ -504,7 +458,8 @@ namespace Ookii.CommandLine.Commands
                     ? (_options.LongArgumentNamePrefix ?? CommandLineParser.DefaultLongArgumentNamePrefix)
                     : (_options.ArgumentNamePrefixes?.FirstOrDefault() ?? CommandLineParser.GetDefaultArgumentNamePrefixes()[0]);
 
-                writer.Inner.WriteLine(_options.StringProvider.CommandHelpInstruction(executableName, prefix, useColor));
+                var transform = _options.NameTransform ?? NameTransform.None;
+                writer.Inner.WriteLine(transform.Apply(_options.StringProvider.CommandHelpInstruction(executableName, prefix, useColor)));
             }
         }
 

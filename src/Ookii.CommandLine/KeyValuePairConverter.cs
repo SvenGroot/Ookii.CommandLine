@@ -7,7 +7,8 @@ using System.Globalization;
 namespace Ookii.CommandLine
 {
     /// <summary>
-    /// Static class providing constants for <see cref="KeyValuePairConverter{TKey, TValue}"/>.
+    /// Static class providing constants for the <see cref="KeyValuePairConverter{TKey, TValue}"/>
+    /// class.
     /// </summary>
     public static class KeyValuePairConverter
     {
@@ -18,13 +19,13 @@ namespace Ookii.CommandLine
     }
 
     /// <summary>
-    /// Converts key-value pairs to and from strings using key=value notation.
+    /// Converts key-value pairs to and from strings using "key=value" notation.
     /// </summary>
     /// <typeparam name="TKey">The type of the key.</typeparam>
     /// <typeparam name="TValue">The type of the value.</typeparam>
     /// <remarks>
     /// <para>
-    ///   This <see cref="TypeConverter"/> is used for dictionary command line arguments.
+    ///   This <see cref="TypeConverter"/> is used for dictionary command line arguments by default.
     /// </para>
     /// </remarks>
     public class KeyValuePairConverter<TKey, TValue> : TypeConverterBase<KeyValuePair<TKey, TValue?>>
@@ -41,7 +42,7 @@ namespace Ookii.CommandLine
         /// </summary>
         /// <param name="stringProvider">Provides a <see cref="LocalizedStringProvider"/> to get error messages.</param>
         /// <param name="argumentName">The name of the argument that this converter is for.</param>
-        /// <param name="allowNullValues">Indicates whether the value type accepts <see langword="null"/> values.</param>
+        /// <param name="allowNullValues">Indicates whether the type of the pair's value accepts <see langword="null"/> values.</param>
         /// <param name="keyConverterType">Provides an optional <see cref="TypeConverter"/> type to use to convert keys.
         /// If <see langword="null"/>, the default converter for <typeparamref name="TKey"/> is used.</param>
         /// <param name="valueConverterType">Provides an optional <see cref="TypeConverter"/> type to use to convert values.
@@ -51,6 +52,13 @@ namespace Ookii.CommandLine
         /// <exception cref="ArgumentNullException"><paramref name="stringProvider"/> or <paramref name="argumentName"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentException"><paramref name="separator"/> is an empty string.</exception>
         /// <exception cref="NotSupportedException">Either the key or value <see cref="TypeConverter"/> does not support converting from a string.</exception>
+        /// <remarks>
+        /// <para>
+        ///   If either <paramref name="keyConverterType"/> or <paramref name="valueConverterType"/> is <see langword="null"/>,
+        ///   conversion of those types is done using the rules outlined in the documentation for the <see cref="CommandLineArgument.ConvertToArgumentType(CultureInfo, string?)"/>
+        ///   method.
+        /// </para>
+        /// </remarks>
         public KeyValuePairConverter(LocalizedStringProvider stringProvider, string argumentName, bool allowNullValues, Type? keyConverterType, Type? valueConverterType, string? separator)
         {
             _stringProvider = stringProvider ?? throw new ArgumentNullException(nameof(stringProvider));

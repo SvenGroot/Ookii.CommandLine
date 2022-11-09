@@ -4,7 +4,7 @@ using System.Text;
 namespace Ookii.CommandLine
 {
     /// <summary>
-    /// Extension methods for applying name transformations.
+    /// Extension methods for the <see cref="NameTransform"/> enumeration.
     /// </summary>
     public static class NameTransformExtensions
     {

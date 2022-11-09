@@ -5,6 +5,10 @@ namespace Ookii.CommandLine
     /// have an explicit name.
     /// </summary>
     /// <seealso cref="ParseOptionsAttribute.NameTransform" />
+    /// <seealso cref="ParseOptions.NameTransform"/>
+    /// <seealso cref="ParseOptions.ValueDescriptionTransform"/>
+    /// <seealso cref="Commands.CommandOptions.CommandNameTransform"/>
+    /// <seealso cref="NameTransformExtensions.Apply"/>
     public enum NameTransform
     {
         /// <summary>
@@ -13,7 +17,7 @@ namespace Ookii.CommandLine
         None,
         /// <summary>
         /// The names are transformed to PascalCase. This removes all underscores, and the first
-        /// character and every character after an underscore is changed to uppercase. The case of
+        /// character, and every character after an underscore, is changed to uppercase. The case of
         /// other characters is not changed.
         /// </summary>
         PascalCase,
@@ -29,8 +33,8 @@ namespace Ookii.CommandLine
         /// </summary>
         DashCase,
         /// <summary>
-        /// The names are transformed to dash-case. Similar to <see cref="SnakeCase"/>, but uses a dash instead
-        /// of an underscore.
+        /// The names are transformed to dash-case. Similar to <see cref="SnakeCase"/>, but uses a
+        /// dash instead of an underscore.
         /// </summary>
         SnakeCase
     }

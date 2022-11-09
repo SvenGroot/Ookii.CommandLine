@@ -9,6 +9,7 @@
     ///   property or the <see cref="ParseOptions.Mode"/> property.
     /// </para>
     /// </remarks>
+    /// <seealso cref="CommandLineParser.Mode"/>
     public enum ParsingMode
     {
         /// <summary>

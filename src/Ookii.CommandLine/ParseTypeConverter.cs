@@ -9,6 +9,9 @@ using System.Threading.Tasks;
 
 namespace Ookii.CommandLine
 {
+    /// <summary>
+    /// Type converter for types with a public static Parse method.
+    /// </summary>
     internal class ParseTypeConverter : TypeConverterBase<object?>
     {
         private readonly MethodInfo _method;

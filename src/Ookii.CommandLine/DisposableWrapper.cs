@@ -12,6 +12,11 @@ namespace Ookii.CommandLine
         }
     }
 
+    /// <summary>
+    /// Helper to either use an existing instance (and not dispose it), or create an instance
+    /// and dispose it.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     internal class DisposableWrapper<T> : IDisposable
         where T : IDisposable
     {

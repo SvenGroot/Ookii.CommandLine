@@ -21,7 +21,12 @@ namespace Ookii.CommandLine.Commands
     ///   and applying the transformation specified by the <see cref="CommandOptions.CommandNameTransform"/>
     ///   property.
     /// </para>
+    /// <para>
+    ///   A command can be given more than one name by using the <see cref="AliasAttribute"/>
+    ///   attribute.
+    /// </para>
     /// </remarks>
+    /// <seealso cref="CommandManager"/>
     [AttributeUsage(AttributeTargets.Class)]
     public sealed class CommandAttribute : Attribute
     {
@@ -46,6 +51,9 @@ namespace Ookii.CommandLine.Commands
         /// Initializes a new instance of the <see cref="CommandAttribute"/> class using the specified command name.
         /// </summary>
         /// <param name="commandName">The name of the command, which can be used to locate it using the <see cref="CommandManager.GetCommand"/> method.</param>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="commandName"/> is <see langword="null"/>.
+        /// </exception>
         public CommandAttribute(string commandName)
         {
             _commandName = commandName ?? throw new ArgumentNullException(nameof(commandName));

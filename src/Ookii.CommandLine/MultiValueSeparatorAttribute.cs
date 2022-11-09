@@ -4,14 +4,14 @@ using System;
 namespace Ookii.CommandLine
 {
     /// <summary>
-    /// Specifies a separator for the values of multi-value arguments
+    /// Specifies a separator for the values of multi-value arguments.
     /// </summary>
     /// <remarks>
     /// <para>
-    ///   Normally, the values for a multi-value argument can only be specified by specifying the
-    ///   argument multiple times, e.g. by using <c>-Sample Value1 -Sample Value2</c>. If you
-    ///   specify the <see cref="MultiValueSeparatorAttribute"/> attribute, it allows you to specify
-    ///   multiple values with a single argument by using a separator.
+    ///   Normally, you need to supply the argument multiple times to set multiple values, e.g.
+    ///   by using <c>-Sample Value1 -Sample Value2</c>. If you specify the <see cref="MultiValueSeparatorAttribute"/>
+    ///   attribute, it allows you to specify multiple values with a single argument by using a
+    ///   separator.
     /// </para>
     /// <para>
     ///   There are two ways you can use separators for multi-value arguments: a white-space
@@ -38,8 +38,8 @@ namespace Ookii.CommandLine
     ///   separator is set to a comma, you can use <c>-Sample Value1,Value2</c>.
     /// </para>
     /// <note>
-    ///   If you specify a separator for a multi-value argument, it will <em>not</em> be possible
-    ///   to use the separator character in the individual argument values. There is no way to
+    ///   If you specify an explicit separator for a multi-value argument, it will <em>not</em> be
+    ///   possible to use the separator in the individual argument values. There is no way to
     ///   escape it.
     /// </note>
     /// <para>
