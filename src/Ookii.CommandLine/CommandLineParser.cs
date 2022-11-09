@@ -1634,6 +1634,7 @@ namespace Ookii.CommandLine
                 _ => _arguments,
             };
 
+            bool first = true;
             foreach (var argument in arguments)
             {
                 bool include = !argument.IsHidden && options.ArgumentDescriptionListFilter switch
@@ -1651,6 +1652,17 @@ namespace Ookii.CommandLine
                 }
 
                 writer.ResetIndent();
+                if (first)
+                {
+                    var header = StringProvider.DescriptionHeader(options.UseColor ?? false);
+                    if (header != null)
+                    {
+                        writer.WriteLine(header);
+                    }
+
+                    first = false;
+                }
+
                 writer.WriteLine(StringProvider.ArgumentDescription(argument, options));
             }
         }

@@ -291,6 +291,20 @@ namespace Ookii.CommandLine
         #region Usage descriptions
 
         /// <summary>
+        /// Gets a header to write before the argument description list.
+        /// </summary>
+        /// <param name="useColor">The value of <see cref="WriteUsageOptions.UseColor"/>.</param>
+        /// <returns>The string, or <see langword="null"/> if there is no header.</returns>
+        /// <remarks>
+        /// <para>
+        ///   This string doesn't have any predefined colors in the <see cref="WriteUsageOptions"/>
+        ///   class, so the <paramref name="useColor"/> parameter is provided to allow you to
+        ///   manually add colors if desired.
+        /// </para>
+        /// </remarks>
+        public virtual string? DescriptionHeader(bool useColor) => null;
+
+        /// <summary>
         /// Gets a formatted value description, similar to "&lt;value&gt;", for use with the
         /// <see cref="ArgumentDescription"/> method.
         /// </summary>
