@@ -1,8 +1,8 @@
 ﻿using Ookii.CommandLine;
 
-namespace ParserSample;
+namespace LongShort;
 
-public static class Program
+internal static class Program
 {
     // No need to use the Main(string[] args) overload (though you can if you want), because
     // CommandLineParser can take the arguments directly from Environment.GetCommandLineArgs().
@@ -29,6 +29,7 @@ public static class Program
         writer.WriteLine($"Date: {arguments.Date?.ToString() ?? "(null)"}");
         writer.WriteLine($"Count: {arguments.Count}");
         writer.WriteLine($"Verbose: {arguments.Verbose}");
+        writer.WriteLine($"Process: {arguments.Process}");
         var values = arguments.Values == null ? "(null)" : "{ " + string.Join(", ", arguments.Values) + " }";
         writer.WriteLine($"Values: {values}");
         writer.WriteLine($"Day: {arguments.Day?.ToString() ?? "(null)"}");
