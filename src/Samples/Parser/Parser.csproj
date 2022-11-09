@@ -11,7 +11,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Ookii.CommandLine\Ookii.CommandLine.csproj" />
+    <ProjectReference Include="..\..\Ookii.CommandLine\Ookii.CommandLine.csproj" />
   </ItemGroup>
 
 </Project>
