@@ -21,7 +21,7 @@ namespace Ookii.CommandLine
     /// <para>
     ///   The <see cref="CommandLineParser"/> class can parse a set of command line arguments into
     ///   values. Which arguments are accepted is determined from the constructor parameters,
-    ///   properties, and methods of the type passed to the <see cref="CommandLineParser.CommandLineParser(Type, ParseOptions)"/>
+    ///   properties, and methods of the type passed to the <see cref="CommandLineParser(Type, ParseOptions)"/>
     ///   constructor. The result of a parsing operation is an instance of that type, created using
     ///   the values that were supplied on the command line.
     /// </para>
@@ -29,6 +29,11 @@ namespace Ookii.CommandLine
     ///   An argument defined by a constructor parameter is always positional, and is required if
     ///   the parameter has no default value. If your type has multiple constructors, use the
     ///   <see cref="CommandLineConstructorAttribute"/> attribute to indicate which one to use.
+    /// </para>
+    /// <para>
+    ///   A constructor parameter with the type <see cref="CommandLineParser"/> is not an argument,
+    ///   but will be passed the instance of the <see cref="CommandLineParser"/> class used to
+    ///   parse the arguments when the type is instantiated.
     /// </para>
     /// <para>
     ///   A property defines a command line argument if it is <see langword="public"/>, not
@@ -172,6 +177,7 @@ namespace Ookii.CommandLine
         private readonly string? _longArgumentNamePrefix;
         private readonly NameTransform _nameTransform;
         private readonly LocalizedStringProvider _stringProvider;
+        private int _injectionIndex = -1;
 
         /// <summary>
         /// Gets the default character used to separate the name and the value of an argument.
@@ -1174,10 +1180,17 @@ namespace Ookii.CommandLine
 
             foreach (ParameterInfo parameter in parameters)
             {
-                var argument = CommandLineArgument.Create(this, parameter, options?.DefaultValueDescriptions,
-                    valueDescriptionTransform);
+                if (parameter.ParameterType == typeof(CommandLineParser) && _injectionIndex < 0)
+                {
+                    _injectionIndex = _arguments.Count;
+                }
+                else
+                {
+                    var argument = CommandLineArgument.Create(this, parameter, options?.DefaultValueDescriptions,
+                        valueDescriptionTransform);
 
-                AddNamedArgument(argument);
+                    AddNamedArgument(argument);
+                }
             }
         }
 
@@ -1383,10 +1396,25 @@ namespace Ookii.CommandLine
                 validator.Validate(this);
             }
 
-            var constructorArgumentValues = new object?[_constructorArgumentCount];
-            for (int x = 0; x < _constructorArgumentCount; ++x)
+            var count = _constructorArgumentCount;
+            if (_injectionIndex >= 0)
             {
-                constructorArgumentValues[x] = _arguments[x].Value;
+                ++count;
+            }
+
+            var constructorArgumentValues = new object?[count];
+            int offset = 0;
+            for (int x = 0; x < count; ++x)
+            {
+                if (x == _injectionIndex)
+                {
+                    constructorArgumentValues[x] = this;
+                    offset = 1;
+                }
+                else
+                {
+                    constructorArgumentValues[x] = _arguments[x - offset].Value;
+                }
             }
 
             object commandLineArguments = CreateArgumentsTypeInstance(constructorArgumentValues);

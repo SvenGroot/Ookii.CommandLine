@@ -13,7 +13,7 @@ namespace Ookii.CommandLine.Tests
     }
 
     [ApplicationFriendlyName("Friendly name")]
-    [System.ComponentModel.Description("Test arguments description.")]
+    [Description("Test arguments description.")]
     class TestArguments
     {
         private readonly Collection<int> _arg12 = new Collection<int>();
@@ -23,7 +23,7 @@ namespace Ookii.CommandLine.Tests
         {
         }
 
-        public TestArguments([System.ComponentModel.Description("Arg1 description.")] string arg1, [System.ComponentModel.Description("Arg2 description."), ArgumentName("other"), ValueDescription("Number")] int arg2 = 42, bool notSwitch = false)
+        public TestArguments([Description("Arg1 description.")] string arg1, [Description("Arg2 description."), ArgumentName("other"), ValueDescription("Number")] int arg2 = 42, bool notSwitch = false)
         {
             Arg1 = arg1;
             Arg2 = arg2;
@@ -40,17 +40,17 @@ namespace Ookii.CommandLine.Tests
         public string Arg3 { get; set; }
 
         // Default value is intentionally a string to test default value conversion.
-        [CommandLineArgument("other2", DefaultValue = "47", ValueDescription = "Number", Position = 1), System.ComponentModel.Description("Arg4 description.")]
+        [CommandLineArgument("other2", DefaultValue = "47", ValueDescription = "Number", Position = 1), Description("Arg4 description.")]
         [ValidateRange(0, 1000, IncludeInUsageHelp = false)]
         public int Arg4 { get; set; }
 
         // Short/long name stuff should be ignored if not using LongShort mode.
-        [CommandLineArgument(Position = 0, ShortName = 'a', IsLong = false), System.ComponentModel.Description("Arg5 description.")]
+        [CommandLineArgument(Position = 0, ShortName = 'a', IsLong = false), Description("Arg5 description.")]
         public float Arg5 { get; set; }
 
         [Alias("Alias1")]
         [Alias("Alias2")]
-        [CommandLineArgument(IsRequired = true), System.ComponentModel.Description("Arg6 description.")]
+        [CommandLineArgument(IsRequired = true), Description("Arg6 description.")]
         public string Arg6 { get; set; }
 
         [Alias("Alias3")]
@@ -121,7 +121,6 @@ namespace Ookii.CommandLine.Tests
                 _throwingArgument = value;
             }
         }
-
     }
 
     class DictionaryArguments
@@ -436,5 +435,44 @@ namespace Ookii.CommandLine.Tests
         [CommandLineArgument]
         [MultiValueSeparator]
         public bool[] MultiSwitch { get; set; }
+    }
+
+    class InjectionArguments
+    {
+        private readonly CommandLineParser _parser;
+
+        public InjectionArguments(CommandLineParser parser)
+        {
+            _parser = parser;
+        }
+
+        public CommandLineParser Parser => _parser;
+
+        [CommandLineArgument]
+        public int Arg { get; set; }
+    }
+
+    class InjectionMixedArguments
+    {
+        private readonly CommandLineParser _parser;
+        private readonly int _arg1;
+        private readonly int _arg2;
+
+        public InjectionMixedArguments(int arg1, CommandLineParser parser, int arg2)
+        {
+            _arg1 = arg1;
+            _parser = parser;
+            _arg2 = arg2;
+        }
+
+        public CommandLineParser Parser => _parser;
+
+        public int Arg1 => _arg1;
+
+        public int Arg2 => _arg2;
+
+        [CommandLineArgument]
+        public int Arg3 { get; set; }
+
     }
 }
