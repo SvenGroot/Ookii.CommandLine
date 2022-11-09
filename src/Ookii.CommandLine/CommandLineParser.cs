@@ -228,6 +228,22 @@ namespace Ookii.CommandLine
         public event EventHandler<ArgumentParsedEventArgs>? ArgumentParsed;
 
         /// <summary>
+        /// Event raised when a non-multi-value argument is specified more than once.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        ///   Handling this event allows you to inspect the new value, and decide to keep the old
+        ///   or new value. It also allows you to, for instance, print a warning for duplicate
+        ///   arguments.
+        /// </para>
+        /// <para>
+        ///   This even is only raised when the <see cref="AllowDuplicateArguments"/> property is
+        ///   <see langword="true"/>.
+        /// </para>
+        /// </remarks>
+        public event EventHandler<DuplicateArgumentEventArgs>? DuplicateArgument;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="CommandLineParser"/> class using the specified arguments type, argument name prefixes,
         /// and <see cref="IComparer{T}"/> instance for comparing argument names.
         /// </summary>
@@ -1093,6 +1109,15 @@ namespace Ookii.CommandLine
             ArgumentParsed?.Invoke(this, e);
         }
 
+        /// <summary>
+        /// Raises the <see cref="DuplicateArgument"/> event.
+        /// </summary>
+        /// <param name="e">The data for the event.</param>
+        protected virtual void OnDuplicateArgument(DuplicateArgumentEventArgs e)
+        {
+            DuplicateArgument?.Invoke(this, e);
+        }
+
         internal static object? ParseInternal(Type argumentsType, string[] args, int index, ParseOptions? options)
         {
             options ??= new();
@@ -1429,6 +1454,21 @@ namespace Ookii.CommandLine
 
         private bool ParseArgumentValue(CommandLineArgument argument, string? value)
         {
+            if (argument.HasValue && !argument.IsMultiValue)
+            {
+                if (!AllowDuplicateArguments)
+                {
+                    throw StringProvider.CreateException(CommandLineArgumentErrorCategory.DuplicateArgument, argument);
+                }
+
+                var duplicateEventArgs = new DuplicateArgumentEventArgs(argument, value);
+                OnDuplicateArgument(duplicateEventArgs);
+                if (duplicateEventArgs.KeepOldValue)
+                {
+                    return false;
+                }
+            }
+
             bool continueParsing = argument.SetValue(Culture, value);
             var e = new ArgumentParsedEventArgs(argument)
             {
@@ -1444,6 +1484,7 @@ namespace Ookii.CommandLine
             {
                 HelpRequested = cancel;
             }
+
             return cancel;
         }
 

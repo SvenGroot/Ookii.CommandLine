@@ -1224,11 +1224,6 @@ namespace Ookii.CommandLine
 
         internal bool SetValue(CultureInfo culture, string? value)
         {
-            if (HasValue && !IsMultiValue && !_parser.AllowDuplicateArguments)
-            {
-                throw _parser.StringProvider.CreateException(CommandLineArgumentErrorCategory.DuplicateArgument, this);
-            }
-
             _valueHelper ??= CreateValueHelper();
 
             bool continueParsing;

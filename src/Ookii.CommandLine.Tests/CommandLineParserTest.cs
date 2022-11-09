@@ -988,6 +988,50 @@ namespace Ookii.CommandLine.Tests
             Assert.AreEqual(3, result2.Arg3);
         }
 
+        [TestMethod]
+        public void TestDuplicateArguments()
+        {
+            var parser = new CommandLineParser<SimpleArguments>();
+            CheckThrows(() => parser.Parse(new[] { "-Argument1", "foo", "-Argument1", "bar" }), parser, CommandLineArgumentErrorCategory.DuplicateArgument, "Argument1");
+            parser.AllowDuplicateArguments = true;
+            var result = parser.Parse(new[] { "-Argument1", "foo", "-Argument1", "bar" });
+            Assert.AreEqual("bar", result.Argument1);
+
+            bool handlerCalled = false;
+            bool keepOldValue = false;
+            EventHandler<DuplicateArgumentEventArgs> handler = (sender, e) =>
+            {
+                Assert.AreEqual("Argument1", e.Argument.ArgumentName);
+                Assert.AreEqual("foo", e.Argument.Value);
+                Assert.AreEqual("bar", e.NewValue);
+                handlerCalled = true;
+                if (keepOldValue)
+                {
+                    e.KeepOldValue = true;
+                }
+            };
+
+            parser.DuplicateArgument += handler;
+
+            // Handler is not called when duplicates not allowed.
+            parser.AllowDuplicateArguments = false;
+            CheckThrows(() => parser.Parse(new[] { "-Argument1", "foo", "-Argument1", "bar" }), parser, CommandLineArgumentErrorCategory.DuplicateArgument, "Argument1");
+            Assert.IsFalse(handlerCalled);
+
+            // Now it is called.
+            parser.AllowDuplicateArguments = true;
+            result = parser.Parse(new[] { "-Argument1", "foo", "-Argument1", "bar" });
+            Assert.AreEqual("bar", result.Argument1);
+            Assert.IsTrue(handlerCalled);
+
+            // Keep the old value.
+            handlerCalled = false;
+            keepOldValue = true;
+            result = parser.Parse(new[] { "-Argument1", "foo", "-Argument1", "bar" });
+            Assert.AreEqual("foo", result.Argument1);
+            Assert.IsTrue(handlerCalled);
+        }
+
         private record class ExpectedArgument
         {
             public ExpectedArgument(string name, Type type, ArgumentKind kind = ArgumentKind.SingleValue)
