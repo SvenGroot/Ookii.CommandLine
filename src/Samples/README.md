@@ -9,3 +9,5 @@ Ookii.CommandLine comes with several samples that demonstrate various aspects of
 - The [**Long/short mode sample**](LongShort) demonstrates the long/short parsing mode, where
   arguments can have both a long name with `--` and a short name with `-`. It also showcases a few
   other non-default options.
+- The [**Custom usage sample**](CustomUsage) demonstrates the flexibility of Ookii.CommandLine's
+  usage help generation, by customizing it to use completely different formatting.
