@@ -57,7 +57,7 @@ argument's custom value description is used, how the -OperationIndex argument sh
 value, how the -Count argument shows a message from its ValidateRange validator, and how the aliases
 of the -Verbose and -Help arguments are shown.
 
-If the console is capable, color output is used, as shown below.
+If the console is capable, color output is used, as shown below (the colors are fully customizable).
 
 ![Color output sample](../../../docs/images/color.png)
 

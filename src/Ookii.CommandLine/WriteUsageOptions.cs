@@ -52,6 +52,15 @@ namespace Ookii.CommandLine
         public const int DefaultLongShortArgumentDescriptionIndent = 12;
 
         /// <summary>
+        /// The default indentation for the application description.
+        /// </summary>
+        /// <value>
+        /// The default indentation, which is zero.
+        /// </value>
+        /// <seealso cref="IncludeApplicationDescription"/>
+        public const int DefaultApplicationDescriptionIndent = 0;
+
+        /// <summary>
         /// Gets or sets a value indicating whether the value of the <see cref="CommandLineParser.Description"/> property
         /// is written before the syntax.
         /// </summary>
@@ -60,6 +69,25 @@ namespace Ookii.CommandLine
         ///   is written before the syntax; otherwise, <see langword="false"/>. The default value is <see langword="true"/>.
         /// </value>
         public bool IncludeApplicationDescription { get; set; } = true;
+
+        /// <summary>
+        /// The indentation to use for the application description.
+        /// </summary>
+        /// <value>
+        /// The indentation. The default value is the value of the <see cref="DefaultApplicationDescriptionIndent"/>
+        /// constant.
+        /// </value>
+        /// <remarks>
+        /// <para>
+        ///   This property is only used if the <see cref="IncludeApplicationDescription"/> property
+        ///   is <see langword="true"/>.
+        /// </para>
+        /// <para>
+        ///   This also applies to the command description when showing usage help for a subcommand.
+        /// </para>
+        /// </remarks>
+        /// <seealso cref="CommandManager"/>
+        public int ApplicationDescriptionIndent { get; set; } = DefaultApplicationDescriptionIndent;
 
         /// <summary>
         /// Gets or sets a value that overrides the default application executable name used in the

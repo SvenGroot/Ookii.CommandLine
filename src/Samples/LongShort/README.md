@@ -56,7 +56,7 @@ Usage: LongShort [--source] <string> [--destination] <string> [[--operation-inde
             Displays version information.
 ```
 
-Note that there is both a `-d` and a `-D` argument, possible due to the use of case sensitive
+Note that there is both a `-d` and a `-D` argument, possible due to the use of case-sensitive
 argument names.
 
 Long/short mode allows you to combine switches with short names, so running `LongShort -vp` sets

@@ -576,10 +576,10 @@ You must use at least one of: -Address, -Path.
 
         private static readonly string _expectedUsageSyntaxOnly = @"Usage: test [/arg1] <String> [[/other] <Number>] [[/notSwitch] <Boolean>] [[/Arg5] <Single>] [[/other2] <Number>] [[/Arg8] <DayOfWeek>...] /Arg6 <String> [/Arg10...] [/Arg11] [/Arg12 <Int32>...] [/Arg13 <String=Int32>...] [/Arg14 <String=Int32>...] [/Arg15 <KeyValuePair<String, Int32>>] [/Arg3 <String>] [/Arg7] [/Arg9 <Int32>] [/Help] [/Version]
 
-Run 'test /Help' for usage help.
+Run 'test /Help' for more information.
 ".ReplaceLineEndings();
 
-        private static readonly string _expectedUsageMessageOnly = @"Run 'test /Help' for usage help.
+        private static readonly string _expectedUsageMessageOnly = @"Run 'test /Help' for more information.
 ".ReplaceLineEndings();
 
         private static readonly string _expectedUsageSeparator = @"Test arguments description.

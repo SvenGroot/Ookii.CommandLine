@@ -525,11 +525,11 @@ namespace Ookii.CommandLine
         /// <returns>The string</returns>
         /// <remarks>
         /// <para>
-        ///   This function is also used to show the command description of a subcommand when
+        ///   This method is also used to show the command description of a subcommand when
         ///   creating the usage help for that command.
         /// </para>
         /// <para>
-        ///   This property is only used if the <see cref="WriteUsageOptions.IncludeApplicationDescription"/>
+        ///   This method is only used if the <see cref="WriteUsageOptions.IncludeApplicationDescription"/>
         ///   property is <see langword="true"/>.
         /// </para>
         /// </remarks>

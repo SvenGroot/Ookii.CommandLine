@@ -1655,6 +1655,7 @@ namespace Ookii.CommandLine
 
             if (mode == UsageHelpRequest.Full && options.IncludeApplicationDescription && !string.IsNullOrEmpty(Description))
             {
+                lineWriter.Inner.Indent = ShouldIndent(lineWriter.Inner) ? options.ApplicationDescriptionIndent : 0;
                 lineWriter.Inner.WriteLine(StringProvider.ApplicationDescription(Description, options.UseColor ?? false));
                 lineWriter.Inner.WriteLine();
             }
@@ -1714,18 +1715,22 @@ namespace Ookii.CommandLine
                     continue;
                 }
 
-                writer.ResetIndent();
                 if (first)
                 {
                     var header = StringProvider.DescriptionHeader(options.UseColor ?? false);
                     if (header != null)
                     {
+                        var oldIndent = writer.Indent;
+                        writer.Indent = 0;
+                        writer.ResetIndent();
                         writer.WriteLine(header);
+                        writer.Indent = oldIndent;
                     }
 
                     first = false;
                 }
 
+                writer.ResetIndent();
                 writer.WriteLine(StringProvider.ArgumentDescription(argument, options));
             }
         }
