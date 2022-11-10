@@ -29,7 +29,16 @@ namespace Ookii.CommandLine
                 ? new object?[] { value, culture }
                 : new object?[] { value };
 
-            return _method.Invoke(null, parameters);
+            try
+            {
+                return _method.Invoke(null, parameters);
+            }
+            catch (Exception ex)
+            {
+                // Since we don't know what the method will throw, we'll wrap anything in a
+                // FormatException.
+                throw new FormatException(ex.Message, ex);
+            }
         }
     }
 }

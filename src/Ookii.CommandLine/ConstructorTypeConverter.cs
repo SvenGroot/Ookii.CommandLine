@@ -18,7 +18,16 @@ namespace Ookii.CommandLine
 
         protected override object? Convert(ITypeDescriptorContext? context, CultureInfo? culture, string value)
         {
-            return _type.CreateInstance(value);
+            try
+            {
+                return _type.CreateInstance(value);
+            }
+            catch (Exception ex)
+            {
+                // Since we don't know what the constructor will throw, we'll wrap anything in a
+                // FormatException.
+                throw new FormatException(ex.Message, ex);
+            }
         }
     }
 }

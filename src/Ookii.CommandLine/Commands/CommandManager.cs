@@ -495,24 +495,29 @@ namespace Ookii.CommandLine.Commands
                 var description = GetDescription();
                 if (description != null)
                 {
+                    if (lineWriter != null && CommandLineParser.ShouldIndent(lineWriter))
+                    {
+                        lineWriter.Indent = _options.UsageOptions.ApplicationDescriptionIndent;
+                    }
+
                     writer.Inner.WriteLine(_options.StringProvider.CommandListApplicationDescription(description, useColor));
                     writer.Inner.WriteLine();
                 }
             }
 
             var executableName = _options.UsageOptions.GetExecutableName();
-            if (lineWriter != null)
+            if (lineWriter != null && CommandLineParser.ShouldIndent(lineWriter))
             {
-                lineWriter.Indent = CommandLineParser.ShouldIndent(lineWriter) ? _options.UsageOptions.SyntaxIndent : 0;
+                lineWriter.Indent = _options.UsageOptions.SyntaxIndent;
             }
 
             writer.Inner.WriteLine(_options.StringProvider.RootCommandUsageSyntax(executableName, usageColorStart, colorEnd));
             writer.Inner.WriteLine();
             writer.Inner.WriteLine(_options.StringProvider.AvailableCommandsHeader(useColor));
             writer.Inner.WriteLine();
-            if (lineWriter != null)
+            if (lineWriter != null && CommandLineParser.ShouldIndent(lineWriter))
             {
-                lineWriter.Indent = CommandLineParser.ShouldIndent(lineWriter) ? _options.CommandDescriptionIndent : 0;
+                lineWriter.Indent = _options.CommandDescriptionIndent;
             }
 
             foreach (var command in GetCommands())
