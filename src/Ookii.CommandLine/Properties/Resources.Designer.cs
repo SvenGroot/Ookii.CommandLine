@@ -646,7 +646,7 @@ namespace Ookii.CommandLine.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Must not be empty or white-space..
+        ///   Looks up a localized string similar to Must not be blank..
         /// </summary>
         internal static string ValidateNotWhiteSpaceUsageHelp {
             get {

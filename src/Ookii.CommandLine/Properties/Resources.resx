@@ -343,7 +343,7 @@
     <value>Must not be empty.</value>
   </data>
   <data name="ValidateNotWhiteSpaceUsageHelp" xml:space="preserve">
-    <value>Must not be empty or white-space.</value>
+    <value>Must not be blank.</value>
   </data>
   <data name="ValidateProhibitsUsageHelpFormat" xml:space="preserve">
     <value>Cannot be used with: {0}.</value>

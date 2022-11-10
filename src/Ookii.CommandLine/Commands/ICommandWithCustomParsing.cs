@@ -21,6 +21,6 @@
         /// <param name="args">The arguments.</param>
         /// <param name="index">The index of the first argument.</param>
         /// <param name="options">The options to use for parsing and usage help.</param>
-        void Parse(string[] args, int index, ParseOptions options);
+        void Parse(string[] args, int index, CommandOptions options);
     }
 }

@@ -142,7 +142,7 @@ namespace Ookii.CommandLine.Commands
         ///   <paramref name="args"/> is <see langword="null"/>.
         /// </exception>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> does not fall inside the bounds of <paramref name="args"/>.</exception>
-        public ICommand CreateInstance(string[] args, int index, ParseOptions? options = null)
+        public ICommand CreateInstance(string[] args, int index, CommandOptions? options = null)
         {
             if (args == null)
             {

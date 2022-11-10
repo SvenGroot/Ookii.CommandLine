@@ -33,7 +33,7 @@ namespace Ookii.CommandLine.Tests
     [Description("Custom parsing command.")]
     internal class CustomParsingCommand : ICommandWithCustomParsing
     {
-        public void Parse(string[] args, int index, ParseOptions options)
+        public void Parse(string[] args, int index, CommandOptions options)
         {
             Value = args[index];
         }

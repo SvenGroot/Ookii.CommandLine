@@ -11,5 +11,11 @@ Ookii.CommandLine comes with several samples that demonstrate various aspects of
   other non-default options.
 - The [**Custom usage sample**](CustomUsage) demonstrates the flexibility of Ookii.CommandLine's
   usage help generation, by customizing it to use completely different formatting.
-- The [**Subcomand sample**] demonstrates how to create a simple application that has multiple
+
+There are two commands demonstrating how to use subcommands:
+
+- The [**Subcommand sample**] demonstrates how to create a simple application that has multiple
   subcommands.
+- The [**Nested commands sample**] demonstrates how to create an application where commands can
+  contain other commands. It also demonstrates how to create common arguments for multiple commands
+  using a common base class.
