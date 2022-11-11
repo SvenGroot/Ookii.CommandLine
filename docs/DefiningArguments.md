@@ -62,7 +62,7 @@ public string SomeProperty { get; set; } = "default";
 ```
 
 Here, the value “default” will not be changed if the argument was not specified. This is particularly
-useful if the argument uses a [non-nullable reference type](Command%20Line%20Arguments%20in%20Ookii.CommandLine.md#arguments-with-non-nullable-types),
+useful if the argument uses a [non-nullable reference type](Arguments.md#arguments-with-non-nullable-types),
 which must be initialized with a non-null value.
 
 However, if this method is used, the default value cannot be included in the usage description
@@ -86,6 +86,10 @@ For example, you could use the following argument definition:
 [Alias("?")]
 public bool Help { get; set; }
 ```
+
+## Using methods
+
+TODO
 
 ## Using constructor parameters
 
@@ -113,6 +117,8 @@ If your type has more than one constructor, you must mark one of them using the 
 
 If you don’t wish to define arguments using the constructor, simply use a constructor without any parameters (or don’t define an explicit constructor).
 
+### CommandLineParser injection
+
 ## Defining aliases
 
 An alias is an alternative name that can be used to specify a command line argument. Aliases can be added to a command line argument by applying the `AliasAttribute` to the property or constructor parameter that defines the argument.
@@ -125,3 +131,7 @@ public bool Verbose { get; set; }
 ```
 
 To specify more than one alias for an argument, simply apply the `AliasAttribute` multiple times.
+
+## Name transformation
+
+TODO

@@ -132,6 +132,10 @@ dictionary argument.
 
 See also the [API documentation](https://www.ookii.org/Link/CommandLineDoc) for the `CommandLineArgument.AllowNull` property.
 
-* [Defining Command Line Arguments](Defining%20Command%20Line%20Arguments.md)
+## Long/short mode
+
+TODO
+
+* [Defining Command Line Arguments](DefiningArguments.md)
 * [Parsing Command Line Arguments](Parsing%20Command%20Line%20Arguments.md)
-* [Generating Usage Help](Generating%20Usage%20Help.md)
+* [Generating Usage Help](UsageHelp.md)

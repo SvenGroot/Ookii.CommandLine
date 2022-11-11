@@ -213,10 +213,8 @@ namespace Ookii.CommandLine.Commands
         ///   If the <see cref="ParseOptions.Out"/> property or <see cref="ParseOptions.Error"/>
         ///   property is <see langword="null"/>, output is written to a <see cref="LineWrappingTextWriter"/>
         ///   for the standard output and error streams respectively, wrapping at the console's
-        ///   window width. When the console output is redirected to a file, Microsoft .Net will
-        ///   still report the console's actual window width, but on Mono the value of the
-        ///   <see cref="Console.WindowWidth"/> property will be 0. In that case, the usage
-        ///   information will not be wrapped.
+        ///   window width. When the console output is redirected to a file, wrapping may still
+        ///   be applied depending on your platform.
         /// </para>
         /// <para>
         ///   If the <see cref="ParseOptions.Out"/> property is instance of the
