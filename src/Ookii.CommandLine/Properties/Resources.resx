@@ -372,4 +372,7 @@
   <data name="DuplicateArgumentWarningFormat" xml:space="preserve">
     <value>Warning: the argument '{0}' was supplied more than once.</value>
   </data>
+  <data name="ArgumentConversionErrorMessageFormat" xml:space="preserve">
+    <value>Invalid value for argument '{0}': {1}</value>
+  </data>
 </root>

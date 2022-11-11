@@ -1,6 +1,7 @@
 using System;
 using System.ComponentModel;
 using System.Globalization;
+using System.Reflection;
 
 namespace Ookii.CommandLine
 {
@@ -22,11 +23,9 @@ namespace Ookii.CommandLine
             {
                 return _type.CreateInstance(value);
             }
-            catch (Exception ex)
+            catch (TargetInvocationException ex)
             {
-                // Since we don't know what the constructor will throw, we'll wrap anything in a
-                // FormatException.
-                throw new FormatException(ex.Message, ex);
+                throw new FormatException(ex.InnerException?.Message ?? ex.Message, ex);
             }
         }
     }
