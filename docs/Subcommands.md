@@ -29,3 +29,7 @@ The `ShellCommand.RunShellCommand` method works the same as the `ShellCommand.Cr
 It is recommended to return the value of the `ShellCommand.ExitCode` property to the operating system (by returning it from the `Main` method or by using the `Environment.``ExitCode` property) after running the shell command.
 
 The source code of a full sample application that defines two commands is included with the Ookii.CommandLine library.
+
+## Name transformation
+
+TODO
