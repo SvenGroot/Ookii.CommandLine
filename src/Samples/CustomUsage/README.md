@@ -22,9 +22,9 @@ USAGE:
   CustomUsage [--source] <string> [--destination] <string> [arguments]
 
 OPTIONS:
-  -D|--date <date-time>       Provides a date to the application.
   -c|--count <number>         Provides the count for something to the application. [range: 0-100]
   -d|--destination <string>   The destination data.
+  -D|--date <date-time>       Provides a date to the application.
   --day <day-of-week>         This is an argument using an enumeration type.
   -h|--help                   Displays this help message.
   --operation-index <number>  The operation's index. [default: 1]

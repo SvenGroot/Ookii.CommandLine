@@ -313,7 +313,9 @@ namespace Ookii.CommandLine
         {
             if (CaseSensitive)
             {
-                return StringComparer.Ordinal;
+                // Do not use Ordinal for case-sensitive comparisons so that when sorting capitals
+                // and non-capitals are sorted together.
+                return StringComparer.InvariantCulture;
             }
             else
             {
