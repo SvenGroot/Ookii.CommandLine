@@ -1,8 +1,8 @@
 ﻿// Ookii.CommandLine is easy to use with top-level statements too.
-// Parse the arguments. See ProgramArguments.cs for the definitions.
 using CustomUsage;
 using Ookii.CommandLine;
 
+// Parse the arguments. See ProgramArguments.cs for the definitions.
 var arguments = ProgramArguments.Parse();
 
 // No need to do anything when the value is null; Parse() already printed errors and
