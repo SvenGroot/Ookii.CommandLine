@@ -70,15 +70,6 @@ namespace Ookii.CommandLine.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Invalid value for argument &apos;{0}&apos;: {1}.
-        /// </summary>
-        internal static string ArgumentConversionErrorMessageFormat {
-            get {
-                return ResourceManager.GetString("ArgumentConversionErrorMessageFormat", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to The name for argument &apos;{0}&apos; contains a colon (:), which is not allowed..
         /// </summary>
         internal static string ArgumentNameContainsSeparatorFormat {

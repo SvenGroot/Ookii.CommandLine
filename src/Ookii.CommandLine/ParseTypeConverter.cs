@@ -33,9 +33,11 @@ namespace Ookii.CommandLine
             {
                 return _method.Invoke(null, parameters);
             }
-            catch (TargetInvocationException ex)
+            catch (Exception ex)
             {
-                throw new FormatException(ex.InnerException?.Message ?? ex.Message, ex);
+                // Since we don't know what the method will throw, we'll wrap anything in a
+                // FormatException.
+                throw new FormatException(ex.Message, ex);
             }
         }
     }

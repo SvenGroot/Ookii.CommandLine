@@ -27,14 +27,9 @@ namespace Ookii.CommandLine
         /// <param name="argumentName">The name of the argument.</param>
         /// <param name="argumentValue">The value of the argument.</param>
         /// <param name="valueDescription">The value description of the argument.</param>
-        /// <param name="message">A message describing the error.</param>
         /// <returns>The error message.</returns>
-        public virtual string ArgumentValueConversionError(string argumentName, string? argumentValue, string valueDescription, string? message)
-        {
-            return message != null
-                ? Format(Resources.ArgumentConversionErrorMessageFormat, argumentName, message)
-                : Format(Resources.ArgumentConversionErrorFormat, argumentValue, argumentName, valueDescription);
-        }
+        public virtual string ArgumentValueConversionError(string argumentName, string? argumentValue, string valueDescription)
+            => Format(Resources.ArgumentConversionErrorFormat, argumentValue, argumentName, valueDescription);
 
         /// <summary>
         /// Gets the error message for <see cref="CommandLineArgumentErrorCategory.UnknownArgument"/>.
@@ -290,7 +285,7 @@ namespace Ookii.CommandLine
             var message = category switch
             {
                 CommandLineArgumentErrorCategory.MissingRequiredArgument => MissingRequiredArgument(argumentName!),
-                CommandLineArgumentErrorCategory.ArgumentValueConversion => ArgumentValueConversionError(argumentName!, value, argument!.ValueDescription, inner?.Message),
+                CommandLineArgumentErrorCategory.ArgumentValueConversion => ArgumentValueConversionError(argumentName!, value, argument!.ValueDescription),
                 CommandLineArgumentErrorCategory.UnknownArgument => UnknownArgument(argumentName!),
                 CommandLineArgumentErrorCategory.MissingNamedArgumentValue => MissingNamedArgumentValue(argumentName!),
                 CommandLineArgumentErrorCategory.DuplicateArgument => DuplicateArgument(argumentName!),
