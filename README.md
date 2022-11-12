@@ -1,40 +1,41 @@
 # Ookii.CommandLine [![NuGet](https://img.shields.io/nuget/v/Ookii.CommandLine)](https://www.nuget.org/packages/Ookii.CommandLine/)
 
-Ookii.CommandLine is a powerful and flexible command line parsing library for .Net applications. It
-allows you to easily define strongly-typed required, optional, positional and named arguments, parse
-the command line, generate usage information, and write applications with subcommands.
+Ookii.CommandLine is a powerful and flexible command line argument parsing library for .Net
+applications. It allows you to easily define strongly-typed required, optional, positional and named
+arguments, parse the command line arguments, generate usage information, and write applications with
+subcommands.
 
 Ookii.CommandLine is provided in versions for .Net Standard 2.0 and .Net 6.0 and later, with the
 latter adding some extra functionality around [Nullable Reference Types](docs/Arguments.md#arguments-with-non-nullable-types).
 
-Ookii.CommandLine can be added to your project in Visual Studio via [NuGet](https://nuget.org/packages/Ookii.CommandLine).
-[Code snippets](docs/Code%20Snippets.md) are available on the
+Ookii.CommandLine can be added to your project using [NuGet](https://nuget.org/packages/Ookii.CommandLine).
+[Code snippets](docs/Code%20Snippets.md) for Visual Studio are available on the
 [Visual Studio marketplace](https://www.ookii.org/Link/CommandLineSnippets).
 
 ## Overview
 
-Ookii.CommandLine is a library that helps you to parse command line arguments for your application.
-It allows you to easily define a set of strongly-typed arguments, and then parse the command line
-supplied to your application for those arguments. In addition, it allows you to generate usage help
-from the arguments that you defined which you can display to the user.
+Ookii.CommandLine is a library that lets you parse the command line arguments for your application
+into a set of strongly-typed, named values. You can easily define the accepted arguments, and then
+parse the command line supplied to your application for those arguments. In addition, you can
+generate usage help that can be displayed to the user.
 
 Ookii.CommandLine can be used with any kind of .Net application, whether console or GUI. Although a
 limited subset of functionality—particularly related around generating usage help text—is geared
 primarily towards console applications that are invoked from the command line, the main command line
 parsing functionality is usable in any application that needs to process command line arguments.
 
-Command line parsing is done in a way that is similar to that used by PowerShell. Each argument has
-a name (case insensitive by default), and can be supplied by name on the command line. An argument
-can also be positional, in which case it can be supplied without the name. Arguments can be required
-or optional, and there is support for switch arguments (which don't need a value but are either
-present or not) and arguments with multiple values. Various aspects of the parsing behavior can be
+The [command line parsing rules](docs/Arguments.md) are similar to those used by PowerShell. Each
+argument has a name (case insensitive by default), and can be supplied by name on the command line.
+An argument can also be positional, in which case it can be supplied without the name. Arguments can
+be required or optional, and can be switch arguments (which don't need a value but are either
+present or not) or accept multiple values. Various aspects of the parsing behavior can be
 customized, and there is also support for a mode where arguments have long and short names with
 different prefixes.
 
 To define a set of command line arguments, you create a class that will hold their values. The
-constructor parameters and properties of that class determine the set of arguments that are
-accepted. Attributes can be used to specify things such as the argument name and whether or not an
-argument is required or positional, and to specify descriptions used in the generated usage help.
+constructor parameters and properties of that class determine which arguments are accepted.
+Attributes can be used to specify things such as the argument name and whether or not an argument is
+required or positional, and to specify descriptions used in the generated usage help.
 
 For example, the following class defines four arguments: a required positional argument, an optional
 positional argument, a named argument, and a switch argument:
@@ -43,13 +44,13 @@ positional argument, a named argument, and a switch argument:
 class MyArguments
 {
     [CommandLineArgument(Position = 0, IsRequired = true)]
-    public string RequiredArgument { get; set; }
+    public string? Required { get; set; }
     [CommandLineArgument(Position = 1)]
-    public int OptionalArgument { get; set; }
+    public int Optional { get; set; }
     [CommandLineArgument]
-    public DateTime NamedArgument { get; set; }
+    public DateTime Named { get; set; }
     [CommandLineArgument]
-    public bool SwitchArgument { get; set; }
+    public bool Switch { get; set; }
 }
 ```
 
@@ -60,7 +61,7 @@ var arguments = CommandLineParser.Parse<MyArguments>();
 ```
 
 And that's it! This code will take the arguments from `Environment.GetCommandLineArgs()` (you can
-also manually pass a `args` array if you want), will handle and print errors to the console, and
+also manually pass an `args` array if you want), will handle and print errors to the console, and
 will print usage help if needed. It returns an instance of `MyArguments` if successful, and `null`
 if not.
 
@@ -68,36 +69,36 @@ If the arguments are invalid, or help is requested, this application will print 
 help:
 
 ```text
-Usage: MyApplication [-RequiredArgument] <String> [[-OptionalArgument] <Number>] [-Help]
-   [-NamedArgument <DateTime>] [-SwitchArgument] [-Version]
+Usage: MyApplication [-Required] <String> [[-Optional] <Number>] [-Help] [-Named <DateTime>]
+   [-Switch] [-Version]
 ```
 
-The application has two additional arguments, `-Help` and `-Version`, which are automatically added
-by default. The usage help can be greatly expanded when you add descriptions and other constraints
-to your arguments. See the [sample documentation](src/Samples) for several full examples of usage
-help generated by Ookii.CommandLine.
+The application has two arguments that weren't in the class, `-Help` and `-Version`, which are
+automatically added by default. The usage help can be greatly expanded when you add descriptions and
+other constraints to your arguments. See the [documentation for the samples](src/Samples) for
+several full examples of usage help generated by Ookii.CommandLine.
 
 An example invocation of this application, specifying all the arguments, would look like this:
 
 ```text
-./MyApplication foo 42 -SwitchArgument -NamedArgument 2022-08-14
+./MyApplication foo 42 -Switch -Named 2022-08-14
 ```
 
 In addition, Ookii.CommandLine can be used to create applications that have [multiple subcommands](docs/Subcommands.md),
 each with their own arguments.
 
-Try it yourself [on .Net Fiddle](https://dotnetfiddle.net/fgLvSl).
+[Try it yourself on .Net Fiddle](https://dotnetfiddle.net/fgLvSl).
 
 ## Requirements
 
 Ookii.CommandLine is a class library for use in your own applications for [Microsoft .Net](https://dotnet.microsoft.com/).
-It can be used with applications targeting at least one of the following environments:
+It can be used with applications targeting one of the following:
 
 - .Net Standard 2.0
 - .Net 6.0 (for additional nullable reference type functionality)
 
 As of version 3.0, .Net Framework 2.0 is no longer supported. You can still target .Net Framework
-4.6.1 and later using the .Net Standard 2.0 package. If you need to support and older version of
+4.6.1 and later using the .Net Standard 2.0 package. If you need to support an older version of
 .Net, please continue to use [version 2.4](https://github.com/SvenGroot/ookii.commandline/releases/tag/v2.4).
 
 ## Building and testing
@@ -115,6 +116,7 @@ The class library documentation is generated using [Sandcastle Help File Builder
 ## More information
 
 Please check out the following to get started:
+
 - [Usage documentation](docs/Documentation.md)
 - [Class library documentation](https://www.ookii.org/Link/CommandLineDoc)
 - [Sample applications](src/Samples) with detailed explanations and sample output.

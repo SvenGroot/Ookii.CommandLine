@@ -8,15 +8,16 @@ customize usage help, and explain other functionality such as subcommands.
 In addition to this documentation, several [samples](../src/Samples) are provided, all with
 explanations of what they do and examples of their output.
 
-
 ## Contents
 
-* [What's New in Ookii.CommandLine](ChangeLog.md)
-* [Command Line Arguments in Ookii.CommandLine](Arguments.md)
-  * [Defining Command Line Arguments](DefiningArguments.md)
-  * [Parsing Command Line Arguments](Parsing%20Command%20Line%20Arguments.md)
-  * [Generating Usage Help](UsageHelp.md)
-* [Shell Commands](Subcommands.md)
-* [Line Wrapping Text Writer](Line%20Wrapping%20Text%20Writer.md)
-* [Code Snippets](Code%20Snippets.md)
-* [Class Library Documentation](https://www.ookii.org/Link/CommandLineDoc)
+- [What's new in Ookii.CommandLine](ChangeLog.md)
+- [Tutorial: getting started with Ookii.CommandLine](Tutorial.md)
+- [Command line arguments in Ookii.CommandLine](Arguments.md)
+  - [Defining command line arguments](DefiningArguments.md)
+  - [Parsing command line arguments](ParsingArguments.md)
+  - [Generating usage help](UsageHelp.md)
+  - TODO: Validation
+- [Subcommands](Subcommands.md)
+- [Line wrapping text writer](Line%20Wrapping%20Text%20Writer.md)
+- [Code snippets](Code%20Snippets.md)
+- [Class library documentation](https://www.ookii.org/Link/CommandLineDoc)

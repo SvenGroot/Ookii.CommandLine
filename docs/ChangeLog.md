@@ -2,48 +2,61 @@
 
 ## Ookii.CommandLine 3.0
 
-- Command line parsing improvments
+- Argument parsing
   - Added support for a [new parsing mode](Arguments.md#longshort-mode) where arguments can have a
-    separate long name using the `--` prefix (customizable of course) and short name using the `-`
-    prefix. This allows you to use a parsing style that's closer to many tools, including `dotnet`
+    separate long name using the `--` prefix (customizable, of course) and short name using the `-`
+    prefix. This allows you to use a parsing style that's similar to some tools, including `dotnet`
     itself.
   - Allow [automatic name transformation](DefiningArguments.md#name-transformation) of arguments,
     value descriptions, and [subcommand names](Subcommands.md#name-transformation) so you don't need
-    to use custom names everywhere if yo want a different convention for names than you're using for
-    .Net identifiers.
+    to use custom names everywhere if you want a different convention for names than you're using
+    for .Net identifiers.
   - Added support for [argument validation and dependencies](Validation.md).
-  - Allow [conversion of argument types](Arguments.md#argument-value-conversion) with public static
-    `Parse` methods or constructors taking a string argument, even without a `TypeConverter`.
+  - Allow the use of [types](Arguments.md#argument-value-conversion) with public static `Parse`
+    methods or constructors taking a string argument for arguments, even without a `TypeConverter`.
   - You can now customize parsing behavior by applying the `ParseOptionsAttribute` to your class, as
     an alternative to passing `ParseOptions` to the static `Parse<T>` method.
-  - Argument conversion now defaults to using `CultureInfo.InvariantCulture`.
-  - Added `Parse` method overloads that take arguments from `Environment.GetCommandLineArgs()`.
-  - Added a generic `CommandLineParser<T>` helper class.
-  - You can [use static methods to define arguments](DefiningArguments.md#using-methods).
+  - Argument value conversion now defaults to using `CultureInfo.InvariantCulture`.
+  - Added a `Parse` method overloads that takes arguments from `Environment.GetCommandLineArgs()`.
+  - Added a generic `CommandLineParser<T>` helper class, for easier usage when you don't want to use
+    the static helper method.
+  - You can use [static methods to define arguments](DefiningArguments.md#using-methods).
   - Automatically add `-Help` and `-Version` arguments if not defined.
   - Optionally show a warning when duplicate arguments are supplied.
   - Optional support for [multi-value arguments](Arguments.md#arguments-with-multiple-values) that
-    consume multiple argument tokens without a separator, e.g. `-Value 1 2 3` to assign three values.
-  - Arguments types can [use a constructor parameter](DefiningArguments.md#commandlineparser-injection)
-    to receive the `CommandLineParser` instance they were created with.
-- Subcommand improvements
+    consume multiple argument tokens without a separator, e.g. `-Value 1 2 3` to assign three
+    values.
+  - Arguments types can [use a constructor
+    parameter](DefiningArguments.md#commandlineparser-injection) to receive the `CommandLineParser`
+    instance they were created with.
+  - Added the ability to customize error messages.
+- Subcommands
   - Renamed "shell commands" to "subcommands" because I never liked the old name.
   - Completely reworked [subcommand](Subcommands.md) support, with a brand new, more powerful and
     easier to use API.
-  - Asynchronous tasks.
-  - Subcommand aliases.
+  - Support for asynchronous tasks.
+  - Support for subcommand aliases.
+  - You can now use subcommands from multiple assemblies at once, and apply a filter.
   - Automatically add a `version` subcommand if not defined.
-- Usage help improvements
+- Usage help
   - Color output support.
   - Greatly expanded [usage help customization options](UsageHelp.md), including abbreviated syntax,
-    description list ordering and filtering, the ability to override any string, and much more.
-  - Added the ability to customize error messages.
+    description list ordering and filtering, the ability to override any string, and more.
   - Arguments and subcommands can be hidden from the usage help.
   - Improved detection logic for the application executable name in the usage syntax.
+  - Aliases and default value are now shown in the usage help by default.
+  - Arguments that have no description but that have other information not shown in the usage syntax
+    (like aliases, default value, validators) will be included in the description list by default.
+  - Changed the default format for how aliases are displayed.
 - More [samples](../src/Samples), with updated documentation.
+- Various bug fixes.
 - No longer targets .Net Framework 2.0 (only .Net Standard 2.0 and .Net 6.0 are targeted).
 
-TODO Breaking changes.
+**IMPORTANT:** Several of the changes in version 3.0 are *breaking changes*. The changes to the
+subcommand support and usage help customization are breaking API changes that may require some code
+changes. In addition, there are several breaking behavior changes such as using `InvariantCulture`
+by default, and the default format changes to the usage help. Make sure you test your application
+after upgrading to version 3.0, even if no code changes were required for your application.
 
 ## Ookii.CommandLine 2.4
 
