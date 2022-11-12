@@ -184,8 +184,8 @@ Arguments don't have to be strings. In fact, they can have any type as long as t
 types are supported (like `int`, `float`, `bool`), as well as many more that can be converted from
 a string (like enumerations, or classes like `FileInfo` or `Uri`).
 
-Let's try this out by adding another argument in the Arguments class. First add this to the top
-of Arguments.cs:
+Let's try this out by adding more arguments in the Arguments class. First, add this to the top of
+Arguments.cs:
 
 ```csharp
 using Ookii.CommandLine.Validation
@@ -213,7 +213,7 @@ which can be used as an alternative name to supply the argument.
 The second argument, "Inverted", is a boolean, which means it's a switch argument. Switch arguments
 don't need values, you either supply them or you don't.
 
-Now, let's update `ReadFile` to use this new argument:
+Now, let's update `ReadFile` to use the new arguments:
 
 ```csharp
 private static void ReadFile(Arguments args)
@@ -270,10 +270,28 @@ if it's not supplied and the default value is `null`:
 
 ```csharp
 [CommandLineArgument]
-public int MaxLines { get; set; } = 10
+public int MaxLines { get; set; } = 10;
 ```
 
 The advantage of the former approach is that the default value will be included in the usage help.
+The latter allows you to use non-constant values, and can sometimes be required if the type of an
+argument is a non-nullable reference type (you can also use both, in which case the `DefaultValue`
+property will overwrite the initial value).
+
+While we're talking about non-nullable reference types, consider the following alternative for the
+"Path" argument:
+
+```csharp
+[CommandLineArgument(Position = 0, IsRequired = true)]
+public string SomeArgument { get; set; } = string.Empty;
+```
+
+Even though the property is required, and we know it will be set, we have to initialize it to a
+non-null value because the C# compiler doesn't know that. The advantage of this would be that we
+can remove the `!` from the value's usage in `ReadFile`, at the cost of an unnecessary
+initialization. As a bonus, for .Net 6.0 and later only, Ookii.CommandLine will make sure that
+arguments with non-nullable types can't be set to null, even if the `TypeConverter` returns null
+for some reason.
 
 ## Expanding the usage help
 
@@ -350,13 +368,13 @@ The "MaxLines" argument also has its alias listed, just like the "Help" argument
 > Don't like the way the usage help looks? It can be fully customized! Check out the [custom usage
 > sample](../src/Samples/CustomUsage) for an example of that.
 
-## Customizing the parsing behavior (long/short mode)
+## Customizing parsing behavior (including long/short mode)
 
-Ookii.CommandLine offers many ways in which the way it parses the command line can be customized.
-For example, you can disable the use of white space as a separator between argument names and
-values, and specify a custom separator. You can specify custom argument name prefixes, instead of
-`-` which is the default (on Windows, `/` is also accepted by default). You can make the argument
-names case sensitive. And there's more.
+Ookii.CommandLine offers many options with which the way it parses the command line can be
+customized. For example, you can disable the use of white space as a separator between argument
+names and values, and specify a custom separator. You can specify custom argument name prefixes,
+instead of `-` which is the default (on Windows, `/` is also accepted by default). You can make the
+argument names case sensitive. And there's more.
 
 Most of these options can be specified using the `ParseOptionsAttribute`, which you can apply to
 your class. Let's apply some options:
@@ -386,8 +404,8 @@ class Arguments
 ```
 
 The biggest change here is that we've set the `Mode` to `ParsingMode.LongShort`. This is an
-alternative set of parsing rules, where every argument can have a long name (using the `--` prefix
-by default, and a single-character short name using the `-` prefix).
+alternative set of parsing rules, where every argument can have a long name, using the `--` prefix
+by default, and a single-character short name using the `-` prefix.
 
 We've changed the arguments as well, to give both "MaxLines" and "Inverted" short names, which will
 be derived using the first character of their long names. You can also specify a custom short name

@@ -278,6 +278,38 @@ causes inconsistent naming for your arguments. You can fix this by specifying ex
 either type of argument, or by using a [name transformation](#name-transformation) to make all
 automatic names consistent.
 
+### Nullable reference types
+
+While it's generally cleaner to use properties to define arguments, one legitimate use for
+constructor parameters is when you have an argument whose type is non-nullable. If using a property
+to define such an argument, the C# compiler requires you to initialize it to a non-null value, even
+if the argument is required.
+
+```csharp
+[CommandLineArgument(Position = 0, IsRequired = true)]
+public string SomeArgument { get; set; } = string.Empty;
+```
+
+The property is initialized to an empty string, because we have to, but that value will never be
+used, unless you instantiate the class manually without using `CommandLineParser`.
+
+Constructor parameters get around this restriction:
+
+```csharp
+private readonly string _someArgument;
+
+public MyArguments(string someArgument)
+{
+    _someArgument = someArgument;
+}
+
+public string SomeArgument => _someArgument;
+```
+
+Here, the extra initialization is not necessary, because the non-nullable field is set by the
+constructor. Ookii.CommandLine will guarantee it will never pass a null value to an argument that
+uses a non-nullable type (if using .Net 6.0 or later).
+
 ### CommandLineParser injection
 
 If your constructor has a parameter whose type is `CommandLineParser`, this does not define an
@@ -384,6 +416,9 @@ The "Help" argument has two aliases, "?" and "h". The "Version" argument doesn't
 
 When using [long/short mode](Arguments.md#longshort-mode), the "Help" argument has the short name
 "?", and a short alias "h", while the "Version" argument has no short name.
+
+If you use a name transformation, that transformation is also applied to the automatic argument
+names.
 
 The names and aliases of the automatic arguments can be customized using the `LocalizedStringProvider`
 class.
