@@ -368,7 +368,7 @@ The "MaxLines" argument also has its alias listed, just like the "Help" argument
 > Don't like the way the usage help looks? It can be fully customized! Check out the [custom usage
 > sample](../src/Samples/CustomUsage) for an example of that.
 
-## Customizing parsing behavior (including long/short mode)
+## Long/short mode and other customizations
 
 Ookii.CommandLine offers many options with which the way it parses the command line can be
 customized. For example, you can disable the use of white space as a separator between argument
@@ -458,27 +458,27 @@ class, the `ParseOptions` class takes precedence.
 
 ## Using subcommands
 
-Many applications have more than once function, which are invoked through subcommands. Think for
-example of the `dotnet` command, which has commands like `dotnet build` and `dotnet run`, or
-something like `git` with commands like `git pull` or `git cherry-pick`. Each command does something
-different, and needs its own command line arguments.
+Many applications have multiple functions, which are invoked through subcommands. Think for example
+of the `dotnet` command, which has commands like `dotnet build` and `dotnet run`, or something like
+`git` with commands like `git pull` or `git cherry-pick`. Each command does something different, and
+needs its own command line arguments.
 
-Using Ookii.CommandLine, subcommands are just classes that define arguments, the exact same as we've
-already been doing. The only difference is that they have to implement an interface, specify an
-attribute, and how you invoke them from the main method.
+Creating subcommands with Ookii.CommandLine is very similar to what we've been doing already. A
+subcommand is a class that defines arguments, same as before. The class will just have to implement
+the `ICommand` interface, and use the `CommandAttribute` attribute. And, we'll have to change our
+main methods to use commands.
 
 Let's change the example we've built so far to use subcommands. I'm going to go back to the version
-before we changed the options (so using the default parsing mode), but you can use the long/short
-mode version as well if you want.
+from before we changed to long/short mode, but this isn't strictly necessary.
 
-First, we'll rename our `Arguments` class to `ReadCommand` (this is optional, but it just makes more
-sense that way; you can also change the file name if you want), and add another `using` statement:
+First, we'll rename our `Arguments` class to `ReadCommand` (just for clarity), and add another
+`using` statement:
 
 ```csharp
 using Ookii.CommandLine.Commands;
 ```
 
-Then, we'll change renamed `Arguments` class into a subcommand:
+Then, we'll change the renamed `Arguments` class into a subcommand:
 
 ```csharp
 [Description("Reads a file and displays the contents on the command line.")]
@@ -492,7 +492,7 @@ all commands must implement.
 
 We don't have to change anything about the properties defining the arguments. However, we do have
 to implement the `ICommand` interface, which has a single method called `Run`. To implement it, we
-move the implementation of `ReadFile` from Program.cs (you can remove it from there if you want):
+move the implementation of `ReadFile` from Program.cs into this method:
 
 ```csharp
 public int Run()
@@ -523,12 +523,12 @@ public int Run()
 }
 ```
 
-`Run` is like the `Main` method for your command, and its return value should be treated like the
-exit code returned from `Main`.
+The `Run` method is like the `Main` method for your command, and its return value should be treated
+like the exit code returned from `Main`.
 
 And that's it: we've now defined a command. However, we still need to change the `Main` method to
 use commands instead of just parsing arguments from a single class. Fortunately, this is very
-simple. First add the `using Ookii.CommandLine.Commands;` statement, to Program.cs, and then update
+simple. First add the `using Ookii.CommandLine.Commands;` statement to Program.cs, and then update
 your `Main` method:
 
 ```csharp
@@ -539,16 +539,17 @@ public static int Main()
 }
 ```
 
-The `CommandManager` class handles the finding your commands, and lets you specify various options,
+The `CommandManager` class handles finding your commands, and lets you specify various options,
 including the `ParseOptions` that will be shared by all commands. The default constructor will look
-for classes that implement `ICommand` and have the `CommandAttribute` attribute in the calling
-assembly, and uses the default options.
+for subcommand classes in the calling assembly, and uses the default options.
 
-The `RunCommand()` method takes care of reading the command name from the first argument to your
-application, finding the command, creating it, and running it. If anything goes wrong, it will
-either display a list of commands, or if a command has been found, the help for that command. The
-return value is the value returned from `Run()`, or `null` if parsing failed, in which case we return
-an error exit code.
+The `RunCommand()` method will take the arguments from `Environment.GetCommandLineArgs()` (as
+before, you can also pass them explicitly), and uses the first argument as the command name. If a
+command with that name exists, it uses `CommandLineParser` to parse the arguments for that command,
+and finally invokes the `ICommand.Run()` method. If anything goes wrong, it will either display a list
+of commands, or if a command has been found, the help for that command. The return value is the
+value returned from `ICommand.Run()`, or null if parsing failed, in which case we return a non-zero
+exit code to indicate failure.
 
 If we run our application without arguments again (`dotnet run`), we see the following:
 
@@ -568,7 +569,7 @@ When no command, or an unknown command, is supplied, a list of commands is print
 `DescriptionAttribute` for our class, which was the application description before, is now the
 description of the command.
 
-There is a second command, "version," which is automatically added unless there already is a command
+There is a second command, "version", which is automatically added unless there already is a command
 with that name. It does the same thing as the "-Version" argument before.
 
 Let's see the usage help for our command:
@@ -603,12 +604,15 @@ argument, since that would be redundant with the "version" command.
 
 ## Command options
 
-Just like with parsing, the behavior with commands can be customized. You can of course apply a
-`ParseOptionsAttribute` to the command class, but those options then apply only to that command,
-and options that are specific to subcommands are not available.
+Just like when you use `CommandLineParser` directly, parsing behavior can be customized. You can of
+course apply a `ParseOptionsAttribute` to the command class, but those options then apply only to
+that command, and there are a number of options specific to subcommands that can't be set that way.
 
-Instead, you can use the `CommandOptions` class, which you can pass to the command manager. For
-example:
+Instead, you can use the `CommandOptions` class, which you can pass to the command manager.
+`CommandOptions` derives from `ParseOptions`, so all the normal parsing options are available,
+including several additional ones.
+
+Let's change our main method as follows:
 
 ```csharp
 var options = new CommandOptions()
@@ -622,7 +626,7 @@ var manager = new CommandManager(options);
 return manager.RunCommand() ?? 1;
 ```
 
-Here we're applying a name transformation to the command names, which means we can change our class
+Here, we're applying a name transformation to the command names, which means we can change our class
 to this:
 
 ```csharp
@@ -636,15 +640,46 @@ the command is still called "read". That's because for subcommands, the name tra
 strip the suffix "Command" from the name by default. This too can be customized with the
 `CommandOptions` class.
 
-We also set the `ShowCommandHelpInstruction` property, which will cause the application to print
+We also set the `ShowCommandHelpInstruction` property, which causes the `CommandManager` to print
 a message like `Run 'tutorial <command> -Help' for more information about a command.` after the
 command list. This is disabled by default because the `CommandManager` won't check if all the
 commands actually have a `-Help` argument. It's recommended to enable this if all your commands do.
 
-The last option is `IncludeApplicationDescriptionBeforeCommandList`, which won't have done anything
-right now. It lets you use the assembly description as an application description, which will be
-printed before the usage help, but since there is no description right now, it didn't do anything.
-Add a `<Description>` element to the tutorial.csproj file to add one.
+The last option is `IncludeApplicationDescriptionBeforeCommandList`, which prints the assembly
+description before the command list. However, if you run your application, you'll see it didn't do
+anything. That's because the tutorial application doesn't have an assembly description. Insert the
+following into a `<PropertyGroup>` in the tutorial.csproj file to fix that.
+
+```xml
+<Description>An application to read and write files.</Description>
+```
+
+Now, if you run the application without arguments, you'll see this:
+
+```text
+An application to read and write files.
+
+Usage: tutorial <command> [arguments]
+
+The following commands are available:
+
+    read
+        Reads a file and displays the contents on the command line.
+
+    version
+        Displays version information.
+
+Run 'tutorial <command> -Help' for more information about a command.
+```
+
+So we have an application description, and instructions for the user on how to get help for a
+command. But, we still have only one command ("version" doesn't count), and the description we just
+added is lying (the application only reads files).
+
+## Multiple commands
+
+An application with only one subcommand doesn't really need to use subcommands, so let's add a
+second one
 
 ## Common arguments for commands
 
