@@ -75,6 +75,17 @@ namespace Ookii.CommandLine.Tests
         }
     }
 
+    // Used in stand-alone test, so not an actual command.
+    class AsyncBaseCommand : AsyncCommandBase
+    {
+        public override async Task<int> RunAsync()
+        {
+            // Do something actually async to test the wait in Run().
+            await Task.Delay(100);
+            return 42;
+        }
+    }
+
     public class NotACommand : ICommand
     {
         public int Run()

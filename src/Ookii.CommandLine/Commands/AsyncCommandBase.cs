@@ -16,7 +16,7 @@ namespace Ookii.CommandLine.Commands
         /// Calls the <see cref="RunAsync"/> method and waits synchronously for it to complete.
         /// </summary>
         /// <returns>The exit code of the command.</returns>
-        public int Run()
+        public virtual int Run()
         {
             return Task.Run(RunAsync).ConfigureAwait(false).GetAwaiter().GetResult();
         }

@@ -262,6 +262,18 @@ namespace Ookii.CommandLine.Tests
             Assert.AreEqual(5, result);
         }
 
+        [TestMethod]
+        public async Task TestAsyncCommandBase()
+        {
+            var command = new AsyncBaseCommand();
+            var actual = await command.RunAsync();
+            Assert.AreEqual(42, actual);
+
+            // Test Run invokes RunAsync.
+            actual = command.Run();
+            Assert.AreEqual(42, actual);
+        }
+
         private static void VerifyCommand(CommandInfo command, string name, Type type, bool customParsing = false, string[] aliases = null)
         {
             Assert.AreEqual(name, command.Name);
