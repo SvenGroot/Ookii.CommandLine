@@ -249,6 +249,7 @@ namespace Ookii.CommandLine
         private readonly ReadOnlyCollection<char>? _shortAliases;
         private readonly Type _argumentType;
         private readonly Type _elementType;
+        private readonly Type _elementTypeWithNullable;
         private readonly string? _description;
         private readonly bool _isRequired;
         private readonly string _memberName;
@@ -309,7 +310,7 @@ namespace Ookii.CommandLine
             }
 
             _argumentType = info.ArgumentType;
-            _elementType = info.ArgumentType;
+            _elementTypeWithNullable = info.ArgumentType;
             _description = info.Description;
             _isRequired = info.IsRequired;
             _allowNull = info.AllowNull;
@@ -328,7 +329,7 @@ namespace Ookii.CommandLine
                 {
                     Debug.Assert(elementType != null);
                     _argumentKind = ArgumentKind.Dictionary;
-                    _elementType = elementType!;
+                    _elementTypeWithNullable = elementType!;
                     _allowDuplicateDictionaryKeys = info.AllowDuplicateDictionaryKeys;
                     _allowNull = DetermineDictionaryValueTypeAllowsNull(dictionaryType, info.Property, info.Parameter);
                     _keyValueSeparator = info.KeyValueSeparator ?? KeyValuePairConverter.DefaultSeparator;
@@ -339,16 +340,16 @@ namespace Ookii.CommandLine
                         _converter = (TypeConverter)Activator.CreateInstance(converterType, _parser.StringProvider, _argumentName, _allowNull, info.KeyConverterType, info.ValueConverterType, _keyValueSeparator)!;
                     }
 
-                    var valueDescription = info.ValueDescription ?? GetDefaultValueDescription(elementType!,
+                    var valueDescription = info.ValueDescription ?? GetDefaultValueDescription(_elementTypeWithNullable,
                         info.DefaultValueDescriptions);
 
                     if (valueDescription == null)
                     {
-                        var key = DetermineValueDescription(genericArguments[0], info.DefaultValueDescriptions,
-                            info.ValueDescriptionTransform);
+                        var key = DetermineValueDescription(genericArguments[0].GetUnderlyingType(),
+                            info.DefaultValueDescriptions, info.ValueDescriptionTransform);
 
-                        var value = DetermineValueDescription(genericArguments[1], info.DefaultValueDescriptions,
-                            info.ValueDescriptionTransform);
+                        var value = DetermineValueDescription(genericArguments[1].GetUnderlyingType(),
+                            info.DefaultValueDescriptions, info.ValueDescriptionTransform);
 
                         valueDescription = $"{key}{_keyValueSeparator}{value}";
                     }
@@ -359,7 +360,7 @@ namespace Ookii.CommandLine
                 {
                     Debug.Assert(elementType != null);
                     _argumentKind = ArgumentKind.MultiValue;
-                    _elementType = elementType!;
+                    _elementTypeWithNullable = elementType!;
                     _allowNull = DetermineCollectionElementTypeAllowsNull(collectionType, info.Property, info.Parameter);
                 }
             }
@@ -368,21 +369,25 @@ namespace Ookii.CommandLine
                 _argumentKind = ArgumentKind.Method;
             }
 
+            // If it's a Nullable<T>, now get the underlying type.
+            _elementType = _elementTypeWithNullable.GetUnderlyingType();
+
             if (IsMultiValue)
             {
                 _multiValueSeparator = info.MultiValueSeparator;
                 _allowMultiValueWhiteSpaceSeparator = !IsSwitch && info.AllowMultiValueWhiteSpaceSeparator;
             }
 
+            // Use the original Nullable<T> for this if it is one.
+            if (_converter == null)
+            {
+                _converter = _elementTypeWithNullable.GetStringConverter(converterType);
+            }
+
             if (_valueDescription == null)
             {
                 _valueDescription = info.ValueDescription ?? DetermineValueDescription(_elementType,
                     info.DefaultValueDescriptions, info.ValueDescriptionTransform);
-            }
-
-            if (_converter == null)
-            {
-                _converter = _elementType.GetStringConverter(converterType);
             }
 
             _defaultValue = ConvertToArgumentTypeInvariant(info.DefaultValue);
@@ -720,13 +725,10 @@ namespace Ookii.CommandLine
         /// </para>
         /// <para>
         ///   A argument is a switch argument when it is not positional, and its <see cref="ElementType"/>
-        ///   is either <see cref="bool"/> or a <see cref="Nullable{T}"/> of <see cref="bool"/>.
+        ///   is a <see cref="bool"/>.
         /// </para>
         /// </remarks>
-        public bool IsSwitch
-        {
-            get { return Position == null && (ElementType == typeof(bool) || ElementType == typeof(bool?)); }
-        }
+        public bool IsSwitch => Position == null && ElementType == typeof(bool);
 
         /// <summary>
         /// Gets a value which indicates what kind of argument this instance represents.
@@ -1141,7 +1143,7 @@ namespace Ookii.CommandLine
         /// <exception cref="NotSupportedException">The conversion is not supported.</exception>
         public object? ConvertToArgumentTypeInvariant(object? value)
         {
-            if (value == null || _elementType.IsAssignableFrom(value.GetType()))
+            if (value == null || _elementTypeWithNullable.IsAssignableFrom(value.GetType()))
             {
                 return value;
             }
@@ -1611,7 +1613,7 @@ namespace Ookii.CommandLine
                 return (IValueHelper)Activator.CreateInstance(type, _allowDuplicateDictionaryKeys, _allowNull)!;
 
             case ArgumentKind.MultiValue:
-                type = typeof(MultiValueHelper<>).MakeGenericType(ElementType);
+                type = typeof(MultiValueHelper<>).MakeGenericType(_elementTypeWithNullable);
                 return (IValueHelper)Activator.CreateInstance(type)!;
 
             case ArgumentKind.Method:
@@ -1934,7 +1936,6 @@ namespace Ookii.CommandLine
 
         private static string DetermineValueDescription(Type type, IDictionary<Type, string>? defaultValueDescriptions, NameTransform transform)
         {
-            type = type.GetNullableCoreType();
             return GetDefaultValueDescription(type, defaultValueDescriptions) ?? transform.Apply(GetFriendlyTypeName(type));
         }
     }

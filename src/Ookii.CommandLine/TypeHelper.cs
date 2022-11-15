@@ -86,40 +86,55 @@ namespace Ookii.CommandLine
 
             if (converterType == null)
             {
-                // If no explicit converter and the default one can't converter from string, see if
-                // there's a Parse method we can use.
-                var method = type.GetMethod(ParseMethodName, BindingFlags.Static | BindingFlags.Public,
-                    null, new[] { typeof(string), typeof(CultureInfo) }, null);
-
-                if (method != null && method.ReturnType == type)
+                var underlyingType = type.GetUnderlyingType();
+                converter = GetDefaultConverter(underlyingType);
+                if (converter != null)
                 {
-                    return new ParseTypeConverter(method, true);
-                }
-
-                // Check for Parse without a culture arguments.
-                method = type.GetMethod(ParseMethodName, BindingFlags.Static | BindingFlags.Public, null,
-                    new[] { typeof(string) }, null);
-
-                if (method != null && method.ReturnType == type)
-                {
-                    return new ParseTypeConverter(method, false);
-                }
-
-                // Check for a constructor with a string argument.
-                if (type.GetConstructor(new[] { typeof(string) }) != null)
-                {
-                    return new ConstructorTypeConverter(type);
+                    return type.IsNullableValueType()
+                        ? new NullableConverterWrapper(underlyingType, converter)
+                        : converter;
                 }
             }
 
             throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.NoTypeConverterFormat, type));
         }
 
-        public static Type GetNullableCoreType(this Type type)
+        public static bool IsNullableValueType(this Type type)
         {
-            return (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
-                ? type.GetGenericArguments()[0]
-                : type;
+            return type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>);
+        }
+
+        public static Type GetUnderlyingType(this Type type)
+            => type.IsNullableValueType() ? type.GetGenericArguments()[0] : type;
+
+        private static TypeConverter? GetDefaultConverter(this Type type)
+        {
+            // If no explicit converter and the default one can't converter from string, see if
+            // there's a Parse method we can use.
+            var method = type.GetMethod(ParseMethodName, BindingFlags.Static | BindingFlags.Public,
+                null, new[] { typeof(string), typeof(CultureInfo) }, null);
+
+            if (method != null && method.ReturnType == type)
+            {
+                return new ParseTypeConverter(method, true);
+            }
+
+            // Check for Parse without a culture arguments.
+            method = type.GetMethod(ParseMethodName, BindingFlags.Static | BindingFlags.Public, null,
+                new[] { typeof(string) }, null);
+
+            if (method != null && method.ReturnType == type)
+            {
+                return new ParseTypeConverter(method, false);
+            }
+
+            // Check for a constructor with a string argument.
+            if (type.GetConstructor(new[] { typeof(string) }) != null)
+            {
+                return new ConstructorTypeConverter(type);
+            }
+
+            return null;
         }
     }
 }

@@ -105,9 +105,10 @@ One benefit of using validators is that they can add a help message for their co
 usage help. For example, the `ValidateRangeAttribute` will show a usage help message like "Must
 be between 0 and 100." These messages will be added to the end of the argument's description.
 
-The only exception is the `ValidatePatternAttribute`, which does not know the intent of the pattern
-and can therefore not provide a meaningful help message to the user. In this case, you should
-manually add a message to the argument's description to make the intent clear.
+The only exceptions is the `ValidatePatternAttribute`, which does not know the intent of the pattern
+and can therefore not provide a meaningful help message to the user, and the
+`ValidateNotNullAttribute`. In this case, you should manually add a message to the argument's
+description to make the intent clear.
 
 If you don't wish to include a validator's message in the usage help, you can turn this off using
 the `IncludeInUsageHelp` property, which all built-in validators with usage help provide. You can

@@ -97,8 +97,7 @@ namespace Ookii.CommandLine.Validation
         /// <para>
         ///   If you need to check the type of the argument, use the <see cref="CommandLineArgument.ElementType"/>
         ///   property unless you want to get the collection type for a multi-value or dictionary
-        ///   argument. Be aware that the <see cref="CommandLineArgument.ElementType"/> property
-        ///   may return the <see cref="Nullable{T}"/> type.
+        ///   argument.
         /// </para>
         /// </remarks>
         public abstract bool IsValid(CommandLineArgument argument, object? value);

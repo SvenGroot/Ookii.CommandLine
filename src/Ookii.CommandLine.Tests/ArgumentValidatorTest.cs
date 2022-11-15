@@ -131,14 +131,14 @@ namespace Ookii.CommandLine.Tests
             var argument = _parser.GetArgument("Day");
             Assert.IsTrue(validator.IsValid(argument, DayOfWeek.Sunday));
             Assert.IsTrue(validator.IsValid(argument, DayOfWeek.Saturday));
+            Assert.IsTrue(validator.IsValid(argument, null));
             Assert.IsFalse(validator.IsValid(argument, (DayOfWeek)9));
-            Assert.IsFalse(validator.IsValid(argument, null));
 
             argument = _parser.GetArgument("Day2");
             Assert.IsTrue(validator.IsValid(argument, (DayOfWeek?)DayOfWeek.Sunday));
             Assert.IsTrue(validator.IsValid(argument, (DayOfWeek?)DayOfWeek.Saturday));
-            Assert.IsFalse(validator.IsValid(argument, (DayOfWeek?)9));
             Assert.IsTrue(validator.IsValid(argument, null));
+            Assert.IsFalse(validator.IsValid(argument, (DayOfWeek?)9));
         }
     }
 }

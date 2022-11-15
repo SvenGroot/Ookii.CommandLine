@@ -50,20 +50,13 @@ namespace Ookii.CommandLine.Validation
         /// </exception>
         public override bool IsValid(CommandLineArgument argument, object? value)
         {
-            var type = argument.ElementType.GetNullableCoreType();
-            if (!type.IsEnum)
+            if (!argument.ElementType.IsEnum)
             {
                 throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture,
                     Properties.Resources.ArgumentNotEnumFormat, argument.ArgumentName));
             }
 
-            if (value == null)
-            {
-                // If the ElementType was Nullable<T>, null is allowed.
-                return type != argument.ElementType;
-            }
-
-            return type.IsEnumDefined(value);
+            return value == null || argument.ElementType.IsEnumDefined(value);
         }
 
         /// <summary>
@@ -77,11 +70,11 @@ namespace Ookii.CommandLine.Validation
 
         /// <inheritdoc/>
         protected override string GetUsageHelpCore(CommandLineArgument argument)
-            => argument.Parser.StringProvider.ValidateEnumValueUsageHelp(argument.ElementType.GetNullableCoreType());
+            => argument.Parser.StringProvider.ValidateEnumValueUsageHelp(argument.ElementType);
 
         /// <inheritdoc/>
         public override string GetErrorMessage(CommandLineArgument argument, object? value)
-            => argument.Parser.StringProvider.ValidateEnumValueFailed(argument.ArgumentName,
-                    argument.ElementType.GetNullableCoreType(), value, IncludeValuesInErrorMessage);
+            => argument.Parser.StringProvider.ValidateEnumValueFailed(argument.ArgumentName, argument.ElementType, value,
+                    IncludeValuesInErrorMessage);
     }
 }

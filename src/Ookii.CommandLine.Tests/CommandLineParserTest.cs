@@ -65,14 +65,14 @@ namespace Ookii.CommandLine.Tests
                 new ExpectedArgument("Arg8", typeof(DayOfWeek[]), ArgumentKind.MultiValue) { ElementType = typeof(DayOfWeek), Position = 5 },
                 new ExpectedArgument("Arg6", typeof(string)) { Position = null, IsRequired = true, Description = "Arg6 description.", Aliases = new[] { "Alias1", "Alias2" } },
                 new ExpectedArgument("Arg10", typeof(bool[]), ArgumentKind.MultiValue) { ElementType = typeof(bool), Position = null, IsSwitch = true },
-                new ExpectedArgument("Arg11", typeof(bool?)) { Position = null, ValueDescription = "Boolean", IsSwitch = true },
+                new ExpectedArgument("Arg11", typeof(bool?)) { ElementType = typeof(bool), Position = null, ValueDescription = "Boolean", IsSwitch = true },
                 new ExpectedArgument("Arg12", typeof(Collection<int>), ArgumentKind.MultiValue) { ElementType = typeof(int), Position = null, DefaultValue = 42 },
                 new ExpectedArgument("Arg13", typeof(Dictionary<string, int>), ArgumentKind.Dictionary) { ElementType = typeof(KeyValuePair<string, int>), ValueDescription = "String=Int32" },
                 new ExpectedArgument("Arg14", typeof(IDictionary<string, int>), ArgumentKind.Dictionary) { ElementType = typeof(KeyValuePair<string, int>), ValueDescription = "String=Int32" },
                 new ExpectedArgument("Arg15", typeof(KeyValuePair<string, int>)) { ValueDescription = "KeyValuePair<String, Int32>" },
                 new ExpectedArgument("Arg3", typeof(string)) { Position = null },
                 new ExpectedArgument("Arg7", typeof(bool)) { Position = null, IsSwitch = true, Aliases = new[] { "Alias3" } },
-                new ExpectedArgument("Arg9", typeof(int?)) { Position = null, ValueDescription = "Int32" },
+                new ExpectedArgument("Arg9", typeof(int?)) { ElementType = typeof(int), Position = null, ValueDescription = "Int32" },
                 new ExpectedArgument("Help", typeof(bool), ArgumentKind.Method) { MemberName = "AutomaticHelp", Description = "Displays this help message.", IsSwitch = true, Aliases = new[] { "?", "h" } },
                 new ExpectedArgument("Version", typeof(bool), ArgumentKind.Method) { MemberName = "AutomaticVersion", Description = "Displays version information.", IsSwitch = true },
             });
@@ -885,6 +885,9 @@ namespace Ookii.CommandLine.Tests
             Assert.AreEqual(DayOfWeek.Monday, result.Day2);
             result = parser.Parse(new[] { "-Day2", "" });
             Assert.IsNull(result.Day2);
+
+            // NotNull validator with Nullable<T>.
+            CheckThrows(() => parser.Parse(new[] { "-NotNull", "" }), parser, CommandLineArgumentErrorCategory.ValidationFailed, "NotNull");
         }
 
         [TestMethod]
@@ -1043,6 +1046,33 @@ namespace Ookii.CommandLine.Tests
             result = parser.Parse(new[] { "-Argument1", "foo", "-Argument1", "bar" });
             Assert.AreEqual("foo", result.Argument1);
             Assert.IsTrue(handlerCalled);
+        }
+
+        [TestMethod]
+        public void TestConversion()
+        {
+            var parser = new CommandLineParser<ConversionArguments>();
+            var result = parser.Parse("-ParseCulture 1 -Parse 2 -Ctor 3 -ParseNullable 4 -ParseMulti 5 6 -ParseNullableMulti 7 8 -NullableMulti 9 10 -Nullable 11".Split(' '));
+            Assert.AreEqual(1, result.ParseCulture.Value);
+            Assert.AreEqual(2, result.Parse.Value);
+            Assert.AreEqual(3, result.Ctor.Value);
+            Assert.AreEqual(4, result.ParseNullable.Value.Value);
+            Assert.AreEqual(5, result.ParseMulti[0].Value);
+            Assert.AreEqual(6, result.ParseMulti[1].Value);
+            Assert.AreEqual(7, result.ParseNullableMulti[0].Value.Value);
+            Assert.AreEqual(8, result.ParseNullableMulti[1].Value.Value);
+            Assert.AreEqual(9, result.NullableMulti[0].Value);
+            Assert.AreEqual(10, result.NullableMulti[1].Value);
+            Assert.AreEqual(11, result.Nullable);
+
+            result = parser.Parse(new[] { "-ParseNullable", "", "-NullableMulti", "1", "", "2", "-ParseNullableMulti", "3", "", "4" });
+            Assert.IsNull(result.ParseNullable);
+            Assert.AreEqual(1, result.NullableMulti[0].Value);
+            Assert.IsNull(result.NullableMulti[1]);
+            Assert.AreEqual(2, result.NullableMulti[2].Value);
+            Assert.AreEqual(3, result.ParseNullableMulti[0].Value.Value);
+            Assert.IsNull(result.ParseNullableMulti[1]);
+            Assert.AreEqual(4, result.ParseNullableMulti[2].Value.Value);
         }
 
         private record class ExpectedArgument

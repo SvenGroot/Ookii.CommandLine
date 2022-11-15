@@ -314,7 +314,7 @@ Usage: test [-arg1] <String> [[-other] <Number>] [[-notSwitch] <Boolean>] [[-Arg
 
 ".ReplaceLineEndings();
 
-        private static readonly string _expectedUsageValidators = @"Usage: test [[-arg2] <String>] [-Arg1 <Int32>] [-Arg3 <Int32>] [-Arg4 <String>...] [-Day <DayOfWeek>] [-Day2 <DayOfWeek>] [-Help] [-Version]
+        private static readonly string _expectedUsageValidators = @"Usage: test [[-arg2] <String>] [-Arg1 <Int32>] [-Arg3 <Int32>] [-Arg4 <String>...] [-Day <DayOfWeek>] [-Day2 <DayOfWeek>] [-Help] [-NotNull <Int32>] [-Version]
 
     -arg2 <String>
         Arg2 description. Must not be empty.
@@ -336,6 +336,9 @@ Usage: test [-arg1] <String> [[-other] <Number>] [[-notSwitch] <Boolean>] [[-Arg
 
     -Help [<Boolean>] (-?, -h)
         Displays this help message.
+
+    -NotNull <Int32>
+        NotNull description.
 
     -Version [<Boolean>]
         Displays version information.

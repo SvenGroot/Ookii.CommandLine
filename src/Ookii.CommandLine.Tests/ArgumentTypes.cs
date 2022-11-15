@@ -394,6 +394,11 @@ namespace Ookii.CommandLine.Tests
         [Description("Day2 description.")]
         [ValidateEnumValue]
         public DayOfWeek? Day2 { get; set; }
+
+        [CommandLineArgument]
+        [Description("NotNull description.")]
+        [ValidateNotNull]
+        public int? NotNull { get; set; }
     }
 
     // N.B. nameof is only safe if the argument name matches the property name.
@@ -483,6 +488,71 @@ namespace Ookii.CommandLine.Tests
 
         [CommandLineArgument]
         public int Arg3 { get; set; }
+    }
 
+    struct StructWithParseCulture
+    {
+        public int Value { get; set; }
+
+        public static StructWithParseCulture Parse(string value, IFormatProvider provider)
+        {
+            return new StructWithParseCulture()
+            {
+                Value = int.Parse(value, provider)
+            };
+        }
+    }
+
+    struct StructWithParse
+    {
+        public int Value { get; set; }
+
+        public static StructWithParse Parse(string value)
+        {
+            return new StructWithParse()
+            {
+                Value = int.Parse(value, CultureInfo.InvariantCulture)
+            };
+        }
+    }
+
+    struct StructWithCtor
+    {
+        public StructWithCtor(string value)
+        {
+            Value = int.Parse(value);
+        }
+
+        public int Value { get; set; }
+    }
+
+    class ConversionArguments
+    {
+        [CommandLineArgument]
+        public StructWithParseCulture ParseCulture { get; set; }
+
+        [CommandLineArgument]
+        public StructWithParse Parse { get; set; }
+
+        [CommandLineArgument]
+        public StructWithCtor Ctor { get; set; }
+
+        [CommandLineArgument]
+        public StructWithParse? ParseNullable { get; set; }
+
+        [CommandLineArgument]
+        [MultiValueSeparator]
+        public StructWithParse[] ParseMulti { get; set; }
+
+        [CommandLineArgument]
+        [MultiValueSeparator]
+        public StructWithParse?[] ParseNullableMulti { get; set; }
+
+        [CommandLineArgument]
+        [MultiValueSeparator]
+        public int?[] NullableMulti { get; set; }
+
+        [CommandLineArgument]
+        public int? Nullable { get; set; }
     }
 }
