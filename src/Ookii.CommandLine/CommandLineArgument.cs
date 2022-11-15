@@ -594,13 +594,11 @@ namespace Ookii.CommandLine
         /// </summary>
         /// <value>
         /// If the <see cref="IsMultiValue"/> property is <see langword="true"/>, the <see cref="Type"/>
-        /// of each individual value; otherwise, the same value as the <see cref="ArgumentType"/>
+        /// of each individual value; if the argument type is an instance of <see cref="Nullable{T}"/>,
+        /// the type <c>T</c>; otherwise, the same value as the <see cref="ArgumentType"/>
         /// property.
         /// </value>
-        public Type ElementType
-        {
-            get { return _elementType; }
-        }
+        public Type ElementType => _elementType;
 
         /// <summary>
         /// Gets the position of this argument.
@@ -1574,34 +1572,27 @@ namespace Ookii.CommandLine
             // This is used to generate a value description from a type name if no custom value description was supplied.
             if (type.IsGenericType)
             {
-                // We print Nullable<T> as just T.
-                if (type.GetGenericTypeDefinition() == typeof(Nullable<>))
+                var name = new StringBuilder(type.FullName?.Length ?? 0);
+                name.Append(type.Name, 0, type.Name.IndexOf("`", StringComparison.Ordinal));
+                name.Append('<');
+                // If only I was targeting .Net 4, I could use string.Join for this.
+                bool first = true;
+                foreach (Type typeArgument in type.GetGenericArguments())
                 {
-                    return GetFriendlyTypeName(type.GetGenericArguments()[0]);
-                }
-                else
-                {
-                    StringBuilder name = new StringBuilder(type.FullName?.Length ?? 0);
-                    name.Append(type.Name, 0, type.Name.IndexOf("`", StringComparison.Ordinal));
-                    name.Append('<');
-                    // If only I was targeting .Net 4, I could use string.Join for this.
-                    bool first = true;
-                    foreach (Type typeArgument in type.GetGenericArguments())
+                    if (first)
                     {
-                        if (first)
-                        {
-                            first = false;
-                        }
-                        else
-                        {
-                            name.Append(", ");
-                        }
-
-                        name.Append(GetFriendlyTypeName(typeArgument));
+                        first = false;
                     }
-                    name.Append('>');
-                    return name.ToString();
+                    else
+                    {
+                        name.Append(", ");
+                    }
+
+                    name.Append(GetFriendlyTypeName(typeArgument));
                 }
+
+                name.Append('>');
+                return name.ToString();
             }
             else
             {
@@ -1933,11 +1924,6 @@ namespace Ookii.CommandLine
                 return null;
             }
 
-            if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
-            {
-                type = type.GetGenericArguments()[0];
-            }
-
             if (defaultValueDescriptions.TryGetValue(type, out string? value))
             {
                 return value;
@@ -1948,6 +1934,7 @@ namespace Ookii.CommandLine
 
         private static string DetermineValueDescription(Type type, IDictionary<Type, string>? defaultValueDescriptions, NameTransform transform)
         {
+            type = type.GetNullableCoreType();
             return GetDefaultValueDescription(type, defaultValueDescriptions) ?? transform.Apply(GetFriendlyTypeName(type));
         }
     }

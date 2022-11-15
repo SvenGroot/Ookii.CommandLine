@@ -163,14 +163,14 @@ namespace Ookii.CommandLine
         }
 
         /// <summary>
-        /// Gets an error message used if the <see cref="ValidateNotNullOrEmptyAttribute"/> fails
+        /// Gets an error message used if the <see cref="ValidateNotEmptyAttribute"/> fails
         /// validation because the string was empty.
         /// </summary>
         /// <param name="argumentName">The name of the argument.</param>
         /// <returns>The error message.</returns>
         /// <remarks>
         /// <para>
-        ///   If <see cref="ValidateNotNullOrEmptyAttribute"/> failed because the value was
+        ///   If <see cref="ValidateNotEmptyAttribute"/> failed because the value was
         ///   <see langword="null"/>, the <see cref="NullArgumentValue"/> method is called instead.
         /// </para>
         /// </remarks>
@@ -178,14 +178,14 @@ namespace Ookii.CommandLine
             => Format(Resources.ValidateNotEmptyFailedFormat, argumentName);
 
         /// <summary>
-        /// Gets an error message used if the <see cref="ValidateNotNullOrWhiteSpaceAttribute"/> fails
+        /// Gets an error message used if the <see cref="ValidateNotWhiteSpaceAttribute"/> fails
         /// validation because the string was empty.
         /// </summary>
         /// <param name="argumentName">The name of the argument.</param>
         /// <returns>The error message.</returns>
         /// <remarks>
         /// <para>
-        ///   If <see cref="ValidateNotNullOrWhiteSpaceAttribute"/> failed because the value was
+        ///   If <see cref="ValidateNotWhiteSpaceAttribute"/> failed because the value was
         ///   <see langword="null"/>, the <see cref="NullArgumentValue"/> method is called instead.
         /// </para>
         /// </remarks>
@@ -234,6 +234,25 @@ namespace Ookii.CommandLine
             {
                 return Format(Resources.ValidateCountBothFormat, argumentName, attribute.Minimum, attribute.Maximum);
             }
+        }
+
+        /// <summary>
+        /// Gets an error message used if the <see cref="ValidateEnumValueAttribute"/> fails validation.
+        /// </summary>
+        /// <param name="argumentName">The name of the argument.</param>
+        /// <param name="enumType">The type of the enumeration.</param>
+        /// <param name="value">The value of the argument.</param>
+        /// <param name="includeValues">
+        ///   <see langword="true"/> to include the possible values of the enumeration in the error
+        ///   message; otherwise, <see langword="false"/>.
+        /// </param>
+        /// <returns>The error message.</returns>
+        public virtual string ValidateEnumValueFailed(string argumentName, Type enumType, object? value, bool includeValues)
+        {
+            return includeValues
+                ? Format(Resources.ValidateEnumValueFailedWithValuesFormat, argumentName, string.Join(ArgumentSeparator,
+                    Enum.GetNames(enumType)))
+                : Format(Resources.ValidateEnumValueFailedFormat, value, argumentName);
         }
 
         /// <summary>

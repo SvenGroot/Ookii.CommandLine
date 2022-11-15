@@ -372,4 +372,16 @@
   <data name="DuplicateArgumentWarningFormat" xml:space="preserve">
     <value>Warning: the argument '{0}' was supplied more than once.</value>
   </data>
+  <data name="ArgumentNotEnumFormat" xml:space="preserve">
+    <value>The argument '{0}' is not an enumeration.</value>
+  </data>
+  <data name="ValidateEnumValueFailedFormat" xml:space="preserve">
+    <value>The value '{0}' is not one of the valid values for the argument '{1}'.</value>
+  </data>
+  <data name="ValidateEnumValueFailedWithValuesFormat" xml:space="preserve">
+    <value>The argument '{0}' must be one of the following values: {1}.</value>
+  </data>
+  <data name="ValidateEnumValueUsageHelpFormat" xml:space="preserve">
+    <value>Possible values: {0}.</value>
+  </data>
 </root>

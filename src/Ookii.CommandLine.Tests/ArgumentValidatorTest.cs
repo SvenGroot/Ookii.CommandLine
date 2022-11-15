@@ -10,6 +10,7 @@ namespace Ookii.CommandLine.Tests
     [TestClass]
     public class ArgumentValidatorTest
     {
+        CommandLineParser _parser;
         CommandLineArgument _argument;
 
         [TestInitialize]
@@ -17,8 +18,8 @@ namespace Ookii.CommandLine.Tests
         {
             // Just so we have a CommandLineArgument instance to pass. None of the built-in
             // validators use that for anything other than the name and type.
-            var parser = new CommandLineParser<ValidationArguments>();
-            _argument = parser.GetArgument("Arg3");
+            _parser = new CommandLineParser<ValidationArguments>();
+            _argument = _parser.GetArgument("Arg3");
         }
 
         [TestMethod]
@@ -121,6 +122,23 @@ namespace Ookii.CommandLine.Tests
             Assert.IsTrue(validator.IsValid(_argument, "ABCD"));
             Assert.IsFalse(validator.IsValid(_argument, ""));
             Assert.IsFalse(validator.IsValid(_argument, null));
+        }
+
+        [TestMethod]
+        public void TestValidateEnumValue()
+        {
+            var validator = new ValidateEnumValueAttribute();
+            var argument = _parser.GetArgument("Day");
+            Assert.IsTrue(validator.IsValid(argument, DayOfWeek.Sunday));
+            Assert.IsTrue(validator.IsValid(argument, DayOfWeek.Saturday));
+            Assert.IsFalse(validator.IsValid(argument, (DayOfWeek)9));
+            Assert.IsFalse(validator.IsValid(argument, null));
+
+            argument = _parser.GetArgument("Day2");
+            Assert.IsTrue(validator.IsValid(argument, (DayOfWeek?)DayOfWeek.Sunday));
+            Assert.IsTrue(validator.IsValid(argument, (DayOfWeek?)DayOfWeek.Saturday));
+            Assert.IsFalse(validator.IsValid(argument, (DayOfWeek?)9));
+            Assert.IsTrue(validator.IsValid(argument, null));
         }
     }
 }

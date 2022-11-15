@@ -21,24 +21,25 @@ inter-dependencies. The following are the built-in argument value validators:
 
 Validator                        | Description
 ---------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-`ValidateCountAttribute`         | Makes sure the number of items for a multi-value argument is in the specified range.
-`ValidateNotEmptyAttribute`      | Makes sure the value of an argument is not an empty string.
-`ValidateNotNullAttribute`       | Makes sure the value of an argument is not `null`. This is only useful if the `TypeConverter` for an argument can return `null`. It's not necessary to use this argument on value types, or if using .Net 6.0 or later, on non-nullable reference types.
-`ValidateNotWhiteSpaceAttribute` | Makes sure the value of argument of an argument is not an empty string or a string containing only white-space characters.
-`ValidatePatternAttribute`       | Makes sure the value of an argument matches the specified regular expression.
-`ValidateRangeAttribute`         | Makes sure the value of an argument in in the specified range.
-`ValidateStringLengthAttribute`  | Makes sure the length of an argument's string value is in the specified range.
+`ValidateCountAttribute`         | Validates that the number of items for a multi-value argument is in the specified range.
+`ValidateEnumValueAttribute`     | Validates that the value is one of the defined values for an enumeration. The default `TypeConverter` for an enumeration allows conversion from the underlying value, even if that value is not a defined value for the enumeration. This validator prevents that. See also [enumeration type conversion](Arguments.md#enumeration-type-conversion).
+`ValidateNotEmptyAttribute`      | Validates that the value of an argument is not an empty string.
+`ValidateNotNullAttribute`       | Validates that the value of an argument is not `null`. This is only useful if the `TypeConverter` for an argument can return `null` (for example, the `NullableConverter` can). It's not necessary to use this argument on non-nullable value types, or if using .Net 6.0 or later, on non-nullable reference types.
+`ValidateNotWhiteSpaceAttribute` | Validates that the value of argument of an argument is not an empty string or a string containing only white-space characters.
+`ValidatePatternAttribute`       | Validates that the value of an argument matches the specified regular expression.
+`ValidateRangeAttribute`         | Validates that the value of an argument is in the specified range. This can be used on any type that implements the `IComparable<T>` interface.
+`ValidateStringLengthAttribute`  | Validates that the length of an argument's string value is in the specified range.
 
 Note that there is no `ValidateSetAttribute`, or an equivalent way to make sure that an argument is
 one of a predefined set of values, because you're encouraged to use an enumeration type for this
-instead. You can of course use the `ValidatePatternAttribute` for this purpose as well.
+instead, in combination with the `ValidateEnumValueAttribute` if desired. You can of course use the `ValidatePatternAttribute` for this purpose as well.
 
 The `ValidateRangeAttribute`, `ValidateCountAttribute` and `ValidateStringLengthAttribute` all allow
 the use of open-ended ranges, without either a lower or upper bound.
 
 Depending on the type of validation being done, validation occurs at different times. The
-`ValidateNotNullAttribute` and the `ValidateRangeAttribute` are applied to the converted value, when
-the argument is parsed.
+`ValidateEnumValueAttribute`, `ValidateNotNullAttribute` and  `ValidateRangeAttribute` are applied
+to the value after conversion to the argument's type.
 
 The `ValidateCountAttribute` is applied after all arguments are parsed, because it cannot know the
 total number of values before that point.
@@ -66,14 +67,165 @@ public string[]? Values { get; set; }
 [CommandLineArgument]
 [ValidatePattern("^[a-z][a-z0-9]*$", RegexOptions.IgnoreCase)]
 public string? Identifier { get; set; }
+
+// Constrain the value to valid enumeration values, and don't allow the use of commas to prevent
+// lists of values with this non-flags enumeration.
+[CommandLineArgument]
+[ValidatePattern("^[^,]*$")]
+[ValidateEnumValue]
+public DayOfWeek Day { get; set; }
 ```
 
 ### Validation failure
 
 If a validator fails, a `CommandLineArgumentException` is thrown with the `Category` property set to
-`CommandLineArgumentErrorCategory.ValidationFailed`, and the . The static
-`CommandLineParse.Parse<T>()` method will print the validator's custom error message.
+`CommandLineArgumentErrorCategory.ValidationFailed`, and the exception message set to a custom
+message provided by the validator. The static `CommandLineParse.Parse<T>()` method will print the
+error message and show usage help, as always.
+
+For example, the `ValidateRangeAttribute` will use an error message like "The argument 'Count' must
+be between 0 and 100." or "The argument 'Count' must be at least 1."
+
+The `ValidatePatternAttribute` validator does not have a custom error message by default, because it cannot
+know the purpose of the of the pattern used. Instead, it will return a generic error message stating
+the value is invalid. You can use the `ValidatePatternAttribute.ErrorMessage` property to
+specify a custom error message.
+
+The `ValidateEnumValueAttribute` validator includes the possible enum values in the error message
+by default. If there are a lot of values, you may wish to disable this, which can be done with the
+`ValidateEnumValueAttribute.IncludeValuesInErrorMessage` property.
 
 As with all other error messages, the messages for all built-in validators are obtained from the
 `LocalizedStringProvider` class and can be customized by deriving a custom string provider from that
 class.
+
+### Usage help
+
+One benefit of using validators is that they can add a help message for their constraint to the
+usage help. For example, the `ValidateRangeAttribute` will show a usage help message like "Must
+be between 0 and 100." These messages will be added to the end of the argument's description.
+
+The only exception is the `ValidatePatternAttribute`, which does not know the intent of the pattern
+and can therefore not provide a meaningful help message to the user. In this case, you should
+manually add a message to the argument's description to make the intent clear.
+
+If you don't wish to include a validator's message in the usage help, you can turn this off using
+the `IncludeInUsageHelp` property, which all built-in validators with usage help provide. You can
+also disable the message for all validators using the
+`WriteUsageOptions.IncludeValidatorsInDescription` message.
+
+The `ValidateEnumValueAttribute` will list all defined enumeration values, which may be rather long
+depending on the number of values. If the number of values is large, you may wish to exclude it
+from the usage help using the `IncludeInUsageHelp` property.
+
+The validator usage help messages can be customized using the `LocalizedStringProvider`. For
+example, the [custom usage sample](../src/Samples/CustomUsage) changes the message for the
+`ValidateRangeAttribute` to look like "[range: 0-100]" instead.
+
+## Argument dependencies and restrictions
+
+Besides arguments value validators, there are also a number of built-in validators that specify
+dependencies or restrictions on other arguments. The following validators are available:
+
+Validate | Description
+---------|------------
+`ProhibitsAttribute` | Indicates that an argument cannot be used in combination with another argument.
+`RequiresAttribute` | Indicates that an argument can only be used in combination with another argument.
+`RequiresAnyAttribute` | This is a class validator, that must be applied to the arguments class instead of an argument, which validates that at least one of the specified arguments is present on the command line.
+
+For example, you might have an application that can read data from a file, or from a server at a
+specified IP address and port. You could express these arguments as follows:
+
+```csharp
+[RequiresAny(nameof(Path), nameof(Ip))]
+internal class ProgramArguments
+{
+    [CommandLineArgument(Position = 0)]
+    [Description("The path to use.")]
+    public FileInfo? Path { get; set; }
+
+    [CommandLineArgument]
+    [Description("The IP address to connect to.")]
+    [Prohibits(nameof(Path))]
+    public IPAddress? Ip { get; set; }
+
+    [CommandLineArgument(DefaultValue = 80)]
+    [Description("The port to connect to.")]
+    [Requires(nameof(Ip))]
+    public int Port { get; set; }
+}
+```
+
+The "Ip" argument uses the `ProhibitsAttribute` to indicate it is mutually exclusive with the
+"Path" argument. The "Port" argument uses the `RequiresAttribute` to indicate it can only be used
+when the `Ip` argument is also specified.
+
+The application requires the use of either "Path" or "Ip", but we cannot mark either one required,
+because doing so would make it impossible to specify the other argument. Instead, the
+`RequiresAnyAttribute` on the class indicates that one or the other must be present for a successful
+invocation.
+
+Just like the argument value validators, the dependency validators will add a usage help message
+if desired. In the case of a class validator like the `RequiresAnyAttribute`, this message is shown
+before the description list.
+
+Check out the [argument dependencies sample](../src/Samples/ArgumentDependencies/) to see this in
+action.
+
+## Custom validators
+
+Besides the built-in validators, you can also create your own validators by inheriting from the
+`ArgumentValidationAttribute` class or the `ClassValidationAttribute` class depending on what type
+of validation you wish to perform.
+
+If you plan to include a usage help message, inherit from the `ArgumentValidationWithHelpAttribute`
+class to provide a `IncludeInUsageHelp` property, though this is not required.
+
+You must implement at least the `IsValid()` method, which returns a boolean indicating whether the
+value is valid (you should not throw an exception). Override the `GetErrorMessage()` method to
+provide a custom error message, and the `GetUsageHelp()` method to provide a help message (if you
+inherit from the `ArgumentValidationWithHelpAttribute` class, override `GetUsageHelpCore()`
+instead).
+
+You can also override the `ErrorCategory` property to use a different error category for validation
+failure than `ValidationFailed`.
+
+For the `ArgumentValidationAttribute` class, override the `Mode` property to specify whether you
+want to run validation before the value is converted to the argument type, after the conversion
+(this is the default), or after argument parsing is finished.
+
+For example, the following is a validator that checks if a number is even:
+
+```csharp
+class ValidateEvenAttribute : ArgumentValidationWithHelpAttribute
+{
+    public override bool IsValid(CommandLineArgument argument, object? value)
+        => value is int number && (number % 2) == 0;
+
+    public override string GetErrorMessage(CommandLineArgument argument, object? value)
+        => $"The argument '{argument.ArgumentName}' must be an even number.";
+
+    protected override string GetUsageHelpCore(CommandLineArgument argument)
+        => "Must be an even number.";
+}
+```
+
+You can also derive from existing validators to customize their behavior. For example, the following
+validator customizes the range validator to use a non-constant lower bound, in this case to check
+whether a date is in the future for the `DateOnly` structure:
+
+```csharp
+class ValidateFutureDateAttribute : ValidateRangeAttribute
+{
+    public ValidateFutureDateAttribute()
+        : base(DateOnly.FromDateTime(DateTime.Today).AddDays(1), null)
+    {
+    }
+
+    public override string GetErrorMessage(CommandLineArgument argument, object? value)
+        => $"The argument '{argument.ArgumentName}' must specify a future date.";
+
+    protected override string GetUsageHelpCore(CommandLineArgument argument)
+        => "Must be a date in the future.";
+}
+```

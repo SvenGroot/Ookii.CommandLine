@@ -384,6 +384,16 @@ namespace Ookii.CommandLine.Tests
         [ValidateStringLength(1, 3)]
         [ValidateCount(2, 4)]
         public string[] Arg4 { get; set; }
+
+        [CommandLineArgument]
+        [Description("Day description.")]
+        [ValidateEnumValue]
+        public DayOfWeek Day { get; set; }
+
+        [CommandLineArgument]
+        [Description("Day2 description.")]
+        [ValidateEnumValue]
+        public DayOfWeek? Day2 { get; set; }
     }
 
     // N.B. nameof is only safe if the argument name matches the property name.

@@ -872,6 +872,19 @@ namespace Ookii.CommandLine.Tests
             CheckThrows(() => parser.Parse(new[] { "-Arg4", "foo;bar;baz;ban;bap" }), parser, CommandLineArgumentErrorCategory.ValidationFailed, "Arg4");
             result = parser.Parse(new[] { "-Arg4", "foo;bar;baz;ban" });
             CollectionAssert.AreEqual(new[] { "foo", "bar", "baz", "ban" }, result.Arg4);
+
+            // Enum validator
+            CheckThrows(() => parser.Parse(new[] { "-Day", "foo" }), parser, CommandLineArgumentErrorCategory.ArgumentValueConversion, "Day", typeof(FormatException));
+            CheckThrows(() => parser.Parse(new[] { "-Day", "9" }), parser, CommandLineArgumentErrorCategory.ValidationFailed, "Day");
+            CheckThrows(() => parser.Parse(new[] { "-Day", "" }), parser, CommandLineArgumentErrorCategory.ArgumentValueConversion, "Day", typeof(FormatException));
+            result = parser.Parse(new[] { "-Day", "1" });
+            Assert.AreEqual(DayOfWeek.Monday, result.Day);
+            CheckThrows(() => parser.Parse(new[] { "-Day2", "foo" }), parser, CommandLineArgumentErrorCategory.ArgumentValueConversion, "Day2", typeof(FormatException));
+            CheckThrows(() => parser.Parse(new[] { "-Day2", "9" }), parser, CommandLineArgumentErrorCategory.ValidationFailed, "Day2");
+            result = parser.Parse(new[] { "-Day2", "1" });
+            Assert.AreEqual(DayOfWeek.Monday, result.Day2);
+            result = parser.Parse(new[] { "-Day2", "" });
+            Assert.IsNull(result.Day2);
         }
 
         [TestMethod]

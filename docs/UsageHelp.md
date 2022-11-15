@@ -287,9 +287,8 @@ OPTIONS:
   --version                   Displays version information.
 ```
 
-## Subcommand help
+## Subcommand usage help
 
-Please see the [subcommands documentation](Subcommands.md) for information about their usage help
-message.
+Please see the [subcommands documentation](Subcommands.md) for information about their usage help.
 
 Next, we'll take a look at [argument validation and dependencies](Validation.md).

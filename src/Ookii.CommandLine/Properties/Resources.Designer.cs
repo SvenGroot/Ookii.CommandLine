@@ -79,6 +79,15 @@ namespace Ookii.CommandLine.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The argument &apos;{0}&apos; is not an enumeration..
+        /// </summary>
+        internal static string ArgumentNotEnumFormat {
+            get {
+                return ResourceManager.GetString("ArgumentNotEnumFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to A positional multi-value argument must be the last positional argument..
         /// </summary>
         internal static string ArrayNotLastArgument {
@@ -615,6 +624,33 @@ namespace Ookii.CommandLine.Properties {
         internal static string ValidateCountUsageHelpMinFormat {
             get {
                 return ResourceManager.GetString("ValidateCountUsageHelpMinFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The value &apos;{0}&apos; is not one of the valid values for the argument &apos;{1}&apos;..
+        /// </summary>
+        internal static string ValidateEnumValueFailedFormat {
+            get {
+                return ResourceManager.GetString("ValidateEnumValueFailedFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The argument &apos;{0}&apos; must be one of the following values: {1}..
+        /// </summary>
+        internal static string ValidateEnumValueFailedWithValuesFormat {
+            get {
+                return ResourceManager.GetString("ValidateEnumValueFailedWithValuesFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Possible values: {0}..
+        /// </summary>
+        internal static string ValidateEnumValueUsageHelpFormat {
+            get {
+                return ResourceManager.GetString("ValidateEnumValueUsageHelpFormat", resourceCulture);
             }
         }
         

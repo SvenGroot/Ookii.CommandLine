@@ -114,5 +114,12 @@ namespace Ookii.CommandLine
 
             throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.NoTypeConverterFormat, type));
         }
+
+        public static Type GetNullableCoreType(this Type type)
+        {
+            return (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
+                ? type.GetGenericArguments()[0]
+                : type;
+        }
     }
 }

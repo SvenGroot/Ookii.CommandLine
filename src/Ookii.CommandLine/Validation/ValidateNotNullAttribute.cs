@@ -10,7 +10,7 @@ namespace Ookii.CommandLine.Validation
     /// <para>
     ///   An argument's value can only be <see langword="null"/> if its <see cref="TypeConverter"/>
     ///   returns <see langword="null"/> from the <see cref="TypeConverter.ConvertFrom(ITypeDescriptorContext?, System.Globalization.CultureInfo?, object)"/>
-    ///   method.
+    ///   method. For example, the <see cref="NullableConverter"/> can return <see langword="null"/>.
     /// </para>
     /// <para>
     ///   It is not necessary to use this attribute on required arguments with types that can't be

@@ -205,18 +205,24 @@ In the case of a numeric value, the converter does not check if the resulting va
 the enumeration type, so again for `DayOfWeek`, a value of "9" would be converted to `(DayOfWeek)9`
 even though there is no such value in the enumeration.
 
+To ensure the result is constrained to only the defined values of the enumeration, use the
+[`ValidateEnumValueAttribute` validator](Validation.md).
+
 The converter allows the use of comma-separated values, which will be combined using a bitwise or
 operation. This is allowed regardless of whether or not the `[Flags]` attribute is present on the
 enumeration, which can have unexpected results. Using the `DayOfWeek` example again, "Monday,Tuesday"
 would result in the value `DayOfWeek.Monday | DayOfWeek.Tuesday`, which is actually equivalent to
 `DayOfWeek.Wednesday`.
 
-One way to avoid this is to use the following [validator](Validation.md), which ensures that the
+One way to avoid this is to use the following pattern validator, which ensures that the
 string value before conversion does not contain a comma:
 
 ```csharp
 [ValidatePattern("^[^,]*$")]
 ```
+
+You can also use a pattern like `"^[a-zA-Z]"` to ensure the value starts with a letter, to disallow
+the use of numeric values entirely.
 
 ### Multi-value and dictionary value conversion
 

@@ -640,6 +640,15 @@ namespace Ookii.CommandLine
         }
 
         /// <summary>
+        /// Gets the usage help for the <see cref="ValidateEnumValueAttribute"/> class.
+        /// </summary>
+        /// <param name="enumType">The enumeration type.</param>
+        /// <returns>The string.</returns>
+        public virtual string ValidateEnumValueUsageHelp(Type enumType)
+            => Format(Resources.ValidateEnumValueUsageHelpFormat, string.Join(ArgumentSeparator, Enum.GetNames(enumType)));
+
+
+        /// <summary>
         /// Gets the usage help for the <see cref="ProhibitsAttribute"/> class.
         /// </summary>
         /// <param name="arguments">The prohibited arguments.</param>

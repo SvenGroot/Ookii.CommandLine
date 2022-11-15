@@ -94,6 +94,12 @@ namespace Ookii.CommandLine.Validation
         ///   <paramref name="value"/> will always be <see langword="null"/>. Use the
         ///   <see cref="CommandLineArgument.Value"/> property instead.
         /// </para>
+        /// <para>
+        ///   If you need to check the type of the argument, use the <see cref="CommandLineArgument.ElementType"/>
+        ///   property unless you want to get the collection type for a multi-value or dictionary
+        ///   argument. Be aware that the <see cref="CommandLineArgument.ElementType"/> property
+        ///   may return the <see cref="Nullable{T}"/> type.
+        /// </para>
         /// </remarks>
         public abstract bool IsValid(CommandLineArgument argument, object? value);
 
