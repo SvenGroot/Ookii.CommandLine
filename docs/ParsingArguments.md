@@ -41,6 +41,7 @@ Argument parsing can fail for a number of reason, including:
 - A non-multi-value argument was specified more than once
 - Too many positional argument values were supplied
 - Argument value conversion failed for one of the arguments.
+- An argument failed [validation](Validation.md).
 
 There can be other reasons as well. In addition, parsing could have been canceled by an argument
 using the `CommandLineArgumentAttribute.CancelParsing` property, a method argument, or the automatic
@@ -79,6 +80,19 @@ In the vast majority of cases, `ParseOptionsAttribute` and `ParseOptions` should
 customize the parsing behavior to your liking. If you need access to the `CommandLineParser` instance
 after parsing finished, you can use [injection](DefiningArguments.md#commandlineparser-injection),
 so it will rarely be necessary to use any other method.
+
+## Custom error messages
+
+There are two ways you can customize the error messages shown to the user.
+
+First, all error messages for the `CommandLineException` class are obtained from the
+`LocalizedStringProvider` class. Create a class that derives from the `LocalizedStringProvider`
+class and override its members to customize any or all error messages. You can specify a custom
+string provider using the `ParseOptions.StringProvider` class.
+
+The alternative is to use the manual parsing method below, and use the
+`CommandLineArgumentException.Category` property to determine the cause of the exception and create
+your own error message.
 
 ## Manual parsing and error handling
 

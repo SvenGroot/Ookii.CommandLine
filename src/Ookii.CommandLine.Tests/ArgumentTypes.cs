@@ -357,7 +357,7 @@ namespace Ookii.CommandLine.Tests
     {
         public static int Arg3Value { get; set; }
 
-        public ValidationArguments([ValidateNotNullOrEmpty, Description("Arg2 description.")] string arg2 = null)
+        public ValidationArguments([ValidateNotEmpty, Description("Arg2 description.")] string arg2 = null)
         {
             Arg2 = arg2;
         }

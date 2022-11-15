@@ -59,7 +59,7 @@ namespace Ookii.CommandLine.Tests
         [TestMethod]
         public void TestValidateNotNullOrEmpty()
         {
-            var validator = new ValidateNotNullOrEmptyAttribute();
+            var validator = new ValidateNotEmptyAttribute();
             Assert.IsTrue(validator.IsValid(_argument, "hello"));
             Assert.IsTrue(validator.IsValid(_argument, " "));
             Assert.IsFalse(validator.IsValid(_argument, null));
@@ -69,7 +69,7 @@ namespace Ookii.CommandLine.Tests
         [TestMethod]
         public void TestValidateNotNullOrWhiteSpace()
         {
-            var validator = new ValidateNotNullOrWhiteSpaceAttribute();
+            var validator = new ValidateNotWhiteSpaceAttribute();
             Assert.IsTrue(validator.IsValid(_argument, "hello"));
             Assert.IsFalse(validator.IsValid(_argument, " "));
             Assert.IsFalse(validator.IsValid(_argument, null));

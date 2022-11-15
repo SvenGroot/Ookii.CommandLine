@@ -588,14 +588,14 @@ namespace Ookii.CommandLine
         }
 
         /// <summary>
-        /// Gets the usage help for the <see cref="ValidateNotNullOrEmptyAttribute"/> class.
+        /// Gets the usage help for the <see cref="ValidateNotEmptyAttribute"/> class.
         /// </summary>
         /// <returns>The string.</returns>
         public virtual string ValidateNotEmptyUsageHelp()
             => Resources.ValidateNotEmptyUsageHelp;
 
         /// <summary>
-        /// Gets the usage help for the <see cref="ValidateNotNullOrWhiteSpaceAttribute"/> class.
+        /// Gets the usage help for the <see cref="ValidateNotWhiteSpaceAttribute"/> class.
         /// </summary>
         /// <returns>The string.</returns>
         public virtual string ValidateNotWhiteSpaceUsageHelp()

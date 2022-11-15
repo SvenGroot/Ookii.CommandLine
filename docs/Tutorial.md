@@ -87,10 +87,11 @@ But wait, we didn't pass any arguments to this method? Actually, the `Parse<T>()
 `Environment.GetCommandLineArgs()` to get the arguments. There are also overloads that take an
 explicit `string[]` array with the arguments, if you want to pass them manually.
 
-So, let's run our application:
+So, let's run our application. Build the application using `dotnet build`, and then, from the
+`bin/Debug/net6.0` directory, run the following:
 
 ```text
-dotnet run -- tutorial.csproj
+./tutorial ../../../tutorial.csproj
 ```
 
 Which will give print the contents of the tutorial.csproj file:
@@ -116,7 +117,7 @@ So far, so good. But what happens if we invoke the application without arguments
 "Path" argument is required. To try this, run the following command:
 
 ```text
-dotnet run
+./tutorial
 ```
 
 This gives the following output:
@@ -146,14 +147,14 @@ arguments with descriptions are shown in that list by default. We'll add some de
 You can also see that there are two more arguments that we didn't define: "-Help" and "-Version".
 These arguments are automatically added by Ookii.CommandLine. So, what do they do?
 
-If you use the "-Help" argument (`dotnet run -- -Help`), it shows the same message as before. The only difference is that
+If you use the "-Help" argument (`./tutorial -Help`), it shows the same message as before. The only difference is that
 there's no error message, even if you omitted the "Path" argument. And even if you do supply a path
 together with "-Help", it still shows the help and exits, it doesn't run the application.
 
 The "-Version" argument shows version information about your application:
 
 ```text
-$ dotnet run -- -Version
+$ ./tutorial -Version
 tutorial 1.0.0
 ```
 
@@ -169,7 +170,7 @@ That's because every argument, even positional ones, can still be supplied by na
 this:
 
 ```text
-dotnet run -- -path tutorial.csproj
+./tutorial -path ../../../tutorial.csproj
 ```
 
 The output is the same as above.
@@ -245,7 +246,7 @@ private static void ReadFile(Arguments args)
 Now we can run the application like this:
 
 ```text
-dotnet run -- tutorial.csproj -max 5 -inverted
+./tutorial ../../../tutorial.csproj -max 5 -inverted
 ```
 
 And it'll only show the first five lines of the file, using black-on-white text.
@@ -335,7 +336,7 @@ typically one-word description of the type of values the argument accepts, which
 brackets in the usage help. It defaults to the type name, but "Int32" might not be very meaningful
 to people who aren't programmers, so we've changed it to "Number" instead.
 
-Now, let's run the application using `dotnet run -- -help`:
+Now, let's run the application using `./tutorial -help`:
 
 ```text
 Reads a file and displays the contents on the command line.
@@ -469,7 +470,8 @@ the `ICommand` interface, and use the `CommandAttribute` attribute. And, we'll h
 main methods to use commands.
 
 Let's change the example we've built so far to use subcommands. I'm going to go back to the version
-from before we changed to long/short mode, but this isn't strictly necessary.
+from before we changed to long/short mode, but this isn't strictly necessary; you can continue
+with that version if you prefer.
 
 First, we'll rename our `Arguments` class to `ReadCommand` (just for clarity), and add another
 `using` statement:
@@ -491,8 +493,8 @@ name of the command, which is "read" in this case. We've also added the `IComman
 all commands must implement.
 
 We don't have to change anything about the properties defining the arguments. However, we do have
-to implement the `ICommand` interface, which has a single method called `Run`. To implement it, we
-move the implementation of `ReadFile` from Program.cs into this method:
+to implement the `ICommand` interface, which has a single method called `Run()`. To implement it, we
+move the implementation of `ReadFile()` from Program.cs into this method:
 
 ```csharp
 public int Run()
@@ -523,13 +525,14 @@ public int Run()
 }
 ```
 
-The `Run` method is like the `Main` method for your command, and its return value should be treated
-like the exit code returned from `Main`.
+The `Run()` method is like the `Main()` method for your command, and its return value should be
+treated like the exit code returned from `Main()`, because typically, you will return the executed
+command's return value from `Main()`.
 
-And that's it: we've now defined a command. However, we still need to change the `Main` method to
+And that's it: we've now defined a command. However, we still need to change the `Main()` method to
 use commands instead of just parsing arguments from a single class. Fortunately, this is very
 simple. First add the `using Ookii.CommandLine.Commands;` statement to Program.cs, and then update
-your `Main` method:
+your `Main()` method:
 
 ```csharp
 public static int Main()
@@ -546,12 +549,16 @@ for subcommand classes in the calling assembly, and uses the default options.
 The `RunCommand()` method will take the arguments from `Environment.GetCommandLineArgs()` (as
 before, you can also pass them explicitly), and uses the first argument as the command name. If a
 command with that name exists, it uses `CommandLineParser` to parse the arguments for that command,
-and finally invokes the `ICommand.Run()` method. If anything goes wrong, it will either display a list
-of commands, or if a command has been found, the help for that command. The return value is the
+and finally invokes the `ICommand.Run()` method. If anything goes wrong, it will either display a
+list of commands, or if a command has been found, the help for that command. The return value is the
 value returned from `ICommand.Run()`, or null if parsing failed, in which case we return a non-zero
 exit code to indicate failure.
 
-If we run our application without arguments again (`dotnet run`), we see the following:
+> If you want to customize any of these steps, there are methods like `GetCommand()` and
+> `CreateCommand()` that you can call to do this manually.
+
+If we build our application, and run it without arguments again (`./tutorial`), we see the
+following:
 
 ```text
 Usage: tutorial <command> [arguments]
@@ -575,7 +582,7 @@ with that name. It does the same thing as the "-Version" argument before.
 Let's see the usage help for our command:
 
 ```text
-dotnet run -- read -help
+./tutorial read -help
 ```
 
 Which gives the following output:
@@ -610,7 +617,7 @@ that command, and there are a number of options specific to subcommands that can
 
 Instead, you can use the `CommandOptions` class, which you can pass to the command manager.
 `CommandOptions` derives from `ParseOptions`, so all the normal parsing options are available,
-including several additional ones.
+as well as several additional ones.
 
 Let's change our main method as follows:
 
@@ -626,8 +633,9 @@ var manager = new CommandManager(options);
 return manager.RunCommand() ?? 1;
 ```
 
-Here, we're applying a name transformation to the command names, which means we can change our class
-to this:
+The first option applies a name transformation to the command names if no explicit name is
+specified, similar to the argument name transformation we used earlier. This means we can change our
+class to this:
 
 ```csharp
 [Description("Reads a file and displays the contents on the command line.")]
@@ -654,6 +662,11 @@ following into a `<PropertyGroup>` in the tutorial.csproj file to fix that.
 <Description>An application to read and write files.</Description>
 ```
 
+> If you were using the long/short version for the subcommand, you'll also want to move the options
+> from the `ParseOptionsAttribute` to the `CommandOptions` so they'll apply to all commands. Note
+> that `CommandOptions` has no `CaseSensitive` property; instead, you have to set the
+> `ArgumentNameComparer` property. Use `StringComparer.Invariant` for case-sensitive argument names.
+
 Now, if you run the application without arguments, you'll see this:
 
 ```text
@@ -679,91 +692,208 @@ added is lying (the application only reads files).
 ## Multiple commands
 
 An application with only one subcommand doesn't really need to use subcommands, so let's add a
-second one
-
-## Common arguments for commands
-
-Sometimes, you'll want some arguments to be available to all arguments. With Ookii.CommandLine, it's
-not possible to define arguments outside of a command. However, you can share arguments by using
-a common base class.
+second one. Create a new file in your project called WriteCommand.cs, and add the following code:
 
 ```csharp
-abstract class BaseCommand : ICommand
+using Ookii.CommandLine;
+using Ookii.CommandLine.Commands;
+using System.ComponentModel;
+
+namespace Tutorial;
+
+[Command]
+[Description("Writes text to a file.")]
+class WriteCommand : ICommand
 {
+    [CommandLineArgument(Position = 0, IsRequired = true)]
+    [Description("The path of the file to write.")]
+    public string? Path { get; set; }
+
+    [CommandLineArgument(Position = 1, IsRequired = true)]
+    [Description("The text to write to the file.")]
+    public string[]? Text { get; set; }
+
     [CommandLineArgument]
-    [Description("The description.")]
-    public int CommonArgument { get; set; }
+    public bool Append { get; set; }
 
-    public abstract int Run();
-}
-
-[Command]
-class SomeCommand : BaseCommand
-{
-    /* ... */
-}
-
-[Command]
-class OtherCommand : BaseCommand
-{
-    /* ... */
-}
-```
-
-Now both commands share the "CommonArgument" argument defined in the base class, in addition to the
-arguments they define. Note that "BaseCommand" is not itself a command, because it doesn't have the
-`CommandAttribute` attribute (and also because it's `abstract`).
-
-If you apply a `ParseOptionsAttribute` attribute to the `BaseCommand` class, you can also share
-parse options between multiple commands, without having to pass a `CommandOptions` instance to the
-`CommandManager` class.
-
-## Asynchronous commands
-
-You may wish to use asynchronous code in your applications. Fortunately, this is supported with the
-`IAsyncCommand` interface. This interface adds a `RunAsync()` method, which you can implement. You
-then run your command with the `CommandManager.RunCommandAsync()` method.
-
-You must still implement `ICommand`, since every command must implement that interface. If you use
-the `RunCommandAsync()` method you can just leave the `Run()` method blank, or throw an exception.
-Alternatively, you can derive from the `AsyncCommandBase` class, which provides a default
-implementation of the `Run()` method that invokes `RunAsync()`.
-
-An asynchronous command could look like this.
-
-```csharp
-[Command]
-class AsyncCommand : AsyncCommandBase
-{
-    public override async Task<int> RunAsync()
+    public int Run()
     {
-        // Do something asynchronous.
-        await Task.Delay(1000);
+        if (Append)
+        {
+            File.AppendAllLines(Path!, Text!);
+        }
+        else
+        {
+            File.WriteAllLines(Path!, Text!);
+        }
+
         return 0;
     }
 }
 ```
 
-And the `Main` method would look like this:
+There's one thing here that we haven't seen before, and that's a multi-value argument. The "Text"
+argument has an array type (`string[]`), which means it can have multiple values by supplying it
+multiple times. We could, for example, use `-Text foo -Text bar` to assign the values "foo" and "bar"
+to it. Because it's also a positional argument, we can also simply use `foo bar` to do the same.
+
+> Positional multi-value arguments must always be the last positional argument.
+
+This command will take the values from the "Text" argument and write them as lines to the specified
+file, optionally appending to the file.
+
+Let's build and run our application again, without arguments:
+
+```text
+./tutorial
+```
+
+Which now gives the following output:
+
+```text
+An application to read and write files.
+
+Usage: tutorial <command> [arguments]
+
+The following commands are available:
+
+    read
+        Reads a file and displays the contents on the command line.
+
+    version
+        Displays version information.
+
+    write
+        Writes text to a file.
+
+Run 'tutorial <command> -Help' for more information about a command.
+```
+
+As you can see, our application picked up the new command without us needing to do anything. That's
+because `CommandManager` automatically looks for all command classes in the assembly.
+
+We can test out our new command like this:
+
+```text
+$ ./tutorial write test.txt "Hello!" "Ookii.CommandLine is pretty neat." "At least I think so."
+$ ./tutorial write test.txt "Thanks for using it!" -Append
+$ ./tutorial read test.txt
+Hello!
+Ookii.CommandLine is pretty neat.
+At least I think so.
+Thanks for using it!
+```
+
+Here, we wrote three lines of text to a file, then appended one more line, and read them back using
+the "read" command.
+
+## Asynchronous commands
+
+If you want to use asynchronous code in your application, subcommands provide a way to do that too.
+
+To make a command asynchronous, we have to implement the `IAsyncCommand` interface. This interface
+derived from the `ICommand` interface, and adds a `RunAsync()` method for you to implement. Then,
+you can invoke your command using the `CommandManager.RunCommandAsync()` method.
+
+Let's make the `WriteCommand` asynchronous. When you do this, you typically only care about the
+`RunAsync()` method, but since `IAsyncCommand` derives from `ICommand`, you must still provide a
+`Run()` method. You could just leave it empty (or throw an exception), since `RunCommandAsync()`
+will never call it. An easier way is to derive your command from the `AsyncCommandBase` class, which
+provides a default implementation of the `Run()` method that will invoke `RunAsync()` and wait for
+it to finish.
+
+So, we'll make the following changes to `WriteCommand`:
 
 ```csharp
-public static Task<int> Main()
+[Command]
+[Description("Writes text to a file.")]
+class WriteCommand : AsyncCommandBase
 {
-    var manager = new CommandManager();
+    /* Properties are unchanged */
+
+    public override async Task<int> RunAsync()
+    {
+        if (Append)
+        {
+            await File.AppendAllLinesAsync(Path!, Text!);
+        }
+        else
+        {
+            await File.WriteAllLinesAsync(Path!, Text!);
+        }
+
+        return 0;
+    }
+}
+```
+
+If you build and run your application now, you'll find that it works, despite not calling
+`RunCommandAsync()` yet. That's because `RunCommand()` will invoke `AsyncCommandBase.Run()`, which
+will create a task to run `RunAsync()` and wait for it.
+
+However, to fully take advantage of asynchronous tasks, you'll want to update the `Main()` method
+as follows:
+
+```csharp
+public static async Task<int> Main()
+{
+    var options = new CommandOptions()
+    {
+        CommandNameTransform = NameTransform.DashCase,
+        ShowCommandHelpInstruction = true,
+        IncludeApplicationDescriptionBeforeCommandList = true,
+    };
+
+    var manager = new CommandManager(options);
     return await manager.RunCommandAsync() ?? 1;
 }
 ```
 
-## Multiple commands
+You'll notice that even with this change, the "read" command still works, despite not being
+asynchronous. That's because the `RunCommandAsync()` will check if a command implements
+`IAsyncCommand`, and if it doesn't, it will fall back to just calling `ICommand.Run()`. So you can
+choose for each command to make it asynchronous or not according to its needs.
 
-An application with just one command isn't very useful. Add more commands by creating more classes
-that implement `ICommand` and have a `CommandAttribute`. Since the `CommandManager` will
-automatically look for all commands in your assembly, you don't have to do anything else. You can
-also define the commands in one or more separate assemblies, and pass those to the
-`CommandManager`'s constructor.
+Converting `ReadCommand` to use asynchronous code is left as an exercise to the reader (hint: you'll
+need .Net 7 for `File.ReadLinesAsync()`, and the `System.Linq.Async` package to be able to use the
+`Take()` extension method on `IAsyncEnumerable<T>`).
 
-For an example of an application with multiple commands, check out the [subcommands sample](../src/Samples/SubCommand).
-There is also a sample demonstrating [nested commands](../src/Samples/NestedCommands).
+## Common arguments for commands
+
+Sometimes, you'll want some arguments to be available to all commands. With Ookii.CommandLine, the
+way to do this is to make a common base class. `CommandLineParser` will consider base class members
+when determining what arguments are available.
+
+For example, if we wanted to make a common base class to share the "Path" argument between the
+"read" and "write" commands, we could do so like this:
+
+```csharp
+abstract class BaseCommand : AsyncCommandBase
+{
+    [CommandLineArgument(Position = 0, IsRequired = true)]
+    [Description("The path of the file.")]
+    public string? Path { get; set; }
+}
+
+[Command]
+class ReadCommand : BaseCommand
+{
+    /* Remove the Path property */
+}
+
+[Command]
+class WriteCommand : BaseCommand
+{
+    /* Remove the Path property */
+}
+```
+
+Now both commands share the "Path" argument defined in the base class, in addition to the arguments
+they define themselves. Note that "BaseCommand" is not itself a command, because it doesn't have the
+`CommandAttribute` attribute (and also because it's `abstract`).
+
+If you apply a `ParseOptionsAttribute` attribute to the `BaseCommand` class, you can also share
+parse options between multiple commands, without having to use `CommandOptions` to do so.
 
 ## More information
 

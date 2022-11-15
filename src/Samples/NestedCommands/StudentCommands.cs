@@ -22,12 +22,12 @@ internal class AddStudentCommand : BaseCommand
 {
     [CommandLineArgument(Position = 0, IsRequired = true)]
     [Description("The first name of the student.")]
-    [ValidateNotNullOrWhiteSpace]
+    [ValidateNotWhiteSpace]
     public string FirstName { get; set; } = string.Empty;
 
     [CommandLineArgument(Position = 1, IsRequired = true)]
     [Description("The last name of the student.")]
-    [ValidateNotNullOrWhiteSpace]
+    [ValidateNotWhiteSpace]
     public string LastName { get; set; } = string.Empty;
 
     [CommandLineArgument(Position = 2)]

@@ -195,6 +195,31 @@ It is possible to override the default conversion by specifying a custom type co
 parameter or property that defines an argument, the specified type converter will be used for
 conversion instead of the default type converter.
 
+### Enumeration type conversion
+
+The default `TypeConverter` for enumeration types is case insensitive, and allows both the names and
+underlying values of the enumeration's members to be used. This means that e.g. for the `DayOfWeek`
+enumeration, "Monday", "monday", and "1" can all be used to indicate `DayOfWeek.Monday`.
+
+In the case of a numeric value, the converter does not check if the resulting value is valid for
+the enumeration type, so again for `DayOfWeek`, a value of "9" would be converted to `(DayOfWeek)9`
+even though there is no such value in the enumeration.
+
+The converter allows the use of comma-separated values, which will be combined using a bitwise or
+operation. This is allowed regardless of whether or not the `[Flags]` attribute is present on the
+enumeration, which can have unexpected results. Using the `DayOfWeek` example again, "Monday,Tuesday"
+would result in the value `DayOfWeek.Monday | DayOfWeek.Tuesday`, which is actually equivalent to
+`DayOfWeek.Wednesday`.
+
+One way to avoid this is to use the following [validator](Validation.md), which ensures that the
+string value before conversion does not contain a comma:
+
+```csharp
+[ValidatePattern("^[^,]*$")]
+```
+
+### Multi-value and dictionary value conversion
+
 Note that for multi-value and dictionary arguments, the converter must be for the element type (e.g.
 if the argument is a multi-value argument of type `int[]`, the type converter must be able to
 convert to `int`). For a dictionary argument the element type is `KeyValuePair<TKey, TValue>`, and
@@ -210,6 +235,8 @@ can also use customize the key/value separator using the `KeyValueSeparatorAttri
 If you do specify the `TypeConverterAttribute` for a dictionary argument, the
 `KeyTypeConverterAttribute`, `ValueTypeConverterAttribute`, and `KeyValueSeparatorAttribute`
 attributes will be ignored.
+
+### Conversion culture
 
 For many types, the conversion can be culture dependent. For example, converting numbers or dates
 depends on the `CultureInfo` class, which defines the accepted formats and how they’re interpreted;

@@ -22,12 +22,12 @@ internal class AddCourseCommand : BaseCommand
 {
     [CommandLineArgument(Position = 0, IsRequired = true)]
     [Description("The first name of the course.")]
-    [ValidateNotNullOrWhiteSpace]
+    [ValidateNotWhiteSpace]
     public string Name { get; set; } = string.Empty;
 
     [CommandLineArgument(Position = 1, IsRequired = true)]
     [Description("The name of the teacher of the course.")]
-    [ValidateNotNullOrWhiteSpace]
+    [ValidateNotWhiteSpace]
     public string Teacher { get; set; } = string.Empty;
 
     protected override async Task<int> RunAsync(Database db)

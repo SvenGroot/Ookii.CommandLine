@@ -1,7 +1,7 @@
 ﻿namespace Ookii.CommandLine.Validation
 {
     /// <summary>
-    /// Validates that the value of an argument is not <see langword="null"/> or an empty string.
+    /// Validates that the value of an argument is not an empty string.
     /// </summary>
     /// <remarks>
     /// <note>
@@ -9,17 +9,13 @@
     ///   value provided by the user, before type conversion takes place.
     /// </note>
     /// <para>
-    ///   The value can only be <see langword="null"/> before type conversion if the argument is
-    ///   a switch and no explicit value was provided.
-    /// </para>
-    /// <para>
     ///   If the argument is optional, validation is only performed if the argument is specified,
     ///   so the value may still be <see langword="null"/> if the argument is not supplied, if that
     ///   is the default value.
     /// </para>
     /// </remarks>
     /// <threadsafety static="true" instance="true"/>
-    public class ValidateNotNullOrEmptyAttribute : ArgumentValidationWithHelpAttribute
+    public class ValidateNotEmptyAttribute : ArgumentValidationWithHelpAttribute
     {
         /// <summary>
         /// Gets a value that indicates when validation will run.
