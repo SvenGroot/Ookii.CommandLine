@@ -308,7 +308,10 @@ namespace Ookii.CommandLine
 
                 _segments.Add(segment);
                 ContentLength += segment.ContentLength;
-                IsEmpty = false;
+                if (segment.Type != SegmentType.PartialLineBreak)
+                {
+                    IsEmpty = false;
+                }
             }
 
             public Segment? LastSegment => _segments.LastOrDefault();

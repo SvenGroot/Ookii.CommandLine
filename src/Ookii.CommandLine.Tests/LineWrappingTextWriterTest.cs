@@ -166,7 +166,7 @@ namespace Ookii.CommandLine.Tests
         [ExpectedException(typeof(ArgumentNullException))]
         public void ConstructorTestBaseWriterNull()
         {
-            LineWrappingTextWriter target = new LineWrappingTextWriter(null, 0, false);
+            new LineWrappingTextWriter(null, 0, false);
         }
 
         [TestMethod()]
@@ -261,6 +261,37 @@ namespace Ookii.CommandLine.Tests
             string actual = "Hello \x1b[38;2;1;2;3mWorld\nand stuff Bye\nEveryone\n".ReplaceLineEndings();
             Assert.AreEqual(actual, writer.BaseWriter.ToString());
         }
+
+        [TestMethod]
+        public void TestWriteChar()
+        {
+            using var writer = LineWrappingTextWriter.ForStringWriter(80);
+            writer.Indent = 8;
+            foreach (var ch in _input.ToCharArray())
+            {
+                writer.Write(ch);
+            }
+
+            writer.Flush();
+            var actual = writer.BaseWriter.ToString();
+            Assert.AreEqual(_expectedIndent, actual);
+        }
+
+        [TestMethod]
+        public void TestWriteCharFormatting()
+        {
+            using var writer = LineWrappingTextWriter.ForStringWriter(80);
+            writer.Indent = 8;
+            foreach (var ch in _inputFormatting.ToCharArray())
+            {
+                writer.Write(ch);
+            }
+
+            writer.Flush();
+            var actual = writer.BaseWriter.ToString();
+            Assert.AreEqual(_expectedFormatting, actual);
+        }
+
 
         private static string WriteString(string value, int maxLength, int segmentSize, int indent = 0)
         {

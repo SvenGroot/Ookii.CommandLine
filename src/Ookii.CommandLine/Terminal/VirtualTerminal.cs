@@ -124,11 +124,17 @@ namespace Ookii.CommandLine.Terminal
 
         internal static int FindSequenceEnd(IEnumerable<char> value)
         {
+            if (!value.Any())
+            {
+                return -1;
+            }
+
             return value.First() switch
             {
                 '[' => FindCsiEnd(value),
                 ']' => FindOscEnd(value),
-                '(' => 2,
+                // If the character after ( isn't present, we haven't found the end yet.
+                '(' => value.Skip(1).Any() ? 2 : -1,
                 _ => 1,
             };
         }
