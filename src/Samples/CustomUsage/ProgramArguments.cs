@@ -94,7 +94,7 @@ class ProgramArguments
                 // Set the indentation to work with the format used by the CustomStringProvider.
                 ApplicationDescriptionIndent = 2,
                 SyntaxIndent = 2,
-                LongShortArgumentDescriptionIndent = 30,
+                ArgumentDescriptionIndent = 30,
                 // Sort the description list by short name.
                 ArgumentDescriptionListOrder = DescriptionListSortMode.AlphabeticalShortName,
                 // Customize some of the colors.

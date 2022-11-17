@@ -401,6 +401,22 @@ namespace Ookii.CommandLine.Tests
         }
 
         [TestMethod]
+        public void TestWriteUsageCustomIndent()
+        {
+            var options = new ParseOptions()
+            {
+                UsageWriter = new UsageWriter()
+                {
+                    ExecutableName = _executableName,
+                    ArgumentDescriptionIndent = 4,
+                }
+            };
+            var target = new CommandLineParser<TestArguments>(options);
+            string actual = target.GetUsage(options.UsageWriter);
+            Assert.AreEqual(_expectedCustomIndentUsage, actual);
+        }
+
+        [TestMethod]
         public void TestStaticParse()
         {
             using var output = new StringWriter();

@@ -13,7 +13,7 @@ internal class CustomUsageWriter : UsageWriter
     // Add a header before the description.
     protected override void WriteApplicationDescription(string description)
     {
-        Writer.Indent = ShouldIndent ? ApplicationDescriptionIndent : 0;
+        SetIndent(ApplicationDescriptionIndent);
 
         // You must *always* check whether color is enabled before using VT sequences. It may be
         // disabled, for example if the output is redirected or the terminal doesn't support VT
@@ -93,6 +93,9 @@ internal class CustomUsageWriter : UsageWriter
             name += " <" + argument.ValueDescription + ">";
         }
 
+        // WriteArgumentDescriptions adjusts the indentation when in long/short mode, which we don't
+        // want here, so set it manually.
+        SetIndent(ArgumentDescriptionIndent);
         Writer.ResetIndent();
         Writer.Write("  ");
         WriteColor(ArgumentDescriptionColor);

@@ -78,16 +78,6 @@ namespace Ookii.CommandLine
         public const int DefaultArgumentDescriptionIndent = 8;
 
         /// <summary>
-        /// The default indentation for the argument descriptions for the <see cref="ParsingMode.LongShort"/>
-        /// mode.
-        /// </summary>
-        /// <value>
-        /// The default indentation, which is twelve characters.
-        /// </value>
-        /// <seealso cref="LongShortArgumentDescriptionIndent"/>
-        public const int DefaultLongShortArgumentDescriptionIndent = 12;
-
-        /// <summary>
         /// The default indentation for the application description.
         /// </summary>
         /// <value>
@@ -324,28 +314,6 @@ namespace Ookii.CommandLine
         /// </para>
         /// </remarks>
         public int ArgumentDescriptionIndent { get; set; } = DefaultArgumentDescriptionIndent;
-
-        /// <summary>
-        /// Gets or sets the number of characters by which to indent all but the first line of each
-        /// argument's description, if the <see cref="CommandLineParser.Mode"/> property is
-        /// <see cref="ParsingMode.LongShort"/>.
-        /// </summary>
-        /// <value>
-        /// The number of characters by which to indent the argument descriptions. The default
-        /// value is the value of the <see cref="DefaultLongShortArgumentDescriptionIndent"/>
-        /// constant.
-        /// </value>
-        /// <remarks>
-        /// <para>
-        ///   This property is used in place of the <see cref="ArgumentDescriptionIndent"/> property
-        ///   when the <see cref="CommandLineParser.Mode"/> property is <see cref="ParsingMode.LongShort"/>.
-        /// </para>
-        /// <para>
-        ///   This value is not used if the maximum line length of the <see cref="LineWrappingTextWriter"/>
-        ///   to which the usage is being written is less than 30.
-        /// </para>
-        /// </remarks>
-        public int LongShortArgumentDescriptionIndent { get; set; } = 12;
 
         /// <summary>
         /// Gets or sets a value that indicates which arguments should be included in the list of
@@ -867,7 +835,7 @@ namespace Ookii.CommandLine
         /// </remarks>
         protected virtual void WriteApplicationDescription(string description)
         {
-            Writer.Indent = ShouldIndent ? ApplicationDescriptionIndent : 0;
+            SetIndent(ApplicationDescriptionIndent);
             Writer.WriteLine(description);
             Writer.WriteLine();
         }
@@ -884,7 +852,7 @@ namespace Ookii.CommandLine
         protected virtual void WriteParserUsageSyntax()
         {
             Writer.ResetIndent();
-            Writer.Indent = ShouldIndent ? SyntaxIndent : 0;
+            SetIndent(SyntaxIndent);
 
             WriteUsageSyntaxPrefix();
             foreach (CommandLineArgument argument in Parser.Arguments)
@@ -1189,13 +1157,12 @@ namespace Ookii.CommandLine
 
             if (ShouldIndent)
             {
-                Writer.Indent = Parser.Mode == ParsingMode.LongShort
-                    ? LongShortArgumentDescriptionIndent
-                    : ArgumentDescriptionIndent;
-            }
-            else
-            {
-                Writer.Indent = 0;
+                // For long/short mode, increase the indentation by the size of the short argument.
+                Writer.Indent = ArgumentDescriptionIndent;
+                if (Parser.Mode == ParsingMode.LongShort)
+                {
+                    Writer.Indent += Parser.ArgumentNamePrefixes[0].Length + NameSeparator.Length + 1;
+                }
             }
 
             var arguments = GetFilteredAndSortedArguments();
@@ -1252,7 +1219,8 @@ namespace Ookii.CommandLine
         protected virtual void WriteArgumentDescription(CommandLineArgument argument)
         {
             Writer.ResetIndent();
-            Writer.Write("    "); // TODO: Base on indent
+            var indent = ShouldIndent ? ArgumentDescriptionIndent : 0;
+            Writer.Write(new string(' ', indent / 2));
 
             var shortPrefix = argument.Parser.ArgumentNamePrefixes[0];
             var prefix = argument.Parser.LongArgumentNamePrefix ?? shortPrefix;
@@ -1270,7 +1238,7 @@ namespace Ookii.CommandLine
                 }
                 else
                 {
-                    Writer.Write(new string(' ', shortPrefix.Length + 3));
+                    Writer.Write(new string(' ', shortPrefix.Length + NameSeparator.Length + 1));
                 }
 
                 if (argument.HasLongName)
@@ -1611,7 +1579,7 @@ namespace Ookii.CommandLine
                 }
             }
 
-            Writer.Indent = ShouldIndent ? SyntaxIndent : 0;
+            SetIndent(SyntaxIndent);
             WriteCommandListUsageSyntax();
             Writer.ResetIndent();
             Writer.Indent = 0;
@@ -1687,7 +1655,7 @@ namespace Ookii.CommandLine
         /// </remarks>
         protected virtual void WriteCommandDescriptions()
         {
-            Writer.Indent = ShouldIndent ? CommandDescriptionIndent : 0;
+            SetIndent(CommandDescriptionIndent);
             foreach (var command in CommandManager.GetCommands())
             {
                 if (command.IsHidden)
@@ -1717,7 +1685,8 @@ namespace Ookii.CommandLine
         protected virtual void WriteCommandDescription(CommandInfo command)
         {
             Writer.ResetIndent();
-            Writer.Write("    "); // TODO: Base on indent.
+            var indent = ShouldIndent ? CommandDescriptionIndent : 0;
+            Writer.Write(new string(' ', indent / 2));
             WriteColor(CommandDescriptionColor);
             WriteCommandName(command.Name);
             if (IncludeCommandAliasInCommandList)
@@ -1847,6 +1816,19 @@ namespace Ookii.CommandLine
         /// </para>
         /// </remarks>
         protected void ResetColor() => WriteColor(ColorReset);
+
+        /// <summary>
+        /// Sets the indentation of the <see cref="Writer"/>, only if the <see cref="ShouldIndent"/>
+        /// property returns <see langword="true"/>.
+        /// </summary>
+        /// <param name="indent">The number of characters to use for indentation.</param>
+        protected void SetIndent(int indent)
+        {
+            if (ShouldIndent)
+            {
+                Writer.Indent = indent;
+            }
+        }
 
         internal string GetArgumentUsage(CommandLineArgument argument)
         {
