@@ -11,12 +11,13 @@ explanations of what they do and examples of their output.
 ## Contents
 
 - [What's new in Ookii.CommandLine](ChangeLog.md)
+- [Migrating from Ookii.CommandLine 2.x](Migrating.md)
 - [Tutorial: getting started with Ookii.CommandLine](Tutorial.md)
 - [Command line arguments in Ookii.CommandLine](Arguments.md)
   - [Defining command line arguments](DefiningArguments.md)
   - [Parsing command line arguments](ParsingArguments.md)
   - [Generating usage help](UsageHelp.md)
-  - TODO: Validation
+  - [Argument validation and dependencies](Validation.md)
 - [Subcommands](Subcommands.md)
 - [Line wrapping text writer](Line%20Wrapping%20Text%20Writer.md)
 - [Code snippets](Code%20Snippets.md)
