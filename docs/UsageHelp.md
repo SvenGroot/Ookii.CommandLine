@@ -8,9 +8,9 @@ whenever you change the arguments to your application. Ookii.CommandLine generat
 text automatically, alleviating this problem.
 
 Usage help can be generated using the `CommandLineParser.WriteUsage` method. The output can be
-customized using the `WriteUsageOptions` class. The `CommandLineParser.WriteUsageToConsole` method
-provides a convenient way to write the usage help to the standard output stream, properly
-word-wrapping the text at the console width.
+customized using the `UsageWriter` class. By default, the `CommandLineParser.WriteUsage` method will
+write the usage help to the standard output stream, properly white-space wrapping the text at the
+console width.
 
 If you use the static `CommandLineParser.Parse<T>()` method, usage help will be printed
 automatically in the event the command line is invalid, or the "-Help" argument was used. In this
@@ -79,7 +79,7 @@ class MyArguments
 ```
 
 If this attribute is not specified, no description is included in the usage help. The description
-can also be omitted by setting the `WriteUsageOptions.IncludeApplicationDescription` property to
+can also be omitted by setting the `UsageWriter.IncludeApplicationDescription` property to
 false.
 
 If you are using [subcommands](Subcommands.md), this first line is the command description, which
@@ -143,11 +143,11 @@ value description (the argument type) omitted, and multi-value arguments are fol
 This is the default formatting; it can be [customized](#customizing-the-usage-help).
 
 If your application has a lot of arguments, the usage syntax may become very long, and therefore
-hard to read. Set the `WriteUsageOptions.UseAbbreviatedSyntax` property to omit all but the
+hard to read. Set the `UsageWriter.UseAbbreviatedSyntax` property to omit all but the
 positional arguments; the user can instead use the argument description list to see what arguments
 are available.
 
-If you are using [long/short mode](Arguments.md), you can set the `WriteUsageOptions.UseShortNamesForSyntax`
+If you are using [long/short mode](Arguments.md), you can set the `UsageWriter.UseShortNamesForSyntax`
 property to use short arguments names instead of long names, for arguments that have a short name,
 in the usage syntax.
 
@@ -210,10 +210,10 @@ public int Argument { get; set; }
 
 By default, the list of argument descriptions will include any argument aliases, their default
 values if set, and any [validator messages](Validation.md). This can be customized using the
-`WriteUsageOptions` class.
+`UsageWriter` class.
 
 You can choose which arguments are included in the description list using the
-`WriteUsageOptions.ArgumentDescriptionListFilter` property. By default, this is set to
+`UsageWriter.ArgumentDescriptionListFilter` property. By default, this is set to
 `DescriptionListFilterMode.Information`, which means that any argument that has any information
 that isn't part of the usage syntax will be included. This could be a description, aliases, a
 default value, or at least one validator message. You can choose to include only arguments with
@@ -221,7 +221,7 @@ descriptions (this was the default behavior before version 3.0), all arguments, 
 description list entirely.
 
 You can also choose the sort order of the description list using the
-`WriteUsageOptions.ArgumentDescriptionListOrder`' property. This defaults to the same order as the
+`UsageWriter.ArgumentDescriptionListOrder`' property. This defaults to the same order as the
 usage syntax, but you can also choose to sort by ascending or descending long or short name.
 
 Since the static `CommandLineParser.Parse<T>()` method will show usage help on error, if you have
@@ -249,19 +249,18 @@ public int Argument { get; set; }
 ## Customizing the usage help
 
 The usage help can be heavily customized. We've already seen how it can be customized using things
-such as custom value descriptions, or various options of the `WriteUsageOptions` class. The latter
+such as custom value descriptions, or various options of the `UsageWriter` class. The latter
 also allows you control things such as the amount of indentation to use for the syntax and the
 description list, and the colors to use.
 
-To go even further, you can derive a class from the `LocalizedStringProvider` class, and override
-its members to customize the exact format of every component of the usage help. You can choose to
-customize as little or as much as you like. The same class can also be used to customize error
-messages and the names and descriptions of the automatic "Help" and "Version" arguments.
+To go even further, you can derive a class from the `UsageWriter` class, and override its members to
+customize the exact format of every component of the usage help. You can choose to customize as
+little or as much as you like, depending on what methods you override.
 
-To specify a custom string provider, using the `ParseOptions.StringProvider` property.
+To specify a custom usage writer, assign it to the `ParseOptions.UsageWriter` property.
 
-The [custom usage sample](../src/Samples//CustomUsage) uses a custom string provider to radically
-alter the format of the usage help, as seen below.
+The [custom usage sample](../src/Samples//CustomUsage) uses a custom usage writer, as well as a
+custom `LocalizedStringProvider` to radically alter the format of the usage help, as seen below.
 
 ```text
 DESCRIPTION:
