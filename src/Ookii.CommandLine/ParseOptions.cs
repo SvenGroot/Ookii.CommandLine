@@ -3,6 +3,7 @@ using Ookii.CommandLine.Commands;
 using Ookii.CommandLine.Terminal;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 
@@ -22,7 +23,7 @@ namespace Ookii.CommandLine
     /// </remarks>
     public class ParseOptions
     {
-        private WriteUsageOptions? _usageOptions;
+        private UsageWriter? _usageWriter;
         private LocalizedStringProvider? _stringProvider;
 
         /// <summary>
@@ -154,20 +155,6 @@ namespace Ookii.CommandLine
         /// </remarks>
         /// <seealso cref="CommandLineParser.ArgumentNameComparer"/>
         public IComparer<string>? ArgumentNameComparer { get; set; }
-
-        /// <summary>
-        /// Gets or sets the output <see cref="TextWriter"/> used to print usage information if
-        /// argument parsing fails or is canceled.
-        /// </summary>
-        /// <remarks>
-        /// If argument parsing is successful, nothing will be written.
-        /// </remarks>
-        /// <value>
-        /// The <see cref="TextWriter"/> used to print usage information, or <see langword="null"/>
-        /// to print to a <see cref="LineWrappingTextWriter"/> for the standard output stream
-        /// (<see cref="Console.Out"/>). The default value is <see langword="null"/>.
-        /// </value>
-        public TextWriter? Out { get; set; }
 
         /// <summary>
         /// Gets or sets the <see cref="TextWriter"/> used to print error information if argument
@@ -352,7 +339,7 @@ namespace Ookii.CommandLine
         ///   <see langword="true"/>.
         /// </para>
         /// <para>
-        ///   After the error message, the value of the <see cref="WriteUsageOptions.ColorReset"/>
+        ///   After the error message, the value of the <see cref="UsageWriter.ColorReset"/>
         ///   property will be written to undo the color change.
         /// </para>
         /// </remarks>
@@ -380,7 +367,7 @@ namespace Ookii.CommandLine
         ///   <see langword="true"/>.
         /// </para>
         /// <para>
-        ///   After the warning message, the value of the <see cref="WriteUsageOptions.ColorReset"/>
+        ///   After the warning message, the value of the <see cref="UsageWriter.ColorReset"/>
         ///   property will be written to undo the color change.
         /// </para>
         /// </remarks>
@@ -442,7 +429,7 @@ namespace Ookii.CommandLine
         ///   If the value of this property is not <see cref="UsageHelpRequest.Full"/>, the
         ///   <see cref="CommandLineParser.Parse{T}(string[], int, ParseOptions?)"/> method and
         ///   <see cref="CommandManager"/> class will write the message returned by the
-        ///   <see cref="LocalizedStringProvider.MoreInfoOnError"/> method instead of usage help.
+        ///   <see cref="UsageWriter.WriteMoreInfoMessage"/> method instead of usage help.
         /// </para>
         /// </remarks>
         public UsageHelpRequest ShowUsageOnError { get; set; }
@@ -493,45 +480,27 @@ namespace Ookii.CommandLine
         public NameTransform? ValueDescriptionTransform { get; set; }
 
         /// <summary>
-        /// Gets or sets the options to use to write usage information to <see cref="Out"/> when
-        /// parsing the arguments fails or is canceled.
+        /// Gets or sets the <see cref="UsageWriter"/> to use to create usage help.
         /// </summary>
         /// <value>
-        /// An instance of the <see cref="WriteUsageOptions"/> attribute.
+        /// An instance of the <see cref="UsageWriter"/> class.
         /// </value>
-        public WriteUsageOptions UsageOptions
+#if NET6_0_OR_GREATER
+        [AllowNull]
+#endif
+        public UsageWriter UsageWriter
         {
-            get => _usageOptions ??= new WriteUsageOptions();
-            set => _usageOptions = value;
+            get => _usageWriter ??= new UsageWriter();
+            set => _usageWriter = value;
         }
 
-        internal OptionsRestorer? EnableOutputColor()
-        {
-            if (Out == null)
-            {
-                var support = UsageOptions.EnableColor();
-                if (support != null)
-                {
-                    return new OptionsRestorer(this, support)
-                    {
-                        ResetUseColor = true,
-                    };
-                }
-            }
-
-            return null;
-        }
-
-        internal OptionsRestorer? EnableErrorColor()
+        internal VirtualTerminalSupport? EnableErrorColor()
         {
             if (Error == null && UseErrorColor == null)
             {
                 var support = VirtualTerminal.EnableColor(StandardStream.Error);
                 UseErrorColor = support.IsSupported;
-                return new OptionsRestorer(this, support)
-                {
-                    ResetUseErrorColor = true,
-                };
+                return support;
             }
 
             return null;

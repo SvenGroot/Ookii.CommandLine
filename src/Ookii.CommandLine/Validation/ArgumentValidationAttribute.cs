@@ -130,7 +130,7 @@ namespace Ookii.CommandLine.Validation
         /// </returns>
         /// <remarks>
         /// <para>
-        ///   This function is only called if the <see cref="WriteUsageOptions.IncludeValidatorsInDescription"/>
+        ///   This function is only called if the <see cref="UsageWriter.IncludeValidatorsInDescription"/>
         ///   property is <see langword="true"/>.
         /// </para>
         /// </remarks>

@@ -1,4 +1,5 @@
-﻿using Ookii.CommandLine.Properties;
+﻿using Ookii.CommandLine.Commands;
+using Ookii.CommandLine.Properties;
 using System.Globalization;
 
 namespace Ookii.CommandLine
@@ -65,6 +66,20 @@ namespace Ookii.CommandLine
         /// </summary>
         /// <returns>The string.</returns>
         public virtual string AutomaticVersionDescription() => Resources.AutomaticVersionDescription;
+
+        /// <summary>
+        /// Gets the name of the version command created if the <see cref="CommandOptions.AutoVersionCommand"/>
+        /// property is <see langword="true"/>.
+        /// </summary>
+        /// <returns>The string.</returns>
+        public virtual string AutomaticVersionCommandName() => Resources.AutomaticVersionCommandName;
+
+        /// <summary>
+        /// Gets the description of the version command created if the <see cref="CommandOptions.AutoVersionCommand"/>
+        /// property is <see langword="true"/>.
+        /// </summary>
+        /// <returns>The string.</returns>
+        public virtual string AutomaticVersionCommandDescription() => Resources.AutomaticVersionDescription;
 
         private static string Format(string format, object? arg0)
             => string.Format(CultureInfo.CurrentCulture, format, arg0);

@@ -12,11 +12,11 @@
         Full,
         /// <summary>
         /// Only the usage syntax is shown; the argument descriptions are not. In addition, the
-        /// <see cref="LocalizedStringProvider.MoreInfoOnError"/> message is shown.
+        /// <see cref="UsageWriter.WriteMoreInfoMessage"/> message is shown.
         /// </summary>
         SyntaxOnly,
         /// <summary>
-        /// No usage help is shown. Instead, the <see cref="LocalizedStringProvider.MoreInfoOnError"/>
+        /// No usage help is shown. Instead, the <see cref="UsageWriter.WriteMoreInfoMessage"/>
         /// message is shown.
         /// </summary>
         None

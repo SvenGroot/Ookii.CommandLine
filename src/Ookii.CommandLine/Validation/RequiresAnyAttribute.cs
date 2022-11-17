@@ -135,7 +135,7 @@ namespace Ookii.CommandLine.Validation
         /// </value>
         /// <remarks>
         /// <para>
-        ///   This has no effect if the <see cref="WriteUsageOptions.IncludeValidatorsInDescription"/>
+        ///   This has no effect if the <see cref="UsageWriter.IncludeValidatorsInDescription"/>
         ///   property is <see langword="false"/>.
         /// </para>
         /// <para>

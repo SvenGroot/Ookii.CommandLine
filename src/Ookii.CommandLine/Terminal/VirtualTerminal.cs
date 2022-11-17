@@ -12,7 +12,7 @@ namespace Ookii.CommandLine.Terminal
     /// <remarks>
     /// <para>
     ///   Virtual terminal sequences are used to add color to various aspects of the usage help,
-    ///   if enabled by the <see cref="WriteUsageOptions.UseColor"/> property.
+    ///   if enabled by the <see cref="UsageWriter"/> class.
     /// </para>
     /// </remarks>
     public static class VirtualTerminal

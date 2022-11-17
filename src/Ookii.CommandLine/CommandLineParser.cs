@@ -157,9 +157,6 @@ namespace Ookii.CommandLine
 
         #endregion
 
-        // Don't apply indentation to console output if the line width is less than this.
-        private const int MinimumLineWidthForIndent = 30;
-
         private readonly Type _argumentsType;
         private readonly List<CommandLineArgument> _arguments = new();
         private readonly SortedDictionary<string, CommandLineArgument> _argumentsByName;
@@ -272,7 +269,7 @@ namespace Ookii.CommandLine
         /// </exception>
         /// <remarks>
         /// <para>
-        ///   If you specify multiple argument name prefixes, the first one will be used when generating usage information using the <see cref="WriteUsage(TextWriter,int,WriteUsageOptions)"/> method.
+        ///   If you specify multiple argument name prefixes, the first one will be used when generating usage information using the <see cref="WriteUsage"/> method.
         /// </para>
         /// </remarks>
         public CommandLineParser(Type argumentsType, IEnumerable<string>? argumentNamePrefixes, IComparer<string>? argumentNameComparer = null)
@@ -299,8 +296,8 @@ namespace Ookii.CommandLine
         /// </exception>
         /// <remarks>
         /// <para>
-        ///   The <see cref="ParseOptions.UsageOptions"/> are not used here. If you want those to
-        ///   take effect, they must still be passed to <see cref="WriteUsage(TextWriter, int, WriteUsageOptions)"/>.
+        ///   The <see cref="ParseOptions.UsageWriter"/> is not used here. If you want it to
+        ///   take effect, it must still be passed to <see cref="WriteUsage"/>.
         /// </para>
         /// </remarks>
         public CommandLineParser(Type argumentsType, ParseOptions? options = null)
@@ -472,7 +469,7 @@ namespace Ookii.CommandLine
         /// </value>
         /// <remarks>
         /// <para>
-        ///   This description will be added to the usage returned by the <see cref="WriteUsage(TextWriter, int, WriteUsageOptions)"/>
+        ///   This description will be added to the usage returned by the <see cref="WriteUsage"/>
         ///   method. This description can be set by applying the <see cref="DescriptionAttribute"/>
         ///   to the command line arguments type.
         /// </para>
@@ -637,6 +634,15 @@ namespace Ookii.CommandLine
         public LocalizedStringProvider StringProvider => _stringProvider;
 
         /// <summary>
+        /// Gets the class validators for the arguments class.
+        /// </summary>
+        /// <value>
+        /// A list of <see cref="ClassValidationAttribute"/> instances.
+        /// </value>
+        public IEnumerable<ClassValidationAttribute> Validators
+            => ArgumentsType.GetCustomAttributes<ClassValidationAttribute>();
+
+        /// <summary>
         /// Gets the string comparer used for argument names.
         /// </summary>
         /// <value>
@@ -661,6 +667,15 @@ namespace Ookii.CommandLine
         public ReadOnlyCollection<CommandLineArgument> Arguments => _argumentsReadOnlyWrapper ??= _arguments.AsReadOnly();
 
         /// <summary>
+        /// Gets the automatic help argument or an argument with the same name, if there is one.
+        /// </summary>
+        /// <value>
+        /// A <see cref="CommandLineArgument"/> instance, or <see langword="null"/> if there is no
+        /// argument using the name of the automatic help argument.
+        /// </value>
+        public CommandLineArgument? HelpArgument { get; private set; }
+
+        /// <summary>
         /// Gets the name of the executable used to invoke the application.
         /// </summary>
         /// <param name="includeExtension">
@@ -680,11 +695,11 @@ namespace Ookii.CommandLine
         /// </para>
         /// <para>
         ///   The return value of this function is used as the default executable name to show in
-        ///   the usage syntax when generating usage help, unless overridden by the <see cref="WriteUsageOptions.ExecutableName"/>
+        ///   the usage syntax when generating usage help, unless overridden by the <see cref="UsageWriter.ExecutableName"/>
         ///   property.
         /// </para>
         /// </remarks>
-        /// <seealso cref="WriteUsageOptions.IncludeExecutableExtension"/>
+        /// <seealso cref="UsageWriter.IncludeExecutableExtension"/>
         public static string GetExecutableName(bool includeExtension = false)
         {
             string? path = null;
@@ -719,69 +734,12 @@ namespace Ookii.CommandLine
         }
 
         /// <summary>
-        /// Writes command line usage help to the standard output stream using the specified options.
-        /// </summary>
-        /// <param name="options">
-        ///   The options to use for formatting the usage. If <see langword="null"/>, the default
-        ///   options are used.
-        /// </param>
-        /// <exception cref="ArgumentOutOfRangeException">
-        ///   <see cref="WriteUsageOptions.SyntaxIndent"/> is less than zero or greater than or equal to <see cref="Console.WindowWidth"/> - 1, or 
-        ///   <see cref="WriteUsageOptions.ArgumentDescriptionIndent"/> is less than zero or greater than or equal to <see cref="Console.WindowWidth"/> - 1.
-        /// </exception>
-        /// <remarks>
-        ///   <para>
-        ///     The usage help consists of first the <see cref="Description"/>, followed by the usage syntax, followed by a description of all the arguments.
-        ///   </para>
-        ///   <para>
-        ///     You can add descriptions to the usage text by applying the <see cref="DescriptionAttribute"/> attribute to your command line arguments type,
-        ///     and the constructor parameters, properties, and methods defining command line arguments.
-        ///   </para>
-        ///   <para>
-        ///     The output will be white-space wrapped at the console's window width. If the
-        ///     standard output stream is redirected, output may still be wrapped, depending on
-        ///     the value returned by <see cref="Console.WindowWidth"/>.
-        ///   </para>
-        ///   <para>
-        ///     Color is applied to the output depending on the value of the <see cref="WriteUsageOptions.UseColor"/>
-        ///     property, and the capabilities of the console.
-        ///   </para>
-        ///   <para>
-        ///     The indentation specified in the <see cref="WriteUsageOptions"/> class is only used
-        ///     if the <see cref="Console.WindowWidth"/> is greater than 30.
-        ///   </para>
-        /// </remarks>
-        /// <seealso cref="WriteUsage"/>
-        /// <seealso cref="GetUsage"/>
-        public void WriteUsageToConsole(WriteUsageOptions? options = null)
-        {
-            options ??= new();
-            using var vtSupport = options.EnableColor();
-
-            // WindowWidth - 1 looks better than just WindowWidth
-            WriteUsage(Console.Out, Console.WindowWidth - 1, options);
-        }
-
-        /// <summary>
         /// Writes command line usage help to the specified <see cref="TextWriter"/> using the specified options.
         /// </summary>
-        /// <param name="writer">The <see cref="TextWriter"/> to write the usage to.</param>
-        /// <param name="maximumLineLength">
-        ///   The maximum line length of lines in the usage text; if <paramref name="writer"/> is
-        ///   an instance of <see cref="LineWrappingTextWriter"/>, this parameter is ignored. A
-        ///   value of less than 1 or larger than 65536 is interpreted as infinite line length.
+        /// <param name="usageWriter">
+        ///   The <see cref="UsageWriter"/> to use for creating the usage. If <see langword="null"/>, a default
+        ///   instance is used.
         /// </param>
-        /// <param name="options">
-        ///   The options to use for formatting the usage. If <see langword="null"/>, the default
-        ///   options are used.
-        /// </param>
-        /// <exception cref="ArgumentNullException">
-        ///   <paramref name="writer"/> is <see langword="null"/>.
-        /// </exception>
-        /// <exception cref="ArgumentOutOfRangeException">
-        ///   <see cref="WriteUsageOptions.SyntaxIndent"/> is less than zero or greater than or equal to <paramref name="maximumLineLength"/>, or 
-        ///   <see cref="WriteUsageOptions.ArgumentDescriptionIndent"/> is less than zero or greater than or equal to <paramref name="maximumLineLength"/>.
-        /// </exception>
         /// <remarks>
         ///   <para>
         ///     The usage help consists of first the <see cref="Description"/>, followed by the usage syntax, followed by a description of all the arguments.
@@ -791,28 +749,15 @@ namespace Ookii.CommandLine
         ///     and the constructor parameters and properties defining command line arguments.
         ///   </para>
         ///   <para>
-        ///     The output will be white-space wrapped at the <paramref name="maximumLineLength"/>.
-        ///   </para>
-        ///   <para>
-        ///     Color is applied to the output only if the <see cref="WriteUsageOptions.UseColor"/>
-        ///     property is <see langword="true"/>.
-        ///   </para>
-        ///   <para>
-        ///     The indentation specified in the <see cref="WriteUsageOptions"/> class is only used
-        ///     if the <paramref name="maximumLineLength"/> is greater than 30.
+        ///     Color is applied to the output only if the <see cref="UsageWriter"/> instance
+        ///     has enabled it.
         ///   </para>
         /// </remarks>
-        /// <seealso cref="WriteUsageToConsole"/>
         /// <seealso cref="GetUsage"/>
-        public void WriteUsage(TextWriter writer, int maximumLineLength, WriteUsageOptions? options = null)
+        public void WriteUsage(UsageWriter? usageWriter = null)
         {
-            if (writer == null)
-            {
-                throw new ArgumentNullException(nameof(writer));
-            }
-
-            options ??= new();
-            WriteUsageCore(writer, maximumLineLength, options, UsageHelpRequest.Full);
+            usageWriter ??= new();
+            usageWriter.WriteParserUsage(this);
         }
 
         /// <summary>
@@ -822,26 +767,21 @@ namespace Ookii.CommandLine
         ///   The maximum line length of lines in the usage text. A value less than 1 or larger
         ///   than 65536 is interpreted as infinite line length.
         /// </param>
-        /// <param name="options">
-        ///   The options to use for formatting the usage. If <see langword="null"/>, the default
-        ///   options are used.
+        /// <param name="usageWriter">
+        ///   The <see cref="UsageWriter"/> to use to create the usage. If <see langword="null"/>,
+        ///   a default instance is used.
         /// </param>
         /// <returns>
         ///   A string containing usage help for the command line options defined by the type
         ///   specified by <see cref="ArgumentsType"/>.
         /// </returns>
-        /// <exception cref="ArgumentOutOfRangeException">
-        ///   <see cref="WriteUsageOptions.SyntaxIndent"/> is less than zero or greater than or equal to <paramref name="maximumLineLength"/>, or 
-        ///   <see cref="WriteUsageOptions.ArgumentDescriptionIndent"/> is less than zero or greater than or equal to <paramref name="maximumLineLength"/>.
-        /// </exception>
         /// <remarks>
-        ///   <inheritdoc cref="WriteUsage(TextWriter, int, WriteUsageOptions?)"/>
+        ///   <inheritdoc cref="WriteUsage"/>
         /// </remarks>
-        public string GetUsage(int maximumLineLength = 0, WriteUsageOptions? options = null)
+        public string GetUsage(UsageWriter? usageWriter = null, int maximumLineLength = 0)
         {
-            using var writer = new StringWriter();
-            WriteUsage(writer, maximumLineLength, options);
-            return writer.ToString();
+            usageWriter ??= new();
+            return usageWriter.GetUsage(this);
         }
 
         /// <summary>
@@ -918,27 +858,19 @@ namespace Ookii.CommandLine
         ///   This is a convenience function that instantiates a <see cref="CommandLineParser"/>,
         ///   calls the <see cref="Parse()"/> method, and returns the result. If an error occurs
         ///   or parsing is canceled, it prints errors to the <see cref="ParseOptions.Error"/>
-        ///   stream, and usage help to the <see cref="ParseOptions.Out"/> stream if the <see cref="HelpRequested"/>
+        ///   stream, and usage help to the <see cref="UsageWriter"/> if the <see cref="HelpRequested"/>
         ///   property is <see langword="true"/>. It then returns <see langword="null"/>.
         /// </para>
         /// <para>
-        ///   If the <see cref="ParseOptions.Out"/> property or <see cref="ParseOptions.Error"/>
-        ///   property is <see langword="null"/>, output is written to a <see cref="LineWrappingTextWriter"/>
-        ///   for the standard output and standard error streams respectively, wrapping at the
-        ///   console's window width. If the streams are redirected, output may still be wrapped,
-        ///   depending on the value returned by <see cref="Console.WindowWidth"/>.
+        ///   If the <see cref="ParseOptions.Error"/> parameter is <see langword="null"/>, output is
+        ///   written to a <see cref="LineWrappingTextWriter"/> for the standard error stream,
+        ///   wrapping at the console's window width. If the stream is redirected, output may still
+        ///   be wrapped, depending on the value returned by <see cref="Console.WindowWidth"/>.
         /// </para>
         /// <para>
-        ///   Color is applied to the output depending on the value of the <see cref="WriteUsageOptions.UseColor"/>
+        ///   Color is applied to the output depending on the value of the <see cref="UsageWriter.UseColor"/>
         ///   property, the <see cref="ParseOptions.UseErrorColor"/> property, and the capabilities
         ///   of the console.
-        /// </para>
-        /// <para>
-        ///   If the <see cref="ParseOptions.Out"/> property is instance of the
-        ///   <see cref="LineWrappingTextWriter"/> class, this method indents additional lines for
-        ///   the usage syntax and argument descriptions according to the values specified by the
-        ///   <see cref="WriteUsageOptions"/> class, unless the <see cref="LineWrappingTextWriter.MaximumLineLength"/>
-        ///   property is less than 30.
         /// </para>
         /// <para>
         ///   If you want more control over the parsing process, including custom error/usage output
@@ -1137,8 +1069,6 @@ namespace Ookii.CommandLine
                 };
             }
 
-            using var vtSupport = options.EnableOutputColor();
-            using var output = DisposableWrapper.Create(options.Out, LineWrappingTextWriter.ForConsoleOut);
             var helpMode = UsageHelpRequest.Full;
             object? result = null;
             try
@@ -1153,17 +1083,7 @@ namespace Ookii.CommandLine
 
             if (parser.HelpRequested)
             {
-                parser.WriteUsageCore(output.Inner, 0, options.UsageOptions, helpMode);
-                if (helpMode != UsageHelpRequest.Full)
-                {
-                    var moreInfo = parser.StringProvider.MoreInfoOnError(parser, options.UsageOptions.GetExecutableName(),
-                        options.UsageOptions.UseColor ?? false);
-
-                    if (moreInfo != null)
-                    {
-                        output.Inner.WriteLine(moreInfo);
-                    }
-                }
+                options.UsageWriter.WriteParserUsage(parser, helpMode);
             }
 
             return result;
@@ -1171,28 +1091,39 @@ namespace Ookii.CommandLine
 
         internal static bool ShouldIndent(LineWrappingTextWriter writer)
         {
-            return writer.MaximumLineLength is 0 or >= MinimumLineWidthForIndent;
+            return writer.MaximumLineLength is 0 or >= 30;
         }
 
         private static void WriteError(ParseOptions options, string message, string color, bool blankLine = false)
         {
             using var errorVtSupport = options.EnableErrorColor();
-            using var error = DisposableWrapper.Create(options.Error, LineWrappingTextWriter.ForConsoleError);
-            if (options.UseErrorColor ?? false)
+            try
             {
-                error.Inner.Write(color);
-            }
+                using var error = DisposableWrapper.Create(options.Error, LineWrappingTextWriter.ForConsoleError);
+                if (options.UseErrorColor ?? false)
+                {
+                    error.Inner.Write(color);
+                }
 
-            error.Inner.Write(message);
-            if (options.UseErrorColor ?? false)
-            {
-                error.Inner.Write(options.UsageOptions.ColorReset);
-            }
+                error.Inner.Write(message);
+                if (options.UseErrorColor ?? false)
+                {
+                    error.Inner.Write(options.UsageWriter.ColorReset);
+                }
 
-            error.Inner.WriteLine();
-            if (blankLine)
-            {
                 error.Inner.WriteLine();
+                if (blankLine)
+                {
+                    error.Inner.WriteLine();
+                }
+            }
+            finally
+            {
+                // Reset UseErrorColor if it was changed.
+                if (errorVtSupport != null)
+                {
+                    options.UseErrorColor = null;
+                }
             }
         }
 
@@ -1281,13 +1212,15 @@ namespace Ookii.CommandLine
             bool autoHelp = options?.AutoHelpArgument ?? optionsAttribute?.AutoHelpArgument ?? true;
             if (autoHelp)
             {
-                var argument = CommandLineArgument.CreateAutomaticHelp(this, options?.DefaultValueDescriptions,
+                var (argument, created) = CommandLineArgument.CreateAutomaticHelp(this, options?.DefaultValueDescriptions,
                     valueDescriptionTransform);
 
-                if (argument != null)
+                if (created)
                 {
                     AddNamedArgument(argument);
                 }
+
+                HelpArgument = argument;
             }
 
             bool autoVersion = options?.AutoVersionArgument ?? optionsAttribute?.AutoVersionArgument ?? true;
@@ -1641,165 +1574,6 @@ namespace Ookii.CommandLine
             }
 
             return markedCtors.First();
-        }
-
-        private void WriteUsageCore(TextWriter writer, int maximumLineLength, WriteUsageOptions options, UsageHelpRequest mode)
-        {
-            if (mode == UsageHelpRequest.None)
-            {
-                return;
-            }
-
-            using var lineWriter = DisposableWrapper.Create(writer as LineWrappingTextWriter,
-                () => new LineWrappingTextWriter(writer, maximumLineLength, false));
-
-            if (mode == UsageHelpRequest.Full && options.IncludeApplicationDescription && !string.IsNullOrEmpty(Description))
-            {
-                lineWriter.Inner.Indent = ShouldIndent(lineWriter.Inner) ? options.ApplicationDescriptionIndent : 0;
-                lineWriter.Inner.WriteLine(StringProvider.ApplicationDescription(Description, options.UseColor ?? false));
-                lineWriter.Inner.WriteLine();
-            }
-
-            WriteUsageSyntax(lineWriter.Inner, options);
-            if (mode == UsageHelpRequest.Full)
-            {
-                WriteClassValidatorHelp(lineWriter.Inner, options);
-                WriteArgumentDescriptions(lineWriter.Inner, options);
-            }
-        }
-
-        private void WriteArgumentDescriptions(LineWrappingTextWriter writer, WriteUsageOptions options)
-        {
-            if (options.ArgumentDescriptionListFilter == DescriptionListFilterMode.None)
-            {
-                return;
-            }
-
-            if (!ShouldIndent(writer))
-            {
-                writer.Indent = 0;
-            }
-            else
-            {
-                writer.Indent = Mode == ParsingMode.LongShort
-                    ? options.LongShortArgumentDescriptionIndent
-                    : options.ArgumentDescriptionIndent;
-            }
-
-            var comparer = _argumentsByName.Comparer;
-            IEnumerable<CommandLineArgument> arguments = options.ArgumentDescriptionListOrder switch
-            {
-                DescriptionListSortMode.Alphabetical => _arguments.OrderBy(arg => arg.ArgumentName, comparer),
-                DescriptionListSortMode.AlphabeticalDescending => _arguments.OrderByDescending(arg => arg.ArgumentName, comparer),
-                DescriptionListSortMode.AlphabeticalShortName =>
-                    _arguments.OrderBy(arg => arg.HasShortName ? arg.ShortName.ToString() : arg.ArgumentName, comparer),
-                DescriptionListSortMode.AlphabeticalShortNameDescending =>
-                    _arguments.OrderByDescending(arg => arg.HasShortName ? arg.ShortName.ToString() : arg.ArgumentName, comparer),
-                _ => _arguments,
-            };
-
-            bool first = true;
-            foreach (var argument in arguments)
-            {
-                bool include = !argument.IsHidden && options.ArgumentDescriptionListFilter switch
-                {
-                    DescriptionListFilterMode.Information => argument.HasInformation(options),
-                    DescriptionListFilterMode.Description => !string.IsNullOrEmpty(argument.Description),
-                    DescriptionListFilterMode.All => true,
-                    _ => false,
-                };
-
-                // Omit arguments that don't fit the filter.
-                if (!include)
-                {
-                    continue;
-                }
-
-                if (first)
-                {
-                    var header = StringProvider.DescriptionHeader(options.UseColor ?? false);
-                    if (header != null)
-                    {
-                        var oldIndent = writer.Indent;
-                        writer.Indent = 0;
-                        writer.ResetIndent();
-                        writer.WriteLine(header);
-                        writer.Indent = oldIndent;
-                    }
-
-                    first = false;
-                }
-
-                writer.ResetIndent();
-                writer.WriteLine(StringProvider.ArgumentDescription(argument, options));
-            }
-        }
-
-        private void WriteUsageSyntax(LineWrappingTextWriter writer, WriteUsageOptions options)
-        {
-            writer.ResetIndent();
-            writer.Indent = ShouldIndent(writer) ? options.SyntaxIndent : 0;
-
-            bool useColor = options.UseColor ?? false;
-            string colorStart = string.Empty;
-            string colorEnd = string.Empty;
-            if (useColor)
-            {
-                colorStart = options.UsagePrefixColor;
-                colorEnd = options.ColorReset;
-            }
-
-            string executableName = options.GetExecutableName();
-            string prefix = options.CommandName == null
-                ? StringProvider.UsagePrefix(executableName, colorStart, colorEnd)
-                : StringProvider.CommandUsagePrefix(executableName, options.CommandName, colorStart, colorEnd);
-
-            writer.Write(prefix);
-
-            foreach (CommandLineArgument argument in _arguments)
-            {
-                if (argument.IsHidden)
-                {
-                    continue;
-                }
-
-                writer.Write(" ");
-                if (options.UseAbbreviatedSyntax && argument.Position == null)
-                {
-                    writer.Write(StringProvider.AbbreviatedRemainingArguments(useColor));
-                    break;
-                }
-
-                writer.Write(argument.ToString(options));
-            }
-
-            writer.WriteLine(); // End syntax line
-            writer.WriteLine(); // Blank line
-        }
-
-        private void WriteClassValidatorHelp(LineWrappingTextWriter writer, WriteUsageOptions options)
-        {
-            if (!options.IncludeValidatorsInDescription)
-            {
-                return;
-            }
-
-            writer.Indent = 0;
-            bool hasHelp = false;
-            foreach (var validator in _argumentsType.GetCustomAttributes<ClassValidationAttribute>())
-            {
-                var help = validator.GetUsageHelp(this);
-                if (!string.IsNullOrEmpty(help))
-                {
-                    hasHelp = true;
-                    writer.WriteLine(help);
-                }
-            }
-
-            if (hasHelp)
-            {
-                writer.WriteLine(); // Blank line.
-            }
         }
 
         private object CreateArgumentsTypeInstance(object?[] constructorArgumentValues)

@@ -76,9 +76,8 @@ namespace Ookii.CommandLine.Tests
             using var writer = LineWrappingTextWriter.ForStringWriter(0);
             var options = new CommandOptions()
             {
-                Out = writer,
                 Error = writer,
-                UsageOptions = new WriteUsageOptions()
+                UsageWriter = new UsageWriter(writer)
                 {
                     ExecutableName = _executableName,
                 }
@@ -122,9 +121,8 @@ namespace Ookii.CommandLine.Tests
             using var writer = LineWrappingTextWriter.ForStringWriter(0);
             var options = new CommandOptions()
             {
-                Out = writer,
                 Error = writer,
-                UsageOptions = new WriteUsageOptions()
+                UsageWriter = new UsageWriter(writer)
                 {
                     ExecutableName = _executableName,
                 }
@@ -141,12 +139,10 @@ namespace Ookii.CommandLine.Tests
             using var writer = LineWrappingTextWriter.ForStringWriter(0);
             var options = new CommandOptions()
             {
-                Out = writer,
                 Error = writer,
-                UsageOptions = new WriteUsageOptions()
+                UsageWriter = new UsageWriter(writer, true)
                 {
                     ExecutableName = _executableName,
-                    UseColor = true,
                 }
             };
 
@@ -161,12 +157,11 @@ namespace Ookii.CommandLine.Tests
             using var writer = LineWrappingTextWriter.ForStringWriter(0);
             var options = new CommandOptions()
             {
-                Out = writer,
                 Error = writer,
-                ShowCommandHelpInstruction = true,
-                UsageOptions = new WriteUsageOptions()
+                UsageWriter = new UsageWriter(writer)
                 {
                     ExecutableName = _executableName,
+                    IncludeCommandHelpInstruction = true,
                 }
             };
 
@@ -181,11 +176,10 @@ namespace Ookii.CommandLine.Tests
             using var writer = LineWrappingTextWriter.ForStringWriter(0);
             var options = new CommandOptions()
             {
-                Out = writer,
                 Error = writer,
-                IncludeApplicationDescriptionBeforeCommandList = true,
-                UsageOptions = new WriteUsageOptions()
+                UsageWriter = new UsageWriter(writer)
                 {
+                    IncludeApplicationDescriptionBeforeCommandList = true,
                     ExecutableName = _executableName,
                 }
             };
@@ -193,6 +187,26 @@ namespace Ookii.CommandLine.Tests
             var manager = new CommandManager(_commandAssembly, options);
             manager.WriteUsage();
             Assert.AreEqual(_expectedUsageWithDescription, writer.BaseWriter.ToString());
+        }
+
+        [TestMethod]
+        public void TestCommandUsage()
+        {
+            using var writer = LineWrappingTextWriter.ForStringWriter(0);
+            var options = new CommandOptions()
+            {
+                Error = writer,
+                UsageWriter = new UsageWriter(writer)
+                {
+                    ExecutableName = _executableName,
+                }
+            };
+
+            // This tests whether the command name is included in the help for the command.
+            var manager = new CommandManager(_commandAssembly, options);
+            var result = manager.CreateCommand(new[] { "AsyncCommand", "-Help" });
+            Assert.IsNull(result);
+            Assert.AreEqual(_expectedCommandUsage, writer.BaseWriter.ToString());
         }
 
         [TestMethod]
@@ -296,7 +310,6 @@ The following commands are available:
 
     AnotherSimpleCommand, alias
 
-
     custom
         Custom parsing command.
 
@@ -314,7 +327,6 @@ The following commands are available:
 
     AnotherSimpleCommand, alias
 
-
     custom
         Custom parsing command.
 
@@ -328,7 +340,6 @@ The following commands are available:
 The following commands are available:
 
     [32mAnotherSimpleCommand, alias[0m
-
 
     [32mcustom[0m
         Custom parsing command.
@@ -346,7 +357,6 @@ The following commands are available:
 The following commands are available:
 
     AnotherSimpleCommand, alias
-
 
     custom
         Custom parsing command.
@@ -368,7 +378,6 @@ The following commands are available:
 
     AnotherSimpleCommand, alias
 
-
     custom
         Custom parsing command.
 
@@ -377,6 +386,18 @@ The following commands are available:
 
     version
         Displays version information.
+
+".ReplaceLineEndings();
+
+        public static readonly string _expectedCommandUsage = @"Async command description.
+
+Usage: test AsyncCommand [[-Value] <Int32>] [-Help]
+
+    -Value <Int32>
+        Argument description.
+
+    -Help [<Boolean>] (-?, -h)
+        Displays this help message.
 
 ".ReplaceLineEndings();
 

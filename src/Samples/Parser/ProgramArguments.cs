@@ -180,7 +180,7 @@ class ProgramArguments
             //
             // Unlike the Parse method above, this does write the full usage on error; you'd
             // have to replicate the behavior of ShowUsageOnError manually.
-            parser.WriteUsageToConsole();
+            parser.WriteUsage();
         }
 
         return null;

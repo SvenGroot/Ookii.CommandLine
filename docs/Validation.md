@@ -47,8 +47,8 @@ total number of values before that point.
 The remaining validators are applied to the string value before type conversion occurs. This means
 you can use these validators regardless of the actual type of the argument.
 
-If a validator, other than `ValidateCountAttribute` is used with a multi-value argument, it's
-applied to each value.
+If a built-in validator, other than `ValidateCountAttribute` is used with a multi-value argument,
+it's applied to each value.
 
 The code below shows some examples of validators:
 
@@ -169,6 +169,10 @@ invocation.
 Just like the argument value validators, the dependency validators will add a usage help message
 if desired. In the case of a class validator like the `RequiresAnyAttribute`, this message is shown
 before the description list.
+
+**IMPORTANT:** The `RequiresAttribute`, `ProhibitsAttribute` and `RequiresAnyAttribute` all take the
+name of an _argument_ as their parameter. The use of `nameof()` as above is only safe if the member
+names match the argument names.
 
 Check out the [argument dependencies sample](../src/Samples/ArgumentDependencies/) to see this in
 action.

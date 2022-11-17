@@ -574,6 +574,15 @@ namespace Ookii.CommandLine.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to This property is only available during a write usage operation..
+        /// </summary>
+        internal static string UsageWriterPropertyNotAvailable {
+            get {
+                return ResourceManager.GetString("UsageWriterPropertyNotAvailable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The argument &apos;{0}&apos; must have between {1} and {2} items..
         /// </summary>
         internal static string ValidateCountBothFormat {

@@ -24,11 +24,14 @@ static class Program
             // Set options so the command names are determined by the class name, transformed to
             // dash-case and with the "Command" suffix stripped.
             CommandNameTransform = NameTransform.DashCase,
-            // Since all the commands have an automatic "-Help" argument, show the instruction
-            // how to get help on a command.
-            ShowCommandHelpInstruction = true,
-            // Show the application description before the command list.
-            IncludeApplicationDescriptionBeforeCommandList = true,
+            UsageWriter = new UsageWriter()
+            {
+                // Since all the commands have an automatic "-Help" argument, show the instruction
+                // how to get help on a command.
+                IncludeCommandHelpInstruction = true,
+                // Show the application description before the command list.
+                IncludeApplicationDescriptionBeforeCommandList = true,
+            },
         };
 
         // Create a CommandManager for the commands in the current assembly.

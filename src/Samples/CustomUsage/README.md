@@ -1,8 +1,8 @@
 ﻿# Custom usage sample
 
 This sample shows the flexibility of Ookii.CommandLine's usage help generation. It uses a custom
-LocalizedStringProvider, along with some options set in the WriteUsageOptions, to completely
-transform the way the usage help looks.
+UsageWriter, along with a custom LocalizedStringProvider, to completely transform the way the usage
+help looks.
 
 This sample also uses long/short parsing mode, but everything in it is applicable to default mode as
 well.

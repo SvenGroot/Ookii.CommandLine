@@ -87,7 +87,7 @@ class ProgramArguments
             },
             // Use our own string provider for the custom usage strings.
             StringProvider = new CustomStringProvider(),
-            UsageOptions = new WriteUsageOptions()
+            UsageWriter = new CustomUsageWriter()
             {
                 // Only list the positional arguments in the syntax.
                 UseAbbreviatedSyntax = true,

@@ -100,6 +100,19 @@ namespace Ookii.CommandLine.Commands
         }
 
         /// <summary>
+        /// Gets the options used by this instance.
+        /// </summary>
+        /// <value>
+        /// An instance of the <see cref="CommandOptions"/> class.
+        /// </value>
+        /// <remarks>
+        /// <para>
+        ///   Modifying the options will change the way this instance behaves.
+        /// </para>
+        /// </remarks>
+        public CommandOptions Options => _options;
+
+        /// <summary>
         /// Gets information about the commands.
         /// </summary>
         /// <returns>
@@ -204,24 +217,16 @@ namespace Ookii.CommandLine.Commands
         /// </exception>
         /// <remarks>
         /// <para>
-        ///   If the command could not be found, a list of possible commands is written to 
-        ///   <see cref="ParseOptions.Out"/>. If an error occurs parsing the command's arguments,
-        ///   the error message is written to <see cref="ParseOptions.Error"/>, and the shell
-        ///   command's usage information is written to <see cref="ParseOptions.Out"/>.
+        ///   If the command could not be found, a list of possible commands is written using the
+        ///   <see cref="ParseOptions.UsageWriter"/>. If an error occurs parsing the command's arguments,
+        ///   the error message is written to <see cref="ParseOptions.Error"/>, and the
+        ///   command's usage information is written to <see cref="ParseOptions.UsageWriter"/>.
         /// </para>
         /// <para>
-        ///   If the <see cref="ParseOptions.Out"/> property or <see cref="ParseOptions.Error"/>
-        ///   property is <see langword="null"/>, output is written to a <see cref="LineWrappingTextWriter"/>
-        ///   for the standard output and error streams respectively, wrapping at the console's
-        ///   window width. When the console output is redirected to a file, wrapping may still
-        ///   be applied depending on your platform.
-        /// </para>
-        /// <para>
-        ///   If the <see cref="ParseOptions.Out"/> property is instance of the
-        ///   <see cref="LineWrappingTextWriter"/> class, this method indents additional lines for
-        ///   the usage syntax and argument descriptions according to the values specified by the
-        ///   <see cref="CommandOptions"/>, unless the <see cref="LineWrappingTextWriter.MaximumLineLength"/>
-        ///   property is less than 30.
+        ///   If the <see cref="ParseOptions.Error"/> parameter is <see langword="null"/>, output is
+        ///   written to a <see cref="LineWrappingTextWriter"/> for the standard error stream,
+        ///   wrapping at the console's window width. If the stream is redirected, output may still
+        ///   be wrapped, depending on the value returned by <see cref="Console.WindowWidth"/>.
         /// </para>
         /// <para>
         ///   Commands that don't meet the criteria of the <see cref="CommandOptions.CommandFilter"/>
@@ -245,31 +250,25 @@ namespace Ookii.CommandLine.Commands
                 throw new ArgumentOutOfRangeException(nameof(index));
             }
 
-            using var restorer = _options.EnableOutputColor() ?? new OptionsRestorer(_options, null);
-            using var output = DisposableWrapper.Create(_options.Out, LineWrappingTextWriter.ForConsoleOut);
-
-            // Update the values because the options are passed to the command and the
-            // ParseInternal method.
-            if (_options.Out == null)
-            {
-                _options.Out = output.Inner;
-                restorer.ResetOut = true;
-            }
-
-            restorer.ResetCommandName = true;
-
             var commandInfo = commandName == null
                 ? null
                 : GetCommand(commandName);
 
-            if (commandInfo == null)
+            if (commandInfo is not CommandInfo info)
             {
                 WriteUsage();
                 return null;
             }
 
-            _options.UsageOptions.CommandName = commandInfo.Value.Name;
-            return commandInfo.Value.CreateInstance(args, index, _options);
+            _options.UsageWriter.CommandName = info.Name;
+            try
+            {
+                return info.CreateInstance(args, index, _options);
+            }
+            finally
+            {
+                _options.UsageWriter.CommandName = null;
+            }
         }
 
         /// <inheritdoc cref="CreateCommand(string?, string[], int)"/>
@@ -466,7 +465,7 @@ namespace Ookii.CommandLine.Commands
         /// <remarks>
         /// <para>
         ///   This method writes usage help for the application, including a list of all shell
-        ///   command names and their descriptions to <see cref="ParseOptions.Out"/>.
+        ///   command names and their descriptions to <see cref="ParseOptions.UsageWriter"/>.
         /// </para>
         /// <para>
         ///   A command's name is retrieved from its <see cref="CommandAttribute"/> attribute,
@@ -475,77 +474,32 @@ namespace Ookii.CommandLine.Commands
         /// </remarks>
         public void WriteUsage()
         {
-            using var restorer = _options.EnableOutputColor();
-            using var writer = DisposableWrapper.Create(_options.Out, LineWrappingTextWriter.ForConsoleOut);
-            var lineWriter = writer.Inner as LineWrappingTextWriter;
-
-            var useColor = _options.UsageOptions.UseColor ?? false;
-            string usageColorStart = string.Empty;
-            string colorEnd = string.Empty;
-            if (useColor)
-            {
-                usageColorStart = _options.UsageOptions.UsagePrefixColor;
-                colorEnd = _options.UsageOptions.ColorReset;
-            }
-
-            if (_options.IncludeApplicationDescriptionBeforeCommandList)
-            {
-                var description = GetDescription();
-                if (description != null)
-                {
-                    if (lineWriter != null && CommandLineParser.ShouldIndent(lineWriter))
-                    {
-                        lineWriter.Indent = _options.UsageOptions.ApplicationDescriptionIndent;
-                    }
-
-                    writer.Inner.WriteLine(_options.StringProvider.CommandListApplicationDescription(description, useColor));
-                    writer.Inner.WriteLine();
-                }
-            }
-
-            var executableName = _options.UsageOptions.GetExecutableName();
-            if (lineWriter != null && CommandLineParser.ShouldIndent(lineWriter))
-            {
-                lineWriter.Indent = _options.UsageOptions.SyntaxIndent;
-            }
-
-            writer.Inner.WriteLine(_options.StringProvider.RootCommandUsageSyntax(executableName, usageColorStart, colorEnd));
-            writer.Inner.WriteLine();
-            writer.Inner.WriteLine(_options.StringProvider.AvailableCommandsHeader(useColor));
-            writer.Inner.WriteLine();
-            if (lineWriter != null && CommandLineParser.ShouldIndent(lineWriter))
-            {
-                lineWriter.Indent = _options.CommandDescriptionIndent;
-            }
-
-            foreach (var command in GetCommands())
-            {
-                if (command.IsHidden)
-                {
-                    continue;
-                }
-
-                lineWriter?.ResetIndent();
-                writer.Inner.WriteLine(_options.StringProvider.CommandDescription(command, _options));
-            }
-
-            if (_options.ShowCommandHelpInstruction)
-            {
-                if (lineWriter != null)
-                {
-                    lineWriter.Indent = 0;
-                }
-
-                var prefix = _options.Mode == ParsingMode.LongShort
-                    ? (_options.LongArgumentNamePrefix ?? CommandLineParser.DefaultLongArgumentNamePrefix)
-                    : (_options.ArgumentNamePrefixes?.FirstOrDefault() ?? CommandLineParser.GetDefaultArgumentNamePrefixes()[0]);
-
-                var transform = _options.NameTransform ?? NameTransform.None;
-                writer.Inner.WriteLine(transform.Apply(_options.StringProvider.CommandHelpInstruction(executableName, prefix, useColor)));
-            }
+            _options.UsageWriter.WriteCommandListUsage(this);
         }
 
-        private string? GetDescription() 
+        /// <summary>
+        /// Gets a string with the usage help with a list of all the commands.
+        /// </summary>
+        /// <returns>A string containing the usage help.</returns>
+        /// <remarks>
+        /// <para>
+        ///   A command's name is retrieved from its <see cref="CommandAttribute"/> attribute,
+        ///   and the description is retrieved from its <see cref="DescriptionAttribute"/> attribute.
+        /// </para>
+        /// </remarks>
+        public string GetUsage()
+        {
+            return _options.UsageWriter.GetCommandListUsage(this);
+        }
+
+        /// <summary>
+        /// Gets the application description that will optionally be included in the usage help.
+        /// </summary>
+        /// <returns>
+        /// The value of the <see cref="AssemblyDescriptionAttribute"/> for the first assembly
+        /// used by this instance.
+        /// </returns>
+        public string? GetApplicationDescription() 
             => (_assembly ?? _assemblies?.FirstOrDefault())?.GetCustomAttribute<AssemblyDescriptionAttribute>()?.Description;
 
         // Return value does not include the automatic version command.

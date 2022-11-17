@@ -12,11 +12,6 @@ namespace Ookii.CommandLine.Commands
     public class CommandOptions : ParseOptions
     {
         /// <summary>
-        /// Gets the default value for the <see cref="CommandDescriptionIndent"/> property.
-        /// </summary>
-        public const int DefaultCommandDescriptionIndent = 8;
-
-        /// <summary>
         /// Gets or sets the <see cref="IEqualityComparer{T}"/> used to compare command names.
         /// </summary>
         /// <value>
@@ -99,51 +94,6 @@ namespace Ookii.CommandLine.Commands
         public Func<CommandInfo, bool>? CommandFilter { get; set; }
 
         /// <summary>
-        /// Gets or sets the color applied to the <see cref="LocalizedStringProvider.CommandDescription"/>.
-        /// </summary>
-        /// <value>
-        ///   The virtual terminal sequence for a color. The default value is
-        ///   <see cref="TextFormat.ForegroundGreen"/>.
-        /// </value>
-        /// <remarks>
-        /// <para>
-        ///   The color will only be used if the <see cref="WriteUsageOptions.UseColor"/> property is
-        ///   <see langword="true"/>; otherwise, it will be replaced with an empty string.
-        /// </para>
-        /// <para>
-        ///   If the string contains anything other than virtual terminal sequences, those parts
-        ///   will be included in the output, but only when the <see cref="WriteUsageOptions.UseColor"/> property is
-        ///   <see langword="true"/>.
-        /// </para>
-        /// <para>
-        ///   The portion of the string that has color will end with the <see cref="WriteUsageOptions.ColorReset"/>.
-        /// </para>
-        /// <para>
-        ///   With the default value, only the command name portion of the string has color; the
-        ///   application name does not.
-        /// </para>
-        /// </remarks>
-        public string CommandDescriptionColor { get; set; } = TextFormat.ForegroundGreen;
-
-        /// <summary>
-        /// Gets or sets the number of characters by which to indent the all but the first line of command descriptions.
-        /// </summary>
-        /// <value>
-        /// The number of characters by which to indent the all but the first line of command descriptions. The default value is 8.
-        /// </value>
-        /// <remarks>
-        /// <para>
-        ///   This value should be adjusted to match the return value specified by the
-        ///   <see cref="LocalizedStringProvider.CommandDescription"/> property.
-        /// </para>
-        /// <para>
-        ///   This value is not used if <see cref="ParseOptions.Out"/> is not a <see cref="LineWrappingTextWriter"/>, or the
-        ///   maximum line length is less than 30.
-        /// </para>
-        /// </remarks>
-        public int CommandDescriptionIndent { get; set; } = DefaultCommandDescriptionIndent;
-
-        /// <summary>
         /// Gets or sets a value that indicates whether a version command should automatically be
         /// created.
         /// </summary>
@@ -160,51 +110,6 @@ namespace Ookii.CommandLine.Commands
         /// </para>
         /// </remarks>
         public bool AutoVersionCommand { get; set; } = true;
-
-        /// <summary>
-        /// Gets or sets a value that indicates whether a message is shown at the bottom of the
-        /// command list that instructs the user how to get help for individual commands.
-        /// </summary>
-        /// <value>
-        /// <see langword="true"/> to show the instruction; otherwise, <see langword="false"/>.
-        /// The default value is <see langword="false"/>.
-        /// </value>
-        /// <remarks>
-        /// <para>
-        ///   If set to <see langword="true"/>, the message is provided by <see cref="LocalizedStringProvider.CommandHelpInstruction"/>.
-        ///   The default implementation of that method assumes that all commands have a help
-        ///   argument, the same <see cref="ParsingMode"/>, and the same argument prefixes. For
-        ///   that reason, showing this message is not enabled by default.
-        /// </para>
-        /// </remarks>
-        public bool ShowCommandHelpInstruction { get; set; }
-
-        /// <summary>
-        /// Gets or sets a value that indicates whether to show the application description before
-        /// the command list in the usage help.
-        /// </summary>
-        /// <value>
-        /// <see langword="true"/> to show the description; otherwise, <see langword="false"/>. The
-        /// default value is <see langword="false"/>.
-        /// </value>
-        /// <remarks>
-        /// <para>
-        ///   The description to show is taken from the <see cref="AssemblyDescriptionAttribute"/>
-        ///   of the first assembly passed to the <see cref="CommandManager"/> class. If the
-        ///   assembly has no description, nothing is written.
-        /// </para>
-        /// </remarks>
-        public bool IncludeApplicationDescriptionBeforeCommandList { get; set; }
-
-        /// <summary>
-        /// Gets or sets a value that indicates whether to show a command's aliases as part of the
-        /// command list usage help.
-        /// </summary>
-        /// <value>
-        /// <see langword="true"/> to show the command's aliases; otherwise, <see langword="false"/>.
-        /// The default value is <see langword="true"/>.
-        /// </value>
-        public bool IncludeCommandAliasInCommandList { get; set; } = true;
 
         internal string AutoVersionCommandName()
         {

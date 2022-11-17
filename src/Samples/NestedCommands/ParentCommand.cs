@@ -21,13 +21,16 @@ internal abstract class ParentCommand : AsyncCommandBase, ICommandWithCustomPars
 
     public void Parse(string[] args, int index, CommandOptions options)
     {
-        // Add the command name to the usage.
         var info = new CommandInfo(GetType(), options);
-        options.UsageOptions.ExecutableName = CommandLineParser.GetExecutableName() + " " + info.Name;
 
-        // Use a custom StringProvider to replace the application description with the
+        // Use a custom UsageWriter to replace the application description with the
         // description of this command.
-        options.StringProvider = new CustomStringProvider(info);
+        options.UsageWriter = new CustomUsageWriter(info)
+        {
+            // Apply the same options as the parent command.
+            IncludeApplicationDescriptionBeforeCommandList = true,
+            IncludeCommandHelpInstruction = true,
+        };
 
         // Nested commands don't need to have a "version" command.
         options.AutoVersionCommand = false;

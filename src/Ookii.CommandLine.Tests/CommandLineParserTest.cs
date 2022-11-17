@@ -265,12 +265,12 @@ namespace Ookii.CommandLine.Tests
         {
             Type argumentsType = typeof(TestArguments);
             CommandLineParser target = new CommandLineParser(argumentsType, new[] { "/", "-" });
-            var options = new WriteUsageOptions()
+            var options = new UsageWriter()
             {
                 ExecutableName = _executableName
             };
 
-            string actual = target.GetUsage(0, options);
+            string actual = target.GetUsage(options);
             Assert.AreEqual(_expectedDefaultUsage, actual);
         }
 
@@ -278,25 +278,25 @@ namespace Ookii.CommandLine.Tests
         public void TestWriteUsageLongShort()
         {
             var target = new CommandLineParser<LongShortArguments>();
-            var options = new WriteUsageOptions()
+            var options = new UsageWriter()
             {
                 ExecutableName = _executableName
             };
 
-            string actual = target.GetUsage(0, options);
+            string actual = target.GetUsage(options);
             Assert.AreEqual(_expectedLongShortUsage, actual);
 
             options.UseShortNamesForSyntax = true;
-            actual = target.GetUsage(0, options);
+            actual = target.GetUsage(options);
             Assert.AreEqual(_expectedLongShortUsageShortNameSyntax, actual);
 
-            options = new WriteUsageOptions()
+            options = new UsageWriter()
             {
                 ExecutableName = _executableName,
                 UseAbbreviatedSyntax = true,
             };
 
-            actual = target.GetUsage(0, options);
+            actual = target.GetUsage(options);
             Assert.AreEqual(_expectedLongShortUsageAbbreviated, actual);
         }
 
@@ -304,21 +304,21 @@ namespace Ookii.CommandLine.Tests
         public void TestWriteUsageFilter()
         {
             var target = new CommandLineParser<TestArguments>();
-            var options = new WriteUsageOptions()
+            var options = new UsageWriter()
             {
                 ExecutableName = _executableName,
                 ArgumentDescriptionListFilter = DescriptionListFilterMode.Description
             };
 
-            string actual = target.GetUsage(0, options);
+            string actual = target.GetUsage(options);
             Assert.AreEqual(_expectedUsageDescriptionOnly, actual);
 
             options.ArgumentDescriptionListFilter = DescriptionListFilterMode.All;
-            actual = target.GetUsage(0, options);
+            actual = target.GetUsage(options);
             Assert.AreEqual(_expectedUsageAll, actual);
 
             options.ArgumentDescriptionListFilter = DescriptionListFilterMode.None;
-            actual = target.GetUsage(0, options);
+            actual = target.GetUsage(options);
             Assert.AreEqual(_expectedUsageNone, actual);
         }
 
@@ -326,17 +326,16 @@ namespace Ookii.CommandLine.Tests
         public void TestWriteUsageColor()
         {
             var target = new CommandLineParser(typeof(TestArguments), new[] { "/", "-" });
-            var options = new WriteUsageOptions()
+            var options = new UsageWriter(useColor: true)
             {
                 ExecutableName = _executableName,
-                UseColor = true,
             };
 
-            string actual = target.GetUsage(0, options);
+            string actual = target.GetUsage(options);
             Assert.AreEqual(_expectedUsageColor, actual);
 
             target = new CommandLineParser(typeof(LongShortArguments));
-            actual = target.GetUsage(0, options);
+            actual = target.GetUsage(options);
             Assert.AreEqual(_expectedLongShortUsageColor, actual);
         }
 
@@ -344,43 +343,43 @@ namespace Ookii.CommandLine.Tests
         public void TestWriteUsageOrder()
         {
             var parser = new CommandLineParser<LongShortArguments>();
-            var options = new WriteUsageOptions()
+            var options = new UsageWriter()
             {
                 ExecutableName = _executableName,
                 ArgumentDescriptionListOrder = DescriptionListSortMode.Alphabetical,
             };
 
-            var usage = parser.GetUsage(0, options);
+            var usage = parser.GetUsage(options);
             Assert.AreEqual(_expectedUsageAlphabeticalLongName, usage);
 
             options.ArgumentDescriptionListOrder = DescriptionListSortMode.AlphabeticalDescending;
-            usage = parser.GetUsage(0, options);
+            usage = parser.GetUsage(options);
             Assert.AreEqual(_expectedUsageAlphabeticalLongNameDescending, usage);
 
             options.ArgumentDescriptionListOrder = DescriptionListSortMode.AlphabeticalShortName;
-            usage = parser.GetUsage(0, options);
+            usage = parser.GetUsage(options);
             Assert.AreEqual(_expectedUsageAlphabeticalShortName, usage);
 
             options.ArgumentDescriptionListOrder = DescriptionListSortMode.AlphabeticalShortNameDescending;
-            usage = parser.GetUsage(0, options);
+            usage = parser.GetUsage(options);
             Assert.AreEqual(_expectedUsageAlphabeticalShortNameDescending, usage);
 
             parser = new CommandLineParser<LongShortArguments>(new ParseOptions() { Mode = ParsingMode.Default });
             options.ArgumentDescriptionListOrder = DescriptionListSortMode.Alphabetical;
-            usage = parser.GetUsage(0, options);
+            usage = parser.GetUsage(options);
             Assert.AreEqual(_expectedUsageAlphabetical, usage);
 
             options.ArgumentDescriptionListOrder = DescriptionListSortMode.AlphabeticalDescending;
-            usage = parser.GetUsage(0, options);
+            usage = parser.GetUsage(options);
             Assert.AreEqual(_expectedUsageAlphabeticalDescending, usage);
 
             // ShortName versions work like regular if not in LongShortMode.
             options.ArgumentDescriptionListOrder = DescriptionListSortMode.AlphabeticalShortName;
-            usage = parser.GetUsage(0, options);
+            usage = parser.GetUsage(options);
             Assert.AreEqual(_expectedUsageAlphabetical, usage);
 
             options.ArgumentDescriptionListOrder = DescriptionListSortMode.AlphabeticalShortNameDescending;
-            usage = parser.GetUsage(0, options);
+            usage = parser.GetUsage(options);
             Assert.AreEqual(_expectedUsageAlphabeticalDescending, usage);
         }
 
@@ -390,14 +389,14 @@ namespace Ookii.CommandLine.Tests
             var options = new ParseOptions()
             {
                 ArgumentNamePrefixes = new[] { "/", "-" },
-                UsageOptions = new WriteUsageOptions()
+                UsageWriter = new UsageWriter()
                 {
                     ExecutableName = _executableName,
                     UseWhiteSpaceValueSeparator = false,
                 }
             };
             var target = new CommandLineParser<TestArguments>(options);
-            string actual = target.GetUsage(0, options.UsageOptions);
+            string actual = target.GetUsage(options.UsageWriter);
             Assert.AreEqual(_expectedUsageSeparator, actual);
         }
 
@@ -405,15 +404,17 @@ namespace Ookii.CommandLine.Tests
         public void TestStaticParse()
         {
             using var output = new StringWriter();
+            using var lineWriter = new LineWrappingTextWriter(output, 0);
             using var error = new StringWriter();
             var options = new ParseOptions()
             {
                 ArgumentNamePrefixes = new[] { "/", "-" },
-                Out = output,
                 Error = error,
+                UsageWriter = new UsageWriter(lineWriter)
+                {
+                    ExecutableName = _executableName,
+                }
             };
-
-            options.UsageOptions.ExecutableName = _executableName;
 
             var result = CommandLineParser.Parse<TestArguments>(new[] { "foo", "-Arg6", "bar" }, options);
             Assert.IsNotNull(result);
@@ -588,10 +589,10 @@ namespace Ookii.CommandLine.Tests
         [TestMethod]
         public void TestCulture()
         {
-            var result = CommandLineParser.Parse<CultureArguments>(new[] { "-Argument", "5.5 " });
+            var result = CommandLineParser.Parse<CultureArguments>(new[] { "-Argument", "5.5" });
             Assert.IsNotNull(result);
             Assert.AreEqual(5.5, result.Argument);
-            Assert.IsNull(CommandLineParser.Parse<CultureArguments>(new[] { "-Argument", "5,5 " }));
+            Assert.IsNull(CommandLineParser.Parse<CultureArguments>(new[] { "-Argument", "5,5" }));
 
             var options = new ParseOptions { Culture = new CultureInfo("nl-NL") };
             result = CommandLineParser.Parse<CultureArguments>(new[] { "-Argument", "5,5" }, options);
@@ -722,13 +723,13 @@ namespace Ookii.CommandLine.Tests
             TestArgument(parser.GetArgument("Hidden"), new ExpectedArgument("Hidden", typeof(int)) { IsHidden = true });
 
             // Verify it's not in the usage.
-            var options = new WriteUsageOptions()
+            var options = new UsageWriter()
             {
                 ExecutableName = _executableName,
                 ArgumentDescriptionListFilter = DescriptionListFilterMode.All,
             };
 
-            var usage = parser.GetUsage(0, options);
+            var usage = parser.GetUsage(options);
             Assert.AreEqual(_expectedUsageHidden, usage);
         }
 
@@ -933,18 +934,18 @@ namespace Ookii.CommandLine.Tests
         public void TestValidatorUsageHelp()
         {
             CommandLineParser parser = new CommandLineParser<ValidationArguments>();
-            var options = new WriteUsageOptions()
+            var options = new UsageWriter()
             {
                 ExecutableName = _executableName,
             };
 
-            Assert.AreEqual(_expectedUsageValidators, parser.GetUsage(0, options));
+            Assert.AreEqual(_expectedUsageValidators, parser.GetUsage(options));
 
             parser = new CommandLineParser<DependencyArguments>();
-            Assert.AreEqual(_expectedUsageDependencies, parser.GetUsage(0, options));
+            Assert.AreEqual(_expectedUsageDependencies, parser.GetUsage(options));
 
             options.IncludeValidatorsInDescription = false;
-            Assert.AreEqual(_expectedUsageDependenciesDisabled, parser.GetUsage(0, options));
+            Assert.AreEqual(_expectedUsageDependenciesDisabled, parser.GetUsage(options));
         }
 
         [TestMethod]

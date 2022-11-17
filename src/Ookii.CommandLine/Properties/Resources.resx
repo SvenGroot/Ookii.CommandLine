@@ -384,4 +384,7 @@
   <data name="ValidateEnumValueUsageHelpFormat" xml:space="preserve">
     <value>Possible values: {0}.</value>
   </data>
+  <data name="UsageWriterPropertyNotAvailable" xml:space="preserve">
+    <value>This property is only available during a write usage operation.</value>
+  </data>
 </root>

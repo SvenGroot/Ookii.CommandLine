@@ -21,6 +21,7 @@ namespace Ookii.CommandLine.Tests
     public class AnotherSimpleCommand : ICommand
     {
         [CommandLineArgument]
+        [Description("Argument description")]
         public int Value { get; set; }
 
         public int Run()
@@ -57,9 +58,11 @@ namespace Ookii.CommandLine.Tests
 
     // Hidden so I don't have to update the expected usage.
     [Command(IsHidden = true)]
+    [Description("Async command description.")]
     class AsyncCommand : IAsyncCommand
     {
         [CommandLineArgument(Position = 0)]
+        [Description("Argument description.")]
         public int Value { get; set; }
 
         public int Run()
