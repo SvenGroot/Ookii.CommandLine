@@ -1,4 +1,6 @@
-﻿using Ookii.CommandLine.Terminal;
+﻿#if !NET6_0_OR_GREATER
+
+using Ookii.CommandLine.Terminal;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -13,9 +15,6 @@ namespace Ookii.CommandLine
     // This is a poor man's ReadOnlySpan<char> for .Net Standard 2.0.
     internal struct StringSpan : IEnumerable<char>
     {
-        private static readonly char[] _segmentSeparators = { '\r', '\n', VirtualTerminal.Escape };
-        private static readonly char[] _newLineSeparators = { '\r', '\n' };
-
         private readonly string? _stringValue;
         private readonly char[]? _charArrayValue;
         private readonly char _charValue;
@@ -153,89 +152,6 @@ namespace Ookii.CommandLine
             }
         }
 
-        public IEnumerable<(StringSegmentType, StringSpan)> Split(bool newLinesOnly)
-        {
-            var separators = newLinesOnly ? _newLineSeparators : _segmentSeparators;
-            var remaining = this;
-            while (remaining.Length > 0)
-            {
-                var separatorIndex = remaining.IndexOfAny(separators);
-                if (separatorIndex < 0)
-                {
-                    yield return (StringSegmentType.Text, remaining);
-                    break;
-                }
-
-                if (separatorIndex > 0)
-                {
-                    yield return (StringSegmentType.Text, remaining.Slice(0, separatorIndex));
-                    remaining = remaining.Slice(separatorIndex);
-                }
-
-                if (remaining[0] == VirtualTerminal.Escape)
-                {
-                    // This is a VT sequence.
-                    // Find the end of the sequence.
-                    var end = VirtualTerminal.FindSequenceEnd(remaining.Slice(1));
-                    if (end == -1)
-                    {
-                        // No end? Should come in a following write.
-                        yield return (StringSegmentType.PartialFormatting, remaining);
-                        break;
-                    }
-
-                    //end++;
-                    yield return (StringSegmentType.Formatting, remaining.Slice(0, end));
-                    remaining = remaining.Slice(end);
-                }
-                else
-                {
-                    StringSpan lineBreak;
-                    (lineBreak, remaining) = remaining.SkipLineBreak();
-
-                    if (remaining.Length == 0 && lineBreak.Length == 1 && lineBreak[0] == '\r')
-                    {
-                        // This could be the start of a Windows-style break, the remainder of
-                        // which could follow in the next span.
-                        yield return (StringSegmentType.PartialLineBreak, lineBreak);
-                        break;
-                    }
-
-                    yield return (StringSegmentType.LineBreak, lineBreak);
-                }
-            }
-        }
-
-        public (StringSpan, StringSpan) SkipLineBreak()
-        {
-            Debug.Assert(this[0] is '\r' or '\n');
-            var split = this[0] == '\r' && Length > 1 && this[1] == '\n'
-                ? 2
-                : 1;
-
-            return Split(split);
-        }
-
-        public (StringSpan, StringSpan) Split(int index) => (Slice(0, index), Slice(index));
-
-        public (StringSpan, StringSpan)? BreakLine(int startIndex, bool force)
-        {
-            if (force)
-            {
-                return (Slice(0, startIndex), Slice(startIndex));
-            }
-
-            for (int index = startIndex; index >= 0; --index)
-            {
-                if (char.IsWhiteSpace(this[index]))
-                {
-                    return (Slice(0, index), Slice(index + 1));
-                }
-            }
-
-            return null;
-        }
-
         public void WriteTo(TextWriter writer)
         {
             if (_stringValue != null)
@@ -249,14 +165,6 @@ namespace Ookii.CommandLine
             else if (_length > 0)
             {
                 writer.Write(_charValue);
-            }
-        }
-
-        private void ValidateIndex(int index, string name)
-        {
-            if (index < 0 || index > Length)
-            {
-                throw new ArgumentOutOfRangeException(name);
             }
         }
 
@@ -285,5 +193,15 @@ namespace Ookii.CommandLine
         }
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+        private void ValidateIndex(int index, string name)
+        {
+            if (index < 0 || index > Length)
+            {
+                throw new ArgumentOutOfRangeException(name);
+            }
+        }
     }
 }
+
+#endif

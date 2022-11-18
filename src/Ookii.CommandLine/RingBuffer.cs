@@ -5,6 +5,10 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+#if NET6_0_OR_GREATER
+using StringSpan = System.ReadOnlySpan<char>;
+#endif
+
 
 namespace Ookii.CommandLine
 {
@@ -105,7 +109,7 @@ namespace Ookii.CommandLine
             }
         }
 
-        public (StringSpan, StringSpan) GetContents(int offset)
+        public StringSpanTuple GetContents(int offset)
         {
             if (offset < 0 || offset > Size)
             {
@@ -120,10 +124,10 @@ namespace Ookii.CommandLine
 
             if (start > _bufferEnd)
             {
-                return (new StringSpan(_buffer, _bufferStart, _buffer.Length - _bufferStart), new StringSpan(_buffer, 0, _bufferEnd));
+                return new(new StringSpan(_buffer, _bufferStart, _buffer.Length - _bufferStart), new StringSpan(_buffer, 0, _bufferEnd));
             }
 
-            return (new StringSpan(_buffer, start, _bufferEnd - start), default);
+            return new(new StringSpan(_buffer, start, _bufferEnd - start), default);
         }
 
         public int BreakLine(int offset, int length)

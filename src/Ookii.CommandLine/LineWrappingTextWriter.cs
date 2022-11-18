@@ -7,6 +7,9 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Text;
+#if NET6_0_OR_GREATER
+using StringSpan = System.ReadOnlySpan<char>;
+#endif
 
 namespace Ookii.CommandLine
 {
@@ -70,7 +73,7 @@ namespace Ookii.CommandLine
             public int ContentLength => IsContent(Type) ? Length : 0;
 
             public static bool IsContent(StringSegmentType type)
-                => !(type is StringSegmentType.Formatting or StringSegmentType.PartialFormatting or StringSegmentType.PartialLineBreak);
+                => type is not (StringSegmentType.Formatting or StringSegmentType.PartialFormatting or StringSegmentType.PartialLineBreak);
 
         }
 
@@ -224,30 +227,37 @@ namespace Ookii.CommandLine
 
             public StringSpan BreakLine(TextWriter writer, StringSpan newSegment, int maxLength, int indent)
             {
-                var remaining = BreakLine(writer, newSegment, maxLength, indent, false)
-                    ?? BreakLine(writer, newSegment, maxLength, indent, true);
+                if (!BreakLine(writer, newSegment, maxLength, indent, false, out var remaining))
+                {
+                    // Guaranteed to succeed with force=true.
+                    var result = BreakLine(writer, newSegment, maxLength, indent, true, out remaining);
+                    Debug.Assert(result);
+                }
 
-                return remaining!.Value;
+                return remaining;
             }
 
-            private StringSpan? BreakLine(TextWriter writer, StringSpan newSegment, int maxLength, int indent, bool force)
+            // Use an out param because StringSpan is ReadOnlySpan<char> on .Net 6.
+            private bool BreakLine(TextWriter writer, StringSpan newSegment, int maxLength, int indent, bool force, out StringSpan remaining)
             {
                 Debug.Assert(LineLength <= maxLength || newSegment.Length == 0);
 
-                var splits = newSegment.BreakLine(maxLength - LineLength, force);
-                if (splits is var (before, after))
+                if (newSegment.BreakLine(maxLength - LineLength, force, out var splits))
                 {
+                    var (before, after) = splits;
                     WriteSegments(writer, _segments);
                     before.WriteTo(writer);
                     writer.WriteLine();
                     ClearCurrentLine(indent);
                     Indentation = indent;
-                    return after;
+                    remaining = after;
+                    return true;
                 }
 
                 if (IsEmpty)
                 {
-                    return null;
+                    remaining = default;
+                    return false;
                 }
 
                 int offset = 0;
@@ -290,11 +300,13 @@ namespace Ookii.CommandLine
                         ContentLength = _segments.Sum(s => s.ContentLength);
                         IsEmpty = (ContentLength == 0); // Can I get rid of IsEmpty?
                         Indentation = indent;
-                        return newSegment;
+                        remaining = newSegment;
+                        return true;
                     }
                 }
 
-                return null;
+                remaining = default;
+                return false;
             }
 
             public void ClearCurrentLine(int indent)
@@ -488,7 +500,14 @@ namespace Ookii.CommandLine
         /// <inheritdoc/>
         public override void Write(char value)
         {
+#if NET6_0_OR_GREATER
+            unsafe
+            {
+                WriteCore(new StringSpan(&value, 1));
+            }
+#else
             WriteCore(new StringSpan(value));
+#endif
         }
 
         /// <inheritdoc/>
@@ -496,7 +515,11 @@ namespace Ookii.CommandLine
         {
             if (value != null)
             {
+#if NET6_0_OR_GREATER
+                WriteCore(value);
+#else
                 WriteCore(new StringSpan(value));
+#endif
             }
         }
 
@@ -525,6 +548,20 @@ namespace Ookii.CommandLine
 
             WriteCore(new StringSpan(buffer, index, count));
         }
+
+#if NET6_0_OR_GREATER
+
+        /// <inheritdoc/>
+        public override void Write(ReadOnlySpan<char> buffer) => WriteCore(buffer);
+
+        /// <inheritdoc/>
+        public override void WriteLine(ReadOnlySpan<char> buffer)
+        {
+            Write(buffer);
+            WriteLine();
+        }
+
+#endif
 
         /// <inheritdoc/>
         public override void Flush()
@@ -588,7 +625,7 @@ namespace Ookii.CommandLine
         {
             Debug.Assert(_maximumLineLength == 0);
 
-            foreach (var (type, span) in buffer.Split(true))
+            buffer.Split(true, (type, span) =>
             {
                 // TODO: Partial line break?
                 if (type == StringSegmentType.LineBreak)
@@ -603,7 +640,7 @@ namespace Ookii.CommandLine
                     span.WriteTo(_baseWriter);
                     _currentLineLength += span.Length;
                 }
-            }
+            });
         }
 
         private void WriteIndentDirectIfNeeded()
@@ -632,7 +669,7 @@ namespace Ookii.CommandLine
                 return;
             }
 
-            foreach (var (type, span) in buffer.Split(_countFormatting))
+            buffer.Split(_countFormatting, (type, span) =>
             {
                 bool hadPartialLineBreak = _lineBuffer.CheckAndRemovePartialLineBreak();
                 if (hadPartialLineBreak)
@@ -671,7 +708,7 @@ namespace Ookii.CommandLine
                         }
                     }
                 }
-            }
+            });
         }
 
         private static int GetLineLengthForConsole()
