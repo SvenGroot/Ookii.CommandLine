@@ -55,266 +55,97 @@ namespace Ookii.CommandLine
     {
         #region Nested types
 
-        private enum SegmentType
-        {
-            Text,
-            Formatting,
-            LineBreak,
-            PartialFormatting,
-            PartialLineBreak
-        }
-
-        [DebuggerDisplay("Type = {Type}, Indent = {Indent}, {Content}")]
+        [DebuggerDisplay("Type = {Type}, ContentLength = {ContentLength}, Length = {Length}")]
         private struct Segment
         {
-            public Segment(SegmentType segmentType, StringBuffer? content = null, int indent = 0)
+            public Segment(StringSegmentType type, int length)
             {
-                Type = segmentType;
-                Content = content;
-                Indent = indent;
+                Type = type;
+                Length = length;
             }
 
-            public StringBuffer? Content { get; set; }
-            public SegmentType Type { get; set; }
-            public int Indent { get; set; }
+            public StringSegmentType Type { get; set; }
+            public int Length { get; set; }
 
-            public int ContentLength =>
-                Type switch
-                {
-                    SegmentType.Formatting or SegmentType.PartialFormatting => 0,
-                    _ => (Content?.Length ?? 0) + Indent,
-                };
+            public int ContentLength => IsContent(Type) ? Length : 0;
 
+            public static bool IsContent(StringSegmentType type)
+                => !(type is StringSegmentType.Formatting or StringSegmentType.PartialFormatting or StringSegmentType.PartialLineBreak);
 
-            public void WriteTo(TextWriter writer)
-            {
-                // If we're writing segments and we still have a partial line break, it should be
-                // treated as an actual line break.
-                if (Type == SegmentType.LineBreak || Type == SegmentType.PartialLineBreak)
-                {
-                    writer.WriteLine();
-                }
-                else
-                {
-                    if (Indent > 0)
-                    {
-                        WriteIndent(writer, Indent);
-                    }
-
-                    if (Content != null)
-                    {
-                        Content.Value.WriteTo(writer);
-                    }
-                }
-            }
-        }
-
-        private struct StringBuffer
-        {
-            // Wish I could use ReadOnlySpan...
-            private readonly ArraySegment<char> _value;
-
-            private static readonly char[] _segmentSeparators = { '\r', '\n', VirtualTerminal.Escape };
-
-            public StringBuffer(char[] value)
-                : this(new ArraySegment<char>(value))
-            {
-            }
-
-            public StringBuffer(char[] value, int offset, int length)
-                : this(new ArraySegment<char>(value, offset, length))
-            {
-            }
-
-            public StringBuffer(ArraySegment<char> value)
-            {
-                _value = value;
-            }
-
-            public StringBuffer(string value)
-                : this(value.ToCharArray())
-            {
-            }
-
-            public IEnumerable<char> Characters => _value;
-
-            public char this[int index] => _value.Array![index + _value.Offset];
-
-            public int Length => _value.Count;
-
-            public int SkipLineBreak(int index)
-            {
-                Debug.Assert(this[index] == '\r' || this[index] == '\n');
-                if (this[index] == '\r' && index + 1 < Length && this[index + 1] == '\n')
-                {
-                    return index + 2; // Windows line ending
-                }
-                else
-                {
-                    return index + 1;
-                }
-            }
-
-            private int IndexOfAny(char[] separators, int start)
-            {
-                int index = Array.FindIndex(_value.Array!, _value.Offset + start, _value.Count - start, ch => separators.Contains(ch));
-                if (index >= 0)
-                {
-                    index -= _value.Offset;
-                }
-
-                return index;
-            }
-
-            public IEnumerable<Segment> Split(bool newLinesOnly)
-            {
-                int pos = 0;
-                int segmentStart = pos;
-                while (pos < Length)
-                {
-                    var separatorIndex = IndexOfAny(_segmentSeparators, pos);
-                    if (separatorIndex < 0)
-                    {
-                        yield return new Segment(SegmentType.Text, this.Slice(segmentStart));
-                        break;
-                    }
-
-                    int end;
-                    if (this[separatorIndex] == VirtualTerminal.Escape)
-                    {
-                        // This is a VT sequence.
-                        if (newLinesOnly)
-                        {
-                            // Ignore it if requested.
-                            pos = separatorIndex + 1;
-                            continue;
-                        }
-
-                        if (separatorIndex > segmentStart)
-                        {
-                            yield return new Segment(SegmentType.Text, this.Slice(segmentStart, separatorIndex - segmentStart));
-                        }
-
-                        // Find the end of the sequence.
-                        end = VirtualTerminal.FindSequenceEnd(Characters.Skip(separatorIndex + 1));
-                        if (end == -1)
-                        {
-                            // No end? Should come in a following write.
-                            yield return new Segment(SegmentType.PartialFormatting, this.Slice(separatorIndex));
-                            break;
-                        }
-
-                        end += separatorIndex + 1;
-                        yield return new Segment(SegmentType.Formatting, this.Slice(separatorIndex, end - separatorIndex));
-                    }
-                    else
-                    {
-                        end = SkipLineBreak(separatorIndex);
-                        if (separatorIndex > segmentStart)
-                        {
-                            yield return new Segment(SegmentType.Text, this.Slice(segmentStart, separatorIndex - segmentStart));
-                        }
-
-                        if (end == Length && this[end - 1] == '\r')
-                        {
-                            // This could be the start of a Windows-style break, the remainder of
-                            // which could follow in the next write.
-                            yield return new Segment(SegmentType.PartialLineBreak, this.Slice(separatorIndex));
-                            break;
-                        }
-
-                        yield return new Segment(SegmentType.LineBreak, this.Slice(separatorIndex, end - separatorIndex));
-                    }
-
-                    pos = end;
-                    segmentStart = pos;
-                }
-            }
-
-            public StringBuffer Slice(int offset)
-            {
-                return Slice(offset, Length - offset);
-            }
-
-            public StringBuffer Slice(int offset, int count)
-            {
-                int newOffset = _value.Offset + Math.Min(Length, offset);
-                if (newOffset + count > _value.Offset + Length)
-                {
-                    count = Length - newOffset;
-                }
-
-                return new StringBuffer(_value.Array!, newOffset, count);
-            }
-
-            public void WriteTo(TextWriter writer)
-            {
-                writer.Write(_value.Array!, _value.Offset, _value.Count);
-            }
-
-            public (StringBuffer, StringBuffer, int)? BreakLine(int startIndex, bool force)
-            {
-                if (force)
-                {
-                    return (Slice(0, startIndex), Slice(startIndex), startIndex);
-                }
-
-                int count = startIndex + 1;
-                startIndex += _value.Offset;
-
-                int breakPoint = Array.FindLastIndex(_value.Array!, startIndex, count, ch => char.IsWhiteSpace(ch));
-                if (breakPoint < 0)
-                {
-                    return null;
-                }
-
-                breakPoint -= _value.Offset;
-                return (Slice(0, breakPoint), Slice(breakPoint + 1), breakPoint);
-            }
-
-            public override string? ToString()
-            {
-                return new string(_value.Array!, _value.Offset, _value.Count);
-            }
         }
 
         private class LineBuffer
         {
+            private readonly RingBuffer _buffer;
             private readonly List<Segment> _segments = new();
+
+            public LineBuffer(int capacity)
+            {
+                _buffer = new(capacity);
+            }
 
             public int ContentLength { get; private set; }
 
             public bool IsEmpty { get; private set; } = true;
 
+            public int Indentation { get; set; }
 
-            public void Append(Segment segment)
+            public int LineLength => ContentLength + Indentation;
+
+            public void Append(StringSpan span, StringSegmentType type)
             {
-                Debug.Assert(segment.Type != SegmentType.LineBreak);
-                if (LastSegment is Segment last && last.Type == SegmentType.PartialFormatting)
+                Debug.Assert(type != StringSegmentType.LineBreak);
+
+                // If we got here, we know the line length is not overflowing, so copy everything
+                // except partial linebreaks into the buffer.
+                if (type != StringSegmentType.PartialLineBreak)
                 {
-                    if (segment.Type == SegmentType.Text)
+                    _buffer.CopyFrom(span);
+                }
+
+                if (LastSegment is Segment last)
+                {
+                    if (last.Type == type)
                     {
-                        Debug.Assert(segment.Content != null);
-                        FindPartialFormattingEnd(segment);
+                        last.Length += span.Length;
+                        _segments[_segments.Count - 1] = last;
+                        if (Segment.IsContent(type))
+                        {
+                            ContentLength += span.Length;
+                        }
+
                         return;
                     }
-                    else
+                    else if (last.Type == StringSegmentType.PartialFormatting)
                     {
-                        // If this is not a text segment, we never found the end of the formatting,
-                        // so just treat everything up to now as formatting.
-                        ConvertPartialToFormatting();
+                        if (type == StringSegmentType.Text)
+                        {
+                            FindPartialFormattingEnd(last, span.Length);
+                            return;
+                        }
+                        else
+                        {
+                            // If this is not a text segment, we never found the end of the formatting,
+                            // so just treat everything up to now as formatting.
+                            last.Type = StringSegmentType.Formatting;
+                            _segments[_segments.Count - 1] = last;
+                        }
                     }
                 }
 
+                var segment = new Segment(type, span.Length);
                 _segments.Add(segment);
-                ContentLength += segment.ContentLength;
-                if (segment.Type != SegmentType.PartialLineBreak)
+                var contentLength = segment.ContentLength;
+                ContentLength += contentLength;
+                if (contentLength > 0)
                 {
                     IsEmpty = false;
                 }
             }
 
-            public Segment? LastSegment => _segments.LastOrDefault();
+            public Segment? LastSegment => _segments.Count > 0 ? _segments[_segments.Count - 1] : null;
+
+            public bool HasPartialFormatting => LastSegment is Segment last && last.Type == StringSegmentType.PartialFormatting;
 
             public void FlushTo(TextWriter writer, int indent)
             {
@@ -337,7 +168,7 @@ namespace Ookii.CommandLine
 
             public bool CheckAndRemovePartialLineBreak()
             {
-                if (LastSegment is Segment last && last.Type == SegmentType.PartialLineBreak)
+                if (LastSegment is Segment last && last.Type == StringSegmentType.PartialLineBreak)
                 {
                     _segments.RemoveAt(_segments.Count - 1);
                     return true;
@@ -346,132 +177,137 @@ namespace Ookii.CommandLine
                 return false;
             }
 
-            private void FindPartialFormattingEnd(Segment segment)
+            private void FindPartialFormattingEnd(Segment lastSegment, int newLength)
             {
-                var partialText = _segments
-                    .SkipWhile(s => s.Type != SegmentType.PartialFormatting)
-                    .SelectMany(s => s.Content!.Value.Characters);
-
-                var text = partialText
-                    .Concat(segment.Content!.Value.Characters)
-                    .Skip(1);
-
-                int end = VirtualTerminal.FindSequenceEnd(text);
-                if (end == -1)
+                var offset = _segments.Take(_segments.Count - 1).Sum(s => s.Length);
+                var (first, second) = _buffer.GetContents(offset);
+                int index = VirtualTerminal.FindSequenceEnd(first.Slice(1), second);
+                if (index < 0)
                 {
-                    segment.Type = SegmentType.PartialFormatting;
-                    _segments.Add(segment);
+                    // No ending found, concatenate this to the last segment.
+                    lastSegment.Length += newLength;
+                    _segments[_segments.Count - 1] = lastSegment;
                 }
                 else
                 {
-                    end += 1 - partialText.Count();
-                    var formattingEnd = segment.Content!.Value.Slice(0, end);
-                    _segments.Add(new Segment(SegmentType.Formatting, formattingEnd));
-                    ConvertPartialToFormatting();
-                    var remain = segment.Content!.Value.Slice(end);
-                    if (remain.Length != 0)
+                    // Concatenate the rest of the formatting.
+                    var remaining = newLength - (index - lastSegment.Length);
+                    lastSegment.Length = index;
+                    lastSegment.Type = StringSegmentType.Formatting;
+                    _segments[_segments.Count - 1] = lastSegment;
+                    if (remaining > 0)
                     {
-                        _segments.Add(new Segment(SegmentType.Text, remain));
-                        ContentLength += remain.Length;
+                        _segments.Add(new Segment(StringSegmentType.Text, remaining));
+                        ContentLength += remaining;
                     }
                 }
             }
 
-            private void ConvertPartialToFormatting()
+            private void WriteSegments(TextWriter writer, IEnumerable<Segment> segments)
             {
-                for (int i = 0; i < _segments.Count; i++)
-                {
-                    var segment = _segments[i];
-                    if (segment.Type == SegmentType.PartialFormatting)
-                    {
-                        segment.Type = SegmentType.Formatting;
-                        _segments[i] = segment;
-                    }
-                }
-            }
-
-            private static void WriteSegments(TextWriter writer, IEnumerable<Segment> segments)
-            {
+                WriteIndent(writer, Indentation);
                 foreach (var segment in segments)
                 {
-                    segment.WriteTo(writer);
+                    switch (segment.Type)
+                    {
+                    case StringSegmentType.PartialLineBreak:
+                    case StringSegmentType.LineBreak:
+                        writer.WriteLine();
+                        break;
+
+                    default:
+                        _buffer.WriteTo(writer, segment.Length);
+                        break;
+                    }
                 }
             }
 
-            public bool BreakLine(TextWriter writer, int maxLength, int indent, bool force)
+            public StringSpan BreakLine(TextWriter writer, StringSpan newSegment, int maxLength, int indent)
             {
-                Debug.Assert(!IsEmpty);
-                int index = maxLength;
-                int segmentIndex;
-                int currentLength = ContentLength;
-                (StringBuffer, StringBuffer, int)? splits = null;
-                for (segmentIndex = _segments.Count - 1; segmentIndex >= 0; segmentIndex--)
+                var remaining = BreakLine(writer, newSegment, maxLength, indent, false)
+                    ?? BreakLine(writer, newSegment, maxLength, indent, true);
+
+                return remaining!.Value;
+            }
+
+            private StringSpan? BreakLine(TextWriter writer, StringSpan newSegment, int maxLength, int indent, bool force)
+            {
+                Debug.Assert(LineLength <= maxLength || newSegment.Length == 0);
+
+                var splits = newSegment.BreakLine(maxLength - LineLength, force);
+                if (splits is var (before, after))
+                {
+                    WriteSegments(writer, _segments);
+                    before.WriteTo(writer);
+                    writer.WriteLine();
+                    ClearCurrentLine(indent);
+                    Indentation = indent;
+                    return after;
+                }
+
+                if (IsEmpty)
+                {
+                    return null;
+                }
+
+                int offset = 0;
+                int contentOffset = 0;
+                foreach (var segment in _segments)
+                {
+                    offset += segment.Length;
+                    contentOffset += segment.ContentLength;
+                }
+
+                for (int segmentIndex = _segments.Count - 1; segmentIndex >= 0; segmentIndex--)
                 {
                     var segment = _segments[segmentIndex];
-                    if (segment.Type != SegmentType.Text || segment.Content == null)
+                    offset -= segment.Length;
+                    contentOffset -= segment.ContentLength;
+                    if (segment.Type != StringSegmentType.Text || contentOffset > maxLength)
                     {
                         continue;
                     }
 
-                    currentLength -= segment.ContentLength;
-                    if (index < currentLength)
+                    int breakIndex = _buffer.BreakLine(offset, Math.Min(segment.Length, maxLength - contentOffset));
+                    if (breakIndex >= 0)
                     {
-                        continue;
+                        WriteSegments(writer, _segments.Take(segmentIndex));
+                        breakIndex -= offset;
+                        _buffer.WriteTo(writer, breakIndex);
+                        _buffer.Discard(1);
+                        writer.WriteLine();
+                        if (breakIndex + 1 < segment.Length)
+                        {
+                            _segments.RemoveRange(0, segmentIndex);
+                            segment.Length -= breakIndex + 1;
+                            _segments[0] = segment;
+                        }
+                        else
+                        {
+                            _segments.RemoveRange(0, segmentIndex + 1);
+                        }
+
+                        ContentLength = _segments.Sum(s => s.ContentLength);
+                        IsEmpty = (ContentLength == 0); // Can I get rid of IsEmpty?
+                        Indentation = indent;
+                        return newSegment;
                     }
-
-                    splits = segment.Content.Value.BreakLine(index - currentLength, force);
-                    if (splits != null)
-                    {
-                        break;
-                    }
-
-                    index = currentLength - 1;
                 }
 
-                if (splits == null)
-                {
-                    return false;
-                }
-
-                var (lineEnd, lineStart, breakPoint) = splits.Value;
-                WriteSegments(writer, _segments.Take(segmentIndex));
-                lineEnd.WriteTo(writer);
-                writer.WriteLine();
-                ContentLength -= (breakPoint + 1);
-
-                _segments.RemoveRange(0, segmentIndex + 1);
-                if (lineStart.Length > 0)
-                {
-                    _segments.Insert(0, new Segment(SegmentType.Text, lineStart));
-                }
-                else
-                {
-                    IsEmpty = _segments.Count == 0;
-                }
-
-                if (indent > 0)
-                {
-                    _segments.Insert(0, new Segment(SegmentType.Text, null, indent));
-                    ContentLength += indent;
-                }
-
-                ContentLength = _segments.Sum(s => s.ContentLength);
-
-                return true;
+                return null;
             }
 
             public void ClearCurrentLine(int indent)
             {
                 _segments.Clear();
-                if (!IsEmpty && indent > 0)
+                ContentLength = 0;
+                if (!IsEmpty)
                 {
-                    // Line needs to be indented, so fill the indent length with white space.
-                    _segments.Add(new Segment(SegmentType.Text, null, indent));
-                    ContentLength = indent;
+                    Indentation = indent;
                 }
                 else
                 {
-                    ContentLength = 0;
+                    Indentation = 0;
                 }
 
                 // This line contains no content, only (possibly) indentation.
@@ -531,7 +367,8 @@ namespace Ookii.CommandLine
             _countFormatting = countFormatting;
             if (_maximumLineLength > 0)
             {
-                _lineBuffer = new();
+                // Add some slack for formatting characters.
+                _lineBuffer = new(countFormatting ? _maximumLineLength : _maximumLineLength * 2);
             }
         }
 
@@ -651,15 +488,7 @@ namespace Ookii.CommandLine
         /// <inheritdoc/>
         public override void Write(char value)
         {
-            if (_maximumLineLength > 0)
-            {
-                // This is not exactly optimal but it will do.
-                Write(new[] { value }, 0, 1);
-            }
-            else
-            {
-                _baseWriter.Write(value);
-            }
+            WriteCore(new StringSpan(value));
         }
 
         /// <inheritdoc/>
@@ -667,7 +496,7 @@ namespace Ookii.CommandLine
         {
             if (value != null)
             {
-                WriteCore(new StringBuffer(value));
+                WriteCore(new StringSpan(value));
             }
         }
 
@@ -694,9 +523,7 @@ namespace Ookii.CommandLine
                 throw new ArgumentException(Properties.Resources.IndexCountOutOfRange);
             }
 
-            // The array must be cloned because we'll store references to segments of it, which
-            // would break if the caller changes the contents.
-            WriteCore(new StringBuffer((char[])buffer.Clone(), index, count));
+            WriteCore(new StringSpan(buffer, index, count));
         }
 
         /// <inheritdoc/>
@@ -757,13 +584,14 @@ namespace Ookii.CommandLine
             }
         }
 
-        private void WriteNoMaximum(StringBuffer buffer)
+        private void WriteNoMaximum(StringSpan buffer)
         {
             Debug.Assert(_maximumLineLength == 0);
 
-            foreach (var segment in buffer.Split(true))
+            foreach (var (type, span) in buffer.Split(true))
             {
-                if (segment.Type == SegmentType.LineBreak)
+                // TODO: Partial line break?
+                if (type == StringSegmentType.LineBreak)
                 {
                     _baseWriter.WriteLine();
                     _indentNextWrite = _currentLineLength != 0;
@@ -772,8 +600,8 @@ namespace Ookii.CommandLine
                 else
                 {
                     WriteIndentDirectIfNeeded();
-                    segment.Content!.Value.WriteTo(_baseWriter);
-                    _currentLineLength += segment.Content!.Value.Length;
+                    span.WriteTo(_baseWriter);
+                    _currentLineLength += span.Length;
                 }
             }
         }
@@ -796,7 +624,7 @@ namespace Ookii.CommandLine
             }
         }
 
-        private void WriteCore(StringBuffer buffer)
+        private void WriteCore(StringSpan buffer)
         {
             if (_lineBuffer == null)
             {
@@ -804,7 +632,7 @@ namespace Ookii.CommandLine
                 return;
             }
 
-            foreach (var segment in buffer.Split(_countFormatting))
+            foreach (var (type, span) in buffer.Split(_countFormatting))
             {
                 bool hadPartialLineBreak = _lineBuffer.CheckAndRemovePartialLineBreak();
                 if (hadPartialLineBreak)
@@ -812,23 +640,34 @@ namespace Ookii.CommandLine
                     _lineBuffer.WriteLineTo(_baseWriter, _indent);
                 }
 
-                if (segment.Type == SegmentType.LineBreak)
+                if (type == StringSegmentType.LineBreak)
                 {
                     // Check if this is just the end of a partial line break. If it is, it was
                     // already written above.
-                    if (!hadPartialLineBreak || segment.Content!.Value.Length == 1 && segment.Content!.Value[0] != '\n')
+                    if (!hadPartialLineBreak || span.Length == 1 && span[0] != '\n')
                     {
                         _lineBuffer.WriteLineTo(_baseWriter, _indent);
                     }
                 }
                 else
                 {
-                    _lineBuffer.Append(segment);
-                    while (_lineBuffer.ContentLength > _maximumLineLength)
+                    var remaining = span;
+                    if (type == StringSegmentType.Text && !_lineBuffer.HasPartialFormatting)
                     {
-                        if (!_lineBuffer.BreakLine(_baseWriter, _maximumLineLength, _indent, false))
+                        while (_lineBuffer.LineLength + remaining.Length > _maximumLineLength)
                         {
-                            _lineBuffer.BreakLine(_baseWriter, _maximumLineLength, _indent, true);
+                            remaining = _lineBuffer.BreakLine(_baseWriter, remaining, _maximumLineLength, _indent);
+                        }
+                    }
+
+                    if (remaining.Length > 0)
+                    {
+                        _lineBuffer.Append(remaining, type);
+                        if (_lineBuffer.LineLength > _maximumLineLength)
+                        {
+                            // This can happen if we couldn't break above because partial formatting
+                            // had to be resolved.
+                            _lineBuffer.BreakLine(_baseWriter, default, _maximumLineLength, _indent);
                         }
                     }
                 }

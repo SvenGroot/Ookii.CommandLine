@@ -233,6 +233,10 @@ namespace Ookii.CommandLine.Tests
         public void TestSkipFormatting()
         {
             Assert.AreEqual(_expectedFormatting, WriteString(_inputFormatting, 80, _inputFormatting.Length, 8));
+            Assert.AreEqual(_expectedLongFormatting, WriteString(_inputLongFormatting, 80, _inputLongFormatting.Length, 8));
+            Assert.AreEqual(_expectedLongFormatting, WriteString(_inputLongFormatting, 80, 80, 8));
+            Assert.AreEqual(_expectedLongFormatting, WriteString(_inputLongFormatting, 80, 50, 8));
+            Assert.AreEqual(_expectedLongFormatting, WriteChars(_inputLongFormatting.ToCharArray(), 80, 8));
         }
 
         [TestMethod]
@@ -265,31 +269,13 @@ namespace Ookii.CommandLine.Tests
         [TestMethod]
         public void TestWriteChar()
         {
-            using var writer = LineWrappingTextWriter.ForStringWriter(80);
-            writer.Indent = 8;
-            foreach (var ch in _input.ToCharArray())
-            {
-                writer.Write(ch);
-            }
-
-            writer.Flush();
-            var actual = writer.BaseWriter.ToString();
-            Assert.AreEqual(_expectedIndent, actual);
+            Assert.AreEqual(_expectedIndent, WriteChars(_input.ToCharArray(), 80, 8));
         }
 
         [TestMethod]
         public void TestWriteCharFormatting()
         {
-            using var writer = LineWrappingTextWriter.ForStringWriter(80);
-            writer.Indent = 8;
-            foreach (var ch in _inputFormatting.ToCharArray())
-            {
-                writer.Write(ch);
-            }
-
-            writer.Flush();
-            var actual = writer.BaseWriter.ToString();
-            Assert.AreEqual(_expectedFormatting, actual);
+            Assert.AreEqual(_expectedFormatting, WriteChars(_inputFormatting.ToCharArray(), 80, 8));
         }
 
 
@@ -325,6 +311,18 @@ namespace Ookii.CommandLine.Tests
             return writer.BaseWriter.ToString();
         }
 
+        private static string WriteChars(char[] value, int maxLength, int indent = 0)
+        {
+            using var writer = LineWrappingTextWriter.ForStringWriter(maxLength);
+            writer.Indent = indent;
+            foreach (var ch in value)
+            {
+                writer.Write(ch);
+            }
+
+            writer.Flush();
+            return writer.BaseWriter.ToString();
+        }
 
         #region Input and expected values
 
@@ -472,6 +470,12 @@ Tincidunt vitae semper quis lectus nulla at volutpat diam ut. Vitae tempus
         tristique risus nec feugiat in fermentum.[0m
 ".ReplaceLineEndings();
 
+        private const string _inputLongFormatting = "Lorem ipsum dolor sit amet, consectetur\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Donec adipiscing tristique risus nec feugiat in fermentum.";
+
+        private static readonly string _expectedLongFormatting = @"Lorem ipsum dolor sit amet, consectetur[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m adipiscing elit, sed do eiusmod tempor
+        incididunt ut labore et dolore magna aliqua. Donec adipiscing tristique
+        risus nec feugiat in fermentum.
+".ReplaceLineEndings();
 
         #endregion
     }

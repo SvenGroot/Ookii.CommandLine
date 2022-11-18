@@ -122,31 +122,43 @@ namespace Ookii.CommandLine.Terminal
             return FormattableString.Invariant($"{Escape}[{(foreground ? 38 : 48)};2;{color.R};{color.G};{color.B}m");
         }
 
-        internal static int FindSequenceEnd(IEnumerable<char> value)
+        // Returns the index of the character after the end of the sequence.
+        internal static int FindSequenceEnd(StringSpan value, StringSpan value2 = default)
         {
-            if (!value.Any())
+            if (value.Length == 0)
             {
                 return -1;
             }
 
-            return value.First() switch
+            return value[0] switch
             {
-                '[' => FindCsiEnd(value),
-                ']' => FindOscEnd(value),
+                '[' => FindCsiEnd(value.Slice(1), value2),
+                ']' => FindOscEnd(value.Slice(1), value2),
                 // If the character after ( isn't present, we haven't found the end yet.
-                '(' => value.Skip(1).Any() ? 2 : -1,
+                '(' => value.Length + value2.Length > 1 ? 3 : -1,
                 _ => 1,
             };
         }
 
-        private static int FindCsiEnd(IEnumerable<char> value)
+
+        private static int FindCsiEnd(StringSpan value, StringSpan value2)
         {
             int index = 0;
-            foreach (var ch in value.Skip(1))
+            foreach (var ch in value)
             {
                 if (!char.IsNumber(ch) && ch != ';' && ch != ' ')
                 {
-                    return index + 2;
+                    return index + 3;
+                }
+
+                ++index;
+            }
+
+            foreach (var ch in value2)
+            {
+                if (!char.IsNumber(ch) && ch != ';' && ch != ' ')
+                {
+                    return index + 3;
                 }
 
                 ++index;
@@ -155,20 +167,50 @@ namespace Ookii.CommandLine.Terminal
             return -1;
         }
 
-        private static int FindOscEnd(IEnumerable<char> value)
+        private static int FindOscEnd(StringSpan value, StringSpan value2)
         {
             int index = 0;
             bool hasEscape = false;
-            foreach (var ch in value.Skip(1))
+            foreach (var ch in value)
             {
                 if (ch == 0x7)
                 {
-                    return index + 2;
+                    return index + 3;
                 }
 
-                if (hasEscape && ch == '\\')
+                if (hasEscape)
                 {
-                    return index + 2;
+                    if (ch == '\\')
+                    {
+                        return index + 3;
+                    }
+
+                    hasEscape = false;
+                }
+
+                if (ch == Escape)
+                {
+                    hasEscape = true;
+                }
+
+                ++index;
+            }
+
+            foreach (var ch in value2)
+            {
+                if (ch == 0x7)
+                {
+                    return index + 3;
+                }
+
+                if (hasEscape)
+                {
+                    if (ch == '\\')
+                    {
+                        return index + 3;
+                    }
+
+                    hasEscape = false;
                 }
 
                 if (ch == Escape)
