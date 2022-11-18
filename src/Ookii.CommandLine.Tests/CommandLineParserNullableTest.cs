@@ -1,6 +1,12 @@
 ﻿// Copyright (c) Sven Groot (Ookii.org)
+
+// These types don't apply to .Net Framework.
+#if NET6_0_OR_GREATER
+
 #nullable enable
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 
@@ -318,3 +324,5 @@ namespace Ookii.CommandLine.Tests
         }
     }
 }
+
+#endif

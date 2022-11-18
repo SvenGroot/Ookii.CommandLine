@@ -1,5 +1,7 @@
 ﻿using Ookii.CommandLine.Commands;
+using System;
 using System.ComponentModel;
+using System.Threading.Tasks;
 
 namespace Ookii.CommandLine.Tests
 {

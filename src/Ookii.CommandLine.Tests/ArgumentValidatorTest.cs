@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Ookii.CommandLine.Validation;
+using System;
 using System.Text.RegularExpressions;
 
 namespace Ookii.CommandLine.Tests

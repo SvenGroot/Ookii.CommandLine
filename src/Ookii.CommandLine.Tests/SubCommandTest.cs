@@ -1,7 +1,10 @@
 ﻿// Copyright (c) Sven Groot (Ookii.org)
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Ookii.CommandLine.Commands;
+using System;
+using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 
 namespace Ookii.CommandLine.Tests
 {

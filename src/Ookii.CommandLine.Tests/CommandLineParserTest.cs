@@ -1,7 +1,10 @@
 ﻿// Copyright (c) Sven Groot (Ookii.org)
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
+using System.IO;
 using System.Net;
 using System.Reflection;
 
@@ -14,6 +17,13 @@ namespace Ookii.CommandLine.Tests
     [TestClass()]
     public partial class CommandLineParserTest
     {
+#if NET6_0_OR_GREATER
+        private static readonly Type ArgumentConversionInner = typeof(ArgumentException);
+#else
+        // Number converters on .Net Framework throw Exception. It's not my fault.
+        private static readonly Type ArgumentConversionInner = typeof(Exception);
+#endif
+
         /// <summary>
         ///A test for CommandLineParser Constructor
         ///</summary>
@@ -257,7 +267,7 @@ namespace Ookii.CommandLine.Tests
                 target,
                 CommandLineArgumentErrorCategory.ArgumentValueConversion,
                 "DefaultSeparator",
-                typeof(ArgumentException));
+                ArgumentConversionInner);
         }
 
         [TestMethod]
@@ -1000,7 +1010,7 @@ namespace Ookii.CommandLine.Tests
             CollectionAssert.AreEqual(new[] { 1, 2 }, result.Multi);
 
             CheckThrows(() => parser.Parse(new[] { "1", "-Multi", "-Other", "5", "6" }), parser, CommandLineArgumentErrorCategory.MissingNamedArgumentValue, "Multi");
-            CheckThrows(() => parser.Parse(new[] { "-MultiSwitch", "true", "false" }), parser, CommandLineArgumentErrorCategory.ArgumentValueConversion, "Arg1", typeof(ArgumentException));
+            CheckThrows(() => parser.Parse(new[] { "-MultiSwitch", "true", "false" }), parser, CommandLineArgumentErrorCategory.ArgumentValueConversion, "Arg1", ArgumentConversionInner);
             parser.AllowWhiteSpaceValueSeparator = false;
             CheckThrows(() => parser.Parse(new[] { "1", "-Multi:2", "2", "3", "4", "-Other", "5", "6" }), parser, CommandLineArgumentErrorCategory.TooManyArguments);
         }
@@ -1092,7 +1102,7 @@ namespace Ookii.CommandLine.Tests
             Assert.AreEqual(4, result.ParseNullableMulti[2].Value.Value);
         }
 
-        private record class ExpectedArgument
+        private class ExpectedArgument
         {
             public ExpectedArgument(string name, Type type, ArgumentKind kind = ArgumentKind.SingleValue)
             {
