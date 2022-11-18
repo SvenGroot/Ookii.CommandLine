@@ -147,45 +147,55 @@ namespace Ookii.CommandLine.Terminal
         private static int FindCsiEnd(StringSpan value, StringSpan value2)
         {
             int index = 0;
+            if (FindCsiEnd(value, ref index) || FindCsiEnd(value2, ref index))
+            {
+                return index + 3;
+            }
+
+            return -1;
+        }
+
+        private static bool FindCsiEnd(StringSpan value, ref int index)
+        {
             foreach (var ch in value)
             {
                 if (!char.IsNumber(ch) && ch != ';' && ch != ' ')
                 {
-                    return index + 3;
+                    return true;
                 }
 
                 ++index;
             }
 
-            foreach (var ch in value2)
-            {
-                if (!char.IsNumber(ch) && ch != ';' && ch != ' ')
-                {
-                    return index + 3;
-                }
-
-                ++index;
-            }
-
-            return -1;
+            return false;
         }
 
         private static int FindOscEnd(StringSpan value, StringSpan value2)
         {
             int index = 0;
             bool hasEscape = false;
+            if (FindOscEnd(value, ref index, ref hasEscape) || FindOscEnd(value2, ref index, ref hasEscape))
+            {
+                return index + 3;
+            }
+
+            return -1;
+        }
+
+        private static bool FindOscEnd(StringSpan value, ref int index, ref bool hasEscape)
+        {
             foreach (var ch in value)
             {
                 if (ch == 0x7)
                 {
-                    return index + 3;
+                    return true;
                 }
 
                 if (hasEscape)
                 {
                     if (ch == '\\')
                     {
-                        return index + 3;
+                        return true;
                     }
 
                     hasEscape = false;
@@ -199,32 +209,7 @@ namespace Ookii.CommandLine.Terminal
                 ++index;
             }
 
-            foreach (var ch in value2)
-            {
-                if (ch == 0x7)
-                {
-                    return index + 3;
-                }
-
-                if (hasEscape)
-                {
-                    if (ch == '\\')
-                    {
-                        return index + 3;
-                    }
-
-                    hasEscape = false;
-                }
-
-                if (ch == Escape)
-                {
-                    hasEscape = true;
-                }
-
-                ++index;
-            }
-
-            return -1;
+            return false;
         }
     }
 }
