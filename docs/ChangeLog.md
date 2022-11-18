@@ -2,6 +2,10 @@
 
 ## Ookii.CommandLine 3.0
 
+**IMPORTANT:** Several of the changes in version 3.0 are *breaking changes*. There are breaking
+API changes as well as several behavior changes. Please see the [information on migrating
+from Ookii.CommandLine 2.x](Migrating.md) if you are upgrading an existing application.
+
 - Argument parsing
   - Added support for a [new parsing mode](Arguments.md#longshort-mode) where arguments can have a
     separate long name using the `--` prefix (customizable, of course) and short name using the `-`
@@ -40,8 +44,9 @@
   - Automatically add a `version` subcommand if not defined.
 - Usage help
   - Color output support.
-  - Greatly expanded [usage help customization options](UsageHelp.md), including abbreviated syntax,
-    description list ordering and filtering, the ability to override any string, and more.
+  - Greatly expanded [usage help customization options](UsageHelp.md) with the new `UsageWriter`
+    class, including abbreviated syntax, description list ordering and filtering, the ability to
+    override any string, and more.
   - Arguments and subcommands can be hidden from the usage help.
   - Improved detection logic for the application executable name in the usage syntax.
   - Aliases and default value are now shown in the usage help by default.
@@ -51,12 +56,6 @@
 - More [samples](../src/Samples), with updated documentation.
 - Various bug fixes.
 - No longer targets .Net Framework 2.0 (only .Net Standard 2.0 and .Net 6.0 are targeted).
-
-**IMPORTANT:** Several of the changes in version 3.0 are *breaking changes*. The changes to the
-subcommand support and usage help customization are breaking API changes that may require some code
-changes. In addition, there are several breaking behavior changes such as using `InvariantCulture`
-by default, and the default format changes to the usage help. Make sure you test your application
-after upgrading to version 3.0, even if no code changes were required for your application.
 
 ## Ookii.CommandLine 2.4
 

@@ -39,6 +39,6 @@ the command list, and the `RequiresAttribute` and `ProhibitsAttribute` added tex
 of the arguments they were applied to.
 
 This is, as always fully customizable. You can disable automatic validator help entirely with the
-`WriteUsageOptions.IncludeValidatorsInDescription` property (note: this also applies to regular
+`UsageWriter.IncludeValidatorsInDescription` property (note: this also applies to regular
 validators like `ValidateRange`), and all the included validators can be included on a case-by-case
 basis with the `IncludeInUsageHelp` property on each validator attribute.

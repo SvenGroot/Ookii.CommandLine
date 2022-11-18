@@ -113,25 +113,25 @@ description to make the intent clear.
 If you don't wish to include a validator's message in the usage help, you can turn this off using
 the `IncludeInUsageHelp` property, which all built-in validators with usage help provide. You can
 also disable the message for all validators using the
-`WriteUsageOptions.IncludeValidatorsInDescription` message.
+`UsageWriter.IncludeValidatorsInDescription` message.
 
 The `ValidateEnumValueAttribute` will list all defined enumeration values, which may be rather long
 depending on the number of values. If the number of values is large, you may wish to exclude it
 from the usage help using the `IncludeInUsageHelp` property.
 
-The validator usage help messages can be customized using the `LocalizedStringProvider`. For
-example, the [custom usage sample](../src/Samples/CustomUsage) changes the message for the
-`ValidateRangeAttribute` to look like "[range: 0-100]" instead.
+The validator usage help messages can be customized by deriving a class from the
+`LocalizedStringProvider` class. For example, the [custom usage sample](../src/Samples/CustomUsage)
+changes the message for the `ValidateRangeAttribute` to look like "[range: 0-100]" instead.
 
 ## Argument dependencies and restrictions
 
 Besides arguments value validators, there are also a number of built-in validators that specify
 dependencies or restrictions on other arguments. The following validators are available:
 
-Validate | Description
----------|------------
-`ProhibitsAttribute` | Indicates that an argument cannot be used in combination with another argument.
-`RequiresAttribute` | Indicates that an argument can only be used in combination with another argument.
+Validate               | Description
+-----------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+`ProhibitsAttribute`   | Indicates that an argument cannot be used in combination with another argument.
+`RequiresAttribute`    | Indicates that an argument can only be used in combination with another argument.
 `RequiresAnyAttribute` | This is a class validator, that must be applied to the arguments class instead of an argument, which validates that at least one of the specified arguments is present on the command line.
 
 For example, you might have an application that can read data from a file, or from a server at a

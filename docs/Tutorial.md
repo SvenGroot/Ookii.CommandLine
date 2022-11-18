@@ -792,7 +792,7 @@ the "read" command.
 If you want to use asynchronous code in your application, subcommands provide a way to do that too.
 
 To make a command asynchronous, we have to implement the `IAsyncCommand` interface. This interface
-derived from the `ICommand` interface, and adds a `RunAsync()` method for you to implement. Then,
+derives from the `ICommand` interface, and adds a `RunAsync()` method for you to implement. Then,
 you can invoke your command using the `CommandManager.RunCommandAsync()` method.
 
 Let's make the `WriteCommand` asynchronous. When you do this, you typically only care about the

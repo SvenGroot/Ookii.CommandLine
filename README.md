@@ -118,6 +118,7 @@ The class library documentation is generated using [Sandcastle Help File Builder
 Please check out the following to get started:
 
 - [Tutorial: getting started with Ookii.CommandLine](docs/Tutorial.md)
+- [Migrating from Ookii.CommandLine 2.x](docs/Migrating.md)
 - [Usage documentation](docs/Documentation.md)
 - [Class library documentation](https://www.ookii.org/Link/CommandLineDoc)
 - [Sample applications](src/Samples) with detailed explanations and sample output.

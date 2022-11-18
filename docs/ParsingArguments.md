@@ -153,9 +153,8 @@ static int Main()
 You can customize some aspects of parsing by setting properties on the `CommandLineParser` class
 before calling `Parse`, but some settings can only be changed using the `ParseOptionsAttribute`
 attribute and the `ParseOptions` class (which you can pass to the `CommandLineParser<T>`
-constructor). Some properties of the `ParseOptions` class (like `Out` and `Error`) are not used with
-the instance methods, and you must manually pass the `WriteUsageOptions` class to
-`WriteUsageToConsole` (or one of the other `WriteUsage` methods); the one contained in the
-`ParseOptions` will not be used.
+constructor). Some properties of the `ParseOptions` class (like `Error`) are not used with the
+instance methods, and you must manually pass the `UsageWriter` class to `WriteUsage`; the one
+contained in the `ParseOptions` will not be used.
 
 Next, we'll take a look at [generating usage help](UsageHelp.md).
