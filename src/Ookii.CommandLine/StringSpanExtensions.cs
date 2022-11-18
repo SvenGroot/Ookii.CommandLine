@@ -6,7 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-#if NET6_0_OR_GREATER
+#if NET6_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
 using StringSpan = System.ReadOnlySpan<char>;
 #endif
 
@@ -110,7 +110,7 @@ namespace Ookii.CommandLine
             return false;
         }
 
-#if NET6_0_OR_GREATER
+#if NET6_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
         public static void CopyTo(this StringSpan self, char[] destination, int start)
         {
             self.CopyTo(destination.AsSpan(start));

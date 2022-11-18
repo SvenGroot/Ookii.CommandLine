@@ -1,6 +1,6 @@
 ﻿// Copyright (c) Sven Groot (Ookii.org)
 
-// These types don't apply to .Net Framework.
+// These tests don't apply to .Net Framework.
 #if NET6_0_OR_GREATER
 
 #nullable enable

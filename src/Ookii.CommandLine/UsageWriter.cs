@@ -170,7 +170,7 @@ namespace Ookii.CommandLine
         /// determined by calling <see cref="CommandLineParser.GetExecutableName(bool)"/>.
         /// </value>
         /// <seealso cref="IncludeExecutableExtension"/>
-#if NET6_0_OR_GREATER
+#if NET6_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
         [AllowNull]
 #endif
         public virtual string ExecutableName

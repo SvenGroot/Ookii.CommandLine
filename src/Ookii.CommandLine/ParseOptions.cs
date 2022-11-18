@@ -485,7 +485,7 @@ namespace Ookii.CommandLine
         /// <value>
         /// An instance of the <see cref="UsageWriter"/> class.
         /// </value>
-#if NET6_0_OR_GREATER
+#if NET6_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
         [AllowNull]
 #endif
         public UsageWriter UsageWriter

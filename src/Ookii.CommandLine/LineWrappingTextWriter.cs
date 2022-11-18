@@ -7,7 +7,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Text;
-#if NET6_0_OR_GREATER
+#if NET6_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
 using StringSpan = System.ReadOnlySpan<char>;
 #endif
 
@@ -403,7 +403,7 @@ namespace Ookii.CommandLine
         }
 
         /// <inheritdoc/>
-#if NET6_0_OR_GREATER
+#if NET6_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
         [AllowNull]
 #endif
         public override string NewLine
@@ -500,7 +500,7 @@ namespace Ookii.CommandLine
         /// <inheritdoc/>
         public override void Write(char value)
         {
-#if NET6_0_OR_GREATER
+#if NET6_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
             unsafe
             {
                 WriteCore(new StringSpan(&value, 1));
@@ -515,7 +515,7 @@ namespace Ookii.CommandLine
         {
             if (value != null)
             {
-#if NET6_0_OR_GREATER
+#if NET6_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
                 WriteCore(value);
 #else
                 WriteCore(new StringSpan(value));
@@ -549,7 +549,7 @@ namespace Ookii.CommandLine
             WriteCore(new StringSpan(buffer, index, count));
         }
 
-#if NET6_0_OR_GREATER
+#if NET6_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
 
         /// <inheritdoc/>
         public override void Write(ReadOnlySpan<char> buffer) => WriteCore(buffer);
