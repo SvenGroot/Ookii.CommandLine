@@ -24,19 +24,21 @@
       <DocumentationSource sourceFile="..\src\Ookii.CommandLine\Ookii.CommandLine.csproj" />
     </DocumentationSources>
     <NamespaceSummaries>
-      <NamespaceSummaryItem name="Ookii.CommandLine" isDocumented="True" xmlns="">&lt;para&gt;
-  The &lt;see cref="N:Ookii.CommandLine"/&gt; namespace contains types to aid with defining a set of accepted command line arguments, parsing those arguments, and generating usage information for them.
-&lt;/para&gt;
-&lt;para&gt;
-  Command line parsing is done by the &lt;see cref="T:Ookii.CommandLine.CommandLineParser"/&gt; class. The help topic for that class describes what you need to know to get started using the Ookii.CommandLine library.
-&lt;/para&gt;
-&lt;para&gt;
-  Ookii.CommandLine also provides functionality for creating command line applications that perform multiple related operations or commands, where each operation has its own arguments. See the &lt;see cref="T:Ookii.CommandLine.ShellCommand"/&gt; class for more information.
+      <NamespaceSummaryItem name="Ookii.CommandLine" isDocumented="True">&lt;para&gt;
+  Provides functionality for defining and parsing command line arguments, and for generating usage help.
 &lt;/para&gt;</NamespaceSummaryItem>
-    </NamespaceSummaries>
+<NamespaceSummaryItem name="Ookii.CommandLine.Commands" isDocumented="True">&lt;para&gt;
+  Provides functionality for creating applications with multiple subcommands, each with their own arguments.
+&lt;/para&gt;</NamespaceSummaryItem>
+<NamespaceSummaryItem name="Ookii.CommandLine.Terminal" isDocumented="True">&lt;para&gt;
+  Provides helpers for supporting virtual terminal sequences and color output.
+&lt;/para&gt;</NamespaceSummaryItem>
+<NamespaceSummaryItem name="Ookii.CommandLine.Validation" isDocumented="True">&lt;para&gt;
+  Provides attributes used to validate the value of arguments, and the relation between arguments.
+&lt;/para&gt;</NamespaceSummaryItem></NamespaceSummaries>
     <CopyrightHref>https://github.com/SvenGroot/ookii.commandline</CopyrightHref>
     <CopyrightText>Copyright &amp;#169%3b Sven Groot %28Ookii.org%29</CopyrightText>
-    <HelpTitle>Ookii.CommandLine 2.4 documentation</HelpTitle>
+    <HelpTitle>Ookii.CommandLine 3.0 documentation</HelpTitle>
     <NamingMethod>MemberName</NamingMethod>
     <PresentationStyle>VS2013</PresentationStyle>
     <SyntaxFilters>C#, Visual Basic, Visual Basic Usage, Managed C++</SyntaxFilters>
@@ -66,7 +68,21 @@
       <Argument Key="baseSourceCodeUrl" Value="" xmlns="" />
       <Argument Key="requestExampleUrl" Value="" xmlns="" />
     </TransformComponentArguments>
-    <ProjectSummary>Test.</ProjectSummary>
+    <ProjectSummary>&amp;lt%3bpara&amp;gt%3b
+  Ookii.CommandLine is a powerful and flexible command line argument parsing library for .Net
+  applications. It allows you to easily define strongly-typed required, optional, positional and named
+  arguments, parse the command line arguments, generate usage information, and write applications with
+  subcommands.
+&amp;lt%3b/para&amp;gt%3b
+&amp;lt%3bpara&amp;gt%3b
+  See the &amp;lt%3bsee href=&amp;quot%3bhttps://github.com/SvenGroot/ookii.commandline&amp;quot%3b&amp;gt%3bdocumentation on GitHub&amp;lt%3b/see&amp;gt%3b for information on how to get started with Ookii.CommandLine.
+&amp;lt%3b/para&amp;gt%3b
+&amp;lt%3bpara&amp;gt%3b
+  Command line parsing is done by the &amp;lt%3bsee cref=&amp;quot%3bT:Ookii.CommandLine.CommandLineParser&amp;quot%3b/&amp;gt%3b class.
+&amp;lt%3b/para&amp;gt%3b
+&amp;lt%3bpara&amp;gt%3b
+  Functionality for creating applications that support multiple commands, where each operation has its own arguments, is provided by the &amp;lt%3bsee cref=&amp;quot%3bT:Ookii.CommandLine.Commands.CommandManager&amp;quot%3b/&amp;gt%3b class.
+&amp;lt%3b/para&amp;gt%3b</ProjectSummary>
   </PropertyGroup>
   <!-- There are no properties for these groups.  AnyCPU needs to appear in
        order for Visual Studio to perform the build.  The others are optional
