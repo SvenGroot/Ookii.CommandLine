@@ -5,8 +5,8 @@ applications. It allows you to easily define strongly-typed required, optional, 
 arguments, parse the command line arguments, generate usage information, and write applications with
 subcommands.
 
-Ookii.CommandLine is provided in versions for .Net Standard 2.0 and .Net 6.0 and later, with the
-latter adding some extra functionality around [Nullable Reference Types](docs/Arguments.md#arguments-with-non-nullable-types).
+Ookii.CommandLine is provided in versions for [.Net Standard 2.0, .Net Standard 2.1, and .Net 6.0
+and later](#requirements).
 
 Ookii.CommandLine can be added to your project using [NuGet](https://nuget.org/packages/Ookii.CommandLine).
 [Code snippets](docs/Code%20Snippets.md) for Visual Studio are available on the
@@ -91,21 +91,31 @@ each with their own arguments.
 
 ## Requirements
 
-Ookii.CommandLine is a class library for use in your own applications for [Microsoft .Net](https://dotnet.microsoft.com/).
-It can be used with applications targeting one of the following:
+Ookii.CommandLine is a class library for use in your own applications for [Microsoft
+.Net](https://dotnet.microsoft.com/). It can be used with applications supporting one of the
+following:
 
 - .Net Standard 2.0
-- .Net 6.0 (for additional nullable reference type functionality)
+- .Net Standard 2.1
+- .Net 6.0
 
 As of version 3.0, .Net Framework 2.0 is no longer supported. You can still target .Net Framework
 4.6.1 and later using the .Net Standard 2.0 package. If you need to support an older version of
 .Net, please continue to use [version 2.4](https://github.com/SvenGroot/ookii.commandline/releases/tag/v2.4).
+
+The .Net Standard 2.1 and .Net 6.0 version utilize `ReadOnlySpan<char>` for improved performance of
+the [`LineWrappingTextWriter`](docs/Utilities.md) class.
+
+The .Net 6.0 version has additional support for [nullable reference types](docs/Arguments.md#arguments-with-non-nullable-types).
 
 ## Building and testing
 
 To build Ookii.CommandLine, make sure you have the .Net 6.0 SDK installed, and simply use the
 `dotnet build` command in the `src` directory. You can run the unit tests using `dotnet test`. The
 tests should pass on all platforms (Windows and Linux have been tested).
+
+The tests are built and run for both .Net 6.0 and .Net Framework 4.8. Running the .Net Framework
+tests on a non-Windows platform may require the use of [Mono](https://www.mono-project.com/).
 
 Ookii.CommandLine uses a strongly-typed resources file, which will not update correctly unless the
 `Resources.resx` file is edited with [Microsoft Visual Studio](https://visualstudio.microsoft.com/).
