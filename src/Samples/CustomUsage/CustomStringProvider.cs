@@ -3,7 +3,9 @@ using Ookii.CommandLine.Validation;
 
 namespace CustomUsage;
 
-// The CustomStringProvider does the bulk of the work of customizing the usage format.
+// A custom string provider can be used to customize many of the strings used by Ookii.CommandLine,
+// including error messages and automatic argument names. Here, it is used to customize the help
+// argument short name and the usage help for the ValidateRangeAttribute.
 internal class CustomStringProvider : LocalizedStringProvider
 {
     // By overriding this, the "--help" argument no longer uses "-?" as its short name.

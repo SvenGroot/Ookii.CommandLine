@@ -45,6 +45,7 @@ class ProgramArguments
 
     [CommandLineArgument]
     [Description("This is an argument using an enumeration type.")]
+    [ValidateEnumValue]
     public DayOfWeek? Day { get; set; }
 
     [CommandLineArgument(IsShort = true)]
@@ -87,6 +88,13 @@ class ProgramArguments
             {
                 { typeof(int), "number" }
             },
+            // If you have a lot of arguments, showing full help if there's a parsing error
+            // can make the error message hard to spot. We set it to show syntax only here,
+            // and require the use of the "-Help" argument for full help.
+            ShowUsageOnError = UsageHelpRequest.SyntaxOnly,
+            // By default, repeating an argument more than once (except for multi-value arguments),
+            // causes an error. Show a warning instead, and use the last value.
+            DuplicateArguments = ErrorMode.Warning,
         };
 
         return CommandLineParser.Parse<ProgramArguments>(options);

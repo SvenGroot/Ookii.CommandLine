@@ -270,6 +270,11 @@ namespace Ookii.CommandLine
         ///   <see cref="CommandLineParser"/> class has been constructed, and still affect the
         ///   parsing behavior. See the <see cref="Options"/> property for details.
         /// </para>
+        /// <para>
+        ///   Some of the properties of the <see cref="ParseOptions"/> class, like anything related
+        ///   to error output, are only used by the static <see cref="Parse{T}(ParseOptions?)"/>
+        ///   class and are not used here.
+        /// </para>
         /// </remarks>
         public CommandLineParser(Type argumentsType, ParseOptions? options = null)
         {

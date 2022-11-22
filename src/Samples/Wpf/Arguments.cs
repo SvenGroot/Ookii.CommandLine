@@ -18,6 +18,9 @@ public class Arguments
     //
     // This is an example of a method argument. It uses a method instead of a property, and gets
     // invoked as soon as the argument is parsed, not waiting for all the arguments.
+    //
+    // A method argument can set its type using a method parameter. If there isn't a parameter like
+    // that (as in this case), it defaults to a switch argument.
     [CommandLineArgument]
     [Description("Displays version information.")]
     public static bool Version(CommandLineParser parser)

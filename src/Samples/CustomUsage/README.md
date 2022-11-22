@@ -25,7 +25,8 @@ OPTIONS:
   -c|--count <number>         Provides the count for something to the application. [range: 0-100]
   -d|--destination <string>   The destination data.
   -D|--date <date-time>       Provides a date to the application.
-  --day <day-of-week>         This is an argument using an enumeration type.
+  --day <day-of-week>         This is an argument using an enumeration type. Possible values:
+                              Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday.
   -h|--help                   Displays this help message.
   --operation-index <number>  The operation's index. [default: 1]
   -p|--process                Does the processing.

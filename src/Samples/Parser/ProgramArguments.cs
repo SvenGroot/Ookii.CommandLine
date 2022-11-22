@@ -115,9 +115,14 @@ class ProgramArguments
     // the DayOfWeek enumeration, so you can do for example "-day monday". This works with
     // any enumeration. Values that are not defined in the enumeration will cause an error.
     //
-    // Note that the enumeration's numeric values also work, so "-day 1" also means Monday.
+    // The string conversion for enumerations also allows the underlying values, so "-day 1" also
+    // means Monday. This doesn't filter for defined values, so "-day 9" would be accepted even
+    // though DayOfWeek has no member with the value 9. The ValidateEnumValueAttribute makes sure
+    // that only defined enum values are allowed. As a bonus, it also adds all the possible values
+    // to the usage help.
     [CommandLineArgument]
     [Description("This is an argument using an enumeration type.")]
+    [ValidateEnumValue]
     public DayOfWeek? Day { get; set; }
 
     // Using a static creation function for a command line arguments class is not required, but

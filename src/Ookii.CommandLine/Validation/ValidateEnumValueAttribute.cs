@@ -60,8 +60,14 @@ namespace Ookii.CommandLine.Validation
         /// should be included in the error message if validation fails.
         /// </summary>
         /// <value>
-        /// <see langword="true"/> to include the error messages; otherwise, <see langword="false"/>.
+        /// <see langword="true"/> to include the values; otherwise, <see langword="false"/>.
         /// </value>
+        /// <remarks>
+        /// <para>
+        ///   This error message is only used if the validation fails, which only the case for
+        ///   undefined numerical values. Strings that don't match the name don't use this error.
+        /// </para>
+        /// </remarks>
         public bool IncludeValuesInErrorMessage { get; set; }
 
         /// <inheritdoc/>

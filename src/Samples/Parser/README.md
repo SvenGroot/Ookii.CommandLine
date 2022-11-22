@@ -34,7 +34,8 @@ Usage: Parser [-Source] <String> [-Destination] <String> [[-OperationIndex] <Int
         Provides a date to the application.
 
     -Day <DayOfWeek>
-        This is an argument using an enumeration type.
+        This is an argument using an enumeration type. Possible values: Sunday, Monday, Tuesday,
+        Wednesday, Thursday, Friday, Saturday.
 
     -Help [<Boolean>] (-?, -h)
         Displays this help message.

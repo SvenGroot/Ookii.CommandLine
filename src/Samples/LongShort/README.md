@@ -37,7 +37,8 @@ Usage: LongShort [--source] <string> [--destination] <string> [[--operation-inde
             Provides a date to the application.
 
         --day <day-of-week>
-            This is an argument using an enumeration type.
+            This is an argument using an enumeration type. Possible values: Sunday, Monday, Tuesday,
+            Wednesday, Thursday, Friday, Saturday.
 
     -?, --help [<boolean>] (-h)
             Displays this help message.

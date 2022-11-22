@@ -3,17 +3,18 @@ using Ookii.CommandLine.Terminal;
 
 namespace CustomUsage;
 
+// A custom usage writer is used to change the format of the usage help.
 internal class CustomUsageWriter : UsageWriter
 {
+    // Override some defaults to suit the custom format.
     public CustomUsageWriter()
     {
         // Only list the positional arguments in the syntax.
         UseAbbreviatedSyntax = true;
 
-        // Set the indentation to work with the format used by the CustomStringProvider.
+        // Set the indentation to work with the formatting used.
         ApplicationDescriptionIndent = 2;
         SyntaxIndent = 2;
-        ArgumentDescriptionIndent = 30;
 
         // Sort the description list by short name.
         ArgumentDescriptionListOrder = DescriptionListSortMode.AlphabeticalShortName;
@@ -62,6 +63,15 @@ internal class CustomUsageWriter : UsageWriter
         WriteColor(TextFormat.BrightForegroundBlack);
         base.WriteArgumentName(argumentName, prefix);
         ResetColor();
+    }
+
+    protected override void WriteArgumentDescriptions()
+    {
+        // Calculate the amount of indentation needed based on the longest names, with two spaces
+        // before and after. This way the usage dynamically adapts if you change the argument
+        // names.
+        ArgumentDescriptionIndent = Parser.Arguments.Max(arg => CalculateNamesLength(arg)) + 4;
+        base.WriteArgumentDescriptions();
     }
 
     // Add a header before the argument description list (normally there is none).
@@ -115,11 +125,59 @@ internal class CustomUsageWriter : UsageWriter
         Writer.ResetIndent();
         Writer.Write("  ");
         WriteColor(ArgumentDescriptionColor);
-        Writer.Write($"{name,-28}");
+        Writer.Write(name);
         ResetColor();
+
+        // Pad until the indentatation is reached.
+        WriteSpacing(ArgumentDescriptionIndent - name.Length - 2);
     }
 
     // Customize the format of the default values.
     protected override void WriteDefaultValue(object defaultValue)
         => Writer.Write($" [default: {defaultValue}]");
+
+    // Calculate the length of the names and value prefix using the same logic as
+    // WriteArgumentDescriptionHeader.
+    private static int CalculateNamesLength(CommandLineArgument argument)
+    {
+        int length = 0;
+        int count = 0;
+        if (argument.HasShortName)
+        {
+            // +1 for separator
+            length += argument.ShortNameWithPrefix!.Length + 1;
+        }
+
+        if (argument.ShortAliases != null)
+        {
+            var shortPrefixLength = argument.Parser.ArgumentNamePrefixes[0].Length;
+            // Space for prefix, short name, separator.
+            length += argument.ShortAliases.Count * (shortPrefixLength + 1 + 1);
+        }
+
+        if (argument.HasLongName)
+        {
+            // +1 for separator
+            length += argument.LongNameWithPrefix!.Length + 1;
+        }
+
+        if (argument.Aliases != null)
+        {
+            var longPrefixLength = argument.Parser.LongArgumentNamePrefix!.Length;
+            // Space for prefix, long name, separator.
+            length += argument.Aliases.Sum(alias => longPrefixLength + alias.Length + 1);
+            count += argument.Aliases.Count;
+        }
+
+        // There is one separator too many
+        length -= 1;
+
+        // Length of value description.
+        if (!argument.IsSwitch)
+        {
+            length += 3 + argument.ValueDescription.Length;
+        }
+
+        return length;
+    }
 }
