@@ -10,6 +10,27 @@ namespace CustomUsage;
 
 internal class CustomUsageWriter : UsageWriter
 {
+    public CustomUsageWriter()
+    {
+        // Only list the positional arguments in the syntax.
+        UseAbbreviatedSyntax = true;
+
+        // Set the indentation to work with the format used by the CustomStringProvider.
+        ApplicationDescriptionIndent = 2;
+        SyntaxIndent = 2;
+        ArgumentDescriptionIndent = 30;
+
+        // Sort the description list by short name.
+        ArgumentDescriptionListOrder = DescriptionListSortMode.AlphabeticalShortName;
+
+        // Customize some of the colors.
+        UsagePrefixColor = TextFormat.ForegroundYellow;
+        ArgumentDescriptionColor = TextFormat.BoldBright;
+
+        // No blank lines between arguments in the description list.
+        BlankLineAfterDescription = false;
+    }
+
     // Add a header before the description.
     protected override void WriteApplicationDescription(string description)
     {
@@ -49,7 +70,7 @@ internal class CustomUsageWriter : UsageWriter
     }
 
     // Add a header before the argument description list (normally there is none).
-    protected override void WriteDescriptionHeader()
+    protected override void WriteArgumentDescriptionListHeader()
     {
         WriteColor(UsagePrefixColor);
         Writer.Write("OPTIONS:");
@@ -57,8 +78,8 @@ internal class CustomUsageWriter : UsageWriter
         Writer.WriteLine();
     }
 
-    // Custom format for argument descriptions.
-    protected override void WriteArgumentDescription(CommandLineArgument argument)
+    // Custom format for argument names and aliases.
+    protected override void WriteArgumentDescriptionHeader(CommandLineArgument argument)
     {
         // Collect all the argument's names and aliases, short names and aliases first.
         var names = Enumerable.Empty<string>();
@@ -101,25 +122,6 @@ internal class CustomUsageWriter : UsageWriter
         WriteColor(ArgumentDescriptionColor);
         Writer.Write($"{name,-28}");
         ResetColor();
-
-        // Write the actual description.
-        if (argument.Description != null)
-        {
-            WriteArgumentDescription(argument.Description);
-        }
-
-        // Add the validators and default value if appropriate.
-        if (IncludeValidatorsInDescription)
-        {
-            WriteArgumentValidators(argument);
-        }
-
-        if (IncludeDefaultValueInDescription && argument.DefaultValue != null)
-        {
-            WriteDefaultValue(argument.DefaultValue);
-        }
-
-        Writer.WriteLine();
     }
 
     // Customize the format of the default values.

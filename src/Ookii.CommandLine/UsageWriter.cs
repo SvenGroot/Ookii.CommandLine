@@ -429,6 +429,16 @@ namespace Ookii.CommandLine
         public bool IncludeValidatorsInDescription { get; set; } = true;
 
         /// <summary>
+        /// Gets or sets a value indicating whether the <see cref="WriteArgumentDescription(CommandLineArgument)"/>
+        /// method will write a blank lines between arguments in the description list.
+        /// </summary>
+        /// <value>
+        /// <see langword="true" /> to write a blank line; otherwise, <see langword="false" />. The
+        /// default value is <see langword="true" />.
+        /// </value>
+        public bool BlankLineAfterDescription { get; set; } = true;
+
+        /// <summary>
         /// Gets or sets the sequence used to reset color applied a usage help element.
         /// </summary>
         /// <value>
@@ -512,6 +522,16 @@ namespace Ookii.CommandLine
         /// </para>
         /// </remarks>
         public int CommandDescriptionIndent { get; set; } = DefaultCommandDescriptionIndent;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the <see cref="WriteCommandDescription(CommandInfo)"/>
+        /// method will write a blank lines between commands in the command list.
+        /// </summary>
+        /// <value>
+        /// <see langword="true" /> to write a blank line; otherwise, <see langword="false" />. The
+        /// default value is <see langword="true" />.
+        /// </value>
+        public bool BlankLineAfterCommandDescription { get; set; } = true;
 
         /// <summary>
         /// Gets or sets a value that indicates whether a message is shown at the bottom of the
@@ -836,8 +856,8 @@ namespace Ookii.CommandLine
         protected virtual void WriteApplicationDescription(string description)
         {
             SetIndent(ApplicationDescriptionIndent);
-            Writer.WriteLine(description);
-            Writer.WriteLine();
+            WriteLine(description);
+            WriteLine();
         }
 
         /// <summary>
@@ -862,7 +882,7 @@ namespace Ookii.CommandLine
                     continue;
                 }
 
-                Writer.Write(" ");
+                Write(" ");
                 if (UseAbbreviatedSyntax && argument.Position == null)
                 {
                     WriteAbbreviatedRemainingArguments();
@@ -879,8 +899,8 @@ namespace Ookii.CommandLine
                 }
             }
 
-            Writer.WriteLine(); // End syntax line
-            Writer.WriteLine(); // Blank line
+            WriteLine(); // End syntax line
+            WriteLine(); // Blank line
         }
 
         /// <summary>
@@ -906,14 +926,14 @@ namespace Ookii.CommandLine
         protected virtual void WriteUsageSyntaxPrefix()
         {
             WriteColor(UsagePrefixColor);
-            Writer.Write(Resources.DefaultUsagePrefix);
+            Write(Resources.DefaultUsagePrefix);
             ResetColor();
-            Writer.Write(' ');
-            Writer.Write(ExecutableName);
+            Write(' ');
+            Write(ExecutableName);
             if (CommandName != null)
             {
-                Writer.Write(' ');
-                Writer.Write(CommandName);
+                Write(' ');
+                Write(CommandName);
             }
         }
 
@@ -933,9 +953,9 @@ namespace Ookii.CommandLine
         /// </remarks>
         protected virtual void WriteOptionalArgumentSyntax(CommandLineArgument argument)
         {
-            Writer.Write(OptionalStart);
+            Write(OptionalStart);
             WriteArgumentSyntax(argument);
-            Writer.Write(OptionalEnd);
+            Write(OptionalEnd);
         }
 
         /// <summary>
@@ -982,7 +1002,7 @@ namespace Ookii.CommandLine
                 // Otherwise, the separator was included in the argument name.
                 if (argument.Position == null || separator == null)
                 {
-                    Writer.Write(separator ?? ' ');
+                    Write(separator ?? ' ');
                 }
 
                 WriteValueDescription(argument.ValueDescription);
@@ -1013,8 +1033,8 @@ namespace Ookii.CommandLine
         /// </remarks>
         protected virtual void WriteArgumentName(string argumentName, string prefix)
         {
-            Writer.Write(prefix);
-            Writer.Write(argumentName);
+            Write(prefix);
+            Write(argumentName);
         }
 
         /// <summary>
@@ -1044,14 +1064,14 @@ namespace Ookii.CommandLine
         /// </remarks>
         protected virtual void WritePositionalArgumentName(string argumentName, string prefix, char? separator)
         {
-            Writer.Write(OptionalStart);
+            Write(OptionalStart);
             WriteArgumentName(argumentName, prefix);
             if (separator is char separatorValue)
             {
-                Writer.Write(separatorValue);
+                Write(separatorValue);
             }
 
-            Writer.Write(OptionalEnd);
+            Write(OptionalEnd);
         }
 
         /// <summary>
@@ -1069,7 +1089,7 @@ namespace Ookii.CommandLine
         /// </para>
         /// </remarks>
         protected virtual void WriteValueDescription(string valueDescription)
-            => Writer.Write($"<{valueDescription}>");
+            => Write($"<{valueDescription}>");
 
         /// <summary>
         /// Writes the string used to indicate there are more arguments if the usage syntax was
@@ -1085,7 +1105,7 @@ namespace Ookii.CommandLine
         /// </para>
         /// </remarks>
         protected virtual void WriteAbbreviatedRemainingArguments()
-            => Writer.Write(Resources.DefaultAbbreviatedRemainingArguments);
+            => Write(Resources.DefaultAbbreviatedRemainingArguments);
 
         /// <summary>
         /// Writes a suffix that indicates an argument is a multi-value argument.
@@ -1100,7 +1120,7 @@ namespace Ookii.CommandLine
         /// </para>
         /// </remarks>
         protected virtual void WriteMultiValueSuffix()
-            => Writer.Write(Resources.DefaultArraySuffix);
+            => Write(Resources.DefaultArraySuffix);
 
         /// <summary>
         /// Writes the help messages for any <see cref="ClassValidationAttribute"/> attributes
@@ -1125,13 +1145,13 @@ namespace Ookii.CommandLine
                 if (!string.IsNullOrEmpty(help))
                 {
                     hasHelp = true;
-                    Writer.WriteLine(help);
+                    WriteLine(help);
                 }
             }
 
             if (hasHelp)
             {
-                Writer.WriteLine(); // Blank line.
+                WriteLine(); // Blank line.
             }
         }
 
@@ -1171,7 +1191,7 @@ namespace Ookii.CommandLine
             {
                 if (first)
                 {
-                    WriteDescriptionHeader();
+                    WriteArgumentDescriptionListHeader();
                     first = false;
                 }
 
@@ -1192,7 +1212,7 @@ namespace Ookii.CommandLine
         ///   method before the first argument.
         /// </para>
         /// </remarks>
-        protected virtual void WriteDescriptionHeader()
+        protected virtual void WriteArgumentDescriptionListHeader()
         {
             // Intentionally blank.
         }
@@ -1203,9 +1223,9 @@ namespace Ookii.CommandLine
         /// <param name="argument">The argument</param>
         /// <remarks>
         /// <para>
-        ///   The base implementation writes the name(s), alias(es), value description on one line,
-        ///   the description text, argument validator messages, and the default value on the next.
-        ///   Which elements are included can be influenced using the properties of this class.
+        ///   The base implementation calls the <see cref="WriteArgumentDescriptionHeader"/> method,
+        ///   the <see cref="WriteArgumentDescriptionBody"/> method, and then adds an extra blank
+        ///   line if the <see cref="BlankLineAfterDescription"/> property is <see langword="true"/>.
         /// </para>
         /// <para>
         ///   If color is enabled, the <see cref="ArgumentDescriptionColor"/> property is used for
@@ -1218,9 +1238,38 @@ namespace Ookii.CommandLine
         /// </remarks>
         protected virtual void WriteArgumentDescription(CommandLineArgument argument)
         {
+            WriteArgumentDescriptionHeader(argument);
+            WriteArgumentDescriptionBody(argument);
+
+            if (BlankLineAfterDescription)
+            {
+                WriteLine();
+            }
+        }
+
+        /// <summary>
+        /// Writes the header of an argument's description, which is usually the name and value
+        /// description.
+        /// </summary>
+        /// <param name="argument">The argument</param>
+        /// <remarks>
+        /// <para>
+        ///   The base implementation writes the name(s), value description, and alias(es), ending
+        ///   with a new line. Which elements are included can be influenced using the properties of
+        ///   this class.
+        /// </para>
+        /// <para>
+        ///   If color is enabled, the <see cref="ArgumentDescriptionColor"/> property is used.
+        /// </para>
+        /// <para>
+        ///   This method is called by the base implementation of <see cref="WriteArgumentDescription(CommandLineArgument)"/>.
+        /// </para>
+        /// </remarks>
+        protected virtual void WriteArgumentDescriptionHeader(CommandLineArgument argument)
+        {
             Writer.ResetIndent();
             var indent = ShouldIndent ? ArgumentDescriptionIndent : 0;
-            Writer.Write(new string(' ', indent / 2));
+            WriteSpacing(indent / 2);
 
             var shortPrefix = argument.Parser.ArgumentNamePrefixes[0];
             var prefix = argument.Parser.LongArgumentNamePrefix ?? shortPrefix;
@@ -1233,12 +1282,12 @@ namespace Ookii.CommandLine
                     WriteArgumentNameForDescription(argument.ShortName.ToString(), shortPrefix);
                     if (argument.HasLongName)
                     {
-                        Writer.Write(NameSeparator);
+                        Write(NameSeparator);
                     }
                 }
                 else
                 {
-                    Writer.Write(new string(' ', shortPrefix.Length + NameSeparator.Length + 1));
+                    WriteSpacing(shortPrefix.Length + NameSeparator.Length + 1);
                 }
 
                 if (argument.HasLongName)
@@ -1251,7 +1300,7 @@ namespace Ookii.CommandLine
                 WriteArgumentNameForDescription(argument.ArgumentName, prefix);
             }
 
-            Writer.Write(' ');
+            Write(' ');
             if (argument.IsSwitch)
             {
                 WriteSwitchValueDescription(argument.ValueDescription);
@@ -1267,7 +1316,23 @@ namespace Ookii.CommandLine
             }
 
             ResetColor();
-            Writer.WriteLine();
+            WriteLine();
+        }
+
+        /// <summary>
+        /// Writes the body of an argument description, which is usually the description itself
+        /// with any supplemental information.
+        /// </summary>
+        /// <param name="argument">The argument.</param>
+        /// <remarks>
+        /// <para>
+        ///   The base implementation writes the description text, argument validator messages, and
+        ///   the default value, following by two new lines. Which elements are included can be
+        ///   influenced using the properties of this class.
+        /// </para>
+        /// </remarks>
+        protected virtual void WriteArgumentDescriptionBody(CommandLineArgument argument)
+        {
             bool hasDescription = !string.IsNullOrEmpty(argument.Description);
             if (hasDescription)
             {
@@ -1284,8 +1349,7 @@ namespace Ookii.CommandLine
                 WriteDefaultValue(argument.DefaultValue);
             }
 
-            Writer.WriteLine();
-            Writer.WriteLine();
+            WriteLine();
         }
 
         /// <summary>
@@ -1307,8 +1371,8 @@ namespace Ookii.CommandLine
         /// </remarks>
         protected virtual void WriteArgumentNameForDescription(string argumentName, string prefix)
         {
-            Writer.Write(prefix);
-            Writer.Write(argumentName);
+            Write(prefix);
+            Write(argumentName);
         }
 
         /// <summary>
@@ -1326,7 +1390,7 @@ namespace Ookii.CommandLine
         /// </para>
         /// </remarks>
         protected virtual void WriteValueDescriptionForDescription(string valueDescription)
-            => Writer.Write($"<{valueDescription}>");
+            => Write($"<{valueDescription}>");
 
         /// <summary>
         /// Writes the value description of a switch argument for use in the argument description
@@ -1345,9 +1409,9 @@ namespace Ookii.CommandLine
         /// </remarks>
         protected virtual void WriteSwitchValueDescription(string valueDescription)
         {
-            Writer.Write(OptionalStart);
+            Write(OptionalStart);
             WriteValueDescriptionForDescription(valueDescription);
-            Writer.Write(OptionalEnd);
+            Write(OptionalEnd);
         }
 
         /// <summary>
@@ -1393,7 +1457,7 @@ namespace Ookii.CommandLine
 
             if (count > 0)
             {
-                Writer.Write(")");
+                Write(")");
             }
         }
 
@@ -1432,7 +1496,7 @@ namespace Ookii.CommandLine
         /// </remarks>
         protected virtual void WriteArgumentDescription(string description)
         {
-            Writer.Write(description);
+            Write(description);
         }
 
         /// <summary>
@@ -1458,8 +1522,8 @@ namespace Ookii.CommandLine
                 var help = validator.GetUsageHelp(argument);
                 if (!string.IsNullOrEmpty(help))
                 {
-                    Writer.Write(' ');
-                    Writer.Write(help);
+                    Write(' ');
+                    Write(help);
                 }
             }
         }
@@ -1481,7 +1545,7 @@ namespace Ookii.CommandLine
         /// </para>
         /// </remarks>
         protected virtual void WriteDefaultValue(object defaultValue)
-            => Writer.Write(Resources.DefaultDefaultValueFormat, defaultValue);
+            => Write(Resources.DefaultDefaultValueFormat, defaultValue);
 
         /// <summary>
         /// Writes a message telling to user how to get more detailed help.
@@ -1511,7 +1575,7 @@ namespace Ookii.CommandLine
                     ExecutableName += " " + CommandName;
                 }
 
-                Writer.WriteLine(Resources.MoreInfoOnErrorFormat, name, arg.ArgumentNameWithPrefix);
+                WriteLine(Resources.MoreInfoOnErrorFormat, name, arg.ArgumentNameWithPrefix);
             }
         }
 
@@ -1617,8 +1681,8 @@ namespace Ookii.CommandLine
         protected virtual void WriteCommandListUsageSyntax()
         {
             WriteUsageSyntaxPrefix();
-            Writer.WriteLine(Resources.DefaultCommandUsageSuffix);
-            Writer.WriteLine();
+            WriteLine(Resources.DefaultCommandUsageSuffix);
+            WriteLine();
         }
 
         /// <summary>
@@ -1636,8 +1700,8 @@ namespace Ookii.CommandLine
         /// </remarks>
         protected virtual void WriteAvailableCommandsHeader()
         {
-            Writer.WriteLine(Resources.DefaultAvailableCommandsHeader);
-            Writer.WriteLine();
+            WriteLine(Resources.DefaultAvailableCommandsHeader);
+            WriteLine();
         }
 
         /// <summary>
@@ -1684,9 +1748,32 @@ namespace Ookii.CommandLine
         /// </remarks>
         protected virtual void WriteCommandDescription(CommandInfo command)
         {
+            WriteCommandDescriptionHeader(command);
+            WriteCommandDescriptionBody(command);
+
+            if (BlankLineAfterCommandDescription)
+            {
+                WriteLine();
+            }
+        }
+
+        /// <summary>
+        /// Writes the header of a command's description, which is typically the name and alias(es)
+        /// of a command.
+        /// </summary>
+        /// <param name="command">The command.</param>
+        /// <remarks>
+        /// <para>
+        ///   The base implementation the command's name and alias(es), using the color from the
+        ///   <see cref="CommandDescriptionColor"/> property if color is enabled, followed by a
+        ///   newline.
+        /// </para>
+        /// </remarks>
+        protected virtual void WriteCommandDescriptionHeader(CommandInfo command)
+        {
             Writer.ResetIndent();
             var indent = ShouldIndent ? CommandDescriptionIndent : 0;
-            Writer.Write(new string(' ', indent / 2));
+            WriteSpacing(indent / 2);
             WriteColor(CommandDescriptionColor);
             WriteCommandName(command.Name);
             if (IncludeCommandAliasInCommandList)
@@ -1695,14 +1782,26 @@ namespace Ookii.CommandLine
             }
 
             ResetColor();
-            Writer.WriteLine();
+            WriteLine();
+        }
+
+        /// <summary>
+        /// Writes the body of a command's description, which is typically the name and alias(es)
+        /// of a command.
+        /// </summary>
+        /// <param name="command">The command</param>
+        /// <remarks>
+        /// <para>
+        ///   The base implementation writes the command's description, followed by two newlines.
+        /// </para>
+        /// </remarks>
+        private void WriteCommandDescriptionBody(CommandInfo command)
+        {
             if (command.Description != null)
             {
                 WriteCommandDescription(command.Description);
-                Writer.WriteLine();
+                WriteLine();
             }
-
-            Writer.WriteLine();
         }
 
         /// <summary>
@@ -1719,7 +1818,7 @@ namespace Ookii.CommandLine
         /// </para>
         /// </remarks>
         protected virtual void WriteCommandName(string commandName)
-            => Writer.Write(commandName);
+            => Write(commandName);
 
         /// <summary>
         /// Writes the aliases of a command.
@@ -1739,8 +1838,8 @@ namespace Ookii.CommandLine
         {
             foreach (var alias in aliases)
             {
-                Writer.Write(NameSeparator);
-                Writer.Write(alias);
+                Write(NameSeparator);
+                Write(alias);
             }
         }
 
@@ -1758,7 +1857,7 @@ namespace Ookii.CommandLine
         /// </para>
         /// </remarks>
         protected virtual void WriteCommandDescription(string description)
-            => Writer.Write(description);
+            => Write(description);
 
         /// <summary>
         /// Writes an instruction on how to get help on a command.
@@ -1778,9 +1877,64 @@ namespace Ookii.CommandLine
         /// </para>
         /// </remarks>
         protected virtual void WriteCommandHelpInstruction(string argumentNamePrefix, string argumentName)
-            => Writer.WriteLine(Resources.CommandHelpInstructionFormat, ExecutableName, argumentNamePrefix, argumentName);
+            => WriteLine(Resources.CommandHelpInstructionFormat, ExecutableName, argumentNamePrefix, argumentName);
 
         #endregion
+
+        /// <summary>
+        /// Writes the specified amount of spaces to the <see cref="Writer"/>.
+        /// </summary>
+        /// <param name="count">The number of spaces.</param>
+        protected virtual void WriteSpacing(int count)
+        {
+            for (int i = 0; i < count; ++i)
+            {
+                Write(' ');
+            }
+        }
+
+        /// <summary>
+        /// Writes a string to the <see cref="Writer"/>.
+        /// </summary>
+        /// <param name="value">The string to write.</param>
+        /// <remarks>
+        /// <para>
+        ///   This method, along with <see cref="Write(char)"/>, is called for every write by the
+        ///   base implementation. Override this method if you need to apply a transformation,
+        ///   like HTML encoding, to all written text.
+        /// </para>
+        /// </remarks>
+        protected virtual void Write(string? value) => Writer.Write(value);
+
+        /// <summary>
+        /// Writes a character to the <see cref="Writer"/>.
+        /// </summary>
+        /// <param name="value">The character to write.</param>
+        /// <remarks>
+        /// <para>
+        ///   This method, along with <see cref="Write(char)"/>, is called for every write by the
+        ///   base implementation. Override this method if you need to apply a transformation,
+        ///   like HTML encoding, to all written text.
+        /// </para>
+        /// </remarks>
+        protected virtual void Write(char value) => Writer.Write(value);
+
+        /// <summary>
+        /// Writes a new line to the <see cref="Writer"/>.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        ///   This method is called for every explicit new line added by the base implementation.
+        ///   Override this method if you need to apply a transformation to all newlines.
+        /// </para>
+        /// <note>
+        ///   This method does not get called for newlines embedded in strings like argument
+        ///   descriptions. Those will be part of strings passed to the <see cref="Write(string)"/>
+        ///   method.
+        /// </note>
+        /// </remarks>
+        protected virtual void WriteLine() => Writer.WriteLine();
+        
 
         /// <summary>
         /// Writes a string with virtual terminal sequences only if color is enabled.
@@ -1800,7 +1954,7 @@ namespace Ookii.CommandLine
         {
             if (UseColor)
             {
-                Writer.Write(color);
+                Write(color);
             }
         }
 
@@ -1848,6 +2002,20 @@ namespace Ookii.CommandLine
             return writer.BaseWriter.ToString()!;
         }
 
+        private void WriteLine(string? value)
+        {
+            Write(value);
+            WriteLine();
+        }
+
+        private void Write(string format, object? arg0) => Write(string.Format(Writer.FormatProvider, format, arg0));
+        
+        private void WriteLine(string format, object? arg0, object? arg1)
+            => WriteLine(string.Format(Writer.FormatProvider, format, arg0, arg1));
+
+        private void WriteLine(string format, object? arg0, object? arg1, object? arg2)
+            => WriteLine(string.Format(Writer.FormatProvider, format, arg0, arg1, arg2));
+
         private VirtualTerminalSupport? EnableColor()
         {
             if (_useColor == null && _writer == null)
@@ -1871,11 +2039,11 @@ namespace Ookii.CommandLine
             {
                 if (count == 0)
                 {
-                    Writer.Write(" (");
+                    Write(" (");
                 }
                 else
                 {
-                    Writer.Write(NameSeparator);
+                    Write(NameSeparator);
                 }
 
                 WriteAlias(alias!.ToString()!, prefix);

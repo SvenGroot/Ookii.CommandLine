@@ -87,20 +87,7 @@ class ProgramArguments
             },
             // Use our own string provider for the custom usage strings.
             StringProvider = new CustomStringProvider(),
-            UsageWriter = new CustomUsageWriter()
-            {
-                // Only list the positional arguments in the syntax.
-                UseAbbreviatedSyntax = true,
-                // Set the indentation to work with the format used by the CustomStringProvider.
-                ApplicationDescriptionIndent = 2,
-                SyntaxIndent = 2,
-                ArgumentDescriptionIndent = 30,
-                // Sort the description list by short name.
-                ArgumentDescriptionListOrder = DescriptionListSortMode.AlphabeticalShortName,
-                // Customize some of the colors.
-                UsagePrefixColor = TextFormat.ForegroundYellow,
-                ArgumentDescriptionColor = TextFormat.BoldBright,
-            },
+            UsageWriter = new CustomUsageWriter(),
         };
 
         return CommandLineParser.Parse<ProgramArguments>(options);
