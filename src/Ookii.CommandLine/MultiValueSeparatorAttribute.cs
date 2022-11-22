@@ -65,7 +65,7 @@ namespace Ookii.CommandLine
         /// </para>
         /// </remarks>
         public MultiValueSeparatorAttribute()
-        { 
+        {
         }
 
         /// <summary>

@@ -540,6 +540,5 @@ namespace Ookii.CommandLine
 
             return null;
         }
-
     }
 }

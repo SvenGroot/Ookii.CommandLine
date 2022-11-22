@@ -92,7 +92,5 @@ namespace Ookii.CommandLine
             STD_INPUT_HANDLE = -10,
             STD_ERROR_HANDLE = -12,
         }
-
-
     }
 }

@@ -1592,12 +1592,12 @@ namespace Ookii.CommandLine
         protected IEnumerable<CommandLineArgument> GetFilteredAndSortedArguments()
         {
             var arguments = Parser.Arguments.Where(argument => !argument.IsHidden && ArgumentDescriptionListFilter switch
-                {
-                    DescriptionListFilterMode.Information => argument.HasInformation(this),
-                    DescriptionListFilterMode.Description => !string.IsNullOrEmpty(argument.Description),
-                    DescriptionListFilterMode.All => true,
-                    _ => false,
-                });
+            {
+                DescriptionListFilterMode.Information => argument.HasInformation(this),
+                DescriptionListFilterMode.Description => !string.IsNullOrEmpty(argument.Description),
+                DescriptionListFilterMode.All => true,
+                _ => false,
+            });
 
             var comparer = Parser.ArgumentNameComparer;
             return ArgumentDescriptionListOrder switch
@@ -1934,7 +1934,7 @@ namespace Ookii.CommandLine
         /// </note>
         /// </remarks>
         protected virtual void WriteLine() => Writer.WriteLine();
-        
+
 
         /// <summary>
         /// Writes a string with virtual terminal sequences only if color is enabled.
@@ -2009,7 +2009,7 @@ namespace Ookii.CommandLine
         }
 
         private void Write(string format, object? arg0) => Write(string.Format(Writer.FormatProvider, format, arg0));
-        
+
         private void WriteLine(string format, object? arg0, object? arg1)
             => WriteLine(string.Format(Writer.FormatProvider, format, arg0, arg1));
 

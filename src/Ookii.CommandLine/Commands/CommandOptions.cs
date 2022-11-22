@@ -115,6 +115,5 @@ namespace Ookii.CommandLine.Commands
         {
             return CommandNameTransform.Apply(StringProvider.AutomaticVersionCommandName());
         }
-
     }
 }

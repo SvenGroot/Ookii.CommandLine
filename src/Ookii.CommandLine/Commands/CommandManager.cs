@@ -518,7 +518,7 @@ namespace Ookii.CommandLine.Commands
         /// The value of the <see cref="AssemblyDescriptionAttribute"/> for the first assembly
         /// used by this instance.
         /// </returns>
-        public string? GetApplicationDescription() 
+        public string? GetApplicationDescription()
             => (_assembly ?? _assemblies?.FirstOrDefault())?.GetCustomAttribute<AssemblyDescriptionAttribute>()?.Description;
 
         // Return value does not include the automatic version command.
