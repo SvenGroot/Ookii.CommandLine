@@ -54,6 +54,14 @@ internal class HtmlUsageWriter : UsageWriter
         Writer.Write($"<strong>{ExecutableName}</strong>");
     }
 
+    // Prevent wrapping after the argument name prefix.
+    protected override void WriteArgumentName(string argumentName, string prefix)
+    {
+        Writer.Write("<span class=\"argument\">");
+        base.WriteArgumentName(argumentName, prefix);
+        Writer.Write("</span>");
+    }
+
     // Header and description list for descriptions.
     protected override void WriteArgumentDescriptions()
     {
@@ -81,6 +89,10 @@ internal class HtmlUsageWriter : UsageWriter
         Writer.Write("</dd>");
     }
 
+    // Prevent wrapping after the argument name prefix.
+    protected override void WriteArgumentNameForDescription(string argumentName, string prefix)
+        => WriteArgumentName(argumentName, prefix);
+
     // Make sure all text is HTML encoded.
     protected override void Write(string? value)
     {
@@ -107,7 +119,7 @@ internal class HtmlUsageWriter : UsageWriter
             color: deepskyblue;
         }
         dt {
-            color:lightgreen;
+            color: lightgreen;
         }
         dd {
             margin-bottom: 1em;
@@ -115,6 +127,9 @@ internal class HtmlUsageWriter : UsageWriter
         #usage {
             text-indent: -2em;
             margin-left: 2em;
+        }
+        .argument {
+            white-space: nowrap;
         }
     </style>
 </head>

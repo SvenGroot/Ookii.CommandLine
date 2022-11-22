@@ -19,13 +19,14 @@ The sample uses a simple CSS stylesheet to format the usage help; you can make t
 like, of course.
 
 This is by no means the only way. Since all the information needed to generate usage help is
-available in the `CommandLineParser` class, you could just as easily forego the `UsageWriter`
-entirely and use XAML page to show the usage.
+available in the `CommandLineParser` class, you could for example use a custom XAML page to show
+the usage.
 
-This sample also defines a custom "-Version" argument. The automatic one that gets added by
-Ookii.CommandLine writes to the console, so isn't useful here. This manual implementation shows
-the version information in a dialog box.
+This sample also defines a custom `-Version` argument; the automatic one that gets added by
+Ookii.CommandLine writes to the console, so it isn't useful here. This manual implementation shows
+the same version information in a dialog box.
 
-A similar approach would work for Windows Forms, or other GUI framework.
+A similar approach would work for Windows Forms, or any other GUI framework.
 
-This application is very basic; it's just a sample, and I don't do a lot of GUI work nowadays. Sorry.
+This application is very basic; it's just a sample, and I don't do a lot of GUI work nowadays. It's
+just intended to show how the `UsageWriter` can be adapted to work in the context of a GUI app.
