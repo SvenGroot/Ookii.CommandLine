@@ -38,6 +38,11 @@ namespace Ookii.CommandLine.Commands
     /// <para>
     ///   Commands can be defined in a single assembly, or multiple assemblies.
     /// </para>
+    /// <note>
+    ///   If you reuse the same <see cref="CommandManager"/> instance or <see cref="CommandOptions"/>
+    ///   instance to create multiple commands, the <see cref="ParseOptionsAttribute"/> of one
+    ///   command may affect the behavior of another.
+    /// </note>
     /// </remarks>
     /// <seealso cref="CommandLineParser"/>
     /// <seealso href="https://www.github.com/SvenGroot/ookii.commandline"/>
@@ -71,6 +76,14 @@ namespace Ookii.CommandLine.Commands
         /// <exception cref="ArgumentNullException">
         /// <paramref name="assembly"/> is <see langword="null"/>.
         /// </exception>
+        /// <remarks>
+        /// <note>
+        ///   Once a command is created, the <paramref name="options"/> instance may be modified
+        ///   with the options of the <see cref="ParseOptionsAttribute"/> attribute applied to the
+        ///   command class. Be aware of this if reusing the same <see cref="CommandManager"/> or
+        ///   <see cref="CommandOptions"/> instance to create multiple commands.
+        /// </note>
+        /// </remarks>
         public CommandManager(Assembly assembly, CommandOptions? options = null)
         {
             _assembly = assembly ?? throw new ArgumentNullException(nameof(assembly));
@@ -109,6 +122,12 @@ namespace Ookii.CommandLine.Commands
         /// <para>
         ///   Modifying the options will change the way this instance behaves.
         /// </para>
+        /// <note>
+        ///   Once a command is created, the <see cref="ParseOptions"/> instance may be modified
+        ///   with the options of the <see cref="ParseOptionsAttribute"/> attribute applied to the
+        ///   command class. Be aware of this if reusing the same <see cref="CommandManager"/> or
+        ///   <see cref="CommandOptions"/> instance to create multiple commands.
+        /// </note>
         /// </remarks>
         public CommandOptions Options => _options;
 

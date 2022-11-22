@@ -17,6 +17,9 @@ modifications unless you used subcommands or heavily customized the usage help f
     can return null even if it previously wouldn't.
   - Recommended: use the `CommandLineParser<T>` class to get strongly typed instance `Parse()`
     methods.
+  - The `CommandLineParser` constructor now takes a `ParseOptions` instance.
+  - Several properties of the `CommandLineParser` class that could be used to change parsing behavior
+    are now read-only and can only be changed through `ParseOptions`.
 - The `WriteUsageOptions` class has been replaced with `UsageWriter`.
 - Usage options that previously were formatting strings now require creating a class that derives
   from `UsageWriter` and overrides some of its methods (you have much more control over the

@@ -20,6 +20,8 @@ from Ookii.CommandLine 2.x](Migrating.md) if you are upgrading an existing appli
     methods or constructors taking a string argument for arguments, even without a `TypeConverter`.
   - You can now customize parsing behavior by applying the `ParseOptionsAttribute` to your class, as
     an alternative to passing `ParseOptions` to the static `Parse<T>` method.
+  - `ParseOptions` is now also used to set options when manually creating a `CommandLineParser`
+    instance.
   - Argument value conversion now defaults to using `CultureInfo.InvariantCulture`.
   - Added a `Parse` method overloads that takes arguments from `Environment.GetCommandLineArgs()`.
   - Added a generic `CommandLineParser<T>` helper class, for easier usage when you don't want to use

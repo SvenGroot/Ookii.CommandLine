@@ -224,8 +224,6 @@ namespace Ookii.CommandLine
             public bool CancelParsing { get; set; }
             public bool IsHidden { get; set; }
             public IEnumerable<ArgumentValidationAttribute> Validators { get; set; }
-            public IDictionary<Type, string>? DefaultValueDescriptions { get; set; }
-            public NameTransform ValueDescriptionTransform { get; set; }
         }
 
         private struct MethodArgumentInfo
@@ -341,16 +339,12 @@ namespace Ookii.CommandLine
                     }
 
                     var valueDescription = info.ValueDescription ?? GetDefaultValueDescription(_elementTypeWithNullable,
-                        info.DefaultValueDescriptions);
+                        _parser.Options.DefaultValueDescriptions);
 
                     if (valueDescription == null)
                     {
-                        var key = DetermineValueDescription(genericArguments[0].GetUnderlyingType(),
-                            info.DefaultValueDescriptions, info.ValueDescriptionTransform);
-
-                        var value = DetermineValueDescription(genericArguments[1].GetUnderlyingType(),
-                            info.DefaultValueDescriptions, info.ValueDescriptionTransform);
-
+                        var key = DetermineValueDescription(genericArguments[0].GetUnderlyingType(), _parser.Options);
+                        var value = DetermineValueDescription(genericArguments[1].GetUnderlyingType(), _parser.Options);
                         valueDescription = $"{key}{_keyValueSeparator}{value}";
                     }
 
@@ -386,8 +380,7 @@ namespace Ookii.CommandLine
 
             if (_valueDescription == null)
             {
-                _valueDescription = info.ValueDescription ?? DetermineValueDescription(_elementType,
-                    info.DefaultValueDescriptions, info.ValueDescriptionTransform);
+                _valueDescription = info.ValueDescription ?? DetermineValueDescription(_elementType, _parser.Options);
             }
 
             _defaultValue = ConvertToArgumentTypeInvariant(info.DefaultValue);
@@ -1244,7 +1237,7 @@ namespace Ookii.CommandLine
             return continueParsing;
         }
 
-        internal static CommandLineArgument Create(CommandLineParser parser, ParameterInfo parameter, IDictionary<Type, string>? defaultValueDescriptions, NameTransform valueDescriptionTransform)
+        internal static CommandLineArgument Create(CommandLineParser parser, ParameterInfo parameter)
         {
             if (parser == null)
             {
@@ -1261,7 +1254,7 @@ namespace Ookii.CommandLine
             var valueTypeConverterAttribute = parameter.GetCustomAttribute<ValueTypeConverterAttribute>();
             var argumentNameAttribute = parameter.GetCustomAttribute<ArgumentNameAttribute>();
             var multiValueSeparatorAttribute = parameter.GetCustomAttribute<MultiValueSeparatorAttribute>();
-            var argumentName = DetermineArgumentName(argumentNameAttribute?.ArgumentName, parameter.Name, parser.NameTransform);
+            var argumentName = DetermineArgumentName(argumentNameAttribute?.ArgumentName, parameter.Name, parser.Options.NameTransform);
             var info = new ArgumentInfo()
             {
                 Parser = parser,
@@ -1288,14 +1281,12 @@ namespace Ookii.CommandLine
                 MemberName = parameter.Name,
                 AllowNull = DetermineAllowsNull(parameter),
                 Validators = parameter.GetCustomAttributes<ArgumentValidationAttribute>(),
-                DefaultValueDescriptions = defaultValueDescriptions,
-                ValueDescriptionTransform = valueDescriptionTransform,
             };
 
             return new CommandLineArgument(info);
         }
 
-        internal static CommandLineArgument Create(CommandLineParser parser, PropertyInfo property, IDictionary<Type, string>? defaultValueDescriptions, NameTransform valueDescriptionTransform)
+        internal static CommandLineArgument Create(CommandLineParser parser, PropertyInfo property)
         {
             if (parser == null)
             {
@@ -1307,10 +1298,10 @@ namespace Ookii.CommandLine
                 throw new ArgumentNullException(nameof(property));
             }
 
-            return Create(parser, property, null, property.PropertyType, DetermineAllowsNull(property), defaultValueDescriptions, valueDescriptionTransform);
+            return Create(parser, property, null, property.PropertyType, DetermineAllowsNull(property));
         }
 
-        internal static CommandLineArgument Create(CommandLineParser parser, MethodInfo method, IDictionary<Type, string>? defaultValueDescriptions, NameTransform valueDescriptionTransform)
+        internal static CommandLineArgument Create(CommandLineParser parser, MethodInfo method)
         {
             if (parser == null)
             {
@@ -1329,11 +1320,11 @@ namespace Ookii.CommandLine
             }
 
             var (methodInfo, argumentType, allowsNull) = infoTuple.Value;
-            return Create(parser, null, methodInfo, argumentType, allowsNull, defaultValueDescriptions, valueDescriptionTransform);
+            return Create(parser, null, methodInfo, argumentType, allowsNull);
         }
 
         private static CommandLineArgument Create(CommandLineParser parser, PropertyInfo? property, MethodArgumentInfo? method,
-            Type argumentType, bool allowsNull, IDictionary<Type, string>? defaultValueDescriptions, NameTransform valueDescriptionTransform)
+            Type argumentType, bool allowsNull)
         {
             var member = ((MemberInfo?)property ?? method?.Method)!;
             var attribute = member.GetCustomAttribute<CommandLineArgumentAttribute>();
@@ -1346,7 +1337,7 @@ namespace Ookii.CommandLine
             var keyTypeConverterAttribute = member.GetCustomAttribute<KeyTypeConverterAttribute>();
             var valueTypeConverterAttribute = member.GetCustomAttribute<ValueTypeConverterAttribute>();
             var multiValueSeparatorAttribute = member.GetCustomAttribute<MultiValueSeparatorAttribute>();
-            var argumentName = DetermineArgumentName(attribute.ArgumentName, member.Name, parser.NameTransform);
+            var argumentName = DetermineArgumentName(attribute.ArgumentName, member.Name, parser.Options.NameTransform);
             var info = new ArgumentInfo()
             {
                 Parser = parser,
@@ -1376,8 +1367,6 @@ namespace Ookii.CommandLine
                 CancelParsing = attribute.CancelParsing,
                 IsHidden = attribute.IsHidden,
                 Validators = member.GetCustomAttributes<ArgumentValidationAttribute>(),
-                DefaultValueDescriptions = defaultValueDescriptions,
-                ValueDescriptionTransform = valueDescriptionTransform,
             };
 
             return new CommandLineArgument(info);
@@ -1390,7 +1379,7 @@ namespace Ookii.CommandLine
                 throw new ArgumentNullException(nameof(parser));
             }
 
-            var argumentName = DetermineArgumentName(null, parser.StringProvider.AutomaticHelpName(), parser.NameTransform);
+            var argumentName = DetermineArgumentName(null, parser.StringProvider.AutomaticHelpName(), parser.Options.NameTransform);
             var shortName = parser.StringProvider.AutomaticHelpShortName();
             var shortAlias = char.ToLowerInvariant(argumentName[0]);
             var existingArg = parser.GetArgument(argumentName) ??
@@ -1420,8 +1409,6 @@ namespace Ookii.CommandLine
                 MemberName = memberName,
                 CancelParsing = true,
                 Validators = Enumerable.Empty<ArgumentValidationAttribute>(),
-                DefaultValueDescriptions = defaultValueDescriptions,
-                ValueDescriptionTransform = valueDescriptionTransform,
             };
 
             var shortNameString = shortName.ToString();
@@ -1450,7 +1437,7 @@ namespace Ookii.CommandLine
                 throw new ArgumentNullException(nameof(parser));
             }
 
-            var argumentName = DetermineArgumentName(null, parser.StringProvider.AutomaticVersionName(), parser.NameTransform);
+            var argumentName = DetermineArgumentName(null, parser.StringProvider.AutomaticVersionName(), parser.Options.NameTransform);
             if (parser.GetArgument(argumentName) != null)
             {
                 return null;
@@ -1471,8 +1458,6 @@ namespace Ookii.CommandLine
                 Description = parser.StringProvider.AutomaticVersionDescription(),
                 MemberName = memberName,
                 Validators = Enumerable.Empty<ArgumentValidationAttribute>(),
-                DefaultValueDescriptions = defaultValueDescriptions,
-                ValueDescriptionTransform = valueDescriptionTransform,
             };
 
             return new CommandLineArgument(info);
@@ -1883,14 +1868,14 @@ namespace Ookii.CommandLine
             return false;
         }
 
-        private static string DetermineArgumentName(string? explicitName, string memberName, NameTransform transform)
+        private static string DetermineArgumentName(string? explicitName, string memberName, NameTransform? transform)
         {
             if (explicitName != null)
             {
                 return explicitName;
             }
 
-            return transform.Apply(memberName);
+            return transform?.Apply(memberName) ?? memberName;
         }
 
         private void Validate(object? value, ValidationMode mode)
@@ -1919,9 +1904,16 @@ namespace Ookii.CommandLine
             return null;
         }
 
-        private static string DetermineValueDescription(Type type, IDictionary<Type, string>? defaultValueDescriptions, NameTransform transform)
+        private static string DetermineValueDescription(Type type, ParseOptions options)
         {
-            return GetDefaultValueDescription(type, defaultValueDescriptions) ?? transform.Apply(GetFriendlyTypeName(type));
+            var result = GetDefaultValueDescription(type, options.DefaultValueDescriptions);
+            if (result == null)
+            {
+                var typeName = GetFriendlyTypeName(type);
+                result = options.ValueDescriptionTransform?.Apply(typeName) ?? typeName;
+            }
+
+            return result;
         }
     }
 }

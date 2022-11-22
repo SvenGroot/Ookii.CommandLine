@@ -160,22 +160,23 @@ namespace Ookii.CommandLine
         private readonly Type _argumentsType;
         private readonly List<CommandLineArgument> _arguments = new();
         private readonly SortedDictionary<string, CommandLineArgument> _argumentsByName;
+
         // Uses string, even though short names are single char, so it can use the same comparer
         // as _argumentsByName.
         private readonly SortedDictionary<string, CommandLineArgument>? _argumentsByShortName;
         private readonly ConstructorInfo _commandLineConstructor;
         private readonly int _constructorArgumentCount;
         private readonly int _positionalArgumentCount;
-        private readonly string[] _argumentNamePrefixes;
+
+        private readonly ParseOptions _parseOptions;
+        private readonly ParsingMode _mode;
         private readonly PrefixInfo[] _sortedPrefixes;
+        private readonly string[] _argumentNamePrefixes;
+        private readonly string? _longArgumentNamePrefix;
+
         private ReadOnlyCollection<CommandLineArgument>? _argumentsReadOnlyWrapper;
         private ReadOnlyCollection<string>? _argumentNamePrefixesReadOnlyWrapper;
-        private readonly ParsingMode _mode;
-        private readonly string? _longArgumentNamePrefix;
-        private readonly NameTransform _nameTransform;
-        private readonly LocalizedStringProvider _stringProvider;
         private int _injectionIndex = -1;
-        private ErrorMode _duplicateArgumentsMode;
 
         /// <summary>
         /// Gets the default character used to separate the name and the value of an argument.
@@ -242,42 +243,6 @@ namespace Ookii.CommandLine
         public event EventHandler<DuplicateArgumentEventArgs>? DuplicateArgument;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="CommandLineParser"/> class using the specified arguments type, argument name prefixes,
-        /// and <see cref="IComparer{T}"/> instance for comparing argument names.
-        /// </summary>
-        /// <param name="argumentsType">The <see cref="Type"/> of the class that defines the command line arguments.</param>
-        /// <param name="argumentNamePrefixes">
-        ///   Optional prefixes that are used to indicate argument names on the command line, or
-        ///   <see langword="null"/> to use the prefixes from the <see cref="ParseOptionsAttribute.ArgumentNamePrefixes"/>
-        ///   property, or the default prefixes for the current platform.
-        /// </param>
-        /// <param name="argumentNameComparer">
-        ///   An optional <see cref="IComparer{T}"/> that is used to match the names of arguments, or
-        ///   <see langword="null"/> to use the default comparer, case-insensitive by default or
-        ///   case-sensitive if specified using <see cref="ParseOptionsAttribute.CaseSensitive"/>.
-        ///   </param>
-        /// <exception cref="ArgumentNullException">
-        ///   <paramref name="argumentsType"/> is <see langword="null"/>.
-        /// </exception>
-        /// <exception cref="ArgumentException">
-        ///   <paramref name="argumentNamePrefixes"/> contains no elements or contains a <see langword="null"/> or empty string value.
-        /// </exception>
-        /// <exception cref="NotSupportedException">
-        ///   The <see cref="CommandLineParser"/> cannot use <paramref name="argumentsType"/> as the command line arguments type,
-        ///   because it violates one of the rules concerning argument names or positions, or has an argument type that cannot
-        ///   be parsed.
-        /// </exception>
-        /// <remarks>
-        /// <para>
-        ///   If you specify multiple argument name prefixes, the first one will be used when generating usage information using the <see cref="WriteUsage"/> method.
-        /// </para>
-        /// </remarks>
-        public CommandLineParser(Type argumentsType, IEnumerable<string>? argumentNamePrefixes, IComparer<string>? argumentNameComparer = null)
-            : this(argumentsType, CreateOptions(argumentNamePrefixes, argumentNameComparer))
-        {
-        }
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="CommandLineParser"/> class using the
         /// specified arguments type and options.
         /// </summary>
@@ -296,27 +261,34 @@ namespace Ookii.CommandLine
         /// </exception>
         /// <remarks>
         /// <para>
-        ///   The <see cref="ParseOptions.UsageWriter"/> is not used here. If you want it to
-        ///   take effect, it must still be passed to <see cref="WriteUsage"/>.
+        ///   If the <paramref name="options"/> parameter is not <see langword="null"/>, the
+        ///   instance passed in will be modified to reflect the options from the arguments class's
+        ///   <see cref="ParseOptionsAttribute"/> attribute, if it has one.
+        /// </para>
+        /// <para>
+        ///   Certain properties of the <see cref="ParseOptions"/> class can be changed after the
+        ///   <see cref="CommandLineParser"/> class has been constructed, and still affect the
+        ///   parsing behavior. See the <see cref="Options"/> property for details.
         /// </para>
         /// </remarks>
         public CommandLineParser(Type argumentsType, ParseOptions? options = null)
         {
             _argumentsType = argumentsType ?? throw new ArgumentNullException(nameof(argumentsType));
-            _stringProvider = options?.StringProvider ?? new LocalizedStringProvider();
+            _parseOptions = options ?? new();
 
             var optionsAttribute = _argumentsType.GetCustomAttribute<ParseOptionsAttribute>();
-            _mode = options?.Mode ?? optionsAttribute?.Mode ?? ParsingMode.Default;
-            _nameTransform = options?.NameTransform ?? optionsAttribute?.NameTransform ?? NameTransform.None;
-            var comparer = options?.ArgumentNameComparer ?? optionsAttribute?.GetStringComparer() ?? StringComparer.OrdinalIgnoreCase;
-            var prefixes = options?.ArgumentNamePrefixes ?? optionsAttribute?.ArgumentNamePrefixes;
-            _argumentNamePrefixes = DetermineArgumentNamePrefixes(prefixes);
+            if (optionsAttribute != null)
+            {
+                _parseOptions.Merge(optionsAttribute);
+            }
+
+            _mode = _parseOptions.Mode ?? default;
+            var comparer = _parseOptions.ArgumentNameComparer ?? StringComparer.OrdinalIgnoreCase;
+            _argumentNamePrefixes = DetermineArgumentNamePrefixes(_parseOptions);
             var prefixInfos = _argumentNamePrefixes.Select(p => new PrefixInfo { Prefix = p, Short = true });
             if (_mode == ParsingMode.LongShort)
             {
-                _longArgumentNamePrefix = options?.LongArgumentNamePrefix ?? optionsAttribute?.LongArgumentNamePrefix ??
-                    DefaultLongArgumentNamePrefix;
-
+                _longArgumentNamePrefix = _parseOptions.LongArgumentNamePrefix ?? DefaultLongArgumentNamePrefix;
                 if (string.IsNullOrWhiteSpace(_longArgumentNamePrefix))
                 {
                     throw new ArgumentException(Properties.Resources.EmptyArgumentNamePrefix, nameof(options));
@@ -328,12 +300,10 @@ namespace Ookii.CommandLine
             }
 
             _sortedPrefixes = prefixInfos.OrderByDescending(info => info.Prefix.Length).ToArray();
-
             _argumentsByName = new(comparer);
 
             _commandLineConstructor = GetCommandLineConstructor();
-
-            DetermineConstructorArguments(options, optionsAttribute);
+            DetermineConstructorArguments();
             _constructorArgumentCount = _arguments.Count;
             _positionalArgumentCount = _constructorArgumentCount + DetermineMemberArguments(options, optionsAttribute);
             DetermineAutomaticArguments(options, optionsAttribute);
@@ -345,11 +315,6 @@ namespace Ookii.CommandLine
             }
 
             VerifyPositionalArgumentRules();
-
-            _duplicateArgumentsMode = options?.DuplicateArguments ?? optionsAttribute?.DuplicateArguments ?? ErrorMode.Error;
-            AllowWhiteSpaceValueSeparator = options?.AllowWhiteSpaceValueSeparator ?? optionsAttribute?.AllowWhiteSpaceValueSeparator ?? true;
-            NameValueSeparator = options?.NameValueSeparator ?? optionsAttribute?.NameValueSeparator ?? DefaultNameValueSeparator;
-            Culture = options?.Culture ?? CultureInfo.InvariantCulture;
         }
 
         /// <summary>
@@ -362,26 +327,6 @@ namespace Ookii.CommandLine
         /// <seealso cref="ParseOptionsAttribute.Mode"/>
         /// <seealso cref="ParseOptions.Mode"/>
         public ParsingMode Mode => _mode;
-
-        /// <summary>
-        /// Gets or sets a value that indicates how names were created for arguments that didn't have
-        /// an explicit name.
-        /// </summary>
-        /// <value>
-        /// One of the values of the <see cref="NameTransform"/> enumeration.
-        /// </value>
-        /// <remarks>
-        /// <para>
-        ///   If an argument didn't have the <see cref="CommandLineArgumentAttribute.ArgumentName"/>
-        ///   property set, or doesn't have an <see cref="ArgumentNameAttribute"/> attribute for
-        ///   constructor parameters, the argument name was determined by taking the name of the
-        ///   property, constructor parameter, or method that defined it, and applying the specified
-        ///   transform.
-        /// </para>
-        /// </remarks>
-        /// <seealso cref="ParseOptionsAttribute.NameTransform"/>
-        /// <seealso cref="ParseOptions.NameTransform"/>
-        public NameTransform NameTransform => _nameTransform;
 
         /// <summary>
         /// Gets the argument name prefixes used by this instance.
@@ -478,17 +423,40 @@ namespace Ookii.CommandLine
             => _argumentsType.GetCustomAttribute<DescriptionAttribute>()?.Description ?? string.Empty;
 
         /// <summary>
-        /// Gets or sets the culture used to convert command line argument values from their string representation to the argument type.
+        /// Gets the options used by this instance.
+        /// </summary>
+        /// <value>
+        /// An instance of the <see cref="ParseOptions"/> class.
+        /// </value>
+        /// <remarks>
+        /// <para>
+        ///   If you change the value of the <see cref="ParseOptions.Culture"/>, <see cref="ParseOptions.DuplicateArguments"/>,
+        ///   <see cref="ParseOptions.AllowWhiteSpaceValueSeparator"/>, <see cref="ParseOptions.NameValueSeparator"/>,
+        ///   <see cref="StringProvider"/> or <see cref="UsageWriter"/> property, this will affect
+        ///   the behavior of this instance. The other properties of the <see cref="ParseOptions"/>
+        ///   class are only used when the <see cref="CommandLineParser"/> class in constructed, so
+        ///   changing them afterwards will have no effect.
+        /// </para>
+        /// </remarks>
+        public ParseOptions Options => _parseOptions;
+
+        /// <summary>
+        /// Gets the culture used to convert command line argument values from their string representation to the argument type.
         /// </summary>
         /// <value>
         /// The culture used to convert command line argument values from their string representation to the argument type. The default value
         /// is <see cref="CultureInfo.InvariantCulture"/>.
         /// </value>
+        /// <remarks>
+        /// <para>
+        ///   Use the <see cref="ParseOptions"/> class to change this value.
+        /// </para>
+        /// </remarks>
         /// <seealso cref="ParseOptions.Culture"/>
-        public CultureInfo Culture { get; set; } = CultureInfo.InvariantCulture;
+        public CultureInfo Culture => _parseOptions.Culture ?? CultureInfo.InvariantCulture;
 
         /// <summary>
-        /// Gets or sets a value indicating whether duplicate arguments are allowed.
+        /// Gets a value indicating whether duplicate arguments are allowed.
         /// </summary>
         /// <value>
         ///   <see langword="true"/> if it is allowed to supply non-multi-value arguments more than once; otherwise, <see langword="false"/>.
@@ -506,17 +474,17 @@ namespace Ookii.CommandLine
         ///   The <see cref="AllowDuplicateArguments"/> property has no effect on multi-value or
         ///   dictionary arguments, which can always be supplied multiple times.
         /// </para>
+        /// <para>
+        ///   Use the <see cref="ParseOptions"/> or <see cref="ParseOptionsAttribute "/> class to
+        ///   change this value.
+        /// </para>
         /// </remarks>
         /// <see cref="ParseOptionsAttribute.DuplicateArguments"/>
         /// <see cref="ParseOptions.DuplicateArguments"/>
-        public bool AllowDuplicateArguments
-        {
-            get => _duplicateArgumentsMode != ErrorMode.Error;
-            set => _duplicateArgumentsMode = value ? ErrorMode.Allow : ErrorMode.Error;
-        }
+        public bool AllowDuplicateArguments => (_parseOptions.DuplicateArguments ?? default) != ErrorMode.Error;
 
         /// <summary>
-        /// Gets or sets a value indicating whether the value of an argument may be in a separate
+        /// Gets value indicating whether the value of an argument may be in a separate
         /// argument from its name.
         /// </summary>
         /// <value>
@@ -541,7 +509,7 @@ namespace Ookii.CommandLine
         ///   "value" is considered to be the value for the next positional argument.
         /// </para>
         /// <para>
-        ///   For switch arguments (<see cref="CommandLineArgument.IsSwitch"/> is <see langword="true"/>),
+        ///   For switch arguments (the <see cref="CommandLineArgument.IsSwitch"/> property is <see langword="true"/>),
         ///   only the character specified in the <see cref="NameValueSeparator"/> property is allowed
         ///   to specify an explicit value regardless of the value of the <see cref="AllowWhiteSpaceValueSeparator"/>
         ///   property. Given a switch argument named "Switch"  the command line <c>-Switch false</c>
@@ -549,10 +517,14 @@ namespace Ookii.CommandLine
         ///   next positional argument is "false", even if the <see cref="AllowWhiteSpaceValueSeparator"/>
         ///   property is <see langword="true"/>.
         /// </para>
+        /// <para>
+        ///   Use the <see cref="ParseOptions"/> or <see cref="ParseOptionsAttribute "/> class to
+        ///   change this value.
+        /// </para>
         /// </remarks>
         /// <seealso cref="ParseOptionsAttribute.AllowWhiteSpaceValueSeparator"/>
         /// <seealso cref="ParseOptions.AllowWhiteSpaceValueSeparator"/>
-        public bool AllowWhiteSpaceValueSeparator { get; set; }
+        public bool AllowWhiteSpaceValueSeparator => _parseOptions.AllowWhiteSpaceValueSeparator ?? true;
 
         /// <summary>
         /// Gets or sets the character used to separate the name and the value of an argument.
@@ -574,15 +546,19 @@ namespace Ookii.CommandLine
         /// </note>
         /// <note>
         ///   Do not pick a whitespace character as the separator. Doing this only works if the
-        ///   whitespace character is part of the argument, which usually means it needs to be
+        ///   whitespace character is part of the argument token, which usually means it needs to be
         ///   quoted or escaped when invoking your application. Instead, use the
         ///   <see cref="AllowWhiteSpaceValueSeparator"/> property to control whether whitespace
         ///   is allowed as a separator.
         /// </note>
+        /// <para>
+        ///   Use the <see cref="ParseOptions"/> or <see cref="ParseOptionsAttribute "/> class to
+        ///   change this value.
+        /// </para>
         /// </remarks>
         /// <seealso cref="ParseOptionsAttribute.NameValueSeparator"/>
         /// <seealso cref="ParseOptions.NameValueSeparator"/>
-        public char NameValueSeparator { get; set; } = DefaultNameValueSeparator;
+        public char NameValueSeparator => _parseOptions.NameValueSeparator ?? DefaultNameValueSeparator;
 
         /// <summary>
         /// Gets or sets a value that indicates whether usage help should be displayed if the <see cref="Parse(string[], int)"/>
@@ -631,7 +607,7 @@ namespace Ookii.CommandLine
         /// An instance of a class inheriting from the <see cref="LocalizedStringProvider"/> class.
         /// </value>
         /// <seealso cref="ParseOptions.StringProvider"/>
-        public LocalizedStringProvider StringProvider => _stringProvider;
+        public LocalizedStringProvider StringProvider => _parseOptions.StringProvider;
 
         /// <summary>
         /// Gets the class validators for the arguments class.
@@ -737,8 +713,9 @@ namespace Ookii.CommandLine
         /// Writes command line usage help to the specified <see cref="TextWriter"/> using the specified options.
         /// </summary>
         /// <param name="usageWriter">
-        ///   The <see cref="UsageWriter"/> to use for creating the usage. If <see langword="null"/>, a default
-        ///   instance is used.
+        ///   The <see cref="UsageWriter"/> to use to create the usage. If <see langword="null"/>,
+        ///   the value from the <see cref="ParseOptions.UsageWriter"/> property in the
+        ///   <see cref="Options"/> property is sued.
         /// </param>
         /// <remarks>
         ///   <para>
@@ -756,7 +733,7 @@ namespace Ookii.CommandLine
         /// <seealso cref="GetUsage"/>
         public void WriteUsage(UsageWriter? usageWriter = null)
         {
-            usageWriter ??= new();
+            usageWriter ??= _parseOptions.UsageWriter;
             usageWriter.WriteParserUsage(this);
         }
 
@@ -769,7 +746,8 @@ namespace Ookii.CommandLine
         /// </param>
         /// <param name="usageWriter">
         ///   The <see cref="UsageWriter"/> to use to create the usage. If <see langword="null"/>,
-        ///   a default instance is used.
+        ///   the value from the <see cref="ParseOptions.UsageWriter"/> property in the
+        ///   <see cref="Options"/> property is sued.
         /// </param>
         /// <returns>
         ///   A string containing usage help for the command line options defined by the type
@@ -780,8 +758,8 @@ namespace Ookii.CommandLine
         /// </remarks>
         public string GetUsage(UsageWriter? usageWriter = null, int maximumLineLength = 0)
         {
-            usageWriter ??= new();
-            return usageWriter.GetUsage(this);
+            usageWriter ??= _parseOptions.UsageWriter;
+            return usageWriter.GetUsage(this, maximumLineLength: maximumLineLength);
         }
 
         /// <summary>
@@ -1060,7 +1038,7 @@ namespace Ookii.CommandLine
             options ??= new();
             var parser = new CommandLineParser(argumentsType, options);
 
-            if (parser._duplicateArgumentsMode == ErrorMode.Warning)
+            if (options.DuplicateArguments == ErrorMode.Warning)
             {
                 parser.DuplicateArgument += (sender, e) =>
                 {
@@ -1127,34 +1105,33 @@ namespace Ookii.CommandLine
             }
         }
 
-        private static string[] DetermineArgumentNamePrefixes(IEnumerable<string>? namedArgumentPrefixes)
+        private static string[] DetermineArgumentNamePrefixes(ParseOptions options)
         {
-            if (namedArgumentPrefixes == null)
+            if (options.ArgumentNamePrefixes == null)
             {
                 return GetDefaultArgumentNamePrefixes();
             }
             else
             {
-                var result = namedArgumentPrefixes.ToArray();
+                var result = options.ArgumentNamePrefixes.ToArray();
                 if (result.Length == 0)
                 {
-                    throw new ArgumentException(Properties.Resources.EmptyArgumentNamePrefixes, nameof(namedArgumentPrefixes));
+                    throw new ArgumentException(Properties.Resources.EmptyArgumentNamePrefixes, nameof(options));
                 }
 
                 if (result.Any(prefix => string.IsNullOrWhiteSpace(prefix)))
                 {
-                    throw new ArgumentException(Properties.Resources.EmptyArgumentNamePrefix, nameof(namedArgumentPrefixes));
+                    throw new ArgumentException(Properties.Resources.EmptyArgumentNamePrefix, nameof(options));
                 }
 
                 return result;
             }
         }
 
-        private void DetermineConstructorArguments(ParseOptions? options, ParseOptionsAttribute? optionsAttribute)
+        private void DetermineConstructorArguments()
         {
             ParameterInfo[] parameters = _commandLineConstructor.GetParameters();
-            var valueDescriptionTransform = options?.ValueDescriptionTransform ?? optionsAttribute?.ValueDescriptionTransform
-                ?? NameTransform.None;
+            var valueDescriptionTransform = _parseOptions.ValueDescriptionTransform ?? default;
 
             foreach (ParameterInfo parameter in parameters)
             {
@@ -1164,9 +1141,7 @@ namespace Ookii.CommandLine
                 }
                 else
                 {
-                    var argument = CommandLineArgument.Create(this, parameter, options?.DefaultValueDescriptions,
-                        valueDescriptionTransform);
-
+                    var argument = CommandLineArgument.Create(this, parameter);
                     AddNamedArgument(argument);
                 }
             }
@@ -1186,10 +1161,8 @@ namespace Ookii.CommandLine
                 {
                     var argument = member switch
                     {
-                        PropertyInfo prop => CommandLineArgument.Create(this, prop, options?.DefaultValueDescriptions,
-                            valueDescriptionTransform),
-                        MethodInfo method => CommandLineArgument.Create(this, method, options?.DefaultValueDescriptions,
-                            valueDescriptionTransform),
+                        PropertyInfo prop => CommandLineArgument.Create(this, prop),
+                        MethodInfo method => CommandLineArgument.Create(this, method),
                         _ => throw new InvalidOperationException(),
                     };
 
@@ -1586,20 +1559,6 @@ namespace Ookii.CommandLine
             {
                 throw StringProvider.CreateException(CommandLineArgumentErrorCategory.CreateArgumentsTypeError, ex.InnerException);
             }
-        }
-
-        private static ParseOptions? CreateOptions(IEnumerable<string>? argumentNamePrefixes, IComparer<string>? argumentNameComparer)
-        {
-            if (argumentNamePrefixes == null && argumentNameComparer == null)
-            {
-                return null;
-            }
-
-            return new ParseOptions()
-            {
-                ArgumentNamePrefixes = argumentNamePrefixes,
-                ArgumentNameComparer = argumentNameComparer,
-            };
         }
     }
 }

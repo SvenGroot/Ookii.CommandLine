@@ -144,7 +144,12 @@ namespace Ookii.CommandLine.Tests
         public void ParseTestEmptyArguments()
         {
             Type argumentsType = typeof(EmptyArguments);
-            CommandLineParser target = new CommandLineParser(argumentsType, new[] { "/", "-" });
+            var options = new ParseOptions()
+            {
+                ArgumentNamePrefixes = new[] { "/", "-" }
+            };
+
+            var target = new CommandLineParser(argumentsType, options);
 
             // This test was added because version 2.0 threw an IndexOutOfRangeException when you tried to specify a positional argument when there were no positional arguments defined.
             CheckThrows(() => target.Parse(new[] { "Foo", "Bar" }), target, CommandLineArgumentErrorCategory.TooManyArguments);
@@ -154,7 +159,12 @@ namespace Ookii.CommandLine.Tests
         public void ParseTestTooManyArguments()
         {
             Type argumentsType = typeof(MultipleConstructorsArguments);
-            CommandLineParser target = new CommandLineParser(argumentsType, new[] { "/", "-" });
+            var options = new ParseOptions()
+            {
+                ArgumentNamePrefixes = new[] { "/", "-" }
+            };
+
+            var target = new CommandLineParser(argumentsType, options);
 
             // Only accepts one positional argument.
             CheckThrows(() => target.Parse(new[] { "Foo", "Bar" }), target, CommandLineArgumentErrorCategory.TooManyArguments);
@@ -164,7 +174,12 @@ namespace Ookii.CommandLine.Tests
         public void ParseTestPropertySetterThrows()
         {
             Type argumentsType = typeof(MultipleConstructorsArguments);
-            CommandLineParser target = new CommandLineParser(argumentsType, new[] { "/", "-" });
+            var options = new ParseOptions()
+            {
+                ArgumentNamePrefixes = new[] { "/", "-" }
+            };
+
+            var target = new CommandLineParser(argumentsType, options);
 
             CheckThrows(() => target.Parse(new[] { "Foo", "-ThrowingArgument", "-5" }),
                 target,
@@ -177,7 +192,12 @@ namespace Ookii.CommandLine.Tests
         public void ParseTestConstructorThrows()
         {
             Type argumentsType = typeof(MultipleConstructorsArguments);
-            CommandLineParser target = new CommandLineParser(argumentsType, new[] { "/", "-" });
+            var options = new ParseOptions()
+            {
+                ArgumentNamePrefixes = new[] { "/", "-" }
+            };
+
+            var target = new CommandLineParser(argumentsType, options);
 
             CheckThrows(() => target.Parse(new[] { "invalid" }),
                 target,
@@ -190,7 +210,12 @@ namespace Ookii.CommandLine.Tests
         public void ParseTestDuplicateDictionaryKeys()
         {
             Type argumentsType = typeof(DictionaryArguments);
-            CommandLineParser target = new CommandLineParser(argumentsType, new[] { "/", "-" });
+            var options = new ParseOptions()
+            {
+                ArgumentNamePrefixes = new[] { "/", "-" }
+            };
+
+            var target = new CommandLineParser(argumentsType, options);
 
             DictionaryArguments args = (DictionaryArguments)target.Parse(new[] { "-DuplicateKeys", "Foo=1", "-DuplicateKeys", "Bar=2", "-DuplicateKeys", "Foo=3" });
             Assert.IsNotNull(args);
@@ -209,7 +234,12 @@ namespace Ookii.CommandLine.Tests
         public void ParseTestMultiValueSeparator()
         {
             Type argumentsType = typeof(MultiValueSeparatorArguments);
-            CommandLineParser target = new CommandLineParser(argumentsType, new[] { "/", "-" });
+            var options = new ParseOptions()
+            {
+                ArgumentNamePrefixes = new[] { "/", "-" }
+            };
+
+            var target = new CommandLineParser(argumentsType, options);
 
             MultiValueSeparatorArguments args = (MultiValueSeparatorArguments)target.Parse(new[] { "-NoSeparator", "Value1,Value2", "-NoSeparator", "Value3", "-Separator", "Value1,Value2", "-Separator", "Value3" });
             Assert.IsNotNull(args);
@@ -221,7 +251,12 @@ namespace Ookii.CommandLine.Tests
         public void ParseTestNameValueSeparator()
         {
             Type argumentsType = typeof(SimpleArguments);
-            CommandLineParser target = new CommandLineParser(argumentsType, new[] { "/", "-" });
+            var options = new ParseOptions()
+            {
+                ArgumentNamePrefixes = new[] { "/", "-" }
+            };
+
+            var target = new CommandLineParser(argumentsType, options);
             Assert.AreEqual(CommandLineParser.DefaultNameValueSeparator, target.NameValueSeparator);
             SimpleArguments args = (SimpleArguments)target.Parse(new[] { "-Argument1:test", "-Argument2:foo:bar" });
             Assert.IsNotNull(args);
@@ -232,7 +267,7 @@ namespace Ookii.CommandLine.Tests
                 CommandLineArgumentErrorCategory.UnknownArgument,
                 "Argument1=test");
 
-            target.NameValueSeparator = '=';
+            target.Options.NameValueSeparator = '=';
             args = (SimpleArguments)target.Parse(new[] { "-Argument1=test", "-Argument2=foo=bar" });
             Assert.IsNotNull(args);
             Assert.AreEqual("test", args.Argument1);
@@ -274,13 +309,18 @@ namespace Ookii.CommandLine.Tests
         public void TestWriteUsage()
         {
             Type argumentsType = typeof(TestArguments);
-            CommandLineParser target = new CommandLineParser(argumentsType, new[] { "/", "-" });
-            var options = new UsageWriter()
+            var options = new ParseOptions()
+            {
+                ArgumentNamePrefixes = new[] { "/", "-" }
+            };
+
+            var target = new CommandLineParser(argumentsType, options);
+            var writer = new UsageWriter()
             {
                 ExecutableName = _executableName
             };
 
-            string actual = target.GetUsage(options);
+            string actual = target.GetUsage(writer);
             Assert.AreEqual(_expectedDefaultUsage, actual);
         }
 
@@ -335,17 +375,22 @@ namespace Ookii.CommandLine.Tests
         [TestMethod]
         public void TestWriteUsageColor()
         {
-            var target = new CommandLineParser(typeof(TestArguments), new[] { "/", "-" });
-            var options = new UsageWriter(useColor: true)
+            var options = new ParseOptions()
+            {
+                ArgumentNamePrefixes = new[] { "/", "-" }
+            };
+
+            var target = new CommandLineParser(typeof(TestArguments), options);
+            var writer = new UsageWriter(useColor: true)
             {
                 ExecutableName = _executableName,
             };
 
-            string actual = target.GetUsage(options);
+            string actual = target.GetUsage(writer);
             Assert.AreEqual(_expectedUsageColor, actual);
 
             target = new CommandLineParser(typeof(LongShortArguments));
-            actual = target.GetUsage(options);
+            actual = target.GetUsage(writer);
             Assert.AreEqual(_expectedLongShortUsageColor, actual);
         }
 
@@ -568,20 +613,6 @@ namespace Ookii.CommandLine.Tests
             Assert.AreEqual("---", parser.LongArgumentNamePrefix);
             // Verify case sensitivity.
             Assert.IsNull(parser.GetArgument("argument"));
-            Assert.IsNotNull(parser.GetArgument("Argument"));
-            // Verify no auto help argument.
-            Assert.IsNull(parser.GetArgument("Help"));
-
-            // Constructor params take precedence.
-            parser = new CommandLineParser(typeof(ParseOptionsArguments), new[] { "+" }, StringComparer.OrdinalIgnoreCase);
-            Assert.IsFalse(parser.AllowWhiteSpaceValueSeparator);
-            Assert.IsTrue(parser.AllowDuplicateArguments);
-            Assert.AreEqual('=', parser.NameValueSeparator);
-            Assert.AreEqual(ParsingMode.LongShort, parser.Mode);
-            CollectionAssert.AreEqual(new[] { "+" }, parser.ArgumentNamePrefixes);
-            Assert.AreEqual("---", parser.LongArgumentNamePrefix);
-            // Verify case insensitivity.
-            Assert.IsNotNull(parser.GetArgument("argument"));
             Assert.IsNotNull(parser.GetArgument("Argument"));
             // Verify no auto help argument.
             Assert.IsNull(parser.GetArgument("Help"));
@@ -1011,7 +1042,7 @@ namespace Ookii.CommandLine.Tests
 
             CheckThrows(() => parser.Parse(new[] { "1", "-Multi", "-Other", "5", "6" }), parser, CommandLineArgumentErrorCategory.MissingNamedArgumentValue, "Multi");
             CheckThrows(() => parser.Parse(new[] { "-MultiSwitch", "true", "false" }), parser, CommandLineArgumentErrorCategory.ArgumentValueConversion, "Arg1", ArgumentConversionInner);
-            parser.AllowWhiteSpaceValueSeparator = false;
+            parser.Options.AllowWhiteSpaceValueSeparator = false;
             CheckThrows(() => parser.Parse(new[] { "1", "-Multi:2", "2", "3", "4", "-Other", "5", "6" }), parser, CommandLineArgumentErrorCategory.TooManyArguments);
         }
 
@@ -1036,7 +1067,7 @@ namespace Ookii.CommandLine.Tests
         {
             var parser = new CommandLineParser<SimpleArguments>();
             CheckThrows(() => parser.Parse(new[] { "-Argument1", "foo", "-Argument1", "bar" }), parser, CommandLineArgumentErrorCategory.DuplicateArgument, "Argument1");
-            parser.AllowDuplicateArguments = true;
+            parser.Options.DuplicateArguments = ErrorMode.Allow;
             var result = parser.Parse(new[] { "-Argument1", "foo", "-Argument1", "bar" });
             Assert.AreEqual("bar", result.Argument1);
 
@@ -1057,17 +1088,18 @@ namespace Ookii.CommandLine.Tests
             parser.DuplicateArgument += handler;
 
             // Handler is not called when duplicates not allowed.
-            parser.AllowDuplicateArguments = false;
+            parser.Options.DuplicateArguments = ErrorMode.Error;
             CheckThrows(() => parser.Parse(new[] { "-Argument1", "foo", "-Argument1", "bar" }), parser, CommandLineArgumentErrorCategory.DuplicateArgument, "Argument1");
             Assert.IsFalse(handlerCalled);
 
             // Now it is called.
-            parser.AllowDuplicateArguments = true;
+            parser.Options.DuplicateArguments = ErrorMode.Allow;
             result = parser.Parse(new[] { "-Argument1", "foo", "-Argument1", "bar" });
             Assert.AreEqual("bar", result.Argument1);
             Assert.IsTrue(handlerCalled);
 
-            // Keep the old value.
+            // Also called for warning, and keep the old value.
+            parser.Options.DuplicateArguments = ErrorMode.Warning;
             handlerCalled = false;
             keepOldValue = true;
             result = parser.Parse(new[] { "-Argument1", "foo", "-Argument1", "bar" });

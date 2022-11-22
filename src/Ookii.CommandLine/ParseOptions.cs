@@ -59,7 +59,7 @@ namespace Ookii.CommandLine
         /// an explicit name.
         /// </summary>
         /// <value>
-        /// One of the values of the <see cref="NameTransform"/> enumeration, or <see langword="null"/>
+        /// One of the values of the <see cref="CommandLine.NameTransform"/> enumeration, or <see langword="null"/>
         /// to use the value from the <see cref="ParseOptionsAttribute"/> attribute, or if that
         /// attribute is not present, <see cref="NameTransform.None"/>. The default value is
         /// <see langword="null"/>.
@@ -81,7 +81,7 @@ namespace Ookii.CommandLine
         ///   <see cref="ParseOptionsAttribute.NameTransform"/> property.
         /// </para>
         /// </remarks>
-        /// <seealso cref="CommandLineParser.NameTransform"/>
+        /// <seealso cref="NameTransform"/>
         /// <seealso cref="ValueDescriptionTransform"/>
         /// <seealso cref="CommandOptions.CommandNameTransform"/>
         public NameTransform? NameTransform { get; set; }
@@ -319,7 +319,7 @@ namespace Ookii.CommandLine
         /// </remarks>
         /// <seealso cref="LocalizedStringProvider.AutomaticVersionName"/>
         /// <seealso cref="LocalizedStringProvider.AutomaticVersionDescription"/>
-        public bool AutoVersionArgument { get; set; } = true;
+        public bool? AutoVersionArgument { get; set; } = true;
 
         /// <summary>
         /// Gets or sets the color applied to error messages.
@@ -492,6 +492,41 @@ namespace Ookii.CommandLine
         {
             get => _usageWriter ??= new UsageWriter();
             set => _usageWriter = value;
+        }
+
+        /// <summary>
+        /// Merges the options in this instance with the options from the <see cref="ParseOptionsAttribute"/>
+        /// attribute.
+        /// </summary>
+        /// <param name="attribute">The <see cref="ParseOptionsAttribute"/>.</param>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="attribute"/> is <see langword="null"/>.
+        /// </exception>
+        /// <remarks>
+        /// <para>
+        ///   For all properties that have an equivalent in the <see cref="ParseOptionsAttribute"/>,
+        ///   class, if the property in this instance is <see langword="null"/>, it will be set to
+        ///   the value from the <see cref="ParseOptionsAttribute"/> class.
+        /// </para>
+        /// </remarks>
+        public void Merge(ParseOptionsAttribute attribute)
+        {
+            if (attribute == null)
+            {
+                throw new ArgumentNullException(nameof(attribute));
+            }
+
+            Mode ??= attribute.Mode;
+            NameTransform ??= attribute.NameTransform;
+            ArgumentNamePrefixes ??= attribute.ArgumentNamePrefixes;
+            LongArgumentNamePrefix ??= attribute.LongArgumentNamePrefix;
+            ArgumentNameComparer ??= attribute.GetStringComparer();
+            DuplicateArguments ??= attribute.DuplicateArguments;
+            AllowWhiteSpaceValueSeparator ??= attribute.AllowWhiteSpaceValueSeparator;
+            NameValueSeparator ??= attribute.NameValueSeparator;
+            AutoHelpArgument ??= attribute.AutoHelpArgument;
+            AutoVersionArgument ??= attribute.AutoVersionArgument;
+            ValueDescriptionTransform ??= attribute.ValueDescriptionTransform;
         }
 
         internal VirtualTerminalSupport? EnableErrorColor()

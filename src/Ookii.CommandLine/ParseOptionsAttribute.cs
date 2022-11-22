@@ -90,8 +90,7 @@ namespace Ookii.CommandLine
         /// </para>
         /// <para>
         ///   This value can be overridden by the <see cref="ParseOptions.ArgumentNamePrefixes"/>
-        ///   property, or the <see cref="CommandLineParser.CommandLineParser(Type, IEnumerable{string}?, IComparer{string}?)"/>
-        ///   constructor.
+        ///   property.
         /// </para>
         /// </remarks>
         /// <seealso cref="CommandLineParser.ArgumentNamePrefixes"/>
@@ -135,8 +134,7 @@ namespace Ookii.CommandLine
         /// </para>
         /// <para>
         ///   This value can be overridden by the <see cref="ParseOptions.ArgumentNameComparer"/>
-        ///   property, or the <see cref="CommandLineParser(Type, IEnumerable{string}?, IComparer{string}?)"/>
-        ///   constructor.
+        ///   property.
         /// </para>
         /// </remarks>
         /// <seealso cref="CommandLineParser.ArgumentNameComparer"/>
@@ -285,7 +283,7 @@ namespace Ookii.CommandLine
         /// </remarks>
         /// <seealso cref="LocalizedStringProvider.AutomaticVersionName"/>
         /// <seealso cref="LocalizedStringProvider.AutomaticVersionDescription"/>
-        public bool? AutoVersionArgument { get; set; } = true;
+        public bool AutoVersionArgument { get; set; } = true;
 
         /// <summary>
         /// Gets or sets a value that indicates how value descriptions derived from type names
