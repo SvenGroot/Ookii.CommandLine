@@ -1,0 +1,5 @@
+# Unused parameters or privates are not a problem in the test project, and is often deliberate.
+[*.cs]
+dotnet_diagnostic.IDE0051.severity = silent
+dotnet_code_quality_unused_parameters = silent
+dotnet_diagnostic.IDE0060.severity = silent

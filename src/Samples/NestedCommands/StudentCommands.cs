@@ -110,5 +110,4 @@ internal class AddStudentCourseCommand : BaseCommand
         await db.Save(Path);
         return (int)ExitCode.Success;
     }
-
 }

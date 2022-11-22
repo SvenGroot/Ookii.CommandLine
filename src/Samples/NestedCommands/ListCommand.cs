@@ -44,5 +44,4 @@ internal class ListCommand : BaseCommand
 
         return Task.FromResult((int)ExitCode.Success);
     }
-
 }
