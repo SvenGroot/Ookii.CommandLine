@@ -1519,16 +1519,13 @@ namespace Ookii.CommandLine
             UsedArgumentName = null;
         }
 
-        internal static void ShowVersion(Assembly assembly, string friendlyName)
+        internal static void ShowVersion(LocalizedStringProvider stringProvider, Assembly assembly, string friendlyName)
         {
-            var versionAttribute = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>();
-            var version = versionAttribute?.InformationalVersion ?? assembly.GetName().Version?.ToString() ?? string.Empty;
-            var copyRightAttribute = assembly.GetCustomAttribute<AssemblyCopyrightAttribute>();
-
-            Console.WriteLine($"{friendlyName} {version}");
-            if (copyRightAttribute != null)
+            Console.WriteLine(stringProvider.ApplicationNameAndVersion(assembly, friendlyName));
+            var copyright = stringProvider.ApplicationCopyright(assembly);
+            if (copyright != null)
             {
-                Console.WriteLine(copyRightAttribute.Copyright);
+                Console.WriteLine(copyright);
             }
         }
 
@@ -1880,7 +1877,7 @@ namespace Ookii.CommandLine
 
         private static bool AutomaticVersion(CommandLineParser parser)
         {
-            ShowVersion(parser.ArgumentsType.Assembly, parser.ApplicationFriendlyName);
+            ShowVersion(parser.StringProvider, parser.ArgumentsType.Assembly, parser.ApplicationFriendlyName);
 
             // Cancel parsing but do not show help.
             return false;

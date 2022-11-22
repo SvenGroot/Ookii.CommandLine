@@ -1,6 +1,8 @@
 ﻿using Ookii.CommandLine.Commands;
 using Ookii.CommandLine.Properties;
+using System;
 using System.Globalization;
+using System.Reflection;
 
 namespace Ookii.CommandLine
 {
@@ -80,6 +82,44 @@ namespace Ookii.CommandLine
         /// </summary>
         /// <returns>The string.</returns>
         public virtual string AutomaticVersionCommandDescription() => Resources.AutomaticVersionDescription;
+
+        /// <summary>
+        /// Gets the name and version of the application, used by the automatic version argument
+        /// and command.
+        /// </summary>
+        /// <param name="assembly">The assembly whose version to use.</param>
+        /// <param name="friendlyName">
+        /// The friendly name of the application; typically the value of the <see cref="CommandLineParser.ApplicationFriendlyName"/>
+        /// property.
+        /// </param>
+        /// <returns>The string.</returns>
+        /// <remarks>
+        /// <para>
+        ///   The base implementation uses the <see cref="AssemblyInformationalVersionAttribute"/>,
+        ///   and will fall back to the assembly version if none is defined.
+        /// </para>
+        /// </remarks>
+        public virtual string ApplicationNameAndVersion(Assembly assembly, string friendlyName)
+        {
+            var versionAttribute = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>();
+            var version = versionAttribute?.InformationalVersion ?? assembly.GetName().Version?.ToString() ?? string.Empty;
+            return $"{friendlyName} {version}";
+        }
+
+        /// <summary>
+        /// Gets the copyright information for the application, used by the automatic version
+        /// argument and command.
+        /// </summary>
+        /// <param name="assembly">The assembly whose copyright information to use.</param>
+        /// <returns>The string.</returns>
+        /// <remarks>
+        /// <para>
+        ///   The base implementation returns the value of the <see cref="AssemblyCopyrightAttribute"/>,
+        ///   or <see langword="null"/> if none is defined.
+        /// </para>
+        /// </remarks>
+        public virtual string? ApplicationCopyright(Assembly assembly)
+            => assembly.GetCustomAttribute<AssemblyCopyrightAttribute>()?.Copyright;
 
         private static string Format(string format, object? arg0)
             => string.Format(CultureInfo.CurrentCulture, format, arg0);
