@@ -1,10 +1,8 @@
 ﻿using Ookii.CommandLine;
 using Ookii.CommandLine.Validation;
 using Ookii.Dialogs.Wpf;
-using System;
 using System.ComponentModel;
 using System.Reflection;
-using System.Windows;
 
 namespace wpftest3;
 

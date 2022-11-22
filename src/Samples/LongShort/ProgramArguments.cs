@@ -1,6 +1,5 @@
 ﻿using Ookii.CommandLine;
 using Ookii.CommandLine.Validation;
-using System;
 using System.ComponentModel;
 
 namespace LongShort;

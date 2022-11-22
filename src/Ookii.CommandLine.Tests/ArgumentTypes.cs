@@ -1,5 +1,4 @@
-﻿using Ookii.CommandLine;
-using Ookii.CommandLine.Validation;
+﻿using Ookii.CommandLine.Validation;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -109,7 +108,9 @@ namespace Ookii.CommandLine.Tests
         public MultipleConstructorsArguments(string arg1)
         {
             if (arg1 == "invalid")
+            {
                 throw new ArgumentException("Invalid argument value.", nameof(arg1));
+            }
         }
 
         [CommandLineArgument]
@@ -119,7 +120,10 @@ namespace Ookii.CommandLine.Tests
             set
             {
                 if (value < 0)
+                {
                     throw new ArgumentOutOfRangeException(nameof(value));
+                }
+
                 _throwingArgument = value;
             }
         }

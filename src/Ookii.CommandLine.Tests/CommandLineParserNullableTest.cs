@@ -15,14 +15,16 @@ namespace Ookii.CommandLine.Tests
     [TestClass]
     public class CommandLineParserNullableTest
     {
-        #region Nested types
+#region Nested types
 
         class NullReturningStringConverter : TypeConverter
         {
             public override bool CanConvertFrom(ITypeDescriptorContext? context, Type sourceType)
             {
                 if (sourceType == typeof(string))
+                {
                     return true;
+                }
 
                 return base.CanConvertFrom(context, sourceType);
             }
@@ -32,9 +34,13 @@ namespace Ookii.CommandLine.Tests
                 if (value is string s)
                 {
                     if (s == "(null)")
+                    {
                         return null;
+                    }
                     else
+                    {
                         return s;
+                    }
                 }
 
                 return base.ConvertFrom(context, culture, value);
@@ -46,7 +52,9 @@ namespace Ookii.CommandLine.Tests
             public override bool CanConvertFrom(ITypeDescriptorContext? context, Type sourceType)
             {
                 if (sourceType == typeof(string))
+                {
                     return true;
+                }
 
                 return base.CanConvertFrom(context, sourceType);
             }
@@ -56,9 +64,13 @@ namespace Ookii.CommandLine.Tests
                 if (value is string s)
                 {
                     if (s == "(null)")
+                    {
                         return null;
+                    }
                     else
+                    {
                         return int.Parse(s);
+                    }
                 }
 
                 return base.ConvertFrom(context, culture, value);
@@ -180,7 +192,7 @@ namespace Ookii.CommandLine.Tests
             public Dictionary<string, string?>? InvalidDictionary { get; set; }
         }
 
-        #endregion
+#endregion
 
         [TestMethod]
         public void TestAllowNull()

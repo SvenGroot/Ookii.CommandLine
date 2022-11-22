@@ -562,7 +562,9 @@ namespace Ookii.CommandLine.Tests
             static void handler1(object sender, ArgumentParsedEventArgs e)
             {
                 if (e.Argument.ArgumentName == "DoesNotCancel")
+                {
                     e.Cancel = true;
+                }
             }
 
             parser.ArgumentParsed += handler1;
@@ -583,7 +585,9 @@ namespace Ookii.CommandLine.Tests
             static void handler2(object sender, ArgumentParsedEventArgs e)
             {
                 if (e.Argument.ArgumentName == "DoesCancel")
+                {
                     e.OverrideCancelParsing = true;
+                }
             }
 
             parser.ArgumentParsed += handler2;
@@ -1214,18 +1218,32 @@ namespace Ookii.CommandLine.Tests
             CollectionAssert.AreEqual(arg10, result.Arg10);
             Assert.AreEqual(arg11, result.Arg11);
             if (arg12 == null)
+            {
                 Assert.AreEqual(0, result.Arg12.Count);
+            }
             else
+            {
                 CollectionAssert.AreEqual(arg12, result.Arg12);
+            }
+
             CollectionAssert.AreEqual(arg13, result.Arg13);
             if (arg14 == null)
+            {
                 Assert.AreEqual(0, result.Arg14.Count);
+            }
             else
+            {
                 CollectionAssert.AreEqual(arg14, (System.Collections.ICollection)result.Arg14);
+            }
+
             if (arg15 == null)
+            {
                 Assert.AreEqual(default(KeyValuePair<string, int>), result.Arg15);
+            }
             else
+            {
                 Assert.AreEqual(arg15.Value, result.Arg15);
+            }
         }
 
         private static void CheckThrows(Action operation, CommandLineParser parser, CommandLineArgumentErrorCategory category, string argumentName = null, Type innerExceptionType = null)
@@ -1241,9 +1259,13 @@ namespace Ookii.CommandLine.Tests
                 Assert.AreEqual(category, ex.Category);
                 Assert.AreEqual(argumentName, ex.ArgumentName);
                 if (innerExceptionType == null)
+                {
                     Assert.IsNull(ex.InnerException);
+                }
                 else
+                {
                     Assert.IsInstanceOfType(ex.InnerException, innerExceptionType);
+                }
             }
         }
     }

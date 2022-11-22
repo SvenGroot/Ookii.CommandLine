@@ -1,5 +1,4 @@
-﻿using Ookii.CommandLine;
-using Ookii.CommandLine.Commands;
+﻿using Ookii.CommandLine.Commands;
 using System.Reflection;
 
 namespace NestedCommands;

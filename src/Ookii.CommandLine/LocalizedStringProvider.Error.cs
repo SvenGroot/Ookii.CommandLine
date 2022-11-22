@@ -1,9 +1,6 @@
 ﻿using Ookii.CommandLine.Properties;
-using Ookii.CommandLine.Validation;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 
 namespace Ookii.CommandLine
 {

@@ -33,7 +33,7 @@ namespace SubCommandSample
         //
         // The NameTransform makes sure the argument matches the naming style of the other arguments.
         public ReadCommand([Description("The name of the file to read.")] FileInfo path)
-        { 
+        {
             _path = path;
         }
 
