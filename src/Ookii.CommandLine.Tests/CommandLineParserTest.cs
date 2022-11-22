@@ -1217,6 +1217,7 @@ namespace Ookii.CommandLine.Tests
             Assert.AreEqual(arg9, result.Arg9);
             CollectionAssert.AreEqual(arg10, result.Arg10);
             Assert.AreEqual(arg11, result.Arg11);
+            Assert.AreEqual(notSwitch, result.NotSwitch);
             if (arg12 == null)
             {
                 Assert.AreEqual(0, result.Arg12.Count);
