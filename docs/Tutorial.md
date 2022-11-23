@@ -626,8 +626,11 @@ Let's change our main method as follows:
 var options = new CommandOptions()
 {
     CommandNameTransform = NameTransform.DashCase,
-    IncludeCommandHelpInstruction = true,
-    IncludeApplicationDescriptionBeforeCommandList = true,
+    UsageWriter = new UsageWriter()
+    {
+        IncludeCommandHelpInstruction = true,
+        IncludeApplicationDescriptionBeforeCommandList = true,
+    },
 };
 
 var manager = new CommandManager(options);

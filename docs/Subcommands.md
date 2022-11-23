@@ -69,14 +69,9 @@ When using the `CommandManager` class as [shown below](#using-subcommands), the 
 created using the `CommandLineParser` as usual, using all the arguments except for the command name.
 Then, the `ICommand.Run()` method will be called.
 
-All of the functionality available with regular arguments types is available with commands too,
-including [usage help generation](#subcommand-usage-help), [long/short mode](Arguments.md#longshort-mode),
-all types or arguments, validators, etc.
-
-While you can use the `ParseOptionsAttribute` to customize the behavior of a subcommand class, keep
-in mind that this only applies to the class with that attribute. For this reason, it's typically
-better to use the `CommandOptions` class (which derives from `ParseOptions`) instead, to ensure
-consistent behavior between all your commands.
+All of the functionality and [options](#subcommand-options) available with regular arguments types
+is available with commands too, including [usage help generation](#subcommand-usage-help),
+[long/short mode](Arguments.md#longshort-mode), all types or arguments, validators, etc.
 
 ### Name transformation
 
@@ -123,11 +118,17 @@ class ReadDirectoryCommand : ICommand
 ### Asynchronous commands
 
 It's possible to use asynchronous code with subcommands. To do this, implement the `IAsyncCommand`
-interface, which derives from `ICommand`. This interface adds the `IAsyncCommand.RunAsync()` method.
+interface, which derives from `ICommand`, and use the `CommandManager.RunCommandAsync()` method (see
+[below](#using-subcommands)).
 
-Because `IAsyncCommand` derives from `ICommand`, it's still necessary to implement the
-`ICommand.Run()` method. The `AsyncCommandBase` class is provided for convenience, which provides
-an implementation of `ICommand.Run()` which invokes `IAsyncCommand.RunAsync()` and waits for it.
+The `IAsyncCommand` interface adds a new `IAsyncCommand.RunAsync()` method, but because
+`IAsyncCommand` derives from `ICommand`, it's still necessary to implement the `ICommand.Run()`
+method. If you use `RunCommandAsync()`, the `ICommand.Run()` method is guaranteed to never be called
+on a command that implements `IAsyncCommand`, so you can just leave this empty.
+
+However, a better option is to use the `AsyncCommandBase` class, which is provided for convenience,
+and provides an implementation of `ICommand.Run()` which invokes `IAsyncCommand.RunAsync()` and
+waits for it. That way, your command is compatible with both `RunCommand()` and `RunCommandAsync()`.
 
 ```csharp
 [Command]
@@ -148,8 +149,8 @@ class AsyncSleepCommand : AsyncCommandBase
 
 ### Multiple commands with common arguments
 
-Sometimes, you have multiple commands that all need some of the same arguments. For example, you may
-have a database application where every command needs the connection string as an argument. Because
+You may have multiple commands that have one or more arguments in common. For example, you may have
+a database application where every command needs the connection string as an argument. Because
 `CommandLineParser` considers base class members when defining arguments, this can be accomplished
 by having a common base class for each command that needs the common arguments.
 
@@ -198,13 +199,54 @@ not have the `CommandAttribute` attribute, and because it is abstract.
 
 ### Custom parsing
 
-In rare cases, you may want to create commands that do not use the `CommandLineParser` class to parse
+In some cases, you may want to create commands that do not use the `CommandLineParser` class to parse
 their arguments. For this purpose, you can implement the `ICommandWithCustomParsing` method instead.
 You must still use the `CommandAttribute`.
 
 Your type must have a constructor with no parameters, and implement the
 `ICommandWithCustomParsing.Parse()` method, which will be called before `ICommand.Run()` to allow
-you to parse the command line arguments.
+you to parse the command line arguments. You can combine `ICommandWithCustomParsing` with
+`IAsyncCommand` if you wish.
+
+In this case, it is up to the command to handle argument parsing, and handle errors and display
+usage help if appropriate.
+
+For example, you may have a command that launches an external executable, and wants to pass the
+arguments to that executable.
+
+```csharp
+[Command]
+class LaunchCommand : AsyncCommandBase, ICommandWithCustomParsing
+{
+    private string[]? _args;
+
+    public void Parse(string[] args, int index, CommandOptions options)
+    {
+        _args = args[index..];
+    }
+
+    public override async Task<int> RunAsync()
+    {
+        var info = new ProcessStartInfo("executable");
+        if (_args != null)
+        {
+            foreach (var arg in _args)
+            {
+                info.ArgumentList.Add(arg);
+            }
+        }
+
+        var process = Process.Start(info);
+        if (process != null)
+        {
+            await process.WaitForExitAsync();
+            return process.ExitCode;
+        }
+
+        return 1;
+    }
+}
+```
 
 ## Using subcommands
 
@@ -236,6 +278,10 @@ This code does the following:
       and return `null`.
 3. If `RunCommand()` returned null, returns an error exit code.
 
+> Note: the `CommandManager` does not check if command names and aliases are unique. If you have
+> multiple commands with the same names, the first matching one will be used, and there is no
+> guarantee on the order in which command classes are checked.
+
 If you use the `IAsyncCommand` interface or `AsyncCommandBase` class, use the following code instead.
 
 ```csharp
@@ -247,24 +293,259 @@ public static async Task<int> Main()
 ```
 
 Note that the `RunCommandAsync()` method can still run commands that only implement `ICommand`, and
-not `ICommandAsync`, so you can freely mix both types of command.
+not `IAsyncCommand`, so you can freely mix both types of command.
 
-TODO: options, other CommandManager methods.
+If you use `RunCommand()` with asynchronous commands, it will call the `ICommand.Run()` method, so
+whether this works depends on the command's implementation of that method. If you used
+`AsyncCommandBase`, this will call the `RunAsync()` method, so the command will work correctly.
+However, in all cases, it's strongly recommended to use `RunCommandAsync()` if you use any
+asynchronous commands.
 
-To use a shell command, you must first determine the shell command the user wishes to invoke, typically by inspecting the first element of the array of arguments passed to the `Main` method of your application.
+Check out the [tutorial](Tutorial.md) and the [subcommand sample](../src/Samples/SubCommand) for
+more detailed examples of how to create and use commands.
 
-You can then get the `Type` instance of the shell command’s class by calling the `ShellCommand.GetShellCommand` method. This method searches the specified assembly for a type that inherits from the `ShellCommand` class, and has the `ShellCommandAttribute` attribute applied with the `ShellCommandAttribute.Name` property set to the specified name. You can also get a list of all shell commands in an assembly by using the `ShellCommand.GetShellCommands` method.
+### Other assemblies
 
-This `Type` instance can be passed to the constructor of the `CommandLineParser` class, after which you can parse arguments for the command as usual (make sure to pass an index so that the command name is not treated as an argument), and finally invoke its `ShellCommand.Run` method.
+The default constructor for the `CommandManager` class will look for command classes only in the
+calling assembly. If your command classes are all in the same assembly as your main method, this
+will be sufficient. However, you may want to have your commands in a separate assembly, or split
+amongst several assemblies. You could even want to dynamically load plugins with additional commands.
 
-The `ShellCommand` class provides static utility methods that perform these tasks for you. The `ShellCommand.CreateShellCommand` method finds and creates a shell command, and writes error and usage information to the output if it failed. If no command name was specified, or the specified command name could not be found, it writes a list of all shell commands in the assembly and their descriptions to the output. If the command was found but parsing its arguments failed, it writes usage information for that command to the output.
+The `CommandManager` constructor has overloads that take a single assembly, or an array of
+assemblies. This allows you to load commands from one or more sources. You can even filter which
+commands you actually want to use from those assemblies using the `CommandOptions.CommandFilter`
+property.
 
-The `ShellCommand.RunShellCommand` method works the same as the `ShellCommand.CreateShellCommand` method, but also invokes the `ShellCommand.Run` method if the command was successfully created.
+```csharp
+public static int Main()
+{
+    var assemblies = new[] { Assembly.GetExecutingAssembly() };
+    assemblies = assemblies.Concat(LoadPlugins()).ToArray();
+    var manager = new CommandManager(assemblies);
+    return manager.RunCommand() ?? 1;
+}
+```
 
-It is recommended to return the value of the `ShellCommand.ExitCode` property to the operating system (by returning it from the `Main` method or by using the `Environment.``ExitCode` property) after running the shell command.
+The omitted `LoadPlugins()` method would presumably load some list of assemblies from the
+application's configuration.
 
-The source code of a full sample application that defines two commands is included with the Ookii.CommandLine library.
+### Subcommand options
+
+Just like when you use `CommandLineParser` directly, there are many options available to customize
+the parsing behavior. When using `CommandManager`, you use the `CommandOptions` class to provide
+options. This class derives from `ParseOptions`, so all the same options are available, in addition
+to several options that apply only to subcommands.
+
+> While you can use the `ParseOptionsAttribute` to customize the behavior of a subcommand class,
+> this will only apply to the class using the attribute. For a consistent experience, it's preferred
+> to use `CommandOptions`.
+
+For example, the following code enables some options:
+
+```csharp
+public static int Main()
+{
+    var options = new CommandOptions()
+    {
+        CommandNameComparer = StringComparer.Invariant,
+        CommandNameTransform = NameTransform.DashCase,
+        UsageWriter = new UsageWriter()
+        {
+            IncludeCommandHelpInstruction = true,
+            IncludeApplicationDescriptionBeforeCommandList = true,
+        }
+    };
+
+    var manager = new CommandManager(options);
+    return manager.RunCommand() ?? 1;
+}
+```
+
+This code makes command names case sensitive by using the invariant string comparer (the default is
+`StringComparer.OrdinalIgnoreCase`, which is case insensitive), enables a name transformation, and
+also sets some [usage help options](#subcommand-usage-help).
+
+### Custom error handling
+
+As with the static `CommandLineParser.Parse<T>()` method, `RunCommand()` and `RunCommandAsync()`
+handle errors and display usage help. If for any reason you want to do this manually,
+`CommandManager` provides the tools to do so.
+
+The `CommandManager.GetCommand()` method returns information about a command, if one with the
+specified name exists. From there, you can manually create a `CommandLineParser` for the command,
+instantiate the class, and invoke its run method.
+
+When doing this, it's your responsibility to handle things such as `IAsyncCommand` or
+`ICommandWithCustomParsing`. Of course, you can omit those parts if you do not have any commands
+using those interfaces.
+
+Because of the complexity of this approach, it's probably easier to just redirect the error and
+output of the regular `RunCommand(Async)` methods, as shown below:
+
+```csharp
+var writer = LineWrappingTextWriter.ForStringWriter();
+var options = new CommandOptions()
+{
+    Error = writer,
+    UsageWriter = new UsageWriter(writer),
+};
+
+var manager = new CommandManager(options);
+var exitCode = await manager.RunCommandAsync();
+if (exitCode is int value)
+{
+    return value;
+}
+
+// For demonstration purposes only; probably not the best way to show this.
+MessageBox.Show(writer.BaseWriter.ToString());
+return 1;
+```
+
+This, combined with a custom `UsageWriter` to format the usage help as you like, is probably
+sufficient for most scenarios. You can also use separate writers for errors and usage help, so you
+can display them separately.
+
+However, if you do want to manually handle everything, the below is an example of what this would
+look like.
+
+```csharp
+public static async Task<int> Main(string[] args)
+{
+    var options = new CommandOptions() { /* omitted */ };
+    var manager = new CommandManager(options);
+    var info = args.Length > 0 ? manager.GetCommand(args[0]) : null;
+    if (info is not CommandInfo commandInfo)
+    {
+        // No command or unknown command.
+        manager.WriteUsage();
+        return 1;
+    }
+
+    ICommand? command = null;
+    if (commandInfo.UseCustomArgumentParsing)
+    {
+        // CreateInstance handles parsing errors for CommandLineParser, so don't use it then,
+        // but it must be used for commands with custom parsing (unless you want to manually
+        // use Activator.CreateInstance). How errors are handled here depends on you.
+        command = commandInfo.CreateInstance(args, 1, options);
+    }
+    else
+    {
+        // Options must also be passed here if they contain changes to any ParseOptions.
+        // CreateParser is guaranteed to not return null if UseCustomArgumentParsing is false.
+        var parser = commandInfo.CreateParser(options)!;
+        try
+        {
+            // Skip the command name in the arguments.
+            command = (ICommand?)parser.Parse(args, 1);
+        }
+        catch (CommandLineArgumentException ex)
+        {
+            Console.Error.WriteLine(ex.Message);
+        }
+
+        if (parser.HelpRequested)
+        {
+            parser.WriteUsage();
+        }
+    }
+
+    // Run the command if successfully created, asynchronous if supported.
+    if (command != null)
+    {
+        if (command is IAsyncCommand asyncCommand)
+        {
+            return await asyncCommand.RunAsync();
+        }
+
+        return command.Run();
+    }
+
+    return 1;
+}
+```
+
+The `CommandManager` class also offers the `CreateCommand()` method, which instantiates the command
+class but does not call the `Run(Async)` method. This method also handles errors and shows usage
+help automatically.
 
 ## Subcommand usage help
 
-TODO
+Since subcommands are created using the `CommandLineParser`, they support showing usage help when
+parsing errors occur, or the `-Help` argument is used. For example, with the [subcommand sample](../src/Samples/SubCommand) you could run the following to get help on the `read` command:
+
+```text
+./SubCommand read -help
+```
+
+In addition, the `CommandManager` also prints usage help if no command name was supplied, or the
+supplied command name did not match any command defined in the application. In this case, it prints
+a list of commands, with their descriptions. This is what that looks like for the sample:
+
+```text
+Subcommand sample for Ookii.CommandLine.
+
+Usage: SubCommand <command> [arguments]
+
+The following commands are available:
+
+    read
+        Reads and displays data from a file using the specified encoding, wrapping the text to fit
+        the console.
+
+    version
+        Displays version information.
+
+    write
+        Writes lines to a file, wrapping them to the specified width.
+
+Run 'SubCommand <command> -Help' for more information about a command.
+```
+
+Usage help for a `CommandManager` is also created using the `UsageWriter`, and can be customized
+by setting the subcommand-specific properties of that class. The sample above uses two of them:
+`IncludeApplicationDescriptionBeforeCommandList` which causes the assembly description of the first
+assembly used by the `CommandManager` to be printed before the command list, and `IncludeCommandHelpInstruction`, which prints the line at the bottom telling the user to use `-Help`.
+
+For the `IncludeCommandHelpInstruction` option, the text will use the name of the automatic help
+argument, after applying the `ParseOptions.ArgumentNameTransform` if one is set. If using
+[long/short mode](Arguments.md#longshort-mode), the long argument prefix is used. Note that the
+`CommandManager` won't check if every command actually has an argument with that name, so only
+enable it if this is true (it's recommended to enable it if it is).
+
+Other properties let you configure indentation and colors, among others.
+
+The actual help is created using a number of protected virtual methods on the `UsageWriter`, so
+this can be further customized by deriving your own class from the `UsageWriter` class. Creating
+command list usage help is driven by the `WriteCommandListUsageCore()` method. You can also
+override other methods to customize parts of the usage help, such as `WriteCommandListUsageSyntax()`,
+`WriteCommandDescription()`, and `WriteCommandHelpInstruction()`, to name just a few.
+
+## Automatic commands
+
+As mentioned above, subcommand classes will not get an automatic `-Version` argument. Instead, there
+is an automatic `version` command that gets added, which displays the same information.
+
+**Important:** The `version` command takes the name, version information, and copyright text from
+the *entry-point assembly* of the application, regardless of what assembly or assemblies were passed
+to the `CommandManager`. If this is not correct for your application, you should create your own
+`version` command.
+
+If you create a command named `version`, the automatic `version` command will not be added. You can
+also disable the command with the `CommandOptions.AutoVersionCommand` property. The name and
+description of the command can be customized using the `LocalizedStringProvider`.
+
+## Nested subcommands
+
+Ookii.CommandLine does not natively support nested subcommands. However, with the
+`CommandOptions.CommandFilter` property and the `ICommandWithCustomParsing` interface, it provides
+the tools needed to implement support for this fairly easily.
+
+The [nested commands sample](../src/Samples/NestedCommands) shows a complete implementation of this
+functionality.
+
+Providing native support for nested subcommands is planned for a future release.
+
+The next page will take a look at several [utility classes](Utilities.md) provided, and used, by
+Ookii.CommandLine.

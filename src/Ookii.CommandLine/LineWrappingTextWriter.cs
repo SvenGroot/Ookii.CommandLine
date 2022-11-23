@@ -480,7 +480,9 @@ namespace Ookii.CommandLine
         /// <summary>
         /// Gets a <see cref="LineWrappingTextWriter"/> that writes to a <see cref="StringWriter"/>.
         /// </summary>
-        /// <param name="maximumLineLength">The maximum length of a line, in characters.</param>
+        /// <param name="maximumLineLength">
+        /// The maximum length of a line, in characters, or 0 to use no maximum.
+        /// </param>
         /// <param name="formatProvider">An <see cref="IFormatProvider"/> that controls formatting.</param>
         /// <param name="countFormatting">
         ///   If set to <see langword="false"/>, virtual terminal sequences used to format the text
@@ -492,7 +494,7 @@ namespace Ookii.CommandLine
         ///   To retrieve the resulting string, first call <see cref="Flush"/>, then use the <see cref="StringWriter.ToString"/> method
         ///   of the <see cref="BaseWriter"/>.
         /// </remarks>
-        public static LineWrappingTextWriter ForStringWriter(int maximumLineLength, IFormatProvider? formatProvider = null, bool countFormatting = false)
+        public static LineWrappingTextWriter ForStringWriter(int maximumLineLength = 0, IFormatProvider? formatProvider = null, bool countFormatting = false)
         {
             return new LineWrappingTextWriter(new StringWriter(formatProvider), maximumLineLength, true, countFormatting);
         }
