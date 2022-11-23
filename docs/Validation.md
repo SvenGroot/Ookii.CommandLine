@@ -234,3 +234,6 @@ class ValidateFutureDateAttribute : ValidateRangeAttribute
         => "Must be a date in the future.";
 }
 ```
+
+Now that you know (almost) everything there is to know about arguments, let's move on to
+[subcommands](Subcommands.md).

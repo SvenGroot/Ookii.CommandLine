@@ -320,8 +320,4 @@ those tools also use lower-case argument names, which you can easily achieve usi
 
 ## More information
 
-Next, let's take a look at how to define and parse arguments.
-
-- [Defining Command Line Arguments](DefiningArguments.md)
-- [Parsing Command Line Arguments](ParsingArguments.md)
-- [Generating Usage Help](UsageHelp.md)
+Next, let's take a look at how to [define arguments](DefiningArguments.md).

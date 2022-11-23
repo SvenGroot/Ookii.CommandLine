@@ -1,4 +1,7 @@
-﻿namespace Ookii.CommandLine.Terminal
+﻿using System;
+using System.Drawing;
+
+namespace Ookii.CommandLine.Terminal
 {
     /// <summary>
     /// Provides constants for various virtual terminal sequences that control text format.
@@ -169,5 +172,20 @@
         /// Sets the background color to bright White.
         /// </summary>
         public const string BrightBackgroundWhite = "\x1b[107m";
+
+        /// <summary>
+        /// Returns the virtual terminal sequence to the foreground or background color to an RGB
+        /// color.
+        /// </summary>
+        /// <param name="color">The color to use.</param>
+        /// <param name="foreground">
+        ///   <see langword="true"/> to apply the color to the background; otherwise, it's applied
+        ///   to the background.
+        /// </param>
+        /// <returns>A string with the virtual terminal sequence.</returns>
+        public static string GetExtendedColor(Color color, bool foreground = true)
+        {
+            return FormattableString.Invariant($"{VirtualTerminal.Escape}[{(foreground ? 38 : 48)};2;{color.R};{color.G};{color.B}m");
+        }
     }
 }

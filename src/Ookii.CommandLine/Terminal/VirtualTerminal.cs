@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Drawing;
 using System.Runtime.InteropServices;
 #if NET6_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
 using StringSpan = System.ReadOnlySpan<char>;
@@ -106,21 +105,6 @@ namespace Ookii.CommandLine.Terminal
             }
 
             return EnableVirtualTerminalSequences(stream);
-        }
-
-        /// <summary>
-        /// Returns the virtual terminal sequence to the foreground or background color to an RGB
-        /// color.
-        /// </summary>
-        /// <param name="color">The color to use.</param>
-        /// <param name="foreground">
-        ///   <see langword="true"/> to apply the color to the background; otherwise, it's applied
-        ///   to the background.
-        /// </param>
-        /// <returns>A string with the virtual terminal sequence.</returns>
-        public static string GetExtendedColor(Color color, bool foreground = true)
-        {
-            return FormattableString.Invariant($"{Escape}[{(foreground ? 38 : 48)};2;{color.R};{color.G};{color.B}m");
         }
 
         // Returns the index of the character after the end of the sequence.

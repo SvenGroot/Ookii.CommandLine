@@ -63,11 +63,16 @@ the property is read-only, it must not return a null value.
 
 ```csharp
 [CommandLineArgument]
-public string[] MultiValue { get; set; }
+public string[]? MultiValue { get; set; }
 
 [CommandLineArgument]
-public List<string> AlsoMultiValue { get; } = new();
+public ICollection<string> AlsoMultiValue { get; } = new List<int>();
 ```
+
+It is possible to use `List<string>` (or any other type implementing `ICollection<T>`) as the type
+of the property for the second argument, but, if using .Net 6.0 or later, `CommandLineParser` can
+only determine the [nullability](Arguments.md#arguments-with-non-nullable-types) of the collection's
+elements if the property type is either an array or `ICollection<T>` itself.
 
 To define a dictionary argument, you can use either a read-write property of type `Dictionary<TKey, TValue>`
 or a read-only property of any type implementing `IDictionary<TKey, TValue>`.
@@ -76,11 +81,15 @@ Consider the following properties:
 
 ```csharp
 [CommandLineArgument]
-public Dictionary<string, int> Dictionary { get; set; }
+public Dictionary<string, int>? Dictionary { get; set; }
 
 [CommandLineArgument]
-public IDictionary<string, int> AlsoDictionary { get; } = new Dictionary<string, int>();
+public IDictionary<string, int> AlsoDictionary { get; } = new SortedDictionary<string, int>();
 ```
+
+As above, it is possible to use `SortedDictionary<string, int>` as the property type, but
+nullability for the dictionary values can only be determined if the type is `Dictionary<TKey, TValue>`
+or `IDictionary<TKey, TValue>`.
 
 ### Default values
 

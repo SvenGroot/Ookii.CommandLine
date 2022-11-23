@@ -9,8 +9,8 @@ text automatically, alleviating this problem.
 
 Usage help can be generated using the `CommandLineParser.WriteUsage` method. The output can be
 customized using the `UsageWriter` class. By default, the `CommandLineParser.WriteUsage` method will
-write the usage help to the standard output stream, properly white-space wrapping the text at the
-console width.
+write the usage help to the standard output stream, using the `LineWrappingTextWriter` class to
+white-space wrap the text at the console width.
 
 If you use the static `CommandLineParser.Parse<T>()` method, usage help will be printed
 automatically in the event the command line is invalid, or the "-Help" argument was used. In this
@@ -43,7 +43,8 @@ Usage: Parser [-Source] <String> [-Destination] <String> [[-OperationIndex] <Int
         Provides a date to the application.
 
     -Day <DayOfWeek>
-        This is an argument using an enumeration type.
+        This is an argument using an enumeration type. Possible values: Sunday, Monday, Tuesday,
+        Wednesday, Thursday, Friday, Saturday.
 
     -Help [<Boolean>] (-?, -h)
         Displays this help message.
@@ -246,20 +247,49 @@ So hide an argument, use the `CommandLineArgumentAttribute.IsHidden` property, o
 public int Argument { get; set; }
 ```
 
+## Color output
+
+When possible, Ookii.CommandLine will use color when writing usage help. This is controlled by the
+`UsageWriter.UseColor` property. When set to null (the default), the `UsageWriter` tries to
+determine whether color is supported. Color will only be enabled if:
+
+1. There is no environment variable named `NO_COLOR`.
+2. The standard output stream is not redirected.
+3. The `TERM` environment variable is not set to `dumb`.
+4. On Windows, enabling virtual terminal sequences using `SetConsoleMode` must succeed.
+5. On other platforms, the `TERM` environment variable must be defined.
+
+`UsageWriter` uses virtual terminal sequences to set color. Several components of the help have
+preset colors, which can be customized using properties of the `UsageWriter` class. Set them to
+any of the constants of the `TextFormat` class, or the return value of the `GetExtendedColor` method
+for any 24-bit color, or any other valid virtual terminal sequence.
+
+In order to support proper white-space wrapping text that contains virtual terminal sequences, the
+`LineWrappingTextWriter` class will not count virtual terminal sequences as part of the line length.
+
 ## Customizing the usage help
 
 The usage help can be heavily customized. We've already seen how it can be customized using things
-such as custom value descriptions, or various options of the `UsageWriter` class. The latter
-also allows you control things such as the amount of indentation to use for the syntax and the
-description list, and the colors to use.
+such as custom value descriptions, or various options of the `UsageWriter` class. In addition to
+properties already mentioned, the latter also allows you control things such as the amount of
+indentation to use for the syntax and the description list, and the colors to use.
 
-To go even further, you can derive a class from the `UsageWriter` class, and override its members to
-customize the exact format of every component of the usage help. You can choose to customize as
-little or as much as you like, depending on what methods you override.
+To provide further customization options, you can derive a class from the `UsageWriter` class. The
+`UsageWriter` class has protected virtual methods for every part of the usage. These range from
+top-level methods like `WriteParserUsageCore()` which drives the entire process, methods responsible
+for a section such as `WriteParserUsageSyntax()` or `WriteArgumentDescriptions()`, methods
+responsible for a single argument like `WriteArgumentSyntax()` or `WriteArgumentDescription()`, down
+to methods that write single piece of text like `WriteArgumentName()` or `WriteValueDescription()`.
+
+These methods call each other, so you can customize as little or as much as you like, depending on
+which methods you override. For example, if you want to use something other than angle brackets for
+value descriptions, just override `WriteValueDescription()` (and probably also
+`WriteValueDescriptionForDescription()`). Or, if you want to change the entire format of the
+descriptions, override `WriteArgumentDescription()`.
 
 To specify a custom usage writer, assign it to the `ParseOptions.UsageWriter` property.
 
-The [custom usage sample](../src/Samples//CustomUsage) uses a custom usage writer, as well as a
+The [custom usage sample](../src/Samples/CustomUsage) uses a custom usage writer, as well as a
 custom `LocalizedStringProvider` to radically alter the format of the usage help, as seen below.
 
 ```text
@@ -275,7 +305,8 @@ OPTIONS:
   -c|--count <number>         Provides the count for something to the application. [range: 0-100]
   -d|--destination <string>   The destination data.
   -D|--date <date-time>       Provides a date to the application.
-  --day <day-of-week>         This is an argument using an enumeration type.
+  --day <day-of-week>         This is an argument using an enumeration type. Possible values:
+                              Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday.
   -h|--help                   Displays this help message.
   --operation-index <number>  The operation's index. [default: 1]
   -p|--process                Does the processing.
@@ -285,6 +316,12 @@ OPTIONS:
                               multiple times to set more than one value.
   --version                   Displays version information.
 ```
+
+The [WPF usage sample](../src/Samples/Wpf) is another example that uses a custom `UsageWriter`, in
+this case to output the usage help as HTML.
+
+You can see that the `UsageWriter` class offers a lot of flexibility to customize the usage help
+to your liking.
 
 ## Subcommand usage help
 

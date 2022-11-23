@@ -134,8 +134,8 @@ namespace Ookii.CommandLine.Commands
         /// <param name="args">The arguments to the command.</param>
         /// <param name="index">The index in <paramref name="args"/> at which to start parsing the arguments.</param>
         /// <param name="options">
-        ///   The options that control parsing behavior. If <see langword="null" />, the default
-        ///   options are used.
+        ///   The options that control parsing behavior and error and usage help output. If <see
+        ///   langword="null" />, the default options are used.
         /// </param>
         /// <returns>An instance of the <see cref="CommandType"/>.</returns>
         /// <exception cref="ArgumentNullException">
@@ -163,6 +163,33 @@ namespace Ookii.CommandLine.Commands
             }
 
             return (ICommand)CommandLineParser.ParseInternal(CommandType, args, index, options)!;
+        }
+
+        /// <summary>
+        /// Creates a <see cref="CommandLineParser"/> instance that can be used to instantiate
+        /// </summary>
+        /// <param name="options">
+        /// The options for the parser, or <see langword="null"/> to use default options.
+        /// </param>
+        /// <returns>
+        /// A <see cref="CommandLineParser"/> instance, or <see langword="null"/> if the
+        /// <see cref="UseCustomArgumentParsing"/> property is <see langword="true"/>.
+        /// </returns>
+        /// <remarks>
+        /// <para>
+        ///   If the <see cref="UseCustomArgumentParsing"/> property is <see langword="true"/>, the
+        ///   command cannot be created suing the <see cref="CommandLineParser"/> class, and you
+        ///   must use the <see cref="CreateInstance"/> method.
+        /// </para>
+        /// </remarks>
+        public CommandLineParser? CreateParser(ParseOptions? options = null)
+        {
+            if (UseCustomArgumentParsing)
+            {
+                return null;
+            }
+
+            return new CommandLineParser(CommandType, options);
         }
 
         /// <summary>

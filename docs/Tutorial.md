@@ -284,15 +284,16 @@ While we're talking about non-nullable reference types, consider the following a
 
 ```csharp
 [CommandLineArgument(Position = 0, IsRequired = true)]
-public string SomeArgument { get; set; } = string.Empty;
+public string Path { get; set; } = string.Empty;
 ```
 
 Even though the property is required, and we know it will be set, we have to initialize it to a
-non-null value because the C# compiler doesn't know that. The advantage of this would be that we
+non-null value because the C# compiler doesn't know that (and it wouldn't be true if you create the
+class using a method other than the `CommandLineParser`). The advantage of this would be that we
 can remove the `!` from the value's usage in `ReadFile`, at the cost of an unnecessary
 initialization. As a bonus, for .Net 6.0 and later only, Ookii.CommandLine will make sure that
 arguments with non-nullable types can't be set to null, even if the `TypeConverter` returns null
-for some reason.
+(it will treat that as an error).
 
 ## Expanding the usage help
 
