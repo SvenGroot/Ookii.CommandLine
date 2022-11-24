@@ -58,20 +58,20 @@ latter can also be used to customize the usage help and error messages.
 `ParseOptions` can even be used to redirect where error and help are written.
 
 ```csharp
-using var writer = new StringWriter();
+using var writer = LineWrappingTextWriter.ForStringWriter();
 var options = new ParseOptions()
 {
-    Out = writer,
     Error = writer,
     Mode = ParsingMode.LongShort,
     DuplicateArguments = ErrorMode.Warning,
+    UsageWriter = new UsageWriter(writer);
 };
 
 var arguments = CommandLineParser.Parse<MyArguments>(options);
 if (arguments == null)
 {
     // There are probably better ways to show help in a GUI app than this.
-    MessageBox.Show(writer.ToString());
+    MessageBox.Show(writer.BaseWriter.ToString());
     return 1;
 }
 ```
@@ -143,7 +143,7 @@ static int Main()
 
     if (parser.HelpRequested)
     {
-        parser.WriteUsageToConsole();
+        parser.WriteUsage();
     }
 
     return 1;

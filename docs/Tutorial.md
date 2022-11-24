@@ -626,8 +626,11 @@ Let's change our main method as follows:
 var options = new CommandOptions()
 {
     CommandNameTransform = NameTransform.DashCase,
-    ShowCommandHelpInstruction = true,
-    IncludeApplicationDescriptionBeforeCommandList = true,
+    UsageWriter = new UsageWriter()
+    {
+        IncludeCommandHelpInstruction = true,
+        IncludeApplicationDescriptionBeforeCommandList = true,
+    },
 };
 
 var manager = new CommandManager(options);
@@ -649,7 +652,7 @@ the command is still called "read". That's because for subcommands, the name tra
 strip the suffix "Command" from the name by default. This too can be customized with the
 `CommandOptions` class.
 
-We also set the `ShowCommandHelpInstruction` property, which causes the `CommandManager` to print
+We also set the `IncludeCommandHelpInstruction` property, which causes the `CommandManager` to print
 a message like `Run 'tutorial <command> -Help' for more information about a command.` after the
 command list. This is disabled by default because the `CommandManager` won't check if all the
 commands actually have a `-Help` argument. It's recommended to enable this if all your commands do.
@@ -841,7 +844,7 @@ public static async Task<int> Main()
     var options = new CommandOptions()
     {
         CommandNameTransform = NameTransform.DashCase,
-        ShowCommandHelpInstruction = true,
+        IncludeCommandHelpInstruction = true,
         IncludeApplicationDescriptionBeforeCommandList = true,
     };
 

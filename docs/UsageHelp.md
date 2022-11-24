@@ -281,6 +281,10 @@ for a section such as `WriteParserUsageSyntax()` or `WriteArgumentDescriptions()
 responsible for a single argument like `WriteArgumentSyntax()` or `WriteArgumentDescription()`, down
 to methods that write single piece of text like `WriteArgumentName()` or `WriteValueDescription()`.
 
+> The `UsageWriter` class has several properties and methods that apply only to
+> [subcommands](Subcommands.md#subcommand-usage-help), so these will have no effect if you are not
+> using subcommands.
+
 These methods call each other, so you can customize as little or as much as you like, depending on
 which methods you override. For example, if you want to use something other than angle brackets for
 value descriptions, just override `WriteValueDescription()` (and probably also
