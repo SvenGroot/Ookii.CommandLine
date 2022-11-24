@@ -5,15 +5,15 @@
       <SnippetTypes>
         <SnippetType>Expansion</SnippetType>
       </SnippetTypes>
-      <Title>clcmd</Title>
+      <Title>clcmdasync</Title>
       <Author>Sven Groot (Ookii.org)</Author>
       <Description>
-        Snippet for creating a subcommand class for use with Ookii.CommandLine.
+        Snippet for creating an asynchronous subcommand class for use with Ookii.CommandLine.
       </Description>
       <HelpUrl>
         https://github.com/SvenGroot/ookii.commandline
       </HelpUrl>
-      <Shortcut>clcmd</Shortcut>
+      <Shortcut>clcmdasync</Shortcut>
     </Header>
     <Snippet>
       <Declarations>
@@ -58,13 +58,13 @@
       </Imports>
       <Code Language="csharp"><![CDATA[[Command($CommandName$)]
 [Description("$Description$")]
-class $Name$ : ICommand
+class $Name$ : AsyncCommandBase
 {
     // [CommandLineArgument(Position = 0, IsRequired = true)]
     // [Description("Argument description.")]
     // public string SampleArgument { get; set; }
 
-    public int Run()
+    public override async Task<int> Run()
     {
         $end$
         return 0;

@@ -5,22 +5,22 @@
       <SnippetTypes>
         <SnippetType>Expansion</SnippetType>
       </SnippetTypes>
-      <Title>clcmd</Title>
+      <Title>clcmdasync</Title>
       <Author>Sven Groot (Ookii.org)</Author>
       <Description>
-        Snippet for creating a subcommand class for use with Ookii.CommandLine.
+        Snippet for creating an asynchronous subcommand class for use with Ookii.CommandLine.
       </Description>
       <HelpUrl>
         https://github.com/SvenGroot/ookii.commandline
       </HelpUrl>
-      <Shortcut>clcmd</Shortcut>
+      <Shortcut>clcmdasync</Shortcut>
     </Header>
     <Snippet>
       <Declarations>
         <Literal Editable="true">
           <ID>CommandName</ID>
           <ToolTip>Command name</ToolTip>
-          <Default>"name"</Default>
+          <Default>"test"</Default>
           <Function>
           </Function>
         </Literal>
@@ -56,20 +56,21 @@
           <Namespace>System.ComponentModel</Namespace>
         </Import>
       </Imports>
-      <Code Language="csharp"><![CDATA[[Command($CommandName$)]
-[Description("$Description$")]
-class $Name$ : ICommand
-{
-    // [CommandLineArgument(Position = 0, IsRequired = true)]
-    // [Description("Argument description.")]
-    // public string SampleArgument { get; set; }
+      <Code Language="VB">
+    <![CDATA[<Command($CommandName$)>
+<Description("$Description$")>
+Class $Name$
+    Inerits AsyncCommandBase
 
-    public int Run()
-    {
+    ' <CommandLineArgument(Position:=0, IsRequired:=True)>
+    ' <Description("Argument description")>
+    ' Public Property SampleArgument As String
+
+    Public Overrides Asnc Function Run() As Task(Of Integer)
         $end$
-        return 0;
-    }
-}]]></Code>
+        Return 0
+    End Function
+End Class]]></Code>
     </Snippet>
   </CodeSnippet>
 </CodeSnippets>
