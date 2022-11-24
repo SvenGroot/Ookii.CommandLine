@@ -425,16 +425,14 @@ public static async Task<int> Main(string[] args)
     ICommand? command = null;
     if (commandInfo.UseCustomArgumentParsing)
     {
-        // CreateInstance handles parsing errors for CommandLineParser, so don't use it then,
-        // but it must be used for commands with custom parsing (unless you want to manually
-        // use Activator.CreateInstance). How errors are handled here depends on you.
-        command = commandInfo.CreateInstance(args, 1, options);
+        // CreateInstance handles parsing errors and displays usage when it uses the
+        // CommandLineParser, so don't use it in that case. However, it must be used for commands
+        // with custom parsing. How errors are handled here depends on the command.
+        command = commandInfo.CreateInstance(args, 1);
     }
     else
     {
-        // Options must also be passed here if they contain changes to any ParseOptions.
-        // CreateParser is guaranteed to not return null if UseCustomArgumentParsing is false.
-        var parser = commandInfo.CreateParser(options)!;
+        var parser = commandInfo.CreateParser();
         try
         {
             // Skip the command name in the arguments.

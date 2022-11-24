@@ -220,27 +220,27 @@ namespace Ookii.CommandLine.Tests
                 CommandNameTransform = NameTransform.PascalCase
             };
 
-            var info = new CommandInfo(typeof(AnotherSimpleCommand), options);
+            var manager = new CommandManager(_commandAssembly, options);
+            var info = new CommandInfo(typeof(AnotherSimpleCommand), manager);
             Assert.AreEqual("AnotherSimple", info.Name);
 
             options.CommandNameTransform = NameTransform.CamelCase;
-            info = new CommandInfo(typeof(AnotherSimpleCommand), options);
+            info = new CommandInfo(typeof(AnotherSimpleCommand), manager);
             Assert.AreEqual("anotherSimple", info.Name);
 
             options.CommandNameTransform = NameTransform.SnakeCase;
-            info = new CommandInfo(typeof(AnotherSimpleCommand), options);
+            info = new CommandInfo(typeof(AnotherSimpleCommand), manager);
             Assert.AreEqual("another_simple", info.Name);
 
             options.CommandNameTransform = NameTransform.DashCase;
-            info = new CommandInfo(typeof(AnotherSimpleCommand), options);
+            info = new CommandInfo(typeof(AnotherSimpleCommand), manager);
             Assert.AreEqual("another-simple", info.Name);
 
             options.StripCommandNameSuffix = null;
-            info = new CommandInfo(typeof(AnotherSimpleCommand), options);
+            info = new CommandInfo(typeof(AnotherSimpleCommand), manager);
             Assert.AreEqual("another-simple-command", info.Name);
 
             options.StripCommandNameSuffix = "Command";
-            var manager = new CommandManager(_commandAssembly, options);
             Assert.IsNotNull(manager.GetCommand("another-simple"));
 
             // Check automatic command name is affected too.

@@ -153,7 +153,7 @@ namespace Ookii.CommandLine.Commands
             if (_options.AutoVersionCommand &&
                 !commands.Any(c => _options.CommandNameComparer.Compare(c.Name, Properties.Resources.AutomaticVersionCommandName) == 0))
             {
-                var versionCommand = CommandInfo.GetAutomaticVersionCommand(_options);
+                var versionCommand = CommandInfo.GetAutomaticVersionCommand(this);
                 commands = commands.Append(versionCommand);
             }
 
@@ -211,7 +211,7 @@ namespace Ookii.CommandLine.Commands
             if (_options.AutoVersionCommand &&
                 _options.CommandNameComparer.Compare(commandName, _options.AutoVersionCommandName()) == 0)
             {
-                return CommandInfo.GetAutomaticVersionCommand(_options);
+                return CommandInfo.GetAutomaticVersionCommand(this);
             }
 
             return null;
@@ -282,7 +282,7 @@ namespace Ookii.CommandLine.Commands
             _options.UsageWriter.CommandName = info.Name;
             try
             {
-                return info.CreateInstance(args, index, _options);
+                return info.CreateInstance(args, index);
             }
             finally
             {
@@ -536,7 +536,7 @@ namespace Ookii.CommandLine.Commands
             }
 
             return from type in types
-                   let info = CommandInfo.TryCreate(type, _options)
+                   let info = CommandInfo.TryCreate(type, this)
                    where info != null && (_options.CommandFilter?.Invoke(info.Value) ?? true)
                    select info.Value;
         }

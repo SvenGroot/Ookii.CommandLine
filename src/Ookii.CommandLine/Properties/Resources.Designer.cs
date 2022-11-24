@@ -457,6 +457,15 @@ namespace Ookii.CommandLine.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cannot create a parser for a command with custom parsing..
+        /// </summary>
+        internal static string NoParserForCustomParsingCommand {
+            get {
+                return ResourceManager.GetString("NoParserForCustomParsingCommand", resourceCulture);
+            }
+        }
+
+        /// <summary>
         ///   Looks up a localized string similar to No type converter that can convert to and from a string exists for type &apos;{0}&apos;. Use the TypeConverterAttribute to specify a custom TypeConverter..
         /// </summary>
         internal static string NoTypeConverterFormat {

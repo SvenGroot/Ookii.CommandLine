@@ -20,17 +20,6 @@ internal abstract class ParentCommand : AsyncCommandBase, ICommandWithCustomPars
 
     public void Parse(string[] args, int index, CommandOptions options)
     {
-        var info = new CommandInfo(GetType(), options);
-
-        // Use a custom UsageWriter to replace the application description with the
-        // description of this command.
-        options.UsageWriter = new CustomUsageWriter(info)
-        {
-            // Apply the same options as the parent command.
-            IncludeApplicationDescriptionBeforeCommandList = true,
-            IncludeCommandHelpInstruction = true,
-        };
-
         // Nested commands don't need to have a "version" command.
         options.AutoVersionCommand = false;
 
@@ -40,6 +29,16 @@ internal abstract class ParentCommand : AsyncCommandBase, ICommandWithCustomPars
             (command) => command.CommandType.GetCustomAttribute<ParentCommandAttribute>()?.ParentCommand == GetType();
 
         var manager = new CommandManager(options);
+        var info = new CommandInfo(GetType(), manager);
+
+        // Use a custom UsageWriter to replace the application description with the
+        // description of this command.
+        options.UsageWriter = new CustomUsageWriter(info)
+        {
+            // Apply the same options as the parent command.
+            IncludeApplicationDescriptionBeforeCommandList = true,
+            IncludeCommandHelpInstruction = true,
+        };
 
         // All commands in this sample are async, so this cast is safe.
         _childCommand = (IAsyncCommand?)manager.CreateCommand(args, index);
