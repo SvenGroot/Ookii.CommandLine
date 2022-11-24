@@ -9,7 +9,7 @@ Ookii.CommandLine is provided in versions for [.Net Standard 2.0, .Net Standard 
 and later](#requirements).
 
 Ookii.CommandLine can be added to your project using [NuGet](https://nuget.org/packages/Ookii.CommandLine).
-[Code snippets](docs/Code%20Snippets.md) for Visual Studio are available on the
+[Code snippets](docs/CodeSnippets.md) for Visual Studio are available on the
 [Visual Studio marketplace](https://www.ookii.org/Link/CommandLineSnippets).
 
 ## Overview

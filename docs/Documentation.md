@@ -19,6 +19,6 @@ explanations of what they do and examples of their output.
   - [Generating usage help](UsageHelp.md)
   - [Argument validation and dependencies](Validation.md)
 - [Subcommands](Subcommands.md)
-- [Line wrapping text writer](Utilities.md)
-- [Code snippets](Code%20Snippets.md)
+- [LineWrappingTextWriter and other utilities](Utilities.md)
+- [Code snippets](CodeSnippets.md)
 - [Class library documentation](https://www.ookii.org/Link/CommandLineDoc)
