@@ -27,20 +27,21 @@
       <NamespaceSummaryItem name="Ookii.CommandLine" isDocumented="True">&lt;para&gt;
   Provides functionality for defining and parsing command line arguments, and for generating usage help.
 &lt;/para&gt;</NamespaceSummaryItem>
-<NamespaceSummaryItem name="Ookii.CommandLine.Commands" isDocumented="True">&lt;para&gt;
+      <NamespaceSummaryItem name="Ookii.CommandLine.Commands" isDocumented="True">&lt;para&gt;
   Provides functionality for creating applications with multiple subcommands, each with their own arguments.
 &lt;/para&gt;</NamespaceSummaryItem>
-<NamespaceSummaryItem name="Ookii.CommandLine.Terminal" isDocumented="True">&lt;para&gt;
+      <NamespaceSummaryItem name="Ookii.CommandLine.Terminal" isDocumented="True">&lt;para&gt;
   Provides helpers for supporting virtual terminal sequences and color output.
 &lt;/para&gt;</NamespaceSummaryItem>
-<NamespaceSummaryItem name="Ookii.CommandLine.Validation" isDocumented="True">&lt;para&gt;
+      <NamespaceSummaryItem name="Ookii.CommandLine.Validation" isDocumented="True">&lt;para&gt;
   Provides attributes used to validate the value of arguments, and the relation between arguments.
-&lt;/para&gt;</NamespaceSummaryItem></NamespaceSummaries>
+&lt;/para&gt;</NamespaceSummaryItem>
+    </NamespaceSummaries>
     <CopyrightHref>https://github.com/SvenGroot/ookii.commandline</CopyrightHref>
     <CopyrightText>Copyright &amp;#169%3b Sven Groot %28Ookii.org%29</CopyrightText>
     <HelpTitle>Ookii.CommandLine 3.0 documentation</HelpTitle>
     <NamingMethod>MemberName</NamingMethod>
-    <PresentationStyle>VS2013</PresentationStyle>
+    <PresentationStyle>Default2022</PresentationStyle>
     <SyntaxFilters>C#, Visual Basic, Visual Basic Usage, Managed C++</SyntaxFilters>
     <SdkLinkTarget>Blank</SdkLinkTarget>
     <RootNamespaceContainer>True</RootNamespaceContainer>

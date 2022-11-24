@@ -81,7 +81,7 @@ namespace Ookii.CommandLine
     /// <threadsafety static="true" instance="false"/>
     /// <seealso cref="CommandLineParser{T}"/>
     /// <seealso cref="CommandManager"/>
-    /// <seealso href="https://www.github.com/SvenGroot/ookii.commandline"/>
+    /// <seealso href="https://www.github.com/SvenGroot/ookii.commandline">Usage documentation</seealso>
     public class CommandLineParser
     {
         #region Nested types
