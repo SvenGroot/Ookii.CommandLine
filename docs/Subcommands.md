@@ -347,7 +347,7 @@ public static int Main()
 {
     var options = new CommandOptions()
     {
-        CommandNameComparer = StringComparer.Invariant,
+        CommandNameComparer = StringComparer.InvariantCulture,
         CommandNameTransform = NameTransform.DashCase,
         UsageWriter = new UsageWriter()
         {

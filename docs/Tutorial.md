@@ -38,12 +38,12 @@ class Arguments
 ```
 
 In Ookii.CommandLine, you define arguments by making a class that holds them, and adding properties
-to that class. Every public property that has the `CommandLineArgumentAttribute` defines an argument.
+to that class. Every public property that has the [`CommandLineArgumentAttribute`][] defines an argument.
 
 The code above defines a single argument called "Path", indicates it's the first positional argument,
 and makes it required.
 
-> You can use the `CommandLineArgumentAttribute` to specify a custom name for your argument. If you
+> You can use the [`CommandLineArgumentAttribute`][] to specify a custom name for your argument. If you
 > don't, the property name is used.
 
 Now replace the contents of Program.cs with the following:
@@ -83,8 +83,8 @@ the contents of the file specified by the path argument to the console.
 The important part is the call to `CommandLineParser.Parse<Arguments>()`. This static method will
 parse your arguments, handle and print any errors, and print usage help if required.
 
-But wait, we didn't pass any arguments to this method? Actually, the `Parse<T>()` method will call
-`Environment.GetCommandLineArgs()` to get the arguments. There are also overloads that take an
+But wait, we didn't pass any arguments to this method? Actually, the [`Parse<T>()`][Parse<T>()_1] method will call
+[`Environment.GetCommandLineArgs()`][] to get the arguments. There are also overloads that take an
 explicit `string[]` array with the arguments, if you want to pass them manually.
 
 So, let's run our application. Build the application using `dotnet build`, and then, from the
@@ -137,7 +137,7 @@ Usage: tutorial [-Path] <String> [-Help] [-Version]
 > The actual usage help uses color if your console supports it. See [here](images/color.png) for
 > an example.
 
-As you can see, the `Parse<T>()` method lets us know what's wrong (we didn't supply the required
+As you can see, the [`Parse<T>()`][Parse<T>()_1] method lets us know what's wrong (we didn't supply the required
 argument), and shows the usage help.
 
 The usage syntax (the line starting with "Usage:") shows the argument we defined. However, the list
@@ -160,10 +160,10 @@ tutorial 1.0.0
 
 By default, it shows the assembly name and informational version. It'll also show the assembly's
 copyright information, if there is any (there's not in this case). You can also use the
-`ApplicationFriendlyNameAttribute` attribute to specify a custom name instead of the assembly name.
+[`ApplicationFriendlyNameAttribute`][] attribute to specify a custom name instead of the assembly name.
 
 > If you define an argument called "Help" or "Version", the automatic arguments won't be added.
-> Also, you can disable the automatic arguments using the `ParseOptionsAttribute` attribute.
+> Also, you can disable the automatic arguments using the [`ParseOptionsAttribute`][] attribute.
 
 Note that in the usage syntax, your positional "Path" argument still has its name shown as "-Path".
 That's because every argument, even positional ones, can still be supplied by name. So if you run
@@ -183,7 +183,7 @@ The output is the same as above.
 Arguments don't have to be strings. In fact, they can have any type as long as there's a way to
 [convert to them](Arguments.md#argument-value-conversion) from a string. All of the basic .Net
 types are supported (like `int`, `float`, `bool`), as well as many more that can be converted from
-a string (like enumerations, or classes like `FileInfo` or `Uri`).
+a string (like enumerations, or classes like [`FileInfo`][] or [`Uri`][]).
 
 Let's try this out by adding more arguments in the Arguments class. First, add this to the top of
 Arguments.cs:
@@ -209,7 +209,7 @@ positional (you must use the name), and it's optional. We've also added a valida
 value is positive, and since "-MaxLines" might be a bit verbose, we've given it an alias "-Max",
 which can be used as an alternative name to supply the argument.
 
-> An argument can have any number of aliases; just repeat the `AliasAttribute` attribute.
+> An argument can have any number of aliases; just repeat the [`AliasAttribute`][] attribute.
 
 The second argument, "Inverted", is a boolean, which means it's a switch argument. Switch arguments
 don't need values, you either supply them or you don't.
@@ -254,9 +254,9 @@ And it'll only show the first five lines of the file, using black-on-white text.
 If you supply a value that's not a valid integer for "MaxLines", or a value that's less than 1,
 you'll once again get an error message and the usage help.
 
-Above, we used a nullable value type (`Nullable<int>`, or `int?`) so we could tell whether the
+Above, we used a nullable value type ([`Nullable<int>`][], or `int?`) so we could tell whether the
 argument was supplied. Instead, we could also set a default value. This can be done in two ways: the
-first is using the `DefaultValue` property (the validator and alias are omitted for brevity):
+first is using the [`DefaultValue`][DefaultValue_1] property (the validator and alias are omitted for brevity):
 
 ```csharp
 [CommandLineArgument(DefaultValue = 10)]
@@ -276,7 +276,7 @@ public int MaxLines { get; set; } = 10;
 
 The advantage of the former approach is that the default value will be included in the usage help.
 The latter allows you to use non-constant values, and can sometimes be required if the type of an
-argument is a non-nullable reference type (you can also use both, in which case the `DefaultValue`
+argument is a non-nullable reference type (you can also use both, in which case the [`DefaultValue`][DefaultValue_1]
 property will overwrite the initial value).
 
 While we're talking about non-nullable reference types, consider the following alternative for the
@@ -289,17 +289,17 @@ public string Path { get; set; } = string.Empty;
 
 Even though the property is required, and we know it will be set, we have to initialize it to a
 non-null value because the C# compiler doesn't know that (and it wouldn't be true if you create the
-class using a method other than the `CommandLineParser`). The advantage of this would be that we
+class using a method other than the [`CommandLineParser`][]). The advantage of this would be that we
 can remove the `!` from the value's usage in `ReadFile`, at the cost of an unnecessary
 initialization. As a bonus, for .Net 6.0 and later only, Ookii.CommandLine will make sure that
-arguments with non-nullable types can't be set to null, even if the `TypeConverter` returns null
+arguments with non-nullable types can't be set to null, even if the [`TypeConverter`][] returns null
 (it will treat that as an error).
 
 ## Expanding the usage help
 
 We saw before that our custom arguments were showing up in the usage syntax, but didn't have any
 descriptions. Typically, you'll want to add descriptions to your arguments. This is done using the
-`System.ComponentModel.DescriptionAttribute` attribute.
+[`System.ComponentModel.DescriptionAttribute`][] attribute.
 
 Let's add some for our arguments:
 
@@ -361,7 +361,7 @@ Usage: tutorial [-Path] <String> [-Help] [-Inverted] [-MaxLines <Number>] [-Vers
 ```
 
 Now our usage help looks a lot better! All the arguments are present in the description list. Also
-note how the `ValidateRangeAttribute` validator we used automatically added its condition to the
+note how the [`ValidateRangeAttribute`][] validator we used automatically added its condition to the
 description of "MaxLines" (this can be disabled either globally or on a per-validator basis if you
 want). Things like the default value are added in a similar fashion.
 
@@ -378,7 +378,7 @@ names and values, and specify a custom separator. You can specify custom argumen
 instead of `-` which is the default (on Windows, `/` is also accepted by default). You can make the
 argument names case sensitive. And there's more.
 
-Most of these options can be specified using the `ParseOptionsAttribute`, which you can apply to
+Most of these options can be specified using the [`ParseOptionsAttribute`][], which you can apply to
 your class. Let's apply some options:
 
 ```csharp
@@ -405,14 +405,14 @@ class Arguments
 }
 ```
 
-The biggest change here is that we've set the `Mode` to `ParsingMode.LongShort`. This is an
+The biggest change here is that we've set the [`Mode`][Mode_2] to [`ParsingMode.LongShort`][]. This is an
 alternative set of parsing rules, where every argument can have a long name, using the `--` prefix
 by default, and a single-character short name using the `-` prefix.
 
 We've changed the arguments as well, to give both "MaxLines" and "Inverted" short names, which will
 be derived using the first character of their long names. You can also specify a custom short name
-using the `CommandLineArgumentAttribute.ShortName` property. Arguments always have a long name by
-default, which can be disabled with the `CommandLineArgumentAttribute.IsLong` property (they must
+using the [`CommandLineArgumentAttribute.ShortName`][] property. Arguments always have a long name by
+default, which can be disabled with the [`CommandLineArgumentAttribute.IsLong`][] property (they must
 have either a short or a long name).
 
 I've also applied a name transformation to the argument names and value descriptions. In this case,
@@ -450,13 +450,13 @@ the name transformation has changed the name of all of our arguments (which, rem
 case sensitive). We now have very different parsing behavior without having to change the code
 that uses the arguments at all.
 
-In addition to the `ParseOptionsAttribute` attribute, you can also use the `ParseOptions` class
+In addition to the [`ParseOptionsAttribute`][] attribute, you can also use the [`ParseOptions`][] class
 to specify many of the same options and a bunch of other ones that didn't lend themselves well to
 an attribute, including where to write errors and help, and customization options for the
-usage help. You can pass an instance of the `ParseOptions` class to the `Parse<T>()` method.
+usage help. You can pass an instance of the [`ParseOptions`][] class to the [`Parse<T>()`][Parse<T>()_1] method.
 
-If you specify the same option in both the `ParseOptionsAttribute` attribute and the `ParseOptions`
-class, the `ParseOptions` class takes precedence.
+If you specify the same option in both the [`ParseOptionsAttribute`][] attribute and the [`ParseOptions`][]
+class, the [`ParseOptions`][] class takes precedence.
 
 ## Using subcommands
 
@@ -467,7 +467,7 @@ needs its own command line arguments.
 
 Creating subcommands with Ookii.CommandLine is very similar to what we've been doing already. A
 subcommand is a class that defines arguments, same as before. The class will just have to implement
-the `ICommand` interface, and use the `CommandAttribute` attribute. And, we'll have to change our
+the [`ICommand`][] interface, and use the [`CommandAttribute`][] attribute. And, we'll have to change our
 main methods to use commands.
 
 Let's change the example we've built so far to use subcommands. I'm going to go back to the version
@@ -489,12 +489,12 @@ Then, we'll change the renamed `Arguments` class into a subcommand:
 class ReadCommand : ICommand
 ```
 
-We've added the `CommandAttribute`, which indicates the class is a command and lets us specify the
-name of the command, which is "read" in this case. We've also added the `ICommand` interface, which
+We've added the [`CommandAttribute`][], which indicates the class is a command and lets us specify the
+name of the command, which is "read" in this case. We've also added the [`ICommand`][] interface, which
 all commands must implement.
 
 We don't have to change anything about the properties defining the arguments. However, we do have
-to implement the `ICommand` interface, which has a single method called `Run()`. To implement it, we
+to implement the [`ICommand`][] interface, which has a single method called [`Run()`][Run()_1]. To implement it, we
 move the implementation of `ReadFile()` from Program.cs into this method:
 
 ```csharp
@@ -526,7 +526,7 @@ public int Run()
 }
 ```
 
-The `Run()` method is like the `Main()` method for your command, and its return value should be
+The [`Run()`][Run()_1] method is like the `Main()` method for your command, and its return value should be
 treated like the exit code returned from `Main()`, because typically, you will return the executed
 command's return value from `Main()`.
 
@@ -543,20 +543,20 @@ public static int Main()
 }
 ```
 
-The `CommandManager` class handles finding your commands, and lets you specify various options,
-including the `ParseOptions` that will be shared by all commands. The default constructor will look
+The [`CommandManager`][] class handles finding your commands, and lets you specify various options,
+including the [`ParseOptions`][] that will be shared by all commands. The default constructor will look
 for subcommand classes in the calling assembly, and uses the default options.
 
-The `RunCommand()` method will take the arguments from `Environment.GetCommandLineArgs()` (as
+The [`RunCommand()`][] method will take the arguments from [`Environment.GetCommandLineArgs()`][] (as
 before, you can also pass them explicitly), and uses the first argument as the command name. If a
-command with that name exists, it uses `CommandLineParser` to parse the arguments for that command,
-and finally invokes the `ICommand.Run()` method. If anything goes wrong, it will either display a
+command with that name exists, it uses [`CommandLineParser`][] to parse the arguments for that command,
+and finally invokes the [`ICommand.Run()`][] method. If anything goes wrong, it will either display a
 list of commands, or if a command has been found, the help for that command. The return value is the
-value returned from `ICommand.Run()`, or null if parsing failed, in which case we return a non-zero
+value returned from [`ICommand.Run()`][], or null if parsing failed, in which case we return a non-zero
 exit code to indicate failure.
 
-> If you want to customize any of these steps, there are methods like `GetCommand()` and
-> `CreateCommand()` that you can call to do this manually.
+> If you want to customize any of these steps, there are methods like [`GetCommand()`][] and
+> [`CreateCommand()`][] that you can call to do this manually.
 
 If we build our application, and run it without arguments again (`./tutorial`), we see the
 following:
@@ -574,7 +574,7 @@ The following commands are available:
 ```
 
 When no command, or an unknown command, is supplied, a list of commands is printed. The
-`DescriptionAttribute` for our class, which was the application description before, is now the
+[`DescriptionAttribute`][] for our class, which was the application description before, is now the
 description of the command.
 
 There is a second command, "version", which is automatically added unless there already is a command
@@ -612,12 +612,12 @@ argument, since that would be redundant with the "version" command.
 
 ## Command options
 
-Just like when you use `CommandLineParser` directly, parsing behavior can be customized. You can of
-course apply a `ParseOptionsAttribute` to the command class, but those options then apply only to
+Just like when you use [`CommandLineParser`][] directly, parsing behavior can be customized. You can of
+course apply a [`ParseOptionsAttribute`][] to the command class, but those options then apply only to
 that command, and there are a number of options specific to subcommands that can't be set that way.
 
-Instead, you can use the `CommandOptions` class, which you can pass to the command manager.
-`CommandOptions` derives from `ParseOptions`, so all the normal parsing options are available,
+Instead, you can use the [`CommandOptions`][] class, which you can pass to the command manager.
+[`CommandOptions`][] derives from [`ParseOptions`][], so all the normal parsing options are available,
 as well as several additional ones.
 
 Let's change our main method as follows:
@@ -647,17 +647,17 @@ class to this:
 class ReadCommand : ICommand
 ```
 
-We've removed the explicit name from the `CommandAttribute`. If you run the application, you'll see
+We've removed the explicit name from the [`CommandAttribute`][]. If you run the application, you'll see
 the command is still called "read". That's because for subcommands, the name transformation will
 strip the suffix "Command" from the name by default. This too can be customized with the
-`CommandOptions` class.
+[`CommandOptions`][] class.
 
-We also set the `IncludeCommandHelpInstruction` property, which causes the `CommandManager` to print
+We also set the [`IncludeCommandHelpInstruction`][] property, which causes the [`CommandManager`][] to print
 a message like `Run 'tutorial <command> -Help' for more information about a command.` after the
-command list. This is disabled by default because the `CommandManager` won't check if all the
+command list. This is disabled by default because the [`CommandManager`][] won't check if all the
 commands actually have a `-Help` argument. It's recommended to enable this if all your commands do.
 
-The last option is `IncludeApplicationDescriptionBeforeCommandList`, which prints the assembly
+The last option is [`IncludeApplicationDescriptionBeforeCommandList`][], which prints the assembly
 description before the command list. However, if you run your application, you'll see it didn't do
 anything. That's because the tutorial application doesn't have an assembly description. Insert the
 following into a `<PropertyGroup>` in the tutorial.csproj file to fix that.
@@ -667,9 +667,10 @@ following into a `<PropertyGroup>` in the tutorial.csproj file to fix that.
 ```
 
 > If you were using the long/short version for the subcommand, you'll also want to move the options
-> from the `ParseOptionsAttribute` to the `CommandOptions` so they'll apply to all commands. Note
-> that `CommandOptions` has no `CaseSensitive` property; instead, you have to set the
-> `ArgumentNameComparer` property. Use `StringComparer.Invariant` for case-sensitive argument names.
+> from the [`ParseOptionsAttribute`][] to the [`CommandOptions`][] so they'll apply to all commands. Note
+> that [`CommandOptions`][] has no [`CaseSensitive`][] property; instead, you have to set the
+> [`ArgumentNameComparer`][ArgumentNameComparer_1] property. Use [`StringComparer.InvariantCulture`][] for case-sensitive argument
+> names.
 
 Now, if you run the application without arguments, you'll see this:
 
@@ -774,7 +775,7 @@ Run 'tutorial <command> -Help' for more information about a command.
 ```
 
 As you can see, our application picked up the new command without us needing to do anything. That's
-because `CommandManager` automatically looks for all command classes in the assembly.
+because [`CommandManager`][] automatically looks for all command classes in the assembly.
 
 We can test out our new command like this:
 
@@ -795,15 +796,15 @@ the "read" command.
 
 If you want to use asynchronous code in your application, subcommands provide a way to do that too.
 
-To make a command asynchronous, we have to implement the `IAsyncCommand` interface. This interface
-derives from the `ICommand` interface, and adds a `RunAsync()` method for you to implement. Then,
-you can invoke your command using the `CommandManager.RunCommandAsync()` method.
+To make a command asynchronous, we have to implement the [`IAsyncCommand`][] interface. This interface
+derives from the [`ICommand`][] interface, and adds a [`RunAsync()`][RunAsync()_1] method for you to implement. Then,
+you can invoke your command using the [`CommandManager.RunCommandAsync()`][] method.
 
 Let's make the `WriteCommand` asynchronous. When you do this, you typically only care about the
-`RunAsync()` method, but since `IAsyncCommand` derives from `ICommand`, you must still provide a
-`Run()` method. You could just leave it empty (or throw an exception), since `RunCommandAsync()`
-will never call it. An easier way is to derive your command from the `AsyncCommandBase` class, which
-provides a default implementation of the `Run()` method that will invoke `RunAsync()` and wait for
+[`RunAsync()`][RunAsync()_1] method, but since [`IAsyncCommand`][] derives from [`ICommand`][], you must still provide a
+[`Run()`][Run()_1] method. You could just leave it empty (or throw an exception), since [`RunCommandAsync()`][]
+will never call it. An easier way is to derive your command from the [`AsyncCommandBase`][] class, which
+provides a default implementation of the [`Run()`][Run()_0] method that will invoke [`RunAsync()`][RunAsync()_1] and wait for
 it to finish.
 
 So, we'll make the following changes to `WriteCommand`:
@@ -832,8 +833,8 @@ class WriteCommand : AsyncCommandBase
 ```
 
 If you build and run your application now, you'll find that it works, despite not calling
-`RunCommandAsync()` yet. That's because `RunCommand()` will invoke `AsyncCommandBase.Run()`, which
-will create a task to run `RunAsync()` and wait for it.
+[`RunCommandAsync()`][] yet. That's because [`RunCommand()`][] will invoke [`AsyncCommandBase.Run()`][], which
+will create a task to run [`RunAsync()`][RunAsync()_0] and wait for it.
 
 However, to fully take advantage of asynchronous tasks, you'll want to update the `Main()` method
 as follows:
@@ -854,18 +855,19 @@ public static async Task<int> Main()
 ```
 
 You'll notice that even with this change, the "read" command still works, despite not being
-asynchronous. That's because the `RunCommandAsync()` will check if a command implements
-`IAsyncCommand`, and if it doesn't, it will fall back to just calling `ICommand.Run()`. So you can
+asynchronous. That's because the [`RunCommandAsync()`][] will check if a command implements
+[`IAsyncCommand`][], and if it doesn't, it will fall back to just calling [`ICommand.Run()`][]. So you can
 choose for each command to make it asynchronous or not according to its needs.
 
 Converting `ReadCommand` to use asynchronous code is left as an exercise to the reader (hint: you'll
-need .Net 7 for `File.ReadLinesAsync()`, and the `System.Linq.Async` package to be able to use the
-`Take()` extension method on `IAsyncEnumerable<T>`).
+need .Net 7 for [`File.ReadLinesAsync()`][], and the
+[`System.Linq.Async`](https://www.nuget.org/packages/System.Linq.Async) package to be able to use
+the [`Take()`][] extension method on [`IAsyncEnumerable<T>`][]; or you can just use [`StreamReader`][]).
 
 ## Common arguments for commands
 
 Sometimes, you'll want some arguments to be available to all commands. With Ookii.CommandLine, the
-way to do this is to make a common base class. `CommandLineParser` will consider base class members
+way to do this is to make a common base class. [`CommandLineParser`][] will consider base class members
 when determining what arguments are available.
 
 For example, if we wanted to make a common base class to share the "Path" argument between the
@@ -894,10 +896,10 @@ class WriteCommand : BaseCommand
 
 Now both commands share the "Path" argument defined in the base class, in addition to the arguments
 they define themselves. Note that "BaseCommand" is not itself a command, because it doesn't have the
-`CommandAttribute` attribute (and also because it's `abstract`).
+[`CommandAttribute`][] attribute (and also because it's `abstract`).
 
-If you apply a `ParseOptionsAttribute` attribute to the `BaseCommand` class, you can also share
-parse options between multiple commands, without having to use `CommandOptions` to do so.
+If you apply a [`ParseOptionsAttribute`][] attribute to the `BaseCommand` class, you can also share
+parse options between multiple commands, without having to use [`CommandOptions`][] to do so.
 
 ## More information
 
@@ -907,3 +909,50 @@ following resources:
 - [Usage documentation](Documentation.md)
 - [Class library documentation](https://www.ookii.org/Link/CommandLineDoc)
 - [Sample applications](../src/Samples)
+
+[`AliasAttribute`]: https://www.ookii.org/docs/commandline-3.0-preview/html/T_Ookii_CommandLine_AliasAttribute.htm
+[`ApplicationFriendlyNameAttribute`]: https://www.ookii.org/docs/commandline-3.0-preview/html/T_Ookii_CommandLine_ApplicationFriendlyNameAttribute.htm
+[`AsyncCommandBase.Run()`]: https://www.ookii.org/docs/commandline-3.0-preview/html/M_Ookii_CommandLine_Commands_AsyncCommandBase_Run.htm
+[`AsyncCommandBase`]: https://www.ookii.org/docs/commandline-3.0-preview/html/T_Ookii_CommandLine_Commands_AsyncCommandBase.htm
+[`CaseSensitive`]: https://www.ookii.org/docs/commandline-3.0-preview/html/P_Ookii_CommandLine_ParseOptionsAttribute_CaseSensitive.htm
+[`CommandAttribute`]: https://www.ookii.org/docs/commandline-3.0-preview/html/T_Ookii_CommandLine_Commands_CommandAttribute.htm
+[`CommandLineArgumentAttribute.IsLong`]: https://www.ookii.org/docs/commandline-3.0-preview/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_IsLong.htm
+[`CommandLineArgumentAttribute.ShortName`]: https://www.ookii.org/docs/commandline-3.0-preview/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_ShortName.htm
+[`CommandLineArgumentAttribute`]: https://www.ookii.org/docs/commandline-3.0-preview/html/T_Ookii_CommandLine_CommandLineArgumentAttribute.htm
+[`CommandLineParser`]: https://www.ookii.org/docs/commandline-3.0-preview/html/T_Ookii_CommandLine_CommandLineParser.htm
+[`CommandManager.RunCommandAsync()`]: https://www.ookii.org/docs/commandline-3.0-preview/html/Overload_Ookii_CommandLine_Commands_CommandManager_RunCommandAsync.htm
+[`CommandManager`]: https://www.ookii.org/docs/commandline-3.0-preview/html/T_Ookii_CommandLine_Commands_CommandManager.htm
+[`CommandOptions`]: https://www.ookii.org/docs/commandline-3.0-preview/html/T_Ookii_CommandLine_Commands_CommandOptions.htm
+[`CreateCommand()`]: https://www.ookii.org/docs/commandline-3.0-preview/html/Overload_Ookii_CommandLine_Commands_CommandManager_CreateCommand.htm
+[`DescriptionAttribute`]: https://learn.microsoft.com/dotnet/api/system.componentmodel.descriptionattribute
+[`Environment.GetCommandLineArgs()`]: https://learn.microsoft.com/dotnet/api/system.environment.getcommandlineargs
+[`File.ReadLinesAsync()`]: https://learn.microsoft.com/dotnet/api/system.io.file.readlinesasync
+[`FileInfo`]: https://learn.microsoft.com/dotnet/api/system.io.fileinfo
+[`GetCommand()`]: https://www.ookii.org/docs/commandline-3.0-preview/html/M_Ookii_CommandLine_Commands_CommandManager_GetCommand.htm
+[`IAsyncCommand`]: https://www.ookii.org/docs/commandline-3.0-preview/html/T_Ookii_CommandLine_Commands_IAsyncCommand.htm
+[`IAsyncEnumerable<T>`]: https://learn.microsoft.com/dotnet/api/system.collections.generic.iasyncenumerable-1
+[`ICommand.Run()`]: https://www.ookii.org/docs/commandline-3.0-preview/html/M_Ookii_CommandLine_Commands_ICommand_Run.htm
+[`ICommand`]: https://www.ookii.org/docs/commandline-3.0-preview/html/T_Ookii_CommandLine_Commands_ICommand.htm
+[`IncludeApplicationDescriptionBeforeCommandList`]: https://www.ookii.org/docs/commandline-3.0-preview/html/P_Ookii_CommandLine_UsageWriter_IncludeApplicationDescriptionBeforeCommandList.htm
+[`IncludeCommandHelpInstruction`]: https://www.ookii.org/docs/commandline-3.0-preview/html/P_Ookii_CommandLine_UsageWriter_IncludeCommandHelpInstruction.htm
+[`Nullable<int>`]: https://learn.microsoft.com/dotnet/api/system.nullable-1
+[`ParseOptions`]: https://www.ookii.org/docs/commandline-3.0-preview/html/T_Ookii_CommandLine_ParseOptions.htm
+[`ParseOptionsAttribute`]: https://www.ookii.org/docs/commandline-3.0-preview/html/T_Ookii_CommandLine_ParseOptionsAttribute.htm
+[`ParsingMode.LongShort`]: https://www.ookii.org/docs/commandline-3.0-preview/html/T_Ookii_CommandLine_ParsingMode.htm
+[`RunCommand()`]: https://www.ookii.org/docs/commandline-3.0-preview/html/Overload_Ookii_CommandLine_Commands_CommandManager_RunCommand.htm
+[`RunCommandAsync()`]: https://www.ookii.org/docs/commandline-3.0-preview/html/Overload_Ookii_CommandLine_Commands_CommandManager_RunCommandAsync.htm
+[`StreamReader`]: https://learn.microsoft.com/dotnet/api/system.io.streamreader
+[`StringComparer.InvariantCulture`]: https://learn.microsoft.com/dotnet/api/system.stringcomparer.invariantculture
+[`System.ComponentModel.DescriptionAttribute`]: https://learn.microsoft.com/dotnet/api/system.componentmodel.descriptionattribute
+[`Take()`]: https://learn.microsoft.com/dotnet/api/system.linq.enumerable.take
+[`TypeConverter`]: https://learn.microsoft.com/dotnet/api/system.componentmodel.typeconverter
+[`Uri`]: https://learn.microsoft.com/dotnet/api/system.uri
+[`ValidateRangeAttribute`]: https://www.ookii.org/docs/commandline-3.0-preview/html/T_Ookii_CommandLine_Validation_ValidateRangeAttribute.htm
+[ArgumentNameComparer_1]: https://www.ookii.org/docs/commandline-3.0-preview/html/P_Ookii_CommandLine_ParseOptions_ArgumentNameComparer.htm
+[DefaultValue_1]: https://www.ookii.org/docs/commandline-3.0-preview/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_DefaultValue.htm
+[Mode_2]: https://www.ookii.org/docs/commandline-3.0-preview/html/P_Ookii_CommandLine_ParseOptionsAttribute_Mode.htm
+[Parse<T>()_1]: https://www.ookii.org/docs/commandline-3.0-preview/html/M_Ookii_CommandLine_CommandLineParser_Parse__1.htm
+[Run()_0]: https://www.ookii.org/docs/commandline-3.0-preview/html/M_Ookii_CommandLine_Commands_AsyncCommandBase_Run.htm
+[Run()_1]: https://www.ookii.org/docs/commandline-3.0-preview/html/M_Ookii_CommandLine_Commands_ICommand_Run.htm
+[RunAsync()_0]: https://www.ookii.org/docs/commandline-3.0-preview/html/M_Ookii_CommandLine_Commands_AsyncCommandBase_RunAsync.htm
+[RunAsync()_1]: https://www.ookii.org/docs/commandline-3.0-preview/html/M_Ookii_CommandLine_Commands_IAsyncCommand_RunAsync.htm

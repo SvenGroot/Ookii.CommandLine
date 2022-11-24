@@ -453,7 +453,7 @@ namespace Ookii.CommandLine.Commands
             return command?.Run();
         }
 
-        /// <inheritdoc cref="RunCommand(string?, string[], int)"/>
+        /// <inheritdoc cref="RunCommandAsync(string?, string[], int)"/>
         /// <summary>
         /// Finds and instantiates the subcommand using the arguments from the <see cref="Environment.GetCommandLineArgs"/>
         /// method, using the first argument as the command name. If it succeeds, runs the command

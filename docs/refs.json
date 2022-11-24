@@ -1,0 +1,87 @@
+{
+  "#apiPrefix": "https://learn.microsoft.com/dotnet/api/",
+  "#prefix": "https://www.ookii.org/docs/commandline-3.0-preview/html/",
+  "#suffix": ".htm",
+  "AliasAttribute": "T_Ookii_CommandLine_AliasAttribute",
+  "ApplicationFriendlyNameAttribute": "T_Ookii_CommandLine_ApplicationFriendlyNameAttribute",
+  "ArgumentNameComparer": [
+    "P_Ookii_CommandLine_CommandLineParser_ArgumentNameComparer",
+    "P_Ookii_CommandLine_ParseOptions_ArgumentNameComparer"
+  ],
+  "Arguments": [
+    "P_Ookii_CommandLine_CommandLineParser_Arguments",
+    "P_Ookii_CommandLine_Validation_DependencyValidationAttribute_Arguments",
+    "P_Ookii_CommandLine_Validation_RequiresAnyAttribute_Arguments"
+  ],
+  "AsyncCommandBase": "T_Ookii_CommandLine_Commands_AsyncCommandBase",
+  "AsyncCommandBase.Run()": "M_Ookii_CommandLine_Commands_AsyncCommandBase_Run",
+  "BaseCommand": null,
+  "CaseSensitive": "P_Ookii_CommandLine_ParseOptionsAttribute_CaseSensitive",
+  "CommandAttribute": "T_Ookii_CommandLine_Commands_CommandAttribute",
+  "CommandLineArgumentAttribute": "T_Ookii_CommandLine_CommandLineArgumentAttribute",
+  "CommandLineArgumentAttribute.IsLong": "P_Ookii_CommandLine_CommandLineArgumentAttribute_IsLong",
+  "CommandLineArgumentAttribute.ShortName": "P_Ookii_CommandLine_CommandLineArgumentAttribute_ShortName",
+  "CommandLineParser": "T_Ookii_CommandLine_CommandLineParser",
+  "CommandLineParser.Parse<Arguments>()": null,
+  "CommandManager": "T_Ookii_CommandLine_Commands_CommandManager",
+  "CommandManager.RunCommandAsync()": "Overload_Ookii_CommandLine_Commands_CommandManager_RunCommandAsync",
+  "CommandOptions": "T_Ookii_CommandLine_Commands_CommandOptions",
+  "CreateCommand()": "Overload_Ookii_CommandLine_Commands_CommandManager_CreateCommand",
+  "DefaultValue": [
+    "P_Ookii_CommandLine_CommandLineArgument_DefaultValue",
+    "P_Ookii_CommandLine_CommandLineArgumentAttribute_DefaultValue"
+  ],
+  "DescriptionAttribute": "#system.componentmodel.descriptionattribute",
+  "Environment.GetCommandLineArgs()": "#system.environment.getcommandlineargs",
+  "File.ReadLinesAsync()": "#system.io.file.readlinesasync",
+  "FileInfo": "#system.io.fileinfo",
+  "GetCommand()": "M_Ookii_CommandLine_Commands_CommandManager_GetCommand",
+  "IAsyncCommand": "T_Ookii_CommandLine_Commands_IAsyncCommand",
+  "IAsyncEnumerable<T>": "#system.collections.generic.iasyncenumerable-1",
+  "ICommand": "T_Ookii_CommandLine_Commands_ICommand",
+  "ICommand.Run()": "M_Ookii_CommandLine_Commands_ICommand_Run",
+  "IncludeApplicationDescriptionBeforeCommandList": "P_Ookii_CommandLine_UsageWriter_IncludeApplicationDescriptionBeforeCommandList",
+  "IncludeCommandHelpInstruction": "P_Ookii_CommandLine_UsageWriter_IncludeCommandHelpInstruction",
+  "Main()": null,
+  "Mode": [
+    "P_Ookii_CommandLine_CommandLineParser_Mode",
+    "P_Ookii_CommandLine_ParseOptions_Mode",
+    "P_Ookii_CommandLine_ParseOptionsAttribute_Mode",
+    "P_Ookii_CommandLine_Validation_ArgumentValidationAttribute_Mode",
+    "P_Ookii_CommandLine_Validation_DependencyValidationAttribute_Mode",
+    "P_Ookii_CommandLine_Validation_ValidateCountAttribute_Mode",
+    "P_Ookii_CommandLine_Validation_ValidateNotEmptyAttribute_Mode",
+    "P_Ookii_CommandLine_Validation_ValidateNotWhiteSpaceAttribute_Mode",
+    "P_Ookii_CommandLine_Validation_ValidatePatternAttribute_Mode",
+    "P_Ookii_CommandLine_Validation_ValidateStringLengthAttribute_Mode"
+  ],
+  "Nullable<int>": "#system.nullable-1",
+  "Parse<T>()": [
+    "Overload_Ookii_CommandLine_CommandLineParser_Parse",
+    "M_Ookii_CommandLine_CommandLineParser_Parse__1"
+  ],
+  "ParseOptions": "T_Ookii_CommandLine_ParseOptions",
+  "ParseOptionsAttribute": "T_Ookii_CommandLine_ParseOptionsAttribute",
+  "ParsingMode.LongShort": "T_Ookii_CommandLine_ParsingMode",
+  "ReadCommand": null,
+  "ReadFile": null,
+  "ReadFile()": null,
+  "Run()": [
+    "M_Ookii_CommandLine_Commands_AsyncCommandBase_Run",
+    "M_Ookii_CommandLine_Commands_ICommand_Run"
+  ],
+  "RunAsync()": [
+    "M_Ookii_CommandLine_Commands_AsyncCommandBase_RunAsync",
+    "M_Ookii_CommandLine_Commands_IAsyncCommand_RunAsync"
+  ],
+  "RunCommand()": "Overload_Ookii_CommandLine_Commands_CommandManager_RunCommand",
+  "RunCommandAsync()": "Overload_Ookii_CommandLine_Commands_CommandManager_RunCommandAsync",
+  "StreamReader": "#system.io.streamreader",
+  "StringComparer.InvariantCulture": "#system.stringcomparer.invariantculture",
+  "System.ComponentModel.DescriptionAttribute": "#system.componentmodel.descriptionattribute",
+  "Take()": "#system.linq.enumerable.take",
+  "TypeConverter": "#system.componentmodel.typeconverter",
+  "Uri": "#system.uri",
+  "ValidateRangeAttribute": "T_Ookii_CommandLine_Validation_ValidateRangeAttribute",
+  "WriteCommand": null
+}
