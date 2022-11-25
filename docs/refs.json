@@ -23,10 +23,12 @@
   "CommandLineArgumentAttribute.ShortName": "P_Ookii_CommandLine_CommandLineArgumentAttribute_ShortName",
   "CommandLineParser": "T_Ookii_CommandLine_CommandLineParser",
   "CommandLineParser.Parse<Arguments>()": null,
+  "CommandLineParser<T>": "T_Ookii_CommandLine_CommandLineParser_1",
   "CommandManager": "T_Ookii_CommandLine_Commands_CommandManager",
   "CommandManager.RunCommandAsync()": "Overload_Ookii_CommandLine_Commands_CommandManager_RunCommandAsync",
   "CommandOptions": "T_Ookii_CommandLine_Commands_CommandOptions",
   "CreateCommand()": "Overload_Ookii_CommandLine_Commands_CommandManager_CreateCommand",
+  "CultureInfo.InvariantCulture": "#system.globalization.cultureinfo.invariantculture",
   "DefaultValue": [
     "P_Ookii_CommandLine_CommandLineArgument_DefaultValue",
     "P_Ookii_CommandLine_CommandLineArgumentAttribute_DefaultValue"
@@ -56,6 +58,15 @@
     "P_Ookii_CommandLine_Validation_ValidateStringLengthAttribute_Mode"
   ],
   "Nullable<int>": "#system.nullable-1",
+  "Parse()": [
+    "M_Ookii_CommandLine_CommandLineParser_1_Parse_1",
+    "M_Ookii_CommandLine_CommandLineParser_1_Parse",
+    "M_Ookii_CommandLine_CommandLineParser_Parse_1",
+    "M_Ookii_CommandLine_CommandLineParser_Parse",
+    "M_Ookii_CommandLine_Commands_ICommandWithCustomParsing_Parse",
+    "Overload_Ookii_CommandLine_CommandLineParser_1_Parse",
+    "Overload_Ookii_CommandLine_CommandLineParser_Parse"
+  ],
   "Parse<T>()": [
     "Overload_Ookii_CommandLine_CommandLineParser_Parse",
     "M_Ookii_CommandLine_CommandLineParser_Parse__1"
@@ -82,6 +93,7 @@
   "Take()": "#system.linq.enumerable.take",
   "TypeConverter": "#system.componentmodel.typeconverter",
   "Uri": "#system.uri",
+  "UsageWriter": "T_Ookii_CommandLine_UsageWriter",
   "ValidateRangeAttribute": "T_Ookii_CommandLine_Validation_ValidateRangeAttribute",
   "WriteCommand": null
 }

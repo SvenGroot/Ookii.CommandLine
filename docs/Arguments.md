@@ -183,7 +183,7 @@ preference:
    parameter or property.
 2. The argument type's default `TypeConverter`, if it can convert from a string.
 3. A `public static T Parse(string, ICultureInfo)` method.
-4. A `public static T Parse()` method.
+4. A `public static T Parse(string)` method.
 5. A public constructor that takes a string argument.
 
 This will cover the majority of types you'd want to use for arguments without having to write any

@@ -16,15 +16,15 @@ from Ookii.CommandLine 2.x](Migrating.md) if you are upgrading an existing appli
     to use custom names everywhere if you want a different convention for names than you're using
     for .Net identifiers.
   - Added support for [argument validation and dependencies](Validation.md).
-  - Allow the use of [types](Arguments.md#argument-value-conversion) with public static `Parse`
-    methods or constructors taking a string argument for arguments, even without a `TypeConverter`.
-  - You can now customize parsing behavior by applying the `ParseOptionsAttribute` to your class, as
-    an alternative to passing `ParseOptions` to the static `Parse<T>` method.
-  - `ParseOptions` is now also used to set options when manually creating a `CommandLineParser`
+  - Allow the use of [types](Arguments.md#argument-value-conversion) with `public static Parse(string)`
+    methods or constructors taking a string argument for arguments, even without a [`TypeConverter`][].
+  - You can now customize parsing behavior by applying the [`ParseOptionsAttribute`][] to your class, as
+    an alternative to passing [`ParseOptions`][] to the static [`Parse<T>()`][Parse<T>()_1] method.
+  - [`ParseOptions`][] is now also used to set options when manually creating a [`CommandLineParser`][]
     instance.
-  - Argument value conversion now defaults to using `CultureInfo.InvariantCulture`.
-  - Added a `Parse` method overloads that takes arguments from `Environment.GetCommandLineArgs()`.
-  - Added a generic `CommandLineParser<T>` helper class, for easier usage when you don't want to use
+  - Argument value conversion now defaults to using [`CultureInfo.InvariantCulture`][].
+  - Added a [`Parse()`][Parse()_6] method overloads that takes arguments from [`Environment.GetCommandLineArgs()`][].
+  - Added a generic [`CommandLineParser<T>`][] helper class, for easier usage when you don't want to use
     the static helper method.
   - You can use [static methods to define arguments](DefiningArguments.md#using-methods).
   - Automatically add `-Help` and `-Version` arguments if not defined.
@@ -32,9 +32,8 @@ from Ookii.CommandLine 2.x](Migrating.md) if you are upgrading an existing appli
   - Optional support for [multi-value arguments](Arguments.md#arguments-with-multiple-values) that
     consume multiple argument tokens without a separator, e.g. `-Value 1 2 3` to assign three
     values.
-  - Arguments types can [use a constructor
-    parameter](DefiningArguments.md#commandlineparser-injection) to receive the `CommandLineParser`
-    instance they were created with.
+  - Arguments types can [use a constructor parameter](DefiningArguments.md#commandlineparser-injection)
+    to receive the [`CommandLineParser`][] instance they were created with.
   - Added the ability to customize error messages.
 - Subcommands
   - Renamed "shell commands" to "subcommands" because I never liked the old name.
@@ -46,7 +45,7 @@ from Ookii.CommandLine 2.x](Migrating.md) if you are upgrading an existing appli
   - Automatically add a `version` subcommand if not defined.
 - Usage help
   - Color output support.
-  - Greatly expanded [usage help customization options](UsageHelp.md) with the new `UsageWriter`
+  - Greatly expanded [usage help customization options](UsageHelp.md) with the new [`UsageWriter`][UsageWriter_1]
     class, including abbreviated syntax, description list ordering and filtering, the ability to
     override any string, and more.
   - Arguments and subcommands can be hidden from the usage help.
@@ -63,11 +62,11 @@ from Ookii.CommandLine 2.x](Migrating.md) if you are upgrading an existing appli
 
 - Ookii.CommandLine now comes in a .Net 6.0 version that fully supports nullable reference types
   (.Net Framework 2.0 and .Net Standard 2.0 versions are also still provided).
-- New static `Parse<T>` helper methods that make parsing command line arguments and printing errors
+- New static [`Parse<T>()`][Parse<T>()_1] helper methods that make parsing command line arguments and printing errors
   and usage even easier.
 - Support for customization of the separator between argument names and values.
 - Support for customization of the separator between keys and values for dictionary arguments.
-- Support for customizing a dictionary argument's key and value `TypeConverter` separately.
+- Support for customizing a dictionary argument's key and value [`TypeConverter`][] separately.
 - Arguments can indicate they cancel parsing to make adding a `-Help` or `-?` argument easier.
 - Some small bug fixes.
 
@@ -128,3 +127,14 @@ and usage.
 
 Upgrading an existing project that is using Ookii.CommandLine 1.0 to Ookii.CommandLine 2.0 or newer
 may require substantial code changes and may change how command lines are parsed.
+
+[`CommandLineParser`]: https://www.ookii.org/docs/commandline-3.0-preview/html/T_Ookii_CommandLine_CommandLineParser.htm
+[`CommandLineParser<T>`]: https://www.ookii.org/docs/commandline-3.0-preview/html/T_Ookii_CommandLine_CommandLineParser_1.htm
+[`CultureInfo.InvariantCulture`]: https://learn.microsoft.com/dotnet/api/system.globalization.cultureinfo.invariantculture
+[`Environment.GetCommandLineArgs()`]: https://learn.microsoft.com/dotnet/api/system.environment.getcommandlineargs
+[`ParseOptions`]: https://www.ookii.org/docs/commandline-3.0-preview/html/T_Ookii_CommandLine_ParseOptions.htm
+[`ParseOptionsAttribute`]: https://www.ookii.org/docs/commandline-3.0-preview/html/T_Ookii_CommandLine_ParseOptionsAttribute.htm
+[`TypeConverter`]: https://learn.microsoft.com/dotnet/api/system.componentmodel.typeconverter
+[Parse()_6]: https://www.ookii.org/docs/commandline-3.0-preview/html/M_Ookii_CommandLine_CommandLineParser_Parse.htm
+[Parse<T>()_1]: https://www.ookii.org/docs/commandline-3.0-preview/html/M_Ookii_CommandLine_CommandLineParser_Parse__1.htm
+[UsageWriter_1]: https://www.ookii.org/docs/commandline-3.0-preview/html/T_Ookii_CommandLine_UsageWriter.htm

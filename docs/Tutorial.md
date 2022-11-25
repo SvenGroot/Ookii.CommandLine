@@ -367,8 +367,8 @@ want). Things like the default value are added in a similar fashion.
 
 The "MaxLines" argument also has its alias listed, just like the "Help" argument.
 
-> Don't like the way the usage help looks? It can be fully customized! Check out the [custom usage
-> sample](../src/Samples/CustomUsage) for an example of that.
+> Don't like the way the usage help looks? It can be fully customized! Check out the
+> [custom usage sample](../src/Samples/CustomUsage) for an example of that.
 
 ## Long/short mode and other customizations
 
