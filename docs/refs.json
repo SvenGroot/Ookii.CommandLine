@@ -3,6 +3,7 @@
   "#prefix": "https://www.ookii.org/docs/commandline-3.0-preview/html/",
   "#suffix": ".htm",
   "AliasAttribute": "T_Ookii_CommandLine_AliasAttribute",
+  "AllowDuplicateDictionaryKeysAttribute": "T_Ookii_CommandLine_AllowDuplicateDictionaryKeysAttribute",
   "ApplicationFriendlyNameAttribute": "T_Ookii_CommandLine_ApplicationFriendlyNameAttribute",
   "ArgumentNameComparer": [
     "P_Ookii_CommandLine_CommandLineParser_ArgumentNameComparer",
@@ -18,10 +19,12 @@
   "BaseCommand": null,
   "CaseSensitive": "P_Ookii_CommandLine_ParseOptionsAttribute_CaseSensitive",
   "CommandAttribute": "T_Ookii_CommandLine_Commands_CommandAttribute",
+  "CommandLineArgument.AllowNull": "P_Ookii_CommandLine_CommandLineArgument_AllowNull",
   "CommandLineArgument.ElementType": "P_Ookii_CommandLine_CommandLineArgument_ElementType",
   "CommandLineArgumentAttribute": "T_Ookii_CommandLine_CommandLineArgumentAttribute",
   "CommandLineArgumentAttribute.IsLong": "P_Ookii_CommandLine_CommandLineArgumentAttribute_IsLong",
   "CommandLineArgumentAttribute.ShortName": "P_Ookii_CommandLine_CommandLineArgumentAttribute_ShortName",
+  "CommandLineArgumentException": "T_Ookii_CommandLine_CommandLineArgumentException",
   "CommandLineParser": "T_Ookii_CommandLine_CommandLineParser",
   "CommandLineParser.HelpRequested": "P_Ookii_CommandLine_CommandLineParser_HelpRequested",
   "CommandLineParser.Parse()": [
@@ -39,8 +42,13 @@
   "CommandOptions": "T_Ookii_CommandLine_Commands_CommandOptions",
   "CreateCommand()": "Overload_Ookii_CommandLine_Commands_CommandManager_CreateCommand",
   "CreateShellCommandOptions": null,
+  "CultureInfo": "#system.globalization.cultureinfo",
   "CultureInfo.InvariantCulture": "#system.globalization.cultureinfo.invariantculture",
   "CurrentCulture": "#system.globalization.cultureinfo.currentculture",
+  "DateTime": "#system.datetime",
+  "DayOfWeek": "#system.dayofweek",
+  "DayOfWeek.Monday": "#system.dayofweek",
+  "DayOfWeek.Wednesday": "#system.dayofweek",
   "DefaultValue": [
     "P_Ookii_CommandLine_CommandLineArgument_DefaultValue",
     "P_Ookii_CommandLine_CommandLineArgumentAttribute_DefaultValue"
@@ -58,6 +66,8 @@
   "ICommandWithCustomParsing.Parse()": "M_Ookii_CommandLine_Commands_ICommandWithCustomParsing_Parse",
   "IncludeApplicationDescriptionBeforeCommandList": "P_Ookii_CommandLine_UsageWriter_IncludeApplicationDescriptionBeforeCommandList",
   "IncludeCommandHelpInstruction": "P_Ookii_CommandLine_UsageWriter_IncludeCommandHelpInstruction",
+  "KeyTypeConverterAttribute": "T_Ookii_CommandLine_KeyTypeConverterAttribute",
+  "KeyValueSeparatorAttribute": "T_Ookii_CommandLine_KeyValueSeparatorAttribute",
   "LineWrappingTextWriter": "T_Ookii_CommandLine_LineWrappingTextWriter",
   "Main()": null,
   "Mode": [
@@ -72,8 +82,13 @@
     "P_Ookii_CommandLine_Validation_ValidatePatternAttribute_Mode",
     "P_Ookii_CommandLine_Validation_ValidateStringLengthAttribute_Mode"
   ],
+  "MultiValueSeparatorAttribute": "T_Ookii_CommandLine_MultiValueSeparatorAttribute",
   "Nullable<int>": "#system.nullable-1",
   "Nullable<T>": "#system.nullable-1",
+  "NullArgumentValue": [
+    "T_Ookii_CommandLine_CommandLineArgumentErrorCategory",
+    "M_Ookii_CommandLine_LocalizedStringProvider_NullArgumentValue"
+  ],
   "Ookii.CommandLine.Commands": "N_Ookii_CommandLine_Commands",
   "Parse()": [
     "M_Ookii_CommandLine_CommandLineParser_1_Parse_1",
@@ -89,6 +104,10 @@
     "M_Ookii_CommandLine_CommandLineParser_Parse__1"
   ],
   "ParseOptions": "T_Ookii_CommandLine_ParseOptions",
+  "ParseOptions.AllowWhiteSpaceValueSeparator": "P_Ookii_CommandLine_ParseOptions_AllowWhiteSpaceValueSeparator",
+  "ParseOptions.ArgumentNameComparer": "P_Ookii_CommandLine_ParseOptions_ArgumentNameComparer",
+  "ParseOptions.Culture": "P_Ookii_CommandLine_ParseOptions_Culture",
+  "ParseOptions.NameValueSeparator": "P_Ookii_CommandLine_ParseOptions_NameValueSeparator",
   "ParseOptionsAttribute": "T_Ookii_CommandLine_ParseOptionsAttribute",
   "ParsingMode.LongShort": "T_Ookii_CommandLine_ParsingMode",
   "ReadCommand": null,
@@ -111,11 +130,14 @@
   "StreamReader": "#system.io.streamreader",
   "StringComparer.InvariantCulture": "#system.stringcomparer.invariantculture",
   "System.ComponentModel.DescriptionAttribute": "#system.componentmodel.descriptionattribute",
+  "System.ComponentModel.TypeConverterAttribute": "#system.componentmodel.typeconverterattribute",
   "Take()": "#system.linq.enumerable.take",
   "TypeConverter": "#system.componentmodel.typeconverter",
+  "TypeConverterAttribute": "#system.componentmodel.typeconverterattribute",
   "Uri": "#system.uri",
   "UsageWriter": "T_Ookii_CommandLine_UsageWriter",
   "ValidateRangeAttribute": "T_Ookii_CommandLine_Validation_ValidateRangeAttribute",
+  "ValueTypeConverterAttribute": "T_Ookii_CommandLine_ValueTypeConverterAttribute",
   "WriteCommand": null,
   "WriteUsageOptions": null
 }

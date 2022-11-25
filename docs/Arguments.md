@@ -24,11 +24,11 @@ Ookii.CommandLine defaults to accepting a dash (`-`) and a forward slash (`/`) o
 a dash (`-`) on other platforms such as Linux or MacOS.
 
 Argument names are case insensitive by default, though this can be customized using the
-`ParseOptions.ArgumentNameComparer` property.
+[`ParseOptions.ArgumentNameComparer`][] property.
 
 The argument value follows the name, separated either by a space or a colon (`:`). You can configure
 how argument names and values can be separated by using the
-`ParseOptions.AllowWhiteSpaceValueSeparator` and the `ParseOptions.NameValueSeparator` properties.
+[`ParseOptions.AllowWhiteSpaceValueSeparator`][] and the [`ParseOptions.NameValueSeparator`][] properties.
 
 Not all arguments require values; those that do not are called [_switch arguments_](#switch-arguments)
 and have a value determined by their presence or absence on the command line.
@@ -63,7 +63,7 @@ positional argument, because the value for “ArgumentName” was already specif
 ## Required arguments
 
 A command line argument that is required must be present on all invocations of the application. If a
-required argument is not present, the `CommandLineParser` class will throw an exception during
+required argument is not present, the [`CommandLineParser`][] class will throw an exception during
 parsing.
 
 Any argument can be made required. Usually, it is recommended for any required argument to also be a
@@ -108,7 +108,7 @@ In this case, if "ArgumentName" is a multi-value argument, the value of the argu
 holding all three values.
 
 It’s possible to specify a separator for multi-value arguments using the
-`MultiValueSeparatorAttribute` attribute. This makes it possible to specify multiple values for the
+[`MultiValueSeparatorAttribute`][] attribute. This makes it possible to specify multiple values for the
 argument while the argument itself is specified only once. For example, if the separator is set to a
 comma, you can specify the values as follows:
 
@@ -125,7 +125,7 @@ culture-sensitive argument types (for example, if you use a comma as the separat
 argument of floating point numbers, cultures that use a comma as the decimal separator will not be
 able to specify values properly).
 
-You can also use the `MultiValueSeparatorAttribute` to indicate it allows white-space separated
+You can also use the [`MultiValueSeparatorAttribute`][] to indicate it allows white-space separated
 values, which means it will consume multiple argument tokens that follow it.
 
 ```text
@@ -147,8 +147,8 @@ argument and a switch. A value of true (or the explicit value if one is given) g
 list for every time that the argument is supplied.
 
 If an argument is not a multi-value argument, it is an error to supply it more than once, unless
-duplicate arguments are allowed in the `ParseOptions`, in which case only the last value is used.
-It's also possible to emit a warning for duplicate values using the `ParseOptions`.
+duplicate arguments are allowed in the [`ParseOptions`][], in which case only the last value is used.
+It's also possible to emit a warning for duplicate values using the [`ParseOptions`][].
 
 ## Dictionary arguments
 
@@ -166,43 +166,43 @@ types of the key and value. Or, when using a read-only property to define the ar
 type that implements `IDictionary<TKey, TValue>`.
 
 If you specify the same key more than once an exception will be thrown unless the
-`AllowDuplicateDictionaryKeysAttribute` attribute is specified for the argument.
+[`AllowDuplicateDictionaryKeysAttribute`][] attribute is specified for the argument.
 
-The default key/value separator (which is `=`) can be overridden using the `KeyValueSeparatorAttribute` attribute.
+The default key/value separator (which is `=`) can be overridden using the [`KeyValueSeparatorAttribute`][] attribute.
 
 ## Argument value conversion
 
 Ookii.CommandLine allows you to define arguments with any .Net type, including types such as
-`string`, `int32`, `DateTime`, `FileInfo`, `Uri`, any enumeration type, and many more. Any type can
+`string`, `int32`, [`DateTime`][], [`FileInfo`][], [`Uri`][], any enumeration type, and many more. Any type can
 be used; the only requirement is that it is possible to convert a string value to that type.
 
 Ookii.CommandLine will try to convert the argument using the following options, in order of
 preference:
 
-1. A custom `TypeConverter`, if the argument has the `TypeConverterAttribute` on its constructor
+1. A custom [`TypeConverter`][], if the argument has the [`TypeConverterAttribute`][] on its constructor
    parameter or property.
-2. The argument type's default `TypeConverter`, if it can convert from a string.
+2. The argument type's default [`TypeConverter`][], if it can convert from a string.
 3. A `public static T Parse(string, ICultureInfo)` method.
 4. A `public static T Parse(string)` method.
 5. A public constructor that takes a string argument.
 
 This will cover the majority of types you'd want to use for arguments without having to write any
 code. If you write your own custom type, you can also use if for arguments as long as it meets one
-of the above criteria (a `TypeConverter` is preferred).
+of the above criteria (a [`TypeConverter`][] is preferred).
 
 It is possible to override the default conversion by specifying a custom type converter using the
-`System.ComponentModel.TypeConverterAttribute`. When this attribute is applied to a constructor
+[`System.ComponentModel.TypeConverterAttribute`][]. When this attribute is applied to a constructor
 parameter or property that defines an argument, the specified type converter will be used for
 conversion instead of the default type converter.
 
 ### Enumeration type conversion
 
-The default `TypeConverter` for enumeration types is case insensitive, and allows both the names and
-underlying values of the enumeration's members to be used. This means that e.g. for the `DayOfWeek`
-enumeration, "Monday", "monday", and "1" can all be used to indicate `DayOfWeek.Monday`.
+The default [`TypeConverter`][] for enumeration types is case insensitive, and allows both the names and
+underlying values of the enumeration's members to be used. This means that e.g. for the [`DayOfWeek`][]
+enumeration, "Monday", "monday", and "1" can all be used to indicate [`DayOfWeek.Monday`][].
 
 In the case of a numeric value, the converter does not check if the resulting value is valid for
-the enumeration type, so again for `DayOfWeek`, a value of "9" would be converted to `(DayOfWeek)9`
+the enumeration type, so again for [`DayOfWeek`][], a value of "9" would be converted to `(DayOfWeek)9`
 even though there is no such value in the enumeration.
 
 To ensure the result is constrained to only the defined values of the enumeration, use the
@@ -210,9 +210,9 @@ To ensure the result is constrained to only the defined values of the enumeratio
 
 The converter allows the use of comma-separated values, which will be combined using a bitwise or
 operation. This is allowed regardless of whether or not the `[Flags]` attribute is present on the
-enumeration, which can have unexpected results. Using the `DayOfWeek` example again, "Monday,Tuesday"
+enumeration, which can have unexpected results. Using the [`DayOfWeek`][] example again, "Monday,Tuesday"
 would result in the value `DayOfWeek.Monday | DayOfWeek.Tuesday`, which is actually equivalent to
-`DayOfWeek.Wednesday`.
+[`DayOfWeek.Wednesday`][].
 
 One way to avoid this is to use the following pattern validator, which ensures that the
 string value before conversion does not contain a comma:
@@ -232,25 +232,25 @@ convert to `int`). For a dictionary argument the element type is `KeyValuePair<T
 the type converter is responsible for parsing the key and value from the argument value.
 
 Ookii.CommandLine provides the `KeyValuePairConverter<TKey, TValue>` class that is used by default
-for dictionary arguments. You can override this using the `TypeConverterAttribute` as usual, but if
+for dictionary arguments. You can override this using the [`TypeConverterAttribute`][] as usual, but if
 you only want to customize the parsing of the key and value types, you can use the
-`KeyTypeConverterAttribute` and the `ValueTypeConverterAttribute` attributes respectively. The
+[`KeyTypeConverterAttribute`][] and the [`ValueTypeConverterAttribute`][] attributes respectively. The
 `KeyValuePairConverter<TKey, TValue>` will use those attributes to locate a custom converter. You
-can also use customize the key/value separator using the `KeyValueSeparatorAttribute` attribute.
+can also use customize the key/value separator using the [`KeyValueSeparatorAttribute`][] attribute.
 
-If you do specify the `TypeConverterAttribute` for a dictionary argument, the
-`KeyTypeConverterAttribute`, `ValueTypeConverterAttribute`, and `KeyValueSeparatorAttribute`
+If you do specify the [`TypeConverterAttribute`][] for a dictionary argument, the
+[`KeyTypeConverterAttribute`][], [`ValueTypeConverterAttribute`][], and [`KeyValueSeparatorAttribute`][]
 attributes will be ignored.
 
 ### Conversion culture
 
 For many types, the conversion can be culture dependent. For example, converting numbers or dates
-depends on the `CultureInfo` class, which defines the accepted formats and how they’re interpreted;
+depends on the [`CultureInfo`][] class, which defines the accepted formats and how they’re interpreted;
 some cultures might use a period as the decimal separator, while others use a comma.
 
 To ensure a consistent parsing experience for all users regardless of their machine's regional
-format settings, Ookii.CommandLine defaults to using `CultureInfo.InvariantCulture`. You can change
-this using the `ParseOptions.Culture` property, but be very careful if you do.
+format settings, Ookii.CommandLine defaults to using [`CultureInfo.InvariantCulture`][]. You can change
+this using the [`ParseOptions.Culture`][] property, but be very careful if you do.
 
 ## Arguments with non-nullable types
 
@@ -259,11 +259,11 @@ fully annotated, but if you use the .Net 6.0 version of the library, command lin
 takes into account the nullability of the properties or parameters that define the arguments. If the
 argument is declared with a nullable reference or value type (e.g. `string?` or `int?`), nothing
 changes. But if the argument is not nullable (e.g. `string` (in a context with NRT support) or
-`int`), `CommandLineParser` will ensure that the value will not be null.
+`int`), [`CommandLineParser`][] will ensure that the value will not be null.
 
-Assigning a null value to an argument only happens if the `TypeConverter` for that argument returns
+Assigning a null value to an argument only happens if the [`TypeConverter`][] for that argument returns
 `null` as the result of the conversion. If this happens and the argument is not nullable, a
-`CommandLineArgumentException` is thrown with the category set to `NullArgumentValue`.
+[`CommandLineArgumentException`][] is thrown with the category set to [`NullArgumentValue`][NullArgumentValue_0].
 
 Null-checking for non-nullable reference types is only available in .Net 6.0 and later. If you are
 using the .Net Standard 2.0 version of Ookii.CommandLine, this check is only done for value types.
@@ -272,9 +272,7 @@ For multi-value arguments, the nullability check applies to the type of the elem
 `string?[]` for an array), and for dictionary arguments, it applies to the value (e.g.
 `Dictionary<string, string?>`); the key may never be null for a dictionary argument.
 
-See also the
-[CommandLineArgument.AllowNull](https://www.ookii.org/docs/commandline-3.0/html/P_Ookii_CommandLine_CommandLineArgument_AllowNull.htm)
-property.
+See also the [`CommandLineArgument.AllowNull`][] property.
 
 ## Long/short mode
 
@@ -321,3 +319,29 @@ those tools also use lower-case argument names, which you can easily achieve usi
 ## More information
 
 Next, let's take a look at how to [define arguments](DefiningArguments.md).
+
+[`AllowDuplicateDictionaryKeysAttribute`]: https://www.ookii.org/docs/commandline-3.0-preview/html/T_Ookii_CommandLine_AllowDuplicateDictionaryKeysAttribute.htm
+[`CommandLineArgument.AllowNull`]: https://www.ookii.org/docs/commandline-3.0-preview/html/P_Ookii_CommandLine_CommandLineArgument_AllowNull.htm
+[`CommandLineArgumentException`]: https://www.ookii.org/docs/commandline-3.0-preview/html/T_Ookii_CommandLine_CommandLineArgumentException.htm
+[`CommandLineParser`]: https://www.ookii.org/docs/commandline-3.0-preview/html/T_Ookii_CommandLine_CommandLineParser.htm
+[`CultureInfo.InvariantCulture`]: https://learn.microsoft.com/dotnet/api/system.globalization.cultureinfo.invariantculture
+[`CultureInfo`]: https://learn.microsoft.com/dotnet/api/system.globalization.cultureinfo
+[`DateTime`]: https://learn.microsoft.com/dotnet/api/system.datetime
+[`DayOfWeek.Monday`]: https://learn.microsoft.com/dotnet/api/system.dayofweek
+[`DayOfWeek.Wednesday`]: https://learn.microsoft.com/dotnet/api/system.dayofweek
+[`DayOfWeek`]: https://learn.microsoft.com/dotnet/api/system.dayofweek
+[`FileInfo`]: https://learn.microsoft.com/dotnet/api/system.io.fileinfo
+[`KeyTypeConverterAttribute`]: https://www.ookii.org/docs/commandline-3.0-preview/html/T_Ookii_CommandLine_KeyTypeConverterAttribute.htm
+[`KeyValueSeparatorAttribute`]: https://www.ookii.org/docs/commandline-3.0-preview/html/T_Ookii_CommandLine_KeyValueSeparatorAttribute.htm
+[`MultiValueSeparatorAttribute`]: https://www.ookii.org/docs/commandline-3.0-preview/html/T_Ookii_CommandLine_MultiValueSeparatorAttribute.htm
+[`ParseOptions.AllowWhiteSpaceValueSeparator`]: https://www.ookii.org/docs/commandline-3.0-preview/html/P_Ookii_CommandLine_ParseOptions_AllowWhiteSpaceValueSeparator.htm
+[`ParseOptions.ArgumentNameComparer`]: https://www.ookii.org/docs/commandline-3.0-preview/html/P_Ookii_CommandLine_ParseOptions_ArgumentNameComparer.htm
+[`ParseOptions.Culture`]: https://www.ookii.org/docs/commandline-3.0-preview/html/P_Ookii_CommandLine_ParseOptions_Culture.htm
+[`ParseOptions.NameValueSeparator`]: https://www.ookii.org/docs/commandline-3.0-preview/html/P_Ookii_CommandLine_ParseOptions_NameValueSeparator.htm
+[`ParseOptions`]: https://www.ookii.org/docs/commandline-3.0-preview/html/T_Ookii_CommandLine_ParseOptions.htm
+[`System.ComponentModel.TypeConverterAttribute`]: https://learn.microsoft.com/dotnet/api/system.componentmodel.typeconverterattribute
+[`TypeConverter`]: https://learn.microsoft.com/dotnet/api/system.componentmodel.typeconverter
+[`TypeConverterAttribute`]: https://learn.microsoft.com/dotnet/api/system.componentmodel.typeconverterattribute
+[`Uri`]: https://learn.microsoft.com/dotnet/api/system.uri
+[`ValueTypeConverterAttribute`]: https://www.ookii.org/docs/commandline-3.0-preview/html/T_Ookii_CommandLine_ValueTypeConverterAttribute.htm
+[NullArgumentValue_0]: https://www.ookii.org/docs/commandline-3.0-preview/html/T_Ookii_CommandLine_CommandLineArgumentErrorCategory.htm
