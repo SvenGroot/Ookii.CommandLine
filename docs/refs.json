@@ -27,6 +27,7 @@
     "P_Ookii_CommandLine_CommandLineArgument_CancelParsing",
     "P_Ookii_CommandLine_CommandLineArgumentAttribute_CancelParsing"
   ],
+  "CanConvertFrom()": "M_Ookii_CommandLine_TypeConverterBase_1_CanConvertFrom",
   "CaseSensitive": "P_Ookii_CommandLine_ParseOptionsAttribute_CaseSensitive",
   "Category": "P_Ookii_CommandLine_CommandLineArgumentException_Category",
   "ClassValidationAttribute": "T_Ookii_CommandLine_Validation_ClassValidationAttribute",
@@ -70,6 +71,8 @@
   "CommandOptions.CommandNameTransform": "P_Ookii_CommandLine_Commands_CommandOptions_CommandNameTransform",
   "CommandOptions.StripCommandNameSuffix": "P_Ookii_CommandLine_Commands_CommandOptions_StripCommandNameSuffix",
   "ConnectionString": null,
+  "Console.WindowWidth": "#system.console.windowwidth",
+  "ConvertFrom()": "M_Ookii_CommandLine_TypeConverterBase_1_ConvertFrom",
   "CreateCommand()": "Overload_Ookii_CommandLine_Commands_CommandManager_CreateCommand",
   "CreateShellCommandOptions": null,
   "CultureInfo": "#system.globalization.cultureinfo",
@@ -92,6 +95,8 @@
     "E_Ookii_CommandLine_CommandLineParser_DuplicateArgument",
     "M_Ookii_CommandLine_LocalizedStringProvider_DuplicateArgument"
   ],
+  "EnableColor()": "M_Ookii_CommandLine_Terminal_VirtualTerminal_EnableColor",
+  "EnableVirtualTerminalSequences()": "M_Ookii_CommandLine_Terminal_VirtualTerminal_EnableVirtualTerminalSequences",
   "Environment.GetCommandLineArgs()": "#system.environment.getcommandlineargs",
   "Error": "P_Ookii_CommandLine_ParseOptions_Error",
   "ErrorCategory": "P_Ookii_CommandLine_Validation_ArgumentValidationAttribute_ErrorCategory",
@@ -119,11 +124,16 @@
     "P_Ookii_CommandLine_Validation_ArgumentValidationWithHelpAttribute_IncludeInUsageHelp",
     "P_Ookii_CommandLine_Validation_RequiresAnyAttribute_IncludeInUsageHelp"
   ],
+  "Indent": "P_Ookii_CommandLine_LineWrappingTextWriter_Indent",
   "Int32": "#system.int32",
   "IsValid()": "M_Ookii_CommandLine_Validation_ArgumentValidationAttribute_IsValid",
   "KeyTypeConverterAttribute": "T_Ookii_CommandLine_KeyTypeConverterAttribute",
   "KeyValueSeparatorAttribute": "T_Ookii_CommandLine_KeyValueSeparatorAttribute",
   "LineWrappingTextWriter": "T_Ookii_CommandLine_LineWrappingTextWriter",
+  "LineWrappingTextWriter.ForConsoleError()": "M_Ookii_CommandLine_LineWrappingTextWriter_ForConsoleError",
+  "LineWrappingTextWriter.ForConsoleOut()": "M_Ookii_CommandLine_LineWrappingTextWriter_ForConsoleOut",
+  "LineWrappingTextWriter.Indent": "P_Ookii_CommandLine_LineWrappingTextWriter_Indent",
+  "LineWrappingTextWriter.ResetIndent()": "M_Ookii_CommandLine_LineWrappingTextWriter_ResetIndent",
   "List<int>": "#system.collections.generic.list-1",
   "List<string>": "#system.collections.generic.list-1",
   "LoadPlugins()": null,
@@ -152,6 +162,7 @@
     "M_Ookii_CommandLine_LocalizedStringProvider_NullArgumentValue"
   ],
   "Ookii.CommandLine.Commands": "N_Ookii_CommandLine_Commands",
+  "Ookii.CommandLine.Terminal": "N_Ookii_CommandLine_Terminal",
   "Ookii.CommandLine.Validation": "N_Ookii_CommandLine_Validation",
   "Parse()": [
     "M_Ookii_CommandLine_CommandLineParser_1_Parse_1",
@@ -186,6 +197,7 @@
   "ReadFile()": null,
   "RequiresAnyAttribute": "T_Ookii_CommandLine_Validation_RequiresAnyAttribute",
   "RequiresAttribute": "T_Ookii_CommandLine_Validation_RequiresAttribute",
+  "ResetIndent()": "M_Ookii_CommandLine_LineWrappingTextWriter_ResetIndent",
   "Run()": [
     "M_Ookii_CommandLine_Commands_AsyncCommandBase_Run",
     "M_Ookii_CommandLine_Commands_ICommand_Run"
@@ -217,6 +229,8 @@
   "Take()": "#system.linq.enumerable.take",
   "TERM": null,
   "TextFormat": "T_Ookii_CommandLine_Terminal_TextFormat",
+  "TextWriter": "#system.io.textwriter",
+  "ToString()": "#system.object.tostring",
   "TypeConverter": "#system.componentmodel.typeconverter",
   "TypeConverterAttribute": "#system.componentmodel.typeconverterattribute",
   "TypeConverterBase<T>": "T_Ookii_CommandLine_TypeConverterBase_1",
@@ -246,6 +260,7 @@
   ],
   "ValueDescriptionAttribute": "T_Ookii_CommandLine_ValueDescriptionAttribute",
   "ValueTypeConverterAttribute": "T_Ookii_CommandLine_ValueTypeConverterAttribute",
+  "VirtualTerminal": "T_Ookii_CommandLine_Terminal_VirtualTerminal",
   "WriteArgumentDescription()": [
     "M_Ookii_CommandLine_UsageWriter_WriteArgumentDescription_1",
     "M_Ookii_CommandLine_UsageWriter_WriteArgumentDescription",
