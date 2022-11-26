@@ -139,6 +139,6 @@ Please check out the following to get started:
 
 - [Tutorial: getting started with Ookii.CommandLine](docs/Tutorial.md)
 - [Migrating from Ookii.CommandLine 2.x](docs/Migrating.md)
-- [Usage documentation](docs/Documentation.md)
+- [Usage documentation](docs/README.md)
 - [Class library documentation](https://www.ookii.org/Link/CommandLineDoc)
 - [Sample applications](src/Samples) with detailed explanations and sample output.

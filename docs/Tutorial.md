@@ -4,7 +4,7 @@ This tutorial will show you the basics of how to use Ookii.CommandLine. The tuto
 how to create a basic application that parses the command line and shows usage help, how to
 customize some of the options, and how to use Subcommands.
 
-Refer to the [documentation](Documentation.md) for more detailed information.
+Refer to the [documentation](README.md) for more detailed information.
 
 ## Creating a project
 
@@ -906,7 +906,7 @@ parse options between multiple commands, without having to use [`CommandOptions`
 I hope this tutorial helped you get started with Ookii.CommandLine. To learn more, check out the
 following resources:
 
-- [Usage documentation](Documentation.md)
+- [Usage documentation](README.md)
 - [Class library documentation](https://www.ookii.org/Link/CommandLineDoc)
 - [Sample applications](../src/Samples)
 
