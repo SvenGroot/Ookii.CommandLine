@@ -2,22 +2,24 @@
 
 ## Ookii.CommandLine 3.0
 
-**IMPORTANT:** Several of the changes in version 3.0 are *breaking changes*. There are breaking
-API changes as well as several behavior changes. Please see the [information on migrating
-from Ookii.CommandLine 2.x](Migrating.md) if you are upgrading an existing application.
+**IMPORTANT:** Several of the changes in version 3.0 are *breaking changes*. There are breaking API
+changes as well as several behavior changes. In general, it's not expected that you'll need to make
+many changes, unless you were using subcommands or extensively customized the usage help. Please see
+the [information on migrating from Ookii.CommandLine 2.x](Migrating.md) if you are upgrading an
+existing application.
 
 - Argument parsing
   - Added support for a [new parsing mode](Arguments.md#longshort-mode) where arguments can have a
-    separate long name using the `--` prefix (customizable, of course) and short name using the `-`
-    prefix. This allows you to use a parsing style that's similar to some tools, including `dotnet`
-    itself.
+    separate long name using the `--` prefix (customizable, of course) and single-character short
+    name using the `-` prefix. This allows you to use a parsing style that's similar to common tools,
+    including `dotnet` itself.
   - Allow [automatic name transformation](DefiningArguments.md#name-transformation) of arguments,
     value descriptions, and [subcommand names](Subcommands.md#name-transformation) so you don't need
     to use custom names everywhere if you want a different convention for names than you're using
     for .Net identifiers.
   - Added support for [argument validation and dependencies](Validation.md).
-  - Allow the use of [types](Arguments.md#argument-value-conversion) with `public static Parse(string)`
-    methods or constructors taking a string argument for arguments, even without a [`TypeConverter`][].
+  - Allow the use of [types](Arguments.md#argument-value-conversion) with `public static Parse()`
+    methods or constructors taking a string parameter, even without a [`TypeConverter`][].
   - You can now customize parsing behavior by applying the [`ParseOptionsAttribute`][] to your class, as
     an alternative to passing [`ParseOptions`][] to the static [`Parse<T>()`][Parse<T>()_1] method.
   - [`ParseOptions`][] is now also used to set options when manually creating a [`CommandLineParser`][]
@@ -32,31 +34,33 @@ from Ookii.CommandLine 2.x](Migrating.md) if you are upgrading an existing appli
   - Optional support for [multi-value arguments](Arguments.md#arguments-with-multiple-values) that
     consume multiple argument tokens without a separator, e.g. `-Value 1 2 3` to assign three
     values.
-  - Arguments types can [use a constructor parameter](DefiningArguments.md#commandlineparser-injection)
+  - Arguments classes can [use a constructor parameter](DefiningArguments.md#commandlineparser-injection)
     to receive the [`CommandLineParser`][] instance they were created with.
-  - Added the ability to customize error messages.
+  - Added the ability to customize error messages and other strings.
 - Subcommands
   - Renamed "shell commands" to "subcommands" because I never liked the old name.
   - Completely reworked [subcommand](Subcommands.md) support, with a brand new, more powerful and
     easier to use API.
-  - Support for asynchronous tasks.
+  - Support for asynchronous subcommands.
   - Support for subcommand aliases.
   - You can now use subcommands from multiple assemblies at once, and apply a filter.
-  - Automatically add a `version` subcommand if not defined.
+  - Automatically add a `version` subcommand if one does not exist.
 - Usage help
-  - Color output support.
-  - Greatly expanded [usage help customization options](UsageHelp.md) with the new [`UsageWriter`][UsageWriter_1]
-    class, including abbreviated syntax, description list ordering and filtering, the ability to
-    override any string, and more.
+  - [Color output](UsageHelp.md#color-output) support.
+  - Greatly expanded [usage help customization options](UsageHelp.md#customizing-the-usage-help)
+    with the new [`UsageWriter`][UsageWriter_1] class, including abbreviated syntax, description
+    list ordering and filtering, the ability to override any string or format, and more.
   - Arguments and subcommands can be hidden from the usage help.
   - Improved detection logic for the application executable name in the usage syntax.
-  - Aliases and default value are now shown in the usage help by default.
   - Arguments that have no description but that have other information not shown in the usage syntax
-    (like aliases, default value, validators) will be included in the description list by default.
+    (like aliases, a default value, or validators) will be included in the description list by
+    default.
+  - Aliases and the default value are now shown in the usage help by default.
   - Changed the default format for how aliases are displayed.
 - More [samples](../src/Samples), with updated documentation.
 - Various bug fixes.
-- No longer targets .Net Framework 2.0 (only .Net Standard 2.0 and .Net 6.0 are targeted).
+- No longer targets .Net Framework 2.0
+  - Now targets .Net Standard 2.0, .Net Standard 2.1, and .Net 6.0 and later.
 
 ## Ookii.CommandLine 2.4
 
