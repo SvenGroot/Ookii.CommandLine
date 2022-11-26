@@ -1,8 +1,8 @@
 # Tutorial: getting started with Ookii.CommandLine
 
-This tutorial will show you the basics of how to use Ookii.CommandLine. The tutorial will show you
-how to create a basic application that parses the command line and shows usage help, how to
-customize some of the options, and how to use Subcommands.
+This tutorial will show you the basics of how to use Ookii.CommandLine. It will show you how to
+create a basic application that parses the command line and shows usage help, how to customize some
+of the options--including the new long/short mode--and how to use subcommands.
 
 Refer to the [documentation](README.md) for more detailed information.
 
@@ -83,9 +83,10 @@ the contents of the file specified by the path argument to the console.
 The important part is the call to `CommandLineParser.Parse<Arguments>()`. This static method will
 parse your arguments, handle and print any errors, and print usage help if required.
 
-But wait, we didn't pass any arguments to this method? Actually, the [`Parse<T>()`][Parse<T>()_1] method will call
-[`Environment.GetCommandLineArgs()`][] to get the arguments. There are also overloads that take an
-explicit `string[]` array with the arguments, if you want to pass them manually.
+But wait, we didn't pass any arguments to this method? Actually, the [`Parse<T>()`][Parse<T>()_1]
+method will call [`Environment.GetCommandLineArgs()`][] to get the arguments. There are also
+overloads that take an explicit `string[]` array with the arguments, if you want to pass them
+manually.
 
 So, let's run our application. Build the application using `dotnet build`, and then, from the
 `bin/Debug/net6.0` directory, run the following:
@@ -113,8 +114,8 @@ Which will give print the contents of the tutorial.csproj file:
 </Project>
 ```
 
-So far, so good. But what happens if we invoke the application without arguments? After all, the
-"Path" argument is required. To try this, run the following command:
+So far, so good. But what happens if we invoke the application without arguments? After all, we
+made the `-Path` argument required. To try this, run the following command:
 
 ```text
 ./tutorial
@@ -137,35 +138,37 @@ Usage: tutorial [-Path] <String> [-Help] [-Version]
 > The actual usage help uses color if your console supports it. See [here](images/color.png) for
 > an example.
 
-As you can see, the [`Parse<T>()`][Parse<T>()_1] method lets us know what's wrong (we didn't supply the required
-argument), and shows the usage help.
+As you can see, the [`Parse<T>()`][Parse<T>()_1] method lets us know what's wrong (we didn't supply
+the required argument), and shows the usage help.
 
-The usage syntax (the line starting with "Usage:") shows the argument we defined. However, the list
-of arguments below it does not. That's because our argument didn't have a description, and only
-arguments with descriptions are shown in that list by default. We'll add some descriptions below.
+The usage syntax (the line starting with "Usage:") includes the argument we defined. However, the
+list of argument descriptions below it does not. That's because our argument doesn't have a
+description, and only arguments with descriptions are shown in that list by default. We'll add some
+descriptions [below](#expanding-the-usage-help).
 
-You can also see that there are two more arguments that we didn't define: "-Help" and "-Version".
+You can also see that there are two more arguments that we didn't define: `-Help` and `-Version`.
 These arguments are automatically added by Ookii.CommandLine. So, what do they do?
 
-If you use the "-Help" argument (`./tutorial -Help`), it shows the same message as before. The only difference is that
-there's no error message, even if you omitted the "Path" argument. And even if you do supply a path
-together with "-Help", it still shows the help and exits, it doesn't run the application.
+If you use the `-Help` argument (`./tutorial -Help`), it shows the same message as before. The only
+difference is that there's no error message, even if you omitted the `-Path` argument. And even if
+you do supply a path together with `-Help`, it still shows the help and exits, it doesn't run the
+application. Basically, the presence of `-Help` will override anything else.
 
-The "-Version" argument shows version information about your application:
+The `-Version` argument shows version information about your application:
 
 ```text
 $ ./tutorial -Version
 tutorial 1.0.0
 ```
 
-By default, it shows the assembly name and informational version. It'll also show the assembly's
+By default, it shows the assembly's name and informational version. It'll also show the assembly's
 copyright information, if there is any (there's not in this case). You can also use the
 [`ApplicationFriendlyNameAttribute`][] attribute to specify a custom name instead of the assembly name.
 
 > If you define an argument called "Help" or "Version", the automatic arguments won't be added.
 > Also, you can disable the automatic arguments using the [`ParseOptionsAttribute`][] attribute.
 
-Note that in the usage syntax, your positional "Path" argument still has its name shown as "-Path".
+Note that in the usage syntax, your positional "Path" argument still has its name shown as `-Path`.
 That's because every argument, even positional ones, can still be supplied by name. So if you run
 this:
 
@@ -175,24 +178,24 @@ this:
 
 The output is the same as above.
 
-> Argument names are case insensitive by default, so even though I used "-path" instead of "-Path"
+> Argument names are case insensitive by default, so even though I used `-path` instead of `-Path`
 > above, it still worked.
 
 ## Arguments with other types
 
 Arguments don't have to be strings. In fact, they can have any type as long as there's a way to
-[convert to them](Arguments.md#argument-value-conversion) from a string. All of the basic .Net
-types are supported (like `int`, `float`, `bool`), as well as many more that can be converted from
-a string (like enumerations, or classes like [`FileInfo`][] or [`Uri`][]).
+[convert to that type](Arguments.md#argument-value-conversion) from a string. All of the basic .Net
+types are supported (like `int`, `float`, `bool`, etc.), as well as many more that can be converted
+from a string (like enumerations, or classes like [`FileInfo`][] or [`Uri`][], or many other types).
 
-Let's try this out by adding more arguments in the Arguments class. First, add this to the top of
+Let's try this out by adding more arguments in the `Arguments` class. First, add this to the top of
 Arguments.cs:
 
 ```csharp
-using Ookii.CommandLine.Validation
+using Ookii.CommandLine.Validation;
 ```
 
-And then add the following properties to the Arguments class:
+And then add the following properties to the `Arguments` class:
 
 ```csharp
 [CommandLineArgument]
@@ -204,14 +207,15 @@ public int? MaxLines { get; set; }
 public bool Inverted { get; set; }
 ```
 
-This defines two new arguments. The first, "MaxLines", uses `int` as its type. This argument is not
-positional (you must use the name), and it's optional. We've also added a validator to ensure the
-value is positive, and since "-MaxLines" might be a bit verbose, we've given it an alias "-Max",
-which can be used as an alternative name to supply the argument.
+This defines two new arguments. The first, `-MaxLines`, uses `int?` as its type, so it will only
+accept integer numbers, and be null if not supplied. This argument is not positional (you must use
+the name), and it's optional. We've also added a validator to ensure the value is positive, and
+since `-MaxLines` might be a bit verbose, we've given it an alias `-Max`, which can be used as an
+alternative name to supply the argument.
 
 > An argument can have any number of aliases; just repeat the [`AliasAttribute`][] attribute.
 
-The second argument, "Inverted", is a boolean, which means it's a switch argument. Switch arguments
+The second argument, `-Inverted`, is a boolean, which means it's a switch argument. Switch arguments
 don't need values, you either supply them or you don't.
 
 Now, let's update `ReadFile` to use the new arguments:
@@ -251,23 +255,26 @@ Now we can run the application like this:
 
 And it'll only show the first five lines of the file, using black-on-white text.
 
-If you supply a value that's not a valid integer for "MaxLines", or a value that's less than 1,
+If you supply a value that's not a valid integer for `-MaxLines`, or a value that's less than 1,
 you'll once again get an error message and the usage help.
 
 Above, we used a nullable value type ([`Nullable<int>`][], or `int?`) so we could tell whether the
 argument was supplied. Instead, we could also set a default value. This can be done in two ways: the
-first is using the [`DefaultValue`][DefaultValue_1] property (the validator and alias are omitted for brevity):
+first is using the [`DefaultValue`][DefaultValue_1] property:
 
 ```csharp
 [CommandLineArgument(DefaultValue = 10)]
+[ValidateRange(1, null)]
+[Alias("Max")]
 public int MaxLines { get; set; }
 ```
 
-> If your argument's type doesn't have literals you can use in an attribute, you can also use a
-> string to specify the default value, and the value will be converted when used.
+> If your argument's type doesn't have literals, you can also use a string to specify the default
+> value, and the value will be converted when used. For example, `[CommandLineArgument(DefaultValue = "10")]`
+> is equivalent to the above.
 
 Alternatively, you can just initialize the property, since Ookii.CommandLine won't set the property
-if it's not supplied and the default value is `null`:
+if the argument is not supplied and the default value is null:
 
 ```csharp
 [CommandLineArgument]
@@ -280,20 +287,24 @@ argument is a non-nullable reference type (you can also use both, in which case 
 property will overwrite the initial value).
 
 While we're talking about non-nullable reference types, consider the following alternative for the
-"Path" argument:
+`-Path` argument:
 
 ```csharp
 [CommandLineArgument(Position = 0, IsRequired = true)]
 public string Path { get; set; } = string.Empty;
 ```
 
-Even though the property is required, and we know it will be set, we have to initialize it to a
-non-null value because the C# compiler doesn't know that (and it wouldn't be true if you create the
-class using a method other than the [`CommandLineParser`][]). The advantage of this would be that we
-can remove the `!` from the value's usage in `ReadFile`, at the cost of an unnecessary
-initialization. As a bonus, for .Net 6.0 and later only, Ookii.CommandLine will make sure that
-arguments with non-nullable types can't be set to null, even if the [`TypeConverter`][] returns null
-(it will treat that as an error).
+An automatic property with a non-nullable type must be initialized with a non-null value, or the
+code won't compile. Even though we know the property will be set by the [`CommandLineParser`][],
+because the argument is required, this is still required because the C# compiler can't know that
+(and the compiler is right in case you create an instance manually without using the
+[`CommandLineParser`][]). So we must initialize the property, even if that value won't be used.
+
+The advantage of doing this would be that we can remove the `!` from the value's usage in
+`ReadFile`, at the cost of an unnecessary initialization. As a bonus, for .Net 6.0 and later only,
+the [`CommandLineParser`][] will make sure that arguments with non-nullable types can't be set to
+null, even if the [`TypeConverter`][] for the property's type returns null (it will treat that as an
+error).
 
 ## Expanding the usage help
 
