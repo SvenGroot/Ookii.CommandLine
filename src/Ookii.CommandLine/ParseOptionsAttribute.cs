@@ -66,11 +66,11 @@ namespace Ookii.CommandLine
         ///   help and version attributes.
         /// </para>
         /// <para>
-        ///   This value can be overridden by the <see cref="ParseOptions.NameTransform"/>
+        ///   This value can be overridden by the <see cref="ParseOptions.ArgumentNameTransform"/>
         ///   property.
         /// </para>
         /// </remarks>
-        public NameTransform NameTransform { get; set; }
+        public NameTransform ArgumentNameTransform { get; set; }
 
         /// <summary>
         /// Gets or sets the prefixes that can be used to specify an argument name on the command

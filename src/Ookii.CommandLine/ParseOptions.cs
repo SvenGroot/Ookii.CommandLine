@@ -59,7 +59,7 @@ namespace Ookii.CommandLine
         /// an explicit name.
         /// </summary>
         /// <value>
-        /// One of the values of the <see cref="CommandLine.NameTransform"/> enumeration, or <see langword="null"/>
+        /// One of the values of the <see cref="NameTransform"/> enumeration, or <see langword="null"/>
         /// to use the value from the <see cref="ParseOptionsAttribute"/> attribute, or if that
         /// attribute is not present, <see cref="NameTransform.None"/>. The default value is
         /// <see langword="null"/>.
@@ -78,13 +78,13 @@ namespace Ookii.CommandLine
         /// </para>
         /// <para>
         ///   If not <see langword="null"/>, this property overrides the value of the
-        ///   <see cref="ParseOptionsAttribute.NameTransform"/> property.
+        ///   <see cref="ParseOptionsAttribute.ArgumentNameTransform"/> property.
         /// </para>
         /// </remarks>
         /// <seealso cref="NameTransform"/>
         /// <seealso cref="ValueDescriptionTransform"/>
         /// <seealso cref="CommandOptions.CommandNameTransform"/>
-        public NameTransform? NameTransform { get; set; }
+        public NameTransform? ArgumentNameTransform { get; set; }
 
         /// <summary>
         /// Gets or sets the argument name prefixes to use when parsing the arguments.
@@ -462,7 +462,7 @@ namespace Ookii.CommandLine
         /// are transformed.
         /// </summary>
         /// <value>
-        /// One of the members of the <see cref="NameTransform"/> enumeration, or <see langword="null"/>
+        /// One of the members of the <see cref="ArgumentNameTransform"/> enumeration, or <see langword="null"/>
         /// to use the value from the <see cref="ParseOptionsAttribute"/> attribute, or if that is
         /// not present, <see cref="NameTransform.None"/>. The default value is <see langword="null"/>.
         /// </value>
@@ -517,7 +517,7 @@ namespace Ookii.CommandLine
             }
 
             Mode ??= attribute.Mode;
-            NameTransform ??= attribute.NameTransform;
+            ArgumentNameTransform ??= attribute.ArgumentNameTransform;
             ArgumentNamePrefixes ??= attribute.ArgumentNamePrefixes;
             LongArgumentNamePrefix ??= attribute.LongArgumentNamePrefix;
             ArgumentNameComparer ??= attribute.GetStringComparer();

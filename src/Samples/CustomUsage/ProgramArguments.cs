@@ -11,7 +11,7 @@ namespace CustomUsage;
 [ApplicationFriendlyName("Ookii.CommandLine Long/Short Mode Sample")]
 [Description("Sample command line application with highly customized usage help. The application parses the command line and prints the results, but otherwise does nothing and none of the arguments are actually used for anything.")]
 [ParseOptions(Mode = ParsingMode.LongShort,
-    NameTransform = NameTransform.DashCase,
+    ArgumentNameTransform = NameTransform.DashCase,
     ValueDescriptionTransform = NameTransform.DashCase,
     CaseSensitive = true,
     DuplicateArguments = ErrorMode.Warning)]

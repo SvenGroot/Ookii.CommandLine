@@ -66,7 +66,7 @@ namespace Ookii.CommandLine
         /// <param name="argumentName">
         ///   The name of the argument, or <see langword="null"/> to indicate the member name
         ///   should be used, applying the <see cref="NameTransform"/> specified by the
-        ///   <see cref="ParseOptions.NameTransform"/> property or the <see cref="ParseOptionsAttribute.NameTransform"/>
+        ///   <see cref="ParseOptions.ArgumentNameTransform"/> property or the <see cref="ParseOptionsAttribute.ArgumentNameTransform"/>
         ///   property.
         /// </param>
         /// <para>

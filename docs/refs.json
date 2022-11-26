@@ -183,7 +183,7 @@
   "ParseOptions.AutoVersionArgument": "P_Ookii_CommandLine_ParseOptions_AutoVersionArgument",
   "ParseOptions.Culture": "P_Ookii_CommandLine_ParseOptions_Culture",
   "ParseOptions.DefaultValueDescriptions": "P_Ookii_CommandLine_ParseOptions_DefaultValueDescriptions",
-  "ParseOptions.NameTransform": "P_Ookii_CommandLine_ParseOptions_NameTransform",
+  "ParseOptions.ArgumentNameTransform": "P_Ookii_CommandLine_ParseOptions_ArgumentNameTransform",
   "ParseOptions.NameValueSeparator": "P_Ookii_CommandLine_ParseOptions_NameValueSeparator",
   "ParseOptions.ShowUsageOnError": "P_Ookii_CommandLine_ParseOptions_ShowUsageOnError",
   "ParseOptions.StringProvider": "P_Ookii_CommandLine_ParseOptions_StringProvider",

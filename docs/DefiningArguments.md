@@ -372,11 +372,11 @@ Value          | Description                                                    
 **SnakeCase**  | Member names are transformed to snake_case. This removes leading and trailing underscores, changes all characters to lower-case, and reduces consecutive underscores to a single underscore. An underscore is inserted before previously capitalized letters. | `SomeName`, `someName`, `_someName_` => some_name
 **DashCase**   | Member names are transformed to dash-case. Similar to SnakeCase, but uses a dash instead of an underscore.                                                                                                                                                    | `SomeName`, `someName`, `_someName_` => some-name
 
-Name transformations are set by using the [`ParseOptions.NameTransform`][] property, or the [`ParseOptionsAttribute`][] which
+Name transformations are set by using the [`ParseOptions.ArgumentNameTransform`][] property, or the [`ParseOptionsAttribute`][] which
 can be applied to your arguments class.
 
 ```csharp
-[ParseOptions(NameTransform = NameTransform.DashCase)]
+[ParseOptions(ArgumentNameTransform = NameTransform.DashCase)]
 class Arguments
 {
     [CommandLineArgument]
@@ -393,7 +393,7 @@ explicit names.
 This can be useful if you combine constructor parameters and properties to define arguments.
 
 ```csharp
-[ParseOptions(NameTransform = NameTransform.PascalCase)]
+[ParseOptions(ArgumentNameTransform = NameTransform.PascalCase)]
 class Arguments
 {
     public Arguments(string someArgument)
@@ -456,7 +456,7 @@ Next, we'll take a look at how to [parse the arguments we've defined](ParsingArg
 [`List<int>`]: https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1
 [`List<string>`]: https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1
 [`LocalizedStringProvider`]: https://www.ookii.org/docs/commandline-3.0-preview/html/T_Ookii_CommandLine_LocalizedStringProvider.htm
-[`ParseOptions.NameTransform`]: https://www.ookii.org/docs/commandline-3.0-preview/html/P_Ookii_CommandLine_ParseOptions_NameTransform.htm
+[`ParseOptions.ArgumentNameTransform`]: https://www.ookii.org/docs/commandline-3.0-preview/html/P_Ookii_CommandLine_ParseOptions_ArgumentNameTransform.htm
 [`ParseOptions`]: https://www.ookii.org/docs/commandline-3.0-preview/html/T_Ookii_CommandLine_ParseOptions.htm
 [`ParseOptionsAttribute`]: https://www.ookii.org/docs/commandline-3.0-preview/html/T_Ookii_CommandLine_ParseOptionsAttribute.htm
 [`ShortAliasAttribute`]: https://www.ookii.org/docs/commandline-3.0-preview/html/T_Ookii_CommandLine_ShortAliasAttribute.htm

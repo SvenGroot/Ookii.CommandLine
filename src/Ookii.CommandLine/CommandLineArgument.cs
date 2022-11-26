@@ -1254,7 +1254,7 @@ namespace Ookii.CommandLine
             var valueTypeConverterAttribute = parameter.GetCustomAttribute<ValueTypeConverterAttribute>();
             var argumentNameAttribute = parameter.GetCustomAttribute<ArgumentNameAttribute>();
             var multiValueSeparatorAttribute = parameter.GetCustomAttribute<MultiValueSeparatorAttribute>();
-            var argumentName = DetermineArgumentName(argumentNameAttribute?.ArgumentName, parameter.Name, parser.Options.NameTransform);
+            var argumentName = DetermineArgumentName(argumentNameAttribute?.ArgumentName, parameter.Name, parser.Options.ArgumentNameTransform);
             var info = new ArgumentInfo()
             {
                 Parser = parser,
@@ -1337,7 +1337,7 @@ namespace Ookii.CommandLine
             var keyTypeConverterAttribute = member.GetCustomAttribute<KeyTypeConverterAttribute>();
             var valueTypeConverterAttribute = member.GetCustomAttribute<ValueTypeConverterAttribute>();
             var multiValueSeparatorAttribute = member.GetCustomAttribute<MultiValueSeparatorAttribute>();
-            var argumentName = DetermineArgumentName(attribute.ArgumentName, member.Name, parser.Options.NameTransform);
+            var argumentName = DetermineArgumentName(attribute.ArgumentName, member.Name, parser.Options.ArgumentNameTransform);
             var info = new ArgumentInfo()
             {
                 Parser = parser,
@@ -1379,7 +1379,7 @@ namespace Ookii.CommandLine
                 throw new ArgumentNullException(nameof(parser));
             }
 
-            var argumentName = DetermineArgumentName(null, parser.StringProvider.AutomaticHelpName(), parser.Options.NameTransform);
+            var argumentName = DetermineArgumentName(null, parser.StringProvider.AutomaticHelpName(), parser.Options.ArgumentNameTransform);
             var shortName = parser.StringProvider.AutomaticHelpShortName();
             var shortAlias = char.ToLowerInvariant(argumentName[0]);
             var existingArg = parser.GetArgument(argumentName) ??
@@ -1437,7 +1437,7 @@ namespace Ookii.CommandLine
                 throw new ArgumentNullException(nameof(parser));
             }
 
-            var argumentName = DetermineArgumentName(null, parser.StringProvider.AutomaticVersionName(), parser.Options.NameTransform);
+            var argumentName = DetermineArgumentName(null, parser.StringProvider.AutomaticVersionName(), parser.Options.ArgumentNameTransform);
             if (parser.GetArgument(argumentName) != null)
             {
                 return null;

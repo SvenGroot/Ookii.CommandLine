@@ -14,8 +14,8 @@ namespace Ookii.CommandLine
     /// </para>
     /// <para>
     ///   If no argument name is specified, the parameter name will be used, applying the
-    ///   <see cref="NameTransform"/> specified by the <see cref="ParseOptions.NameTransform"/>
-    ///   property or the <see cref="ParseOptionsAttribute.NameTransform"/> property.
+    ///   <see cref="NameTransform"/> specified by the <see cref="ParseOptions.ArgumentNameTransform"/>
+    ///   property or the <see cref="ParseOptionsAttribute.ArgumentNameTransform"/> property.
     /// </para>
     /// <para>
     ///   The <see cref="NameTransform"/> will not be applied to names specified with this

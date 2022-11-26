@@ -385,7 +385,7 @@ your class. Let's apply some options:
 [Description("Reads a file and displays the contents on the command line.")]
 [ParseOptions(Mode = ParsingMode.LongShort,
     CaseSensitive = true,
-    NameTransform = NameTransform.DashCase,
+    ArgumentNameTransform = NameTransform.DashCase,
     ValueDescriptionTransform = NameTransform.DashCase)]
 class Arguments
 {
@@ -415,7 +415,7 @@ using the [`CommandLineArgumentAttribute.ShortName`][] property. Arguments alway
 default, which can be disabled with the [`CommandLineArgumentAttribute.IsLong`][] property (they must
 have either a short or a long name).
 
-I've also applied a name transformation to the argument names and value descriptions. In this case,
+We've also applied a name transformation to the argument names and value descriptions. In this case,
 they'll be transformed to "dash-case" (lower case, with a dash between every word). This saves you
 from having to give every argument a custom name if you want to use a different naming style.
 

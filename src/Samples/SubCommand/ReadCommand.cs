@@ -22,7 +22,7 @@ namespace SubCommandSample
     // Check the Program.cs file to see how this command is invoked.
     [Command]
     [Description("Reads and displays data from a file using the specified encoding, wrapping the text to fit the console.")]
-    [ParseOptions(NameTransform = NameTransform.PascalCase)]
+    [ParseOptions(ArgumentNameTransform = NameTransform.PascalCase)]
     class ReadCommand : AsyncCommandBase
     {
         private readonly FileInfo _path;

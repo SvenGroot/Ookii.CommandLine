@@ -1655,7 +1655,7 @@ namespace Ookii.CommandLine
                     ? (CommandManager.Options.LongArgumentNamePrefix ?? CommandLineParser.DefaultLongArgumentNamePrefix)
                     : (CommandManager.Options.ArgumentNamePrefixes?.FirstOrDefault() ?? CommandLineParser.GetDefaultArgumentNamePrefixes()[0]);
 
-                var transform = CommandManager.Options.NameTransform ?? NameTransform.None;
+                var transform = CommandManager.Options.ArgumentNameTransform ?? NameTransform.None;
                 var argumentName = transform.Apply(CommandManager.Options.StringProvider.AutomaticHelpName());
 
                 Writer.Indent = 0;

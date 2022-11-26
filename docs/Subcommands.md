@@ -507,7 +507,7 @@ by setting the subcommand-specific properties of that class. The sample above us
 assembly used by the [`CommandManager`][] to be printed before the command list, and [`IncludeCommandHelpInstruction`][], which prints the line at the bottom telling the user to use `-Help`.
 
 For the [`IncludeCommandHelpInstruction`][] option, the text will use the name of the automatic help
-argument, after applying the [`ParseOptions.NameTransform`][] if one is set. If using
+argument, after applying the [`ParseOptions.ArgumentNameTransform`][] if one is set. If using
 [long/short mode](Arguments.md#longshort-mode), the long argument prefix is used. Note that the
 [`CommandManager`][] won't check if every command actually has an argument with that name, so only
 enable it if this is true (it's recommended to enable it if it is).
@@ -579,7 +579,7 @@ Ookii.CommandLine.
 [`NameTransform.None`]: https://www.ookii.org/docs/commandline-3.0-preview/html/T_Ookii_CommandLine_NameTransform.htm
 [`Ookii.CommandLine.Commands`]: https://www.ookii.org/docs/commandline-3.0-preview/html/N_Ookii_CommandLine_Commands.htm
 [`ParseOptions.AutoVersionArgument`]: https://www.ookii.org/docs/commandline-3.0-preview/html/P_Ookii_CommandLine_ParseOptions_AutoVersionArgument.htm
-[`ParseOptions.NameTransform`]: https://www.ookii.org/docs/commandline-3.0-preview/html/P_Ookii_CommandLine_ParseOptions_NameTransform.htm
+[`ParseOptions.ArgumentNameTransform`]: https://www.ookii.org/docs/commandline-3.0-preview/html/P_Ookii_CommandLine_ParseOptions_ArgumentNameTransform.htm
 [`ParseOptions`]: https://www.ookii.org/docs/commandline-3.0-preview/html/T_Ookii_CommandLine_ParseOptions.htm
 [`ParseOptionsAttribute`]: https://www.ookii.org/docs/commandline-3.0-preview/html/T_Ookii_CommandLine_ParseOptionsAttribute.htm
 [`RunCommand()`]: https://www.ookii.org/docs/commandline-3.0-preview/html/Overload_Ookii_CommandLine_Commands_CommandManager_RunCommand.htm

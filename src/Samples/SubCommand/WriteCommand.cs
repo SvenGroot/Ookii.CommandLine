@@ -22,7 +22,7 @@ namespace SubCommandSample
     // Check the Program.cs file to see how this command is invoked.
     [Command]
     [Description("Writes lines to a file, wrapping them to the specified width.")]
-    [ParseOptions(NameTransform = NameTransform.PascalCase)]
+    [ParseOptions(ArgumentNameTransform = NameTransform.PascalCase)]
     class WriteCommand : ICommand
     {
         private readonly FileInfo _path;

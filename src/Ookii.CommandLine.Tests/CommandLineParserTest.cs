@@ -799,7 +799,7 @@ namespace Ookii.CommandLine.Tests
         {
             var options = new ParseOptions
             {
-                NameTransform = NameTransform.PascalCase
+                ArgumentNameTransform = NameTransform.PascalCase
             };
 
             var parser = new CommandLineParser<NameTransformArguments>(options);
@@ -819,7 +819,7 @@ namespace Ookii.CommandLine.Tests
         {
             var options = new ParseOptions
             {
-                NameTransform = NameTransform.CamelCase
+                ArgumentNameTransform = NameTransform.CamelCase
             };
 
             var parser = new CommandLineParser<NameTransformArguments>(options);
@@ -839,7 +839,7 @@ namespace Ookii.CommandLine.Tests
         {
             var options = new ParseOptions
             {
-                NameTransform = NameTransform.SnakeCase
+                ArgumentNameTransform = NameTransform.SnakeCase
             };
 
             var parser = new CommandLineParser<NameTransformArguments>(options);
@@ -859,7 +859,7 @@ namespace Ookii.CommandLine.Tests
         {
             var options = new ParseOptions
             {
-                NameTransform = NameTransform.DashCase
+                ArgumentNameTransform = NameTransform.DashCase
             };
 
             var parser = new CommandLineParser<NameTransformArguments>(options);
