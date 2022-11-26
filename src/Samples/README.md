@@ -15,7 +15,7 @@ Ookii.CommandLine comes with several samples that demonstrate various aspects of
 
 There are two samples demonstrating how to use subcommands:
 
-- The [**Subcommand sample**](SubCommand) demonstrates how to create a simple application that has
+- The [**Subcommand sample**](Subcommand) demonstrates how to create a simple application that has
   multiple subcommands.
 - The [**Nested commands sample**](NestedCommands) demonstrates how to create an application where commands can
   contain other commands. It also demonstrates how to create common arguments for multiple commands

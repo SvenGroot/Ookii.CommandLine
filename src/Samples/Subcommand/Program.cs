@@ -1,14 +1,13 @@
 ﻿using Ookii.CommandLine;
 using Ookii.CommandLine.Commands;
 using Ookii.CommandLine.Terminal;
-using SubCommand;
 using System.Threading.Tasks;
 
 // For an application using subcommands, set the friendly name used for the automatic version
 // command on the assembly.
 [assembly: ApplicationFriendlyName("Ookii.CommandLine Subcommand Sample")]
 
-namespace SubCommandSample;
+namespace SubcommandSample;
 
 static class Program
 {

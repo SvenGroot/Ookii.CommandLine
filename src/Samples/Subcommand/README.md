@@ -14,7 +14,7 @@ When invoked without arguments, a subcommand application prints the list of comm
 ```text
 Subcommand sample for Ookii.CommandLine.
 
-Usage: SubCommand <command> [arguments]
+Usage: Subcommand <command> [arguments]
 
 The following commands are available:
 
@@ -28,18 +28,18 @@ The following commands are available:
     write
         Writes lines to a file, wrapping them to the specified width.
 
-Run 'SubCommand <command> -Help' for more information about a command.
+Run 'Subcommand <command> -Help' for more information about a command.
 ```
 
 Like the usage help format for arguments, the command list format can also be customized. If the
 console is capable, the command list also uses color.
 
-If we run `SubCommand write -Help`, we get the following:
+If we run `Subcommand write -Help`, we get the following:
 
 ```text
 Writes lines to a file, wrapping them to the specified width.
 
-Usage: SubCommand write [-Path] <FileInfo> [[-Lines] <String>...] [-Encoding <Encoding>] [-Help]
+Usage: Subcommand write [-Path] <FileInfo> [[-Lines] <String>...] [-Encoding <Encoding>] [-Help]
    [-MaximumLineLength <Int32>] [-Overwrite]
 
     -Path <FileInfo>
@@ -69,7 +69,7 @@ in the usage syntax.
 
 Subcommands have an automatic `-Help` argument, but as you can see, no `-Version` argument. Instead,
 there is an automatic `version` command, which has the same function. We can see that if we run
-`SubCommand version`:
+`Subcommand version`:
 
 ```text
 Ookii.CommandLine Subcommand Sample 3.0.0

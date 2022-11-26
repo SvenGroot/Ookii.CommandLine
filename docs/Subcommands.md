@@ -14,10 +14,10 @@ command. The remaining arguments are arguments to that command. You cannot have 
 not associated with a command using the subcommand functionality in Ookii.CommandLine, though you
 can still easily define [common arguments](#multiple-commands-with-common-arguments).
 
-For example, the [subcommand sample](../src/Samples/SubCommand) can be invoked as follows:
+For example, the [subcommand sample](../src/Samples/Subcommand) can be invoked as follows:
 
 ```text
-./SubCommand read file.txt -Encoding utf-16
+./Subcommand read file.txt -Encoding utf-16
 ```
 
 This command line invokes the command named `read`, and passes the remaining arguments to that
@@ -301,7 +301,7 @@ whether this works depends on the command's implementation of that method. If yo
 However, in all cases, it's strongly recommended to use [`RunCommandAsync()`][] if you use any
 asynchronous commands.
 
-Check out the [tutorial](Tutorial.md) and the [subcommand sample](../src/Samples/SubCommand) for
+Check out the [tutorial](Tutorial.md) and the [subcommand sample](../src/Samples/Subcommand) for
 more detailed examples of how to create and use commands.
 
 ### Other assemblies
@@ -471,10 +471,10 @@ help automatically.
 ## Subcommand usage help
 
 Since subcommands are created using the [`CommandLineParser`][], they support showing usage help when
-parsing errors occur, or the `-Help` argument is used. For example, with the [subcommand sample](../src/Samples/SubCommand) you could run the following to get help on the `read` command:
+parsing errors occur, or the `-Help` argument is used. For example, with the [subcommand sample](../src/Samples/Subcommand) you could run the following to get help on the `read` command:
 
 ```text
-./SubCommand read -help
+./Subcommand read -help
 ```
 
 In addition, the [`CommandManager`][] also prints usage help if no command name was supplied, or the
@@ -484,7 +484,7 @@ a list of commands, with their descriptions. This is what that looks like for th
 ```text
 Subcommand sample for Ookii.CommandLine.
 
-Usage: SubCommand <command> [arguments]
+Usage: Subcommand <command> [arguments]
 
 The following commands are available:
 
@@ -498,7 +498,7 @@ The following commands are available:
     write
         Writes lines to a file, wrapping them to the specified width.
 
-Run 'SubCommand <command> -Help' for more information about a command.
+Run 'Subcommand <command> -Help' for more information about a command.
 ```
 
 Usage help for a [`CommandManager`][] is also created using the [`UsageWriter`][], and can be customized
