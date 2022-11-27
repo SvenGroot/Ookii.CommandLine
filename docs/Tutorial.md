@@ -2,7 +2,7 @@
 
 This tutorial will show you the basics of how to use Ookii.CommandLine. It will show you how to
 create a basic application that parses the command line and shows usage help, how to customize some
-of the options--including the new long/short mode--and how to use subcommands.
+of the options—including the new long/short mode—and how to use subcommands.
 
 Refer to the [documentation](README.md) for more detailed information.
 
@@ -308,7 +308,7 @@ error).
 
 ## Expanding the usage help
 
-We saw before that our custom arguments were showing up in the usage syntax, but didn't have any
+We saw before that our custom arguments were included in the usage syntax, but didn't have any
 descriptions. Typically, you'll want to add descriptions to your arguments. This is done using the
 [`System.ComponentModel.DescriptionAttribute`][] attribute.
 
@@ -343,7 +343,7 @@ class Arguments
 I've also added a description to the class itself. That description is shown before the usage syntax
 as part of the usage help. Use it to provide a description for your application as a whole.
 
-The "MaxLines" property now also sets its *value description*. The value description is a short,
+The `MaxLines` property now also sets its *value description*. The value description is a short,
 typically one-word description of the type of values the argument accepts, which is shown in angle
 brackets in the usage help. It defaults to the type name, but "Int32" might not be very meaningful
 to people who aren't programmers, so we've changed it to "Number" instead.
@@ -373,21 +373,21 @@ Usage: tutorial [-Path] <String> [-Help] [-Inverted] [-MaxLines <Number>] [-Vers
 
 Now our usage help looks a lot better! All the arguments are present in the description list. Also
 note how the [`ValidateRangeAttribute`][] validator we used automatically added its condition to the
-description of "MaxLines" (this can be disabled either globally or on a per-validator basis if you
-want). Things like the default value are added in a similar fashion.
+description of `-MaxLines` (this can be disabled either globally or on a per-validator basis if you
+want). Things like the default value, if an argument has one, are added in a similar fashion.
 
-The "MaxLines" argument also has its alias listed, just like the "Help" argument.
+The `-MaxLines` argument also has its alias listed, just like the `-Help` argument.
 
 > Don't like the way the usage help looks? It can be fully customized! Check out the
 > [custom usage sample](../src/Samples/CustomUsage) for an example of that.
 
 ## Long/short mode and other customizations
 
-Ookii.CommandLine offers many options with which the way it parses the command line can be
-customized. For example, you can disable the use of white space as a separator between argument
-names and values, and specify a custom separator. You can specify custom argument name prefixes,
-instead of `-` which is the default (on Windows, `/` is also accepted by default). You can make the
-argument names case sensitive. And there's more.
+Ookii.CommandLine offers many options to customize the way it parses the command line. For example,
+you can disable the use of white space as a separator between argument names and values, and specify
+a custom separator. You can specify custom argument name prefixes, instead of `-` which is the
+default (on Windows only, `/` is also accepted by default). You can make the argument names case
+sensitive. And there's more.
 
 Most of these options can be specified using the [`ParseOptionsAttribute`][], which you can apply to
 your class. Let's apply some options:
@@ -416,19 +416,32 @@ class Arguments
 }
 ```
 
-The biggest change here is that we've set the [`Mode`][Mode_2] to [`ParsingMode.LongShort`][]. This is an
-alternative set of parsing rules, where every argument can have a long name, using the `--` prefix
-by default, and a single-character short name using the `-` prefix.
+The biggest change here is that we've set the [`Mode`][Mode_2] property to
+[`ParsingMode.LongShort`][]. This is an alternative set of parsing rules, where every argument can
+have two separate names: a long name, using the `--` prefix by default, and a single-character short
+name using the `-` prefix (and `/` on Windows).
 
-We've changed the arguments as well, to give both "MaxLines" and "Inverted" short names, which will
-be derived using the first character of their long names. You can also specify a custom short name
-using the [`CommandLineArgumentAttribute.ShortName`][] property. Arguments always have a long name by
-default, which can be disabled with the [`CommandLineArgumentAttribute.IsLong`][] property (they must
-have either a short or a long name).
+When using long/short mode, all arguments have long names by default, but you'll need to indicate
+which arguments have short names. We've done that here with the `MaxLines` and `Inverted`
+properties, by specifying `IsShort = true`. This gives them a short name using the first character
+of their long name, so `-m` and `-i` in this case. You can also specify a custom short name using the
+[`CommandLineArgumentAttribute.ShortName`][] property.
 
-We've also applied a name transformation to the argument names and value descriptions. In this case,
-they'll be transformed to "dash-case" (lower case, with a dash between every word). This saves you
-from having to give every argument a custom name if you want to use a different naming style.
+If you want an argument to only have a short name, you can disable the long name using the
+[`CommandLineArgumentAttribute.IsLong`][] property.
+
+The second option we set is the [`ParseOptionsAttribute.CaseSensitive`][] property, which means that our
+argument names are now case sensitive. That means the user will have to use the correct case when
+supplying an argument name, and you can have argument names that differ only by case if you want.
+
+Lastly, we've applied a name transformation to the argument names and value descriptions. In this
+case, they'll be transformed to "dash-case" (lower case, with a dash between every word). This saves
+you from having to give every argument a custom name if you want to use a different naming style.
+
+With all these changes, the `MaxLines` property now creates an argument with the long name
+`--max-lines`, and the short name `-m`. We also have an argument with the long name `--inverted`,
+and the short name `-i`. Finally, `--path` only has a long name, and is still positional. All of
+these names are now case sensitive.
 
 > Name transformations don't apply to names or value descriptions that are explicitly specified, so
 > we had to change "number" and "max" manually to match.
@@ -456,30 +469,31 @@ Usage: tutorial [--path] <string> [--help] [--inverted] [--max-lines <number>] [
             Displays version information.
 ```
 
-As you can see, the format is slightly different, giving more prominence to the short names. And
-the name transformation has changed the name of all of our arguments (which, remember, are now
-case sensitive). We now have very different parsing behavior without having to change the code
-that uses the arguments at all.
+As you can see, the format is slightly different, giving more prominence to the short names. You
+can see the result of the name transformation on all the arguments and value descriptions, including
+the automatic `--help` and `--version` arguments, which are now also lower case.
 
-In addition to the [`ParseOptionsAttribute`][] attribute, you can also use the [`ParseOptions`][] class
-to specify many of the same options and a bunch of other ones that didn't lend themselves well to
-an attribute, including where to write errors and help, and customization options for the
-usage help. You can pass an instance of the [`ParseOptions`][] class to the [`Parse<T>()`][Parse<T>()_1] method.
+In addition to the [`ParseOptionsAttribute`][] attribute, you can also use the [`ParseOptions`][]
+class to specify these and many other options, including where to write errors and help, and
+customization options for the usage help. You can pass an instance of the [`ParseOptions`][] class
+to the [`Parse<T>()`][Parse<T>()_1] method.
 
-If you specify the same option in both the [`ParseOptionsAttribute`][] attribute and the [`ParseOptions`][]
-class, the [`ParseOptions`][] class takes precedence.
+For the options that are available on both the [`ParseOptionsAttribute`][] attribute and the
+[`ParseOptions`][] class, you can choose which method to use based on your personal preference. If
+you specify the same option in both the [`ParseOptionsAttribute`][] attribute and the
+[`ParseOptions`][] class, the [`ParseOptions`][] class takes precedence.
 
 ## Using subcommands
 
 Many applications have multiple functions, which are invoked through subcommands. Think for example
-of the `dotnet` command, which has commands like `dotnet build` and `dotnet run`, or something like
-`git` with commands like `git pull` or `git cherry-pick`. Each command does something different, and
-needs its own command line arguments.
+of the `dotnet` application, which has commands like `dotnet build` and `dotnet run`, or something
+like `git` with commands like `git pull` or `git cherry-pick`. Each command does something
+different, and needs its own command line arguments.
 
 Creating subcommands with Ookii.CommandLine is very similar to what we've been doing already. A
-subcommand is a class that defines arguments, same as before. The class will just have to implement
-the [`ICommand`][] interface, and use the [`CommandAttribute`][] attribute. And, we'll have to change our
-main methods to use commands.
+subcommand is a class that defines arguments, same as before; the class will just have to implement
+the [`ICommand`][] interface, and use the [`CommandAttribute`][] attribute. Additionally, we'll have
+to change our `Main()` method to use subcommands.
 
 Let's change the example we've built so far to use subcommands. I'm going to go back to the version
 from before we changed to long/short mode, but this isn't strictly necessary; you can continue
@@ -500,9 +514,9 @@ Then, we'll change the renamed `Arguments` class into a subcommand:
 class ReadCommand : ICommand
 ```
 
-We've added the [`CommandAttribute`][], which indicates the class is a command and lets us specify the
-name of the command, which is "read" in this case. We've also added the [`ICommand`][] interface, which
-all commands must implement.
+We've added the [`CommandAttribute`][], which indicates the class is a command and lets us specify
+the name of the command, which is "read" in this case. We've also added the [`ICommand`][]
+interface, which all commands must implement.
 
 We don't have to change anything about the properties defining the arguments. However, we do have
 to implement the [`ICommand`][] interface, which has a single method called [`Run()`][Run()_1]. To implement it, we
@@ -588,8 +602,8 @@ When no command, or an unknown command, is supplied, a list of commands is print
 [`DescriptionAttribute`][] for our class, which was the application description before, is now the
 description of the command.
 
-There is a second command, "version", which is automatically added unless there already is a command
-with that name. It does the same thing as the "-Version" argument before.
+There is a second command, `version`, which is automatically added unless there already is a command
+with that name. It does the same thing as the `-Version` argument before.
 
 Let's see the usage help for our command:
 
@@ -618,8 +632,8 @@ Usage: tutorial read [-Path] <String> [-Help] [-Inverted] [-MaxLines <Number>]
 ```
 
 There are two differences to spot from the earlier version: the usage syntax now says `tutorial read`
-before the arguments, indicating you have to use the command, and there is no automatic "-Version"
-argument, since that would be redundant with the "version" command.
+before the arguments, indicating you have to use the command, and there is no automatic `-Version`
+argument, since that would be redundant with the `version` command.
 
 ## Command options
 
@@ -658,13 +672,14 @@ class to this:
 class ReadCommand : ICommand
 ```
 
-We've removed the explicit name from the [`CommandAttribute`][]. If you run the application, you'll see
-the command is still called "read". That's because for subcommands, the name transformation will
+We've removed the explicit name from the [`CommandAttribute`][]. If you run the application, you'll
+see the command is still called "read". That's because for subcommands, the name transformation will
 strip the suffix "Command" from the name by default. This too can be customized with the
 [`CommandOptions`][] class.
 
-We also set the [`IncludeCommandHelpInstruction`][] property, which causes the [`CommandManager`][] to print
-a message like `Run 'tutorial <command> -Help' for more information about a command.` after the
+We also set some options to customize the usage help. The first one is the
+[`IncludeCommandHelpInstruction`][] property, which causes the [`CommandManager`][] to print a
+message like `Run 'tutorial <command> -Help' for more information about a command.` after the
 command list. This is disabled by default because the [`CommandManager`][] won't check if all the
 commands actually have a `-Help` argument. It's recommended to enable this if all your commands do.
 
@@ -748,14 +763,14 @@ class WriteCommand : ICommand
 }
 ```
 
-There's one thing here that we haven't seen before, and that's a multi-value argument. The "Text"
+There's one thing here that we haven't seen before, and that's a multi-value argument. The `-Text`
 argument has an array type (`string[]`), which means it can have multiple values by supplying it
 multiple times. We could, for example, use `-Text foo -Text bar` to assign the values "foo" and "bar"
 to it. Because it's also a positional argument, we can also simply use `foo bar` to do the same.
 
 > Positional multi-value arguments must always be the last positional argument.
 
-This command will take the values from the "Text" argument and write them as lines to the specified
+This command will take the values from the `-Text` argument and write them as lines to the specified
 file, optionally appending to the file.
 
 Let's build and run our application again, without arguments:
@@ -856,8 +871,11 @@ public static async Task<int> Main()
     var options = new CommandOptions()
     {
         CommandNameTransform = NameTransform.DashCase,
-        IncludeCommandHelpInstruction = true,
-        IncludeApplicationDescriptionBeforeCommandList = true,
+        UsageWriter = new UsageWriter()
+        {
+            IncludeCommandHelpInstruction = true,
+            IncludeApplicationDescriptionBeforeCommandList = true,
+        },
     };
 
     var manager = new CommandManager(options);
@@ -881,8 +899,8 @@ Sometimes, you'll want some arguments to be available to all commands. With Ooki
 way to do this is to make a common base class. [`CommandLineParser`][] will consider base class members
 when determining what arguments are available.
 
-For example, if we wanted to make a common base class to share the "Path" argument between the
-"read" and "write" commands, we could do so like this:
+For example, if we wanted to make a common base class to share the `-Path` argument between the
+`read` and `write` commands, we could do so like this:
 
 ```csharp
 abstract class BaseCommand : AsyncCommandBase
@@ -895,18 +913,18 @@ abstract class BaseCommand : AsyncCommandBase
 [Command]
 class ReadCommand : BaseCommand
 {
-    /* Remove the Path property */
+    /* Remove the Path property, leave everything else */
 }
 
 [Command]
 class WriteCommand : BaseCommand
 {
-    /* Remove the Path property */
+    /* Remove the Path property, leave everything else */
 }
 ```
 
-Now both commands share the "Path" argument defined in the base class, in addition to the arguments
-they define themselves. Note that "BaseCommand" is not itself a command, because it doesn't have the
+Now both commands share the `-Path` argument defined in the base class, in addition to the arguments
+they define themselves. Note that `BaseCommand` is not itself a command, because it doesn't have the
 [`CommandAttribute`][] attribute (and also because it's `abstract`).
 
 If you apply a [`ParseOptionsAttribute`][] attribute to the `BaseCommand` class, you can also share
@@ -949,6 +967,7 @@ following resources:
 [`Nullable<int>`]: https://learn.microsoft.com/dotnet/api/system.nullable-1
 [`ParseOptions`]: https://www.ookii.org/docs/commandline-3.0-preview/html/T_Ookii_CommandLine_ParseOptions.htm
 [`ParseOptionsAttribute`]: https://www.ookii.org/docs/commandline-3.0-preview/html/T_Ookii_CommandLine_ParseOptionsAttribute.htm
+[`ParseOptionsAttribute.CaseSensitive`]: https://www.ookii.org/docs/commandline-3.0-preview/html/P_Ookii_CommandLine_ParseOptionsAttribute_CaseSensitive.htm
 [`ParsingMode.LongShort`]: https://www.ookii.org/docs/commandline-3.0-preview/html/T_Ookii_CommandLine_ParsingMode.htm
 [`RunCommand()`]: https://www.ookii.org/docs/commandline-3.0-preview/html/Overload_Ookii_CommandLine_Commands_CommandManager_RunCommand.htm
 [`RunCommandAsync()`]: https://www.ookii.org/docs/commandline-3.0-preview/html/Overload_Ookii_CommandLine_Commands_CommandManager_RunCommandAsync.htm
