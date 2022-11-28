@@ -6,7 +6,6 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <Description>Command line parsing sample for Ookii.CommandLine, using long/short parsing mode.</Description>
-    <VersionPrefix>3.0.0</VersionPrefix>
     <Copyright>Copyright (c) Sven Groot (Ookii.org)
 This is sample code, so you can use it freely.</Copyright>
   </PropertyGroup>

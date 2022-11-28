@@ -6,11 +6,6 @@
     <LangVersion>9.0</LangVersion>
     <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
-    <Authors>Sven Groot</Authors>
-    <Company>Ookii.org</Company>
-    <Copyright>Copyright (c) Sven Groot (Ookii.org)</Copyright>
-    <VersionPrefix>3.0.0</VersionPrefix>
-    <VersionSuffix>preview</VersionSuffix>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/SvenGroot/ookii.commandline</PackageProjectUrl>
     <RepositoryUrl>https://github.com/SvenGroot/ookii.commandline</RepositoryUrl>
@@ -24,7 +19,7 @@
 - Easily define arguments by creating a class with properties.
 - Create applications with multiple subcommands.
 - Generate fully customizable usage help.
-- Support PowerShell-like and POSIX-like parsing rules.</Description>
+- Supports PowerShell-like and POSIX-like parsing rules.</Description>
     <PackageTags>command line arguments parsing parser parse argument args console</PackageTags>
     <PackageReleaseNotes>For details, please view: https://www.ookii.org/Link/CommandLineVersionHistory</PackageReleaseNotes>
     <IncludeSymbols>true</IncludeSymbols>
@@ -55,13 +50,4 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
-
-  <ItemGroup>
-    <None Update="icon.png">
-      <Pack>True</Pack>
-      <PackagePath>\</PackagePath>
-    </None>
-  </ItemGroup>
-
-
 </Project>
