@@ -7,6 +7,9 @@
   "AllowDuplicateDictionaryKeysAttribute": "T_Ookii_CommandLine_AllowDuplicateDictionaryKeysAttribute",
   "ApplicationFriendlyNameAttribute": "T_Ookii_CommandLine_ApplicationFriendlyNameAttribute",
   "ArgumentNameAttribute": "T_Ookii_CommandLine_ArgumentNameAttribute",
+  "ArgumentNameAttribute.IsLong": "P_Ookii_CommandLine_ArgumentNameAttribute_IsLong",
+  "ArgumentNameAttribute.IsShort": "P_Ookii_CommandLine_ArgumentNameAttribute_IsShort",
+  "ArgumentNameAttribute.ShortName": "P_Ookii_CommandLine_ArgumentNameAttribute_ShortName",
   "ArgumentNameComparer": [
     "P_Ookii_CommandLine_CommandLineParser_ArgumentNameComparer",
     "P_Ookii_CommandLine_ParseOptions_ArgumentNameComparer"
@@ -22,6 +25,7 @@
   "ArgumentValidationWithHelpAttribute": "T_Ookii_CommandLine_Validation_ArgumentValidationWithHelpAttribute",
   "AsyncCommandBase": "T_Ookii_CommandLine_Commands_AsyncCommandBase",
   "AsyncCommandBase.Run()": "M_Ookii_CommandLine_Commands_AsyncCommandBase_Run",
+  "Bar": null,
   "BaseCommand": null,
   "CancelParsing": [
     "P_Ookii_CommandLine_CommandLineArgument_CancelParsing",
@@ -92,6 +96,7 @@
   "DeleteCommand": null,
   "DescriptionAttribute": "#system.componentmodel.descriptionattribute",
   "DescriptionListFilterMode.Information": "T_Ookii_CommandLine_DescriptionListFilterMode",
+  "Dictionary<TKey, TValue>": "#system.collections.generic.dictionary-2",
   "DuplicateArgument": [
     "E_Ookii_CommandLine_CommandLineParser_DuplicateArgument",
     "M_Ookii_CommandLine_LocalizedStringProvider_DuplicateArgument"
@@ -104,6 +109,7 @@
   "File.ReadLinesAsync()": "#system.io.file.readlinesasync",
   "FileInfo": "#system.io.fileinfo",
   "FlagsAttribute": "#system.flagsattribute",
+  "Foo": null,
   "GetArgument": "M_Ookii_CommandLine_CommandLineParser_GetArgument",
   "GetCommand()": "M_Ookii_CommandLine_Commands_CommandManager_GetCommand",
   "GetErrorMessage()": "M_Ookii_CommandLine_Validation_ArgumentValidationAttribute_GetErrorMessage",
@@ -120,6 +126,7 @@
   "ICommandWithCustomParsing": "T_Ookii_CommandLine_Commands_ICommandWithCustomParsing",
   "ICommandWithCustomParsing.Parse()": "M_Ookii_CommandLine_Commands_ICommandWithCustomParsing_Parse",
   "IComparable<T>": "#system.icomparable-1",
+  "IDictionary<TKey, TValue>": "#system.collections.generic.idictionary-2",
   "IncludeApplicationDescriptionBeforeCommandList": "P_Ookii_CommandLine_UsageWriter_IncludeApplicationDescriptionBeforeCommandList",
   "IncludeCommandHelpInstruction": "P_Ookii_CommandLine_UsageWriter_IncludeCommandHelpInstruction",
   "IncludeInUsageHelp": [
@@ -227,6 +234,7 @@
   "ShellCommandAttribute.CustomParsing": null,
   "ShortAliasAttribute": "T_Ookii_CommandLine_ShortAliasAttribute",
   "SomeName": null,
+  "SortedDictionary<string, int>": "#system.collections.generic.sorteddictionary-2",
   "StreamReader": "#system.io.streamreader",
   "String": "#system.string",
   "StringComparer.InvariantCulture": "#system.stringcomparer.invariantculture",

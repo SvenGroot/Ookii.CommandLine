@@ -92,9 +92,10 @@ allowed to define a required positional argument after an optional positional ar
 
 ## Switch arguments
 
-A switch argument is an argument with a Boolean type (`bool`). Its value is determined by its
-presence or absence on the command line; the value will be true if the argument is supplied, and
-false if not. The following sets the switch argument named “Switch” to true:
+A switch argument, sometimes also called a flag, is an argument with a Boolean type (`bool`). Its
+value is determined by its presence or absence on the command line; the value will be true if the
+argument is supplied, and false if not. The following sets the switch argument named “Switch” to
+true:
 
 ```text
 -Switch

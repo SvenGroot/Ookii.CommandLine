@@ -57,7 +57,8 @@ existing application.
     default.
   - Aliases and the default value are now shown in the usage help by default.
   - Changed the default format for how aliases are displayed.
-- More [samples](../src/Samples), with updated documentation.
+- Updated and improved documentation.
+- More [samples](../src/Samples) with descriptions and explanations.
 - Various bug fixes.
 - No longer targets .Net Framework 2.0
   - Now targets .Net Standard 2.0, .Net Standard 2.1, and .Net 6.0 and later.
