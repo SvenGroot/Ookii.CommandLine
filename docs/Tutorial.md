@@ -510,8 +510,8 @@ Then, we'll rename our `Arguments` class to `ReadCommand` (just for clarity), an
 subcommand:
 
 ```csharp
-[Description("Reads a file and displays the contents on the command line.")]
 [Command("read")]
+[Description("Reads a file and displays the contents on the command line.")]
 class ReadCommand : ICommand
 ```
 
@@ -694,8 +694,8 @@ specified, similar to the argument name transformation we used earlier. This mea
 class to this:
 
 ```csharp
-[Description("Reads a file and displays the contents on the command line.")]
 [Command]
+[Description("Reads a file and displays the contents on the command line.")]
 class ReadCommand : ICommand
 ```
 
