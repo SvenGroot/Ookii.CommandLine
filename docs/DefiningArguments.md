@@ -175,26 +175,42 @@ public bool Help { get; set; }
 
 ### Long/short mode
 
-When using [long/short mode](Arguments.md#longshort-mode), the name derived from the property name
-or explicitly given in the [`CommandLineArgumentAttribute`][] constructor is the long name.
+To enable [long/short mode](Arguments.md#longshort-mode), you typically want to set three options
+if you want to mimic typical POSIX conventions: the mode itself, case sensitive argument names,
+and dash-case [name transformation](#name-transformation).
+
+When using long/short mode, the name derived from the property name or explicitly given in the
+[`CommandLineArgumentAttribute`][] constructor is the long name.
 
 To set a short name, set [`CommandLineArgumentAttribute.ShortName`][] property. Alternatively,
 you can set the [`CommandLineArgumentAttribute.IsShort`][] property to `true` to use the first character
 of the long name as the short name.
 
+You can disable the long name using the [`CommandLineArgumentAttribute.IsLong`](TODO) property, in
+which case the argument will only have a short name (it must have at least either a short or a long
+name).
+
 ```csharp
-[CommandLineArgument(IsShort = true)]
-public string? Path { get; set; }
+[ParseOptions(Mode = ParsingMode.LongShort,
+    CaseSensitive = true,
+    ArgumentNameTransform = NameTransform.DashCase,
+    ValueDescriptionNameTransform = NameTransform.DashCase)]
+class MyArguments
+{
+    [CommandLineArgument(IsShort = true)]
+    public string? Path { get; set; }
 
-[CommandLineArgument(ShortName = 'a')]
-public int Foo { get; set;}
+    [CommandLineArgument(ShortName = 'a')]
+    public int Foo { get; set;}
 
-[CommandLineArgument(IsShort = true, IsLong = false)]
-public bool Bar { get; set; }
+    [CommandLineArgument(IsShort = true, IsLong = false)]
+    public bool Bar { get; set; }
+}
 ```
 
-In this case, the "Path" argument will have the short name "P", and the "Foo" argument will have the
-short name "a". The "Bar" argument will have the short name "B", but no long name.
+In this case, the `--path` argument will have the short name `-p`, and the `--foo` argument will
+have the short name `-a`. The `-b` argument from the `Bar` property has no long name. The names are
+all lower case due to the name transformation.
 
 ## Using methods
 

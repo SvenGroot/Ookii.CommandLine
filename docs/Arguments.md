@@ -12,8 +12,9 @@ that you can easily access in your application.
 The method used to extract values from the array of string arguments is determined by the command
 line argument parsing rules. Ookii.CommandLine supports two sets of parsing rules: the default mode,
 which uses parsing rules similar to those used by PowerShell, and [long/short mode](#longshort-mode),
-which lets arguments have a long name and a short name, with different prefixes. Most of the below
-information applies to both modes, with the differences described at the end.
+which is more POSIX-like, and lets arguments have a long name and a short name, with different
+prefixes. Most of the below information applies to both modes, with the differences described at the
+end.
 
 ## Named arguments
 
@@ -294,10 +295,21 @@ See also the [`CommandLineArgument.AllowNull`][] property.
 
 ## Long/short mode
 
-Ookii.CommandLine supports an alternative parsing mode called "long/short mode." In this mode,
-arguments can have long names and single-character short names, each with their own argument name
-prefix. By default, the prefix `--` is used for long names, and `-` (and `/` on Windows) for short
-names.
+POSIX and GNU conventions specify that options use a dash (`-`) followed by a single characters, and
+define the concept of long options, which use `--` followed by an a multi-character name. This style
+is used by many tools like `dotnet`, `git`, and many others, and may be preferred if you are writing
+a cross-platform application.
+
+Ookii.CommandLine calls this style of parsing "long/short mode," and offers it as an alternative
+mode to augment the default parsing rules. In this mode, an argument can have the regular long name
+and an additional single-character short name, each with its own argument name prefix. By default,
+the prefix `--` is used for long names, and `-` (and `/` on Windows) for short names.
+
+POSIX conventions also specify the use of lower case argument names, with dashes separating words
+("dash-case"), which you can easily achieve using [name transformation](DefiningArguments.md#name-transformation),
+and case-sensitive argument names, which can be enabled with the
+[`ParseOptionsAttribute.CaseSensitive`][] property or the [`ParseOptions.ArgumentNameComparer`][]
+property.
 
 For example, an argument named `--path` could have a short name `-p`. It could then be supplied
 using either name:
@@ -326,14 +338,16 @@ example, given the switches `-a`, `-b` and `-c`, the following command line sets
 -abc
 ```
 
+This is equivalent to:
+
+```text
+-a -b -c
+```
+
 This only works for switch arguments, and does not apply to long names.
 
 Besides these differences, long/short mode follows the same rules and conventions as the default
 mode outlined above, with all the same options.
-
-Long/short mode mimics the behavior of many tools like `dotnet` and `git` more closely. Usually,
-those tools also use lower-case argument names, which you can easily achieve using
-[name transformation](DefiningArguments.md#name-transformation).
 
 ## More information
 

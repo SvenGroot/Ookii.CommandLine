@@ -1,9 +1,12 @@
 # Ookii.CommandLine [![NuGet](https://img.shields.io/nuget/v/Ookii.CommandLine)](https://www.nuget.org/packages/Ookii.CommandLine/)
 
 Ookii.CommandLine is a powerful and flexible command line argument parsing library for .Net
-applications. It allows you to easily define strongly-typed required, optional, positional and named
-arguments, parse the command line arguments, generate usage information, and write applications with
-subcommands.
+applications.
+
+- Easily define arguments by creating a class with properties.
+- Create applications with multiple subcommands.
+- Generate fully customizable usage help.
+- Supports PowerShell-like and POSIX-like parsing rules.</Description>
 
 Ookii.CommandLine is provided in versions for [.Net Standard 2.0, .Net Standard 2.1, and .Net 6.0
 and later](#requirements).
@@ -19,37 +22,39 @@ into a set of strongly-typed, named values. You can easily define the accepted a
 parse the command line supplied to your application for those arguments. In addition, you can
 generate usage help that can be displayed to the user.
 
-Ookii.CommandLine can be used with any kind of .Net application, whether console or GUI. Although a
-limited subset of functionality—particularly related around generating usage help text—is geared
-primarily towards console applications that are invoked from the command line, the main command line
-parsing functionality is usable in any application that needs to process command line arguments.
+Ookii.CommandLine can be used with any kind of .Net application, whether console or GUI. Some
+functions, such as creating usage help, are primarily designed for console applications, but even
+those can be easily adapted for use with other styles of applications.
 
-The [command line parsing rules](docs/Arguments.md) are similar to those used by PowerShell. Each
-argument has a name (case insensitive by default), and can be supplied by name on the command line.
-An argument can also be positional, in which case it can be supplied without the name. Arguments can
-be required or optional, and can be switch arguments (which don't need a value but are either
-present or not) or accept multiple values. Various aspects of the parsing behavior can be
-customized, and there is also support for a mode where arguments have long and short names with
-different prefixes.
+Two styles of [command line parsing rules](docs/Arguments.md) are supported: the default mode uses
+rules similar to those used by PowerShell, and the alternative [long/short mode](docs/Arguments.md#longshort-mode)
+uses a style influenced by POSIX conventions, where arguments have separate long and short names
+with different prefixes. Many aspects of the parsing rules are configurable.
 
-To define a set of command line arguments, you create a class that will hold their values. The
-constructor parameters and properties of that class determine which arguments are accepted.
-Attributes can be used to specify things such as the argument name and whether or not an argument is
-required or positional, and to specify descriptions used in the generated usage help.
+To determine which arguments are accepted, you create a class, with constructor parameters and
+properties that define the arguments. Attributes are used to specify names, create required or
+positional arguments, and to specify descriptions for use in the generated usage help.
 
 For example, the following class defines four arguments: a required positional argument, an optional
-positional argument, a named-only argument, and a switch argument:
+positional argument, a named-only argument, and a switch argument (sometimes also called a flag):
 
 ```csharp
 class MyArguments
 {
     [CommandLineArgument(Position = 0, IsRequired = true)]
+    [Description("A required positional argument.")]
     public string? Required { get; set; }
+
     [CommandLineArgument(Position = 1)]
+    [Description("An optional positional argument.")]
     public int Optional { get; set; }
+
     [CommandLineArgument]
+    [Description("An argument that can only supplied by name.")]
     public DateTime Named { get; set; }
+
     [CommandLineArgument]
+    [Description("A switch argument, which doesn't require a value.")]
     public bool Switch { get; set; }
 }
 ```
@@ -62,36 +67,49 @@ To parse these arguments, all you have to do is add the following line to your `
 var arguments = CommandLineParser.Parse<MyArguments>();
 ```
 
-And that's it! This code will take the arguments from `Environment.GetCommandLineArgs()` (you can
-also manually pass an `args` array if you want), will handle and print errors to the console, and
-will print usage help if needed. It returns an instance of `MyArguments` if successful, and `null`
-if not.
+This code will take the arguments from `Environment.GetCommandLineArgs()` (you can also manually
+pass a `string[]` array if you want), will handle and print errors to the console, and will print
+usage help if needed. It returns an instance of `MyArguments` if successful, and `null` if not.
 
 If the arguments are invalid, or help is requested, this application will print the following usage
 help:
 
 ```text
-Usage: MyApplication [-Required] <String> [[-Optional] <Number>] [-Help] [-Named <DateTime>]
+Usage: MyApplication [-Required] <String> [[-Optional] <Int32>] [-Help] [-Named <DateTime>]
    [-Switch] [-Version]
+
+    -Required <String>
+        A required positional argument.
+
+    -Optional <Int32>
+        An optional positional argument.
 
     -Help [<Boolean>] (-?, -h)
         Displays this help message.
+
+    -Named <DateTime>
+        An argument that can only supplied by name.
+
+    -Switch [<Boolean>]
+        A switch argument, which doesn't require a value.
 
     -Version [<Boolean>]
         Displays version information.
 ```
 
-The application has two arguments that weren't in the class, `-Help` and `-Version`, which are
-automatically added by default. No description is shown for the manually-defined arguments, because
-they don't have any descriptions; the usage help can be greatly expanded when you add descriptions
-and other metadata to your arguments. See the [documentation for the samples](src/Samples) for
-several full examples of usage help generated by Ookii.CommandLine. The usage help format can also
-be [fully customized](src/Samples/CustomUsage).
+The [usage help](docs/UsageHelp.md) includes the descriptions given for the arguments.
 
-An example invocation of this application, specifying all the arguments, would look like this:
+See the [documentation for the samples](src/Samples) for more examples of usage help generated by
+Ookii.CommandLine. The usage help format can also be [fully customized](src/Samples/CustomUsage).
+
+The application also has two arguments that weren't in the class, `-Help` and `-Version`, which are
+automatically added by default.
+
+An example invocation of this application, specifying all the arguments, would look like this
+(argument names are case insensitive by default):
 
 ```text
-./MyApplication foo 42 -Switch -Named 2022-08-14
+./MyApplication foo 42 -switch -named 2022-08-14
 ```
 
 In addition, Ookii.CommandLine can be used to create applications that have [multiple subcommands](docs/Subcommands.md),
@@ -132,6 +150,24 @@ Ookii.CommandLine uses a strongly-typed resources file, which will not update co
 I could not find a way to make this work correctly with both Visual Studio and the `dotnet` command.
 
 The class library documentation is generated using [Sandcastle Help File Builder](https://github.com/EWSoftware/SHFB).
+
+## Comparing with System.CommandLine
+
+Back when Ookii.CommandLine was first written, there was no official way to parse command line
+arguments; the only way was a third-party library, or do it yourself.
+
+Nowadays, System.CommandLine offers an official Microsoft solution for command line parsing. Why,
+then, should you use Ookii.CommandLine?
+
+Ookii.CommandLine has a very different design. It uses a declarative approach to defining command
+line arguments, using properties and attributes, which I personally prefer as it reduces the amount
+of code you typically need to write.
+
+Additionally, Ookii.CommandLine supports a more PowerShell-like syntax, as well as the more
+POSIX-like syntax that System.CommandLine uses).
+
+In the end, it comes down to personal preference. You should use whichever one suits your needs and
+coding style best.
 
 ## More information
 
