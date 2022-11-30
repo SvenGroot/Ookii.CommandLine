@@ -48,6 +48,7 @@
   "CommandLineArgumentAttribute.Position": "P_Ookii_CommandLine_CommandLineArgumentAttribute_Position",
   "CommandLineArgumentAttribute.ShortName": "P_Ookii_CommandLine_CommandLineArgumentAttribute_ShortName",
   "CommandLineArgumentAttribute.ValueDescription": "P_Ookii_CommandLine_CommandLineArgumentAttribute_ValueDescription",
+  "CommandLineArgumentErrorCategory": "T_Ookii_CommandLine_CommandLineArgumentErrorCategory",
   "CommandLineArgumentErrorCategory.ValidationFailed": "T_Ookii_CommandLine_CommandLineArgumentErrorCategory",
   "CommandLineArgumentException": "T_Ookii_CommandLine_CommandLineArgumentException",
   "CommandLineArgumentException.Category": "P_Ookii_CommandLine_CommandLineArgumentException_Category",
