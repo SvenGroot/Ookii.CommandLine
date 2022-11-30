@@ -25,11 +25,11 @@ command.
 
 ## Defining subcommands
 
-A subcommand class is essentially no different than a [regular arguments class](DefiningArguments.md).
-Arguments can be defined using its constructor parameters, properties and method, exactly as was
+A subcommand class is essentially the same as a [regular arguments class](DefiningArguments.md).
+Arguments can be defined using its constructor parameters, properties, and methods, exactly as was
 shown before.
 
-Subcommand classes have a few differences from regular arguments classes:
+Subcommand classes have the following differences from regular arguments classes:
 
 1. They must implement the [`ICommand`][] interface.
 2. They must use the [`CommandAttribute`][] attribute.
@@ -70,13 +70,13 @@ created using the [`CommandLineParser`][] as usual, using all the arguments exce
 Then, the [`ICommand.Run()`][] method will be called.
 
 All of the functionality and [options](#subcommand-options) available with regular arguments types
-is available with commands too, including [usage help generation](#subcommand-usage-help),
-[long/short mode](Arguments.md#longshort-mode), all types or arguments, validators, etc.
+are available with commands too, including [usage help generation](#subcommand-usage-help),
+[long/short mode](Arguments.md#longshort-mode), all kinds of arguments, validators, etc.
 
 ### Name transformation
 
 The sample above used the [`CommandAttribute`][] attribute to set an explicit name for the command. If
-no named is specified, the name is derived from the type name.
+no name is specified, the name is derived from the type name.
 
 ```csharp
 [Command]
@@ -137,7 +137,7 @@ class AsyncSleepCommand : AsyncCommandBase
 {
     [CommandLineArgument(Position = 0, DefaultValue = 1000)]
     [Description("The sleep time in milliseconds.")]
-    public int SleepTime;
+    public int SleepTime { get; set; };
 
     public override async Task<int> RunAsync()
     {
@@ -191,11 +191,11 @@ class DeleteCommand : DatabaseCommand
 }
 ```
 
-The two commands, `AddCommand` and `DeleteCommand` both inherit the `ConnectionString` argument, and
+The two commands, `AddCommand` and `DeleteCommand` both inherit the `-ConnectionString` argument, and
 add their own additional arguments.
 
-The `DatabaseCommand` class is not considered a subcommand by the [`CommandManager`][], because it does
-not have the [`CommandAttribute`][] attribute, and because it is abstract.
+The `DatabaseCommand` class is not considered a subcommand by the [`CommandManager`][], because it
+does not have the [`CommandAttribute`][] attribute, and because it is abstract.
 
 ### Custom parsing
 
@@ -268,14 +268,14 @@ This code does the following:
 1. Creates a command manager with default options, which looks for command classes in the assembly
    that called the constructor (the assembly containing `Main()`, in this case).
 2. Calls the [`RunCommand()`][] method, which:
-   1. Gets the arguments using [`Environment.GetCommandLineArgs()`][] (you can also pass a `string[]` array
-      to the [`RunCommand`][] method).
+   1. Gets the arguments using [`Environment.GetCommandLineArgs()`][] (you can also pass a
+      `string[]` array to the [`RunCommand`][] method).
    2. Uses the first argument to determine the command name.
-   3. Creates the command, and invokes the [`ICommand.Run()`][] method, and returns its return value.
-   4. If the command could not be created, for example because no command name was supplied, an unknown
-      command name was supplied, or an error occurred parsing the commands arguments, it will print
-      the error message and usage help, similar to the static [`CommandLineParser.Parse<T>()`][] method,
-      and return `null`.
+   3. Creates the command, invokes the [`ICommand.Run()`][] method, and returns its return value.
+   4. If the command could not be created, for example because no command name was supplied, an
+      unknown command name was supplied, or an error occurred parsing the command's arguments, it
+      will print the error message and usage help, similar to the static
+      [`CommandLineParser.Parse<T>()`][] method, and return null.
 3. If [`RunCommand()`][] returned null, returns an error exit code.
 
 > Note: the [`CommandManager`][] does not check if command names and aliases are unique. If you have
@@ -501,24 +501,27 @@ The following commands are available:
 Run 'Subcommand <command> -Help' for more information about a command.
 ```
 
-Usage help for a [`CommandManager`][] is also created using the [`UsageWriter`][], and can be customized
-by setting the subcommand-specific properties of that class. The sample above uses two of them:
-[`IncludeApplicationDescriptionBeforeCommandList`][] which causes the assembly description of the first
-assembly used by the [`CommandManager`][] to be printed before the command list, and [`IncludeCommandHelpInstruction`][], which prints the line at the bottom telling the user to use `-Help`.
+Usage help for a [`CommandManager`][] is also created using the [`UsageWriter`][], and can be
+customized by setting the subcommand-specific properties of that class. The sample above uses two of
+them: [`IncludeApplicationDescriptionBeforeCommandList`][], which causes the assembly description of
+the first assembly used by the [`CommandManager`][] to be printed before the command list, and
+[`IncludeCommandHelpInstruction`][], which prints the line at the bottom telling the user to use
+`-Help`.
 
 For the [`IncludeCommandHelpInstruction`][] option, the text will use the name of the automatic help
 argument, after applying the [`ParseOptions.ArgumentNameTransform`][] if one is set. If using
 [long/short mode](Arguments.md#longshort-mode), the long argument prefix is used. Note that the
 [`CommandManager`][] won't check if every command actually has an argument with that name, so only
-enable it if this is true (it's recommended to enable it if it is).
+enable it if this is true (it's recommended to enable it if possible).
 
 Other properties let you configure indentation and colors, among others.
 
 The actual help is created using a number of protected virtual methods on the [`UsageWriter`][], so
 this can be further customized by deriving your own class from the [`UsageWriter`][] class. Creating
 command list usage help is driven by the [`WriteCommandListUsageCore()`][] method. You can also
-override other methods to customize parts of the usage help, such as [`WriteCommandListUsageSyntax()`][],
-[`WriteCommandDescription()`][], and [`WriteCommandHelpInstruction()`][], to name just a few.
+override other methods to customize parts of the usage help, such as
+[`WriteCommandListUsageSyntax()`][], [`WriteCommandDescription()`][], and
+[`WriteCommandHelpInstruction()`][], to name just a few.
 
 ## Automatic commands
 
