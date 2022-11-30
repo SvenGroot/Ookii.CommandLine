@@ -27,7 +27,7 @@ error streams, automatically wrapping at the console width.
 > console.
 
 Lines will be wrapped at white-space characters only. If a line does not have a suitable place to
-wrap, it will be wrapped at maximum line length regardless.
+wrap, it will be wrapped at the maximum line length regardless.
 
 If you write virtual terminal sequences to a [`LineWrappingTextWriter`][], by default these will not be
 included when calculating the length of the current line, so inserting VT sequences, e.g. for
@@ -79,20 +79,22 @@ This line is not.
 
 ## Virtual terminal support
 
-Virtual terminal (VT) sequences are a method to manipulate the console utilized by many consoles. It
-is supported on recent versions of Windows, and most other platforms.
+Virtual terminal (VT) sequences are a method to manipulate the console utilized, supported by many
+console applications on many operating systems. It is supported by the console host on recent
+versions of Windows, by [Windows Terminal](https://learn.microsoft.com/windows/terminal/install),
+and many console applications on other platforms.
 
 A VT sequence consists of an escape character, followed by a string that specifies what action to
 take. They can be used to set colors and other formatting options, but also to do things like move
 the cursor.
 
-Ookii.CommandLine uses VT sequences to add color to the usage help, and error messages. To help
-you use color in your own application, and to customize the colors used by the [`UsageWriter`][], a
-few types are provided in the [`Ookii.CommandLine.Terminal`][] namespace.
+Ookii.CommandLine uses VT sequences to add color to the usage help and error messages. To let you
+customize the colors used by the [`UsageWriter`][], and to use color in your own console
+applications, a few types are provided in the [`Ookii.CommandLine.Terminal`][] namespace.
 
 The [`VirtualTerminal`][] class allows you to determine whether virtual terminal sequences are
-supported and to enable them. The [`UsageWriter`][] class uses this internally to enable color output
-where possible.
+supported, and to enable them. The [`UsageWriter`][] class uses this internally to enable color output
+when possible.
 
 The [`TextFormat`][] class provides a number of constants for the predefined background and foreground
 colors and formats supported by the console, as well as a method to create a VT sequence for any
@@ -118,9 +120,10 @@ Console.WriteLine();
 ```
 
 On Windows, VT support must be enabled for a process. In addition to checking for support, the
-[`EnableVirtualTerminalSequences()`][] and [`EnableColor()`][] methods also enables it if necessary, and
-they return a disposable type that will revert the console mode when disposed. On other platforms,
-it only checks for support and disposing the returned instance does nothing.
+[`EnableVirtualTerminalSequences()`][] and [`EnableColor()`][] methods also enable it if necessary,
+and they return a disposable type that will revert the console mode when disposed or garbage
+collected. On other platforms, it only checks for support and disposing the returned instance does
+nothing.
 
 ## TypeConverterBase\<T>
 
