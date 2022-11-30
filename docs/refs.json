@@ -54,6 +54,7 @@
   "CommandLineArgumentException.Category": "P_Ookii_CommandLine_CommandLineArgumentException_Category",
   "CommandLineConstructorAttribute": "T_Ookii_CommandLine_CommandLineConstructorAttribute",
   "CommandLineParser": "T_Ookii_CommandLine_CommandLineParser",
+  "CommandLineParser.GetUsage()": "M_Ookii_CommandLine_CommandLineParser_GetUsage",
   "CommandLineParser.HelpRequested": "P_Ookii_CommandLine_CommandLineParser_HelpRequested",
   "CommandLineParser.Parse()": [
     "M_Ookii_CommandLine_CommandLineParser_Parse_1",

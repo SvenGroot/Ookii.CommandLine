@@ -57,6 +57,8 @@ existing application.
     default.
   - Aliases and the default value are now shown in the usage help by default.
   - Changed the default format for how aliases are displayed.
+  - With the static [`Parse<T>()`][Parse<T>()_1] method, you can choose to show no or partial usage
+    help on error.
 - Updated and improved documentation.
 - More [samples](../src/Samples) with descriptions and explanations.
 - Various bug fixes.

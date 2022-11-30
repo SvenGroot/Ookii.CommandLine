@@ -7,14 +7,16 @@ Creating this kind of usage help text is tedious, and you must make sure it is k
 whenever you change the arguments to your application. Ookii.CommandLine generates this usage help
 text automatically, alleviating this problem.
 
-Usage help can be generated using the [`CommandLineParser.WriteUsage()`][] method. The output can be
-customized using the [`UsageWriter`][] class. By default, the [`CommandLineParser.WriteUsage()`][] method will
-write the usage help to the standard output stream, using the [`LineWrappingTextWriter`][] class to
-white-space wrap the text at the console width.
-
 If you use the static [`CommandLineParser.Parse<T>()`][] method, usage help will be printed
-automatically in the event the command line is invalid, or the "-Help" argument was used. In this
-case, you can customize the output using the [`ParseOptions.UsageWriter`][] property.
+automatically in the event the command line is invalid, or the `-Help` argument was used. You can
+customize the output using the [`ParseOptions.UsageWriter`][] property.
+
+If you don't use the static methods, you can print usage help can be generated using the
+[`CommandLineParser.WriteUsage()`][] method. By default, the [`CommandLineParser.WriteUsage()`][]
+method will write the usage help to the standard output stream, using the
+[`LineWrappingTextWriter`][] class to white-space wrap the text at the console width.
+
+You can also get a string with the usage help using the [`CommandLineParser.GetUsage()`][] method.
 
 The following example shows the usage help generated for the [parser sample](../src/Samples/Parser)
 application included with the Ookii.CommandLine library:
@@ -60,8 +62,8 @@ Usage: Parser [-Source] <String> [-Destination] <String> [[-OperationIndex] <Int
         Displays version information.
 ```
 
-The usage help consists of three components: the application description, the argument syntax, and
-the argument descriptions.
+The usage help consists of three main components: the application description, the argument syntax,
+and the argument descriptions.
 
 ## Application description
 
@@ -91,8 +93,8 @@ is specified the same way, by applying the [`DescriptionAttribute`][] to your co
 The argument syntax shows the arguments and their types, telling the user in short how your
 application can be invoked from the command line. The argument syntax typically starts with the name
 of the application executable, and is followed by all the arguments, indicating their name and type.
-There is an indication of which arguments are required or optional, and whether they allow multiple
-values.
+The syntax shows which arguments are required or optional, positional, and whether they allow
+multiple values.
 
 The order of the arguments in the usage syntax is as follows:
 
@@ -100,7 +102,7 @@ The order of the arguments in the usage syntax is as follows:
 2. Required positional arguments, in alphabetical order.
 3. The remaining arguments, in alphabetical order.
 
-The syntax for a single argument has the following format:
+The syntax for a single argument has the following default format:
 
 1. For a required, non-positional argument:
 
@@ -222,7 +224,7 @@ descriptions (this was the default behavior before version 3.0), all arguments, 
 description list entirely.
 
 You can also choose the sort order of the description list using the
-[`UsageWriter.ArgumentDescriptionListOrder`][]' property. This defaults to the same order as the
+[`UsageWriter.ArgumentDescriptionListOrder`][] property. This defaults to the same order as the
 usage syntax, but you can also choose to sort by ascending or descending long or short name.
 
 Since the static [`CommandLineParser.Parse<T>()`][] method will show usage help on error, if you have
@@ -230,7 +232,7 @@ a lot of arguments it may be necessary for the user to scroll up past the argume
 to see the error message to determine what was wrong with the command line. Since this may be
 inconvenient, you can choose to omit the argument description list, or the usage help entirely,
 when an error occurs, using the [`ParseOptions.ShowUsageOnError`][] property. In this case, the user
-will have to use the "-Help" argument to see the full help.
+will have to use the `-Help` argument to see the full help.
 
 ## Hidden arguments
 
@@ -239,12 +241,14 @@ an argument is deprecated, or part of preview functionality. For this purpose, y
 argument, which means that it can still be used, but won't be included in the usage syntax or
 argument description list.
 
-So hide an argument, use the [`CommandLineArgumentAttribute.IsHidden`][] property.
+To hide an argument, use the [`CommandLineArgumentAttribute.IsHidden`][] property.
 
 ```csharp
 [CommandLineArgument(IsHidden = true)]
 public int Argument { get; set; }
 ```
+
+Note that positional arguments cannot be hidden.
 
 ## Color output
 
@@ -263,17 +267,22 @@ preset colors, which can be customized using properties of the [`UsageWriter`][]
 of the constants of the [`TextFormat`][] class, or the return value of the [`GetExtendedColor()`][] method
 for any 24-bit color, or any other valid virtual terminal sequence.
 
-In order to support proper white-space wrapping text that contains virtual terminal sequences, the
-[`LineWrappingTextWriter`][] class will not count virtual terminal sequences as part of the line length.
+In order to support proper white-space wrapping for text that contains virtual terminal sequences,
+the [`LineWrappingTextWriter`][] class will not count virtual terminal sequences as part of the line
+length.
+
+The below is an example of the usage help with the default colors.
+
+![Usage help in color](images/color.png)
 
 ## Customizing the usage help
 
 The usage help can be heavily customized. We've already seen how it can be customized using things
-such as custom value descriptions, or various options of the [`UsageWriter`][] class. In addition to
-properties already mentioned, the latter also allows you control things such as the amount of
-indentation to use for the syntax and the description list, and the colors to use.
+such as custom value descriptions, or various properties of the [`UsageWriter`][] class. These can
+also be used to control the indentation of the text, what elements to include, and various small
+formatting changes such as whether to white space or the custom name/value separator.
 
-To provide further customization options, you can derive a class from the [`UsageWriter`][] class. The
+To customize the usage even further, you can derive a class from the [`UsageWriter`][] class. The
 [`UsageWriter`][] class has protected virtual methods for every part of the usage. These range from
 top-level methods like [`WriteParserUsageCore()`][] which drives the entire process, methods responsible
 for a section such as [`WriteParserUsageSyntax()`][] or [`WriteArgumentDescriptions()`][], methods
@@ -281,8 +290,8 @@ responsible for a single argument like [`WriteArgumentSyntax()`][] or [`WriteArg
 to methods that write single piece of text like [`WriteArgumentName()`][] or [`WriteValueDescription()`][].
 
 > The [`UsageWriter`][] class has several properties and methods that apply only to
-> [subcommands](Subcommands.md#subcommand-usage-help), so these will have no effect if you are not
-> using subcommands.
+> [subcommands](Subcommands.md#subcommand-usage-help), so setting or overriding these will have no
+> effect if you are not using subcommands.
 
 These methods call each other, so you can customize as little or as much as you like, depending on
 which methods you override. For example, if you want to use something other than angle brackets for
@@ -293,7 +302,7 @@ descriptions, override [`WriteArgumentDescription()`][WriteArgumentDescription()
 To specify a custom usage writer, assign it to the [`ParseOptions.UsageWriter`][] property.
 
 The [custom usage sample](../src/Samples/CustomUsage) uses a custom usage writer, as well as a
-custom [`LocalizedStringProvider`][] to radically alter the format of the usage help, as seen below.
+custom [`LocalizedStringProvider`][], to radically alter the format of the usage help, as seen below.
 
 ```text
 DESCRIPTION:
@@ -328,7 +337,7 @@ to your liking.
 
 ## Subcommand usage help
 
-Please see the [subcommands documentation](Subcommands.md) for information about their usage help.
+Please see the [subcommand documentation](Subcommands.md) for information about their usage help.
 
 Next, we'll take a look at [argument validation and dependencies](Validation.md).
 
@@ -366,3 +375,5 @@ Next, we'll take a look at [argument validation and dependencies](Validation.md)
 [`WriteValueDescription()`]: https://www.ookii.org/docs/commandline-3.0-preview/html/M_Ookii_CommandLine_UsageWriter_WriteValueDescription.htm
 [`WriteValueDescriptionForDescription()`]: https://www.ookii.org/docs/commandline-3.0-preview/html/M_Ookii_CommandLine_UsageWriter_WriteValueDescriptionForDescription.htm
 [WriteArgumentDescription()_1]: https://www.ookii.org/docs/commandline-3.0-preview/html/M_Ookii_CommandLine_UsageWriter_WriteArgumentDescription.htm
+
+[`CommandLineParser.GetUsage()`]: https://www.ookii.org/docs/commandline-3.0-preview/html/M_Ookii_CommandLine_CommandLineParser_GetUsage.htm
