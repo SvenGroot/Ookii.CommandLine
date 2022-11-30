@@ -255,6 +255,7 @@
   "TypeConverterAttribute": "#system.componentmodel.typeconverterattribute",
   "TypeConverterBase<T>": "T_Ookii_CommandLine_TypeConverterBase_1",
   "Uri": "#system.uri",
+  "UsageHelpRequest.SyntaxOnly": "T_Ookii_CommandLine_UsageHelpRequest",
   "UsageWriter": "T_Ookii_CommandLine_UsageWriter",
   "UsageWriter.ArgumentDescriptionListFilter": "P_Ookii_CommandLine_UsageWriter_ArgumentDescriptionListFilter",
   "UsageWriter.ArgumentDescriptionListOrder": "P_Ookii_CommandLine_UsageWriter_ArgumentDescriptionListOrder",
