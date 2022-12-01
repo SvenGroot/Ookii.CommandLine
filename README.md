@@ -162,8 +162,8 @@ Ookii.CommandLine has a very different design. It uses a declarative approach to
 line arguments, using properties and attributes, which I personally prefer as it reduces the amount
 of code you typically need to write.
 
-Additionally, Ookii.CommandLine supports a more PowerShell-like syntax, as well as the more
-POSIX-like syntax that System.CommandLine uses).
+Additionally, Ookii.CommandLine supports a more PowerShell-like syntax, as well as the POSIX-like
+syntax that System.CommandLine uses.
 
 In the end, it comes down to personal preference. You should use whichever one suits your needs and
 coding style best.
