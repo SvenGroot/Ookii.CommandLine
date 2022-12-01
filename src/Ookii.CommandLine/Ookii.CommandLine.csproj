@@ -21,7 +21,7 @@
 - Generate fully customizable usage help.
 - Supports PowerShell-like and POSIX-like parsing rules.</Description>
     <PackageTags>command line arguments parsing parser parse argument args console</PackageTags>
-    <PackageReleaseNotes>For details, please view: https://www.ookii.org/Link/CommandLineVersionHistory</PackageReleaseNotes>
+    <PackageReleaseNotes>This version contains breaking changes compared to version 2.x. For details, please view: https://www.ookii.org/Link/CommandLineVersionHistory</PackageReleaseNotes>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <PackageIcon>icon.png</PackageIcon>
