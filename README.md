@@ -6,7 +6,7 @@ applications.
 - Easily define arguments by creating a class with properties.
 - Create applications with multiple subcommands.
 - Generate fully customizable usage help.
-- Supports PowerShell-like and POSIX-like parsing rules.</Description>
+- Supports PowerShell-like and POSIX-like parsing rules.
 
 Ookii.CommandLine is provided in versions for [.Net Standard 2.0, .Net Standard 2.1, and .Net 6.0 and later](#requirements).
 
