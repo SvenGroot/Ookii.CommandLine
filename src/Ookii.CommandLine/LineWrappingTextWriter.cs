@@ -636,36 +636,35 @@ namespace Ookii.CommandLine
                     // If we already had a partial line break, write it now.
                     if (_hasPartialLineBreak)
                     {
-                        _baseWriter.WriteLine();
-                        _indentNextWrite = _currentLineLength != 0;
-                        _currentLineLength = 0;
+                        WriteLineBreakDirect();
+                    }
+                    else
+                    {
+                        _hasPartialLineBreak = true;
                     }
 
-                    _hasPartialLineBreak = true;
                     break;
 
                 case StringSegmentType.LineBreak:
                     // Write an extra line break if there was a partial one and this one isn't the
                     // end of that line break.
-                    if (_hasPartialLineBreak && (span.Length != 1 || span[0] != '\n'))
+                    if (_hasPartialLineBreak)
                     {
-                        _baseWriter.WriteLine();
-                        _currentLineLength = 0;
+                        _hasPartialLineBreak = false;
+                        if (span.Length != 1 || span[0] != '\n')
+                        {
+                            WriteLineBreakDirect();
+                        }
                     }
 
-                    _hasPartialLineBreak = false;
-                    _baseWriter.WriteLine();
-                    _indentNextWrite = _currentLineLength != 0;
-                    _currentLineLength = 0;
+                    WriteLineBreakDirect();
                     break;
 
                 default:
                     // If we had a partial line break, write it now.
                     if (_hasPartialLineBreak)
                     {
-                        _baseWriter.WriteLine();
-                        _indentNextWrite = _currentLineLength != 0;
-                        _currentLineLength = 0;
+                        WriteLineBreakDirect();
                         _hasPartialLineBreak = false;
                     }
 
@@ -675,6 +674,13 @@ namespace Ookii.CommandLine
                     break;
                 }
             });
+        }
+
+        private void WriteLineBreakDirect()
+        {
+            _baseWriter.WriteLine();
+            _indentNextWrite = _currentLineLength != 0;
+            _currentLineLength = 0;
         }
 
         private void WriteIndentDirectIfNeeded()
