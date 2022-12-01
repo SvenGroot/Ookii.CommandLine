@@ -7,7 +7,8 @@ using System.Globalization;
 namespace Ookii.CommandLine
 {
     /// <summary>
-    /// Static class providing constants for <see cref="KeyValuePairConverter{TKey, TValue}"/>.
+    /// Static class providing constants for the <see cref="KeyValuePairConverter{TKey, TValue}"/>
+    /// class.
     /// </summary>
     public static class KeyValuePairConverter
     {
@@ -18,46 +19,58 @@ namespace Ookii.CommandLine
     }
 
     /// <summary>
-    /// Converts key-value pairs to and from strings using key=value notation.
+    /// Converts key-value pairs to and from strings using "key=value" notation.
     /// </summary>
     /// <typeparam name="TKey">The type of the key.</typeparam>
     /// <typeparam name="TValue">The type of the value.</typeparam>
     /// <remarks>
     /// <para>
-    ///   This <see cref="TypeConverter"/> is used for dictionary command line arguments.
+    ///   This <see cref="TypeConverter"/> is used for dictionary command line arguments by default.
     /// </para>
     /// </remarks>
-    public class KeyValuePairConverter<TKey, TValue> : TypeConverter
+    public class KeyValuePairConverter<TKey, TValue> : TypeConverterBase<KeyValuePair<TKey, TValue?>>
     {
         private readonly TypeConverter _keyConverter;
         private readonly TypeConverter _valueConverter;
         private readonly string _argumentName;
         private readonly bool _allowNullValues;
         private readonly string _separator;
+        private readonly LocalizedStringProvider _stringProvider;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="KeyValuePairConverter{TKey, TValue}"/> class.
         /// </summary>
+        /// <param name="stringProvider">Provides a <see cref="LocalizedStringProvider"/> to get error messages.</param>
         /// <param name="argumentName">The name of the argument that this converter is for.</param>
-        /// <param name="allowNullValues">Indicates whether the value type accepts <see langword="null"/> values.</param>
+        /// <param name="allowNullValues">Indicates whether the type of the pair's value accepts <see langword="null"/> values.</param>
         /// <param name="keyConverterType">Provides an optional <see cref="TypeConverter"/> type to use to convert keys.
         /// If <see langword="null"/>, the default converter for <typeparamref name="TKey"/> is used.</param>
         /// <param name="valueConverterType">Provides an optional <see cref="TypeConverter"/> type to use to convert values.
         /// If <see langword="null"/>, the default converter for <typeparamref name="TValue"/> is used.</param>
         /// <param name="separator">Provides an optional custom key/value separator. If <see langword="null" />, the value
         /// of <see cref="KeyValuePairConverter.DefaultSeparator"/> is used.</param>
-        /// <exception cref="ArgumentNullException"><paramref name="argumentName"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="stringProvider"/> or <paramref name="argumentName"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentException"><paramref name="separator"/> is an empty string.</exception>
         /// <exception cref="NotSupportedException">Either the key or value <see cref="TypeConverter"/> does not support converting from a string.</exception>
-        public KeyValuePairConverter(string argumentName, bool allowNullValues, Type? keyConverterType, Type? valueConverterType, string? separator)
+        /// <remarks>
+        /// <para>
+        ///   If either <paramref name="keyConverterType"/> or <paramref name="valueConverterType"/> is <see langword="null"/>,
+        ///   conversion of those types is done using the rules outlined in the documentation for the <see cref="CommandLineArgument.ConvertToArgumentType(CultureInfo, string?)"/>
+        ///   method.
+        /// </para>
+        /// </remarks>
+        public KeyValuePairConverter(LocalizedStringProvider stringProvider, string argumentName, bool allowNullValues, Type? keyConverterType, Type? valueConverterType, string? separator)
         {
+            _stringProvider = stringProvider ?? throw new ArgumentNullException(nameof(stringProvider));
             _argumentName = argumentName ?? throw new ArgumentNullException(nameof(argumentName));
             _allowNullValues = allowNullValues;
-            _keyConverter = GetConverter(keyConverterType, typeof(TKey));
-            _valueConverter = GetConverter(valueConverterType, typeof(TValue));
+            _keyConverter = typeof(TKey).GetStringConverter(keyConverterType);
+            _valueConverter = typeof(TValue).GetStringConverter(valueConverterType);
             _separator = separator ?? KeyValuePairConverter.DefaultSeparator;
             if (_separator.Length == 0)
+            {
                 throw new ArgumentException(Properties.Resources.EmptyKeyValueSeparator, nameof(separator));
+            }
         }
 
         /// <summary>
@@ -65,112 +78,42 @@ namespace Ookii.CommandLine
         /// </summary>
         /// <exception cref="NotSupportedException">Either the key or value <see cref="TypeConverter"/> does not support converting from a string.</exception>
         public KeyValuePairConverter()
-            : this(string.Empty, true, null, null, null)
+            : this(new LocalizedStringProvider(), string.Empty, true, null, null, null)
         {
         }
 
+        /// <inheritdoc />
         /// <summary>
-        /// Returns whether this converter can convert an object of the given type to the type of this converter, using the specified context.
+        /// Converts from a string to the type of this converter.
         /// </summary>
-        /// <param name="context">An <see cref="T:System.ComponentModel.ITypeDescriptorContext"/> that provides a format context.</param>
-        /// <param name="sourceType">A <see cref="T:System.Type"/> that represents the type you want to convert from.</param>
-        /// <returns>
-        /// <see langword="true"/> if this converter can perform the conversion; otherwise, <see langword="false"/>.
-        /// </returns>
-        public override bool CanConvertFrom(ITypeDescriptorContext? context, Type sourceType)
+        /// <exception cref="FormatException">The <paramref name="value"/> could not be converted.</exception>
+        protected override KeyValuePair<TKey, TValue?> Convert(ITypeDescriptorContext? context, CultureInfo? culture, string value)
         {
-            if( sourceType == typeof(string) )
-                return true;
-            else
-                return base.CanConvertFrom(context, sourceType);
-        }
-
-        /// <summary>
-        /// Returns whether this converter can convert the object to the specified type, using the specified context.
-        /// </summary>
-        /// <param name="context">An <see cref="T:System.ComponentModel.ITypeDescriptorContext"/> that provides a format context.</param>
-        /// <param name="destinationType">A <see cref="T:System.Type"/> that represents the type you want to convert to.</param>
-        /// <returns>
-        /// <see langword="true"/> if this converter can perform the conversion; otherwise, <see langword="false"/>.
-        /// </returns>
-        public override bool CanConvertTo(ITypeDescriptorContext? context, Type? destinationType)
-        {
-            if( destinationType == typeof(string) )
-                return true;
-            else
-                return base.CanConvertTo(context, destinationType);
-        }
-
-        /// <summary>
-        /// Converts the given object to the type of this converter, using the specified context and culture information.
-        /// </summary>
-        /// <param name="context">An <see cref="T:System.ComponentModel.ITypeDescriptorContext"/> that provides a format context.</param>
-        /// <param name="culture">The <see cref="T:System.Globalization.CultureInfo"/> to use as the current culture.</param>
-        /// <param name="value">The <see cref="T:System.Object"/> to convert.</param>
-        /// <returns>
-        /// An <see cref="T:System.Object"/> that represents the converted value.
-        /// </returns>
-        /// <exception cref="T:System.NotSupportedException">
-        /// The conversion cannot be performed.
-        /// </exception>
-        public override object? ConvertFrom(ITypeDescriptorContext? context, System.Globalization.CultureInfo? culture, object value)
-        {
-            var stringValue = value as string;
-            if( stringValue != null )
+            var (key, valueForKey) = value.SplitOnce(_separator);
+            if (valueForKey == null)
             {
-                int index = stringValue.IndexOf(_separator);
-                if( index < 0 )
-                    throw new FormatException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.NoKeyValuePairSeparatorFormat, _separator));
-
-                string key = stringValue.Substring(0, index);
-                string valueForKey = stringValue.Substring(index + _separator.Length);
-                object? convertedKey = _keyConverter.ConvertFromString(context, culture, key);
-                object? convertedValue = _valueConverter.ConvertFromString(context, culture, valueForKey);
-                if (convertedKey == null || (!_allowNullValues && convertedValue == null))
-                    throw new CommandLineArgumentException(String.Format(CultureInfo.CurrentCulture, Properties.Resources.NullArgumentValueFormat, _argumentName), _argumentName, CommandLineArgumentErrorCategory.NullArgumentValue);
-
-                return new KeyValuePair<TKey, TValue?>((TKey)convertedKey, (TValue?)convertedValue);
+                throw new FormatException(_stringProvider.MissingKeyValuePairSeparator(_separator));
             }
 
-            return base.ConvertFrom(context, culture, value);
+            object? convertedKey = _keyConverter.ConvertFromString(context, culture, key);
+            object? convertedValue = _valueConverter.ConvertFromString(context, culture, valueForKey);
+            if (convertedKey == null || (!_allowNullValues && convertedValue == null))
+            {
+                throw _stringProvider.CreateException(CommandLineArgumentErrorCategory.NullArgumentValue, _argumentName);
+            }
+
+            return new((TKey)convertedKey, (TValue?)convertedValue);
         }
 
-        /// <summary>
-        /// Converts the given value object to the specified type, using the specified context and culture information.
-        /// </summary>
-        /// <param name="context">An <see cref="T:System.ComponentModel.ITypeDescriptorContext"/> that provides a format context.</param>
-        /// <param name="culture">A <see cref="T:System.Globalization.CultureInfo"/>. If null is passed, the current culture is assumed.</param>
-        /// <param name="value">The <see cref="T:System.Object"/> to convert.</param>
-        /// <param name="destinationType">The <see cref="T:System.Type"/> to convert the <paramref name="value"/> parameter to.</param>
+        /// <inheritdoc/>
         /// <returns>
-        /// An <see cref="T:System.Object"/> that represents the converted value.
+        /// A string representing the object.
         /// </returns>
-        /// <exception cref="T:System.ArgumentNullException">
-        /// The <paramref name="destinationType"/> parameter is null.
-        /// </exception>
-        /// <exception cref="T:System.NotSupportedException">
-        /// The conversion cannot be performed.
-        ///   </exception>
-        public override object? ConvertTo(ITypeDescriptorContext? context, CultureInfo? culture, object? value, Type destinationType)
+        protected override string? Convert(ITypeDescriptorContext? context, CultureInfo? culture, KeyValuePair<TKey, TValue?> value)
         {
-            if( destinationType == null )
-                throw new ArgumentNullException(nameof(destinationType));
-            if (value == null)
-                throw new ArgumentNullException(nameof(value));
-
-            KeyValuePair<TKey, TValue> pair = (KeyValuePair<TKey, TValue>)value;
-            if( destinationType == typeof(string) )
-                return _keyConverter.ConvertToString(context, culture, pair.Key) + "=" + _valueConverter.ConvertToString(context, culture, pair.Value);
-
-            return base.ConvertTo(context, culture, value, destinationType);
+            var key = _keyConverter.ConvertToString(context, culture, value.Key);
+            var valueString = _keyConverter.ConvertToString(context, culture, value.Value);
+            return key + _separator + valueString;
         }
-
-        private static TypeConverter GetConverter(Type? converterType, Type type)
-        {
-            TypeConverter converter = converterType == null ? TypeDescriptor.GetConverter(type) : (TypeConverter)Activator.CreateInstance(converterType)!;
-            if( converter == null || !(converter.CanConvertFrom(typeof(string)) && converter.CanConvertTo(typeof(string))) )
-                throw new NotSupportedException(string.Format(CultureInfo.InvariantCulture, Properties.Resources.NoTypeConverterFormat, type));
-            return converter;
-        }    
     }
 }

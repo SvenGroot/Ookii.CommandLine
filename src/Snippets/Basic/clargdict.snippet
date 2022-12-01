@@ -11,7 +11,7 @@
         Snippet for creating a dictionary command line argument for use with Ookii.CommandLine.
       </Description>
       <HelpUrl>
-        http://ookiicommandline.codeplex.com
+        https://github.com/SvenGroot/ookii.commandline
       </HelpUrl>
       <Shortcut>clargdict</Shortcut>
     </Header>
@@ -45,11 +45,18 @@
           <Function>
           </Function>
         </Literal>
+        <Literal Editable="true">
+          <ID>Description</ID>
+          <ToolTip>The argument description</ToolTip>
+          <Default>Argument description.</Default>
+          <Function>
+          </Function>
+        </Literal>
       </Declarations>
       <References>
         <Reference>
           <Assembly>Ookii.CommandLine.dll</Assembly>
-          <Url>http://ookiicommandline.codeplex.com</Url>
+          <Url>https://github.com/SvenGroot/ookii.commandline</Url>
         </Reference>
       </References>
       <Imports>
@@ -57,19 +64,16 @@
           <Namespace>System.Collections.Generic</Namespace>
         </Import>
         <Import>
+          <Namespace>System.ComponentModel</Namespace>
+        </Import>
+        <Import>
           <Namespace>Ookii.CommandLine</Namespace>
         </Import>
       </Imports>
       <Code Language="VB">
-        <![CDATA[Private Readonly $FieldName$ As New Dictionary(Of $KeyType$, $ValueType$)
-
-<CommandLineArgument>
-Public ReadOnly Property $Name$ As IDictionary(Of $KeyType$, $ValueType$)
-    Get
-        Return $FieldName$
-    End Get
-End Property]]>
-      </Code>
+          <![CDATA[<CommandLineArgument>
+<Description("$Description$")>
+Public ReadOnly Property $Name$ As Dictionary(Of $KeyType$, $ValueType$)]]></Code>
     </Snippet>
   </CodeSnippet>
 </CodeSnippets>

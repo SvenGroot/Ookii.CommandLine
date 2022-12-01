@@ -4,7 +4,7 @@ using System;
 namespace Ookii.CommandLine
 {
     /// <summary>
-    /// Defines a custom key-value separator for dictionary arguments.
+    /// Defines a custom key/value separator for dictionary arguments.
     /// </summary>
     /// <remarks>
     /// <para>
@@ -14,7 +14,7 @@ namespace Ookii.CommandLine
     /// </para>
     /// <para>
     ///   This attribute is ignored if the dictionary argument uses the <see cref="System.ComponentModel.TypeConverterAttribute"/>
-    ///   attribute.
+    ///   attribute, or if the argument is not a dictionary argument.
     /// </para>
     /// </remarks>
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Parameter)]
@@ -31,10 +31,14 @@ namespace Ookii.CommandLine
         public KeyValueSeparatorAttribute(string separator)
         {
             if (separator == null)
+            {
                 throw new ArgumentNullException(nameof(separator));
+            }
 
             if (separator.Length == 0)
+            {
                 throw new ArgumentException(Properties.Resources.EmptyKeyValueSeparator, nameof(separator));
+            }
 
             _separator = separator;
         }

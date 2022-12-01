@@ -94,6 +94,34 @@
       <IncludeInVSIX>true</IncludeInVSIX>
       <VSIXSubPath>OokiiCommandLineVB</VSIXSubPath>
     </Content>
+    <Content Include="CSharp\clargswitch.snippet">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+      <VSIXSubPath>OokiiCommandLineCS</VSIXSubPath>
+    </Content>
+    <Content Include="CSharp\clcmd.snippet">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+      <VSIXSubPath>OokiiCommandLineCS</VSIXSubPath>
+    </Content>
+    <Content Include="Basic\clargswitch.snippet">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <VSIXSubPath>OokiiCommandLineVB</VSIXSubPath>
+    </Content>
+    <Content Include="Basic\clcmd.snippet">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <VSIXSubPath>OokiiCommandLineVB</VSIXSubPath>
+    </Content>
+    <Content Include="CSharp\clcmdasync.snippet">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <VSIXSubPath>OokiiCommandLineCS</VSIXSubPath>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Basic\clcmdasync.snippet">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <VSIXSubPath>OokiiCommandLineVB</VSIXSubPath>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
     <None Include="source.extension.vsixmanifest">
       <SubType>Designer</SubType>
     </None>

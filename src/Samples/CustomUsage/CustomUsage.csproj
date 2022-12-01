@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <Description>Command line parsing sample for Ookii.CommandLine, using customized usage help.</Description>
+    <Copyright>Copyright (c) Sven Groot (Ookii.org)
+This is sample code, so you can use it freely.</Copyright>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Ookii.CommandLine\Ookii.CommandLine.csproj" />
+  </ItemGroup>
+
+</Project>

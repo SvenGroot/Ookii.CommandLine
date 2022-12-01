@@ -11,7 +11,7 @@
         Snippet for creating a command line arguments class for use with Ookii.CommandLine.
       </Description>
       <HelpUrl>
-        http://ookiicommandline.codeplex.com
+        https://github.com/SvenGroot/ookii.commandline
       </HelpUrl>
       <Shortcut>clargclass</Shortcut>
     </Header>
@@ -24,30 +24,37 @@
           <Function>
           </Function>
         </Literal>
+        <Literal Editable="true">
+          <ID>Description</ID>
+          <ToolTip>The application description</ToolTip>
+          <Default>Application description.</Default>
+          <Function>
+          </Function>
+        </Literal>
       </Declarations>
       <References>
         <Reference>
           <Assembly>Ookii.CommandLine.dll</Assembly>
-          <Url>http://ookiicommandline.codeplex.com</Url>
+          <Url>https://github.com/SvenGroot/ookii.commandline</Url>
         </Reference>
       </References>
       <Imports>
         <Import>
           <Namespace>Ookii.CommandLine</Namespace>
         </Import>
+        <Import>
+          <Namespace>System.ComponentModel</Namespace>
+        </Import>
       </Imports>
-      <Code Language="VB">
-        <![CDATA[Class $Name$
+      <Code Language="VB"><![CDATA[<Description("$Description$")>
+Class $Name$
     ' <CommandLineArgument(Position:=0, IsRequired:=True)>
+    ' <Description("Argument description")>
     ' Public Property SampleArgument As String
 
-    Public Shared Function Create(ByVal args() As String) As $Name$
-        ' Customize the parsing behavior by changing the options.
-        Dim options As New ParseOptions With {
-            .Culture = System.Globalization.CultureInfo.CurrentCulture
-        }
-
-        return CommandLineParser.Parse(Of $Name$)(args, options)
+    Public Shared Function Parse() As $Name$
+        ' Parse the arguments from Environment.GetCommandLineArgs().
+        return CommandLineParser.Parse(Of $Name$)()
     End Function
 End Class]]>
       </Code>

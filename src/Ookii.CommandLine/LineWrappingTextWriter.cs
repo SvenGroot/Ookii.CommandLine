@@ -1,14 +1,21 @@
 ﻿// Copyright (c) Sven Groot (Ookii.org)
+using Ookii.CommandLine.Terminal;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Linq;
 using System.Text;
+#if NET6_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+using StringSpan = System.ReadOnlySpan<char>;
+#endif
 
 namespace Ookii.CommandLine
 {
     /// <summary>
-    /// Implements a <see cref="TextWriter"/> that writes text to another <see cref="TextWriter"/>, wrapping
-    /// lines at word boundaries at a specific maximum line length.
+    /// Implements a <see cref="TextWriter"/> that writes text to another <see cref="TextWriter"/>,
+    /// white-space wrapping lines at the specified maximum line length, and supporting indentation.
     /// </summary>
     /// <remarks>
     /// <para>
@@ -16,10 +23,12 @@ namespace Ookii.CommandLine
     ///   the length of the buffered data exceeds the value of the <see cref="MaximumLineLength"/> property.
     /// </para>
     /// <para>
-    ///   If the length of the buffered data exceeds the value of the <see cref="MaximumLineLength"/> property, the
-    ///   <see cref="LineWrappingTextWriter"/> will attempt to find a white space character to break the line at. If such a white space character
-    ///   is found, everything before that character is output to the <see cref="BaseWriter"/>, and everything after that character is kept
-    ///   in the buffer. The white space character itself is not written to the output.
+    ///   If the length of the buffered data exceeds the value of the <see cref="MaximumLineLength"/>
+    ///   property, the <see cref="LineWrappingTextWriter"/> will attempt to find a white-space
+    ///   character to break the line at. If such a white-space character is found, everything
+    ///   before that character is output to the <see cref="BaseWriter"/> followed by a line ending,
+    ///   and everything after that character is kept in the buffer. The white-space character
+    ///   itself is not written to the output.
     /// </para>
     /// <para>
     ///   If no suitable place to break the line could be found, the line is broken at the maximum line length. This may occur in the middle
@@ -37,83 +46,284 @@ namespace Ookii.CommandLine
     /// </para>
     /// <para>
     ///   The <see cref="ResetIndent"/> property can be used to move the output position back to the beginning of the line. If the buffer is
-    ///   not empty, is is first flushed and indentation is reset to zero on the next line. After the next line break, indentation will again
+    ///   not empty, is first flushed and indentation is reset to zero on the next line. After the next line break, indentation will again
     ///   be set to the value of the <see cref="Indent"/> property.
+    /// </para>
+    /// <para>
+    ///   If there is no maximum line length, output is written directly to the <see cref="BaseWriter"/>
+    ///   and buffering does not occur. Indentation is still inserted as appropriate.
     /// </para>
     /// </remarks>
     public class LineWrappingTextWriter : TextWriter
     {
         #region Nested types
 
-        // We want to use the same code for either Write(char[]) and Write(string), without allocating a new char[] or string for either, so we provide this helper to access one or the other
-        private struct StringBuffer
+        [DebuggerDisplay("Type = {Type}, ContentLength = {ContentLength}, Length = {Length}")]
+        private struct Segment
         {
-            private readonly string? _stringValue;
-            private readonly char[]? _charArrayValue;
-
-            public StringBuffer(string stringValue)
+            public Segment(StringSegmentType type, int length)
             {
-                _stringValue = stringValue;
-                _charArrayValue = null;
+                Type = type;
+                Length = length;
             }
 
-            public StringBuffer(char[] charArrayValue)
+            public StringSegmentType Type { get; set; }
+            public int Length { get; set; }
+
+            public int ContentLength => IsContent(Type) ? Length : 0;
+
+            public static bool IsContent(StringSegmentType type)
+                => type is not (StringSegmentType.Formatting or StringSegmentType.PartialFormatting or StringSegmentType.PartialLineBreak);
+
+        }
+
+        private class LineBuffer
+        {
+            private readonly RingBuffer _buffer;
+            private readonly List<Segment> _segments = new();
+
+            public LineBuffer(int capacity)
             {
-                _stringValue = null;
-                _charArrayValue = charArrayValue;
+                _buffer = new(capacity);
             }
 
-            public char this[int index]
-            {
-                get { return _stringValue == null ? _charArrayValue![index] : _stringValue[index]; }
-            }
+            public int ContentLength { get; private set; }
 
-            public char[] Characters => _charArrayValue ?? _stringValue!.ToCharArray();
+            public bool IsEmpty { get; private set; } = true;
 
-            public int IndexOfLineBreak(int index, int count)
+            public int Indentation { get; set; }
+
+            public int LineLength => ContentLength + Indentation;
+
+            public void Append(StringSpan span, StringSegmentType type)
             {
-                if( _stringValue == null )
+                Debug.Assert(type != StringSegmentType.LineBreak);
+
+                // If we got here, we know the line length is not overflowing, so copy everything
+                // except partial linebreaks into the buffer.
+                if (type != StringSegmentType.PartialLineBreak)
                 {
-                    int end = index + count;
-                    for( int x = index; x < end; ++x )
+                    _buffer.CopyFrom(span);
+                }
+
+                if (LastSegment is Segment last)
+                {
+                    if (last.Type == type)
                     {
-                        if( _charArrayValue![x] == '\r' || _charArrayValue[x] == '\n' )
-                            return x;
+                        last.Length += span.Length;
+                        _segments[_segments.Count - 1] = last;
+                        if (Segment.IsContent(type))
+                        {
+                            ContentLength += span.Length;
+                        }
+
+                        return;
                     }
-                    return -1;
+                    else if (last.Type == StringSegmentType.PartialFormatting)
+                    {
+                        if (type == StringSegmentType.Text)
+                        {
+                            FindPartialFormattingEnd(last, span.Length);
+                            return;
+                        }
+                        else
+                        {
+                            // If this is not a text segment, we never found the end of the formatting,
+                            // so just treat everything up to now as formatting.
+                            last.Type = StringSegmentType.Formatting;
+                            _segments[_segments.Count - 1] = last;
+                        }
+                    }
                 }
-                else
-                    return _stringValue.IndexOfAny(_lineBreakCharacters, index, count);
+
+                var segment = new Segment(type, span.Length);
+                _segments.Add(segment);
+                var contentLength = segment.ContentLength;
+                ContentLength += contentLength;
+                if (contentLength > 0)
+                {
+                    IsEmpty = false;
+                }
             }
 
-            public int SkipLineBreak(int index, int end)
+            public Segment? LastSegment => _segments.Count > 0 ? _segments[_segments.Count - 1] : null;
+
+            public bool HasPartialFormatting => LastSegment is Segment last && last.Type == StringSegmentType.PartialFormatting;
+
+            public void FlushTo(TextWriter writer, int indent)
             {
-                Debug.Assert(index < end);
-                Debug.Assert(this[index] == '\r' || this[index] == '\n');
-                if (this[index] == '\r' && index + 1 < end && this[index + 1] == '\n')
-                    return index + 2; // Windows line ending
-                else
-                    return index + 1;
+                if (!IsEmpty)
+                {
+                    WriteLineTo(writer, indent);
+                }
             }
 
-            public void WriteLine(TextWriter writer, char[] tempStorage, int index, int count)
+            public void WriteLineTo(TextWriter writer, int indent)
             {
-                if( _stringValue == null )
-                    writer.WriteLine(_charArrayValue!, index, count);
+                if (!IsEmpty)
+                {
+                    WriteSegments(writer, _segments);
+                }
+
+                writer.WriteLine();
+                ClearCurrentLine(indent);
+            }
+
+            public bool CheckAndRemovePartialLineBreak()
+            {
+                if (LastSegment is Segment last && last.Type == StringSegmentType.PartialLineBreak)
+                {
+                    _segments.RemoveAt(_segments.Count - 1);
+                    return true;
+                }
+
+                return false;
+            }
+
+            private void FindPartialFormattingEnd(Segment lastSegment, int newLength)
+            {
+                var offset = _segments.Take(_segments.Count - 1).Sum(s => s.Length);
+                var (first, second) = _buffer.GetContents(offset);
+                int index = VirtualTerminal.FindSequenceEnd(first.Slice(1), second);
+                if (index < 0)
+                {
+                    // No ending found, concatenate this to the last segment.
+                    lastSegment.Length += newLength;
+                    _segments[_segments.Count - 1] = lastSegment;
+                }
                 else
                 {
-                    // Use temp storage to avoid allocating a new string with substring
-                    _stringValue.CopyTo(index, tempStorage, 0, count);
-                    writer.WriteLine(tempStorage, 0, count);
+                    // Concatenate the rest of the formatting.
+                    var remaining = newLength - (index - lastSegment.Length);
+                    lastSegment.Length = index;
+                    lastSegment.Type = StringSegmentType.Formatting;
+                    _segments[_segments.Count - 1] = lastSegment;
+                    if (remaining > 0)
+                    {
+                        _segments.Add(new Segment(StringSegmentType.Text, remaining));
+                        ContentLength += remaining;
+                    }
                 }
             }
 
-            public void CopyTo(int sourceIndex, char[] destination, int destinationIndex, int count)
+            private void WriteSegments(TextWriter writer, IEnumerable<Segment> segments)
             {
-                if( _stringValue == null )
-                    Array.Copy(_charArrayValue!, sourceIndex, destination, destinationIndex, count);
+                WriteIndent(writer, Indentation);
+                foreach (var segment in segments)
+                {
+                    switch (segment.Type)
+                    {
+                    case StringSegmentType.PartialLineBreak:
+                    case StringSegmentType.LineBreak:
+                        writer.WriteLine();
+                        break;
+
+                    default:
+                        _buffer.WriteTo(writer, segment.Length);
+                        break;
+                    }
+                }
+            }
+
+            public StringSpan BreakLine(TextWriter writer, StringSpan newSegment, int maxLength, int indent)
+            {
+                if (!BreakLine(writer, newSegment, maxLength, indent, false, out var remaining))
+                {
+                    // Guaranteed to succeed with force=true.
+                    var result = BreakLine(writer, newSegment, maxLength, indent, true, out remaining);
+                    Debug.Assert(result);
+                }
+
+                return remaining;
+            }
+
+            // Use an out param because StringSpan is ReadOnlySpan<char> on .Net 6.
+            private bool BreakLine(TextWriter writer, StringSpan newSegment, int maxLength, int indent, bool force, out StringSpan remaining)
+            {
+                Debug.Assert(LineLength <= maxLength || newSegment.Length == 0);
+
+                if (newSegment.BreakLine(maxLength - LineLength, force, out var splits))
+                {
+                    var (before, after) = splits;
+                    WriteSegments(writer, _segments);
+                    before.WriteTo(writer);
+                    writer.WriteLine();
+                    ClearCurrentLine(indent);
+                    Indentation = indent;
+                    remaining = after;
+                    return true;
+                }
+
+                if (IsEmpty)
+                {
+                    remaining = default;
+                    return false;
+                }
+
+                int offset = 0;
+                int contentOffset = 0;
+                foreach (var segment in _segments)
+                {
+                    offset += segment.Length;
+                    contentOffset += segment.ContentLength;
+                }
+
+                for (int segmentIndex = _segments.Count - 1; segmentIndex >= 0; segmentIndex--)
+                {
+                    var segment = _segments[segmentIndex];
+                    offset -= segment.Length;
+                    contentOffset -= segment.ContentLength;
+                    if (segment.Type != StringSegmentType.Text || contentOffset > maxLength)
+                    {
+                        continue;
+                    }
+
+                    int breakIndex = _buffer.BreakLine(offset, Math.Min(segment.Length, maxLength - contentOffset));
+                    if (breakIndex >= 0)
+                    {
+                        WriteSegments(writer, _segments.Take(segmentIndex));
+                        breakIndex -= offset;
+                        _buffer.WriteTo(writer, breakIndex);
+                        _buffer.Discard(1);
+                        writer.WriteLine();
+                        if (breakIndex + 1 < segment.Length)
+                        {
+                            _segments.RemoveRange(0, segmentIndex);
+                            segment.Length -= breakIndex + 1;
+                            _segments[0] = segment;
+                        }
+                        else
+                        {
+                            _segments.RemoveRange(0, segmentIndex + 1);
+                        }
+
+                        ContentLength = _segments.Sum(s => s.ContentLength);
+                        IsEmpty = (ContentLength == 0); // Can I get rid of IsEmpty?
+                        Indentation = indent;
+                        remaining = newSegment;
+                        return true;
+                    }
+                }
+
+                remaining = default;
+                return false;
+            }
+
+            public void ClearCurrentLine(int indent)
+            {
+                _segments.Clear();
+                ContentLength = 0;
+                if (!IsEmpty)
+                {
+                    Indentation = indent;
+                }
                 else
-                    _stringValue.CopyTo(sourceIndex, destination, destinationIndex, count);
+                {
+                    Indentation = 0;
+                }
+
+                // This line contains no content, only (possibly) indentation.
+                IsEmpty = true;
             }
         }
 
@@ -122,16 +332,16 @@ namespace Ookii.CommandLine
         private const char IndentChar = ' ';
 
         private readonly TextWriter _baseWriter;
+        private readonly LineBuffer? _lineBuffer;
         private readonly bool _disposeBaseWriter;
         private readonly int _maximumLineLength;
-        private readonly char[]? _currentLine;
-        private int _currentLineLength;
-        private bool _isLineEmpty = true;
-        private static readonly char[] _lineBreakCharacters = { '\r', '\n' };
+        private readonly bool _countFormatting;
         private int _indent;
 
         // Used for indenting when there is no maximum line length.
-        private bool _indentNextWrite = false;
+        private bool _indentNextWrite;
+        private int _currentLineLength;
+        private bool _hasPartialLineBreak;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="LineWrappingTextWriter"/> class.
@@ -139,13 +349,18 @@ namespace Ookii.CommandLine
         /// <param name="baseWriter">The <see cref="TextWriter"/> to which to write the wrapped output.</param>
         /// <param name="maximumLineLength">The maximum length of a line, in characters; a value of less than 1 or larger than 65536 means there is no maximum line length.</param>
         /// <param name="disposeBaseWriter">If set to <see langword="true"/> the <paramref name="baseWriter"/> will be disposed when the <see cref="LineWrappingTextWriter"/> is disposed.</param>
+        /// <param name="countFormatting">
+        ///   If set to <see langword="false"/>, virtual terminal sequences used to format the text
+        ///   will not be counted as part of the line length, and will therefore not affect where
+        ///   the text is wrapped. The default value is <see langword="false"/>.
+        /// </param>
         /// <exception cref="ArgumentNullException">
         ///   <paramref name="baseWriter"/> is <see langword="null" />.
         /// </exception>
         /// <remarks>
         /// <para>
         ///   The largest <paramref name="maximumLineLength"/> value supported is 65535. Above that, line length is considered to be unbounded. This is done
-        ///   to avoid having to allocate very large buffers to support these long line lengths.
+        ///   to avoid having to buffer large amounts of data to support these long line lengths.
         /// </para>
         /// <para>
         ///   If you want to write to the console, use <see cref="Console.Out"/> or <see cref="Console.Error"/> as the <paramref name="baseWriter"/> and
@@ -153,25 +368,21 @@ namespace Ookii.CommandLine
         ///   subtract one from the window width, additional empty lines can be printed if a line is exactly the width of the console. You can easily create a <see cref="LineWrappingTextWriter"/>
         ///   that writes to the console by using the <see cref="ForConsoleOut"/> and <see cref="ForConsoleError"/> methods.
         /// </para>
-        /// <para>
-        ///   When the console output is redirected to a file, Microsoft .Net will still report the console's actual window width, but on Mono
-        ///   the value of <see cref="Console.WindowWidth"/> will be 0. In that case, the <see cref="LineWrappingTextWriter"/> will use no
-        ///   line limit.
-        /// </para>
         /// </remarks>
-        public LineWrappingTextWriter(TextWriter baseWriter, int maximumLineLength, bool disposeBaseWriter)
+        public LineWrappingTextWriter(TextWriter baseWriter, int maximumLineLength, bool disposeBaseWriter = true, bool countFormatting = false)
             : base(baseWriter?.FormatProvider)
         {
-            if( baseWriter == null )
-                throw new ArgumentNullException(nameof(baseWriter));
-
-            _baseWriter = baseWriter;
+            _baseWriter = baseWriter ?? throw new ArgumentNullException(nameof(baseWriter));
             base.NewLine = baseWriter.NewLine;
-            // We interpret anything larger than 65535 to mean infinite length to avoid allocating a buffer that size.
-            _maximumLineLength = (maximumLineLength < 1 || maximumLineLength > UInt16.MaxValue) ? 0 : maximumLineLength;
+            // We interpret anything larger than 65535 to mean infinite length to avoid buffering that much.
+            _maximumLineLength = (maximumLineLength is < 1 or > ushort.MaxValue) ? 0 : maximumLineLength;
             _disposeBaseWriter = disposeBaseWriter;
-            if( _maximumLineLength > 0 )
-                _currentLine = new char[maximumLineLength];
+            _countFormatting = countFormatting;
+            if (_maximumLineLength > 0)
+            {
+                // Add some slack for formatting characters.
+                _lineBuffer = new(countFormatting ? _maximumLineLength : _maximumLineLength * 2);
+            }
         }
 
 
@@ -186,15 +397,24 @@ namespace Ookii.CommandLine
             get { return _baseWriter; }
         }
 
-        /// <summary>
-        /// Returns the <see cref="System.Text.Encoding"/> in which the output is written.
-        /// </summary>
-        /// <value>
-        ///   The <see cref="System.Text.Encoding"/> in which the output is written.
-        /// </value>
-        public override Encoding Encoding 
+        /// <inheritdoc/>
+        public override Encoding Encoding
         {
             get { return _baseWriter.Encoding; }
+        }
+
+        /// <inheritdoc/>
+#if NET6_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        [AllowNull]
+#endif
+        public override string NewLine
+        {
+            get => _baseWriter.NewLine;
+            set
+            {
+                base.NewLine = value;
+                _baseWriter.NewLine = value;
+            }
         }
 
         /// <summary>
@@ -227,16 +447,20 @@ namespace Ookii.CommandLine
         public int Indent
         {
             get { return _indent; }
-            set 
+            set
             {
-                if( value < 0 || (_maximumLineLength > 0 && value >= _maximumLineLength) )
-                    throw new ArgumentOutOfRangeException("value", Properties.Resources.IndentOutOfRange);
+                if (value < 0 || (_maximumLineLength > 0 && value >= _maximumLineLength))
+                {
+                    throw new ArgumentOutOfRangeException(nameof(value), Properties.Resources.IndentOutOfRange);
+                }
+
                 _indent = value;
             }
         }
 
         /// <summary>
-        /// Gets a <see cref="LineWrappingTextWriter"/> that writes to the standard output stream.
+        /// Gets a <see cref="LineWrappingTextWriter"/> that writes to the standard output stream,
+        /// using <see cref="Console.WindowWidth"/> as the maximum line length.
         /// </summary>
         /// <returns>A <see cref="LineWrappingTextWriter"/> that writes to the standard output stream.</returns>
         public static LineWrappingTextWriter ForConsoleOut()
@@ -245,7 +469,8 @@ namespace Ookii.CommandLine
         }
 
         /// <summary>
-        /// Gets a <see cref="LineWrappingTextWriter"/> that writes to the standard error stream.
+        /// Gets a <see cref="LineWrappingTextWriter"/> that writes to the standard error stream,
+        /// using <see cref="Console.WindowWidth"/> as the maximum line length.
         /// </summary>
         /// <returns>A <see cref="LineWrappingTextWriter"/> that writes to the standard error stream.</returns>
         public static LineWrappingTextWriter ForConsoleError()
@@ -254,119 +479,97 @@ namespace Ookii.CommandLine
         }
 
         /// <summary>
-        /// Gets a <see cref="LineWrappingTextWriter"/> that writes to a <see cref="StringWriter"/> using the specified format provider.
-        /// </summary>
-        /// <param name="maximumLineLength">The maximum length of a line, in characters.</param>
-        /// <param name="formatProvider">An <see cref="IFormatProvider"/> that controls formatting.</param>
-        /// <returns>A <see cref="LineWrappingTextWriter"/> that writes to a <see cref="StringWriter"/>.</returns>
-        /// <remarks>
-        ///   To retrieve the resulting string, first call <see cref="Flush"/>, then use the <see cref="StringWriter.ToString"/> method
-        ///   of the <see cref="BaseWriter"/>.
-        /// </remarks>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
-        public static LineWrappingTextWriter ForStringWriter(int maximumLineLength, IFormatProvider? formatProvider)
-        {
-            return new LineWrappingTextWriter(new StringWriter(formatProvider), maximumLineLength, true);
-        }
-
-        /// <summary>
         /// Gets a <see cref="LineWrappingTextWriter"/> that writes to a <see cref="StringWriter"/>.
         /// </summary>
-        /// <param name="maximumLineLength">The maximum length of a line, in characters.</param>
+        /// <param name="maximumLineLength">
+        /// The maximum length of a line, in characters, or 0 to use no maximum.
+        /// </param>
+        /// <param name="formatProvider">An <see cref="IFormatProvider"/> that controls formatting.</param>
+        /// <param name="countFormatting">
+        ///   If set to <see langword="false"/>, virtual terminal sequences used to format the text
+        ///   will not be counted as part of the line length, and will therefore not affect where
+        ///   the text is wrapped. The default value is <see langword="false"/>.
+        /// </param>
         /// <returns>A <see cref="LineWrappingTextWriter"/> that writes to a <see cref="StringWriter"/>.</returns>
         /// <remarks>
         ///   To retrieve the resulting string, first call <see cref="Flush"/>, then use the <see cref="StringWriter.ToString"/> method
         ///   of the <see cref="BaseWriter"/>.
         /// </remarks>
-        public static LineWrappingTextWriter ForStringWriter(int maximumLineLength)
+        public static LineWrappingTextWriter ForStringWriter(int maximumLineLength = 0, IFormatProvider? formatProvider = null, bool countFormatting = false)
         {
-            return ForStringWriter(maximumLineLength, null);
+            return new LineWrappingTextWriter(new StringWriter(formatProvider), maximumLineLength, true, countFormatting);
         }
 
-        /// <summary>
-        /// Writes a character to the text stream.
-        /// </summary>
-        /// <param name="value">The character to write to the text stream.</param>
-        /// <exception cref="ObjectDisposedException">
-        ///   The <see cref="LineWrappingTextWriter"/> is closed.
-        /// </exception>
-        /// <exception cref="IOException">
-        ///   An I/O error occurs.
-        /// </exception>
+        /// <inheritdoc/>
         public override void Write(char value)
         {
-            if( _maximumLineLength > 0 )
+#if NET6_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+            unsafe
             {
-                // This is not exactly optimal but it will do.
-                Write(new[] { value }, 0, 1);
+                WriteCore(new StringSpan(&value, 1));
             }
-            else
-                _baseWriter.Write(value);
+#else
+            WriteCore(new StringSpan(value));
+#endif
         }
 
-        /// <summary>
-        /// Writes a string to the text stream.
-        /// </summary>
-        /// <param name="value">The string to write.</param>
-        /// <exception cref="ObjectDisposedException">
-        ///   The <see cref="LineWrappingTextWriter"/> is closed.
-        /// </exception>
-        /// <exception cref="IOException">
-        ///   An I/O error occurs.
-        /// </exception>
+        /// <inheritdoc/>
         public override void Write(string? value)
         {
-            if( value != null )
+            if (value != null)
             {
-                WriteCore(new StringBuffer(value), 0, value.Length);
+#if NET6_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+                WriteCore(value);
+#else
+                WriteCore(new StringSpan(value));
+#endif
             }
         }
 
-        /// <summary>
-        /// Writes a subarray of characters to the text stream.
-        /// </summary>
-        /// <param name="buffer">The character array to write data from.</param>
-        /// <param name="index">Starting index in the buffer.</param>
-        /// <param name="count">The number of characters to write.</param>
-        /// <exception cref="ArgumentException">
-        ///   The buffer length minus <paramref name="index"/> is less than <paramref name="count"/>.
-        /// </exception>
-        /// <exception cref="ArgumentNullException">
-        ///   The <paramref name="buffer"/> parameter is null.
-        /// </exception>
-        /// <exception cref="ArgumentOutOfRangeException">
-        ///   <paramref name="index"/> or <paramref name="count"/> is negative.
-        /// </exception>
-        /// <exception cref="ObjectDisposedException">
-        ///   The <see cref="LineWrappingTextWriter"/> is closed.
-        /// </exception>
-        /// <exception cref="IOException">
-        ///   An I/O error occurs.
-        /// </exception>
+        /// <inheritdoc/>
         public override void Write(char[] buffer, int index, int count)
         {
-            if( buffer == null )
+            if (buffer == null)
+            {
                 throw new ArgumentNullException(nameof(buffer));
-            if( index < 0 )
-                throw new ArgumentOutOfRangeException(nameof(index), Properties.Resources.ValueMustBeNonNegative);
-            if( count < 0 )
-                throw new ArgumentOutOfRangeException(nameof(count), Properties.Resources.ValueMustBeNonNegative);
-            if( (buffer.Length - index) < count )
-                throw new ArgumentException(Properties.Resources.IndexCountOutOfRange);
+            }
 
-            WriteCore(new StringBuffer(buffer), index, count);
+            if (index < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(index), Properties.Resources.ValueMustBeNonNegative);
+            }
+
+            if (count < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(count), Properties.Resources.ValueMustBeNonNegative);
+            }
+
+            if ((buffer.Length - index) < count)
+            {
+                throw new ArgumentException(Properties.Resources.IndexCountOutOfRange);
+            }
+
+            WriteCore(new StringSpan(buffer, index, count));
         }
 
-        /// <summary>
-        /// Clears all buffers for the current writer and causes any buffered data to be written to the underlying device.
-        /// </summary>
+#if NET6_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+
+        /// <inheritdoc/>
+        public override void Write(ReadOnlySpan<char> buffer) => WriteCore(buffer);
+
+        /// <inheritdoc/>
+        public override void WriteLine(ReadOnlySpan<char> buffer)
+        {
+            Write(buffer);
+            WriteLine();
+        }
+
+#endif
+
+        /// <inheritdoc/>
         public override void Flush()
         {
-            if( _maximumLineLength > 0 && (_currentLineLength > _indent || !_isLineEmpty) )
-            {
-                _baseWriter.WriteLine(_currentLine!, 0, _currentLineLength);
-                ClearCurrentLine(_currentLineLength);
-            }
+            _lineBuffer?.FlushTo(_baseWriter, _indent);
             base.Flush();
             _baseWriter.Flush();
         }
@@ -388,78 +591,96 @@ namespace Ookii.CommandLine
         /// </remarks>
         public void ResetIndent()
         {
-            if( _maximumLineLength > 0 )
+            if (_lineBuffer != null)
             {
-                if( _currentLineLength > _indent || !_isLineEmpty )
+                if (!_lineBuffer.IsEmpty)
                 {
-                    _baseWriter.WriteLine(_currentLine!, 0, _currentLineLength);
+                    _lineBuffer.FlushTo(_baseWriter, 0);
                 }
-                _currentLineLength = 0;
+                else
+                {
+                    _lineBuffer.ClearCurrentLine(0);
+                }
             }
             else
             {
                 if (!_indentNextWrite && _currentLineLength > 0)
+                {
                     _baseWriter.WriteLine();
+                }
 
                 _indentNextWrite = false;
             }
         }
 
-        /// <summary>
-        /// Releases the unmanaged resources used by the <see cref="LineWrappingTextWriter"/> and optionally releases the managed resources.
-        /// </summary>
-        /// <param name="disposing"><see langword="true"/> to release both managed and unmanaged resources; <see langword="false"/> to release only unmanaged resources.</param>
+        /// <inheritdoc/>
         protected override void Dispose(bool disposing)
         {
             Flush();
             base.Dispose(disposing);
-            if( disposing && _disposeBaseWriter )
+            if (disposing && _disposeBaseWriter)
             {
                 _baseWriter.Dispose();
             }
         }
 
-        private void WriteNoMaximum(StringBuffer buffer, int index, int count)
+        private void WriteNoMaximum(StringSpan buffer)
         {
             Debug.Assert(_maximumLineLength == 0);
 
-            int pos = index;
-            int end = index + count;
-            while (pos < end)
+            buffer.Split(true, (type, span) =>
             {
-                // Since there is no maximum line length, look for hard line breaks only.
-                int lineEnd = buffer.IndexOfLineBreak(pos, end - pos);
-                if (lineEnd < 0)
+                switch (type)
                 {
-                    WriteIndentDirectIfNeeded();
-
-                    // No line break, just write the whole thing.
-                    _baseWriter.Write(buffer.Characters, pos, end - pos);
-                    _currentLineLength += end - pos;
-                    pos = end;
-                }
-                else
-                {
-                    if (lineEnd > pos)
+                case StringSegmentType.PartialLineBreak:
+                    // If we already had a partial line break, write it now.
+                    if (_hasPartialLineBreak)
                     {
-                        WriteIndentDirectIfNeeded();
-                        _baseWriter.WriteLine(buffer.Characters, pos, lineEnd - pos);
-                        _currentLineLength += lineEnd - pos;
+                        WriteLineBreakDirect();
                     }
                     else
                     {
-                        // Don't write indent if this is the start of a line but this line is empty,
-                        // but do set the line length so the next line won't indent.
-                        if (_indentNextWrite)
-                            _currentLineLength = 0;
-
-                        _baseWriter.WriteLine();
+                        _hasPartialLineBreak = true;
                     }
 
-                    pos = buffer.SkipLineBreak(lineEnd, end);
-                    _indentNextWrite = true;
+                    break;
+
+                case StringSegmentType.LineBreak:
+                    // Write an extra line break if there was a partial one and this one isn't the
+                    // end of that line break.
+                    if (_hasPartialLineBreak)
+                    {
+                        _hasPartialLineBreak = false;
+                        if (span.Length != 1 || span[0] != '\n')
+                        {
+                            WriteLineBreakDirect();
+                        }
+                    }
+
+                    WriteLineBreakDirect();
+                    break;
+
+                default:
+                    // If we had a partial line break, write it now.
+                    if (_hasPartialLineBreak)
+                    {
+                        WriteLineBreakDirect();
+                        _hasPartialLineBreak = false;
+                    }
+
+                    WriteIndentDirectIfNeeded();
+                    span.WriteTo(_baseWriter);
+                    _currentLineLength += span.Length;
+                    break;
                 }
-            }
+            });
+        }
+
+        private void WriteLineBreakDirect()
+        {
+            _baseWriter.WriteLine();
+            _indentNextWrite = _currentLineLength != 0;
+            _currentLineLength = 0;
         }
 
         private void WriteIndentDirectIfNeeded()
@@ -467,116 +688,67 @@ namespace Ookii.CommandLine
             // Write the indentation if necessary.
             if (_indentNextWrite)
             {
-                // When this is called, _currentLineLength is actually the length of the last line.
-                // We don't indent if the last line was empty.
-                if (_currentLineLength > 0)
-                {
-                    for (int x = 0; x < _indent; ++x)
-                        _baseWriter.Write(IndentChar);
-                }
-
+                WriteIndent(_baseWriter, _indent);
                 _indentNextWrite = false;
-                _currentLineLength = 0;
             }
         }
 
-        private void WriteCore(StringBuffer buffer, int index, int count)
+        private static void WriteIndent(TextWriter writer, int indent)
         {
-            if (_maximumLineLength < 1)
+            for (int x = 0; x < indent; ++x)
             {
-                WriteNoMaximum(buffer, index, count);
+                writer.Write(IndentChar);
+            }
+        }
+
+        private void WriteCore(StringSpan buffer)
+        {
+            if (_lineBuffer == null)
+            {
+                WriteNoMaximum(buffer);
                 return;
             }
 
-            // Arguments have already been checked by caller.
-            int pos = index;
-            int end = index + count;
-            while( pos < end )
+            buffer.Split(_countFormatting, (type, span) =>
             {
-                int lineEnd = buffer.IndexOfLineBreak(pos, end - pos);
-                if( lineEnd < 0 )
-                    lineEnd = end; // No hard line break found
-
-                do
+                bool hadPartialLineBreak = _lineBuffer.CheckAndRemovePartialLineBreak();
+                if (hadPartialLineBreak)
                 {
-                    int lineLength = lineEnd - pos;
-                    if( _currentLineLength + lineLength > _maximumLineLength ) // If line doesn't fit, we need to find a place to wrap it
-                        pos = BreakLine(buffer, pos);
-                    else if( lineEnd < end ) // Line does fit, and we found a hard line break before the end of the string
-                    {
-                        _baseWriter.Write(_currentLine!, 0, _currentLineLength);
-                        buffer.WriteLine(_baseWriter, _currentLine!, pos, lineLength);
-                        pos = lineEnd;
-                        ClearCurrentLine(_currentLineLength + lineLength);
-                    }
-                    else // The entire remainder of the string fits into the buffer
-                    {
-                        buffer.CopyTo(pos, _currentLine!, _currentLineLength, lineLength);
-                        _isLineEmpty = false;
-                        _currentLineLength += lineLength;
-                        pos = lineEnd;
-                    }
-                } while( pos < lineEnd );
-
-                if( lineEnd < end )
-                {
-                    pos = buffer.SkipLineBreak(lineEnd, end);
+                    _lineBuffer.WriteLineTo(_baseWriter, _indent);
                 }
-            }
-        }
 
-        private int BreakLine(StringBuffer buffer, int start)
-        {
-            // Because this function should only be called if the buffer's first line break + _currentLineLength is longer than _maximumLineLength
-            // this function cannot overrun the length of buffer
-            int index;
-            for( index = _maximumLineLength - 1; index >= _indent; --index )
-            {
-                char ch = index < _currentLineLength ? _currentLine![index] : buffer[start + index - _currentLineLength];
-                if( Char.IsWhiteSpace(ch) )
+                if (type == StringSegmentType.LineBreak)
                 {
-                    break;
+                    // Check if this is just the end of a partial line break. If it is, it was
+                    // already written above.
+                    if (!hadPartialLineBreak || span.Length == 1 && span[0] != '\n')
+                    {
+                        _lineBuffer.WriteLineTo(_baseWriter, _indent);
+                    }
                 }
-            }
-            if( index < _indent )
-                index = _maximumLineLength; // No nice place to wrap found
+                else
+                {
+                    var remaining = span;
+                    if (type == StringSegmentType.Text && !_lineBuffer.HasPartialFormatting)
+                    {
+                        while (_lineBuffer.LineLength + remaining.Length > _maximumLineLength)
+                        {
+                            remaining = _lineBuffer.BreakLine(_baseWriter, remaining, _maximumLineLength, _indent);
+                        }
+                    }
 
-            _baseWriter.Write(_currentLine!, 0, Math.Min(index, _currentLineLength));
-            if( index < _currentLineLength )
-            {
-                // We wrapped inside the current line, so we need to copy the remainder of that line to the beginning of the current line buffer
-                int newLineLength = _currentLineLength - (index + 1);
-                Array.Copy(_currentLine!, index + 1, _currentLine!, _indent, newLineLength);
-                for( int x = 0; x < _indent; ++x )
-                    _currentLine![x] = IndentChar;
-                _currentLineLength = newLineLength + _indent;
-                _baseWriter.WriteLine();
-                // We didn't process any characters from the string, so return start.
-                return start;
-            }
-            else
-            {
-                // Our wrap position was inside the string buffer. We already wrote the entire current line, now write the string buffer up until that wrap position.
-                int count = index - _currentLineLength;
-                buffer.WriteLine(_baseWriter, _currentLine!, start, count);
-                ClearCurrentLine(_currentLineLength + count);
-                // If we found a white space character to wrap on, skip it.
-                return index < _maximumLineLength ? start + count + 1 : start + count;
-            }
-        }
-
-        private void ClearCurrentLine(int lastLineLength)
-        {
-            if( lastLineLength > 0 && _indent > 0 )
-            {
-                // Line needs to be indented, so fill the indent length with white space.
-                for( int x = 0; x < _indent; ++x )
-                    _currentLine![x] = IndentChar;
-                _currentLineLength = _indent;
-            }
-            else
-                _currentLineLength = 0; // No indent necessary, just reset to 0.
-            _isLineEmpty = true; // This line contains no content, only indentation.
+                    if (remaining.Length > 0)
+                    {
+                        _lineBuffer.Append(remaining, type);
+                        if (_lineBuffer.LineLength > _maximumLineLength)
+                        {
+                            // This can happen if we couldn't break above because partial formatting
+                            // had to be resolved.
+                            _lineBuffer.BreakLine(_baseWriter, default, _maximumLineLength, _indent);
+                        }
+                    }
+                }
+            });
         }
 
         private static int GetLineLengthForConsole()
@@ -585,7 +757,7 @@ namespace Ookii.CommandLine
             {
                 return Console.WindowWidth - 1;
             }
-            catch( IOException )
+            catch (IOException)
             {
                 return 0;
             }

@@ -1,16 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net6.0;net20;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>net6.0;netstandard2.0;netstandard2.1</TargetFrameworks>
     <Nullable>enable</Nullable>
     <LangVersion>9.0</LangVersion>
-    <Authors>Sven Groot</Authors>
-    <Company>Ookii.org</Company>
-    <Copyright>Copyright © Sven Groot (Ookii.org)</Copyright>
-    <Version>2.4.0</Version>
+    <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <AssemblyVersion>2.4.0.0</AssemblyVersion>
-    <FileVersion>2.4.0.0</FileVersion>
     <PackageProjectUrl>https://github.com/SvenGroot/ookii.commandline</PackageProjectUrl>
     <RepositoryUrl>https://github.com/SvenGroot/ookii.commandline</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
@@ -18,22 +14,27 @@
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>ookii.snk</AssemblyOriginatorKeyFile>
     <DelaySign>false</DelaySign>
-    <Description>Ookii.CommandLine is a powerful command line parsing library for .Net applications. It allows you to easily define required, optional, positional and named arguments, parse the command line, and generate usage information.</Description>
+    <Description>Ookii.CommandLine is a powerful command line parsing library for .Net applications.
+
+- Easily define arguments by creating a class with properties.
+- Create applications with multiple subcommands.
+- Generate fully customizable usage help.
+- Supports PowerShell-like and POSIX-like parsing rules.</Description>
     <PackageTags>command line arguments parsing parser parse argument args console</PackageTags>
-    <PackageReleaseNotes>For details, please view: https://github.com/SvenGroot/ookii.commandline/blob/master/docs/What's%20New%20in%20Ookii.CommandLine.md</PackageReleaseNotes>
+    <PackageReleaseNotes>This version contains breaking changes compared to version 2.x. For details, please view: https://www.ookii.org/Link/CommandLineVersionHistory</PackageReleaseNotes>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <PackageIcon>icon.png</PackageIcon>
   </PropertyGroup>
 
   <PropertyGroup>
-    <DocumentationFile>Ookii.CommandLine.xml</DocumentationFile>
+    <DocumentationFile>$(OutputPath)\Ookii.CommandLine.xml</DocumentationFile>
+    <!-- Turn off unknown reference warning for older frameworks, since we reference some .Net 6.0 types -->
+    <NoWarn Condition="'$(TargetFramework)'!='net6.0'">CS1574</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="..\..\license.md">
-      <Pack>True</Pack>
-      <PackagePath></PackagePath>
-    </None>
+    <None Include="icon.png" Pack="True" PackagePath="" />
   </ItemGroup>
 
   <ItemGroup>
@@ -50,6 +51,4 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
-
-
 </Project>

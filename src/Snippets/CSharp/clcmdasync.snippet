@@ -1,0 +1,75 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+      <Title>clcmdasync</Title>
+      <Author>Sven Groot (Ookii.org)</Author>
+      <Description>
+        Snippet for creating an asynchronous subcommand class for use with Ookii.CommandLine.
+      </Description>
+      <HelpUrl>
+        https://github.com/SvenGroot/ookii.commandline
+      </HelpUrl>
+      <Shortcut>clcmdasync</Shortcut>
+    </Header>
+    <Snippet>
+      <Declarations>
+        <Literal Editable="true">
+          <ID>CommandName</ID>
+          <ToolTip>Command name</ToolTip>
+          <Default>"name"</Default>
+          <Function>
+          </Function>
+        </Literal>
+        <Literal Editable="true">
+          <ID>Name</ID>
+          <ToolTip>Class name</ToolTip>
+          <Default>MyCommand</Default>
+          <Function>
+          </Function>
+        </Literal>
+        <Literal Editable="true">
+          <ID>Description</ID>
+          <ToolTip>The command description</ToolTip>
+          <Default>Command description.</Default>
+          <Function>
+          </Function>
+        </Literal>
+      </Declarations>
+      <References>
+        <Reference>
+          <Assembly>Ookii.CommandLine.dll</Assembly>
+          <Url>https://github.com/SvenGroot/ookii.commandline</Url>
+        </Reference>
+      </References>
+      <Imports>
+        <Import>
+          <Namespace>Ookii.CommandLine</Namespace>
+        </Import>
+        <Import>
+          <Namespace>Ookii.CommandLine.Commands</Namespace>
+        </Import>
+        <Import>
+          <Namespace>System.ComponentModel</Namespace>
+        </Import>
+      </Imports>
+      <Code Language="csharp"><![CDATA[[Command($CommandName$)]
+[Description("$Description$")]
+class $Name$ : AsyncCommandBase
+{
+    // [CommandLineArgument(Position = 0, IsRequired = true)]
+    // [Description("Argument description.")]
+    // public string SampleArgument { get; set; }
+
+    public override async Task<int> Run()
+    {
+        $end$
+        return 0;
+    }
+}]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

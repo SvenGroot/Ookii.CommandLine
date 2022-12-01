@@ -36,7 +36,8 @@ namespace Ookii.CommandLine
         /// </summary>
         MissingRequiredArgument,
         /// <summary>
-        /// Invalid value for a dictionary argument; typically the result of a duplicate key.
+        /// Invalid value for a dictionary argument; typically the result of a duplicate key or
+        /// a value without a key/value separator.
         /// </summary>
         InvalidDictionaryValue,
         /// <summary>
@@ -52,5 +53,19 @@ namespace Ookii.CommandLine
         /// type or (in .Net 6.0 and later) a non-nullable reference type.
         /// </summary>
         NullArgumentValue,
+        /// <summary>
+        /// A combined short argument contains an argument that is not a switch.
+        /// </summary>
+        CombinedShortNameNonSwitch,
+        /// <summary>
+        /// An instance of a class derived from the <see cref="Validation.ArgumentValidationAttribute"/>
+        /// class failed to validate the argument.
+        /// </summary>
+        ValidationFailed,
+        /// <summary>
+        /// An argument failed a dependency check performed by the <see cref="Validation.RequiresAttribute"/>
+        /// or the <see cref="Validation.ProhibitsAttribute"/> class.
+        /// </summary>
+        DependencyFailed,
     }
 }
