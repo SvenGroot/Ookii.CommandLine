@@ -160,24 +160,24 @@ If you want to customize the conversion to string, you can do this too (it uses 
 default), but Ookii.CommandLine never uses this, so it's only relevant if you want to use the
 converter in other contexts.
 
-[`CanConvertFrom()`]: https://www.ookii.org/docs/commandline-3.0-preview/html/M_Ookii_CommandLine_TypeConverterBase_1_CanConvertFrom.htm
+[`CanConvertFrom()`]: https://www.ookii.org/docs/commandline-3.0/html/M_Ookii_CommandLine_TypeConverterBase_1_CanConvertFrom.htm
 [`Console.WindowWidth`]: https://learn.microsoft.com/dotnet/api/system.console.windowwidth
-[`ConvertFrom()`]: https://www.ookii.org/docs/commandline-3.0-preview/html/M_Ookii_CommandLine_TypeConverterBase_1_ConvertFrom.htm
-[`EnableColor()`]: https://www.ookii.org/docs/commandline-3.0-preview/html/M_Ookii_CommandLine_Terminal_VirtualTerminal_EnableColor.htm
-[`EnableVirtualTerminalSequences()`]: https://www.ookii.org/docs/commandline-3.0-preview/html/M_Ookii_CommandLine_Terminal_VirtualTerminal_EnableVirtualTerminalSequences.htm
-[`Indent`]: https://www.ookii.org/docs/commandline-3.0-preview/html/P_Ookii_CommandLine_LineWrappingTextWriter_Indent.htm
-[`LineWrappingTextWriter.ForConsoleError()`]: https://www.ookii.org/docs/commandline-3.0-preview/html/M_Ookii_CommandLine_LineWrappingTextWriter_ForConsoleError.htm
-[`LineWrappingTextWriter.ForConsoleOut()`]: https://www.ookii.org/docs/commandline-3.0-preview/html/M_Ookii_CommandLine_LineWrappingTextWriter_ForConsoleOut.htm
-[`LineWrappingTextWriter.Indent`]: https://www.ookii.org/docs/commandline-3.0-preview/html/P_Ookii_CommandLine_LineWrappingTextWriter_Indent.htm
-[`LineWrappingTextWriter.ResetIndent()`]: https://www.ookii.org/docs/commandline-3.0-preview/html/M_Ookii_CommandLine_LineWrappingTextWriter_ResetIndent.htm
-[`LineWrappingTextWriter`]: https://www.ookii.org/docs/commandline-3.0-preview/html/T_Ookii_CommandLine_LineWrappingTextWriter.htm
-[`Ookii.CommandLine.Terminal`]: https://www.ookii.org/docs/commandline-3.0-preview/html/N_Ookii_CommandLine_Terminal.htm
-[`ResetIndent()`]: https://www.ookii.org/docs/commandline-3.0-preview/html/M_Ookii_CommandLine_LineWrappingTextWriter_ResetIndent.htm
-[`TextFormat`]: https://www.ookii.org/docs/commandline-3.0-preview/html/T_Ookii_CommandLine_Terminal_TextFormat.htm
+[`ConvertFrom()`]: https://www.ookii.org/docs/commandline-3.0/html/M_Ookii_CommandLine_TypeConverterBase_1_ConvertFrom.htm
+[`EnableColor()`]: https://www.ookii.org/docs/commandline-3.0/html/M_Ookii_CommandLine_Terminal_VirtualTerminal_EnableColor.htm
+[`EnableVirtualTerminalSequences()`]: https://www.ookii.org/docs/commandline-3.0/html/M_Ookii_CommandLine_Terminal_VirtualTerminal_EnableVirtualTerminalSequences.htm
+[`Indent`]: https://www.ookii.org/docs/commandline-3.0/html/P_Ookii_CommandLine_LineWrappingTextWriter_Indent.htm
+[`LineWrappingTextWriter.ForConsoleError()`]: https://www.ookii.org/docs/commandline-3.0/html/M_Ookii_CommandLine_LineWrappingTextWriter_ForConsoleError.htm
+[`LineWrappingTextWriter.ForConsoleOut()`]: https://www.ookii.org/docs/commandline-3.0/html/M_Ookii_CommandLine_LineWrappingTextWriter_ForConsoleOut.htm
+[`LineWrappingTextWriter.Indent`]: https://www.ookii.org/docs/commandline-3.0/html/P_Ookii_CommandLine_LineWrappingTextWriter_Indent.htm
+[`LineWrappingTextWriter.ResetIndent()`]: https://www.ookii.org/docs/commandline-3.0/html/M_Ookii_CommandLine_LineWrappingTextWriter_ResetIndent.htm
+[`LineWrappingTextWriter`]: https://www.ookii.org/docs/commandline-3.0/html/T_Ookii_CommandLine_LineWrappingTextWriter.htm
+[`Ookii.CommandLine.Terminal`]: https://www.ookii.org/docs/commandline-3.0/html/N_Ookii_CommandLine_Terminal.htm
+[`ResetIndent()`]: https://www.ookii.org/docs/commandline-3.0/html/M_Ookii_CommandLine_LineWrappingTextWriter_ResetIndent.htm
+[`TextFormat`]: https://www.ookii.org/docs/commandline-3.0/html/T_Ookii_CommandLine_Terminal_TextFormat.htm
 [`TextWriter`]: https://learn.microsoft.com/dotnet/api/system.io.textwriter
 [`ToString()`]: https://learn.microsoft.com/dotnet/api/system.object.tostring
 [`TypeConverter`]: https://learn.microsoft.com/dotnet/api/system.componentmodel.typeconverter
 [`TypeConverterAttribute`]: https://learn.microsoft.com/dotnet/api/system.componentmodel.typeconverterattribute
-[`TypeConverterBase<T>`]: https://www.ookii.org/docs/commandline-3.0-preview/html/T_Ookii_CommandLine_TypeConverterBase_1.htm
-[`UsageWriter`]: https://www.ookii.org/docs/commandline-3.0-preview/html/T_Ookii_CommandLine_UsageWriter.htm
-[`VirtualTerminal`]: https://www.ookii.org/docs/commandline-3.0-preview/html/T_Ookii_CommandLine_Terminal_VirtualTerminal.htm
+[`TypeConverterBase<T>`]: https://www.ookii.org/docs/commandline-3.0/html/T_Ookii_CommandLine_TypeConverterBase_1.htm
+[`UsageWriter`]: https://www.ookii.org/docs/commandline-3.0/html/T_Ookii_CommandLine_UsageWriter.htm
+[`VirtualTerminal`]: https://www.ookii.org/docs/commandline-3.0/html/T_Ookii_CommandLine_Terminal_VirtualTerminal.htm

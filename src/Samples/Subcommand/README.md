@@ -77,6 +77,6 @@ Copyright (c) Sven Groot (Ookii.org)
 This is sample code, so you can use it freely.
 ```
 
-[`CommandLineParser`]: https://www.ookii.org/docs/commandline-3.0-preview/html/T_Ookii_CommandLine_CommandLineParser.htm
+[`CommandLineParser`]: https://www.ookii.org/docs/commandline-3.0/html/T_Ookii_CommandLine_CommandLineParser.htm
 [`TypeConverter`]: https://learn.microsoft.com/dotnet/api/system.componentmodel.typeconverter
 [Encoding_1]: https://learn.microsoft.com/dotnet/api/system.text.encoding

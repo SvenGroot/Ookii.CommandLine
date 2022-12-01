@@ -79,7 +79,7 @@ You can see the sample has customized the parent command to:
 - Remove the a `version` command (nested version commands would kind of redundant).
 
 This was done by changing the [`CommandOptions`][] and using a simple custom
-[`LocalizedStringProvider`][] derived class (see [CustomStringProvider.cs](CustomStringProvider.cs)).
+[`UsageWriter`][] derived class (see [CustomUsageWriter.cs](CustomUsageWriter.cs)).
 
 If we run `./NestedCommand student -Help`, we get the same output. While the `student` command
 doesn't have a help argument (since it uses custom parsing, and not the [`CommandLineParser`][]),
@@ -112,9 +112,9 @@ Usage: NestedCommands student add [-FirstName] <String> [-LastName] <String> [[-
 
 We can see the usage syntax correctly shows both command names before the arguments.
 
-[`CommandLineParser`]: https://www.ookii.org/docs/commandline-3.0-preview/html/T_Ookii_CommandLine_CommandLineParser.htm
-[`CommandManager`]: https://www.ookii.org/docs/commandline-3.0-preview/html/T_Ookii_CommandLine_Commands_CommandManager.htm
-[`CommandOptions.CommandFilter`]: https://www.ookii.org/docs/commandline-3.0-preview/html/P_Ookii_CommandLine_Commands_CommandOptions_CommandFilter.htm
-[`CommandOptions`]: https://www.ookii.org/docs/commandline-3.0-preview/html/T_Ookii_CommandLine_Commands_CommandOptions.htm
-[`ICommandWithCustomParsing`]: https://www.ookii.org/docs/commandline-3.0-preview/html/T_Ookii_CommandLine_Commands_ICommandWithCustomParsing.htm
-[`LocalizedStringProvider`]: https://www.ookii.org/docs/commandline-3.0-preview/html/T_Ookii_CommandLine_LocalizedStringProvider.htm
+[`CommandLineParser`]: https://www.ookii.org/docs/commandline-3.0/html/T_Ookii_CommandLine_CommandLineParser.htm
+[`CommandManager`]: https://www.ookii.org/docs/commandline-3.0/html/T_Ookii_CommandLine_Commands_CommandManager.htm
+[`CommandOptions.CommandFilter`]: https://www.ookii.org/docs/commandline-3.0/html/P_Ookii_CommandLine_Commands_CommandOptions_CommandFilter.htm
+[`CommandOptions`]: https://www.ookii.org/docs/commandline-3.0/html/T_Ookii_CommandLine_Commands_CommandOptions.htm
+[`ICommandWithCustomParsing`]: https://www.ookii.org/docs/commandline-3.0/html/T_Ookii_CommandLine_Commands_ICommandWithCustomParsing.htm
+[`UsageWriter`]: https://www.ookii.org/docs/commandline-3.0/html/T_Ookii_CommandLine_UsageWriter.htm

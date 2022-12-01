@@ -8,8 +8,7 @@ applications.
 - Generate fully customizable usage help.
 - Supports PowerShell-like and POSIX-like parsing rules.</Description>
 
-Ookii.CommandLine is provided in versions for [.Net Standard 2.0, .Net Standard 2.1, and .Net 6.0
-and later](#requirements).
+Ookii.CommandLine is provided in versions for [.Net Standard 2.0, .Net Standard 2.1, and .Net 6.0 and later](#requirements).
 
 Ookii.CommandLine can be added to your project using [NuGet](https://nuget.org/packages/Ookii.CommandLine).
 [Code snippets](docs/CodeSnippets.md) for Visual Studio are available on the

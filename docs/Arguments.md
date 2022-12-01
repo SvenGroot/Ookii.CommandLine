@@ -354,10 +354,10 @@ mode outlined above, with all the same options.
 
 Next, let's take a look at how to [define arguments](DefiningArguments.md).
 
-[`AllowDuplicateDictionaryKeysAttribute`]: https://www.ookii.org/docs/commandline-3.0-preview/html/T_Ookii_CommandLine_AllowDuplicateDictionaryKeysAttribute.htm
-[`CommandLineArgument.AllowNull`]: https://www.ookii.org/docs/commandline-3.0-preview/html/P_Ookii_CommandLine_CommandLineArgument_AllowNull.htm
-[`CommandLineArgumentException`]: https://www.ookii.org/docs/commandline-3.0-preview/html/T_Ookii_CommandLine_CommandLineArgumentException.htm
-[`CommandLineParser`]: https://www.ookii.org/docs/commandline-3.0-preview/html/T_Ookii_CommandLine_CommandLineParser.htm
+[`AllowDuplicateDictionaryKeysAttribute`]: https://www.ookii.org/docs/commandline-3.0/html/T_Ookii_CommandLine_AllowDuplicateDictionaryKeysAttribute.htm
+[`CommandLineArgument.AllowNull`]: https://www.ookii.org/docs/commandline-3.0/html/P_Ookii_CommandLine_CommandLineArgument_AllowNull.htm
+[`CommandLineArgumentException`]: https://www.ookii.org/docs/commandline-3.0/html/T_Ookii_CommandLine_CommandLineArgumentException.htm
+[`CommandLineParser`]: https://www.ookii.org/docs/commandline-3.0/html/T_Ookii_CommandLine_CommandLineParser.htm
 [`CultureInfo.InvariantCulture`]: https://learn.microsoft.com/dotnet/api/system.globalization.cultureinfo.invariantculture
 [`CultureInfo`]: https://learn.microsoft.com/dotnet/api/system.globalization.cultureinfo
 [`DateTime`]: https://learn.microsoft.com/dotnet/api/system.datetime
@@ -367,24 +367,24 @@ Next, let's take a look at how to [define arguments](DefiningArguments.md).
 [`FileInfo`]: https://learn.microsoft.com/dotnet/api/system.io.fileinfo
 [`FlagsAttribute`]: https://learn.microsoft.com/dotnet/api/system.flagsattribute
 [`Int32`]: https://learn.microsoft.com/dotnet/api/system.int32
-[`KeyTypeConverterAttribute`]: https://www.ookii.org/docs/commandline-3.0-preview/html/T_Ookii_CommandLine_KeyTypeConverterAttribute.htm
+[`KeyTypeConverterAttribute`]: https://www.ookii.org/docs/commandline-3.0/html/T_Ookii_CommandLine_KeyTypeConverterAttribute.htm
 [`KeyValuePair<TKey, TValue>`]: https://learn.microsoft.com/dotnet/api/system.collections.generic.keyvaluepair-2
-[`KeyValuePairConverter<TKey, TValue>`]: https://www.ookii.org/docs/commandline-3.0-preview/html/T_Ookii_CommandLine_KeyValuePairConverter_2.htm
-[`KeyValueSeparatorAttribute`]: https://www.ookii.org/docs/commandline-3.0-preview/html/T_Ookii_CommandLine_KeyValueSeparatorAttribute.htm
-[`MultiValueSeparatorAttribute`]: https://www.ookii.org/docs/commandline-3.0-preview/html/T_Ookii_CommandLine_MultiValueSeparatorAttribute.htm
-[`ParseOptions.AllowWhiteSpaceValueSeparator`]: https://www.ookii.org/docs/commandline-3.0-preview/html/P_Ookii_CommandLine_ParseOptions_AllowWhiteSpaceValueSeparator.htm
-[`ParseOptions.ArgumentNameComparer`]: https://www.ookii.org/docs/commandline-3.0-preview/html/P_Ookii_CommandLine_ParseOptions_ArgumentNameComparer.htm
-[`ParseOptions.Culture`]: https://www.ookii.org/docs/commandline-3.0-preview/html/P_Ookii_CommandLine_ParseOptions_Culture.htm
-[`ParseOptions.NameValueSeparator`]: https://www.ookii.org/docs/commandline-3.0-preview/html/P_Ookii_CommandLine_ParseOptions_NameValueSeparator.htm
-[`ParseOptions`]: https://www.ookii.org/docs/commandline-3.0-preview/html/T_Ookii_CommandLine_ParseOptions.htm
-[`ParseOptionsAttribute.AllowWhiteSpaceValueSeparator`]: https://www.ookii.org/docs/commandline-3.0-preview/html/P_Ookii_CommandLine_ParseOptionsAttribute_AllowWhiteSpaceValueSeparator.htm
-[`ParseOptionsAttribute.CaseSensitive`]: https://www.ookii.org/docs/commandline-3.0-preview/html/P_Ookii_CommandLine_ParseOptionsAttribute_CaseSensitive.htm
-[`ParseOptionsAttribute.NameValueSeparator`]: https://www.ookii.org/docs/commandline-3.0-preview/html/P_Ookii_CommandLine_ParseOptionsAttribute_NameValueSeparator.htm
-[`ParseOptionsAttribute`]: https://www.ookii.org/docs/commandline-3.0-preview/html/T_Ookii_CommandLine_ParseOptionsAttribute.htm
+[`KeyValuePairConverter<TKey, TValue>`]: https://www.ookii.org/docs/commandline-3.0/html/T_Ookii_CommandLine_KeyValuePairConverter_2.htm
+[`KeyValueSeparatorAttribute`]: https://www.ookii.org/docs/commandline-3.0/html/T_Ookii_CommandLine_KeyValueSeparatorAttribute.htm
+[`MultiValueSeparatorAttribute`]: https://www.ookii.org/docs/commandline-3.0/html/T_Ookii_CommandLine_MultiValueSeparatorAttribute.htm
+[`ParseOptions.AllowWhiteSpaceValueSeparator`]: https://www.ookii.org/docs/commandline-3.0/html/P_Ookii_CommandLine_ParseOptions_AllowWhiteSpaceValueSeparator.htm
+[`ParseOptions.ArgumentNameComparer`]: https://www.ookii.org/docs/commandline-3.0/html/P_Ookii_CommandLine_ParseOptions_ArgumentNameComparer.htm
+[`ParseOptions.Culture`]: https://www.ookii.org/docs/commandline-3.0/html/P_Ookii_CommandLine_ParseOptions_Culture.htm
+[`ParseOptions.NameValueSeparator`]: https://www.ookii.org/docs/commandline-3.0/html/P_Ookii_CommandLine_ParseOptions_NameValueSeparator.htm
+[`ParseOptions`]: https://www.ookii.org/docs/commandline-3.0/html/T_Ookii_CommandLine_ParseOptions.htm
+[`ParseOptionsAttribute.AllowWhiteSpaceValueSeparator`]: https://www.ookii.org/docs/commandline-3.0/html/P_Ookii_CommandLine_ParseOptionsAttribute_AllowWhiteSpaceValueSeparator.htm
+[`ParseOptionsAttribute.CaseSensitive`]: https://www.ookii.org/docs/commandline-3.0/html/P_Ookii_CommandLine_ParseOptionsAttribute_CaseSensitive.htm
+[`ParseOptionsAttribute.NameValueSeparator`]: https://www.ookii.org/docs/commandline-3.0/html/P_Ookii_CommandLine_ParseOptionsAttribute_NameValueSeparator.htm
+[`ParseOptionsAttribute`]: https://www.ookii.org/docs/commandline-3.0/html/T_Ookii_CommandLine_ParseOptionsAttribute.htm
 [`String`]: https://learn.microsoft.com/dotnet/api/system.string
 [`System.ComponentModel.TypeConverterAttribute`]: https://learn.microsoft.com/dotnet/api/system.componentmodel.typeconverterattribute
 [`TypeConverter`]: https://learn.microsoft.com/dotnet/api/system.componentmodel.typeconverter
 [`TypeConverterAttribute`]: https://learn.microsoft.com/dotnet/api/system.componentmodel.typeconverterattribute
 [`Uri`]: https://learn.microsoft.com/dotnet/api/system.uri
-[`ValueTypeConverterAttribute`]: https://www.ookii.org/docs/commandline-3.0-preview/html/T_Ookii_CommandLine_ValueTypeConverterAttribute.htm
-[NullArgumentValue_0]: https://www.ookii.org/docs/commandline-3.0-preview/html/T_Ookii_CommandLine_CommandLineArgumentErrorCategory.htm
+[`ValueTypeConverterAttribute`]: https://www.ookii.org/docs/commandline-3.0/html/T_Ookii_CommandLine_ValueTypeConverterAttribute.htm
+[NullArgumentValue_0]: https://www.ookii.org/docs/commandline-3.0/html/T_Ookii_CommandLine_CommandLineArgumentErrorCategory.htm

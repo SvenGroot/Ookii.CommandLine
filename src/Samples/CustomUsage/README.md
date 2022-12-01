@@ -50,4 +50,4 @@ If you compare this with the usage output of the [parser sample](../Parser), whi
 output format, you can see just how much you can change by simply overriding some methods on the
 [`UsageWriter`][] class.
 
-[`UsageWriter`]: https://www.ookii.org/docs/commandline-3.0-preview/html/T_Ookii_CommandLine_UsageWriter.htm
+[`UsageWriter`]: https://www.ookii.org/docs/commandline-3.0/html/T_Ookii_CommandLine_UsageWriter.htm

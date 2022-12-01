@@ -88,7 +88,7 @@ This is sample code, so you can use it freely.
 The `-Version` argument shows the value of the [`ApplicationFriendlyNameAttribute`][] (or the assembly
 name, if there isn't one), the assembly's informational version, and the assembly's copyright text.
 
-[`ApplicationFriendlyNameAttribute`]: https://www.ookii.org/docs/commandline-3.0-preview/html/T_Ookii_CommandLine_ApplicationFriendlyNameAttribute.htm
-[`ParseOptions.ShowUsageOnError`]: https://www.ookii.org/docs/commandline-3.0-preview/html/P_Ookii_CommandLine_ParseOptions_ShowUsageOnError.htm
-[`UsageHelpRequest.SyntaxOnly`]: https://www.ookii.org/docs/commandline-3.0-preview/html/T_Ookii_CommandLine_UsageHelpRequest.htm
-[`ValidateRangeAttribute`]: https://www.ookii.org/docs/commandline-3.0-preview/html/T_Ookii_CommandLine_Validation_ValidateRangeAttribute.htm
+[`ApplicationFriendlyNameAttribute`]: https://www.ookii.org/docs/commandline-3.0/html/T_Ookii_CommandLine_ApplicationFriendlyNameAttribute.htm
+[`ParseOptions.ShowUsageOnError`]: https://www.ookii.org/docs/commandline-3.0/html/P_Ookii_CommandLine_ParseOptions_ShowUsageOnError.htm
+[`UsageHelpRequest.SyntaxOnly`]: https://www.ookii.org/docs/commandline-3.0/html/T_Ookii_CommandLine_UsageHelpRequest.htm
+[`ValidateRangeAttribute`]: https://www.ookii.org/docs/commandline-3.0/html/T_Ookii_CommandLine_Validation_ValidateRangeAttribute.htm
