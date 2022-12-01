@@ -29,6 +29,7 @@
 
   <PropertyGroup>
     <DocumentationFile>$(OutputPath)\Ookii.CommandLine.xml</DocumentationFile>
+    <!-- Turn off unknown reference warning for older frameworks, since we reference some .Net 6.0 types -->
     <NoWarn Condition="'$(TargetFramework)'!='net6.0'">CS1574</NoWarn>
   </PropertyGroup>
 
