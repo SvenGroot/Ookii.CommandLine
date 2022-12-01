@@ -341,6 +341,7 @@ namespace Ookii.CommandLine
         // Used for indenting when there is no maximum line length.
         private bool _indentNextWrite;
         private int _currentLineLength;
+        private bool _hasPartialLineBreak;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="LineWrappingTextWriter"/> class.
@@ -629,18 +630,49 @@ namespace Ookii.CommandLine
 
             buffer.Split(true, (type, span) =>
             {
-                // TODO: Partial line break?
-                if (type == StringSegmentType.LineBreak)
+                switch (type)
                 {
+                case StringSegmentType.PartialLineBreak:
+                    // If we already had a partial line break, write it now.
+                    if (_hasPartialLineBreak)
+                    {
+                        _baseWriter.WriteLine();
+                        _indentNextWrite = _currentLineLength != 0;
+                        _currentLineLength = 0;
+                    }
+
+                    _hasPartialLineBreak = true;
+                    break;
+
+                case StringSegmentType.LineBreak:
+                    // Write an extra line break if there was a partial one and this one isn't the
+                    // end of that line break.
+                    if (_hasPartialLineBreak && (span.Length != 1 || span[0] != '\n'))
+                    {
+                        _baseWriter.WriteLine();
+                        _currentLineLength = 0;
+                    }
+
+                    _hasPartialLineBreak = false;
                     _baseWriter.WriteLine();
                     _indentNextWrite = _currentLineLength != 0;
                     _currentLineLength = 0;
-                }
-                else
-                {
+                    break;
+
+                default:
+                    // If we had a partial line break, write it now.
+                    if (_hasPartialLineBreak)
+                    {
+                        _baseWriter.WriteLine();
+                        _indentNextWrite = _currentLineLength != 0;
+                        _currentLineLength = 0;
+                        _hasPartialLineBreak = false;
+                    }
+
                     WriteIndentDirectIfNeeded();
                     span.WriteTo(_baseWriter);
                     _currentLineLength += span.Length;
+                    break;
                 }
             });
         }

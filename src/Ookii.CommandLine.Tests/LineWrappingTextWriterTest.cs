@@ -264,8 +264,20 @@ namespace Ookii.CommandLine.Tests
             writer.Write(";3mWorld and stuff Bye\r");
             writer.Write("\nEveryone");
             writer.Flush();
-            string actual = "Hello \x1b[38;2;1;2;3mWorld\nand stuff Bye\nEveryone\n".ReplaceLineEndings();
-            Assert.AreEqual(actual, writer.BaseWriter.ToString());
+            string expected = "Hello \x1b[38;2;1;2;3mWorld\nand stuff Bye\nEveryone\n".ReplaceLineEndings();
+            Assert.AreEqual(expected, writer.BaseWriter.ToString());
+        }
+
+        [TestMethod]
+        public void TestSplitLineBreakNoMaximum()
+        {
+            using var writer = LineWrappingTextWriter.ForStringWriter();
+            writer.Indent = 4;
+            writer.Write("Foo\r");
+            writer.Write("Bar\r");
+            writer.Write("\nBaz");
+            string expected = "Foo\n    Bar\n    Baz".ReplaceLineEndings();
+            Assert.AreEqual(expected, writer.BaseWriter.ToString());
         }
 
         [TestMethod]
