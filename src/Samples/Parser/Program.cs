@@ -12,13 +12,13 @@ public static class Program
         var arguments = ProgramArguments.Parse();
 
         // No need to do anything when the value is null; Parse() already printed errors and
-        // usage to the console. We return a non-zero value to indicate failure.
+        // usage help to the console. We return a non-zero value to indicate failure.
         if (arguments == null)
         {
             return 1;
         }
 
-        // We use the LineWrappingTextWriter to neatly wrap console output.
+        // We use the LineWrappingTextWriter to neatly white-space wrap console output.
         using var writer = LineWrappingTextWriter.ForConsoleOut();
 
         // Print the values of the arguments.

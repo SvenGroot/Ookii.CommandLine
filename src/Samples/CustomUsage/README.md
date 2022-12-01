@@ -1,4 +1,4 @@
-﻿# Custom usage sample
+# Custom usage sample
 
 This sample shows the flexibility of Ookii.CommandLine's usage help generation. It uses a custom
 UsageWriter, along with a custom LocalizedStringProvider, to completely transform the way the usage
@@ -7,8 +7,8 @@ help looks.
 This sample also uses long/short parsing mode, but everything in it is applicable to default mode as
 well.
 
-It uses the same arguments as the [Parser Sample](../Parser), so see that for more details about
-each argument.
+It uses the same arguments as the [long/short mode sample](../LongShort), so see that for more
+details about each argument.
 
 The usage help for this sample looks very different:
 
@@ -37,14 +37,17 @@ OPTIONS:
   --version                   Displays version information.
 ```
 
-Customizing the usage like this is fairly simple, thanks to the LocalizedStringProvider. That same
-class also allows you to customize error messages and automatic argument names and descriptions.
+Customizing the usage help like this is not difficult, thanks to the [`UsageWriter`][] class. The
+sample [derives a class from it](CustomUsageWriter.cs), and overrides several methods to customize
+the format. This allows it to change the parts it wants, and reuse the code for the parts that are
+not different.
 
 The sample also customizes the colors of the output, as shown in the below screenshot:
 
 ![Custom usage colors](../../../docs/images/custom_usage.png)
 
-If you compare this with the usage output of the [Parser sample](../Parser), which uses the default
-output format, you can see just how much you can change without needing to write code to manually
-handle writing usage help (though you could also do that; all the information you need is provided
-by the CommandLineParser class).
+If you compare this with the usage output of the [parser sample](../Parser), which uses the default
+output format, you can see just how much you can change by simply overriding some methods on the
+[`UsageWriter`][] class.
+
+[`UsageWriter`]: https://www.ookii.org/docs/commandline-3.0-preview/html/T_Ookii_CommandLine_UsageWriter.htm

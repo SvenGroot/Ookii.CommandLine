@@ -105,6 +105,10 @@
   ],
   "EnableColor()": "M_Ookii_CommandLine_Terminal_VirtualTerminal_EnableColor",
   "EnableVirtualTerminalSequences()": "M_Ookii_CommandLine_Terminal_VirtualTerminal_EnableVirtualTerminalSequences",
+  "Encoding": [
+    "P_Ookii_CommandLine_LineWrappingTextWriter_Encoding",
+    "#system.text.encoding"
+  ],
   "Environment.GetCommandLineArgs()": "#system.environment.getcommandlineargs",
   "Error": "P_Ookii_CommandLine_ParseOptions_Error",
   "ErrorCategory": "P_Ookii_CommandLine_Validation_ArgumentValidationAttribute_ErrorCategory",

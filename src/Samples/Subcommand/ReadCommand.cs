@@ -11,7 +11,7 @@ namespace SubcommandSample;
 // This is a sample subcommand that can be invoked by specifying "read" as the first argument
 // to the sample application.
 //
-// Subcommand argument parsing works just like a regular command line argument class. After the
+// Subcommand argument parsing works just like a regular command line arguments class. After the
 // arguments have been parsed, the RunAsync method is invoked to execute the command.
 //
 // This is an asynchronous command. It uses the AsyncCommandBase class to get a default
@@ -49,9 +49,18 @@ class ReadCommand : AsyncCommandBase
     {
         try
         {
+            var options = new FileStreamOptions()
+            {
+                Access = FileAccess.Read,
+                Mode = FileMode.Open,
+                Share = FileShare.ReadWrite | FileShare.Delete,
+                Options = FileOptions.Asynchronous
+            };
+
+            using var reader = new StreamReader(_path.FullName, Encoding, true, options);
+
             // We use a LineWrappingTextWriter to neatly wrap console output
             using var writer = LineWrappingTextWriter.ForConsoleOut();
-            using var reader = new StreamReader(_path.FullName, Encoding, true);
 
             // Write the contents of the file to the console.
             string? line;
@@ -60,8 +69,9 @@ class ReadCommand : AsyncCommandBase
                 await writer.WriteLineAsync(line);
             }
 
-            // The Main method will return the exit status to the operating system. The numbers are made up for the sample, they don't mean anything.
-            // Usually, 0 means success, and any other value indicates an error.
+            // The Main method will return the exit status to the operating system. The numbers are
+            // made up for the sample, they don't mean anything. Usually, 0 means success, and any
+            // other value indicates an error.
             return (int)ExitCode.Success;
         }
         catch (IOException ex)

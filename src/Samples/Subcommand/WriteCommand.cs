@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace SubcommandSample;
 
@@ -15,14 +16,15 @@ namespace SubcommandSample;
 // Subcommand argument parsing works just like a regular command line argument class. After the
 // arguments have been parsed, the Run method is invoked to execute the command.
 //
-// This is *not* an asynchronous command. It could be, but I wanted to demonstrate that even
-// when using RunCommandAsync, not all commands need to be async.
+// This is an asynchronous command. It uses the AsyncCommandBase class to get a default
+// implementation of Run, so we only need to worry about RunAsync, but we could also implement
+// IAsyncCommand ourselves.
 //
 // Check the Program.cs file to see how this command is invoked.
 [Command]
 [Description("Writes lines to a file, wrapping them to the specified width.")]
 [ParseOptions(ArgumentNameTransform = NameTransform.PascalCase)]
-class WriteCommand : ICommand
+class WriteCommand : AsyncCommandBase
 {
     private readonly FileInfo _path;
 
@@ -57,21 +59,22 @@ class WriteCommand : ICommand
     [ValidateRange(0, null)]
     public int MaximumLineLength { get; set; }
 
-    // An argument switch that indicates it's okay to overwrite files.
+    // A switch argument that indicates it's okay to overwrite files.
     [CommandLineArgument]
     [Description("When this option is specified, the file will be overwritten if it already exists.")]
     public bool Overwrite { get; set; }
 
     // Run the command after the arguments have been parsed.
-    public int Run()
+    public override async Task<int> RunAsync()
     {
         try
         {
             // Check if we're allowed to overwrite the file.
             if (!Overwrite && _path.Exists)
             {
-                // The Main method will return the exit status to the operating system. The numbers are made up for the sample, they don't mean anything.
-                // Usually, 0 means success, and any other value indicates an error.
+                // The Main method will return the exit status to the operating system. The numbers
+                // are made up for the sample, they don't mean anything. Usually, 0 means success,
+                // and any other value indicates an error.
                 Program.WriteErrorMessage("File already exists.");
                 return (int)ExitCode.FileExists;
             }
@@ -81,17 +84,18 @@ class WriteCommand : ICommand
                 Access = FileAccess.Write,
                 Mode = Overwrite ? FileMode.Create : FileMode.CreateNew,
                 Share = FileShare.ReadWrite | FileShare.Delete,
+                Options = FileOptions.Asynchronous
             };
 
             using var writer = new StreamWriter(_path.FullName, Encoding, options);
 
-            // We use a LineWrappingTextWriter to neatly wrap the output.
+            // We use a LineWrappingTextWriter to neatly white-space wrap the output.
             using var lineWriter = new LineWrappingTextWriter(writer, MaximumLineLength);
 
             // Write the specified content to the file
             foreach (string line in GetLines())
             {
-                lineWriter.WriteLine(line);
+                await lineWriter.WriteLineAsync(line);
             }
 
             return (int)ExitCode.Success;
@@ -121,7 +125,8 @@ class WriteCommand : ICommand
 
     private static IEnumerable<string> EnumerateStandardInput()
     {
-        // Read from standard input. You can pipe a file to the input, or use it interactively (in that case, press CTRL-Z to send an EOF character and stop writing).
+        // Read from standard input. You can pipe a file to the input, or use it interactively (in
+        // that case, press CTRL-D (CTRL-Z on Windows) to send an EOF character and stop writing).
         string? line;
         while ((line = Console.ReadLine()) != null)
         {

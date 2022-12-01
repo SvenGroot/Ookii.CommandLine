@@ -34,7 +34,7 @@ internal class CustomUsageWriter : UsageWriter
 
         // You must *always* check whether color is enabled before using VT sequences. It may be
         // disabled, for example if the output is redirected or the terminal doesn't support VT
-        // sequences. WriteOptionalColor does this for you.
+        // sequences. WriteColor does this check for you.
         WriteColor(UsagePrefixColor);
         Writer.Write("DESCRIPTION:");
         ResetColor();
@@ -52,11 +52,20 @@ internal class CustomUsageWriter : UsageWriter
         Writer.WriteLine();
         WriteColor(TextFormat.Underline);
         Writer.Write(ExecutableName);
-        // I'm not including CommandName here because this application doesn't have subcommands.
         ResetColor();
+
+        // This application does not use subcommands, but if you do, you have to include the command
+        // name in this function too.
+        if (CommandName != null)
+        {
+            Writer.Write(' ');
+            Writer.Write(CommandName);
+        }
     }
 
     // Add some color to the argument names in the syntax.
+    //
+    // This doesn't apply to the description list because it uses WriteArgumentNameForDescription.
     protected override void WriteArgumentName(string argumentName, string prefix)
     {
         // "bright black", aka "gray"...
@@ -128,7 +137,7 @@ internal class CustomUsageWriter : UsageWriter
         Writer.Write(name);
         ResetColor();
 
-        // Pad until the indentatation is reached.
+        // Pad until the indentation is reached.
         WriteSpacing(ArgumentDescriptionIndent - name.Length - 2);
     }
 

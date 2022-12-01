@@ -4,7 +4,7 @@ using Ookii.CommandLine.Terminal;
 using System.Threading.Tasks;
 
 // For an application using subcommands, set the friendly name used for the automatic version
-// command on the assembly.
+// command by using this attribute on the assembly rather than an arguments type.
 [assembly: ApplicationFriendlyName("Ookii.CommandLine Subcommand Sample")]
 
 namespace SubcommandSample;
@@ -15,9 +15,8 @@ static class Program
     // CommandManager can take the arguments directly from Environment.GetCommandLineArgs().
     static async Task<int> Main()
     {
-        // You can use the CommmandOptions class to customize the parsing behavior and usage
-        // help output.
-        // CommandOptions inherits from ParseOptions so it supports all the same options.
+        // You can use the CommandOptions class to customize the parsing behavior and usage help
+        // output. CommandOptions inherits from ParseOptions so it supports all the same options.
         var options = new CommandOptions()
         {
             // Set options so the command names are determined by the class name, transformed to
@@ -34,13 +33,17 @@ static class Program
         };
 
         // Create a CommandManager for the commands in the current assembly.
+        //
         // In addition to our commands, it will also have an automatic "version" command (this can
         // be disabled with the options).
         var manager = new CommandManager(options);
 
-        // Run the command indicated in the first argument to this application, and use the
-        // return value of its Run method as the applicatino exit code. If the command could
-        // not be created, we return an error code.
+        // Run the command indicated in the first argument to this application, and use the return
+        // value of its Run method as the application exit code. If the command could not be
+        // created, we return an error code.
+        //
+        // We use the async version because our commands use the IAsyncCommand interface. Note that
+        // you can use this method even if not all of your commands use IAsyncCommand.
         return await manager.RunCommandAsync() ?? (int)ExitCode.CreateCommandFailure;
     }
 

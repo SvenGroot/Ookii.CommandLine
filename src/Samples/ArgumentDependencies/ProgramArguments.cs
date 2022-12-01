@@ -28,11 +28,14 @@ internal class ProgramArguments
     [Description("The path to use.")]
     public FileInfo? Path { get; set; }
 
+    // This argument uses the ProhibitsAttribute to indicate it's mutually exclusive with "-Path".
     [CommandLineArgument]
     [Description("The IP address to connect to.")]
     [Prohibits(nameof(Path))]
     public IPAddress? Ip { get; set; }
 
+    // This argument uses the RequiresAttribute to indicate it can only be used if "-Ip" is also
+    // specified.
     [CommandLineArgument(DefaultValue = 80)]
     [Description("The port to connect to.")]
     [Requires(nameof(Ip))]

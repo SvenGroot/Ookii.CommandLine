@@ -4,7 +4,7 @@ using Ookii.Dialogs.Wpf;
 using System.ComponentModel;
 using System.Reflection;
 
-namespace wpftest3;
+namespace WpfSample;
 
 // This class defines the arguments for the sample. It uses the same arguments as the Parser
 // sample, so see that sample for more detailed descriptions.
@@ -14,13 +14,13 @@ public class Arguments
 {
     // The automatic version argument writes to the console, which is not useful in a WPF
     // application. Instead, we define our own, which shows the same information in a dialog.
-    // Because we have an argument named "Version", the automatic one won't get added.
+    // Because we have an argument named "-Version", the automatic one won't get added.
     //
     // This is an example of a method argument. It uses a method instead of a property, and gets
     // invoked as soon as the argument is parsed, not waiting for all the arguments.
     //
-    // A method argument can set its type using a method parameter. If there isn't a parameter like
-    // that (as in this case), it defaults to a switch argument.
+    // A method argument can set its type using a parameter. If there isn't a parameter like that
+    // (as in this case), it defaults to a switch argument.
     [CommandLineArgument]
     [Description("Displays version information.")]
     public static bool Version(CommandLineParser parser)

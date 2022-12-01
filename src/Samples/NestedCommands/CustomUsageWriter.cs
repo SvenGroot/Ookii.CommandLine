@@ -4,6 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace NestedCommands;
 
+// UsageWriter used by parent commands to show a list of child commands.
 internal class CustomUsageWriter : UsageWriter
 {
     private readonly CommandInfo _command;
@@ -13,7 +14,7 @@ internal class CustomUsageWriter : UsageWriter
         _command = command;
     }
 
-    // Override this to add the command name.
+    // Override this to add the parent command name.
     [AllowNull]
     public override string ExecutableName
     {
@@ -24,6 +25,7 @@ internal class CustomUsageWriter : UsageWriter
     // Override this to return the command description instead of the application description.
     protected override void WriteApplicationDescription(string description)
     {
+        // Don't modify anything if this is usage help for a child command's arguments.
         if (OperationInProgress != Operation.CommandListUsage)
         {
             base.WriteApplicationDescription(description);

@@ -8,7 +8,9 @@ namespace CustomUsage;
 // argument short name and the usage help for the ValidateRangeAttribute.
 internal class CustomStringProvider : LocalizedStringProvider
 {
-    // By overriding this, the "--help" argument no longer uses "-?" as its short name.
+    // By overriding this, the "--help" argument no longer uses "-?" as its short name. Normally, it
+    // would also have an alias "-h", but since the short name is already "-h" the alias is no
+    // longer used.
     public override char AutomaticHelpShortName() => 'h';
 
     // Customize the help for the ValidateRangeAttribute.

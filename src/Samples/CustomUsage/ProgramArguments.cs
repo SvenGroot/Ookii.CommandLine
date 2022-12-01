@@ -7,7 +7,9 @@ namespace CustomUsage;
 // This class defines the arguments for the sample. It uses the same arguments as the LongShort
 // sample, so see that sample for more detailed descriptions.
 //
-// This sample uses the long/short argument mode, and customizes the usage help.
+// This sample sets the mode, case sensitivity and name transform to use POSIX conventions.
+//
+// See the Parse() method below to see how the usage customization is applied.
 [ApplicationFriendlyName("Ookii.CommandLine Long/Short Mode Sample")]
 [Description("Sample command line application with highly customized usage help. The application parses the command line and prints the results, but otherwise does nothing and none of the arguments are actually used for anything.")]
 [ParseOptions(Mode = ParsingMode.LongShort,
@@ -19,11 +21,11 @@ class ProgramArguments
 {
     [CommandLineArgument(Position = 0, IsRequired = true, IsShort = true)]
     [Description("The source data.")]
-    public string Source { get; set; } = string.Empty;
+    public string? Source { get; set; }
 
     [CommandLineArgument(Position = 1, IsRequired = true, IsShort = true)]
     [Description("The destination data.")]
-    public string Destination { get; set; } = string.Empty;
+    public string? Destination { get; set; }
 
     [CommandLineArgument(DefaultValue = 1)]
     [Description("The operation's index.")]

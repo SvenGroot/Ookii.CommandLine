@@ -1,7 +1,7 @@
 ﻿using Ookii.CommandLine;
 using System.Net;
 
-namespace wpftest3;
+namespace WpfSample;
 
 // This custom UsageWriter outputs usage as HTML.
 internal class HtmlUsageWriter : UsageWriter
@@ -10,8 +10,8 @@ internal class HtmlUsageWriter : UsageWriter
     public HtmlUsageWriter()
         : base(null, false)
     {
-        // These don't harm the output (whitespace is ignored in HTML after all), but they're not
-        // needed either.
+        // The indents and blank lines don't alter how the output looks (whitespace is ignored in
+        // HTML after all), but they're not needed either.
         SyntaxIndent = 0;
         ArgumentDescriptionIndent = 0;
         BlankLineAfterDescription = false;
@@ -47,9 +47,11 @@ internal class HtmlUsageWriter : UsageWriter
     protected override void WriteUsageSyntaxPrefix()
     {
         Writer.Write($"<strong>{ExecutableName}</strong>");
+        // This application doesn't use subcommands, so we don't need to worry about the command
+        // name.
     }
 
-    // Prevent wrapping after the argument name prefix.
+    // Prevent wrapping an argument name after the argument name prefix.
     protected override void WriteArgumentName(string argumentName, string prefix)
     {
         Writer.Write("<span class=\"argument\">");

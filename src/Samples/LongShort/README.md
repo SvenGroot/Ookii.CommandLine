@@ -1,16 +1,18 @@
 ﻿# Long/short mode sample
 
-This sample shows the alternate long/short parsing mode, as well as some other options that can
-be customized. For example, it uses a NameTransform to make all the arguments dash-case, and uses
-case-sensitive argument matching.
+This sample alters the behavior of Ookii.CommandLine to be more like the POSIX conventions for
+command line arguments. To do this, enables the alternate long/short parsing mode, uses a
+[name transformation](../../../docs/DefiningArguments.md#name-transformation) to make all the
+argument names lower case with dashes between the words, and uses case-sensitive argument names.
 
-In long/short mode, each argument can have a long name, using the `--` prefix (by default), and a
-one-character short name, using the `-` prefix.
+This sample uses the same arguments as the [parser Sample](../Parser), so see that sample's source
+for more details about each argument.
 
-It uses the same arguments as the [Parser Sample](../Parser), so see that for more details about
-each argument.
+In long/short mode, each argument can have a long name, using the `--` prefix, and a one-character
+short name, using the `-` prefix (and '/' on Windows). The prefixes can be customized if desired.
 
-The default usage help has a slightly different format to accommodate the short names.
+When in this mode, the default usage help has a slightly different format to accommodate the short
+names.
 
 ```text
 Sample command line application using long/short parsing mode. The application parses the command
