@@ -1325,7 +1325,7 @@ namespace Ookii.CommandLine
         /// <remarks>
         /// <para>
         ///   The base implementation writes the description text, argument validator messages, and
-        ///   the default value, following by two new lines. Which elements are included can be
+        ///   the default value, followed by two new lines. Which elements are included can be
         ///   influenced using the properties of this class.
         /// </para>
         /// </remarks>
@@ -1735,9 +1735,9 @@ namespace Ookii.CommandLine
         /// <param name="command">The command.</param>
         /// <remarks>
         /// <para>
-        ///   The base implementation writes a line with the command's name and aliases, using
-        ///   the color from the <see cref="CommandDescriptionColor"/> property if color is enabled,
-        ///   followed by a line containing the command's description.
+        ///   The base implementation calls the <see cref="WriteCommandDescriptionHeader"/> method,
+        ///   the <see cref="WriteCommandDescriptionBody"/> method, and then adds an extra blank
+        ///   line if the <see cref="BlankLineAfterCommandDescription"/> property is <see langword="true"/>.
         /// </para>
         /// <para>
         ///   This method is called by the base implementation of the <see cref="WriteCommandDescriptions"/>
@@ -1757,13 +1757,13 @@ namespace Ookii.CommandLine
 
         /// <summary>
         /// Writes the header of a command's description, which is typically the name and alias(es)
-        /// of a command.
+        /// of the command.
         /// </summary>
         /// <param name="command">The command.</param>
         /// <remarks>
         /// <para>
-        ///   The base implementation the command's name and alias(es), using the color from the
-        ///   <see cref="CommandDescriptionColor"/> property if color is enabled, followed by a
+        ///   The base implementation writes the command's name and alias(es), using the color from
+        ///   the <see cref="CommandDescriptionColor"/> property if color is enabled, followed by a
         ///   newline.
         /// </para>
         /// </remarks>
@@ -1784,13 +1784,13 @@ namespace Ookii.CommandLine
         }
 
         /// <summary>
-        /// Writes the body of a command's description, which is typically the name and alias(es)
-        /// of a command.
+        /// Writes the body of a command's description, which is typically the description of the
+        /// command.
         /// </summary>
-        /// <param name="command">The command</param>
+        /// <param name="command">The command.</param>
         /// <remarks>
         /// <para>
-        ///   The base implementation writes the command's description, followed by two newlines.
+        ///   The base implementation writes the command's description, followed by a newline.
         /// </para>
         /// </remarks>
         private void WriteCommandDescriptionBody(CommandInfo command)
@@ -1808,7 +1808,7 @@ namespace Ookii.CommandLine
         /// <param name="commandName">The command name.</param>
         /// <remarks>
         /// <para>
-        ///   The default implementation just writes the name.
+        ///   The base implementation just writes the name.
         /// </para>
         /// <para>
         ///   This method is called by the base implementation of the <see cref="WriteCommandDescription(CommandInfo)"/>
