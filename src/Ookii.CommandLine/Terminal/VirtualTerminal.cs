@@ -33,13 +33,10 @@ namespace Ookii.CommandLine.Terminal
         /// </returns>
         /// <remarks>
         /// <para>
-        ///   Do not write VT sequences to the console unless this method returns <see langword="true"/>.
-        /// </para>
-        /// <para>
-        ///   This function will return <see langword="true"/> if the specified stream is not
-        ///   redirected, and the TERM environment variable is not set to "dumb". On Windows, 
-        ///   enabling VT support has to succeed. On non-Windows platforms, VT support is assumed
-        ///   if the TERM environment variable is defined.
+        ///   Virtual terminal sequences are supported if the specified stream is not redirected,
+        ///   and the TERM environment variable is not set to "dumb". On Windows, enabling VT
+        ///   support has to succeed. On non-Windows platforms, VT support is assumed if the TERM
+        ///   environment variable is defined.
         /// </para>
         /// <para>
         ///   For <see cref="StandardStream.Input"/>, this method does nothing and always returns
@@ -82,7 +79,8 @@ namespace Ookii.CommandLine.Terminal
         }
 
         /// <summary>
-        /// Enables color  for the console attached to the specified stream.
+        /// Enables color support using virtual terminal sequences for the console attached to the
+        /// specified stream.
         /// </summary>
         /// <param name="stream">The <see cref="StandardStream"/> to enable color sequences for.</param>
         /// <returns>
@@ -92,8 +90,8 @@ namespace Ookii.CommandLine.Terminal
         /// </returns>
         /// <remarks>
         /// <para>
-        ///   If an environment variable named "NO_COLOR" exists, this function always returns
-        ///   <see langword="false"/>. Otherwise, this function calls the <see cref="EnableVirtualTerminalSequences"/>
+        ///   If an environment variable named "NO_COLOR" exists, this function will not enable VT
+        ///   sequences. Otherwise, this function calls the <see cref="EnableVirtualTerminalSequences"/>
         ///   method and returns its result.
         /// </para>
         /// </remarks>

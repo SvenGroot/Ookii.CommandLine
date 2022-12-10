@@ -1,7 +1,7 @@
 ﻿namespace Ookii.CommandLine.Terminal
 {
     /// <summary>
-    /// Represents one of the standard console stream.
+    /// Represents one of the standard console streams.
     /// </summary>
     public enum StandardStream
     {

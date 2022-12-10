@@ -216,7 +216,7 @@ namespace Ookii.CommandLine
         /// <remarks>
         /// <para>
         ///   The color will only be used if the <see cref="UseColor"/> property is
-        ///   <see langword="true"/>; otherwise, it will be replaced with an empty string.
+        ///   <see langword="true"/>.
         /// </para>
         /// <para>
         ///   If the string contains anything other than virtual terminal sequences, those parts
@@ -224,10 +224,11 @@ namespace Ookii.CommandLine
         ///   <see langword="true"/>.
         /// </para>
         /// <para>
-        ///   The portion of the string that has color will end with the <see cref="ColorReset"/>.
+        ///   The portion of the string that has color will end with the value of the
+        ///   <see cref="ColorReset"/> property.
         /// </para>
         /// <para>
-        ///   With the default value, only the "Usage:" portion of the string has color; the
+        ///   With the base implementation, only the "Usage:" portion of the string has color; the
         ///   executable name does not.
         /// </para>
         /// </remarks>
@@ -343,7 +344,7 @@ namespace Ookii.CommandLine
         /// <remarks>
         /// <para>
         ///   The color will only be used if the <see cref="UseColor"/> property is
-        ///   <see langword="true"/>; otherwise, it will be replaced with an empty string.
+        ///   <see langword="true"/>.
         /// </para>
         /// <para>
         ///   If the string contains anything other than virtual terminal sequences, those parts
@@ -446,7 +447,7 @@ namespace Ookii.CommandLine
         /// <remarks>
         /// <para>
         ///   This property will only be used if the <see cref="UseColor"/> property is
-        ///   <see langword="true"/>; otherwise, it will be replaced with an empty string.
+        ///   <see langword="true"/>.
         /// </para>
         /// <para>
         ///   If the string contains anything other than virtual terminal sequences, those parts
@@ -490,7 +491,7 @@ namespace Ookii.CommandLine
         /// <remarks>
         /// <para>
         ///   The color will only be used if the <see cref="UseColor"/> property is
-        ///   <see langword="true"/>; otherwise, it will be replaced with an empty string.
+        ///   <see langword="true"/>.
         /// </para>
         /// <para>
         ///   If the string contains anything other than virtual terminal sequences, those parts

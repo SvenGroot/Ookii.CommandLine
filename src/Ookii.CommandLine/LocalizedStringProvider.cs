@@ -6,7 +6,7 @@ using System.Reflection;
 namespace Ookii.CommandLine
 {
     /// <summary>
-    /// Provides custom localized strings for error messages and usage help.
+    /// Provides custom localized strings.
     /// </summary>
     /// <remarks>
     /// <para>
