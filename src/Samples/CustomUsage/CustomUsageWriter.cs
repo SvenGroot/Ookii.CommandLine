@@ -150,7 +150,6 @@ internal class CustomUsageWriter : UsageWriter
     private static int CalculateNamesLength(CommandLineArgument argument)
     {
         int length = 0;
-        int count = 0;
         if (argument.HasShortName)
         {
             // +1 for separator
@@ -175,7 +174,6 @@ internal class CustomUsageWriter : UsageWriter
             var longPrefixLength = argument.Parser.LongArgumentNamePrefix!.Length;
             // Space for prefix, long name, separator.
             length += argument.Aliases.Sum(alias => longPrefixLength + alias.Length + 1);
-            count += argument.Aliases.Count;
         }
 
         // There is one separator too many
