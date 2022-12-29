@@ -35,12 +35,12 @@ class ProgramArguments
     [Description("The source data.")]
     public string? Source { get; set; }
 
-    // This property defines a required positional argument called "Destination".
+    // This property defines a required positional argument called "-Destination".
     [CommandLineArgument(Position = 1, IsRequired = true)]
     [Description("The destination data.")]
     public string? Destination { get; set; }
 
-    // This property defines a optional positional argument called "OperationIndex". If the argument
+    // This property defines a optional positional argument called "-OperationIndex". If the argument
     // is not supplied, this property will be set to the default value 1.
     //
     // The argument's type is "int", so only valid integer values will be accepted. Anything else

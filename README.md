@@ -14,6 +14,8 @@ Ookii.CommandLine can be added to your project using [NuGet](https://nuget.org/p
 [Code snippets](docs/CodeSnippets.md) for Visual Studio are available on the
 [Visual Studio marketplace](https://www.ookii.org/Link/CommandLineSnippets).
 
+A [C++ version](https://github.com/SvenGroot/Ookii.CommandLine.Cpp) is also available.
+
 ## Overview
 
 Ookii.CommandLine is a library that lets you parse the command line arguments for your application

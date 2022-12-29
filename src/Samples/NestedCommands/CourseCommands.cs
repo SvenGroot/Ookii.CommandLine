@@ -21,7 +21,7 @@ internal class CourseCommand : ParentCommand
 internal class AddCourseCommand : BaseCommand
 {
     [CommandLineArgument(Position = 0, IsRequired = true)]
-    [Description("The first name of the course.")]
+    [Description("The name of the course.")]
     [ValidateNotWhiteSpace]
     public string Name { get; set; } = string.Empty;
 

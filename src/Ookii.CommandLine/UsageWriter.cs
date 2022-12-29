@@ -352,7 +352,8 @@ namespace Ookii.CommandLine
         ///   <see langword="true"/>.
         /// </para>
         /// <para>
-        ///   The portion of the string that has color will end with the <see cref="ColorReset"/>.
+        ///   The portion of the string that has color will end with the value of the 
+        ///   <see cref="ColorReset"/> property.
         /// </para>
         /// <para>
         ///   With the default format, only the argument name, value description and aliases

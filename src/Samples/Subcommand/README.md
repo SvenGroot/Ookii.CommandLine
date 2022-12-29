@@ -32,7 +32,7 @@ Run 'Subcommand <command> -Help' for more information about a command.
 ```
 
 Like the usage help format for arguments, the command list format can also be customized using the
-`UsageWriter class. If the console is capable, the command list also uses color.
+`UsageWriter` class. If the console is capable, the command list also uses color.
 
 If we run `./Subcommand write -Help`, we get the following:
 
