@@ -29,7 +29,7 @@
         /// </summary>
         AlphabeticalShortName,
         /// <summary>
-        /// The same as <see cref="AlphabeticalShortNameDescending"/>, but in reverse order.
+        /// The same as <see cref="AlphabeticalShortName"/>, but in reverse order.
         /// </summary>
         AlphabeticalShortNameDescending,
     }
