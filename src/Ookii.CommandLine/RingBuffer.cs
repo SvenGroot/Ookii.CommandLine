@@ -5,10 +5,9 @@ using System.IO;
 using StringSpan = System.ReadOnlySpan<char>;
 #endif
 
-
 namespace Ookii.CommandLine
 {
-    internal class RingBuffer
+    internal partial class RingBuffer
     {
         private char[] _buffer;
         private int _bufferStart;
@@ -68,28 +67,8 @@ namespace Ookii.CommandLine
             }
         }
 
-        public void WriteTo(TextWriter writer, int length)
-        {
-            if (length > Size)
-            {
-                throw new ArgumentOutOfRangeException(nameof(length));
-            }
-
-            var remaining = _buffer.Length - _bufferStart;
-            if (remaining < length)
-            {
-                writer.Write(_buffer, _bufferStart, remaining);
-                remaining = length - remaining;
-                writer.Write(_buffer, 0, remaining);
-                _bufferStart = remaining;
-            }
-            else
-            {
-                writer.Write(_buffer, _bufferStart, length);
-                _bufferStart += length;
-                Debug.Assert(_bufferStart <= _buffer.Length);
-            }
-        }
+        // This method is generated from WriteToAsync before the build.
+        public partial void WriteTo(TextWriter writer, int length);
 
         public void Discard(int length)
         {

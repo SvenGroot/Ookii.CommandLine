@@ -2,6 +2,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace Ookii.CommandLine.Tests
 {
@@ -31,6 +32,19 @@ namespace Ookii.CommandLine.Tests
             // And again, in pieces less than the max line length.
             Assert.AreEqual(_expectedNoIndent, WriteString(_input, maxLength, 50));
         }
+
+        [TestMethod()]
+        public async Task TestWriteStringAsync()
+        {
+            const int maxLength = 80;
+
+            Assert.AreEqual(_expectedNoIndent, await WriteStringAsync(_input, maxLength, _input.Length));
+            // Write it again, in pieces exactly as long as the max line length.
+            Assert.AreEqual(_expectedNoIndent, await WriteStringAsync(_input, maxLength, maxLength));
+            // And again, in pieces less than the max line length.
+            Assert.AreEqual(_expectedNoIndent, await WriteStringAsync(_input, maxLength, 50));
+        }
+
 
         [TestMethod()]
         public void TestWriteStringNoMaximum()
@@ -122,6 +136,25 @@ namespace Ookii.CommandLine.Tests
 
             Assert.AreEqual(_expectedIndentChanges, writer.BaseWriter.ToString());
         }
+
+        [TestMethod()]
+        public async Task TestIndentChangesAsync()
+        {
+            using var writer = LineWrappingTextWriter.ForStringWriter(80);
+            writer.Indent = 4;
+            await writer.WriteLineAsync(_input);
+            writer.Indent = 8;
+            await writer.WriteLineAsync(_input.Trim());
+            // Should add a new line.
+            await writer.ResetIndentAsync();
+            await writer.WriteLineAsync(_input.Trim());
+            // Should not add a new line.
+            await writer.ResetIndentAsync();
+            await writer.FlushAsync();
+
+            Assert.AreEqual(_expectedIndentChanges, writer.BaseWriter.ToString());
+        }
+
         [TestMethod()]
         public void TestIndentStringNoMaximum()
         {
@@ -311,6 +344,26 @@ namespace Ookii.CommandLine.Tests
             writer.Flush();
             return writer.BaseWriter.ToString();
         }
+
+        private static async Task<string> WriteStringAsync(string value, int maxLength, int segmentSize, int indent = 0)
+        {
+            using var writer = LineWrappingTextWriter.ForStringWriter(maxLength);
+            writer.Indent = indent;
+            return await WriteStringAsync(writer, value, segmentSize);
+        }
+
+        private static async Task<string> WriteStringAsync(LineWrappingTextWriter writer, string value, int segmentSize)
+        {
+            for (int i = 0; i < value.Length; i += segmentSize)
+            {
+                // Ignore the suggestion to use AsSpan, we want to call the string overload.
+                await writer.WriteAsync(value.Substring(i, Math.Min(value.Length - i, segmentSize)));
+            }
+
+            await writer.FlushAsync();
+            return writer.BaseWriter.ToString();
+        }
+
 
         private static string WriteCharArray(char[] value, int maxLength, int segmentSize, int indent = 0)
         {

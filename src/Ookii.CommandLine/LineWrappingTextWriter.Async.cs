@@ -1,0 +1,301 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
+#if NET6_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+using StringMemory = System.ReadOnlyMemory<char>;
+#endif
+
+namespace Ookii.CommandLine
+{
+    public partial class LineWrappingTextWriter
+    {
+
+        private partial class LineBuffer
+        {
+            public async Task FlushToAsync(TextWriter writer, int indent)
+            {
+                if (!IsEmpty)
+                {
+                    await WriteLineToAsync(writer, indent);
+                }
+            }
+
+            public async Task WriteLineToAsync(TextWriter writer, int indent)
+            {
+                if (!IsEmpty)
+                {
+                    await WriteSegmentsAsync(writer, _segments);
+                }
+
+                await writer.WriteLineAsync();
+                ClearCurrentLine(indent);
+            }
+
+            private async Task WriteSegmentsAsync(TextWriter writer, IEnumerable<Segment> segments)
+            {
+                await WriteIndentAsync(writer, Indentation);
+                foreach (var segment in segments)
+                {
+                    switch (segment.Type)
+                    {
+                    case StringSegmentType.PartialLineBreak:
+                    case StringSegmentType.LineBreak:
+                        await writer.WriteLineAsync();
+                        break;
+
+                    default:
+                        await _buffer.WriteToAsync(writer, segment.Length);
+                        break;
+                    }
+                }
+            }
+
+            public async Task<StringMemory> BreakLineAsync(TextWriter writer, StringMemory newSegment, int maxLength, int indent)
+            {
+                var result = await BreakLineAsync(writer, newSegment, maxLength, indent, false);
+                if (!result.Success)
+                {
+                    // Guaranteed to succeed with force=true.
+                    result = await BreakLineAsync(writer, newSegment, maxLength, indent, true);
+                    Debug.Assert(result.Success);
+                }
+
+                return result.Remaining;
+            }
+
+            private async Task<AsyncBreakLineResult> BreakLineAsync(TextWriter writer, StringMemory newSegment, int maxLength, int indent, bool force)
+            {
+                Debug.Assert(LineLength <= maxLength || newSegment.Span.Length == 0);
+
+                if (newSegment.BreakLine(maxLength - LineLength, force, out var splits))
+                {
+                    var (before, after) = splits;
+                    await WriteSegmentsAsync(writer, _segments);
+                    await before.WriteToAsync(writer);
+                    await writer.WriteLineAsync();
+                    ClearCurrentLine(indent);
+                    Indentation = indent;
+                    return new() { Success = true, Remaining = after };
+                }
+
+                if (IsEmpty)
+                {
+                    return new() { Success = false };
+                }
+
+                int offset = 0;
+                int contentOffset = 0;
+                foreach (var segment in _segments)
+                {
+                    offset += segment.Length;
+                    contentOffset += segment.ContentLength;
+                }
+
+                for (int segmentIndex = _segments.Count - 1; segmentIndex >= 0; segmentIndex--)
+                {
+                    var segment = _segments[segmentIndex];
+                    offset -= segment.Length;
+                    contentOffset -= segment.ContentLength;
+                    if (segment.Type != StringSegmentType.Text || contentOffset > maxLength)
+                    {
+                        continue;
+                    }
+
+                    int breakIndex = _buffer.BreakLine(offset, Math.Min(segment.Length, maxLength - contentOffset));
+                    if (breakIndex >= 0)
+                    {
+                        await WriteSegmentsAsync(writer, _segments.Take(segmentIndex));
+                        breakIndex -= offset;
+                        await _buffer.WriteToAsync(writer, breakIndex);
+                        _buffer.Discard(1);
+                        await writer.WriteLineAsync();
+                        if (breakIndex + 1 < segment.Length)
+                        {
+                            _segments.RemoveRange(0, segmentIndex);
+                            segment.Length -= breakIndex + 1;
+                            _segments[0] = segment;
+                        }
+                        else
+                        {
+                            _segments.RemoveRange(0, segmentIndex + 1);
+                        }
+
+                        ContentLength = _segments.Sum(s => s.ContentLength);
+                        IsEmpty = (ContentLength == 0); // Can I get rid of IsEmpty?
+                        Indentation = indent;
+                        return new() { Success = true, Remaining = newSegment };
+                    }
+                }
+
+                return new() { Success = false };
+            }
+        }
+
+        /// <inheritdoc/>
+        public override async Task FlushAsync()
+        {
+            if (_lineBuffer != null)
+            {
+                await _lineBuffer.FlushToAsync(_baseWriter, _indent);
+            }
+
+            await base.FlushAsync();
+            await _baseWriter.FlushAsync();
+        }
+
+        public partial async Task ResetIndentAsync()
+        {
+            if (_lineBuffer != null)
+            {
+                if (!_lineBuffer.IsEmpty)
+                {
+                    await _lineBuffer.FlushToAsync(_baseWriter, 0);
+                }
+                else
+                {
+                    _lineBuffer.ClearCurrentLine(0);
+                }
+            }
+            else
+            {
+                if (!_indentNextWrite && _currentLineLength > 0)
+                {
+                    await _baseWriter.WriteLineAsync();
+                }
+
+                _indentNextWrite = false;
+            }
+        }
+
+        private async Task WriteNoMaximumAsync(StringMemory buffer)
+        {
+            Debug.Assert(_maximumLineLength == 0);
+
+            await buffer.SplitAsync(true, async (type, span) =>
+            {
+                switch (type)
+                {
+                case StringSegmentType.PartialLineBreak:
+                    // If we already had a partial line break, write it now.
+                    if (_hasPartialLineBreak)
+                    {
+                        await WriteLineBreakDirectAsync();
+                    }
+                    else
+                    {
+                        _hasPartialLineBreak = true;
+                    }
+
+                    break;
+
+                case StringSegmentType.LineBreak:
+                    // Write an extra line break if there was a partial one and this one isn't the
+                    // end of that line break.
+                    if (_hasPartialLineBreak)
+                    {
+                        _hasPartialLineBreak = false;
+                        if (span.Span.Length != 1 || span.Span[0] != '\n')
+                        {
+                            await WriteLineBreakDirectAsync();
+                        }
+                    }
+
+                    await WriteLineBreakDirectAsync();
+                    break;
+
+                default:
+                    // If we had a partial line break, write it now.
+                    if (_hasPartialLineBreak)
+                    {
+                        await WriteLineBreakDirectAsync();
+                        _hasPartialLineBreak = false;
+                    }
+
+                    await WriteIndentDirectIfNeededAsync();
+                    await span.WriteToAsync(_baseWriter);
+                    _currentLineLength += span.Span.Length;
+                    break;
+                }
+            });
+        }
+
+        private async Task WriteLineBreakDirectAsync()
+        {
+            await _baseWriter.WriteLineAsync();
+            _indentNextWrite = _currentLineLength != 0;
+            _currentLineLength = 0;
+        }
+
+        private async Task WriteIndentDirectIfNeededAsync()
+        {
+            // Write the indentation if necessary.
+            if (_indentNextWrite)
+            {
+                await WriteIndentAsync(_baseWriter, _indent);
+                _indentNextWrite = false;
+            }
+        }
+
+        private static async Task WriteIndentAsync(TextWriter writer, int indent)
+        {
+            for (int x = 0; x < indent; ++x)
+            {
+                await writer.WriteAsync(IndentChar);
+            }
+        }
+
+        private async Task WriteCoreAsync(StringMemory buffer)
+        {
+            ThrowIfWriteInProgress();
+            if (_lineBuffer == null)
+            {
+                await WriteNoMaximumAsync(buffer);
+                return;
+            }
+
+            await buffer.SplitAsync(_countFormatting, async (type, span) =>
+            {
+                bool hadPartialLineBreak = _lineBuffer.CheckAndRemovePartialLineBreak();
+                if (hadPartialLineBreak)
+                {
+                    await _lineBuffer.WriteLineToAsync(_baseWriter, _indent);
+                }
+
+                if (type == StringSegmentType.LineBreak)
+                {
+                    // Check if this is just the end of a partial line break. If it is, it was
+                    // already written above.
+                    if (!hadPartialLineBreak || span.Span.Length == 1 && span.Span[0] != '\n')
+                    {
+                        await _lineBuffer.WriteLineToAsync(_baseWriter, _indent);
+                    }
+                }
+                else
+                {
+                    var remaining = span;
+                    if (type == StringSegmentType.Text && !_lineBuffer.HasPartialFormatting)
+                    {
+                        while (_lineBuffer.LineLength + remaining.Span.Length > _maximumLineLength)
+                        {
+                            remaining = await _lineBuffer.BreakLineAsync(_baseWriter, remaining, _maximumLineLength, _indent);
+                        }
+                    }
+
+                    if (remaining.Span.Length > 0)
+                    {
+                        _lineBuffer.Append(remaining.Span, type);
+                        if (_lineBuffer.LineLength > _maximumLineLength)
+                        {
+                            // This can happen if we couldn't break above because partial formatting
+                            // had to be resolved.
+                            await _lineBuffer.BreakLineAsync(_baseWriter, default, _maximumLineLength, _indent);
+                        }
+                    }
+                }
+            });
+        }
+    }
+}

@@ -97,6 +97,15 @@ namespace Ookii.CommandLine.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to An async write operation is already in progress..
+        /// </summary>
+        internal static string AsyncWriteInProgress {
+            get {
+                return ResourceManager.GetString("AsyncWriteInProgress", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Displays this help message..
         /// </summary>
         internal static string AutomaticHelpDescription {
@@ -464,7 +473,7 @@ namespace Ookii.CommandLine.Properties {
                 return ResourceManager.GetString("NoParserForCustomParsingCommand", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to No type converter that can convert to and from a string exists for type &apos;{0}&apos;. Use the TypeConverterAttribute to specify a custom TypeConverter..
         /// </summary>

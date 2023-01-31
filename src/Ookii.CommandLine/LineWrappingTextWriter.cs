@@ -7,8 +7,11 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
+using System.Threading;
 #if NET6_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
 using StringSpan = System.ReadOnlySpan<char>;
+using StringMemory = System.ReadOnlyMemory<char>;
 #endif
 
 namespace Ookii.CommandLine
@@ -54,7 +57,7 @@ namespace Ookii.CommandLine
     ///   and buffering does not occur. Indentation is still inserted as appropriate.
     /// </para>
     /// </remarks>
-    public class LineWrappingTextWriter : TextWriter
+    public partial class LineWrappingTextWriter : TextWriter
     {
         #region Nested types
 
@@ -77,8 +80,24 @@ namespace Ookii.CommandLine
 
         }
 
-        private class LineBuffer
+        private partial class LineBuffer
         {
+            private struct AsyncBreakLineResult
+            {
+                public bool Success { get; set; }
+                public StringMemory Remaining { get; set; }
+            }
+
+#if NET6_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+            private ref struct BreakLineResult
+#else
+        private struct BreakLineResult
+#endif
+            {
+                public bool Success { get; set; }
+                public StringSpan Remaining { get; set; }
+            }
+
             private readonly RingBuffer _buffer;
             private readonly List<Segment> _segments = new();
 
@@ -150,24 +169,9 @@ namespace Ookii.CommandLine
 
             public bool HasPartialFormatting => LastSegment is Segment last && last.Type == StringSegmentType.PartialFormatting;
 
-            public void FlushTo(TextWriter writer, int indent)
-            {
-                if (!IsEmpty)
-                {
-                    WriteLineTo(writer, indent);
-                }
-            }
+            public partial void FlushTo(TextWriter writer, int indent);
 
-            public void WriteLineTo(TextWriter writer, int indent)
-            {
-                if (!IsEmpty)
-                {
-                    WriteSegments(writer, _segments);
-                }
-
-                writer.WriteLine();
-                ClearCurrentLine(indent);
-            }
+            public partial void WriteLineTo(TextWriter writer, int indent);
 
             public bool CheckAndRemovePartialLineBreak()
             {
@@ -206,108 +210,11 @@ namespace Ookii.CommandLine
                 }
             }
 
-            private void WriteSegments(TextWriter writer, IEnumerable<Segment> segments)
-            {
-                WriteIndent(writer, Indentation);
-                foreach (var segment in segments)
-                {
-                    switch (segment.Type)
-                    {
-                    case StringSegmentType.PartialLineBreak:
-                    case StringSegmentType.LineBreak:
-                        writer.WriteLine();
-                        break;
+            private partial void WriteSegments(TextWriter writer, IEnumerable<Segment> segments);
 
-                    default:
-                        _buffer.WriteTo(writer, segment.Length);
-                        break;
-                    }
-                }
-            }
+            public partial StringSpan BreakLine(TextWriter writer, StringSpan newSegment, int maxLength, int indent);
 
-            public StringSpan BreakLine(TextWriter writer, StringSpan newSegment, int maxLength, int indent)
-            {
-                if (!BreakLine(writer, newSegment, maxLength, indent, false, out var remaining))
-                {
-                    // Guaranteed to succeed with force=true.
-                    var result = BreakLine(writer, newSegment, maxLength, indent, true, out remaining);
-                    Debug.Assert(result);
-                }
-
-                return remaining;
-            }
-
-            // Use an out param because StringSpan is ReadOnlySpan<char> on .Net 6.
-            private bool BreakLine(TextWriter writer, StringSpan newSegment, int maxLength, int indent, bool force, out StringSpan remaining)
-            {
-                Debug.Assert(LineLength <= maxLength || newSegment.Length == 0);
-
-                if (newSegment.BreakLine(maxLength - LineLength, force, out var splits))
-                {
-                    var (before, after) = splits;
-                    WriteSegments(writer, _segments);
-                    before.WriteTo(writer);
-                    writer.WriteLine();
-                    ClearCurrentLine(indent);
-                    Indentation = indent;
-                    remaining = after;
-                    return true;
-                }
-
-                if (IsEmpty)
-                {
-                    remaining = default;
-                    return false;
-                }
-
-                int offset = 0;
-                int contentOffset = 0;
-                foreach (var segment in _segments)
-                {
-                    offset += segment.Length;
-                    contentOffset += segment.ContentLength;
-                }
-
-                for (int segmentIndex = _segments.Count - 1; segmentIndex >= 0; segmentIndex--)
-                {
-                    var segment = _segments[segmentIndex];
-                    offset -= segment.Length;
-                    contentOffset -= segment.ContentLength;
-                    if (segment.Type != StringSegmentType.Text || contentOffset > maxLength)
-                    {
-                        continue;
-                    }
-
-                    int breakIndex = _buffer.BreakLine(offset, Math.Min(segment.Length, maxLength - contentOffset));
-                    if (breakIndex >= 0)
-                    {
-                        WriteSegments(writer, _segments.Take(segmentIndex));
-                        breakIndex -= offset;
-                        _buffer.WriteTo(writer, breakIndex);
-                        _buffer.Discard(1);
-                        writer.WriteLine();
-                        if (breakIndex + 1 < segment.Length)
-                        {
-                            _segments.RemoveRange(0, segmentIndex);
-                            segment.Length -= breakIndex + 1;
-                            _segments[0] = segment;
-                        }
-                        else
-                        {
-                            _segments.RemoveRange(0, segmentIndex + 1);
-                        }
-
-                        ContentLength = _segments.Sum(s => s.ContentLength);
-                        IsEmpty = (ContentLength == 0); // Can I get rid of IsEmpty?
-                        Indentation = indent;
-                        remaining = newSegment;
-                        return true;
-                    }
-                }
-
-                remaining = default;
-                return false;
-            }
+            private partial BreakLineResult BreakLine(TextWriter writer, StringSpan newSegment, int maxLength, int indent, bool force);
 
             public void ClearCurrentLine(int indent)
             {
@@ -327,7 +234,7 @@ namespace Ookii.CommandLine
             }
         }
 
-        #endregion
+#endregion
 
         private const char IndentChar = ' ';
 
@@ -342,6 +249,7 @@ namespace Ookii.CommandLine
         private bool _indentNextWrite;
         private int _currentLineLength;
         private bool _hasPartialLineBreak;
+        private Task _asyncWriteTask = Task.CompletedTask;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="LineWrappingTextWriter"/> class.
@@ -552,6 +460,90 @@ namespace Ookii.CommandLine
             WriteCore(new StringSpan(buffer, index, count));
         }
 
+        /// <inheritdoc/>
+        public override Task WriteAsync(char value)
+        {
+#if NET6_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+            // Array creation is unavoidable here because ReadOnlyMemory can't use a pointer.
+            _asyncWriteTask = WriteCoreAsync(new[] { value });
+#else
+            _asyncWriteTask = WriteCoreAsync(new StringMemory(value));
+#endif
+            return _asyncWriteTask;
+        }
+
+        /// <inheritdoc/>
+        public override Task WriteAsync(string? value)
+        {
+            if (value == null)
+            {
+                return Task.CompletedTask;
+            }
+
+#if NET6_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+            // Array creation is unavoidable here because ReadOnlyMemory can't use a pointer.
+            _asyncWriteTask = WriteCoreAsync(value.AsMemory());
+#else
+            _asyncWriteTask = WriteCoreAsync(new StringMemory(value));
+#endif
+            return _asyncWriteTask;
+        }
+
+        /// <inheritdoc/>
+        public override Task WriteAsync(char[] buffer, int index, int count)
+        {
+            if (buffer == null)
+            {
+                throw new ArgumentNullException(nameof(buffer));
+            }
+
+            if (index < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(index), Properties.Resources.ValueMustBeNonNegative);
+            }
+
+            if (count < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(count), Properties.Resources.ValueMustBeNonNegative);
+            }
+
+            if ((buffer.Length - index) < count)
+            {
+                throw new ArgumentException(Properties.Resources.IndexCountOutOfRange);
+            }
+
+            _asyncWriteTask = WriteCoreAsync(new StringMemory(buffer, index, count));
+            return _asyncWriteTask;
+        }
+
+        /// <inheritdoc/>
+        public override async Task WriteLineAsync() => await WriteAsync(CoreNewLine);
+
+        /// <inheritdoc/>
+        public override async Task WriteLineAsync(char value)
+        {
+            await WriteAsync(value);
+            await WriteLineAsync();
+        }
+
+        /// <inheritdoc/>
+        public override async Task WriteLineAsync(char[] buffer, int index, int count)
+        {
+            await WriteAsync(buffer, index, count);
+            await WriteLineAsync();
+        }
+
+        /// <inheritdoc/>
+        public override async Task WriteLineAsync(string? value)
+        {
+            if (value != null)
+            {
+                await WriteAsync(value);
+            }
+
+            await WriteLineAsync();
+        }
+
 #if NET6_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
 
         /// <inheritdoc/>
@@ -564,15 +556,40 @@ namespace Ookii.CommandLine
             WriteLine();
         }
 
-#endif
+        /// <inheritdoc/>
+        public override async ValueTask DisposeAsync()
+        {
+            await FlushAsync();
+            await base.DisposeAsync();
+            if (_disposeBaseWriter)
+            {
+                await _baseWriter.DisposeAsync();
+            }
+        }
 
         /// <inheritdoc/>
-        public override void Flush()
+        public override Task WriteAsync(StringMemory buffer, CancellationToken cancellationToken = default)
         {
-            _lineBuffer?.FlushTo(_baseWriter, _indent);
-            base.Flush();
-            _baseWriter.Flush();
+            if (cancellationToken.IsCancellationRequested)
+            {
+                return Task.FromCanceled(cancellationToken);
+            }
+
+            // TODO: Use cancellation token if possible.
+            _asyncWriteTask = WriteCoreAsync(buffer);
+            return _asyncWriteTask;
         }
+
+        /// <inheritdoc/>
+        public override async Task WriteLineAsync(StringMemory buffer, CancellationToken cancellationToken = default)
+        {
+            await WriteAsync(buffer, cancellationToken);
+            await WriteAsync(CoreNewLine.AsMemory(), cancellationToken);
+        }
+
+#endif
+
+        public override partial void Flush();
 
         /// <summary>
         /// Restarts writing on the beginning of the line, without indenting that line.
@@ -589,29 +606,27 @@ namespace Ookii.CommandLine
         ///   the output position is simply reset to the beginning of the line without writing anything to the base writer.
         /// </para>
         /// </remarks>
-        public void ResetIndent()
-        {
-            if (_lineBuffer != null)
-            {
-                if (!_lineBuffer.IsEmpty)
-                {
-                    _lineBuffer.FlushTo(_baseWriter, 0);
-                }
-                else
-                {
-                    _lineBuffer.ClearCurrentLine(0);
-                }
-            }
-            else
-            {
-                if (!_indentNextWrite && _currentLineLength > 0)
-                {
-                    _baseWriter.WriteLine();
-                }
+        public partial void ResetIndent();
 
-                _indentNextWrite = false;
-            }
-        }
+        /// <summary>
+        /// Restarts writing on the beginning of the line, without indenting that line.
+        /// </summary>
+        /// <returns>
+        ///   A task that represents the asynchronous reset operation.
+        /// </returns>
+        /// <remarks>
+        /// <para>
+        ///   The <see cref="ResetIndentAsync"/> method will reset the output position to the beginning of the current line.
+        ///   It does not modify the <see cref="Indent"/> property, so the text will be indented again the next time
+        ///   a line break is written to the output.
+        /// </para>
+        /// <para>
+        ///   If the current line buffer is not empty, it will be flushed to the <see cref="BaseWriter"/>, followed by a new line
+        ///   before the indentation is reset. If the current line buffer is empty (a line containing only indentation is considered empty),
+        ///   the output position is simply reset to the beginning of the line without writing anything to the base writer.
+        /// </para>
+        /// </remarks>
+        public partial Task ResetIndentAsync();
 
         /// <inheritdoc/>
         protected override void Dispose(bool disposing)
@@ -624,132 +639,15 @@ namespace Ookii.CommandLine
             }
         }
 
-        private void WriteNoMaximum(StringSpan buffer)
-        {
-            Debug.Assert(_maximumLineLength == 0);
+        private partial void WriteNoMaximum(StringSpan buffer);
 
-            buffer.Split(true, (type, span) =>
-            {
-                switch (type)
-                {
-                case StringSegmentType.PartialLineBreak:
-                    // If we already had a partial line break, write it now.
-                    if (_hasPartialLineBreak)
-                    {
-                        WriteLineBreakDirect();
-                    }
-                    else
-                    {
-                        _hasPartialLineBreak = true;
-                    }
+        private partial void WriteLineBreakDirect();
 
-                    break;
+        private partial void WriteIndentDirectIfNeeded();
 
-                case StringSegmentType.LineBreak:
-                    // Write an extra line break if there was a partial one and this one isn't the
-                    // end of that line break.
-                    if (_hasPartialLineBreak)
-                    {
-                        _hasPartialLineBreak = false;
-                        if (span.Length != 1 || span[0] != '\n')
-                        {
-                            WriteLineBreakDirect();
-                        }
-                    }
+        private static partial void WriteIndent(TextWriter writer, int indent);
 
-                    WriteLineBreakDirect();
-                    break;
-
-                default:
-                    // If we had a partial line break, write it now.
-                    if (_hasPartialLineBreak)
-                    {
-                        WriteLineBreakDirect();
-                        _hasPartialLineBreak = false;
-                    }
-
-                    WriteIndentDirectIfNeeded();
-                    span.WriteTo(_baseWriter);
-                    _currentLineLength += span.Length;
-                    break;
-                }
-            });
-        }
-
-        private void WriteLineBreakDirect()
-        {
-            _baseWriter.WriteLine();
-            _indentNextWrite = _currentLineLength != 0;
-            _currentLineLength = 0;
-        }
-
-        private void WriteIndentDirectIfNeeded()
-        {
-            // Write the indentation if necessary.
-            if (_indentNextWrite)
-            {
-                WriteIndent(_baseWriter, _indent);
-                _indentNextWrite = false;
-            }
-        }
-
-        private static void WriteIndent(TextWriter writer, int indent)
-        {
-            for (int x = 0; x < indent; ++x)
-            {
-                writer.Write(IndentChar);
-            }
-        }
-
-        private void WriteCore(StringSpan buffer)
-        {
-            if (_lineBuffer == null)
-            {
-                WriteNoMaximum(buffer);
-                return;
-            }
-
-            buffer.Split(_countFormatting, (type, span) =>
-            {
-                bool hadPartialLineBreak = _lineBuffer.CheckAndRemovePartialLineBreak();
-                if (hadPartialLineBreak)
-                {
-                    _lineBuffer.WriteLineTo(_baseWriter, _indent);
-                }
-
-                if (type == StringSegmentType.LineBreak)
-                {
-                    // Check if this is just the end of a partial line break. If it is, it was
-                    // already written above.
-                    if (!hadPartialLineBreak || span.Length == 1 && span[0] != '\n')
-                    {
-                        _lineBuffer.WriteLineTo(_baseWriter, _indent);
-                    }
-                }
-                else
-                {
-                    var remaining = span;
-                    if (type == StringSegmentType.Text && !_lineBuffer.HasPartialFormatting)
-                    {
-                        while (_lineBuffer.LineLength + remaining.Length > _maximumLineLength)
-                        {
-                            remaining = _lineBuffer.BreakLine(_baseWriter, remaining, _maximumLineLength, _indent);
-                        }
-                    }
-
-                    if (remaining.Length > 0)
-                    {
-                        _lineBuffer.Append(remaining, type);
-                        if (_lineBuffer.LineLength > _maximumLineLength)
-                        {
-                            // This can happen if we couldn't break above because partial formatting
-                            // had to be resolved.
-                            _lineBuffer.BreakLine(_baseWriter, default, _maximumLineLength, _indent);
-                        }
-                    }
-                }
-            });
-        }
+        private partial void WriteCore(StringSpan buffer);
 
         private static int GetLineLengthForConsole()
         {
@@ -760,6 +658,14 @@ namespace Ookii.CommandLine
             catch (IOException)
             {
                 return 0;
+            }
+        }
+
+        private void ThrowIfWriteInProgress()
+        {
+            if (!_asyncWriteTask.IsCompleted)
+            {
+                throw new InvalidOperationException(Properties.Resources.AsyncWriteInProgress);
             }
         }
     }
