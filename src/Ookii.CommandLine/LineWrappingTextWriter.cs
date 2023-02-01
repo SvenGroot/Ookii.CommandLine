@@ -269,6 +269,13 @@ namespace Ookii.CommandLine
             }
         }
 
+        struct NoWrappingState
+        {
+            public int CurrentLineLength { get; set; }
+            public bool IndentNextWrite { get; set; }
+            public bool HasPartialLineBreak { get; set; }
+        }
+
 #endregion
 
         private const char IndentChar = ' ';
@@ -279,11 +286,13 @@ namespace Ookii.CommandLine
         private readonly int _maximumLineLength;
         private readonly bool _countFormatting;
         private int _indent;
+        private bool _enableWrapping = true;
 
         // Used for indenting when there is no maximum line length.
-        private bool _indentNextWrite;
-        private int _currentLineLength;
-        private bool _hasPartialLineBreak;
+        private NoWrappingState _noWrappingState;
+
+        // Used to discourage calling sync methods when an async method is in progress on the same
+        // thread.
         private Task _asyncWriteTask = Task.CompletedTask;
 
         /// <summary>
@@ -398,6 +407,56 @@ namespace Ookii.CommandLine
                 }
 
                 _indent = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets a value which indicates whether line wrapping is enabled.
+        /// </summary>
+        /// <value>
+        /// <see langword="true"/> to enable line wrapping; otherwise, <see langword="false"/>.
+        /// The default value is <see langword="true"/>, unless the <see cref="MaximumLineLength"/>
+        /// property is zero, in which case the value is always <see langword="false"/> and attempts
+        /// to change it are ignored.
+        /// </value>
+        /// <remarks>
+        /// <para>
+        ///   When this property is changed from <see langword="true"/> to <see langword="false"/>,
+        ///   the buffer will be flushed synchronously if not empty.
+        /// </para>
+        /// <para>
+        ///   When this property is changed from <see langword="false"/> to <see langword="true"/>.
+        ///   if the last character written was not a new line, the current line may not be
+        ///   correctly wrapped.
+        /// </para>
+        /// <para>
+        ///   Changing this property resets indentation so the next write will not be indented.
+        /// </para>
+        /// <para>
+        ///   This property has no effect if there is no maximum line length.
+        /// </para>
+        /// </remarks>
+        public bool EnableWrapping
+        {
+            get => _enableWrapping && _lineBuffer != null;
+            set
+            {
+                ThrowIfWriteInProgress();
+                if (_lineBuffer != null && _enableWrapping != value)
+                {
+                    if (!value)
+                    {
+                        // Flush the buffer but not the base writer, and make sure indent is reset
+                        // even if the buffer was empty (for consistency).
+                        _lineBuffer.FlushTo(_baseWriter, 0, false);
+                        _lineBuffer.ClearCurrentLine(0);
+
+                        // Ensure no state is carried over from the last time this was changed.
+                        _noWrappingState = default;
+                    }
+
+                    _enableWrapping = value;
+                }
             }
         }
 
@@ -653,6 +712,10 @@ namespace Ookii.CommandLine
         ///   <see langword="false"/> if you are done writing to this instance.
         /// </para>
         /// <para>
+        ///   Indentation is reset by this method, so the next write after calling flush will not
+        ///   be indented.
+        /// </para>
+        /// <para>
         ///   The <see cref="Flush()"/> method is equivalent to calling this method with
         ///   <paramref name="insertNewLine"/> set to <see langword="true"/>.
         /// </para>
@@ -678,6 +741,10 @@ namespace Ookii.CommandLine
         /// <para>
         ///   For this reason, it's recommended to only set <paramref name="insertNewLine"/> to
         ///   <see langword="false"/> if you are done writing to this instance.
+        /// </para>
+        /// <para>
+        ///   Indentation is reset by this method, so the next write after calling flush will not
+        ///   be indented.
         /// </para>
         /// <para>
         ///   The <see cref="FlushAsync()"/> method is equivalent to calling this method with

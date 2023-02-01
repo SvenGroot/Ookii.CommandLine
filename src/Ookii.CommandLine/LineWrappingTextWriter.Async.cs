@@ -151,7 +151,7 @@ namespace Ookii.CommandLine
             ThrowIfWriteInProgress();
             if (_lineBuffer != null)
             {
-                await _lineBuffer.FlushToAsync(_baseWriter, _indent, insertNewLine);
+                await _lineBuffer.FlushToAsync(_baseWriter, insertNewLine ? _indent : 0, insertNewLine);
             }
 
             await _baseWriter.FlushAsync();
@@ -173,18 +173,18 @@ namespace Ookii.CommandLine
             }
             else
             {
-                if (!_indentNextWrite && _currentLineLength > 0)
+                if (!_noWrappingState.IndentNextWrite && _noWrappingState.CurrentLineLength > 0)
                 {
                     await _baseWriter.WriteLineAsync();
                 }
 
-                _indentNextWrite = false;
+                _noWrappingState.IndentNextWrite = false;
             }
         }
 
         private async Task WriteNoMaximumAsync(StringMemory buffer)
         {
-            Debug.Assert(_maximumLineLength == 0);
+            Debug.Assert(!EnableWrapping);
 
             await buffer.SplitAsync(true, async (type, span) =>
             {
@@ -192,13 +192,13 @@ namespace Ookii.CommandLine
                 {
                 case StringSegmentType.PartialLineBreak:
                     // If we already had a partial line break, write it now.
-                    if (_hasPartialLineBreak)
+                    if (_noWrappingState.HasPartialLineBreak)
                     {
                         await WriteLineBreakDirectAsync();
                     }
                     else
                     {
-                        _hasPartialLineBreak = true;
+                        _noWrappingState.HasPartialLineBreak = true;
                     }
 
                     break;
@@ -206,9 +206,9 @@ namespace Ookii.CommandLine
                 case StringSegmentType.LineBreak:
                     // Write an extra line break if there was a partial one and this one isn't the
                     // end of that line break.
-                    if (_hasPartialLineBreak)
+                    if (_noWrappingState.HasPartialLineBreak)
                     {
-                        _hasPartialLineBreak = false;
+                        _noWrappingState.HasPartialLineBreak = false;
                         if (span.Span.Length != 1 || span.Span[0] != '\n')
                         {
                             await WriteLineBreakDirectAsync();
@@ -220,15 +220,15 @@ namespace Ookii.CommandLine
 
                 default:
                     // If we had a partial line break, write it now.
-                    if (_hasPartialLineBreak)
+                    if (_noWrappingState.HasPartialLineBreak)
                     {
                         await WriteLineBreakDirectAsync();
-                        _hasPartialLineBreak = false;
+                        _noWrappingState.HasPartialLineBreak = false;
                     }
 
                     await WriteIndentDirectIfNeededAsync();
                     await span.WriteToAsync(_baseWriter);
-                    _currentLineLength += span.Span.Length;
+                    _noWrappingState.CurrentLineLength += span.Span.Length;
                     break;
                 }
             });
@@ -237,17 +237,17 @@ namespace Ookii.CommandLine
         private async Task WriteLineBreakDirectAsync()
         {
             await _baseWriter.WriteLineAsync();
-            _indentNextWrite = _currentLineLength != 0;
-            _currentLineLength = 0;
+            _noWrappingState.IndentNextWrite = _noWrappingState.CurrentLineLength != 0;
+            _noWrappingState.CurrentLineLength = 0;
         }
 
         private async Task WriteIndentDirectIfNeededAsync()
         {
             // Write the indentation if necessary.
-            if (_indentNextWrite)
+            if (_noWrappingState.IndentNextWrite)
             {
                 await WriteIndentAsync(_baseWriter, _indent);
-                _indentNextWrite = false;
+                _noWrappingState.IndentNextWrite = false;
             }
         }
 
@@ -262,7 +262,7 @@ namespace Ookii.CommandLine
         private async Task WriteCoreAsync(StringMemory buffer)
         {
             ThrowIfWriteInProgress();
-            if (_lineBuffer == null)
+            if (!EnableWrapping)
             {
                 await WriteNoMaximumAsync(buffer);
                 return;
@@ -270,7 +270,9 @@ namespace Ookii.CommandLine
 
             await buffer.SplitAsync(_countFormatting, async (type, span) =>
             {
-                bool hadPartialLineBreak = _lineBuffer.CheckAndRemovePartialLineBreak();
+                // _lineBuffer is guaranteed not null by EnableWrapping but the attribute for that
+                // only exists in .Net 6.0.
+                bool hadPartialLineBreak = _lineBuffer!.CheckAndRemovePartialLineBreak();
                 if (hadPartialLineBreak)
                 {
                     await _lineBuffer.WriteLineToAsync(_baseWriter, _indent);
@@ -280,7 +282,7 @@ namespace Ookii.CommandLine
                 {
                     // Check if this is just the end of a partial line break. If it is, it was
                     // already written above.
-                    if (!hadPartialLineBreak || span.Span.Length == 1 && span.Span[0] != '\n')
+                    if (!hadPartialLineBreak || span.Span.Length > 1 || (span.Span.Length == 1 && span.Span[0] != '\n'))
                     {
                         await _lineBuffer.WriteLineToAsync(_baseWriter, _indent);
                     }
