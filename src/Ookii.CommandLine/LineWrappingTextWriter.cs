@@ -103,7 +103,7 @@ namespace Ookii.CommandLine
 #if NET6_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
             private ref struct BreakLineResult
 #else
-        private struct BreakLineResult
+            private struct BreakLineResult
 #endif
             {
                 public bool Success { get; set; }
@@ -520,11 +520,7 @@ namespace Ookii.CommandLine
         {
             if (value != null)
             {
-#if NET6_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-                WriteCore(value);
-#else
-                WriteCore(new StringSpan(value));
-#endif
+                WriteCore(value.AsSpan());
             }
         }
 
@@ -575,12 +571,7 @@ namespace Ookii.CommandLine
                 return Task.CompletedTask;
             }
 
-#if NET6_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-            // Array creation is unavoidable here because ReadOnlyMemory can't use a pointer.
             var task = WriteCoreAsync(value.AsMemory());
-#else
-            var task = WriteCoreAsync(new StringMemory(value));
-#endif
             _asyncWriteTask = task;
             return task;
         }

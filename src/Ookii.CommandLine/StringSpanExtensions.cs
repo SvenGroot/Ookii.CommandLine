@@ -83,6 +83,18 @@ namespace Ookii.CommandLine
 
         public static partial void WriteTo(this StringSpan self, TextWriter writer);
 
+#else
+
+        public static StringSpan AsSpan(this string self)
+        {
+            return new StringSpan(self);
+        }
+
+        public static StringMemory AsMemory(this string self)
+        {
+            return new StringMemory(self);
+        }
+
 #endif
 
         private static (int, int)? BreakLine(StringSpan span, int startIndex, bool force)
