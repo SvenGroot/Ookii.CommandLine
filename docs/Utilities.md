@@ -6,31 +6,33 @@ terminal support, and the [`TypeConverterBase<T>`][] class.
 
 ## LineWrappingTextWriter
 
-The [`LineWrappingTextWriter`][] class is a [`TextWriter`][] implementation that allows you to write text
-to another [`TextWriter`][], white-space wrapping the text at the specified line length, and supporting
-hanging indents.
+The [`LineWrappingTextWriter`][] class is a [`TextWriter`][] implementation that allows you to write
+text to another [`TextWriter`][], white-space wrapping the text at the specified line length, and
+supporting hanging indents.
 
 Ookii.CommandLine uses this class to wrap and indent error messages and usage help when writing to
 the console.
 
-The [`LineWrappingTextWriter`][] can be created to wrap any [`TextWriter`][] and with any line length, using
-its constructor. If you use a line length of less than 1 or greater than `ushort.MaxValue`, this is
-treated as an infinite length, and lines will not be wrapped. The [`LineWrappingTextWriter`][] can still
-be used to create indented text if you use an unrestricted line length.
+The [`LineWrappingTextWriter`][] can be created to wrap any [`TextWriter`][] and with any line
+length, using its constructor. If you use a line length of less than 1 or greater than
+`ushort.MaxValue`, this is treated as an infinite length, and lines will not be wrapped. The
+[`LineWrappingTextWriter`][] can still be used to create indented text if you use an unrestricted
+line length.
 
 Most of the time, you will probably want to use the [`LineWrappingTextWriter.ForConsoleOut()`][] or
 [`LineWrappingTextWriter.ForConsoleError()`][] methods to create a writer for the standard output or
 error streams, automatically wrapping at the console width.
 
 > Both methods actually use `Console.WindowWidth - 1` for their maximum line length, because using
-> [`Console.WindowWidth`][] exactly can lead to extra blank lines if a line is exactly the width of the
-> console.
+> [`Console.WindowWidth`][] exactly can lead to extra blank lines if a line is exactly the width of
+> the console.
 
 Lines will be wrapped at white-space characters only. If a line does not have a suitable place to
-wrap, it will be wrapped at the maximum line length regardless.
+wrap, it will be wrapped at the maximum line length regardless. You can temporarily disable line
+wrapping by setting the `LineWrappingTextWriter.EnableWrapping` property to `false`.
 
-If you write virtual terminal sequences to a [`LineWrappingTextWriter`][], by default these will not be
-included when calculating the length of the current line, so inserting VT sequences, e.g. for
+If you write virtual terminal sequences to a [`LineWrappingTextWriter`][], by default these will not
+be included when calculating the length of the current line, so inserting VT sequences, e.g. for
 colors, will not affect how the text is wrapped.
 
 ### Indentation

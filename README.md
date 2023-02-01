@@ -139,9 +139,17 @@ The .Net 6.0 version has additional support for [nullable reference types](docs/
 
 ## Building and testing
 
-To build Ookii.CommandLine, make sure you have the .Net 6.0 SDK installed, and simply use the
-`dotnet build` command in the `src` directory. You can run the unit tests using `dotnet test`. The
-tests should pass on all platforms (Windows and Linux have been tested).
+To build Ookii.CommandLine, make sure you have the following installed:
+
+- [Microsoft .Net 6.0 SDK](https://dotnet.microsoft.com/download)
+- [Microsoft PowerShell 6 or later](https://github.com/PowerShell/PowerShell)
+
+PowerShell is used to generate some source files during the build. Besides installing it normally,
+you can also install it as a .Net global tool using `dotnet tool install PowerShell --global`.
+
+To build the library, tests and samples, simply use the `dotnet build` command in the `src`
+directory. You can run the unit tests using `dotnet test`. The tests should pass on all platforms
+(Windows and Linux have been tested).
 
 The tests are built and run for both .Net 6.0 and .Net Framework 4.8. Running the .Net Framework
 tests on a non-Windows platform may require the use of [Mono](https://www.mono-project.com/).

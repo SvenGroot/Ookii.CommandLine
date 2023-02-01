@@ -1,5 +1,21 @@
 # What’s new in Ookii.CommandLine
 
+## Ookii.CommandLine 3.1
+
+**IMPORTANT:** If you are upgrading from version 2.x, please check the [migration guide](Migrating.md).
+
+- This release brings several improvements to the `LineWrappingTextWriter`.
+  - Proper async support; the various `WriteAsync()` and `WriteLineAsync()` methods will now call
+    down to the async methods of the base writer for the `LineWrappingTextWriter`, and a new method
+    `ResetIndentAsync()` is provided.
+  - Add a `Flush()` method overload that allows flushing a non-empty buffer without inserting an
+    extra new line.
+  - Temporarily disable line wrapping using the `EnableWrapping` property.
+  - If the base writer is a `StringWriter`, the `LineWrappingTextWriter.ToString()` method now
+    returns the text written to the writer, including text that hasn't been flushed to the base
+    writer yet.
+  - Some minor bug fixes.
+
 ## Ookii.CommandLine 3.0
 
 **IMPORTANT:** Several of the changes in version 3.0 are *breaking changes*. There are breaking API
