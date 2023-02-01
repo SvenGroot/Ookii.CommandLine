@@ -1,5 +1,6 @@
 ﻿// Copyright (c) Sven Groot (Ookii.org)
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Ookii.CommandLine.Terminal;
 using System;
 using System.IO;
 using System.Threading.Tasks;
@@ -325,6 +326,18 @@ namespace Ookii.CommandLine.Tests
             Assert.AreEqual(_expectedFormatting, WriteChars(_inputFormatting.ToCharArray(), 80, 8));
         }
 
+        [TestMethod]
+        public void TestFlush()
+        {
+            using var writer = LineWrappingTextWriter.ForStringWriter(40);
+            writer.Write(TextFormat.ForegroundBlue);
+            writer.WriteLine("This is a test");
+            writer.Write(TextFormat.Default);
+            writer.Flush();
+
+            var expected = $"{TextFormat.ForegroundBlue}This is a test\n{TextFormat.Default}\n".ReplaceLineEndings();
+            Assert.AreEqual(expected, writer.BaseWriter.ToString());
+        }
 
         private static string WriteString(string value, int maxLength, int segmentSize, int indent = 0)
         {

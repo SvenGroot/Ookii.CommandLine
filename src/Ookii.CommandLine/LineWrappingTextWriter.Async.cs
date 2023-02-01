@@ -17,7 +17,8 @@ namespace Ookii.CommandLine
         {
             public async Task FlushToAsync(TextWriter writer, int indent)
             {
-                if (!IsEmpty)
+                // Don't use IsEmpty because we also want to write if there's only VT sequences.
+                if (_segments.Count != 0)
                 {
                     await WriteLineToAsync(writer, indent);
                 }
@@ -25,7 +26,8 @@ namespace Ookii.CommandLine
 
             public async Task WriteLineToAsync(TextWriter writer, int indent)
             {
-                if (!IsEmpty)
+                // Don't use IsEmpty because we also want to write if there's only VT sequences.
+                if (_segments.Count != 0)
                 {
                     await WriteSegmentsAsync(writer, _segments);
                 }

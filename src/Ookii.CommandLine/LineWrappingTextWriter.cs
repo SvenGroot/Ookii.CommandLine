@@ -22,39 +22,51 @@ namespace Ookii.CommandLine
     /// </summary>
     /// <remarks>
     /// <para>
-    ///   The <see cref="LineWrappingTextWriter"/> will buffer the data written to it until an explicit new line is present in the text, or until
-    ///   the length of the buffered data exceeds the value of the <see cref="MaximumLineLength"/> property.
+    ///   If the <see cref="MaximumLineLength"/> property is not zero, the <see cref="LineWrappingTextWriter"/>
+    ///   will buffer the data written to it until an explicit new line is present in the text, or
+    ///   until the length of the buffered data exceeds the value of the <see cref="MaximumLineLength"/>
+    ///   property.
     /// </para>
     /// <para>
     ///   If the length of the buffered data exceeds the value of the <see cref="MaximumLineLength"/>
     ///   property, the <see cref="LineWrappingTextWriter"/> will attempt to find a white-space
     ///   character to break the line at. If such a white-space character is found, everything
-    ///   before that character is output to the <see cref="BaseWriter"/> followed by a line ending,
+    ///   before that character is output to the <see cref="BaseWriter"/>, followed by a line ending,
     ///   and everything after that character is kept in the buffer. The white-space character
     ///   itself is not written to the output.
     /// </para>
     /// <para>
-    ///   If no suitable place to break the line could be found, the line is broken at the maximum line length. This may occur in the middle
-    ///   of a word.
+    ///   If no suitable place to break the line could be found, the line is broken at the maximum
+    ///   line length. This may occur in the middle of a word.
     /// </para>
     /// <para>
-    ///   After a line break (either one that was caused by wrapping or one that was part of the text), the next line is indented by the
-    ///   number of characters specified by the <see cref="Indent"/> property. The length of the indentation counts towards the maximum line length.
+    ///   After a line break (either one that was caused by wrapping or one that was part of the
+    ///   text), the next line is indented by the number of characters specified by the <see cref="Indent"/>
+    ///   property. The length of the indentation counts towards the maximum line length.
     /// </para>
     /// <para>
-    ///   When the <see cref="Flush"/> method is called, the current contents of the buffer are written to the <see cref="BaseWriter"/>, followed
-    ///   by a new line, unless the buffer is empty. If the buffer contains only indentation, it is considered empty and no new line is written.
-    ///   Calling <see cref="Flush"/> has the same effect as writing a new line to the <see cref="LineWrappingTextWriter"/> if the buffer is not empty.
-    ///   The <see cref="LineWrappingTextWriter"/> is flushed when the <see cref="Dispose"/> method is called.
+    ///   When the <see cref="Flush"/> or <see cref="FlushAsync"/> method is called, the current
+    ///   contents of the buffer are written to the <see cref="BaseWriter"/>, followed by a new
+    ///   line, unless the buffer is empty. If the buffer contains only indentation, it is
+    ///   considered empty and no new line is written. Calling <see cref="Flush"/> has the same
+    ///   effect as writing a new line to the <see cref="LineWrappingTextWriter"/> if the buffer is
+    ///   not empty. The <see cref="LineWrappingTextWriter"/> is flushed when the <see cref="Dispose"/>
+    ///   or <see cref="DisposeAsync"/> method is called.
     /// </para>
     /// <para>
-    ///   The <see cref="ResetIndent"/> property can be used to move the output position back to the beginning of the line. If the buffer is
-    ///   not empty, is first flushed and indentation is reset to zero on the next line. After the next line break, indentation will again
-    ///   be set to the value of the <see cref="Indent"/> property.
+    ///   The <see cref="ResetIndent"/> or <see cref="ResetIndentAsync"/> method can be used to move
+    ///   the output position back to the beginning of the line. If the buffer is not empty, is
+    ///   first flushed and indentation is reset to zero on the next line. After the next line
+    ///   break, indentation will again be set to the value of the <see cref="Indent"/> property.
     /// </para>
     /// <para>
     ///   If there is no maximum line length, output is written directly to the <see cref="BaseWriter"/>
     ///   and buffering does not occur. Indentation is still inserted as appropriate.
+    /// </para>
+    /// <para>
+    ///   The <see cref="Flush"/>, <see cref="FlushAsync"/>, <see cref="Dispose"/> and
+    ///   <see cref="DisposeAsync"/> methods will not write an additional new line if the
+    ///   <see cref="MaximumLineLength"/> property is zero.
     /// </para>
     /// </remarks>
     public partial class LineWrappingTextWriter : TextWriter
