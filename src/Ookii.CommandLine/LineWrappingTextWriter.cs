@@ -45,10 +45,10 @@ namespace Ookii.CommandLine
     ///   property. The length of the indentation counts towards the maximum line length.
     /// </para>
     /// <para>
-    ///   When the <see cref="Flush"/> or <see cref="FlushAsync"/> method is called, the current
+    ///   When the <see cref="Flush()"/> or <see cref="FlushAsync()"/> method is called, the current
     ///   contents of the buffer are written to the <see cref="BaseWriter"/>, followed by a new
     ///   line, unless the buffer is empty. If the buffer contains only indentation, it is
-    ///   considered empty and no new line is written. Calling <see cref="Flush"/> has the same
+    ///   considered empty and no new line is written. Calling <see cref="Flush()"/> has the same
     ///   effect as writing a new line to the <see cref="LineWrappingTextWriter"/> if the buffer is
     ///   not empty. The <see cref="LineWrappingTextWriter"/> is flushed when the <see cref="Dispose"/>
     ///   or <see cref="DisposeAsync"/> method is called.
@@ -64,7 +64,7 @@ namespace Ookii.CommandLine
     ///   and buffering does not occur. Indentation is still inserted as appropriate.
     /// </para>
     /// <para>
-    ///   The <see cref="Flush"/>, <see cref="FlushAsync"/>, <see cref="Dispose"/> and
+    ///   The <see cref="Flush()"/>, <see cref="FlushAsync()"/>, <see cref="Dispose"/> and
     ///   <see cref="DisposeAsync"/> methods will not write an additional new line if the
     ///   <see cref="MaximumLineLength"/> property is zero.
     /// </para>
@@ -181,9 +181,11 @@ namespace Ookii.CommandLine
 
             public bool HasPartialFormatting => LastSegment is Segment last && last.Type == StringSegmentType.PartialFormatting;
 
-            public partial void FlushTo(TextWriter writer, int indent);
+            public partial void FlushTo(TextWriter writer, int indent, bool insertNewLine);
 
             public partial void WriteLineTo(TextWriter writer, int indent);
+
+            private partial void WriteTo(TextWriter writer, int indent, bool insertNewLine);
 
             public bool CheckAndRemovePartialLineBreak()
             {
@@ -412,8 +414,8 @@ namespace Ookii.CommandLine
         /// </param>
         /// <returns>A <see cref="LineWrappingTextWriter"/> that writes to a <see cref="StringWriter"/>.</returns>
         /// <remarks>
-        ///   To retrieve the resulting string, first call <see cref="Flush"/>, then use the <see cref="StringWriter.ToString"/> method
-        ///   of the <see cref="BaseWriter"/>.
+        ///   To retrieve the resulting string, first call <see cref="Flush()"/>, then use the <see
+        ///   cref="StringWriter.ToString"/> method of the <see cref="BaseWriter"/>.
         /// </remarks>
         public static LineWrappingTextWriter ForStringWriter(int maximumLineLength = 0, IFormatProvider? formatProvider = null, bool countFormatting = false)
         {
@@ -477,11 +479,12 @@ namespace Ookii.CommandLine
         {
 #if NET6_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
             // Array creation is unavoidable here because ReadOnlyMemory can't use a pointer.
-            _asyncWriteTask = WriteCoreAsync(new[] { value });
+            var task = WriteCoreAsync(new[] { value });
 #else
-            _asyncWriteTask = WriteCoreAsync(new StringMemory(value));
+            var task = WriteCoreAsync(new StringMemory(value));
 #endif
-            return _asyncWriteTask;
+            _asyncWriteTask = task;
+            return task;
         }
 
         /// <inheritdoc/>
@@ -494,11 +497,12 @@ namespace Ookii.CommandLine
 
 #if NET6_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
             // Array creation is unavoidable here because ReadOnlyMemory can't use a pointer.
-            _asyncWriteTask = WriteCoreAsync(value.AsMemory());
+            var task = WriteCoreAsync(value.AsMemory());
 #else
-            _asyncWriteTask = WriteCoreAsync(new StringMemory(value));
+            var task = WriteCoreAsync(new StringMemory(value));
 #endif
-            return _asyncWriteTask;
+            _asyncWriteTask = task;
+            return task;
         }
 
         /// <inheritdoc/>
@@ -524,8 +528,9 @@ namespace Ookii.CommandLine
                 throw new ArgumentException(Properties.Resources.IndexCountOutOfRange);
             }
 
-            _asyncWriteTask = WriteCoreAsync(new StringMemory(buffer, index, count));
-            return _asyncWriteTask;
+            var task = WriteCoreAsync(new StringMemory(buffer, index, count));
+            _asyncWriteTask = task;
+            return task;
         }
 
         /// <inheritdoc/>
@@ -601,7 +606,69 @@ namespace Ookii.CommandLine
 
 #endif
 
-        public override partial void Flush();
+        /// <inheritdoc/>
+        public override void Flush() => Flush(true);
+
+        /// <inheritdoc/>
+        public override Task FlushAsync() => FlushAsync(true);
+
+        /// <summary>
+        /// Clears all buffers for this <see cref="TextWriter"/> and causes any buffered data to be
+        /// written to the underlying writer, optionally inserting an additional new line.
+        /// </summary>
+        /// <param name="insertNewLine">
+        /// Insert an additional new line if the line buffer is not empty. This has no effect if
+        /// the line buffer is empty or the <see cref="MaximumLineLength"/> property is zero.
+        /// </param>
+        /// <remarks>
+        /// <para>
+        ///   If <paramref name="insertNewLine"/> is set to <see langword="false"/>, the
+        ///   <see cref="LineWrappingTextWriter"/> class will not know the length of the flushed
+        ///   line, and therefore the current line may not be correctly wrapped if more text is
+        ///   written to the <see cref="LineWrappingTextWriter"/>.
+        /// </para>
+        /// <para>
+        ///   For this reason, it's recommended to only set <paramref name="insertNewLine"/> to
+        ///   <see langword="false"/> if you are done writing to this instance.
+        /// </para>
+        /// <para>
+        ///   The <see cref="Flush()"/> method is equivalent to calling this method with
+        ///   <paramref name="insertNewLine"/> set to <see langword="true"/>.
+        /// </para>
+        /// </remarks>
+        public void Flush(bool insertNewLine) => FlushCore(insertNewLine);
+
+        /// <summary>
+        /// Clears all buffers for this <see cref="TextWriter"/> and causes any buffered data to be
+        /// written to the underlying writer, optionally inserting an additional new line.
+        /// </summary>
+        /// <param name="insertNewLine">
+        /// Insert an additional new line if the line buffer is not empty. This has no effect if
+        /// the line buffer is empty or the <see cref="MaximumLineLength"/> property is zero.
+        /// </param>
+        /// <returns>A task that represents the asynchronous flush operation.</returns>
+        /// <remarks>
+        /// <para>
+        ///   If <paramref name="insertNewLine"/> is set to <see langword="false"/>, the
+        ///   <see cref="LineWrappingTextWriter"/> class will not know the length of the flushed
+        ///   line, and therefore the current line may not be correctly wrapped if more text is
+        ///   written to the <see cref="LineWrappingTextWriter"/>.
+        /// </para>
+        /// <para>
+        ///   For this reason, it's recommended to only set <paramref name="insertNewLine"/> to
+        ///   <see langword="false"/> if you are done writing to this instance.
+        /// </para>
+        /// <para>
+        ///   The <see cref="FlushAsync()"/> method is equivalent to calling this method with
+        ///   <paramref name="insertNewLine"/> set to <see langword="true"/>.
+        /// </para>
+        /// </remarks>
+        public Task FlushAsync(bool insertNewLine)
+        {
+            var task = FlushCoreAsync(insertNewLine);
+            _asyncWriteTask = task;
+            return task;
+        }
 
         /// <summary>
         /// Restarts writing on the beginning of the line, without indenting that line.
@@ -618,7 +685,7 @@ namespace Ookii.CommandLine
         ///   the output position is simply reset to the beginning of the line without writing anything to the base writer.
         /// </para>
         /// </remarks>
-        public partial void ResetIndent();
+        public void ResetIndent() => ResetIndentCore();
 
         /// <summary>
         /// Restarts writing on the beginning of the line, without indenting that line.
@@ -638,7 +705,12 @@ namespace Ookii.CommandLine
         ///   the output position is simply reset to the beginning of the line without writing anything to the base writer.
         /// </para>
         /// </remarks>
-        public partial Task ResetIndentAsync();
+        public Task ResetIndentAsync()
+        {
+            var task = ResetIndentCoreAsync();
+            _asyncWriteTask = task;
+            return task;
+        }
 
         /// <inheritdoc/>
         protected override void Dispose(bool disposing)
@@ -660,6 +732,10 @@ namespace Ookii.CommandLine
         private static partial void WriteIndent(TextWriter writer, int indent);
 
         private partial void WriteCore(StringSpan buffer);
+
+        private partial void FlushCore(bool insertNewLine);
+
+        private partial void ResetIndentCore();
 
         private static int GetLineLengthForConsole()
         {

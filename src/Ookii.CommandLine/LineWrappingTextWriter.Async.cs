@@ -15,16 +15,21 @@ namespace Ookii.CommandLine
 
         private partial class LineBuffer
         {
-            public async Task FlushToAsync(TextWriter writer, int indent)
+            public async Task FlushToAsync(TextWriter writer, int indent, bool insertNewLine)
             {
                 // Don't use IsEmpty because we also want to write if there's only VT sequences.
                 if (_segments.Count != 0)
                 {
-                    await WriteLineToAsync(writer, indent);
+                    await WriteToAsync(writer, indent, insertNewLine);
                 }
             }
 
             public async Task WriteLineToAsync(TextWriter writer, int indent)
+            {
+                await WriteToAsync(writer, indent, true);
+            }
+
+            private async Task WriteToAsync(TextWriter writer, int indent, bool insertNewLine)
             {
                 // Don't use IsEmpty because we also want to write if there's only VT sequences.
                 if (_segments.Count != 0)
@@ -32,7 +37,11 @@ namespace Ookii.CommandLine
                     await WriteSegmentsAsync(writer, _segments);
                 }
 
-                await writer.WriteLineAsync();
+                if (insertNewLine)
+                {
+                    await writer.WriteLineAsync();
+                }
+
                 ClearCurrentLine(indent);
             }
 
@@ -136,25 +145,24 @@ namespace Ookii.CommandLine
             }
         }
 
-        /// <inheritdoc/>
-        public override async Task FlushAsync()
+        private async Task FlushCoreAsync(bool insertNewLine)
         {
+            ThrowIfWriteInProgress();
             if (_lineBuffer != null)
             {
-                await _lineBuffer.FlushToAsync(_baseWriter, _indent);
+                await _lineBuffer.FlushToAsync(_baseWriter, _indent, insertNewLine);
             }
 
-            await base.FlushAsync();
             await _baseWriter.FlushAsync();
         }
 
-        public partial async Task ResetIndentAsync()
+        private async Task ResetIndentCoreAsync()
         {
             if (_lineBuffer != null)
             {
                 if (!_lineBuffer.IsEmpty)
                 {
-                    await _lineBuffer.FlushToAsync(_baseWriter, 0);
+                    await _lineBuffer.FlushToAsync(_baseWriter, 0, true);
                 }
                 else
                 {

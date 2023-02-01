@@ -339,6 +339,18 @@ namespace Ookii.CommandLine.Tests
             Assert.AreEqual(expected, writer.BaseWriter.ToString());
         }
 
+        [TestMethod]
+        public void TestFlushNoNewLine()
+        {
+            using var writer = LineWrappingTextWriter.ForStringWriter(40);
+            writer.WriteLine("This is a test");
+            writer.Write("Unfinished second line");
+            writer.Flush(false);
+
+            var expected = $"This is a test\nUnfinished second line".ReplaceLineEndings();
+            Assert.AreEqual(expected, writer.BaseWriter.ToString());
+        }
+
         private static string WriteString(string value, int maxLength, int segmentSize, int indent = 0)
         {
             using var writer = LineWrappingTextWriter.ForStringWriter(maxLength);
