@@ -347,7 +347,7 @@ namespace Ookii.CommandLine.Tests
             writer.Write("Unfinished second line");
             writer.Flush(false);
 
-            var expected = $"This is a test\nUnfinished second line".ReplaceLineEndings();
+            var expected = "This is a test\nUnfinished second line".ReplaceLineEndings();
             Assert.AreEqual(expected, writer.BaseWriter.ToString());
         }
 
@@ -363,6 +363,21 @@ namespace Ookii.CommandLine.Tests
 
             var expected = $"{TextFormat.ForegroundBlue}This is a test\n{TextFormat.Default}Hello\n".ReplaceLineEndings();
             Assert.AreEqual(expected, writer.BaseWriter.ToString());
+        }
+
+        [TestMethod]
+        public void TestToString()
+        {
+            using var writer = LineWrappingTextWriter.ForStringWriter(40);
+            writer.WriteLine("This is a test");
+            writer.Write("Unfinished second\x1b[34m line\x1b[0m");
+            var expected = "This is a test\nUnfinished second\x1b[34m line\x1b[0m".ReplaceLineEndings();
+            Assert.AreEqual(expected, writer.ToString());
+            expected = "This is a test\n".ReplaceLineEndings();
+            Assert.AreEqual(expected, writer.BaseWriter.ToString());
+
+            using var writer2 = LineWrappingTextWriter.ForConsoleOut();
+            Assert.AreEqual(typeof(LineWrappingTextWriter).FullName, writer2.ToString());
         }
 
         private static string WriteString(string value, int maxLength, int segmentSize, int indent = 0)
@@ -381,7 +396,7 @@ namespace Ookii.CommandLine.Tests
             }
 
             writer.Flush();
-            return writer.BaseWriter.ToString();
+            return writer.ToString();
         }
 
         private static async Task<string> WriteStringAsync(string value, int maxLength, int segmentSize, int indent = 0)
@@ -400,7 +415,7 @@ namespace Ookii.CommandLine.Tests
             }
 
             await writer.FlushAsync();
-            return writer.BaseWriter.ToString();
+            return writer.ToString();
         }
 
 

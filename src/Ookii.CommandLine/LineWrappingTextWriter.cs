@@ -120,7 +120,9 @@ namespace Ookii.CommandLine
 
             public int ContentLength { get; private set; }
 
-            public bool IsEmpty { get; private set; } = true;
+            public bool IsContentEmpty => ContentLength == 0;
+
+            public bool IsEmpty => _segments.Count == 0;
 
             public int Indentation { get; set; }
 
@@ -171,10 +173,6 @@ namespace Ookii.CommandLine
                 _segments.Add(segment);
                 var contentLength = segment.ContentLength;
                 ContentLength += contentLength;
-                if (contentLength > 0)
-                {
-                    IsEmpty = false;
-                }
             }
 
             public Segment? LastSegment => _segments.Count > 0 ? _segments[_segments.Count - 1] : null;
@@ -185,7 +183,26 @@ namespace Ookii.CommandLine
 
             public partial void WriteLineTo(TextWriter writer, int indent);
 
-            private partial void WriteTo(TextWriter writer, int indent, bool insertNewLine);
+            public void Peek(TextWriter writer)
+            {
+                WriteIndent(writer, Indentation);
+                int offset = 0;
+                foreach (var segment in _segments)
+                {
+                    switch (segment.Type)
+                    {
+                    case StringSegmentType.PartialLineBreak:
+                    case StringSegmentType.LineBreak:
+                        writer.WriteLine();
+                        break;
+
+                    default:
+                        _buffer.Peek(writer, offset, segment.Length);
+                        offset += segment.Length;
+                        break;
+                    }
+                }
+            }
 
             public bool CheckAndRemovePartialLineBreak()
             {
@@ -197,6 +214,8 @@ namespace Ookii.CommandLine
 
                 return false;
             }
+
+            private partial void WriteTo(TextWriter writer, int indent, bool insertNewLine);
 
             private void FindPartialFormattingEnd(Segment lastSegment, int newLength)
             {
@@ -237,8 +256,7 @@ namespace Ookii.CommandLine
                     _segments.Clear();
                 }
 
-                ContentLength = 0;
-                if (!IsEmpty)
+                if (!IsContentEmpty)
                 {
                     Indentation = indent;
                 }
@@ -247,8 +265,7 @@ namespace Ookii.CommandLine
                     Indentation = 0;
                 }
 
-                // This line contains no content, only (possibly) indentation.
-                IsEmpty = true;
+                ContentLength = 0;
             }
         }
 
@@ -714,6 +731,40 @@ namespace Ookii.CommandLine
             var task = ResetIndentCoreAsync();
             _asyncWriteTask = task;
             return task;
+        }
+
+        /// <summary>
+        /// Returns a string representation of the current <see cref="LineWrappingTextWriter"/>
+        /// instance.
+        /// </summary>
+        /// <returns>
+        /// If the <see cref="BaseWriter"/> property is an instance of the <see cref="StringWriter"/>
+        /// class, the text written to this <see cref="LineWrappingTextWriter"/> so far; otherwise,
+        /// the type name.</returns>
+        /// <remarks>
+        /// <para>
+        ///   If the <see cref="BaseWriter"/> property is an instance of the <see cref="StringWriter"/>
+        ///   class, this method will return all text written to this <see cref="LineWrappingTextWriter"/>
+        ///   instance, including text that hasn't been flushed to the underlying <see cref="StringWriter"/>
+        ///   yet. It does this without flushing the buffer.
+        /// </para>
+        /// </remarks>
+        public override string? ToString()
+        {
+            if (_baseWriter is not StringWriter)
+            {
+                return base.ToString();
+            }
+
+            if (_lineBuffer?.IsEmpty ?? true)
+            {
+                return _baseWriter.ToString();
+            }
+
+            using var tempWriter = new StringWriter(FormatProvider) { NewLine = NewLine };
+            tempWriter.Write(_baseWriter.ToString());
+            _lineBuffer.Peek(tempWriter);
+            return tempWriter.ToString();
         }
 
         /// <inheritdoc/>

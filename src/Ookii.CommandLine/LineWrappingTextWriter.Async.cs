@@ -92,7 +92,7 @@ namespace Ookii.CommandLine
                     return new() { Success = true, Remaining = after };
                 }
 
-                if (IsEmpty)
+                if (IsContentEmpty)
                 {
                     return new() { Success = false };
                 }
@@ -135,7 +135,6 @@ namespace Ookii.CommandLine
                         }
 
                         ContentLength = _segments.Sum(s => s.ContentLength);
-                        IsEmpty = (ContentLength == 0); // Can I get rid of IsEmpty?
                         Indentation = indent;
                         return new() { Success = true, Remaining = newSegment };
                     }
@@ -160,7 +159,7 @@ namespace Ookii.CommandLine
         {
             if (_lineBuffer != null)
             {
-                if (!_lineBuffer.IsEmpty)
+                if (!_lineBuffer.IsContentEmpty)
                 {
                     await _lineBuffer.FlushToAsync(_baseWriter, 0, true);
                 }

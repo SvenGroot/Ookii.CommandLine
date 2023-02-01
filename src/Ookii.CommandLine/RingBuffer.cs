@@ -105,6 +105,16 @@ namespace Ookii.CommandLine
             return new(new StringSpan(_buffer, start, _bufferEnd - start), default);
         }
 
+        public void Peek(TextWriter writer, int offset, int length)
+        {
+            var (first, second) = GetContents(offset);
+            first.Slice(0, length).WriteTo(writer);
+            if (length > first.Length)
+            {
+                second.Slice(0, length - first.Length).WriteTo(writer);
+            }
+        }
+
         public int BreakLine(int offset, int length)
         {
             int size = Size;
