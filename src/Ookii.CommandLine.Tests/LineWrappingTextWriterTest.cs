@@ -351,6 +351,20 @@ namespace Ookii.CommandLine.Tests
             Assert.AreEqual(expected, writer.BaseWriter.ToString());
         }
 
+        [TestMethod]
+        public void TestResetIndent()
+        {
+            using var writer = LineWrappingTextWriter.ForStringWriter(40);
+            writer.Write(TextFormat.ForegroundBlue);
+            writer.WriteLine("This is a test");
+            writer.Write(TextFormat.Default);
+            writer.ResetIndent();
+            writer.WriteLine("Hello");
+
+            var expected = $"{TextFormat.ForegroundBlue}This is a test\n{TextFormat.Default}Hello\n".ReplaceLineEndings();
+            Assert.AreEqual(expected, writer.BaseWriter.ToString());
+        }
+
         private static string WriteString(string value, int maxLength, int segmentSize, int indent = 0)
         {
             using var writer = LineWrappingTextWriter.ForStringWriter(maxLength);

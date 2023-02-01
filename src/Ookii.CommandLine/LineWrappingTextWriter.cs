@@ -230,9 +230,13 @@ namespace Ookii.CommandLine
 
             private partial BreakLineResult BreakLine(TextWriter writer, StringSpan newSegment, int maxLength, int indent, bool force);
 
-            public void ClearCurrentLine(int indent)
+            public void ClearCurrentLine(int indent, bool clearSegments = true)
             {
-                _segments.Clear();
+                if (clearSegments)
+                {
+                    _segments.Clear();
+                }
+
                 ContentLength = 0;
                 if (!IsEmpty)
                 {

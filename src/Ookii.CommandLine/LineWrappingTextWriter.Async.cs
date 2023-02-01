@@ -166,7 +166,8 @@ namespace Ookii.CommandLine
                 }
                 else
                 {
-                    _lineBuffer.ClearCurrentLine(0);
+                    // Leave non-content segments in the buffer.
+                    _lineBuffer.ClearCurrentLine(0, false);
                 }
             }
             else
