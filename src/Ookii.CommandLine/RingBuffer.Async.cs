@@ -1,4 +1,6 @@
-﻿using System;
+﻿// The async methods in this file are used to generate the normal, non-async versions using the
+// Convert-SyncMethod.ps1 script.
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;

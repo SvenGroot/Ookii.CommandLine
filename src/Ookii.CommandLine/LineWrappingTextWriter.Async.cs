@@ -1,4 +1,6 @@
-﻿using System;
+﻿// The async methods in this file are used to generate the normal, non-async versions using the
+// Convert-SyncMethod.ps1 script.
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -17,7 +19,7 @@ namespace Ookii.CommandLine
         {
             public async Task FlushToAsync(TextWriter writer, int indent, bool insertNewLine)
             {
-                // Don't use IsEmpty because we also want to write if there's only VT sequences.
+                // Don't use IsContentEmpty because we also want to write if there's only VT sequences.
                 if (_segments.Count != 0)
                 {
                     await WriteToAsync(writer, indent, insertNewLine);
@@ -31,7 +33,7 @@ namespace Ookii.CommandLine
 
             private async Task WriteToAsync(TextWriter writer, int indent, bool insertNewLine)
             {
-                // Don't use IsEmpty because we also want to write if there's only VT sequences.
+                // Don't use IsContentEmpty because we also want to write if there's only VT sequences.
                 if (_segments.Count != 0)
                 {
                     await WriteSegmentsAsync(writer, _segments);

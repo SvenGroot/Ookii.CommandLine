@@ -1,6 +1,7 @@
-﻿using Ookii.CommandLine.Terminal;
+﻿// The async methods in this file are used to generate the normal, non-async versions using the
+// Convert-SyncMethod.ps1 script.
+using Ookii.CommandLine.Terminal;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 #if NET6_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
@@ -12,7 +13,7 @@ namespace Ookii.CommandLine
 
 #if !NET6_0_OR_GREATER && !NETSTANDARD2_1_OR_GREATER
 
-    internal readonly partial struct StringSpan : IEnumerable<char>
+    internal readonly partial struct StringSpan
     {
         public async Task WriteToAsync(TextWriter writer)
         {

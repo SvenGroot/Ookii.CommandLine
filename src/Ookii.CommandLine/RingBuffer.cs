@@ -67,7 +67,6 @@ namespace Ookii.CommandLine
             }
         }
 
-        // This method is generated from WriteToAsync before the build.
         public partial void WriteTo(TextWriter writer, int length);
 
         public void Discard(int length)
@@ -108,10 +107,10 @@ namespace Ookii.CommandLine
         public void Peek(TextWriter writer, int offset, int length)
         {
             var (first, second) = GetContents(offset);
-            first.Slice(0, length).WriteTo(writer);
+            first.Slice(0, Math.Min(length, first.Length)).WriteTo(writer);
             if (length > first.Length)
             {
-                second.Slice(0, length - first.Length).WriteTo(writer);
+                second.Slice(0, Math.Min(length - first.Length, second.Length)).WriteTo(writer);
             }
         }
 
