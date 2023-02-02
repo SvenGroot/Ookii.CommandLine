@@ -549,6 +549,9 @@ namespace Ookii.CommandLine.Tests
             result = (CancelArguments)parser.Parse(new[] { "-Argument1", "foo", "-DoesCancel", "-Argument2", "bar" });
             Assert.IsNull(result);
             Assert.IsTrue(parser.HelpRequested);
+            Assert.AreEqual(ParseStatus.Canceled, parser.Result.Status);
+            Assert.IsNull(parser.Result.LastException);
+            Assert.AreEqual("DoesCancel", parser.Result.ArgumentName);
             Assert.IsTrue(parser.GetArgument("Argument1").HasValue);
             Assert.AreEqual("foo", (string)parser.GetArgument("Argument1").Value);
             Assert.IsTrue(parser.GetArgument("DoesCancel").HasValue);
@@ -570,6 +573,9 @@ namespace Ookii.CommandLine.Tests
             parser.ArgumentParsed += handler1;
             result = (CancelArguments)parser.Parse(new[] { "-Argument1", "foo", "-DoesNotCancel", "-Argument2", "bar" });
             Assert.IsNull(result);
+            Assert.AreEqual(ParseStatus.Canceled, parser.Result.Status);
+            Assert.IsNull(parser.Result.LastException);
+            Assert.AreEqual("DoesNotCancel", parser.Result.ArgumentName);
             Assert.IsTrue(parser.HelpRequested);
             Assert.IsTrue(parser.GetArgument("Argument1").HasValue);
             Assert.AreEqual("foo", (string)parser.GetArgument("Argument1").Value);
@@ -601,6 +607,9 @@ namespace Ookii.CommandLine.Tests
 
             // Automatic help argument should cancel.
             result = (CancelArguments)parser.Parse(new[] { "-Help" });
+            Assert.AreEqual(ParseStatus.Canceled, parser.Result.Status);
+            Assert.IsNull(parser.Result.LastException);
+            Assert.AreEqual("Help", parser.Result.ArgumentName);
             Assert.IsNull(result);
             Assert.IsTrue(parser.HelpRequested);
         }
@@ -1205,6 +1214,9 @@ namespace Ookii.CommandLine.Tests
             string[] args = commandLine.Split(' '); // not using quoted arguments in the tests, so this is fine.
             var result = target.Parse(args);
             Assert.IsNotNull(result);
+            Assert.AreEqual(ParseStatus.Success, target.Result.Status);
+            Assert.IsNull(target.Result.LastException);
+            Assert.IsNull(target.Result.ArgumentName);
             Assert.IsFalse(target.HelpRequested);
             Assert.AreEqual(arg1, result.Arg1);
             Assert.AreEqual(arg2, result.Arg2);
@@ -1257,6 +1269,9 @@ namespace Ookii.CommandLine.Tests
             catch (CommandLineArgumentException ex)
             {
                 Assert.IsTrue(parser.HelpRequested);
+                Assert.AreEqual(ParseStatus.Error, parser.Result.Status);
+                Assert.AreEqual(ex, parser.Result.LastException);
+                Assert.AreEqual(ex.ArgumentName, parser.Result.LastException.ArgumentName);
                 Assert.AreEqual(category, ex.Category);
                 Assert.AreEqual(argumentName, ex.ArgumentName);
                 if (innerExceptionType == null)

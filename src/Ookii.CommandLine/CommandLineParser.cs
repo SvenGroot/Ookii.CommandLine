@@ -657,6 +657,14 @@ namespace Ookii.CommandLine
         public CommandLineArgument? HelpArgument { get; private set; }
 
         /// <summary>
+        /// Gets the result of the last call to the <see cref="Parse(string[], int)"/> method.
+        /// </summary>
+        /// <value>
+        /// An instance of the <see cref="ParseResult"/> class.
+        /// </value>
+        public ParseResult Result { get; private set; }
+
+        /// <summary>
         /// Gets the name of the executable used to invoke the application.
         /// </summary>
         /// <param name="includeExtension">
@@ -812,9 +820,10 @@ namespace Ookii.CommandLine
                 HelpRequested = false;
                 return ParseCore(args, index);
             }
-            catch (CommandLineArgumentException)
+            catch (CommandLineArgumentException ex)
             {
                 HelpRequested = true;
+                Result = ParseResult.FromException(ex);
                 throw;
             }
         }
@@ -1382,6 +1391,7 @@ namespace Ookii.CommandLine
                 argument.ApplyPropertyValue(commandLineArguments);
             }
 
+            Result = ParseResult.Success;
             return commandLineArguments;
         }
 
@@ -1416,6 +1426,11 @@ namespace Ookii.CommandLine
             if (continueParsing)
             {
                 HelpRequested = cancel;
+            }
+
+            if (cancel)
+            {
+                Result = ParseResult.FromCanceled(argument.ArgumentName);
             }
 
             return cancel;
