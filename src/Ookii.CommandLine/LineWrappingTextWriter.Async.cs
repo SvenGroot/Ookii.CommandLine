@@ -81,9 +81,16 @@ namespace Ookii.CommandLine
 
             private async Task<AsyncBreakLineResult> BreakLineAsync(TextWriter writer, StringMemory newSegment, int maxLength, int indent, bool force)
             {
-                Debug.Assert(LineLength <= maxLength || newSegment.Span.Length == 0);
+                if (force)
+                {
+                    Debugger.Break();
+                }
 
-                if (newSegment.BreakLine(maxLength - LineLength, force, out var splits))
+                // Line length can be over the max length if the previous place a line was split
+                // plus the indentation is more than the line length.
+                if (LineLength <= maxLength &&
+                    newSegment.Span.Length != 0 &&
+                    newSegment.BreakLine(maxLength - LineLength, force, out var splits))
                 {
                     var (before, after) = splits;
                     await WriteSegmentsAsync(writer, _segments);
@@ -100,7 +107,7 @@ namespace Ookii.CommandLine
                 }
 
                 int offset = 0;
-                int contentOffset = 0;
+                int contentOffset = Indentation;
                 foreach (var segment in _segments)
                 {
                     offset += segment.Length;
@@ -117,18 +124,26 @@ namespace Ookii.CommandLine
                         continue;
                     }
 
-                    int breakIndex = _buffer.BreakLine(offset, Math.Min(segment.Length, maxLength - contentOffset));
+                    int breakIndex = force
+                        ? Math.Min(segment.Length, maxLength - contentOffset)
+                        : _buffer.BreakLine(offset, Math.Min(segment.Length, maxLength - contentOffset));
+
                     if (breakIndex >= 0)
                     {
                         await WriteSegmentsAsync(writer, _segments.Take(segmentIndex));
                         breakIndex -= offset;
                         await _buffer.WriteToAsync(writer, breakIndex);
-                        _buffer.Discard(1);
                         await writer.WriteLineAsync();
-                        if (breakIndex + 1 < segment.Length)
+                        if (!force)
+                        {
+                            _buffer.Discard(1);
+                            breakIndex += 1;
+                        }
+
+                        if (breakIndex < segment.Length)
                         {
                             _segments.RemoveRange(0, segmentIndex);
-                            segment.Length -= breakIndex + 1;
+                            segment.Length -= breakIndex;
                             _segments[0] = segment;
                         }
                         else
