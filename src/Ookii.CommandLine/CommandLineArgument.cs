@@ -992,8 +992,9 @@ namespace Ookii.CommandLine
         ///   or not.
         /// </para>
         /// <para>
-        ///   The <see cref="CommandLineParser.Parse{T}(string[], ParseOptions?)"/> static helper method will print
-        ///   usage information if parsing was canceled through this method.
+        ///   The <see cref="CommandLineParser{T}.ParseWithErrorHandling()"/> method and the
+        ///   <see cref="CommandLineParser.Parse{T}(string[], ParseOptions?)"/> static helper method
+        ///   will print usage information if parsing was canceled through this method.
         /// </para>
         /// <para>
         ///   Canceling parsing in this way is identical to handling the <see cref="CommandLineParser.ArgumentParsed"/>

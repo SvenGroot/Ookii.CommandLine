@@ -662,6 +662,13 @@ namespace Ookii.CommandLine
         /// <value>
         /// An instance of the <see cref="ParseResult"/> class.
         /// </value>
+        /// <remarks>
+        /// <para>
+        ///   Use this property to get the name of the argument that canceled parsing, or to get
+        ///   error information if the <see cref="ParseWithErrorHandling()"/> method returns
+        ///   <see langword="null"/>.
+        /// </para>
+        /// </remarks>
         public ParseResult Result { get; private set; }
 
         /// <summary>
@@ -826,6 +833,113 @@ namespace Ookii.CommandLine
                 Result = ParseResult.FromException(ex);
                 throw;
             }
+        }
+
+        /// <summary>
+        /// Parses the arguments returned by the <see cref="Environment.GetCommandLineArgs"/>
+        /// method, and displays error messages and usage help if required.
+        /// </summary>
+        /// <returns>
+        ///   An instance of the type specified by the <see cref="ArgumentsType"/> property, or
+        ///   <see langword="null"/> if an error occurred, or argument parsing was canceled by the
+        ///   <see cref="CommandLineArgumentAttribute.CancelParsing"/> property or a method argument
+        ///   that returned <see langword="false"/>.
+        /// </returns>
+        /// <remarks>
+        /// <para>
+        ///   If an error occurs or parsing is canceled, it prints errors to the <see
+        ///   cref="ParseOptions.Error"/> stream, and usage help to the <see cref="UsageWriter"/> if
+        ///   the <see cref="HelpRequested"/> property is <see langword="true"/>. It then returns
+        ///   <see langword="null"/>.
+        /// </para>
+        /// <para>
+        ///   If the return value is <see langword="null"/>, check the <see cref="Result"/>
+        ///   property for more information about whether an error occurred or parsing was
+        ///   canceled.
+        /// </para>
+        /// <para>
+        ///   This method will never throw a <see cref="CommandLineArgumentException"/> exception.
+        /// </para>
+        /// </remarks>
+        public object? ParseWithErrorHandling()
+        {
+            // GetCommandLineArgs include the executable, so skip it.
+            return ParseWithErrorHandling(Environment.GetCommandLineArgs(), 1);
+        }
+
+        /// <summary>
+        /// Parses the arguments returned by the <see cref="Environment.GetCommandLineArgs"/>
+        /// method, and displays error messages and usage help if required.
+        /// </summary>
+        /// <param name="args">The command line arguments.</param>
+        /// <param name="index">The index of the first argument to parse.</param>
+        /// <returns>
+        ///   An instance of the type specified by the <see cref="ArgumentsType"/> property, or
+        ///   <see langword="null"/> if an error occurred, or argument parsing was canceled by the
+        ///   <see cref="CommandLineArgumentAttribute.CancelParsing"/> property or a method argument
+        ///   that returned <see langword="false"/>.
+        /// </returns>
+        /// <remarks>
+        /// <para>
+        ///   If an error occurs or parsing is canceled, it prints errors to the <see
+        ///   cref="ParseOptions.Error"/> stream, and usage help to the <see cref="UsageWriter"/> if
+        ///   the <see cref="HelpRequested"/> property is <see langword="true"/>. It then returns
+        ///   <see langword="null"/>.
+        /// </para>
+        /// <para>
+        ///   If the return value is <see langword="null"/>, check the <see cref="Result"/>
+        ///   property for more information about whether an error occurred or parsing was
+        ///   canceled.
+        /// </para>
+        /// <para>
+        ///   This method will never throw a <see cref="CommandLineArgumentException"/> exception.
+        /// </para>
+        /// </remarks>
+        /// <exception cref="ArgumentNullException">
+        ///   <paramref name="args"/> is <see langword="null"/>.
+        /// </exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        ///   <paramref name="index"/> does not fall within the bounds of <paramref name="args"/>.
+        /// </exception>
+        public object? ParseWithErrorHandling(string[] args, int index = 0)
+        {
+            EventHandler<DuplicateArgumentEventArgs>? handler = null;
+            if (_parseOptions.DuplicateArguments == ErrorMode.Warning)
+            {
+                handler = (sender, e) =>
+                {
+                    var warning = StringProvider.DuplicateArgumentWarning(e.Argument.ArgumentName);
+                    WriteError(_parseOptions, warning, _parseOptions.WarningColor);
+                };
+
+                DuplicateArgument += handler;
+            }
+
+            var helpMode = UsageHelpRequest.Full;
+            object? result = null;
+            try
+            {
+                result = Parse(args, index);
+            }
+            catch (CommandLineArgumentException ex)
+            {
+                WriteError(_parseOptions, ex.Message, _parseOptions.ErrorColor, true);
+                helpMode = _parseOptions.ShowUsageOnError;
+            }
+            finally
+            {
+                if (handler != null)
+                {
+                    DuplicateArgument -= handler;
+                }
+            }
+
+            if (HelpRequested)
+            {
+                _parseOptions.UsageWriter.WriteParserUsage(this, helpMode);
+            }
+
+            return result;
         }
 
         /// <summary>
@@ -1051,34 +1165,7 @@ namespace Ookii.CommandLine
         {
             options ??= new();
             var parser = new CommandLineParser(argumentsType, options);
-
-            if (options.DuplicateArguments == ErrorMode.Warning)
-            {
-                parser.DuplicateArgument += (sender, e) =>
-                {
-                    var warning = parser.StringProvider.DuplicateArgumentWarning(e.Argument.ArgumentName);
-                    WriteError(options, warning, options.WarningColor);
-                };
-            }
-
-            var helpMode = UsageHelpRequest.Full;
-            object? result = null;
-            try
-            {
-                result = parser.Parse(args, index);
-            }
-            catch (CommandLineArgumentException ex)
-            {
-                WriteError(options, ex.Message, options.ErrorColor, true);
-                helpMode = options.ShowUsageOnError;
-            }
-
-            if (parser.HelpRequested)
-            {
-                options.UsageWriter.WriteParserUsage(parser, helpMode);
-            }
-
-            return result;
+            return parser.ParseWithErrorHandling(args, index);
         }
 
         internal static bool ShouldIndent(LineWrappingTextWriter writer)

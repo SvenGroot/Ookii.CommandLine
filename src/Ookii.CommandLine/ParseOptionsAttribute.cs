@@ -19,8 +19,8 @@ namespace Ookii.CommandLine
     ///   properties.
     /// </para>
     /// <para>
-    ///   If you also use the <see cref="ParseOptions"/> class with one of the static <see cref="CommandLineParser.Parse{T}(string[], ParseOptions)"/>
-    ///   functions, any options provided there will override the options set in this attribute.
+    ///   If you also use the <see cref="ParseOptions"/> class, any options provided there will
+    ///   override the options set in this attribute.
     /// </para>
     /// <para>
     ///   If you wish to use the default options, you do not need to apply this attribute to your
@@ -154,10 +154,11 @@ namespace Ookii.CommandLine
         ///   last value supplied will be used.
         /// </para>
         /// <para>
-        ///   If set to <see cref="ErrorMode.Warning"/>, the static <see cref="CommandLineParser.Parse{T}(ParseOptions?)"/>
-        ///   method and the <see cref="Commands.CommandManager"/> class will print a warning to
-        ///   the <see cref="ParseOptions.Error"/> stream when a duplicate argument is found. If
-        ///   you are not using these methods, <see cref="ErrorMode.Warning"/> is identical to
+        ///   If set to <see cref="ErrorMode.Warning"/>, the <see cref="CommandLineParser{T}.ParseWithErrorHandling()"/>
+        ///   method, the static <see cref="CommandLineParser.Parse{T}(ParseOptions?)"/> method and
+        ///   the <see cref="Commands.CommandManager"/> class will print a warning to the
+        ///   <see cref="ParseOptions.Error"/> stream when a duplicate argument is found. If you are
+        ///   not using these methods, <see cref="ErrorMode.Warning"/> is identical to
         ///   <see cref="ErrorMode.Allow"/> and no warning is displayed.
         /// </para>
         /// <para>

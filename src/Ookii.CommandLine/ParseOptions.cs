@@ -10,8 +10,8 @@ using System.IO;
 namespace Ookii.CommandLine
 {
     /// <summary>
-    /// Provides options for the <see cref="CommandLineParser.Parse{T}(string[], ParseOptions)"/> method
-    /// and the <see cref="CommandLineParser(Type, ParseOptions?)"/> constructor.
+    /// Provides options for the <see cref="CommandLineParser.Parse{T}(string[], ParseOptions)"/>
+    /// method and the <see cref="CommandLineParser(Type, ParseOptions?)"/> constructor.
     /// </summary>
     /// <remarks>
     /// <para>
@@ -186,11 +186,12 @@ namespace Ookii.CommandLine
         ///   last value supplied will be used.
         /// </para>
         /// <para>
-        ///   If set to <see cref="ErrorMode.Warning"/>, the static <see cref="CommandLineParser.Parse{T}(ParseOptions?)"/>
-        ///   method and the <see cref="CommandManager"/> class will print a warning to
-        ///   the <see cref="Error"/> stream when a duplicate argument is found. If
-        ///   you are not using these methods, <see cref="ErrorMode.Warning"/> is identical to
-        ///   <see cref="ErrorMode.Allow"/> and no warning is displayed.
+        ///   If set to <see cref="ErrorMode.Warning"/>, the <see cref="CommandLineParser{T}.ParseWithErrorHandling()"/>
+        ///   method, the static <see cref="CommandLineParser.Parse{T}(ParseOptions?)"/> method and
+        ///   the <see cref="CommandManager"/> class will print a warning to the <see cref="Error"/>
+        ///   stream when a duplicate argument is found. If you are not using these methods,
+        ///   <see cref="ErrorMode.Warning"/> is identical to <see cref="ErrorMode.Allow"/> and no
+        ///   warning is displayed.
         /// </para>
         /// <para>
         ///   If not <see langword="null"/>, this property overrides the value of the
@@ -383,9 +384,11 @@ namespace Ookii.CommandLine
         /// <remarks>
         /// <para>
         ///   If this property is <see langword="null"/> and the <see cref="Error"/> property is
-        ///   <see langword="null"/>, the <see cref="CommandLineParser.Parse{T}(string[], int, ParseOptions?)"/>
+        ///   <see langword="null"/>, the <see cref="CommandLineParser{T}.ParseWithErrorHandling()"/>
+        ///   method, the <see cref="CommandLineParser.Parse{T}(string[], int, ParseOptions?)"/>
         ///   method and the <see cref="CommandManager"/> class will determine if color is supported
-        ///   using the <see cref="VirtualTerminal.EnableColor"/> method for the standard error stream.
+        ///   using the <see cref="VirtualTerminal.EnableColor"/> method for the standard error
+        ///   stream.
         /// </para>
         /// <para>
         ///   If this property is set to <see langword="true"/> explicitly, virtual terminal
@@ -427,7 +430,8 @@ namespace Ookii.CommandLine
         /// <remarks>
         /// <para>
         ///   If the value of this property is not <see cref="UsageHelpRequest.Full"/>, the
-        ///   <see cref="CommandLineParser.Parse{T}(string[], int, ParseOptions?)"/> method and
+        ///   <see cref="CommandLineParser{T}.ParseWithErrorHandling()"/> method, the
+        ///   <see cref="CommandLineParser.Parse{T}(string[], int, ParseOptions?)"/> method and the
         ///   <see cref="CommandManager"/> class will write the message returned by the
         ///   <see cref="UsageWriter.WriteMoreInfoMessage"/> method instead of usage help.
         /// </para>

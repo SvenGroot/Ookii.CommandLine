@@ -111,12 +111,35 @@ additional information about the arguments using the [`Arguments`][Arguments_0] 
 [`GetArgument`][] function.
 
 In this case, you can manually create an instance of the [`CommandLineParser<T>`][] class. Then, call
-the instance [`Parse()`][Parse()_5] method.
+the instance `ParseWithErrorHandling()` or [`Parse()`][Parse()_5] method.
 
 > The [`CommandLineParser<T>`][] class is a helper class that derives from [`CommandLineParser`][]
-> and provides strongly-typed [`Parse()`][Parse()_5] methods. You can also instantiate
-> [`CommandLineParser`][] directly, and use its instance [`Parse()`][Parse()_6] methods that return
-> an `object?`.
+> and provides strongly-typed [`Parse()`][Parse()_5] and `ParseWithErrorHandling()` methods. You can
+> also instantiate [`CommandLineParser`][] directly, and use its instance [`Parse()`][Parse()_6]
+> and ``ParseWithErrorHandling()`` methods that return an `object?`.
+
+Using `ParseWithErrorHandling()` is the easiest in this case, because it will still handling
+printing error messages and usage help, the same as the static `Parse<T>()` method. If you want
+more information about the error that occured, you can access the `CommandLineParser.Result`
+property.
+
+For example, you can use this approach if you want to return a success status when parsing was
+canceled, but not when a parsing error occurred:
+
+```csharp
+var parser = new CommandLineParser<MyArguments>();
+var arguments = parser.ParseWithErrorHandling();
+if (parser == null)
+{
+    return parser.Result.Status == ParseStatus.Canceled ? 0 : 1;
+}
+```
+
+You can also use the `ParseResult.ArgumentName` property to determine which argument canceled
+parsing in this case.
+
+The [`CommandLineParser<T>.Parse()`][] method offers the most fine grained control, letting you
+handle errors manually.
 
 If argument parsing fails, the instance [`CommandLineParser<T>.Parse()`][] method will throw a
 [`CommandLineArgumentException`][] exception, which you need to handle. You can simply print the
@@ -135,7 +158,10 @@ To see whether you should show usage help, check the [`HelpRequested`][] propert
 will _always_ be true if an exception was thrown, and _always_ be false if the
 [`Parse()`][Parse()_5] method returned an instance.
 
-Here is a basic sample of parsing using a [`CommandLineParser<T>`][] instance:
+If the [`Parse()`][Parse()_5] method returned null, you can also check the
+`CommandLineParser.Result` property to see which argument canceled parsing.
+
+Here is a basic sample of manual parsing and error handling using the [`Parse()`][Parse()_5] method:
 
 ```csharp
 static int Main()
@@ -166,7 +192,8 @@ static int Main()
 If you wish to customize the behavior, that can still be done using the [`ParseOptionsAttribute`][]
 attribute and the [`ParseOptions`][] class (which you can pass to the [`CommandLineParser<T>`][]
 constructor). Some properties of the [`ParseOptions`][] class (like [`Error`][]) are not used with
-the instance methods, as they apply to the static [`Parse<T>()`][Parse<T>()_1] only.
+the [`Parse()`][Parse()_5]  methods, as they apply to the `ParseWithErrorHandling()` and the static
+[`Parse<T>()`][Parse<T>()_1] methods only.
 
 Next, we'll take a look at [generating usage help](UsageHelp.md).
 
