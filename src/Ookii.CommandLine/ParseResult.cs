@@ -6,7 +6,7 @@ namespace Ookii.CommandLine
     /// Indicates the result of the last call to the <see cref="CommandLineParser.Parse(string[], int)"/>
     /// method.
     /// </summary>
-    /// <seealso cref="CommandLineParser.Result"/>
+    /// <seealso cref="CommandLineParser.ParseResult"/>
     public readonly struct ParseResult
     {
         private ParseResult(ParseStatus status, CommandLineArgumentException? exception = null, string? argumentName = null)

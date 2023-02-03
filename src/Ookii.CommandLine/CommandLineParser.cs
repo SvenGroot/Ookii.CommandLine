@@ -660,7 +660,7 @@ namespace Ookii.CommandLine
         /// Gets the result of the last call to the <see cref="Parse(string[], int)"/> method.
         /// </summary>
         /// <value>
-        /// An instance of the <see cref="ParseResult"/> class.
+        /// An instance of the <see cref="CommandLine.ParseResult"/> class.
         /// </value>
         /// <remarks>
         /// <para>
@@ -669,7 +669,7 @@ namespace Ookii.CommandLine
         ///   <see langword="null"/>.
         /// </para>
         /// </remarks>
-        public ParseResult Result { get; private set; }
+        public ParseResult ParseResult { get; private set; }
 
         /// <summary>
         /// Gets the name of the executable used to invoke the application.
@@ -830,7 +830,7 @@ namespace Ookii.CommandLine
             catch (CommandLineArgumentException ex)
             {
                 HelpRequested = true;
-                Result = ParseResult.FromException(ex);
+                ParseResult = ParseResult.FromException(ex);
                 throw;
             }
         }
@@ -853,7 +853,7 @@ namespace Ookii.CommandLine
         ///   <see langword="null"/>.
         /// </para>
         /// <para>
-        ///   If the return value is <see langword="null"/>, check the <see cref="Result"/>
+        ///   If the return value is <see langword="null"/>, check the <see cref="ParseResult"/>
         ///   property for more information about whether an error occurred or parsing was
         ///   canceled.
         /// </para>
@@ -887,7 +887,7 @@ namespace Ookii.CommandLine
         ///   <see langword="null"/>.
         /// </para>
         /// <para>
-        ///   If the return value is <see langword="null"/>, check the <see cref="Result"/>
+        ///   If the return value is <see langword="null"/>, check the <see cref="ParseResult"/>
         ///   property for more information about whether an error occurred or parsing was
         ///   canceled.
         /// </para>
@@ -1478,7 +1478,7 @@ namespace Ookii.CommandLine
                 argument.ApplyPropertyValue(commandLineArguments);
             }
 
-            Result = ParseResult.Success;
+            ParseResult = ParseResult.Success;
             return commandLineArguments;
         }
 
@@ -1517,7 +1517,7 @@ namespace Ookii.CommandLine
 
             if (cancel)
             {
-                Result = ParseResult.FromCanceled(argument.ArgumentName);
+                ParseResult = ParseResult.FromCanceled(argument.ArgumentName);
             }
 
             return cancel;

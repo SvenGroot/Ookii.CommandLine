@@ -120,7 +120,7 @@ the instance `ParseWithErrorHandling()` or [`Parse()`][Parse()_5] method.
 
 Using `ParseWithErrorHandling()` is the easiest in this case, because it will still handling
 printing error messages and usage help, the same as the static `Parse<T>()` method. If you want
-more information about the error that occured, you can access the `CommandLineParser.Result`
+more information about the error that occurred, you can access the `CommandLineParser.ParseResult`
 property.
 
 For example, you can use this approach if you want to return a success status when parsing was
@@ -131,7 +131,7 @@ var parser = new CommandLineParser<MyArguments>();
 var arguments = parser.ParseWithErrorHandling();
 if (parser == null)
 {
-    return parser.Result.Status == ParseStatus.Canceled ? 0 : 1;
+    return parser.ParseResult.Status == ParseStatus.Canceled ? 0 : 1;
 }
 ```
 
@@ -159,7 +159,7 @@ will _always_ be true if an exception was thrown, and _always_ be false if the
 [`Parse()`][Parse()_5] method returned an instance.
 
 If the [`Parse()`][Parse()_5] method returned null, you can also check the
-`CommandLineParser.Result` property to see which argument canceled parsing.
+`CommandLineParser.ParseResult` property to see which argument canceled parsing.
 
 Here is a basic sample of manual parsing and error handling using the [`Parse()`][Parse()_5] method:
 

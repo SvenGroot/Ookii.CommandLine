@@ -135,7 +135,7 @@ namespace Ookii.CommandLine.Commands
         /// Gets the result of parsing the arguments for the last call to <see cref="CreateCommand()"/>.
         /// </summary>
         /// <value>
-        /// The value of the <see cref="CommandLineParser.Result"/> property after the call to the
+        /// The value of the <see cref="CommandLineParser.ParseResult"/> property after the call to the
         /// <see cref="CommandLineParser.ParseWithErrorHandling()"/> method made while creating
         /// the command.
         /// </value>

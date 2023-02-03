@@ -189,7 +189,7 @@ namespace Ookii.CommandLine.Commands
             {
                 var parser = CreateParser();
                 var command = (ICommand?)parser.ParseWithErrorHandling(args, index);
-                return (command, parser.Result);
+                return (command, parser.ParseResult);
             }
         }
 
