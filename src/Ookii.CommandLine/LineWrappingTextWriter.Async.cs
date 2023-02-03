@@ -81,11 +81,6 @@ namespace Ookii.CommandLine
 
             private async Task<AsyncBreakLineResult> BreakLineAsync(TextWriter writer, StringMemory newSegment, int maxLength, int indent, bool force)
             {
-                if (force)
-                {
-                    Debugger.Break();
-                }
-
                 // Line length can be over the max length if the previous place a line was split
                 // plus the indentation is more than the line length.
                 if (LineLength <= maxLength &&
