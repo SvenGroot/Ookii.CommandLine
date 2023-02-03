@@ -132,6 +132,25 @@ namespace Ookii.CommandLine.Commands
         public CommandOptions Options => _options;
 
         /// <summary>
+        /// Gets the result of parsing the arguments for the last call to <see cref="CreateCommand()"/>.
+        /// </summary>
+        /// <value>
+        /// The value of the <see cref="CommandLineParser.Result"/> property after the call to the
+        /// <see cref="CommandLineParser.ParseWithErrorHandling()"/> method made while creating
+        /// the command.
+        /// </value>
+        /// <remarks>
+        /// <para>
+        ///   If the <see cref="CommandLineParser.ParseWithErrorHandling()"/> was not invoked, for
+        ///   example because the <see cref="CreateCommand()"/> method has not been called, no
+        ///   command name was specified, an unknown command name was specified, or the command used
+        ///   custom parsing, the value of the <see cref="ParseResult.Status"/> property will be
+        ///   <see cref="ParseStatus.None"/>.
+        /// </para>
+        /// </remarks>
+        public ParseResult ParseResult { get; private set; }
+
+        /// <summary>
         /// Gets information about the commands.
         /// </summary>
         /// <returns>
@@ -269,6 +288,7 @@ namespace Ookii.CommandLine.Commands
                 throw new ArgumentOutOfRangeException(nameof(index));
             }
 
+            ParseResult = default;
             var commandInfo = commandName == null
                 ? null
                 : GetCommand(commandName);
@@ -282,7 +302,9 @@ namespace Ookii.CommandLine.Commands
             _options.UsageWriter.CommandName = info.Name;
             try
             {
-                return info.CreateInstance(args, index);
+                var (command, result) = info.CreateInstanceWithResult(args, index);
+                ParseResult = result;
+                return command;
             }
             finally
             {

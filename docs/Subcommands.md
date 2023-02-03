@@ -371,9 +371,16 @@ As with the static [`CommandLineParser.Parse<T>()`][] method, [`RunCommand()`][]
 handle errors and display usage help. If for any reason you want to do this manually,
 [`CommandManager`][] provides the tools to do so.
 
-The [`CommandManager.GetCommand()`][] method returns information about a command, if one with the
-specified name exists. From there, you can manually create a [`CommandLineParser`][] for the command,
-instantiate the class, and invoke its run method.
+If you only want more information about the error, but still want the [`CommandManager`][] class to
+handle and display errors and usage help, you can check the `CommandManager.ParseResult` property to
+get information if [`RunCommand()`][] or [`RunCommandAsync()`][] returned null. The value of the
+`ParseResult.Status` property of the returned structure will indicate whether the command was not
+found, if an error occurred parsing the command's arguments, or if parsing was canceled by one of
+the command's arguments.
+
+If you want to handle errors entirely manually, the [`CommandManager.GetCommand()`][] method returns
+information about a command, if one with the specified name exists. From there, you can manually
+create a [`CommandLineParser`][] for the command, instantiate the class, and invoke its run method.
 
 When doing this, it's your responsibility to handle things such as [`IAsyncCommand`][] or
 [`ICommandWithCustomParsing`][]. Of course, you can omit those parts if you do not have any commands
@@ -398,8 +405,10 @@ if (exitCode is int value)
 }
 
 // For demonstration purposes only; probably not the best way to show this.
-MessageBox.Show(writer.BaseWriter.ToString());
-return 1;
+MessageBox.Show(writer.ToString());
+
+// Return an error code only if the failure was not caused by an argument that canceled parsing.
+return manager.ParseResult.Status == ParseStatus.Canceled ? 0 : 1;
 ```
 
 This, combined with a custom [`UsageWriter`][] to format the usage help as you like, is probably

@@ -262,8 +262,8 @@ is supplied by setting the [`CommandLineArgumentAttribute.CancelParsing`][] prop
 
 When this property is set, parsing is stopped when the argument is encountered. The rest of the
 command line is not processed, and [`CommandLineParser.Parse()`][CommandLineParser.Parse()_2] will
-return null. The static [`Parse<T>()`][Parse<T>()_1] helper method will automatically print usage in
-this case.
+return null. The `ParseWithErrorHandling()` and the static [`Parse<T>()`][Parse<T>()_1] helper
+methods will automatically print usage in this case.
 
 This can be used to implement a custom `-Help` argument, if you don't wish to use the default one.
 

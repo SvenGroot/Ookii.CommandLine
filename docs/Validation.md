@@ -7,8 +7,9 @@ range.
 While it's possible to do this kind of validation after the arguments have been parsed, or to write
 custom property setters that perform the validation, Ookii.CommandLine also provides validation
 attributes. The advantage of this is that you can reuse common validation rules, if you use the
-static [`CommandLineParser.Parse<T>()`][] method it will handle printing validation error messages, and
-validators can also add a help message to the argument descriptions in the [usage help](UsageHelp.md).
+static [`CommandLineParser.Parse<T>()`][] or `CommandLineParser.ParseWithErrorHandling()` method it
+will handle printing validation error messages, and validators can also add a help message to the
+argument descriptions in the [usage help](UsageHelp.md).
 
 ## Built-in validators
 
@@ -80,7 +81,8 @@ public DayOfWeek Day { get; set; }
 If a validator fails, a [`CommandLineArgumentException`][] is thrown with the [`Category`][]
 property set to [`CommandLineArgumentErrorCategory.ValidationFailed`][], and the exception message
 set to a custom message provided by the validator. The static [`CommandLineParser.Parse<T>()`][]
-method will print the error message and show usage help, as always.
+method and the `CommandLineParser.ParseWithErrorHandling()` method will print the error message and
+show usage help, as always.
 
 For example, the [`ValidateRangeAttribute`][] will use an error message like "The argument 'Count'
 must be between 0 and 100." or "The argument 'Count' must be at least 1."

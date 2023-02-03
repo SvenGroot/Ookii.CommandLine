@@ -7,11 +7,12 @@ Creating this kind of usage help text is tedious, and you must make sure it is k
 whenever you change the arguments to your application. Ookii.CommandLine generates this usage help
 text automatically, alleviating this problem.
 
-If you use the static [`CommandLineParser.Parse<T>()`][] method, usage help will be printed
-automatically in the event the command line is invalid, or the `-Help` argument was used. You can
-customize the output using the [`ParseOptions.UsageWriter`][] property.
+If you use the static [`CommandLineParser.Parse<T>()`][] method or the
+`CommandLineParser.ParseWithErrorHandling()` method, usage help will be printed automatically in the
+event the command line is invalid, or the `-Help` argument was used. You can customize the output
+using the [`ParseOptions.UsageWriter`][] property.
 
-If you don't use the static methods, you can print usage help can be generated using the
+If you don't use those methods, you can generate the usage help using the
 [`CommandLineParser.WriteUsage()`][] method. By default, the [`CommandLineParser.WriteUsage()`][]
 method will write the usage help to the standard output stream, using the
 [`LineWrappingTextWriter`][] class to white-space wrap the text at the console width.
@@ -227,12 +228,13 @@ You can also choose the sort order of the description list using the
 [`UsageWriter.ArgumentDescriptionListOrder`][] property. This defaults to the same order as the
 usage syntax, but you can also choose to sort by ascending or descending long or short name.
 
-Since the static [`CommandLineParser.Parse<T>()`][] method will show usage help on error, if you have
-a lot of arguments it may be necessary for the user to scroll up past the argument description list
-to see the error message to determine what was wrong with the command line. Since this may be
-inconvenient, you can choose to omit the argument description list, or the usage help entirely,
-when an error occurs, using the [`ParseOptions.ShowUsageOnError`][] property. In this case, the user
-will have to use the `-Help` argument to see the full help.
+Since the static [`CommandLineParser.Parse<T>()`][] method or the
+`CommandLineParser.ParseWithErrorHandling()` method method will show usage help on error, if you
+have a lot of arguments it may be necessary for the user to scroll up past the argument description
+list to see the error message to determine what was wrong with the command line. Since this may be
+inconvenient, you can choose to omit the argument description list, or the usage help entirely, when
+an error occurs, using the [`ParseOptions.ShowUsageOnError`][] property. In this case, the user will
+have to use the `-Help` argument to see the full help.
 
 ## Hidden arguments
 

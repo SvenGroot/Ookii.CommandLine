@@ -134,12 +134,40 @@ namespace Ookii.CommandLine.Commands
         /// </summary>
         /// <param name="args">The arguments to the command.</param>
         /// <param name="index">The index in <paramref name="args"/> at which to start parsing the arguments.</param>
-        /// <returns>An instance of the <see cref="CommandType"/>.</returns>
+        /// <returns>
+        /// An instance of the <see cref="CommandType"/>, or <see langword="null"/> if an error
+        /// occurred or parsing was canceled.
+        /// </returns>
         /// <exception cref="ArgumentNullException">
         ///   <paramref name="args"/> is <see langword="null"/>.
         /// </exception>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> does not fall inside the bounds of <paramref name="args"/>.</exception>
-        public ICommand CreateInstance(string[] args, int index)
+        public ICommand? CreateInstance(string[] args, int index)
+        {
+            var (command, _) = CreateInstanceWithResult(args, index);
+            return command;
+        }
+
+        /// <summary>
+        /// Creates an instance of the command type.
+        /// </summary>
+        /// <param name="args">The arguments to the command.</param>
+        /// <param name="index">The index in <paramref name="args"/> at which to start parsing the arguments.</param>
+        /// <returns>
+        /// A tuple containing an instance of the <see cref="CommandType"/>, or <see langword="null"/> if an error
+        /// occurred or parsing was canceled, and the <see cref="ParseResult"/> of the operation.
+        /// </returns>
+        /// <remarks>
+        /// <para>
+        ///   The <see cref="ParseResult.Status"/> property of the returned <see cref="ParseResult"/>
+        ///   will be <see cref="ParseStatus.None"/> if the command used custom parsing.
+        /// </para>
+        /// </remarks>
+        /// <exception cref="ArgumentNullException">
+        ///   <paramref name="args"/> is <see langword="null"/>.
+        /// </exception>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> does not fall inside the bounds of <paramref name="args"/>.</exception>
+        public (ICommand?, ParseResult) CreateInstanceWithResult(string[] args, int index)
         {
             if (args == null)
             {
@@ -155,10 +183,14 @@ namespace Ookii.CommandLine.Commands
             {
                 var command = (ICommandWithCustomParsing)Activator.CreateInstance(CommandType)!;
                 command.Parse(args, index, _manager.Options);
-                return command;
+                return (command, default);
             }
-
-            return (ICommand)CommandLineParser.ParseInternal(CommandType, args, index, _manager.Options)!;
+            else
+            {
+                var parser = CreateParser();
+                var command = (ICommand?)parser.ParseWithErrorHandling(args, index);
+                return (command, parser.Result);
+            }
         }
 
         /// <summary>

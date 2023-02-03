@@ -78,7 +78,7 @@ var arguments = CommandLineParser.Parse<MyArguments>(options);
 if (arguments == null)
 {
     // There are probably better ways to show help in a GUI app than this.
-    MessageBox.Show(writer.BaseWriter.ToString());
+    MessageBox.Show(writer.ToString());
     return 1;
 }
 ```
