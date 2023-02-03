@@ -1,10 +1,16 @@
 # Migrating from Ookii.CommandLine 2.x
 
-Ookii.CommandLine 3.0 has a number of breaking changes from version 2.4 and earlier versions. This
-article explains what you need to know to migrate your code to the new version.
+Ookii.CommandLine 3.0 and later have a number of breaking changes from version 2.4 and earlier
+versions. This article explains what you need to know to migrate your code to the new version.
 
 Although there are quite a few changes, it's likely your application will not require many
 modifications unless you used subcommands or heavily customized the usage help format.
+
+## .Net Framework support
+
+As of version 3.0, .Net Framework 2.0 is no longer supported. You can still target .Net Framework
+4.6.1 and later using the .Net Standard 2.0 assembly. If you need to support an older version of
+.Net, please continue to use [version 2.4](https://github.com/SvenGroot/ookii.commandline/releases/tag/v2.4).
 
 ## Breaking API changes
 

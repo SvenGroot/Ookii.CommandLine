@@ -4,7 +4,15 @@
 
 **IMPORTANT:** If you are upgrading from version 2.x, please check the [migration guide](Migrating.md).
 
-- This release brings several improvements to the `LineWrappingTextWriter`.
+- Added an instance `CommandLineParser<T>.ParseWithErrorHandling()` method, which handles errors
+  and displays usage help the same way as the static `Parse<T>()` method, but allows access to more
+  information only available if you have an instance.
+- Added the `CommandLineParser.Result` property, which provides information about errors or which
+  argument canceled parsing, giving detailed failure information to the caller even if the
+  `ParseWithErrorHandling()` method was used.
+- Also exposed the same information for subcommands through the `CommandManager.ParseResult`
+  property.
+- `LineWrappingTextWriter` improvements
   - Proper async support; the various `WriteAsync()` and `WriteLineAsync()` methods will now call
     down to the async methods of the base writer for the `LineWrappingTextWriter`, and a new method
     `ResetIndentAsync()` is provided.
