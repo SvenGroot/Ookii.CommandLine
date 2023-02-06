@@ -69,6 +69,7 @@ namespace Ookii.CommandLine
     ///   <see cref="MaximumLineLength"/> property is zero.
     /// </para>
     /// </remarks>
+    /// <threadsafety static="true" instance="false"/>
     public partial class LineWrappingTextWriter : TextWriter
     {
         #region Nested types
@@ -92,24 +93,24 @@ namespace Ookii.CommandLine
 
         }
 
-        private partial class LineBuffer
+        private struct AsyncBreakLineResult
         {
-            private struct AsyncBreakLineResult
-            {
-                public bool Success { get; set; }
-                public StringMemory Remaining { get; set; }
-            }
+            public bool Success { get; set; }
+            public StringMemory Remaining { get; set; }
+        }
 
 #if NET6_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-            private ref struct BreakLineResult
+        private ref struct BreakLineResult
 #else
-            private struct BreakLineResult
+        private struct BreakLineResult
 #endif
-            {
-                public bool Success { get; set; }
-                public StringSpan Remaining { get; set; }
-            }
+        {
+            public bool Success { get; set; }
+            public StringSpan Remaining { get; set; }
+        }
 
+        private partial class LineBuffer
+        {
             private readonly RingBuffer _buffer;
             private readonly List<Segment> _segments = new();
 
@@ -245,9 +246,9 @@ namespace Ookii.CommandLine
 
             private partial void WriteSegments(TextWriter writer, IEnumerable<Segment> segments);
 
-            public partial StringSpan BreakLine(TextWriter writer, StringSpan newSegment, int maxLength, int indent);
+            public partial BreakLineResult BreakLine(TextWriter writer, StringSpan newSegment, int maxLength, int indent, WrappingMode mode);
 
-            private partial BreakLineResult BreakLine(TextWriter writer, StringSpan newSegment, int maxLength, int indent, bool force);
+            private partial BreakLineResult BreakLine(TextWriter writer, StringSpan newSegment, int maxLength, int indent, BreakLineMode mode);
 
             public void ClearCurrentLine(int indent, bool clearSegments = true)
             {
@@ -286,7 +287,7 @@ namespace Ookii.CommandLine
         private readonly int _maximumLineLength;
         private readonly bool _countFormatting;
         private int _indent;
-        private bool _enableWrapping = true;
+        private WrappingMode _wrapping = WrappingMode.Enabled;
 
         // Used for indenting when there is no maximum line length.
         private NoWrappingState _noWrappingState;
@@ -436,15 +437,15 @@ namespace Ookii.CommandLine
         ///   This property has no effect if there is no maximum line length.
         /// </para>
         /// </remarks>
-        public bool EnableWrapping
+        public WrappingMode Wrapping
         {
-            get => _enableWrapping && _lineBuffer != null;
+            get => _lineBuffer != null ? _wrapping : WrappingMode.Disabled;
             set
             {
                 ThrowIfWriteInProgress();
-                if (_lineBuffer != null && _enableWrapping != value)
+                if (_lineBuffer != null && _wrapping != value)
                 {
-                    if (!value)
+                    if (value == WrappingMode.Disabled)
                     {
                         // Flush the buffer but not the base writer, and make sure indent is reset
                         // even if the buffer was empty (for consistency).
@@ -455,7 +456,7 @@ namespace Ookii.CommandLine
                         _noWrappingState = default;
                     }
 
-                    _enableWrapping = value;
+                    _wrapping = value;
                 }
             }
         }

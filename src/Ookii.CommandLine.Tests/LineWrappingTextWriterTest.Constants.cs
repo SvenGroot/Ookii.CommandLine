@@ -158,28 +158,77 @@ Lorem 01234567890123456789012345678901234567890123456789012345678901234567890123
         risus nec feugiat in fermentum.
 ".ReplaceLineEndings();
 
-        private const string _inputEnableWrapping = "Lorem ipsum dolor sit amet,\nconsectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Donec adipiscing tristique risus nec feugiat in fermentum.";
+        private const string _inputWrappingMode = @"Lorem ipsum dolor sit amet,
+consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Donec adipiscing tristique risus nec feugiat in fermentum.
 
-        private static readonly string _expectedEnableWrapping = @"Lorem ipsum dolor sit amet,
+Lorem 01234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789";
+
+        private static readonly string _expectedWrappingMode = @"Lorem ipsum dolor sit amet,
     consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
     dolore magna aliqua. Donec adipiscing tristique risus nec feugiat in
     fermentum.
+
+Lorem
+    0123456789012345678901234567890123456789012345678901234567890123456789012345
+    6789012345678901234567890123456789012345678901234567890123456789012345678901
+    234567890123456789012345678901234567890123456789
 Lorem ipsum dolor sit amet,
     consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Donec adipiscing tristique risus nec feugiat in fermentum.
+
+Lorem 01234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789
 Lorem ipsum dolor sit amet,
     consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
     dolore magna aliqua. Donec adipiscing tristique risus nec feugiat in
     fermentum.
+
+Lorem
+    0123456789012345678901234567890123456789012345678901234567890123456789012345
+    6789012345678901234567890123456789012345678901234567890123456789012345678901
+    234567890123456789012345678901234567890123456789
 ".ReplaceLineEndings();
 
-        private static readonly string _expectedEnableWrapping2 = @"Lorem ipsum dolor sit amet,
+        private static readonly string _expectedWrappingModeWrite = @"Lorem ipsum dolor sit amet,
     consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
     dolore magna aliqua. Donec adipiscing tristique risus nec feugiat in
-    fermentum.Lorem ipsum dolor sit amet,
-    consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Donec adipiscing tristique risus nec feugiat in fermentum.Lorem ipsum dolor sit amet,
+    fermentum.
+
+Lorem
+    0123456789012345678901234567890123456789012345678901234567890123456789012345
+    6789012345678901234567890123456789012345678901234567890123456789012345678901
+    234567890123456789012345678901234567890123456789Lorem ipsum dolor sit amet,
+    consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Donec adipiscing tristique risus nec feugiat in fermentum.
+
+Lorem 01234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789Lorem ipsum dolor sit amet,
     consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
     dolore magna aliqua. Donec adipiscing tristique risus nec feugiat in
-    fermentum.".ReplaceLineEndings();
+    fermentum.
+
+Lorem
+    0123456789012345678901234567890123456789012345678901234567890123456789012345
+    6789012345678901234567890123456789012345678901234567890123456789012345678901
+    234567890123456789012345678901234567890123456789".ReplaceLineEndings();
+
+        private static readonly string _expectedWrappingModeNoForce = @"Lorem ipsum dolor sit amet,
+    consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
+    dolore magna aliqua. Donec adipiscing tristique risus nec feugiat in
+    fermentum.
+
+Lorem
+    01234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789Lorem
+    ipsum dolor sit amet,
+    consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Donec adipiscing tristique risus nec feugiat in fermentum.
+
+Lorem
+    01234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789Lorem
+    ipsum dolor sit amet,
+    consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
+    dolore magna aliqua. Donec adipiscing tristique risus nec feugiat in
+    fermentum.
+
+Lorem
+    0123456789012345678901234567890123456789012345678901234567890123456789012345
+    6789012345678901234567890123456789012345678901234567890123456789012345678901
+    234567890123456789012345678901234567890123456789".ReplaceLineEndings();
 
     }
 }

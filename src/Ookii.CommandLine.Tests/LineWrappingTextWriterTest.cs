@@ -194,7 +194,7 @@ namespace Ookii.CommandLine.Tests
             Assert.AreEqual(baseWriter.Encoding, target.Encoding);
             Assert.AreEqual(baseWriter.FormatProvider, target.FormatProvider);
             Assert.AreEqual(baseWriter.NewLine, target.NewLine);
-            Assert.IsTrue(target.EnableWrapping);
+            Assert.AreEqual(WrappingMode.Enabled, target.Wrapping);
         }
 
         [TestMethod()]
@@ -407,37 +407,49 @@ namespace Ookii.CommandLine.Tests
         }
 
         [TestMethod]
-        public void TestEnableWrapping()
+        public void TestWrappingMode()
         {
             {
                 using var writer = LineWrappingTextWriter.ForStringWriter(80);
                 writer.Indent = 4;
-                writer.WriteLine(_inputEnableWrapping);
-                writer.EnableWrapping = false;
-                writer.WriteLine(_inputEnableWrapping);
-                writer.EnableWrapping = true;
-                writer.WriteLine(_inputEnableWrapping);
-                Assert.AreEqual(_expectedEnableWrapping, writer.ToString());
+                writer.WriteLine(_inputWrappingMode);
+                writer.Wrapping = WrappingMode.Disabled;
+                writer.WriteLine(_inputWrappingMode);
+                writer.Wrapping = WrappingMode.Enabled;
+                writer.WriteLine(_inputWrappingMode);
+                Assert.AreEqual(_expectedWrappingMode, writer.ToString());
             }
 
             // Make sure the buffer is cleared if not empty.
             {
                 using var writer = LineWrappingTextWriter.ForStringWriter(80);
                 writer.Indent = 4;
-                writer.Write(_inputEnableWrapping);
-                writer.EnableWrapping = false;
-                writer.Write(_inputEnableWrapping);
-                writer.EnableWrapping = true;
-                writer.Write(_inputEnableWrapping);
-                Assert.AreEqual(_expectedEnableWrapping2, writer.ToString());
+                writer.Write(_inputWrappingMode);
+                writer.Wrapping = WrappingMode.Disabled;
+                writer.Write(_inputWrappingMode);
+                writer.Wrapping = WrappingMode.Enabled;
+                writer.Write(_inputWrappingMode);
+                Assert.AreEqual(_expectedWrappingModeWrite, writer.ToString());
+            }
+
+            // Test EnabledNoForce
+            {
+                using var writer = LineWrappingTextWriter.ForStringWriter(80);
+                writer.Indent = 4;
+                writer.Wrapping = WrappingMode.EnabledNoForce;
+                writer.Write(_inputWrappingMode);
+                writer.Write(_inputWrappingMode);
+                writer.Wrapping = WrappingMode.Enabled;
+                writer.Write(_inputWrappingMode);
+                Assert.AreEqual(_expectedWrappingModeNoForce, writer.ToString());
             }
 
             // Should be false and unchangeable if no maximum length.
             {
                 using var writer = LineWrappingTextWriter.ForStringWriter();
-                Assert.IsFalse(writer.EnableWrapping);
-                writer.EnableWrapping = true;
-                Assert.IsFalse(writer.EnableWrapping);
+                Assert.AreEqual(WrappingMode.Disabled, writer.Wrapping);
+                writer.Wrapping = WrappingMode.Enabled;
+                Assert.AreEqual(WrappingMode.Disabled, writer.Wrapping);
             }
         }
 

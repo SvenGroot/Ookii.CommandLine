@@ -66,26 +66,31 @@ namespace Ookii.CommandLine
                 }
             }
 
-            public async Task<StringMemory> BreakLineAsync(TextWriter writer, StringMemory newSegment, int maxLength, int indent)
+            public async Task<AsyncBreakLineResult> BreakLineAsync(TextWriter writer, StringMemory newSegment, int maxLength, int indent, WrappingMode mode)
             {
-                var result = await BreakLineAsync(writer, newSegment, maxLength, indent, false);
+                Debug.Assert(mode != WrappingMode.Disabled);
+                var result = await BreakLineAsync(writer, newSegment, maxLength, indent, BreakLineMode.Backward);
                 if (!result.Success)
                 {
-                    // Guaranteed to succeed with force=true.
-                    result = await BreakLineAsync(writer, newSegment, maxLength, indent, true);
-                    Debug.Assert(result.Success);
+                    var forceMode = mode == WrappingMode.EnabledNoForce ? BreakLineMode.Forward : BreakLineMode.Force;
+                    result = await BreakLineAsync(writer, newSegment, maxLength, indent, forceMode);
                 }
 
-                return result.Remaining;
+                return result;
             }
 
-            private async Task<AsyncBreakLineResult> BreakLineAsync(TextWriter writer, StringMemory newSegment, int maxLength, int indent, bool force)
+            private async Task<AsyncBreakLineResult> BreakLineAsync(TextWriter writer, StringMemory newSegment, int maxLength, int indent, BreakLineMode mode)
             {
+                if (mode == BreakLineMode.Forward)
+                {
+                    maxLength = Math.Max(maxLength, LineLength);
+                }
+
                 // Line length can be over the max length if the previous place a line was split
                 // plus the indentation is more than the line length.
                 if (LineLength <= maxLength &&
                     newSegment.Span.Length != 0 &&
-                    newSegment.BreakLine(maxLength - LineLength, force, out var splits))
+                    newSegment.BreakLine(maxLength - LineLength, mode, out var splits))
                 {
                     var (before, after) = splits;
                     await WriteSegmentsAsync(writer, _segments);
@@ -96,7 +101,10 @@ namespace Ookii.CommandLine
                     return new() { Success = true, Remaining = after };
                 }
 
-                if (IsContentEmpty)
+                // If forward mode is being used, we know there are no usable breaks in the buffer
+                // because the line would've been broken there before the segment was put in the
+                // buffer.
+                if (IsContentEmpty || mode == BreakLineMode.Forward)
                 {
                     return new() { Success = false };
                 }
@@ -119,7 +127,7 @@ namespace Ookii.CommandLine
                         continue;
                     }
 
-                    int breakIndex = force
+                    int breakIndex = mode == BreakLineMode.Force
                         ? Math.Min(segment.Length, maxLength - contentOffset)
                         : _buffer.BreakLine(offset, Math.Min(segment.Length, maxLength - contentOffset));
 
@@ -129,7 +137,7 @@ namespace Ookii.CommandLine
                         breakIndex -= offset;
                         await _buffer.WriteToAsync(writer, breakIndex);
                         await writer.WriteLineAsync();
-                        if (!force)
+                        if (mode != BreakLineMode.Force)
                         {
                             _buffer.Discard(1);
                             breakIndex += 1;
@@ -194,7 +202,7 @@ namespace Ookii.CommandLine
 
         private async Task WriteNoMaximumAsync(StringMemory buffer)
         {
-            Debug.Assert(!EnableWrapping);
+            Debug.Assert(Wrapping == WrappingMode.Disabled);
 
             await buffer.SplitAsync(true, async (type, span) =>
             {
@@ -272,7 +280,7 @@ namespace Ookii.CommandLine
         private async Task WriteCoreAsync(StringMemory buffer)
         {
             ThrowIfWriteInProgress();
-            if (!EnableWrapping)
+            if (Wrapping == WrappingMode.Disabled)
             {
                 await WriteNoMaximumAsync(buffer);
                 return;
@@ -304,7 +312,13 @@ namespace Ookii.CommandLine
                     {
                         while (_lineBuffer.LineLength + remaining.Span.Length > _maximumLineLength)
                         {
-                            remaining = await _lineBuffer.BreakLineAsync(_baseWriter, remaining, _maximumLineLength, _indent);
+                            var result = await _lineBuffer.BreakLineAsync(_baseWriter, remaining, _maximumLineLength, _indent, _wrapping);
+                            if (!result.Success)
+                            {
+                                break;
+                            }
+
+                            remaining = result.Remaining;
                         }
                     }
 
@@ -315,7 +329,7 @@ namespace Ookii.CommandLine
                         {
                             // This can happen if we couldn't break above because partial formatting
                             // had to be resolved.
-                            await _lineBuffer.BreakLineAsync(_baseWriter, default, _maximumLineLength, _indent);
+                            await _lineBuffer.BreakLineAsync(_baseWriter, default, _maximumLineLength, _indent, _wrapping);
                         }
                     }
                 }

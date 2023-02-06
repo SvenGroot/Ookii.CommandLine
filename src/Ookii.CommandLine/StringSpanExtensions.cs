@@ -37,9 +37,9 @@ namespace Ookii.CommandLine
 
         // On .Net 6 StringSpanTuple is a ref struct so it can't be used with Nullable<T>, so use
         // an out param instead.
-        public static bool BreakLine(this StringSpan self, int startIndex, bool force, out StringSpanTuple splits)
+        public static bool BreakLine(this StringSpan self, int startIndex, BreakLineMode mode, out StringSpanTuple splits)
         {
-            if (BreakLine(self, startIndex, force) is var (end, start))
+            if (BreakLine(self, startIndex, mode) is var (end, start))
             {
                 splits = new(self.Slice(0, end), self.Slice(start));
                 return true;
@@ -62,9 +62,9 @@ namespace Ookii.CommandLine
         public static (StringMemory, StringMemory) Split(this StringMemory self, int index)
             => new(self.Slice(0, index), self.Slice(index));
 
-        public static bool BreakLine(this StringMemory self, int startIndex, bool force, out (StringMemory, StringMemory) splits)
+        public static bool BreakLine(this StringMemory self, int startIndex, BreakLineMode mode, out (StringMemory, StringMemory) splits)
         {
-            if (BreakLine(self.Span, startIndex, force) is var (end, start))
+            if (BreakLine(self.Span, startIndex, mode) is var (end, start))
             {
                 splits = new(self.Slice(0, end), self.Slice(start));
                 return true;
@@ -97,19 +97,34 @@ namespace Ookii.CommandLine
 
 #endif
 
-        private static (int, int)? BreakLine(StringSpan span, int startIndex, bool force)
+        private static (int, int)? BreakLine(StringSpan span, int startIndex, BreakLineMode mode)
         {
-            if (force)
+            switch (mode)
             {
+            case BreakLineMode.Force:
                 return (startIndex, startIndex);
-            }
 
-            for (int index = startIndex; index >= 0; --index)
-            {
-                if (char.IsWhiteSpace(span[index]))
+            case BreakLineMode.Backward:
+                for (int index = startIndex; index >= 0; --index)
                 {
-                    return (index, index + 1);
+                    if (char.IsWhiteSpace(span[index]))
+                    {
+                        return (index, index + 1);
+                    }
                 }
+
+                break;
+
+            case BreakLineMode.Forward:
+                for (int index = 0; index <= startIndex; ++index)
+                {
+                    if (char.IsWhiteSpace(span[index]))
+                    {
+                        return (index, index + 1);
+                    }
+                }
+
+                break;
             }
 
             return null;
