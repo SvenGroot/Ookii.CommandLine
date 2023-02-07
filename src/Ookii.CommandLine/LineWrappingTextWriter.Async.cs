@@ -69,13 +69,15 @@ namespace Ookii.CommandLine
             public async Task<AsyncBreakLineResult> BreakLineAsync(TextWriter writer, StringMemory newSegment, int maxLength, int indent, WrappingMode mode)
             {
                 Debug.Assert(mode != WrappingMode.Disabled);
-                var result = await BreakLineAsync(writer, newSegment, maxLength, indent, BreakLineMode.Backward);
-                if (!result.Success)
+                var forceMode = _hasOverflow ? BreakLineMode.Forward : BreakLineMode.Backward;
+                var result = await BreakLineAsync(writer, newSegment, maxLength, indent, forceMode);
+                if (!result.Success && forceMode != BreakLineMode.Forward)
                 {
-                    var forceMode = mode == WrappingMode.EnabledNoForce ? BreakLineMode.Forward : BreakLineMode.Force;
+                    forceMode = mode == WrappingMode.EnabledNoForce ? BreakLineMode.Forward : BreakLineMode.Force;
                     result = await BreakLineAsync(writer, newSegment, maxLength, indent, forceMode);
                 }
 
+                _hasOverflow = !result.Success && mode == WrappingMode.EnabledNoForce;
                 return result;
             }
 
@@ -83,7 +85,7 @@ namespace Ookii.CommandLine
             {
                 if (mode == BreakLineMode.Forward)
                 {
-                    maxLength = Math.Max(maxLength, LineLength);
+                    maxLength = Math.Max(maxLength, LineLength + newSegment.Span.Length - 1);
                 }
 
                 // Line length can be over the max length if the previous place a line was split
@@ -308,8 +310,9 @@ namespace Ookii.CommandLine
                 else
                 {
                     var remaining = span;
-                    if (type == StringSegmentType.Text && !_lineBuffer.HasPartialFormatting)
+                    if (type == StringSegmentType.Text)
                     {
+                        remaining = _lineBuffer.FindPartialFormattingEnd(remaining);
                         while (_lineBuffer.LineLength + remaining.Span.Length > _maximumLineLength)
                         {
                             var result = await _lineBuffer.BreakLineAsync(_baseWriter, remaining, _maximumLineLength, _indent, _wrapping);
@@ -325,12 +328,7 @@ namespace Ookii.CommandLine
                     if (remaining.Span.Length > 0)
                     {
                         _lineBuffer.Append(remaining.Span, type);
-                        if (_lineBuffer.LineLength > _maximumLineLength)
-                        {
-                            // This can happen if we couldn't break above because partial formatting
-                            // had to be resolved.
-                            await _lineBuffer.BreakLineAsync(_baseWriter, default, _maximumLineLength, _indent, _wrapping);
-                        }
+                        Debug.Assert(_lineBuffer.LineLength <= _maximumLineLength || Wrapping == WrappingMode.EnabledNoForce);
                     }
                 }
             });

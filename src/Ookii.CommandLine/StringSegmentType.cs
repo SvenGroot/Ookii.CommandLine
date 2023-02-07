@@ -3,9 +3,14 @@
     enum StringSegmentType
     {
         Text,
-        Formatting,
         LineBreak,
-        PartialFormatting,
+        Formatting,
         PartialLineBreak,
+        // Must be the last group of values in the enum
+        PartialFormattingUnknown,
+        PartialFormattingSimple,
+        PartialFormattingCsi,
+        PartialFormattingOsc,
+        PartialFormattingOscWithEscape,
     }
 }

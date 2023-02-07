@@ -9,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Threading;
+using System.ComponentModel;
 #if NET6_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
 using StringSpan = System.ReadOnlySpan<char>;
 using StringMemory = System.ReadOnlyMemory<char>;
@@ -89,7 +90,7 @@ namespace Ookii.CommandLine
             public int ContentLength => IsContent(Type) ? Length : 0;
 
             public static bool IsContent(StringSegmentType type)
-                => type is not (StringSegmentType.Formatting or StringSegmentType.PartialFormatting or StringSegmentType.PartialLineBreak);
+                => type <= StringSegmentType.LineBreak;
 
         }
 
@@ -113,6 +114,7 @@ namespace Ookii.CommandLine
         {
             private readonly RingBuffer _buffer;
             private readonly List<Segment> _segments = new();
+            private bool _hasOverflow;
 
             public LineBuffer(int capacity)
             {
@@ -153,20 +155,14 @@ namespace Ookii.CommandLine
 
                         return;
                     }
-                    else if (last.Type == StringSegmentType.PartialFormatting)
+                    else if (last.Type >= StringSegmentType.PartialFormattingUnknown)
                     {
-                        if (type == StringSegmentType.Text)
-                        {
-                            FindPartialFormattingEnd(last, span.Length);
-                            return;
-                        }
-                        else
-                        {
-                            // If this is not a text segment, we never found the end of the formatting,
-                            // so just treat everything up to now as formatting.
-                            last.Type = StringSegmentType.Formatting;
-                            _segments[_segments.Count - 1] = last;
-                        }
+                        Debug.Assert(type != StringSegmentType.Text);
+
+                        // If this is not a text segment, we never found the end of the formatting,
+                        // so just treat everything up to now as formatting.
+                        last.Type = StringSegmentType.Formatting;
+                        _segments[_segments.Count - 1] = last;
                     }
                 }
 
@@ -178,7 +174,7 @@ namespace Ookii.CommandLine
 
             public Segment? LastSegment => _segments.Count > 0 ? _segments[_segments.Count - 1] : null;
 
-            public bool HasPartialFormatting => LastSegment is Segment last && last.Type == StringSegmentType.PartialFormatting;
+            public bool HasPartialFormatting => LastSegment is Segment last && last.Type >= StringSegmentType.PartialFormattingUnknown;
 
             public partial void FlushTo(TextWriter writer, int indent, bool insertNewLine);
 
@@ -216,32 +212,45 @@ namespace Ookii.CommandLine
                 return false;
             }
 
+            public StringSpan FindPartialFormattingEnd(StringSpan newSegment)
+            {
+                return newSegment.Slice(FindPartialFormattingEndCore(newSegment));
+            }
+
+            public StringMemory FindPartialFormattingEnd(StringMemory newSegment)
+            {
+                return newSegment.Slice(FindPartialFormattingEndCore(newSegment.Span));
+            }
+
             private partial void WriteTo(TextWriter writer, int indent, bool insertNewLine);
 
-            private void FindPartialFormattingEnd(Segment lastSegment, int newLength)
+            private int FindPartialFormattingEndCore(StringSpan newSegment)
             {
-                var offset = _segments.Take(_segments.Count - 1).Sum(s => s.Length);
-                var (first, second) = _buffer.GetContents(offset);
-                int index = VirtualTerminal.FindSequenceEnd(first.Slice(1), second);
+                if (LastSegment is not Segment lastSegment || lastSegment.Type < StringSegmentType.PartialFormattingUnknown)
+                {
+                    // There is no partial formatting.
+                    return 0;
+                }
+
+                var type = lastSegment.Type;
+                int index = VirtualTerminal.FindSequenceEnd(newSegment, ref type);
                 if (index < 0)
                 {
                     // No ending found, concatenate this to the last segment.
-                    lastSegment.Length += newLength;
+                    _buffer.CopyFrom(newSegment);
+                    lastSegment.Length += newSegment.Length;
+                    lastSegment.Type = type;
                     _segments[_segments.Count - 1] = lastSegment;
+                    return newSegment.Length;
                 }
-                else
-                {
-                    // Concatenate the rest of the formatting.
-                    var remaining = newLength - (index - lastSegment.Length);
-                    lastSegment.Length = index;
-                    lastSegment.Type = StringSegmentType.Formatting;
-                    _segments[_segments.Count - 1] = lastSegment;
-                    if (remaining > 0)
-                    {
-                        _segments.Add(new Segment(StringSegmentType.Text, remaining));
-                        ContentLength += remaining;
-                    }
-                }
+
+                // Concatenate the rest of the formatting.
+                index += 1;
+                _buffer.CopyFrom(newSegment.Slice(0, index));
+                lastSegment.Length += index;
+                lastSegment.Type = StringSegmentType.Formatting;
+                _segments[_segments.Count - 1] = lastSegment;
+                return index;
             }
 
             private partial void WriteSegments(TextWriter writer, IEnumerable<Segment> segments);

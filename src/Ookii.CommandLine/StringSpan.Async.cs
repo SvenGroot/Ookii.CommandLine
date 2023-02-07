@@ -69,14 +69,17 @@ namespace Ookii.CommandLine
                 {
                     // This is a VT sequence.
                     // Find the end of the sequence.
-                    var end = VirtualTerminal.FindSequenceEnd(remaining.Slice(1).Span);
+                    StringSegmentType type = StringSegmentType.PartialFormattingUnknown;
+                    var end = VirtualTerminal.FindSequenceEnd(remaining.Slice(1).Span, ref type);
                     if (end == -1)
                     {
                         // No end? Should come in a following write.
-                        await callback(StringSegmentType.PartialFormatting, remaining);
+                        await callback(type, remaining);
                         break;
                     }
 
+                    // Add one for the escape character, and one to skip past the end.
+                    end += 2;
                     await callback(StringSegmentType.Formatting, remaining.Slice(0, end));
                     remaining = remaining.Slice(end);
                 }
