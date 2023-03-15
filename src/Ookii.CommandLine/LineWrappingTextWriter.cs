@@ -421,29 +421,27 @@ namespace Ookii.CommandLine
         }
 
         /// <summary>
-        /// Gets or sets a value which indicates whether line wrapping is enabled.
+        /// Gets or sets a value which indicates how to wrap lines at the maximum line length.
         /// </summary>
         /// <value>
-        /// <see langword="true"/> to enable line wrapping; otherwise, <see langword="false"/>.
-        /// The default value is <see langword="true"/>, unless the <see cref="MaximumLineLength"/>
-        /// property is zero, in which case the value is always <see langword="false"/> and attempts
-        /// to change it are ignored.
+        /// One of the values of the <see cref="WrappingMode"/> enumeration. If no maximum line
+        /// length is set, the value is always <see cref="WrappingMode.Disabled"/>.
         /// </value>
         /// <remarks>
         /// <para>
-        ///   When this property is changed from <see langword="true"/> to <see langword="false"/>,
-        ///   the buffer will be flushed synchronously if not empty.
+        ///   When this property is changed to <see cref="WrappingMode.Disabled"/> the buffer will
+        ///   be flushed synchronously if not empty.
         /// </para>
         /// <para>
-        ///   When this property is changed from <see langword="false"/> to <see langword="true"/>.
-        ///   if the last character written was not a new line, the current line may not be
+        ///   When this property is changed from <see cref="WrappingMode.Disabled"/> to another
+        ///   value, if the last character written was not a new line, the current line may not be
         ///   correctly wrapped.
         /// </para>
         /// <para>
         ///   Changing this property resets indentation so the next write will not be indented.
         /// </para>
         /// <para>
-        ///   This property has no effect if there is no maximum line length.
+        ///   This property cannot be changed if there is no maximum line length.
         /// </para>
         /// </remarks>
         public WrappingMode Wrapping
