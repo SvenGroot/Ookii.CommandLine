@@ -28,8 +28,9 @@ error streams, automatically wrapping at the console width.
 > the console.
 
 Lines will be wrapped at white-space characters only. If a line does not have a suitable place to
-wrap, it will be wrapped at the maximum line length regardless. You can temporarily disable line
-wrapping by setting the `LineWrappingTextWriter.EnableWrapping` property to `false`.
+wrap, it will be wrapped at the maximum line length. You can temporarily disable line wrapping by
+setting the `LineWrappingTextWriter.Wrapping` property to `WrappingMode.Disabled`, or disable
+breaking lines without a suitable place to wrap by setting it to `WrappingMode.EnabledNoForce`.
 
 If you write virtual terminal sequences to a [`LineWrappingTextWriter`][], by default these will not
 be included when calculating the length of the current line, so inserting VT sequences, e.g. for

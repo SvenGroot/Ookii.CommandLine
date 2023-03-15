@@ -331,10 +331,10 @@ application's configuration.
 
 ### Subcommand options
 
-Just like when you use [`CommandLineParser`][] directly, there are many options available to customize
-the parsing behavior. When using [`CommandManager`][], you use the [`CommandOptions`][] class to provide
-options. This class derives from [`ParseOptions`][], so all the same options are available, in addition
-to several options that apply only to subcommands.
+Just like when you use [`CommandLineParser`][] directly, there are many options available to
+customize the parsing behavior. When using [`CommandManager`][], you use the [`CommandOptions`][]
+class to provide options. This class derives from [`ParseOptions`][], so all the same options are
+available, in addition to several options that apply only to subcommands.
 
 > While you can use the [`ParseOptionsAttribute`][] to customize the behavior of a subcommand class,
 > this will only apply to the class using the attribute. For a consistent experience, it's preferred
@@ -362,14 +362,14 @@ public static int Main()
 ```
 
 This code makes command names case sensitive by using the invariant string comparer (the default is
-[`StringComparer.OrdinalIgnoreCase`][], which is case insensitive), enables a name transformation, and
-also sets some [usage help options](#subcommand-usage-help).
+[`StringComparer.OrdinalIgnoreCase`][], which is case insensitive), enables a name transformation,
+and also sets some [usage help options](#subcommand-usage-help).
 
 ### Custom error handling
 
-As with the static [`CommandLineParser.Parse<T>()`][] method, [`RunCommand()`][] and [`RunCommandAsync()`][]
-handle errors and display usage help. If for any reason you want to do this manually,
-[`CommandManager`][] provides the tools to do so.
+As with the static [`CommandLineParser.Parse<T>()`][] method, [`RunCommand()`][] and
+[`RunCommandAsync()`][] handle errors and display usage help. If for any reason you want to do this
+manually, [`CommandManager`][] provides the tools to do so.
 
 If you only want more information about the error, but still want the [`CommandManager`][] class to
 handle and display errors and usage help, you can check the `CommandManager.ParseResult` property to
@@ -473,14 +473,15 @@ public static async Task<int> Main(string[] args)
 }
 ```
 
-The [`CommandManager`][] class also offers the [`CreateCommand()`][] method, which instantiates the command
-class but does not call the `Run(Async)` method. This method also handles errors and shows usage
-help automatically.
+The [`CommandManager`][] class also offers the [`CreateCommand()`][] method, which instantiates the
+command class but does not call the `Run(Async)` method. This method also handles errors and shows
+usage help automatically.
 
 ## Subcommand usage help
 
-Since subcommands are created using the [`CommandLineParser`][], they support showing usage help when
-parsing errors occur, or the `-Help` argument is used. For example, with the [subcommand sample](../src/Samples/Subcommand) you could run the following to get help on the `read` command:
+Since subcommands are created using the [`CommandLineParser`][], they support showing usage help
+when parsing errors occur, or the `-Help` argument is used. For example, with the [subcommand sample](../src/Samples/Subcommand)
+you could run the following to get help on the `read` command:
 
 ```text
 ./Subcommand read -help

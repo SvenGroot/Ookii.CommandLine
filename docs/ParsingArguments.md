@@ -114,14 +114,12 @@ In this case, you can manually create an instance of the [`CommandLineParser<T>`
 the instance `ParseWithErrorHandling()` or [`Parse()`][Parse()_5] method.
 
 > The [`CommandLineParser<T>`][] class is a helper class that derives from [`CommandLineParser`][]
-> and provides strongly-typed [`Parse()`][Parse()_5] and `ParseWithErrorHandling()` methods. You can
-> also instantiate [`CommandLineParser`][] directly, and use its instance [`Parse()`][Parse()_6]
-> and ``ParseWithErrorHandling()`` methods that return an `object?`.
+> and provides strongly-typed [`Parse()`][Parse()_5] and `ParseWithErrorHandling()` methods.
 
-Using `ParseWithErrorHandling()` is the easiest in this case, because it will still handling
+Using `ParseWithErrorHandling()` is the easiest in this case, because it will still handle
 printing error messages and usage help, the same as the static `Parse<T>()` method. If you want
 more information about the error that occurred, you can access the `CommandLineParser.ParseResult`
-property.
+property after parsing.
 
 For example, you can use this approach if you want to return a success status when parsing was
 canceled, but not when a parsing error occurred:
@@ -129,17 +127,18 @@ canceled, but not when a parsing error occurred:
 ```csharp
 var parser = new CommandLineParser<MyArguments>();
 var arguments = parser.ParseWithErrorHandling();
-if (parser == null)
+if (arguments == null)
 {
     return parser.ParseResult.Status == ParseStatus.Canceled ? 0 : 1;
 }
 ```
 
 You can also use the `ParseResult.ArgumentName` property to determine which argument canceled
-parsing in this case.
+parsing in this case. If an error occurred, the status will be `ParseStatus.Error` and you can use
+the `ParseResult.LastException` property to access the actual error that occurred.
 
-The [`CommandLineParser<T>.Parse()`][] method offers the most fine grained control, letting you
-handle errors manually.
+For the most fine grained control, you can use the [`CommandLineParser<T>.Parse()`][] method, which
+lets you handle errors manually.
 
 If argument parsing fails, the instance [`CommandLineParser<T>.Parse()`][] method will throw a
 [`CommandLineArgumentException`][] exception, which you need to handle. You can simply print the
@@ -217,5 +216,4 @@ Next, we'll take a look at [generating usage help](UsageHelp.md).
 [Arguments_0]: https://www.ookii.org/docs/commandline-3.0/html/P_Ookii_CommandLine_CommandLineParser_Arguments.htm
 [DuplicateArgument_0]: https://www.ookii.org/docs/commandline-3.0/html/E_Ookii_CommandLine_CommandLineParser_DuplicateArgument.htm
 [Parse()_5]: https://www.ookii.org/docs/commandline-3.0/html/Overload_Ookii_CommandLine_CommandLineParser_1_Parse.htm
-[Parse()_6]: https://www.ookii.org/docs/commandline-3.0/html/Overload_Ookii_CommandLine_CommandLineParser_Parse.htm
 [Parse<T>()_1]: https://www.ookii.org/docs/commandline-3.0/html/M_Ookii_CommandLine_CommandLineParser_Parse__1.htm

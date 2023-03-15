@@ -18,7 +18,8 @@
     `ResetIndentAsync()` is provided.
   - Add a `Flush()` method overload that allows flushing a non-empty buffer without inserting an
     extra new line.
-  - Temporarily disable line wrapping using the `EnableWrapping` property.
+  - Control line wrapping behavior with the `Wrapping` property: disable it, or disable forcibly
+    breaking lines if no suitable white-space character is found.
   - If the base writer is a `StringWriter`, the `LineWrappingTextWriter.ToString()` method now
     returns the text written to the writer, including text that hasn't been flushed to the base
     writer yet.
