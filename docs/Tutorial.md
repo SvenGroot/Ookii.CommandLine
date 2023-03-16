@@ -1,8 +1,8 @@
 # Tutorial: getting started with Ookii.CommandLine
 
 This tutorial will show you the basics of how to use Ookii.CommandLine. It will show you how to
-create a basic application that parses the command line and shows usage help, how to customize some
-of the options—including the new long/short mode—and how to use subcommands.
+create an application that parses the command line and shows usage help, how to customize some of
+the options—including the new long/short mode—and how to use subcommands.
 
 Refer to the [documentation](README.md) for more detailed information.
 
@@ -141,10 +141,10 @@ Usage: tutorial [-Path] <String> [-Help] [-Version]
 As you can see, the [`Parse<T>()`][Parse<T>()_1] method lets us know what's wrong (we didn't supply
 the required argument), and shows the usage help.
 
-The usage syntax (the line starting with "Usage:") includes the argument we defined. However, the
-list of argument descriptions below it does not. That's because our argument doesn't have a
-description, and only arguments with descriptions are shown in that list by default. We'll add some
-descriptions [below](#expanding-the-usage-help).
+The usage syntax (the line starting with "Usage:") includes the `-Path` argument we defined.
+However, the list of argument descriptions below it does not. That's because our argument doesn't
+have a description, and only arguments with descriptions are shown in that list by default. We'll
+add some descriptions [below](#expanding-the-usage-help).
 
 You can also see that there are two more arguments that we didn't define: `-Help` and `-Version`.
 These arguments are automatically added by Ookii.CommandLine. So, what do they do?
@@ -186,7 +186,8 @@ The output is the same as above.
 Arguments don't have to be strings. In fact, they can have any type as long as there's a way to
 [convert to that type](Arguments.md#argument-value-conversion) from a string. All of the basic .Net
 types are supported (like `int`, `float`, `bool`, etc.), as well as many more that can be converted
-from a string (like enumerations, or classes like [`FileInfo`][] or [`Uri`][], or many other types).
+from a string (like enumerations, or classes like [`FileInfo`][] or [`Uri`][], and many other
+types).
 
 Let's try this out by adding more arguments in the `Arguments` class. First, add this to the top of
 Arguments.cs:
@@ -309,8 +310,8 @@ error).
 ## Expanding the usage help
 
 We saw before that our custom arguments were included in the usage syntax, but didn't have any
-descriptions. Typically, you'll want to add descriptions to your arguments. This is done using the
-[`System.ComponentModel.DescriptionAttribute`][] attribute.
+descriptions. Typically, you'll want to add descriptions to your arguments, so your users can tell
+what they do. This is done using the [`System.ComponentModel.DescriptionAttribute`][] attribute.
 
 Let's add some for our arguments:
 
@@ -426,7 +427,7 @@ conventions; the same conventions followed by tools such as `dotnet` or `git`, a
 a cross-platform application, you may prefer these conventions over the default, but it's up to you
 of course.
 
-Long/short mode is the key to this behavior. It enables every argument can have two separate names:
+Long/short mode is the key to this behavior. It allows every argument to have two separate names:
 a long name, using the `--` prefix by default, and a single-character short name using the `-`
 prefix (and `/` on Windows).
 
@@ -591,9 +592,10 @@ You could of course still use the [`ParseOptionsAttribute`][], but if you do, th
 apply to that particular command, so for consistency between your commands using the
 [`CommandOptions`][] class is often better.
 
-Note that [`ParseOptions`][] (and therefore, [`CommandOptions`][]) class has no [`CaseSensitive`][]
-property; instead, you have to set the [`ArgumentNameComparer`][ArgumentNameComparer_1] property.
-We use [`StringComparer.InvariantCulture`][] here to get case-sensitive argument names.
+Note that the [`ParseOptions`][] (and therefore, the [`CommandOptions`][]) class has no
+[`CaseSensitive`][] property; instead, you have to set the
+[`ArgumentNameComparer`][ArgumentNameComparer_1] property. We use
+[`StringComparer.InvariantCulture`][] here to get case-sensitive argument names.
 
 > For the default case-insensitive behavior, [`StringComparer.OrdinalIgnoreCase`][] is used. You can
 > also use [`StringComparer.Ordinal`][] for case sensitivity, but [`StringComparer.InvariantCulture`]
@@ -797,7 +799,7 @@ multiple times. We could, for example, use `--text foo --text bar` to assign the
 "bar" to it. Because it's also a positional argument, we can also simply use `foo bar` to do the
 same.
 
-> Positional multi-value arguments must always be the last positional argument.
+> A positional multi-value argument must always be the last positional argument.
 
 This command will take the values from the `--text` argument and write them as lines to the specified
 file, optionally appending to the file.
