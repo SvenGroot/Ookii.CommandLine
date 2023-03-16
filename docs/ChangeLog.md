@@ -4,23 +4,23 @@
 
 **IMPORTANT:** If you are upgrading from version 2.x, please check the [migration guide](Migrating.md).
 
-- Added an instance `CommandLineParser<T>.ParseWithErrorHandling()` method, which handles errors
-  and displays usage help the same way as the static `Parse<T>()` method, but allows access to more
+- Added an instance [`CommandLineParser<T>.ParseWithErrorHandling()`][] method, which handles errors
+  and displays usage help the same way as the static [`Parse<T>()`][Parse<T>()_1] method, but allows access to more
   information only available if you have an instance.
-- Added the `CommandLineParser.ParseResult` property, which provides information about errors or
+- Added the [`CommandLineParser.ParseResult`][] property, which provides information about errors or
   which argument canceled parsing, giving detailed failure information to the caller even if the
-  `ParseWithErrorHandling()` method was used.
-- Also exposed the same information for subcommands through the `CommandManager.ParseResult`
+  [`ParseWithErrorHandling()`][ParseWithErrorHandling()_1] method was used.
+- Also exposed the same information for subcommands through the [`CommandManager.ParseResult`][]
   property.
-- `LineWrappingTextWriter` improvements
-  - Proper async support; the various `WriteAsync()` and `WriteLineAsync()` methods will now call
-    down to the async methods of the base writer for the `LineWrappingTextWriter`, and a new method
-    `ResetIndentAsync()` is provided.
-  - Add a `Flush()` method overload that allows flushing a non-empty buffer without inserting an
+- [`LineWrappingTextWriter`][] improvements
+  - Proper async support; the various [`WriteAsync()`][WriteAsync()_4] and [`WriteLineAsync()`][WriteLineAsync()_5] methods will now call
+    down to the async methods of the base writer for the [`LineWrappingTextWriter`][], and a new method
+    [`ResetIndentAsync()`][] is provided.
+  - Add a [`Flush()`][Flush()_0] method overload that allows flushing a non-empty buffer without inserting an
     extra new line.
-  - Control line wrapping behavior with the `Wrapping` property: disable it, or disable forcibly
+  - Control line wrapping behavior with the [`Wrapping`][] property: disable it, or disable forcibly
     breaking lines if no suitable white-space character is found.
-  - If the base writer is a `StringWriter`, the `LineWrappingTextWriter.ToString()` method now
+  - If the base writer is a [`StringWriter`][], the [`LineWrappingTextWriter.ToString()`][] method now
     returns the text written to the writer, including text that hasn't been flushed to the base
     writer yet.
   - Some minor bug fixes.
@@ -170,3 +170,15 @@ may require substantial code changes and may change how command lines are parsed
 [Parse()_6]: https://www.ookii.org/docs/commandline-3.1/html/M_Ookii_CommandLine_CommandLineParser_Parse.htm
 [Parse<T>()_1]: https://www.ookii.org/docs/commandline-3.1/html/M_Ookii_CommandLine_CommandLineParser_Parse__1.htm
 [UsageWriter_1]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_UsageWriter.htm
+[`CommandLineParser.ParseResult`]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_CommandLineParser_ParseResult.htm
+[`CommandLineParser<T>.ParseWithErrorHandling()`]: https://www.ookii.org/docs/commandline-3.1/html/M_Ookii_CommandLine_CommandLineParser_1_ParseWithErrorHandling.htm
+[`CommandManager.ParseResult`]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_Commands_CommandManager_ParseResult.htm
+[`LineWrappingTextWriter.ToString()`]: https://www.ookii.org/docs/commandline-3.1/html/M_Ookii_CommandLine_LineWrappingTextWriter_ToString.htm
+[`LineWrappingTextWriter`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_LineWrappingTextWriter.htm
+[`ResetIndentAsync()`]: https://www.ookii.org/docs/commandline-3.1/html/M_Ookii_CommandLine_LineWrappingTextWriter_ResetIndentAsync.htm
+[`StringWriter`]: https://learn.microsoft.com/dotnet/api/system.io.stringwriter
+[`Wrapping`]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_LineWrappingTextWriter_Wrapping.htm
+[Flush()_0]: https://www.ookii.org/docs/commandline-3.1/html/M_Ookii_CommandLine_LineWrappingTextWriter_Flush_1.htm
+[ParseWithErrorHandling()_1]: https://www.ookii.org/docs/commandline-3.1/html/M_Ookii_CommandLine_CommandLineParser_1_ParseWithErrorHandling.htm
+[WriteAsync()_4]: https://www.ookii.org/docs/commandline-3.1/html/Overload_Ookii_CommandLine_LineWrappingTextWriter_WriteAsync.htm
+[WriteLineAsync()_5]: https://www.ookii.org/docs/commandline-3.1/html/Overload_Ookii_CommandLine_LineWrappingTextWriter_WriteLineAsync.htm

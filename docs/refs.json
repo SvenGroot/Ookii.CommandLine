@@ -63,12 +63,15 @@
   ],
   "CommandLineParser.Parse<Arguments>()": null,
   "CommandLineParser.Parse<T>()": "M_Ookii_CommandLine_CommandLineParser_Parse__1",
+  "CommandLineParser.ParseResult": "P_Ookii_CommandLine_CommandLineParser_ParseResult",
   "CommandLineParser.WriteUsage()": "M_Ookii_CommandLine_CommandLineParser_WriteUsage",
   "CommandLineParser.WriteUsageToConsole()": null,
   "CommandLineParser<T>": "T_Ookii_CommandLine_CommandLineParser_1",
   "CommandLineParser<T>.Parse()": "Overload_Ookii_CommandLine_CommandLineParser_1_Parse",
+  "CommandLineParser<T>.ParseWithErrorHandling()": "M_Ookii_CommandLine_CommandLineParser_1_ParseWithErrorHandling",
   "CommandManager": "T_Ookii_CommandLine_Commands_CommandManager",
   "CommandManager.GetCommand()": "M_Ookii_CommandLine_Commands_CommandManager_GetCommand",
+  "CommandManager.ParseResult": "P_Ookii_CommandLine_Commands_CommandManager_ParseResult",
   "CommandManager.RunCommandAsync()": "Overload_Ookii_CommandLine_Commands_CommandManager_RunCommandAsync",
   "CommandNameComparer": "P_Ookii_CommandLine_Commands_CommandOptions_CommandNameComparer",
   "CommandNameTransform": "P_Ookii_CommandLine_Commands_CommandOptions_CommandNameTransform",
@@ -115,6 +118,11 @@
   "File.ReadLinesAsync()": "#system.io.file.readlinesasync",
   "FileInfo": "#system.io.fileinfo",
   "FlagsAttribute": "#system.flagsattribute",
+  "Flush()": [
+    "M_Ookii_CommandLine_LineWrappingTextWriter_Flush_1",
+    "M_Ookii_CommandLine_LineWrappingTextWriter_Flush",
+    "Overload_Ookii_CommandLine_LineWrappingTextWriter_Flush"
+  ],
   "Foo": null,
   "GetArgument": "M_Ookii_CommandLine_CommandLineParser_GetArgument",
   "GetCommand()": "M_Ookii_CommandLine_Commands_CommandManager_GetCommand",
@@ -152,6 +160,7 @@
   "LineWrappingTextWriter.ForConsoleOut()": "M_Ookii_CommandLine_LineWrappingTextWriter_ForConsoleOut",
   "LineWrappingTextWriter.Indent": "P_Ookii_CommandLine_LineWrappingTextWriter_Indent",
   "LineWrappingTextWriter.ResetIndent()": "M_Ookii_CommandLine_LineWrappingTextWriter_ResetIndent",
+  "LineWrappingTextWriter.ToString()": "M_Ookii_CommandLine_LineWrappingTextWriter_ToString",
   "List<int>": "#system.collections.generic.list-1",
   "List<string>": "#system.collections.generic.list-1",
   "LoadPlugins()": null,
@@ -211,6 +220,14 @@
   "ParseOptionsAttribute.AllowWhiteSpaceValueSeparator": "P_Ookii_CommandLine_ParseOptionsAttribute_AllowWhiteSpaceValueSeparator",
   "ParseOptionsAttribute.CaseSensitive": "P_Ookii_CommandLine_ParseOptionsAttribute_CaseSensitive",
   "ParseOptionsAttribute.NameValueSeparator": "P_Ookii_CommandLine_ParseOptionsAttribute_NameValueSeparator",
+  "ParseWithErrorHandling()": [
+    "M_Ookii_CommandLine_CommandLineParser_1_ParseWithErrorHandling_1",
+    "M_Ookii_CommandLine_CommandLineParser_1_ParseWithErrorHandling",
+    "M_Ookii_CommandLine_CommandLineParser_ParseWithErrorHandling_1",
+    "M_Ookii_CommandLine_CommandLineParser_ParseWithErrorHandling",
+    "Overload_Ookii_CommandLine_CommandLineParser_1_ParseWithErrorHandling",
+    "Overload_Ookii_CommandLine_CommandLineParser_ParseWithErrorHandling"
+  ],
   "ParsingMode.LongShort": "T_Ookii_CommandLine_ParsingMode",
   "ProhibitsAttribute": "T_Ookii_CommandLine_Validation_ProhibitsAttribute",
   "ReadCommand": null,
@@ -220,6 +237,7 @@
   "RequiresAnyAttribute": "T_Ookii_CommandLine_Validation_RequiresAnyAttribute",
   "RequiresAttribute": "T_Ookii_CommandLine_Validation_RequiresAttribute",
   "ResetIndent()": "M_Ookii_CommandLine_LineWrappingTextWriter_ResetIndent",
+  "ResetIndentAsync()": "M_Ookii_CommandLine_LineWrappingTextWriter_ResetIndentAsync",
   "Run()": [
     "M_Ookii_CommandLine_Commands_AsyncCommandBase_Run",
     "M_Ookii_CommandLine_Commands_ICommand_Run"
@@ -246,6 +264,7 @@
   "StringComparer.InvariantCulture": "#system.stringcomparer.invariantculture",
   "StringComparer.Ordinal": "#system.stringcomparer.ordinal",
   "StringComparer.OrdinalIgnoreCase": "#system.stringcomparer.ordinalignorecase",
+  "StringWriter": "#system.io.stringwriter",
   "StripCommandNameSuffix": "P_Ookii_CommandLine_Commands_CommandOptions_StripCommandNameSuffix",
   "System.ComponentModel.DescriptionAttribute": "#system.componentmodel.descriptionattribute",
   "System.ComponentModel.TypeConverterAttribute": "#system.componentmodel.typeconverterattribute",
@@ -286,6 +305,7 @@
   "ValueDescriptionAttribute": "T_Ookii_CommandLine_ValueDescriptionAttribute",
   "ValueTypeConverterAttribute": "T_Ookii_CommandLine_ValueTypeConverterAttribute",
   "VirtualTerminal": "T_Ookii_CommandLine_Terminal_VirtualTerminal",
+  "Wrapping": "P_Ookii_CommandLine_LineWrappingTextWriter_Wrapping",
   "WriteArgumentDescription()": [
     "M_Ookii_CommandLine_UsageWriter_WriteArgumentDescription_1",
     "M_Ookii_CommandLine_UsageWriter_WriteArgumentDescription",
@@ -294,11 +314,26 @@
   "WriteArgumentDescriptions()": "M_Ookii_CommandLine_UsageWriter_WriteArgumentDescriptions",
   "WriteArgumentName()": "M_Ookii_CommandLine_UsageWriter_WriteArgumentName",
   "WriteArgumentSyntax()": "M_Ookii_CommandLine_UsageWriter_WriteArgumentSyntax",
+  "WriteAsync()": [
+    "M_Ookii_CommandLine_LineWrappingTextWriter_WriteAsync_1",
+    "M_Ookii_CommandLine_LineWrappingTextWriter_WriteAsync_2",
+    "M_Ookii_CommandLine_LineWrappingTextWriter_WriteAsync_3",
+    "M_Ookii_CommandLine_LineWrappingTextWriter_WriteAsync",
+    "Overload_Ookii_CommandLine_LineWrappingTextWriter_WriteAsync"
+  ],
   "WriteCommand": null,
   "WriteCommandDescription()": "M_Ookii_CommandLine_UsageWriter_WriteCommandDescription",
   "WriteCommandHelpInstruction()": "M_Ookii_CommandLine_UsageWriter_WriteCommandHelpInstruction",
   "WriteCommandListUsageCore()": "M_Ookii_CommandLine_UsageWriter_WriteCommandListUsageCore",
   "WriteCommandListUsageSyntax()": "M_Ookii_CommandLine_UsageWriter_WriteCommandListUsageSyntax",
+  "WriteLineAsync()": [
+    "M_Ookii_CommandLine_LineWrappingTextWriter_WriteLineAsync_1",
+    "M_Ookii_CommandLine_LineWrappingTextWriter_WriteLineAsync_2",
+    "M_Ookii_CommandLine_LineWrappingTextWriter_WriteLineAsync_3",
+    "M_Ookii_CommandLine_LineWrappingTextWriter_WriteLineAsync_4",
+    "M_Ookii_CommandLine_LineWrappingTextWriter_WriteLineAsync",
+    "Overload_Ookii_CommandLine_LineWrappingTextWriter_WriteLineAsync"
+  ],
   "WriteParserUsageCore()": "M_Ookii_CommandLine_UsageWriter_WriteParserUsageCore",
   "WriteParserUsageSyntax()": "M_Ookii_CommandLine_UsageWriter_WriteParserUsageSyntax",
   "WriteUsage": [
