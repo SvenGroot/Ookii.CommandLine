@@ -112,9 +112,9 @@ Usage: NestedCommands student add [-FirstName] <String> [-LastName] <String> [[-
 
 We can see the usage syntax correctly shows both command names before the arguments.
 
-[`CommandLineParser`]: https://www.ookii.org/docs/commandline-3.0/html/T_Ookii_CommandLine_CommandLineParser.htm
-[`CommandManager`]: https://www.ookii.org/docs/commandline-3.0/html/T_Ookii_CommandLine_Commands_CommandManager.htm
-[`CommandOptions.CommandFilter`]: https://www.ookii.org/docs/commandline-3.0/html/P_Ookii_CommandLine_Commands_CommandOptions_CommandFilter.htm
-[`CommandOptions`]: https://www.ookii.org/docs/commandline-3.0/html/T_Ookii_CommandLine_Commands_CommandOptions.htm
-[`ICommandWithCustomParsing`]: https://www.ookii.org/docs/commandline-3.0/html/T_Ookii_CommandLine_Commands_ICommandWithCustomParsing.htm
-[`UsageWriter`]: https://www.ookii.org/docs/commandline-3.0/html/T_Ookii_CommandLine_UsageWriter.htm
+[`CommandLineParser`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_CommandLineParser.htm
+[`CommandManager`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_Commands_CommandManager.htm
+[`CommandOptions.CommandFilter`]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_Commands_CommandOptions_CommandFilter.htm
+[`CommandOptions`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_Commands_CommandOptions.htm
+[`ICommandWithCustomParsing`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_Commands_ICommandWithCustomParsing.htm
+[`UsageWriter`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_UsageWriter.htm

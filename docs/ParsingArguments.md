@@ -196,24 +196,24 @@ the [`Parse()`][Parse()_5]  methods, as they apply to the `ParseWithErrorHandlin
 
 Next, we'll take a look at [generating usage help](UsageHelp.md).
 
-[`ArgumentParsed`]: https://www.ookii.org/docs/commandline-3.0/html/E_Ookii_CommandLine_CommandLineParser_ArgumentParsed.htm
-[`CommandLineArgumentAttribute.CancelParsing`]: https://www.ookii.org/docs/commandline-3.0/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_CancelParsing.htm
-[`CommandLineArgumentErrorCategory`]: https://www.ookii.org/docs/commandline-3.0/html/T_Ookii_CommandLine_CommandLineArgumentErrorCategory.htm
-[`CommandLineArgumentException.Category`]: https://www.ookii.org/docs/commandline-3.0/html/P_Ookii_CommandLine_CommandLineArgumentException_Category.htm
-[`CommandLineArgumentException`]: https://www.ookii.org/docs/commandline-3.0/html/T_Ookii_CommandLine_CommandLineArgumentException.htm
-[`CommandLineParser.Parse<T>()`]: https://www.ookii.org/docs/commandline-3.0/html/M_Ookii_CommandLine_CommandLineParser_Parse__1.htm
-[`CommandLineParser`]: https://www.ookii.org/docs/commandline-3.0/html/T_Ookii_CommandLine_CommandLineParser.htm
-[`CommandLineParser<T>.Parse()`]: https://www.ookii.org/docs/commandline-3.0/html/Overload_Ookii_CommandLine_CommandLineParser_1_Parse.htm
-[`CommandLineParser<T>`]: https://www.ookii.org/docs/commandline-3.0/html/T_Ookii_CommandLine_CommandLineParser_1.htm
+[`ArgumentParsed`]: https://www.ookii.org/docs/commandline-3.1/html/E_Ookii_CommandLine_CommandLineParser_ArgumentParsed.htm
+[`CommandLineArgumentAttribute.CancelParsing`]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_CancelParsing.htm
+[`CommandLineArgumentErrorCategory`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_CommandLineArgumentErrorCategory.htm
+[`CommandLineArgumentException.Category`]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_CommandLineArgumentException_Category.htm
+[`CommandLineArgumentException`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_CommandLineArgumentException.htm
+[`CommandLineParser.Parse<T>()`]: https://www.ookii.org/docs/commandline-3.1/html/M_Ookii_CommandLine_CommandLineParser_Parse__1.htm
+[`CommandLineParser`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_CommandLineParser.htm
+[`CommandLineParser<T>.Parse()`]: https://www.ookii.org/docs/commandline-3.1/html/Overload_Ookii_CommandLine_CommandLineParser_1_Parse.htm
+[`CommandLineParser<T>`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_CommandLineParser_1.htm
 [`Environment.GetCommandLineArgs()`]: https://learn.microsoft.com/dotnet/api/system.environment.getcommandlineargs
-[`Error`]: https://www.ookii.org/docs/commandline-3.0/html/P_Ookii_CommandLine_ParseOptions_Error.htm
-[`GetArgument`]: https://www.ookii.org/docs/commandline-3.0/html/M_Ookii_CommandLine_CommandLineParser_GetArgument.htm
-[`HelpRequested`]: https://www.ookii.org/docs/commandline-3.0/html/P_Ookii_CommandLine_CommandLineParser_HelpRequested.htm
-[`LocalizedStringProvider`]: https://www.ookii.org/docs/commandline-3.0/html/T_Ookii_CommandLine_LocalizedStringProvider.htm
-[`ParseOptions.StringProvider`]: https://www.ookii.org/docs/commandline-3.0/html/P_Ookii_CommandLine_ParseOptions_StringProvider.htm
-[`ParseOptions`]: https://www.ookii.org/docs/commandline-3.0/html/T_Ookii_CommandLine_ParseOptions.htm
-[`ParseOptionsAttribute`]: https://www.ookii.org/docs/commandline-3.0/html/T_Ookii_CommandLine_ParseOptionsAttribute.htm
-[Arguments_0]: https://www.ookii.org/docs/commandline-3.0/html/P_Ookii_CommandLine_CommandLineParser_Arguments.htm
-[DuplicateArgument_0]: https://www.ookii.org/docs/commandline-3.0/html/E_Ookii_CommandLine_CommandLineParser_DuplicateArgument.htm
-[Parse()_5]: https://www.ookii.org/docs/commandline-3.0/html/Overload_Ookii_CommandLine_CommandLineParser_1_Parse.htm
-[Parse<T>()_1]: https://www.ookii.org/docs/commandline-3.0/html/M_Ookii_CommandLine_CommandLineParser_Parse__1.htm
+[`Error`]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_ParseOptions_Error.htm
+[`GetArgument`]: https://www.ookii.org/docs/commandline-3.1/html/M_Ookii_CommandLine_CommandLineParser_GetArgument.htm
+[`HelpRequested`]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_CommandLineParser_HelpRequested.htm
+[`LocalizedStringProvider`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_LocalizedStringProvider.htm
+[`ParseOptions.StringProvider`]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_ParseOptions_StringProvider.htm
+[`ParseOptions`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_ParseOptions.htm
+[`ParseOptionsAttribute`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_ParseOptionsAttribute.htm
+[Arguments_0]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_CommandLineParser_Arguments.htm
+[DuplicateArgument_0]: https://www.ookii.org/docs/commandline-3.1/html/E_Ookii_CommandLine_CommandLineParser_DuplicateArgument.htm
+[Parse()_5]: https://www.ookii.org/docs/commandline-3.1/html/Overload_Ookii_CommandLine_CommandLineParser_1_Parse.htm
+[Parse<T>()_1]: https://www.ookii.org/docs/commandline-3.1/html/M_Ookii_CommandLine_CommandLineParser_Parse__1.htm

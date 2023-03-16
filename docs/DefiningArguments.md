@@ -597,42 +597,42 @@ disable either automatic argument using the [`ParseOptions`][].
 
 Next, we'll take a look at how to [parse the arguments we've defined](ParsingArguments.md)
 
-[`AliasAttribute`]: https://www.ookii.org/docs/commandline-3.0/html/T_Ookii_CommandLine_AliasAttribute.htm
-[`ArgumentNameAttribute`]: https://www.ookii.org/docs/commandline-3.0/html/T_Ookii_CommandLine_ArgumentNameAttribute.htm
-[`ArgumentNameAttribute.IsLong`]: https://www.ookii.org/docs/commandline-3.0/html/P_Ookii_CommandLine_ArgumentNameAttribute_IsLong.htm
-[`ArgumentNameAttribute.IsShort`]: https://www.ookii.org/docs/commandline-3.0/html/P_Ookii_CommandLine_ArgumentNameAttribute_IsShort.htm
-[`ArgumentNameAttribute.ShortName`]: https://www.ookii.org/docs/commandline-3.0/html/P_Ookii_CommandLine_ArgumentNameAttribute_ShortName.htm
-[`CommandLineArgumentAttribute.CancelParsing`]: https://www.ookii.org/docs/commandline-3.0/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_CancelParsing.htm
-[`CommandLineArgumentAttribute.DefaultValue`]: https://www.ookii.org/docs/commandline-3.0/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_DefaultValue.htm
-[`CommandLineArgumentAttribute.IsLong`]: https://www.ookii.org/docs/commandline-3.0/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_IsLong.htm
-[`CommandLineArgumentAttribute.IsRequired`]: https://www.ookii.org/docs/commandline-3.0/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_IsRequired.htm
-[`CommandLineArgumentAttribute.IsShort`]: https://www.ookii.org/docs/commandline-3.0/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_IsShort.htm
-[`CommandLineArgumentAttribute.Position`]: https://www.ookii.org/docs/commandline-3.0/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_Position.htm
-[`CommandLineArgumentAttribute.ShortName`]: https://www.ookii.org/docs/commandline-3.0/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_ShortName.htm
-[`CommandLineArgumentAttribute.ValueDescription`]: https://www.ookii.org/docs/commandline-3.0/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_ValueDescription.htm
-[`CommandLineArgumentAttribute`]: https://www.ookii.org/docs/commandline-3.0/html/T_Ookii_CommandLine_CommandLineArgumentAttribute.htm
-[`CommandLineConstructorAttribute`]: https://www.ookii.org/docs/commandline-3.0/html/T_Ookii_CommandLine_CommandLineConstructorAttribute.htm
-[`CommandLineParser.HelpRequested`]: https://www.ookii.org/docs/commandline-3.0/html/P_Ookii_CommandLine_CommandLineParser_HelpRequested.htm
-[`CommandLineParser`]: https://www.ookii.org/docs/commandline-3.0/html/T_Ookii_CommandLine_CommandLineParser.htm
+[`AliasAttribute`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_AliasAttribute.htm
+[`ArgumentNameAttribute`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_ArgumentNameAttribute.htm
+[`ArgumentNameAttribute.IsLong`]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_ArgumentNameAttribute_IsLong.htm
+[`ArgumentNameAttribute.IsShort`]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_ArgumentNameAttribute_IsShort.htm
+[`ArgumentNameAttribute.ShortName`]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_ArgumentNameAttribute_ShortName.htm
+[`CommandLineArgumentAttribute.CancelParsing`]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_CancelParsing.htm
+[`CommandLineArgumentAttribute.DefaultValue`]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_DefaultValue.htm
+[`CommandLineArgumentAttribute.IsLong`]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_IsLong.htm
+[`CommandLineArgumentAttribute.IsRequired`]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_IsRequired.htm
+[`CommandLineArgumentAttribute.IsShort`]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_IsShort.htm
+[`CommandLineArgumentAttribute.Position`]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_Position.htm
+[`CommandLineArgumentAttribute.ShortName`]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_ShortName.htm
+[`CommandLineArgumentAttribute.ValueDescription`]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_ValueDescription.htm
+[`CommandLineArgumentAttribute`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_CommandLineArgumentAttribute.htm
+[`CommandLineConstructorAttribute`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_CommandLineConstructorAttribute.htm
+[`CommandLineParser.HelpRequested`]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_CommandLineParser_HelpRequested.htm
+[`CommandLineParser`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_CommandLineParser.htm
 [`DescriptionAttribute`]: https://learn.microsoft.com/dotnet/api/system.componentmodel.descriptionattribute
 [`Dictionary<TKey, TValue>`]: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2
 [`ICollection<T>`]: https://learn.microsoft.com/dotnet/api/system.collections.generic.icollection-1
 [`IDictionary<TKey, TValue>`]: https://learn.microsoft.com/dotnet/api/system.collections.generic.idictionary-2
 [`List<int>`]: https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1
 [`List<string>`]: https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1
-[`LocalizedStringProvider`]: https://www.ookii.org/docs/commandline-3.0/html/T_Ookii_CommandLine_LocalizedStringProvider.htm
-[`ParseOptions.ArgumentNameTransform`]: https://www.ookii.org/docs/commandline-3.0/html/P_Ookii_CommandLine_ParseOptions_ArgumentNameTransform.htm
-[`ParseOptions`]: https://www.ookii.org/docs/commandline-3.0/html/T_Ookii_CommandLine_ParseOptions.htm
-[`ParseOptionsAttribute`]: https://www.ookii.org/docs/commandline-3.0/html/T_Ookii_CommandLine_ParseOptionsAttribute.htm
-[`ShortAliasAttribute`]: https://www.ookii.org/docs/commandline-3.0/html/T_Ookii_CommandLine_ShortAliasAttribute.htm
+[`LocalizedStringProvider`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_LocalizedStringProvider.htm
+[`ParseOptions.ArgumentNameTransform`]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_ParseOptions_ArgumentNameTransform.htm
+[`ParseOptions`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_ParseOptions.htm
+[`ParseOptionsAttribute`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_ParseOptionsAttribute.htm
+[`ShortAliasAttribute`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_ShortAliasAttribute.htm
 [`SortedDictionary<string, int>`]: https://learn.microsoft.com/dotnet/api/system.collections.generic.sorteddictionary-2
 [`String`]: https://learn.microsoft.com/dotnet/api/system.string
 [`System.ComponentModel.DescriptionAttribute`]: https://learn.microsoft.com/dotnet/api/system.componentmodel.descriptionattribute
 [`TypeConverter`]: https://learn.microsoft.com/dotnet/api/system.componentmodel.typeconverter
 [`TypeConverterAttribute`]: https://learn.microsoft.com/dotnet/api/system.componentmodel.typeconverterattribute
-[`TypeConverterBase<T>`]: https://www.ookii.org/docs/commandline-3.0/html/T_Ookii_CommandLine_TypeConverterBase_1.htm
-[`ValueDescriptionAttribute`]: https://www.ookii.org/docs/commandline-3.0/html/T_Ookii_CommandLine_ValueDescriptionAttribute.htm
-[CancelParsing_1]: https://www.ookii.org/docs/commandline-3.0/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_CancelParsing.htm
-[CommandLineParser.Parse()_2]: https://www.ookii.org/docs/commandline-3.0/html/Overload_Ookii_CommandLine_CommandLineParser_Parse.htm
-[DefaultValue_1]: https://www.ookii.org/docs/commandline-3.0/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_DefaultValue.htm
-[Parse<T>()_1]: https://www.ookii.org/docs/commandline-3.0/html/M_Ookii_CommandLine_CommandLineParser_Parse__1.htm
+[`TypeConverterBase<T>`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_TypeConverterBase_1.htm
+[`ValueDescriptionAttribute`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_ValueDescriptionAttribute.htm
+[CancelParsing_1]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_CancelParsing.htm
+[CommandLineParser.Parse()_2]: https://www.ookii.org/docs/commandline-3.1/html/Overload_Ookii_CommandLine_CommandLineParser_Parse.htm
+[DefaultValue_1]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_DefaultValue.htm
+[Parse<T>()_1]: https://www.ookii.org/docs/commandline-3.1/html/M_Ookii_CommandLine_CommandLineParser_Parse__1.htm

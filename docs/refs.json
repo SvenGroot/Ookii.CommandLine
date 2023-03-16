@@ -1,6 +1,6 @@
 {
   "#apiPrefix": "https://learn.microsoft.com/dotnet/api/",
-  "#prefix": "https://www.ookii.org/docs/commandline-3.0/html/",
+  "#prefix": "https://www.ookii.org/docs/commandline-3.1/html/",
   "#suffix": ".htm",
   "AddCommand": null,
   "AliasAttribute": "T_Ookii_CommandLine_AliasAttribute",
