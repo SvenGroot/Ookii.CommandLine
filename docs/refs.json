@@ -161,6 +161,7 @@
   "LineWrappingTextWriter.Indent": "P_Ookii_CommandLine_LineWrappingTextWriter_Indent",
   "LineWrappingTextWriter.ResetIndent()": "M_Ookii_CommandLine_LineWrappingTextWriter_ResetIndent",
   "LineWrappingTextWriter.ToString()": "M_Ookii_CommandLine_LineWrappingTextWriter_ToString",
+  "LineWrappingTextWriter.Wrapping": "P_Ookii_CommandLine_LineWrappingTextWriter_Wrapping",
   "List<int>": "#system.collections.generic.list-1",
   "List<string>": "#system.collections.generic.list-1",
   "LoadPlugins()": null,
@@ -220,6 +221,10 @@
   "ParseOptionsAttribute.AllowWhiteSpaceValueSeparator": "P_Ookii_CommandLine_ParseOptionsAttribute_AllowWhiteSpaceValueSeparator",
   "ParseOptionsAttribute.CaseSensitive": "P_Ookii_CommandLine_ParseOptionsAttribute_CaseSensitive",
   "ParseOptionsAttribute.NameValueSeparator": "P_Ookii_CommandLine_ParseOptionsAttribute_NameValueSeparator",
+  "ParseResult.ArgumentName": "P_Ookii_CommandLine_ParseResult_ArgumentName",
+  "ParseResult.LastException": "P_Ookii_CommandLine_ParseResult_LastException",
+  "ParseResult.Status": "P_Ookii_CommandLine_ParseResult_Status",
+  "ParseStatus.Error": "T_Ookii_CommandLine_ParseStatus",
   "ParseWithErrorHandling()": [
     "M_Ookii_CommandLine_CommandLineParser_1_ParseWithErrorHandling_1",
     "M_Ookii_CommandLine_CommandLineParser_1_ParseWithErrorHandling",
@@ -306,6 +311,8 @@
   "ValueTypeConverterAttribute": "T_Ookii_CommandLine_ValueTypeConverterAttribute",
   "VirtualTerminal": "T_Ookii_CommandLine_Terminal_VirtualTerminal",
   "Wrapping": "P_Ookii_CommandLine_LineWrappingTextWriter_Wrapping",
+  "WrappingMode.Disabled": "T_Ookii_CommandLine_WrappingMode",
+  "WrappingMode.EnabledNoForce": "T_Ookii_CommandLine_WrappingMode",
   "WriteArgumentDescription()": [
     "M_Ookii_CommandLine_UsageWriter_WriteArgumentDescription_1",
     "M_Ookii_CommandLine_UsageWriter_WriteArgumentDescription",

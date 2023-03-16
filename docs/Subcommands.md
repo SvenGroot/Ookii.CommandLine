@@ -372,9 +372,9 @@ As with the static [`CommandLineParser.Parse<T>()`][] method, [`RunCommand()`][]
 manually, [`CommandManager`][] provides the tools to do so.
 
 If you only want more information about the error, but still want the [`CommandManager`][] class to
-handle and display errors and usage help, you can check the `CommandManager.ParseResult` property to
+handle and display errors and usage help, you can check the [`CommandManager.ParseResult`][] property to
 get information if [`RunCommand()`][] or [`RunCommandAsync()`][] returned null. The value of the
-`ParseResult.Status` property of the returned structure will indicate whether the command was not
+[`ParseResult.Status`][] property of the returned structure will indicate whether the command was not
 found, if an error occurred parsing the command's arguments, or if parsing was canceled by one of
 the command's arguments.
 
@@ -606,3 +606,5 @@ Ookii.CommandLine.
 [`WriteCommandListUsageCore()`]: https://www.ookii.org/docs/commandline-3.1/html/M_Ookii_CommandLine_UsageWriter_WriteCommandListUsageCore.htm
 [`WriteCommandListUsageSyntax()`]: https://www.ookii.org/docs/commandline-3.1/html/M_Ookii_CommandLine_UsageWriter_WriteCommandListUsageSyntax.htm
 [RunAsync()_0]: https://www.ookii.org/docs/commandline-3.1/html/M_Ookii_CommandLine_Commands_AsyncCommandBase_RunAsync.htm
+[`CommandManager.ParseResult`]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_Commands_CommandManager_ParseResult.htm
+[`ParseResult.Status`]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_ParseResult_Status.htm

@@ -111,14 +111,14 @@ additional information about the arguments using the [`Arguments`][Arguments_0] 
 [`GetArgument`][] function.
 
 In this case, you can manually create an instance of the [`CommandLineParser<T>`][] class. Then, call
-the instance `ParseWithErrorHandling()` or [`Parse()`][Parse()_5] method.
+the instance [`ParseWithErrorHandling()`][ParseWithErrorHandling()_1] or [`Parse()`][Parse()_5] method.
 
 > The [`CommandLineParser<T>`][] class is a helper class that derives from [`CommandLineParser`][]
-> and provides strongly-typed [`Parse()`][Parse()_5] and `ParseWithErrorHandling()` methods.
+> and provides strongly-typed [`Parse()`][Parse()_5] and [`ParseWithErrorHandling()`][ParseWithErrorHandling()_1] methods.
 
-Using `ParseWithErrorHandling()` is the easiest in this case, because it will still handle
-printing error messages and usage help, the same as the static `Parse<T>()` method. If you want
-more information about the error that occurred, you can access the `CommandLineParser.ParseResult`
+Using [`ParseWithErrorHandling()`][ParseWithErrorHandling()_1] is the easiest in this case, because it will still handle
+printing error messages and usage help, the same as the static [`Parse<T>()`][Parse<T>()_1] method. If you want
+more information about the error that occurred, you can access the [`CommandLineParser.ParseResult`][]
 property after parsing.
 
 For example, you can use this approach if you want to return a success status when parsing was
@@ -133,9 +133,9 @@ if (arguments == null)
 }
 ```
 
-You can also use the `ParseResult.ArgumentName` property to determine which argument canceled
-parsing in this case. If an error occurred, the status will be `ParseStatus.Error` and you can use
-the `ParseResult.LastException` property to access the actual error that occurred.
+You can also use the [`ParseResult.ArgumentName`][] property to determine which argument canceled
+parsing in this case. If an error occurred, the status will be [`ParseStatus.Error`][] and you can use
+the [`ParseResult.LastException`][] property to access the actual error that occurred.
 
 For the most fine grained control, you can use the [`CommandLineParser<T>.Parse()`][] method, which
 lets you handle errors manually.
@@ -158,7 +158,7 @@ will _always_ be true if an exception was thrown, and _always_ be false if the
 [`Parse()`][Parse()_5] method returned an instance.
 
 If the [`Parse()`][Parse()_5] method returned null, you can also check the
-`CommandLineParser.ParseResult` property to see which argument canceled parsing.
+[`CommandLineParser.ParseResult`][] property to see which argument canceled parsing.
 
 Here is a basic sample of manual parsing and error handling using the [`Parse()`][Parse()_5] method:
 
@@ -191,7 +191,7 @@ static int Main()
 If you wish to customize the behavior, that can still be done using the [`ParseOptionsAttribute`][]
 attribute and the [`ParseOptions`][] class (which you can pass to the [`CommandLineParser<T>`][]
 constructor). Some properties of the [`ParseOptions`][] class (like [`Error`][]) are not used with
-the [`Parse()`][Parse()_5]  methods, as they apply to the `ParseWithErrorHandling()` and the static
+the [`Parse()`][Parse()_5]  methods, as they apply to the [`ParseWithErrorHandling()`][ParseWithErrorHandling()_1] and the static
 [`Parse<T>()`][Parse<T>()_1] methods only.
 
 Next, we'll take a look at [generating usage help](UsageHelp.md).
@@ -217,3 +217,8 @@ Next, we'll take a look at [generating usage help](UsageHelp.md).
 [DuplicateArgument_0]: https://www.ookii.org/docs/commandline-3.1/html/E_Ookii_CommandLine_CommandLineParser_DuplicateArgument.htm
 [Parse()_5]: https://www.ookii.org/docs/commandline-3.1/html/Overload_Ookii_CommandLine_CommandLineParser_1_Parse.htm
 [Parse<T>()_1]: https://www.ookii.org/docs/commandline-3.1/html/M_Ookii_CommandLine_CommandLineParser_Parse__1.htm
+[`CommandLineParser.ParseResult`]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_CommandLineParser_ParseResult.htm
+[`ParseResult.ArgumentName`]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_ParseResult_ArgumentName.htm
+[`ParseResult.LastException`]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_ParseResult_LastException.htm
+[`ParseStatus.Error`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_ParseStatus.htm
+[ParseWithErrorHandling()_1]: https://www.ookii.org/docs/commandline-3.1/html/M_Ookii_CommandLine_CommandLineParser_1_ParseWithErrorHandling.htm

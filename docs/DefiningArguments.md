@@ -262,7 +262,7 @@ is supplied by setting the [`CommandLineArgumentAttribute.CancelParsing`][] prop
 
 When this property is set, parsing is stopped when the argument is encountered. The rest of the
 command line is not processed, and [`CommandLineParser.Parse()`][CommandLineParser.Parse()_2] will
-return null. The `ParseWithErrorHandling()` and the static [`Parse<T>()`][Parse<T>()_1] helper
+return null. The [`ParseWithErrorHandling()`][ParseWithErrorHandling()_1] and the static [`Parse<T>()`][Parse<T>()_1] helper
 methods will automatically print usage in this case.
 
 This can be used to implement a custom `-Help` argument, if you don't wish to use the default one.
@@ -636,3 +636,5 @@ Next, we'll take a look at how to [parse the arguments we've defined](ParsingArg
 [CommandLineParser.Parse()_2]: https://www.ookii.org/docs/commandline-3.1/html/Overload_Ookii_CommandLine_CommandLineParser_Parse.htm
 [DefaultValue_1]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_DefaultValue.htm
 [Parse<T>()_1]: https://www.ookii.org/docs/commandline-3.1/html/M_Ookii_CommandLine_CommandLineParser_Parse__1.htm
+
+[ParseWithErrorHandling()_1]: https://www.ookii.org/docs/commandline-3.1/html/M_Ookii_CommandLine_CommandLineParser_1_ParseWithErrorHandling.htm

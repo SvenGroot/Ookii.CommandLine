@@ -8,7 +8,7 @@ whenever you change the arguments to your application. Ookii.CommandLine generat
 text automatically, alleviating this problem.
 
 If you use the static [`CommandLineParser.Parse<T>()`][] method or the
-`CommandLineParser.ParseWithErrorHandling()` method, usage help will be printed automatically in the
+[`CommandLineParser<T>.ParseWithErrorHandling()`][] method, usage help will be printed automatically in the
 event the command line is invalid, or the `-Help` argument was used. You can customize the output
 using the [`ParseOptions.UsageWriter`][] property.
 
@@ -229,7 +229,7 @@ You can also choose the sort order of the description list using the
 usage syntax, but you can also choose to sort by ascending or descending long or short name.
 
 Since the static [`CommandLineParser.Parse<T>()`][] method or the
-`CommandLineParser.ParseWithErrorHandling()` method method will show usage help on error, if you
+[`CommandLineParser<T>.ParseWithErrorHandling()`][] method method will show usage help on error, if you
 have a lot of arguments it may be necessary for the user to scroll up past the argument description
 list to see the error message to determine what was wrong with the command line. Since this may be
 inconvenient, you can choose to omit the argument description list, or the usage help entirely, when
@@ -377,5 +377,5 @@ Next, we'll take a look at [argument validation and dependencies](Validation.md)
 [`WriteValueDescription()`]: https://www.ookii.org/docs/commandline-3.1/html/M_Ookii_CommandLine_UsageWriter_WriteValueDescription.htm
 [`WriteValueDescriptionForDescription()`]: https://www.ookii.org/docs/commandline-3.1/html/M_Ookii_CommandLine_UsageWriter_WriteValueDescriptionForDescription.htm
 [WriteArgumentDescription()_1]: https://www.ookii.org/docs/commandline-3.1/html/M_Ookii_CommandLine_UsageWriter_WriteArgumentDescription.htm
-
 [`CommandLineParser.GetUsage()`]: https://www.ookii.org/docs/commandline-3.1/html/M_Ookii_CommandLine_CommandLineParser_GetUsage.htm
+[`CommandLineParser<T>.ParseWithErrorHandling()`]: https://www.ookii.org/docs/commandline-3.1/html/M_Ookii_CommandLine_CommandLineParser_1_ParseWithErrorHandling.htm

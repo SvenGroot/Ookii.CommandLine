@@ -29,8 +29,8 @@ error streams, automatically wrapping at the console width.
 
 Lines will be wrapped at white-space characters only. If a line does not have a suitable place to
 wrap, it will be wrapped at the maximum line length. You can temporarily disable line wrapping by
-setting the `LineWrappingTextWriter.Wrapping` property to `WrappingMode.Disabled`, or disable
-breaking lines without a suitable place to wrap by setting it to `WrappingMode.EnabledNoForce`.
+setting the [`LineWrappingTextWriter.Wrapping`][] property to [`WrappingMode.Disabled`][], or disable
+breaking lines without a suitable place to wrap by setting it to [`WrappingMode.EnabledNoForce`][].
 
 If you write virtual terminal sequences to a [`LineWrappingTextWriter`][], by default these will not
 be included when calculating the length of the current line, so inserting VT sequences, e.g. for
@@ -184,3 +184,6 @@ converter in other contexts.
 [`TypeConverterBase<T>`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_TypeConverterBase_1.htm
 [`UsageWriter`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_UsageWriter.htm
 [`VirtualTerminal`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_Terminal_VirtualTerminal.htm
+[`LineWrappingTextWriter.Wrapping`]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_LineWrappingTextWriter_Wrapping.htm
+[`WrappingMode.Disabled`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_WrappingMode.htm
+[`WrappingMode.EnabledNoForce`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_WrappingMode.htm
