@@ -68,7 +68,6 @@ namespace Ookii.CommandLine
         /// Creates a <see cref="ParseResult"/> instance that represents canceled parsing.
         /// </summary>
         /// <param name="argumentName">The name of the argument that canceled parsing.</param>
-        /// <returns></returns>
         /// <returns>An instance of the <see cref="ParseResult"/> structure.</returns>
         /// <exception cref="ArgumentNullException">
         /// <paramref name="argumentName"/> is <see langword="null"/>.

@@ -867,34 +867,13 @@ namespace Ookii.CommandLine
             return ParseWithErrorHandling(Environment.GetCommandLineArgs(), 1);
         }
 
+        /// <inheritdoc cref="ParseWithErrorHandling()" />
         /// <summary>
-        /// Parses the arguments returned by the <see cref="Environment.GetCommandLineArgs"/>
-        /// method, and displays error messages and usage help if required.
+        /// Parses the specified command line arguments, starting at the specified index, and
+        /// displays error messages and usage help if required.
         /// </summary>
         /// <param name="args">The command line arguments.</param>
         /// <param name="index">The index of the first argument to parse.</param>
-        /// <returns>
-        ///   An instance of the type specified by the <see cref="ArgumentsType"/> property, or
-        ///   <see langword="null"/> if an error occurred, or argument parsing was canceled by the
-        ///   <see cref="CommandLineArgumentAttribute.CancelParsing"/> property or a method argument
-        ///   that returned <see langword="false"/>.
-        /// </returns>
-        /// <remarks>
-        /// <para>
-        ///   If an error occurs or parsing is canceled, it prints errors to the <see
-        ///   cref="ParseOptions.Error"/> stream, and usage help to the <see cref="UsageWriter"/> if
-        ///   the <see cref="HelpRequested"/> property is <see langword="true"/>. It then returns
-        ///   <see langword="null"/>.
-        /// </para>
-        /// <para>
-        ///   If the return value is <see langword="null"/>, check the <see cref="ParseResult"/>
-        ///   property for more information about whether an error occurred or parsing was
-        ///   canceled.
-        /// </para>
-        /// <para>
-        ///   This method will never throw a <see cref="CommandLineArgumentException"/> exception.
-        /// </para>
-        /// </remarks>
         /// <exception cref="ArgumentNullException">
         ///   <paramref name="args"/> is <see langword="null"/>.
         /// </exception>
