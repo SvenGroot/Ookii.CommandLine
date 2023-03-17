@@ -453,6 +453,20 @@ namespace Ookii.CommandLine.Tests
             }
         }
 
+        [TestMethod]
+        public void TestExactLineLength()
+        {
+            // This tests for a situation where a line is the exact length of the ring buffer,
+            // but the buffer start is not zero. This can only happen if countFormatting is true
+            // otherwise the buffer is made larger than the line length to begin with.
+            using var writer = LineWrappingTextWriter.ForStringWriter(40, null, true);
+            writer.WriteLine("test");
+            writer.Write("1234 1234 1234 1234 1234 1234 1234 12345");
+            writer.Write("1234 1234 1234 1234 1234 1234 1234 12345");
+            var expected = "test\n1234 1234 1234 1234 1234 1234 1234\n123451234 1234 1234 1234 1234 1234 1234\n12345".ReplaceLineEndings();
+            Assert.AreEqual(expected, writer.ToString());
+        }
+
         private static string WriteString(string value, int maxLength, int segmentSize, int indent = 0)
         {
             using var writer = LineWrappingTextWriter.ForStringWriter(maxLength);

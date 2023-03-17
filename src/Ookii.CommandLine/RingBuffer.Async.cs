@@ -30,6 +30,11 @@ namespace Ookii.CommandLine
                 _bufferStart += length;
                 Debug.Assert(_bufferStart <= _buffer.Length);
             }
+
+            if (_bufferEnd != null && _bufferStart == _bufferEnd.Value)
+            {
+                _bufferEnd = null;
+            }
         }
     }
 }

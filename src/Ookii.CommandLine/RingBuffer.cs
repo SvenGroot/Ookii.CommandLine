@@ -11,17 +11,29 @@ namespace Ookii.CommandLine
     {
         private char[] _buffer;
         private int _bufferStart;
-        private int _bufferEnd;
+        private int? _bufferEnd;
 
         public RingBuffer(int size)
         {
             _buffer = new char[size];
             _bufferStart = 0;
-            _bufferEnd = 0;
+            _bufferEnd = null;
         }
 
-        public int Size => _bufferEnd >= _bufferStart ? _bufferEnd - _bufferStart : Capacity - _bufferStart + _bufferEnd;
+        public int Size
+        {
+            get
+            {
+                if (_bufferEnd == null)
+                {
+                    return 0;
+                }
 
+                return _bufferEnd.Value > _bufferStart
+                    ? _bufferEnd.Value - _bufferStart
+                    : Capacity - _bufferStart + _bufferEnd.Value;
+            }
+        }
         public int Capacity => _buffer.Length;
 
         public char this[int index]
@@ -51,18 +63,19 @@ namespace Ookii.CommandLine
                 Resize(size + span.Length);
             }
 
-            var remaining = _buffer.Length - _bufferEnd;
+            int contentEnd = _bufferEnd ?? _bufferStart;
+            var remaining = _buffer.Length - contentEnd;
             if (remaining < span.Length)
             {
                 var (first, second) = span.Split(remaining);
-                first.CopyTo(_buffer, _bufferEnd);
+                first.CopyTo(_buffer, contentEnd);
                 second.CopyTo(_buffer, 0);
                 _bufferEnd = second.Length;
             }
             else
             {
-                span.CopyTo(_buffer, _bufferEnd);
-                _bufferEnd += span.Length;
+                span.CopyTo(_buffer, contentEnd);
+                _bufferEnd = contentEnd + span.Length;
                 Debug.Assert(_bufferEnd <= _buffer.Length);
             }
         }
@@ -81,6 +94,11 @@ namespace Ookii.CommandLine
                 _bufferStart += length;
                 Debug.Assert(_bufferStart <= _buffer.Length);
             }
+
+            if (_bufferEnd != null && _bufferStart == _bufferEnd.Value)
+            {
+                _bufferEnd = null;
+            }
         }
 
         public StringSpanTuple GetContents(int offset)
@@ -90,18 +108,23 @@ namespace Ookii.CommandLine
                 throw new ArgumentOutOfRangeException(nameof(offset));
             }
 
+            if (_bufferEnd == null)
+            {
+                return default;
+            }
+
             int start = _bufferStart + offset;
             if (start >= _buffer.Length)
             {
                 start -= _buffer.Length;
             }
 
-            if (start > _bufferEnd)
+            if (start > _bufferEnd.Value)
             {
-                return new(new StringSpan(_buffer, _bufferStart, _buffer.Length - _bufferStart), new StringSpan(_buffer, 0, _bufferEnd));
+                return new(new StringSpan(_buffer, _bufferStart, _buffer.Length - _bufferStart), new StringSpan(_buffer, 0, _bufferEnd.Value));
             }
 
-            return new(new StringSpan(_buffer, start, _bufferEnd - start), default);
+            return new(new StringSpan(_buffer, start, _bufferEnd.Value - start), default);
         }
 
         public void Peek(TextWriter writer, int offset, int length)
@@ -155,19 +178,23 @@ namespace Ookii.CommandLine
 
             var newBuffer = new char[newCapacity];
             int size = Size;
-            if (_bufferStart > _bufferEnd)
+            if (_bufferEnd != null)
             {
-                int length = _buffer.Length - _bufferStart;
-                Array.Copy(_buffer, _bufferStart, newBuffer, 0, length);
-                Array.Copy(_buffer, 0, newBuffer, length, _bufferEnd);
-            }
-            else
-            {
-                Array.Copy(_buffer, _bufferStart, newBuffer, 0, _bufferEnd - _bufferStart);
+                if (_bufferStart > _bufferEnd)
+                {
+                    int length = _buffer.Length - _bufferStart;
+                    Array.Copy(_buffer, _bufferStart, newBuffer, 0, length);
+                    Array.Copy(_buffer, 0, newBuffer, length, _bufferEnd.Value);
+                }
+                else
+                {
+                    Array.Copy(_buffer, _bufferStart, newBuffer, 0, _bufferEnd.Value - _bufferStart);
+                }
+
+                _bufferEnd = size;
             }
 
             _bufferStart = 0;
-            _bufferEnd = size;
             _buffer = newBuffer;
         }
     }
