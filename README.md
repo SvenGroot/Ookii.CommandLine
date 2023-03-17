@@ -51,7 +51,7 @@ class MyArguments
     public int Optional { get; set; }
 
     [CommandLineArgument]
-    [Description("An argument that can only supplied by name.")]
+    [Description("An argument that can only be supplied by name.")]
     public DateTime Named { get; set; }
 
     [CommandLineArgument]
