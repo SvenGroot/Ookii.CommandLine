@@ -180,7 +180,7 @@ namespace Ookii.CommandLine
             int size = Size;
             if (_bufferEnd != null)
             {
-                if (_bufferStart > _bufferEnd)
+                if (_bufferStart >= _bufferEnd)
                 {
                     int length = _buffer.Length - _bufferStart;
                     Array.Copy(_buffer, _bufferStart, newBuffer, 0, length);

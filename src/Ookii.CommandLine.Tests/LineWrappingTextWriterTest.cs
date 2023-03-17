@@ -467,6 +467,21 @@ namespace Ookii.CommandLine.Tests
             Assert.AreEqual(expected, writer.ToString());
         }
 
+        [TestMethod]
+        public void TestResizeWithFullBuffer()
+        {
+            using var writer = LineWrappingTextWriter.ForStringWriter(40, null, true);
+            writer.Wrapping = WrappingMode.EnabledNoForce;
+
+            // As with the above test, we want the buffer start to be non-zero.
+            writer.WriteLine("test");
+            writer.Write("1234567890123456789012345678901234567890");
+            writer.Write('1');
+            writer.WriteLine();
+            var expected = "test\n12345678901234567890123456789012345678901\n".ReplaceLineEndings();
+            Assert.AreEqual(expected, writer.ToString());
+        }
+
         private static string WriteString(string value, int maxLength, int segmentSize, int indent = 0)
         {
             using var writer = LineWrappingTextWriter.ForStringWriter(maxLength);
