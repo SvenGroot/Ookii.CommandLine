@@ -46,9 +46,10 @@ namespace Ookii.CommandLine
     /// <para>
     ///   Unlike using the <see cref="CancelParsing"/> or <see cref="CommandLineParser.ArgumentParsed"/>
     ///   event, canceling parsing with the return value does not automatically print the usage
-    ///   help when using the <see cref="CommandLineParser.Parse{T}(string[], int, ParseOptions?)"/>
-    ///   method or the <see cref="CommandManager"/> class. Instead, it must be requested using by
-    ///   setting the <see cref="CommandLineParser.HelpRequested"/> property to <see langword="true"/>.
+    ///   help when using the <see cref="CommandLineParser{T}.ParseWithErrorHandling()"/> method, the
+    ///   <see cref="CommandLineParser.Parse{T}(string[], int, ParseOptions?)"/> method or the
+    ///   <see cref="CommandManager"/> class. Instead, it must be requested using by setting the
+    ///   <see cref="CommandLineParser.HelpRequested"/> property to <see langword="true"/>.
     /// </para>
     /// </remarks>
     /// <threadsafety static="true" instance="false"/>
@@ -300,8 +301,9 @@ namespace Ookii.CommandLine
         ///   or not.
         /// </para>
         /// <para>
-        ///   The <see cref="CommandLineParser.Parse{T}(string[], ParseOptions?)"/> static helper method will print
-        ///   usage information if parsing was canceled through this method.
+        ///   The <see cref="CommandLineParser{T}.ParseWithErrorHandling()"/> method and the
+        ///   <see cref="CommandLineParser.Parse{T}(string[], ParseOptions?)"/> static helper method
+        ///   will print usage information if parsing was canceled through this method.
         /// </para>
         /// <para>
         ///   Canceling parsing in this way is identical to handling the <see cref="CommandLineParser.ArgumentParsed"/>

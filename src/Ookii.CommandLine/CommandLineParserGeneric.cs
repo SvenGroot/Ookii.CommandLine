@@ -53,5 +53,17 @@ namespace Ookii.CommandLine
         {
             return (T?)base.Parse(args, index);
         }
+
+        /// <inheritdoc cref="CommandLineParser.ParseWithErrorHandling()"/>
+        public new T? ParseWithErrorHandling()
+        {
+            return (T?)base.ParseWithErrorHandling();
+        }
+
+        /// <inheritdoc cref="CommandLineParser.ParseWithErrorHandling(string[], int)"/>
+        public new T? ParseWithErrorHandling(string[] args, int index = 0)
+        {
+            return (T?)base.ParseWithErrorHandling(args, index);
+        }
     }
 }

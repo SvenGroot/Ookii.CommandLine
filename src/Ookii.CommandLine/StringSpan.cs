@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 namespace Ookii.CommandLine
 {
     // This is a poor man's ReadOnlySpan<char> for .Net Standard 2.0.
-    internal struct StringSpan : IEnumerable<char>
+    internal partial struct StringSpan : IEnumerable<char>
     {
         private readonly string? _stringValue;
         private readonly char[]? _charArrayValue;
@@ -152,22 +152,7 @@ namespace Ookii.CommandLine
             }
         }
 
-        public void WriteTo(TextWriter writer)
-        {
-            if (_stringValue != null)
-            {
-                writer.Write(_stringValue.Substring(_offset, _length));
-            }
-            else if (_charArrayValue != null)
-            {
-                writer.Write(_charArrayValue, _offset, _length);
-            }
-            else if (_length > 0)
-            {
-                writer.Write(_charValue);
-            }
-        }
-
+        public partial void WriteTo(TextWriter writer);
         public IEnumerator<char> GetEnumerator()
         {
             if (_length == 0)

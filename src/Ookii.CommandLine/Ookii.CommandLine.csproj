@@ -51,4 +51,24 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
+
+  <ItemGroup>
+    <AsyncInputFiles Include="*.Async.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <SyncOutputFiles Include="@(AsyncInputFiles -&gt; '$(MSBuildProjectDirectory)\$(IntermediateOutputPath)%(Filename)%(Extension)'-&gt;Replace('.Async.cs', '.Sync.cs'))" />
+  </ItemGroup>
+
+  <Target Name="GenerateSyncFiles" BeforeTargets="CoreCompile" DependsOnTargets="PrepareForBuild" Inputs="@(AsyncInputFiles)" Outputs="@(SyncOutputFiles)">
+    <Message Text="Generating..." />
+    <Exec Command="pwsh -Command &quot;&amp;{ &amp;'$(MSBuildProjectDirectory)\Convert-SyncMethod.ps1' ('@(AsyncInputFiles -> '%(FullPath)')' -split ';') '$(MSBuildProjectDirectory)\$(IntermediateOutputPath)' }&quot;" />
+    <ItemGroup>
+      <Compile Include="@(SyncOutputFiles)" />
+    </ItemGroup>
+  </Target>
+
+  <Target Name="OokiiCleanCommand" AfterTargets="CoreClean">
+    <Delete Files="@(SyncOutputFiles)" />
+  </Target>
 </Project>

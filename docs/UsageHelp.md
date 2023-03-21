@@ -7,11 +7,12 @@ Creating this kind of usage help text is tedious, and you must make sure it is k
 whenever you change the arguments to your application. Ookii.CommandLine generates this usage help
 text automatically, alleviating this problem.
 
-If you use the static [`CommandLineParser.Parse<T>()`][] method, usage help will be printed
-automatically in the event the command line is invalid, or the `-Help` argument was used. You can
-customize the output using the [`ParseOptions.UsageWriter`][] property.
+If you use the static [`CommandLineParser.Parse<T>()`][] method or the
+[`CommandLineParser<T>.ParseWithErrorHandling()`][] method, usage help will be printed automatically in the
+event the command line is invalid, or the `-Help` argument was used. You can customize the output
+using the [`ParseOptions.UsageWriter`][] property.
 
-If you don't use the static methods, you can print usage help can be generated using the
+If you don't use those methods, you can generate the usage help using the
 [`CommandLineParser.WriteUsage()`][] method. By default, the [`CommandLineParser.WriteUsage()`][]
 method will write the usage help to the standard output stream, using the
 [`LineWrappingTextWriter`][] class to white-space wrap the text at the console width.
@@ -227,12 +228,13 @@ You can also choose the sort order of the description list using the
 [`UsageWriter.ArgumentDescriptionListOrder`][] property. This defaults to the same order as the
 usage syntax, but you can also choose to sort by ascending or descending long or short name.
 
-Since the static [`CommandLineParser.Parse<T>()`][] method will show usage help on error, if you have
-a lot of arguments it may be necessary for the user to scroll up past the argument description list
-to see the error message to determine what was wrong with the command line. Since this may be
-inconvenient, you can choose to omit the argument description list, or the usage help entirely,
-when an error occurs, using the [`ParseOptions.ShowUsageOnError`][] property. In this case, the user
-will have to use the `-Help` argument to see the full help.
+Since the static [`CommandLineParser.Parse<T>()`][] method or the
+[`CommandLineParser<T>.ParseWithErrorHandling()`][] method method will show usage help on error, if you
+have a lot of arguments it may be necessary for the user to scroll up past the argument description
+list to see the error message to determine what was wrong with the command line. Since this may be
+inconvenient, you can choose to omit the argument description list, or the usage help entirely, when
+an error occurs, using the [`ParseOptions.ShowUsageOnError`][] property. In this case, the user will
+have to use the `-Help` argument to see the full help.
 
 ## Hidden arguments
 
@@ -341,39 +343,39 @@ Please see the [subcommand documentation](Subcommands.md) for information about 
 
 Next, we'll take a look at [argument validation and dependencies](Validation.md).
 
-[`CommandLineArgumentAttribute.IsHidden`]: https://www.ookii.org/docs/commandline-3.0/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_IsHidden.htm
-[`CommandLineArgumentAttribute.ValueDescription`]: https://www.ookii.org/docs/commandline-3.0/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_ValueDescription.htm
-[`CommandLineParser.Parse<T>()`]: https://www.ookii.org/docs/commandline-3.0/html/M_Ookii_CommandLine_CommandLineParser_Parse__1.htm
-[`CommandLineParser.WriteUsage()`]: https://www.ookii.org/docs/commandline-3.0/html/M_Ookii_CommandLine_CommandLineParser_WriteUsage.htm
+[`CommandLineArgumentAttribute.IsHidden`]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_IsHidden.htm
+[`CommandLineArgumentAttribute.ValueDescription`]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_ValueDescription.htm
+[`CommandLineParser.Parse<T>()`]: https://www.ookii.org/docs/commandline-3.1/html/M_Ookii_CommandLine_CommandLineParser_Parse__1.htm
+[`CommandLineParser.WriteUsage()`]: https://www.ookii.org/docs/commandline-3.1/html/M_Ookii_CommandLine_CommandLineParser_WriteUsage.htm
 [`DescriptionAttribute`]: https://learn.microsoft.com/dotnet/api/system.componentmodel.descriptionattribute
-[`DescriptionListFilterMode.Information`]: https://www.ookii.org/docs/commandline-3.0/html/T_Ookii_CommandLine_DescriptionListFilterMode.htm
-[`GetExtendedColor()`]: https://www.ookii.org/docs/commandline-3.0/html/M_Ookii_CommandLine_Terminal_TextFormat_GetExtendedColor.htm
+[`DescriptionListFilterMode.Information`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_DescriptionListFilterMode.htm
+[`GetExtendedColor()`]: https://www.ookii.org/docs/commandline-3.1/html/M_Ookii_CommandLine_Terminal_TextFormat_GetExtendedColor.htm
 [`Int32`]: https://learn.microsoft.com/dotnet/api/system.int32
-[`LineWrappingTextWriter`]: https://www.ookii.org/docs/commandline-3.0/html/T_Ookii_CommandLine_LineWrappingTextWriter.htm
-[`LocalizedStringProvider`]: https://www.ookii.org/docs/commandline-3.0/html/T_Ookii_CommandLine_LocalizedStringProvider.htm
+[`LineWrappingTextWriter`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_LineWrappingTextWriter.htm
+[`LocalizedStringProvider`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_LocalizedStringProvider.htm
 [`Nullable<T>`]: https://learn.microsoft.com/dotnet/api/system.nullable-1
-[`ParseOptions.DefaultValueDescriptions`]: https://www.ookii.org/docs/commandline-3.0/html/P_Ookii_CommandLine_ParseOptions_DefaultValueDescriptions.htm
-[`ParseOptions.ShowUsageOnError`]: https://www.ookii.org/docs/commandline-3.0/html/P_Ookii_CommandLine_ParseOptions_ShowUsageOnError.htm
-[`ParseOptions.UsageWriter`]: https://www.ookii.org/docs/commandline-3.0/html/P_Ookii_CommandLine_ParseOptions_UsageWriter.htm
+[`ParseOptions.DefaultValueDescriptions`]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_ParseOptions_DefaultValueDescriptions.htm
+[`ParseOptions.ShowUsageOnError`]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_ParseOptions_ShowUsageOnError.htm
+[`ParseOptions.UsageWriter`]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_ParseOptions_UsageWriter.htm
 [`SetConsoleMode`]: https://learn.microsoft.com/windows/console/setconsolemode
 [`String`]: https://learn.microsoft.com/dotnet/api/system.string
 [`System.ComponentModel.DescriptionAttribute`]: https://learn.microsoft.com/dotnet/api/system.componentmodel.descriptionattribute
-[`TextFormat`]: https://www.ookii.org/docs/commandline-3.0/html/T_Ookii_CommandLine_Terminal_TextFormat.htm
-[`UsageWriter.ArgumentDescriptionListFilter`]: https://www.ookii.org/docs/commandline-3.0/html/P_Ookii_CommandLine_UsageWriter_ArgumentDescriptionListFilter.htm
-[`UsageWriter.ArgumentDescriptionListOrder`]: https://www.ookii.org/docs/commandline-3.0/html/P_Ookii_CommandLine_UsageWriter_ArgumentDescriptionListOrder.htm
-[`UsageWriter.IncludeApplicationDescription`]: https://www.ookii.org/docs/commandline-3.0/html/P_Ookii_CommandLine_UsageWriter_IncludeApplicationDescription.htm
-[`UsageWriter.UseAbbreviatedSyntax`]: https://www.ookii.org/docs/commandline-3.0/html/P_Ookii_CommandLine_UsageWriter_UseAbbreviatedSyntax.htm
-[`UsageWriter.UseColor`]: https://www.ookii.org/docs/commandline-3.0/html/P_Ookii_CommandLine_UsageWriter_UseColor.htm
-[`UsageWriter.UseShortNamesForSyntax`]: https://www.ookii.org/docs/commandline-3.0/html/P_Ookii_CommandLine_UsageWriter_UseShortNamesForSyntax.htm
-[`UsageWriter`]: https://www.ookii.org/docs/commandline-3.0/html/T_Ookii_CommandLine_UsageWriter.htm
-[`ValueDescriptionAttribute`]: https://www.ookii.org/docs/commandline-3.0/html/T_Ookii_CommandLine_ValueDescriptionAttribute.htm
-[`WriteArgumentDescriptions()`]: https://www.ookii.org/docs/commandline-3.0/html/M_Ookii_CommandLine_UsageWriter_WriteArgumentDescriptions.htm
-[`WriteArgumentName()`]: https://www.ookii.org/docs/commandline-3.0/html/M_Ookii_CommandLine_UsageWriter_WriteArgumentName.htm
-[`WriteArgumentSyntax()`]: https://www.ookii.org/docs/commandline-3.0/html/M_Ookii_CommandLine_UsageWriter_WriteArgumentSyntax.htm
-[`WriteParserUsageCore()`]: https://www.ookii.org/docs/commandline-3.0/html/M_Ookii_CommandLine_UsageWriter_WriteParserUsageCore.htm
-[`WriteParserUsageSyntax()`]: https://www.ookii.org/docs/commandline-3.0/html/M_Ookii_CommandLine_UsageWriter_WriteParserUsageSyntax.htm
-[`WriteValueDescription()`]: https://www.ookii.org/docs/commandline-3.0/html/M_Ookii_CommandLine_UsageWriter_WriteValueDescription.htm
-[`WriteValueDescriptionForDescription()`]: https://www.ookii.org/docs/commandline-3.0/html/M_Ookii_CommandLine_UsageWriter_WriteValueDescriptionForDescription.htm
-[WriteArgumentDescription()_1]: https://www.ookii.org/docs/commandline-3.0/html/M_Ookii_CommandLine_UsageWriter_WriteArgumentDescription.htm
-
-[`CommandLineParser.GetUsage()`]: https://www.ookii.org/docs/commandline-3.0/html/M_Ookii_CommandLine_CommandLineParser_GetUsage.htm
+[`TextFormat`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_Terminal_TextFormat.htm
+[`UsageWriter.ArgumentDescriptionListFilter`]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_UsageWriter_ArgumentDescriptionListFilter.htm
+[`UsageWriter.ArgumentDescriptionListOrder`]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_UsageWriter_ArgumentDescriptionListOrder.htm
+[`UsageWriter.IncludeApplicationDescription`]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_UsageWriter_IncludeApplicationDescription.htm
+[`UsageWriter.UseAbbreviatedSyntax`]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_UsageWriter_UseAbbreviatedSyntax.htm
+[`UsageWriter.UseColor`]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_UsageWriter_UseColor.htm
+[`UsageWriter.UseShortNamesForSyntax`]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_UsageWriter_UseShortNamesForSyntax.htm
+[`UsageWriter`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_UsageWriter.htm
+[`ValueDescriptionAttribute`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_ValueDescriptionAttribute.htm
+[`WriteArgumentDescriptions()`]: https://www.ookii.org/docs/commandline-3.1/html/M_Ookii_CommandLine_UsageWriter_WriteArgumentDescriptions.htm
+[`WriteArgumentName()`]: https://www.ookii.org/docs/commandline-3.1/html/M_Ookii_CommandLine_UsageWriter_WriteArgumentName.htm
+[`WriteArgumentSyntax()`]: https://www.ookii.org/docs/commandline-3.1/html/M_Ookii_CommandLine_UsageWriter_WriteArgumentSyntax.htm
+[`WriteParserUsageCore()`]: https://www.ookii.org/docs/commandline-3.1/html/M_Ookii_CommandLine_UsageWriter_WriteParserUsageCore.htm
+[`WriteParserUsageSyntax()`]: https://www.ookii.org/docs/commandline-3.1/html/M_Ookii_CommandLine_UsageWriter_WriteParserUsageSyntax.htm
+[`WriteValueDescription()`]: https://www.ookii.org/docs/commandline-3.1/html/M_Ookii_CommandLine_UsageWriter_WriteValueDescription.htm
+[`WriteValueDescriptionForDescription()`]: https://www.ookii.org/docs/commandline-3.1/html/M_Ookii_CommandLine_UsageWriter_WriteValueDescriptionForDescription.htm
+[WriteArgumentDescription()_1]: https://www.ookii.org/docs/commandline-3.1/html/M_Ookii_CommandLine_UsageWriter_WriteArgumentDescription.htm
+[`CommandLineParser.GetUsage()`]: https://www.ookii.org/docs/commandline-3.1/html/M_Ookii_CommandLine_CommandLineParser_GetUsage.htm
+[`CommandLineParser<T>.ParseWithErrorHandling()`]: https://www.ookii.org/docs/commandline-3.1/html/M_Ookii_CommandLine_CommandLineParser_1_ParseWithErrorHandling.htm

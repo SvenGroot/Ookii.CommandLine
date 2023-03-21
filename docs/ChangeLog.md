@@ -1,5 +1,30 @@
 # What’s new in Ookii.CommandLine
 
+## Ookii.CommandLine 3.1
+
+**IMPORTANT:** If you are upgrading from version 2.x, please check the [migration guide](Migrating.md).
+
+- Added an instance [`CommandLineParser<T>.ParseWithErrorHandling()`][] method, which handles errors
+  and displays usage help the same way as the static [`Parse<T>()`][Parse<T>()_1] method, but allows access to more
+  information only available if you have an instance.
+- Added the [`CommandLineParser.ParseResult`][] property, which provides information about errors or
+  which argument canceled parsing, giving detailed failure information to the caller even if the
+  [`ParseWithErrorHandling()`][ParseWithErrorHandling()_1] method was used.
+- Also exposed the same information for subcommands through the [`CommandManager.ParseResult`][]
+  property.
+- [`LineWrappingTextWriter`][] improvements
+  - Proper async support; the various [`WriteAsync()`][WriteAsync()_4] and [`WriteLineAsync()`][WriteLineAsync()_5] methods will now call
+    down to the async methods of the base writer for the [`LineWrappingTextWriter`][], and a new method
+    [`ResetIndentAsync()`][] is provided.
+  - Add a [`Flush()`][Flush()_0] method overload that allows flushing a non-empty buffer without inserting an
+    extra new line.
+  - Control line wrapping behavior with the [`Wrapping`][] property: disable it, or disable forcibly
+    breaking lines if no suitable white-space character is found.
+  - If the base writer is a [`StringWriter`][], the [`LineWrappingTextWriter.ToString()`][] method now
+    returns the text written to the writer, including text that hasn't been flushed to the base
+    writer yet.
+  - Some minor bug fixes.
+
 ## Ookii.CommandLine 3.0
 
 **IMPORTANT:** Several of the changes in version 3.0 are *breaking changes*. There are breaking API
@@ -135,13 +160,25 @@ and usage.
 Upgrading an existing project that is using Ookii.CommandLine 1.0 to Ookii.CommandLine 2.0 or newer
 may require substantial code changes and may change how command lines are parsed.
 
-[`CommandLineParser`]: https://www.ookii.org/docs/commandline-3.0/html/T_Ookii_CommandLine_CommandLineParser.htm
-[`CommandLineParser<T>`]: https://www.ookii.org/docs/commandline-3.0/html/T_Ookii_CommandLine_CommandLineParser_1.htm
+[`CommandLineParser`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_CommandLineParser.htm
+[`CommandLineParser<T>`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_CommandLineParser_1.htm
 [`CultureInfo.InvariantCulture`]: https://learn.microsoft.com/dotnet/api/system.globalization.cultureinfo.invariantculture
 [`Environment.GetCommandLineArgs()`]: https://learn.microsoft.com/dotnet/api/system.environment.getcommandlineargs
-[`ParseOptions`]: https://www.ookii.org/docs/commandline-3.0/html/T_Ookii_CommandLine_ParseOptions.htm
-[`ParseOptionsAttribute`]: https://www.ookii.org/docs/commandline-3.0/html/T_Ookii_CommandLine_ParseOptionsAttribute.htm
+[`ParseOptions`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_ParseOptions.htm
+[`ParseOptionsAttribute`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_ParseOptionsAttribute.htm
 [`TypeConverter`]: https://learn.microsoft.com/dotnet/api/system.componentmodel.typeconverter
-[Parse()_6]: https://www.ookii.org/docs/commandline-3.0/html/M_Ookii_CommandLine_CommandLineParser_Parse.htm
-[Parse<T>()_1]: https://www.ookii.org/docs/commandline-3.0/html/M_Ookii_CommandLine_CommandLineParser_Parse__1.htm
-[UsageWriter_1]: https://www.ookii.org/docs/commandline-3.0/html/T_Ookii_CommandLine_UsageWriter.htm
+[Parse()_6]: https://www.ookii.org/docs/commandline-3.1/html/M_Ookii_CommandLine_CommandLineParser_Parse.htm
+[Parse<T>()_1]: https://www.ookii.org/docs/commandline-3.1/html/M_Ookii_CommandLine_CommandLineParser_Parse__1.htm
+[UsageWriter_1]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_UsageWriter.htm
+[`CommandLineParser.ParseResult`]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_CommandLineParser_ParseResult.htm
+[`CommandLineParser<T>.ParseWithErrorHandling()`]: https://www.ookii.org/docs/commandline-3.1/html/M_Ookii_CommandLine_CommandLineParser_1_ParseWithErrorHandling.htm
+[`CommandManager.ParseResult`]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_Commands_CommandManager_ParseResult.htm
+[`LineWrappingTextWriter.ToString()`]: https://www.ookii.org/docs/commandline-3.1/html/M_Ookii_CommandLine_LineWrappingTextWriter_ToString.htm
+[`LineWrappingTextWriter`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_LineWrappingTextWriter.htm
+[`ResetIndentAsync()`]: https://www.ookii.org/docs/commandline-3.1/html/M_Ookii_CommandLine_LineWrappingTextWriter_ResetIndentAsync.htm
+[`StringWriter`]: https://learn.microsoft.com/dotnet/api/system.io.stringwriter
+[`Wrapping`]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_LineWrappingTextWriter_Wrapping.htm
+[Flush()_0]: https://www.ookii.org/docs/commandline-3.1/html/M_Ookii_CommandLine_LineWrappingTextWriter_Flush_1.htm
+[ParseWithErrorHandling()_1]: https://www.ookii.org/docs/commandline-3.1/html/M_Ookii_CommandLine_CommandLineParser_1_ParseWithErrorHandling.htm
+[WriteAsync()_4]: https://www.ookii.org/docs/commandline-3.1/html/Overload_Ookii_CommandLine_LineWrappingTextWriter_WriteAsync.htm
+[WriteLineAsync()_5]: https://www.ookii.org/docs/commandline-3.1/html/Overload_Ookii_CommandLine_LineWrappingTextWriter_WriteLineAsync.htm

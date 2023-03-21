@@ -6,31 +6,34 @@ terminal support, and the [`TypeConverterBase<T>`][] class.
 
 ## LineWrappingTextWriter
 
-The [`LineWrappingTextWriter`][] class is a [`TextWriter`][] implementation that allows you to write text
-to another [`TextWriter`][], white-space wrapping the text at the specified line length, and supporting
-hanging indents.
+The [`LineWrappingTextWriter`][] class is a [`TextWriter`][] implementation that allows you to write
+text to another [`TextWriter`][], white-space wrapping the text at the specified line length, and
+supporting hanging indents.
 
 Ookii.CommandLine uses this class to wrap and indent error messages and usage help when writing to
 the console.
 
-The [`LineWrappingTextWriter`][] can be created to wrap any [`TextWriter`][] and with any line length, using
-its constructor. If you use a line length of less than 1 or greater than `ushort.MaxValue`, this is
-treated as an infinite length, and lines will not be wrapped. The [`LineWrappingTextWriter`][] can still
-be used to create indented text if you use an unrestricted line length.
+The [`LineWrappingTextWriter`][] can be created to wrap any [`TextWriter`][] and with any line
+length, using its constructor. If you use a line length of less than 1 or greater than
+`ushort.MaxValue`, this is treated as an infinite length, and lines will not be wrapped. The
+[`LineWrappingTextWriter`][] can still be used to create indented text if you use an unrestricted
+line length.
 
 Most of the time, you will probably want to use the [`LineWrappingTextWriter.ForConsoleOut()`][] or
 [`LineWrappingTextWriter.ForConsoleError()`][] methods to create a writer for the standard output or
 error streams, automatically wrapping at the console width.
 
 > Both methods actually use `Console.WindowWidth - 1` for their maximum line length, because using
-> [`Console.WindowWidth`][] exactly can lead to extra blank lines if a line is exactly the width of the
-> console.
+> [`Console.WindowWidth`][] exactly can lead to extra blank lines if a line is exactly the width of
+> the console.
 
 Lines will be wrapped at white-space characters only. If a line does not have a suitable place to
-wrap, it will be wrapped at the maximum line length regardless.
+wrap, it will be wrapped at the maximum line length. You can temporarily disable line wrapping by
+setting the [`LineWrappingTextWriter.Wrapping`][] property to [`WrappingMode.Disabled`][], or disable
+breaking lines without a suitable place to wrap by setting it to [`WrappingMode.EnabledNoForce`][].
 
-If you write virtual terminal sequences to a [`LineWrappingTextWriter`][], by default these will not be
-included when calculating the length of the current line, so inserting VT sequences, e.g. for
+If you write virtual terminal sequences to a [`LineWrappingTextWriter`][], by default these will not
+be included when calculating the length of the current line, so inserting VT sequences, e.g. for
 colors, will not affect how the text is wrapped.
 
 ### Indentation
@@ -160,24 +163,27 @@ If you want to customize the conversion to string, you can do this too (it uses 
 default), but Ookii.CommandLine never uses this, so it's only relevant if you want to use the
 converter in other contexts.
 
-[`CanConvertFrom()`]: https://www.ookii.org/docs/commandline-3.0/html/M_Ookii_CommandLine_TypeConverterBase_1_CanConvertFrom.htm
+[`CanConvertFrom()`]: https://www.ookii.org/docs/commandline-3.1/html/M_Ookii_CommandLine_TypeConverterBase_1_CanConvertFrom.htm
 [`Console.WindowWidth`]: https://learn.microsoft.com/dotnet/api/system.console.windowwidth
-[`ConvertFrom()`]: https://www.ookii.org/docs/commandline-3.0/html/M_Ookii_CommandLine_TypeConverterBase_1_ConvertFrom.htm
-[`EnableColor()`]: https://www.ookii.org/docs/commandline-3.0/html/M_Ookii_CommandLine_Terminal_VirtualTerminal_EnableColor.htm
-[`EnableVirtualTerminalSequences()`]: https://www.ookii.org/docs/commandline-3.0/html/M_Ookii_CommandLine_Terminal_VirtualTerminal_EnableVirtualTerminalSequences.htm
-[`Indent`]: https://www.ookii.org/docs/commandline-3.0/html/P_Ookii_CommandLine_LineWrappingTextWriter_Indent.htm
-[`LineWrappingTextWriter.ForConsoleError()`]: https://www.ookii.org/docs/commandline-3.0/html/M_Ookii_CommandLine_LineWrappingTextWriter_ForConsoleError.htm
-[`LineWrappingTextWriter.ForConsoleOut()`]: https://www.ookii.org/docs/commandline-3.0/html/M_Ookii_CommandLine_LineWrappingTextWriter_ForConsoleOut.htm
-[`LineWrappingTextWriter.Indent`]: https://www.ookii.org/docs/commandline-3.0/html/P_Ookii_CommandLine_LineWrappingTextWriter_Indent.htm
-[`LineWrappingTextWriter.ResetIndent()`]: https://www.ookii.org/docs/commandline-3.0/html/M_Ookii_CommandLine_LineWrappingTextWriter_ResetIndent.htm
-[`LineWrappingTextWriter`]: https://www.ookii.org/docs/commandline-3.0/html/T_Ookii_CommandLine_LineWrappingTextWriter.htm
-[`Ookii.CommandLine.Terminal`]: https://www.ookii.org/docs/commandline-3.0/html/N_Ookii_CommandLine_Terminal.htm
-[`ResetIndent()`]: https://www.ookii.org/docs/commandline-3.0/html/M_Ookii_CommandLine_LineWrappingTextWriter_ResetIndent.htm
-[`TextFormat`]: https://www.ookii.org/docs/commandline-3.0/html/T_Ookii_CommandLine_Terminal_TextFormat.htm
+[`ConvertFrom()`]: https://www.ookii.org/docs/commandline-3.1/html/M_Ookii_CommandLine_TypeConverterBase_1_ConvertFrom.htm
+[`EnableColor()`]: https://www.ookii.org/docs/commandline-3.1/html/M_Ookii_CommandLine_Terminal_VirtualTerminal_EnableColor.htm
+[`EnableVirtualTerminalSequences()`]: https://www.ookii.org/docs/commandline-3.1/html/M_Ookii_CommandLine_Terminal_VirtualTerminal_EnableVirtualTerminalSequences.htm
+[`Indent`]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_LineWrappingTextWriter_Indent.htm
+[`LineWrappingTextWriter.ForConsoleError()`]: https://www.ookii.org/docs/commandline-3.1/html/M_Ookii_CommandLine_LineWrappingTextWriter_ForConsoleError.htm
+[`LineWrappingTextWriter.ForConsoleOut()`]: https://www.ookii.org/docs/commandline-3.1/html/M_Ookii_CommandLine_LineWrappingTextWriter_ForConsoleOut.htm
+[`LineWrappingTextWriter.Indent`]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_LineWrappingTextWriter_Indent.htm
+[`LineWrappingTextWriter.ResetIndent()`]: https://www.ookii.org/docs/commandline-3.1/html/M_Ookii_CommandLine_LineWrappingTextWriter_ResetIndent.htm
+[`LineWrappingTextWriter`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_LineWrappingTextWriter.htm
+[`Ookii.CommandLine.Terminal`]: https://www.ookii.org/docs/commandline-3.1/html/N_Ookii_CommandLine_Terminal.htm
+[`ResetIndent()`]: https://www.ookii.org/docs/commandline-3.1/html/M_Ookii_CommandLine_LineWrappingTextWriter_ResetIndent.htm
+[`TextFormat`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_Terminal_TextFormat.htm
 [`TextWriter`]: https://learn.microsoft.com/dotnet/api/system.io.textwriter
 [`ToString()`]: https://learn.microsoft.com/dotnet/api/system.object.tostring
 [`TypeConverter`]: https://learn.microsoft.com/dotnet/api/system.componentmodel.typeconverter
 [`TypeConverterAttribute`]: https://learn.microsoft.com/dotnet/api/system.componentmodel.typeconverterattribute
-[`TypeConverterBase<T>`]: https://www.ookii.org/docs/commandline-3.0/html/T_Ookii_CommandLine_TypeConverterBase_1.htm
-[`UsageWriter`]: https://www.ookii.org/docs/commandline-3.0/html/T_Ookii_CommandLine_UsageWriter.htm
-[`VirtualTerminal`]: https://www.ookii.org/docs/commandline-3.0/html/T_Ookii_CommandLine_Terminal_VirtualTerminal.htm
+[`TypeConverterBase<T>`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_TypeConverterBase_1.htm
+[`UsageWriter`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_UsageWriter.htm
+[`VirtualTerminal`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_Terminal_VirtualTerminal.htm
+[`LineWrappingTextWriter.Wrapping`]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_LineWrappingTextWriter_Wrapping.htm
+[`WrappingMode.Disabled`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_WrappingMode.htm
+[`WrappingMode.EnabledNoForce`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_WrappingMode.htm

@@ -106,76 +106,75 @@ namespace Ookii.CommandLine.Terminal
         }
 
         // Returns the index of the character after the end of the sequence.
-        internal static int FindSequenceEnd(StringSpan value, StringSpan value2 = default)
+        internal static int FindSequenceEnd(StringSpan value, ref StringSegmentType type)
         {
             if (value.Length == 0)
             {
                 return -1;
             }
 
-            return value[0] switch
+            return type switch
             {
-                '[' => FindCsiEnd(value.Slice(1), value2),
-                ']' => FindOscEnd(value.Slice(1), value2),
-                // If the character after ( isn't present, we haven't found the end yet.
-                '(' => value.Length + value2.Length > 1 ? 3 : -1,
-                _ => 1,
+                StringSegmentType.PartialFormattingUnknown => value[0] switch
+                {
+                    '[' => FindCsiEnd(value, ref type),
+                    ']' => FindOscEnd(value, ref type),
+                    // If the character after ( isn't present, we haven't found the end yet.
+                    '(' => value.Length > 1 ? 1 : -1,
+                    _ => 0,
+                },
+                StringSegmentType.PartialFormattingSimple => value.Length > 0 ? 0 : -1,
+                StringSegmentType.PartialFormattingCsi => FindCsiEndPartial(value, ref type),
+                StringSegmentType.PartialFormattingOsc or StringSegmentType.PartialFormattingOscWithEscape => FindOscEndPartial(value, ref type),
+                _ => throw new ArgumentException("Invalid type for this operation.", nameof(type)),
             };
         }
 
-
-        private static int FindCsiEnd(StringSpan value, StringSpan value2)
+        private static int FindCsiEnd(StringSpan value, ref StringSegmentType type)
         {
-            int index = 0;
-            if (FindCsiEnd(value, ref index) || FindCsiEnd(value2, ref index))
-            {
-                return index + 3;
-            }
-
-            return -1;
+            int result = FindCsiEndPartial(value.Slice(1), ref type);
+            return result < 0 ? result : result + 1;
         }
 
-        private static bool FindCsiEnd(StringSpan value, ref int index)
+        private static int FindCsiEndPartial(StringSpan value, ref StringSegmentType type)
         {
+            int index = 0;
             foreach (var ch in value)
             {
                 if (!char.IsNumber(ch) && ch != ';' && ch != ' ')
                 {
-                    return true;
+                    return index;
                 }
 
                 ++index;
             }
 
-            return false;
-        }
-
-        private static int FindOscEnd(StringSpan value, StringSpan value2)
-        {
-            int index = 0;
-            bool hasEscape = false;
-            if (FindOscEnd(value, ref index, ref hasEscape) || FindOscEnd(value2, ref index, ref hasEscape))
-            {
-                return index + 3;
-            }
-
+            type = StringSegmentType.PartialFormattingCsi;
             return -1;
         }
 
-        private static bool FindOscEnd(StringSpan value, ref int index, ref bool hasEscape)
+        private static int FindOscEnd(StringSpan value, ref StringSegmentType type)
         {
+            int result = FindOscEndPartial(value.Slice(1), ref type);
+            return result < 0 ? result : result + 1;
+        }
+
+        private static int FindOscEndPartial(StringSpan value, ref StringSegmentType type)
+        {
+            int index = 0;
+            bool hasEscape = type == StringSegmentType.PartialFormattingOscWithEscape;
             foreach (var ch in value)
             {
                 if (ch == 0x7)
                 {
-                    return true;
+                    return index;
                 }
 
                 if (hasEscape)
                 {
                     if (ch == '\\')
                     {
-                        return true;
+                        return index;
                     }
 
                     hasEscape = false;
@@ -189,7 +188,8 @@ namespace Ookii.CommandLine.Terminal
                 ++index;
             }
 
-            return false;
+            type = hasEscape ? StringSegmentType.PartialFormattingOscWithEscape : StringSegmentType.PartialFormattingOsc;
+            return -1;
         }
     }
 }

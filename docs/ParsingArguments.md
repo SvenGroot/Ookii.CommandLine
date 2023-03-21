@@ -78,7 +78,7 @@ var arguments = CommandLineParser.Parse<MyArguments>(options);
 if (arguments == null)
 {
     // There are probably better ways to show help in a GUI app than this.
-    MessageBox.Show(writer.BaseWriter.ToString());
+    MessageBox.Show(writer.ToString());
     return 1;
 }
 ```
@@ -111,12 +111,34 @@ additional information about the arguments using the [`Arguments`][Arguments_0] 
 [`GetArgument`][] function.
 
 In this case, you can manually create an instance of the [`CommandLineParser<T>`][] class. Then, call
-the instance [`Parse()`][Parse()_5] method.
+the instance [`ParseWithErrorHandling()`][ParseWithErrorHandling()_1] or [`Parse()`][Parse()_5] method.
 
 > The [`CommandLineParser<T>`][] class is a helper class that derives from [`CommandLineParser`][]
-> and provides strongly-typed [`Parse()`][Parse()_5] methods. You can also instantiate
-> [`CommandLineParser`][] directly, and use its instance [`Parse()`][Parse()_6] methods that return
-> an `object?`.
+> and provides strongly-typed [`Parse()`][Parse()_5] and [`ParseWithErrorHandling()`][ParseWithErrorHandling()_1] methods.
+
+Using [`ParseWithErrorHandling()`][ParseWithErrorHandling()_1] is the easiest in this case, because it will still handle
+printing error messages and usage help, the same as the static [`Parse<T>()`][Parse<T>()_1] method. If you want
+more information about the error that occurred, you can access the [`CommandLineParser.ParseResult`][]
+property after parsing.
+
+For example, you can use this approach if you want to return a success status when parsing was
+canceled, but not when a parsing error occurred:
+
+```csharp
+var parser = new CommandLineParser<MyArguments>();
+var arguments = parser.ParseWithErrorHandling();
+if (arguments == null)
+{
+    return parser.ParseResult.Status == ParseStatus.Canceled ? 0 : 1;
+}
+```
+
+You can also use the [`ParseResult.ArgumentName`][] property to determine which argument canceled
+parsing in this case. If an error occurred, the status will be [`ParseStatus.Error`][] and you can use
+the [`ParseResult.LastException`][] property to access the actual error that occurred.
+
+For the most fine grained control, you can use the [`CommandLineParser<T>.Parse()`][] method, which
+lets you handle errors manually.
 
 If argument parsing fails, the instance [`CommandLineParser<T>.Parse()`][] method will throw a
 [`CommandLineArgumentException`][] exception, which you need to handle. You can simply print the
@@ -135,7 +157,10 @@ To see whether you should show usage help, check the [`HelpRequested`][] propert
 will _always_ be true if an exception was thrown, and _always_ be false if the
 [`Parse()`][Parse()_5] method returned an instance.
 
-Here is a basic sample of parsing using a [`CommandLineParser<T>`][] instance:
+If the [`Parse()`][Parse()_5] method returned null, you can also check the
+[`CommandLineParser.ParseResult`][] property to see which argument canceled parsing.
+
+Here is a basic sample of manual parsing and error handling using the [`Parse()`][Parse()_5] method:
 
 ```csharp
 static int Main()
@@ -166,29 +191,34 @@ static int Main()
 If you wish to customize the behavior, that can still be done using the [`ParseOptionsAttribute`][]
 attribute and the [`ParseOptions`][] class (which you can pass to the [`CommandLineParser<T>`][]
 constructor). Some properties of the [`ParseOptions`][] class (like [`Error`][]) are not used with
-the instance methods, as they apply to the static [`Parse<T>()`][Parse<T>()_1] only.
+the [`Parse()`][Parse()_5]  methods, as they apply to the [`ParseWithErrorHandling()`][ParseWithErrorHandling()_1] and the static
+[`Parse<T>()`][Parse<T>()_1] methods only.
 
 Next, we'll take a look at [generating usage help](UsageHelp.md).
 
-[`ArgumentParsed`]: https://www.ookii.org/docs/commandline-3.0/html/E_Ookii_CommandLine_CommandLineParser_ArgumentParsed.htm
-[`CommandLineArgumentAttribute.CancelParsing`]: https://www.ookii.org/docs/commandline-3.0/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_CancelParsing.htm
-[`CommandLineArgumentErrorCategory`]: https://www.ookii.org/docs/commandline-3.0/html/T_Ookii_CommandLine_CommandLineArgumentErrorCategory.htm
-[`CommandLineArgumentException.Category`]: https://www.ookii.org/docs/commandline-3.0/html/P_Ookii_CommandLine_CommandLineArgumentException_Category.htm
-[`CommandLineArgumentException`]: https://www.ookii.org/docs/commandline-3.0/html/T_Ookii_CommandLine_CommandLineArgumentException.htm
-[`CommandLineParser.Parse<T>()`]: https://www.ookii.org/docs/commandline-3.0/html/M_Ookii_CommandLine_CommandLineParser_Parse__1.htm
-[`CommandLineParser`]: https://www.ookii.org/docs/commandline-3.0/html/T_Ookii_CommandLine_CommandLineParser.htm
-[`CommandLineParser<T>.Parse()`]: https://www.ookii.org/docs/commandline-3.0/html/Overload_Ookii_CommandLine_CommandLineParser_1_Parse.htm
-[`CommandLineParser<T>`]: https://www.ookii.org/docs/commandline-3.0/html/T_Ookii_CommandLine_CommandLineParser_1.htm
+[`ArgumentParsed`]: https://www.ookii.org/docs/commandline-3.1/html/E_Ookii_CommandLine_CommandLineParser_ArgumentParsed.htm
+[`CommandLineArgumentAttribute.CancelParsing`]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_CancelParsing.htm
+[`CommandLineArgumentErrorCategory`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_CommandLineArgumentErrorCategory.htm
+[`CommandLineArgumentException.Category`]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_CommandLineArgumentException_Category.htm
+[`CommandLineArgumentException`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_CommandLineArgumentException.htm
+[`CommandLineParser.Parse<T>()`]: https://www.ookii.org/docs/commandline-3.1/html/M_Ookii_CommandLine_CommandLineParser_Parse__1.htm
+[`CommandLineParser`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_CommandLineParser.htm
+[`CommandLineParser<T>.Parse()`]: https://www.ookii.org/docs/commandline-3.1/html/Overload_Ookii_CommandLine_CommandLineParser_1_Parse.htm
+[`CommandLineParser<T>`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_CommandLineParser_1.htm
 [`Environment.GetCommandLineArgs()`]: https://learn.microsoft.com/dotnet/api/system.environment.getcommandlineargs
-[`Error`]: https://www.ookii.org/docs/commandline-3.0/html/P_Ookii_CommandLine_ParseOptions_Error.htm
-[`GetArgument`]: https://www.ookii.org/docs/commandline-3.0/html/M_Ookii_CommandLine_CommandLineParser_GetArgument.htm
-[`HelpRequested`]: https://www.ookii.org/docs/commandline-3.0/html/P_Ookii_CommandLine_CommandLineParser_HelpRequested.htm
-[`LocalizedStringProvider`]: https://www.ookii.org/docs/commandline-3.0/html/T_Ookii_CommandLine_LocalizedStringProvider.htm
-[`ParseOptions.StringProvider`]: https://www.ookii.org/docs/commandline-3.0/html/P_Ookii_CommandLine_ParseOptions_StringProvider.htm
-[`ParseOptions`]: https://www.ookii.org/docs/commandline-3.0/html/T_Ookii_CommandLine_ParseOptions.htm
-[`ParseOptionsAttribute`]: https://www.ookii.org/docs/commandline-3.0/html/T_Ookii_CommandLine_ParseOptionsAttribute.htm
-[Arguments_0]: https://www.ookii.org/docs/commandline-3.0/html/P_Ookii_CommandLine_CommandLineParser_Arguments.htm
-[DuplicateArgument_0]: https://www.ookii.org/docs/commandline-3.0/html/E_Ookii_CommandLine_CommandLineParser_DuplicateArgument.htm
-[Parse()_5]: https://www.ookii.org/docs/commandline-3.0/html/Overload_Ookii_CommandLine_CommandLineParser_1_Parse.htm
-[Parse()_6]: https://www.ookii.org/docs/commandline-3.0/html/Overload_Ookii_CommandLine_CommandLineParser_Parse.htm
-[Parse<T>()_1]: https://www.ookii.org/docs/commandline-3.0/html/M_Ookii_CommandLine_CommandLineParser_Parse__1.htm
+[`Error`]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_ParseOptions_Error.htm
+[`GetArgument`]: https://www.ookii.org/docs/commandline-3.1/html/M_Ookii_CommandLine_CommandLineParser_GetArgument.htm
+[`HelpRequested`]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_CommandLineParser_HelpRequested.htm
+[`LocalizedStringProvider`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_LocalizedStringProvider.htm
+[`ParseOptions.StringProvider`]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_ParseOptions_StringProvider.htm
+[`ParseOptions`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_ParseOptions.htm
+[`ParseOptionsAttribute`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_ParseOptionsAttribute.htm
+[Arguments_0]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_CommandLineParser_Arguments.htm
+[DuplicateArgument_0]: https://www.ookii.org/docs/commandline-3.1/html/E_Ookii_CommandLine_CommandLineParser_DuplicateArgument.htm
+[Parse()_5]: https://www.ookii.org/docs/commandline-3.1/html/Overload_Ookii_CommandLine_CommandLineParser_1_Parse.htm
+[Parse<T>()_1]: https://www.ookii.org/docs/commandline-3.1/html/M_Ookii_CommandLine_CommandLineParser_Parse__1.htm
+[`CommandLineParser.ParseResult`]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_CommandLineParser_ParseResult.htm
+[`ParseResult.ArgumentName`]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_ParseResult_ArgumentName.htm
+[`ParseResult.LastException`]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_ParseResult_LastException.htm
+[`ParseStatus.Error`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_ParseStatus.htm
+[ParseWithErrorHandling()_1]: https://www.ookii.org/docs/commandline-3.1/html/M_Ookii_CommandLine_CommandLineParser_1_ParseWithErrorHandling.htm

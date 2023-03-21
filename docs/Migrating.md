@@ -1,10 +1,16 @@
 # Migrating from Ookii.CommandLine 2.x
 
-Ookii.CommandLine 3.0 has a number of breaking changes from version 2.4 and earlier versions. This
-article explains what you need to know to migrate your code to the new version.
+Ookii.CommandLine 3.0 and later have a number of breaking changes from version 2.4 and earlier
+versions. This article explains what you need to know to migrate your code to the new version.
 
 Although there are quite a few changes, it's likely your application will not require many
 modifications unless you used subcommands or heavily customized the usage help format.
+
+## .Net Framework support
+
+As of version 3.0, .Net Framework 2.0 is no longer supported. You can still target .Net Framework
+4.6.1 and later using the .Net Standard 2.0 assembly. If you need to support an older version of
+.Net, please continue to use [version 2.4](https://github.com/SvenGroot/ookii.commandline/releases/tag/v2.4).
 
 ## Breaking API changes
 
@@ -65,29 +71,29 @@ modifications unless you used subcommands or heavily customized the usage help f
 - The [`LineWrappingTextWriter`][] class does not count virtual terminal sequences as part of the
   line length by default.
 
-[`AsyncCommandBase`]: https://www.ookii.org/docs/commandline-3.0/html/T_Ookii_CommandLine_Commands_AsyncCommandBase.htm
-[`CommandAttribute`]: https://www.ookii.org/docs/commandline-3.0/html/T_Ookii_CommandLine_Commands_CommandAttribute.htm
-[`CommandLineArgument.ElementType`]: https://www.ookii.org/docs/commandline-3.0/html/P_Ookii_CommandLine_CommandLineArgument_ElementType.htm
-[`CommandLineParser.HelpRequested`]: https://www.ookii.org/docs/commandline-3.0/html/P_Ookii_CommandLine_CommandLineParser_HelpRequested.htm
-[`CommandLineParser.Parse<T>()`]: https://www.ookii.org/docs/commandline-3.0/html/M_Ookii_CommandLine_CommandLineParser_Parse__1.htm
-[`CommandLineParser.WriteUsage()`]: https://www.ookii.org/docs/commandline-3.0/html/M_Ookii_CommandLine_CommandLineParser_WriteUsage.htm
-[`CommandLineParser`]: https://www.ookii.org/docs/commandline-3.0/html/T_Ookii_CommandLine_CommandLineParser.htm
-[`CommandLineParser<T>`]: https://www.ookii.org/docs/commandline-3.0/html/T_Ookii_CommandLine_CommandLineParser_1.htm
-[`CommandManager.RunCommandAsync()`]: https://www.ookii.org/docs/commandline-3.0/html/Overload_Ookii_CommandLine_Commands_CommandManager_RunCommandAsync.htm
-[`CommandManager`]: https://www.ookii.org/docs/commandline-3.0/html/T_Ookii_CommandLine_Commands_CommandManager.htm
-[`CommandOptions`]: https://www.ookii.org/docs/commandline-3.0/html/T_Ookii_CommandLine_Commands_CommandOptions.htm
+[`AsyncCommandBase`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_Commands_AsyncCommandBase.htm
+[`CommandAttribute`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_Commands_CommandAttribute.htm
+[`CommandLineArgument.ElementType`]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_CommandLineArgument_ElementType.htm
+[`CommandLineParser.HelpRequested`]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_CommandLineParser_HelpRequested.htm
+[`CommandLineParser.Parse<T>()`]: https://www.ookii.org/docs/commandline-3.1/html/M_Ookii_CommandLine_CommandLineParser_Parse__1.htm
+[`CommandLineParser.WriteUsage()`]: https://www.ookii.org/docs/commandline-3.1/html/M_Ookii_CommandLine_CommandLineParser_WriteUsage.htm
+[`CommandLineParser`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_CommandLineParser.htm
+[`CommandLineParser<T>`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_CommandLineParser_1.htm
+[`CommandManager.RunCommandAsync()`]: https://www.ookii.org/docs/commandline-3.1/html/Overload_Ookii_CommandLine_Commands_CommandManager_RunCommandAsync.htm
+[`CommandManager`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_Commands_CommandManager.htm
+[`CommandOptions`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_Commands_CommandOptions.htm
 [`CultureInfo.InvariantCulture`]: https://learn.microsoft.com/dotnet/api/system.globalization.cultureinfo.invariantculture
 [`CurrentCulture`]: https://learn.microsoft.com/dotnet/api/system.globalization.cultureinfo.currentculture
-[`IAsyncCommand`]: https://www.ookii.org/docs/commandline-3.0/html/T_Ookii_CommandLine_Commands_IAsyncCommand.htm
-[`ICommand.Run()`]: https://www.ookii.org/docs/commandline-3.0/html/M_Ookii_CommandLine_Commands_ICommand_Run.htm
-[`ICommand`]: https://www.ookii.org/docs/commandline-3.0/html/T_Ookii_CommandLine_Commands_ICommand.htm
-[`ICommandWithCustomParsing.Parse()`]: https://www.ookii.org/docs/commandline-3.0/html/M_Ookii_CommandLine_Commands_ICommandWithCustomParsing_Parse.htm
-[`ICommandWithCustomParsing`]: https://www.ookii.org/docs/commandline-3.0/html/T_Ookii_CommandLine_Commands_ICommandWithCustomParsing.htm
-[`LineWrappingTextWriter`]: https://www.ookii.org/docs/commandline-3.0/html/T_Ookii_CommandLine_LineWrappingTextWriter.htm
+[`IAsyncCommand`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_Commands_IAsyncCommand.htm
+[`ICommand.Run()`]: https://www.ookii.org/docs/commandline-3.1/html/M_Ookii_CommandLine_Commands_ICommand_Run.htm
+[`ICommand`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_Commands_ICommand.htm
+[`ICommandWithCustomParsing.Parse()`]: https://www.ookii.org/docs/commandline-3.1/html/M_Ookii_CommandLine_Commands_ICommandWithCustomParsing_Parse.htm
+[`ICommandWithCustomParsing`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_Commands_ICommandWithCustomParsing.htm
+[`LineWrappingTextWriter`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_LineWrappingTextWriter.htm
 [`Nullable<T>`]: https://learn.microsoft.com/dotnet/api/system.nullable-1
-[`Ookii.CommandLine.Commands`]: https://www.ookii.org/docs/commandline-3.0/html/N_Ookii_CommandLine_Commands.htm
-[`ParseOptions`]: https://www.ookii.org/docs/commandline-3.0/html/T_Ookii_CommandLine_ParseOptions.htm
-[`UsageWriter`]: https://www.ookii.org/docs/commandline-3.0/html/T_Ookii_CommandLine_UsageWriter.htm
-[CommandLineParser.Parse()_2]: https://www.ookii.org/docs/commandline-3.0/html/Overload_Ookii_CommandLine_CommandLineParser_Parse.htm
-[Parse()_5]: https://www.ookii.org/docs/commandline-3.0/html/Overload_Ookii_CommandLine_CommandLineParser_1_Parse.htm
-[Parse()_6]: https://www.ookii.org/docs/commandline-3.0/html/Overload_Ookii_CommandLine_CommandLineParser_Parse.htm
+[`Ookii.CommandLine.Commands`]: https://www.ookii.org/docs/commandline-3.1/html/N_Ookii_CommandLine_Commands.htm
+[`ParseOptions`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_ParseOptions.htm
+[`UsageWriter`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_UsageWriter.htm
+[CommandLineParser.Parse()_2]: https://www.ookii.org/docs/commandline-3.1/html/Overload_Ookii_CommandLine_CommandLineParser_Parse.htm
+[Parse()_5]: https://www.ookii.org/docs/commandline-3.1/html/Overload_Ookii_CommandLine_CommandLineParser_1_Parse.htm
+[Parse()_6]: https://www.ookii.org/docs/commandline-3.1/html/Overload_Ookii_CommandLine_CommandLineParser_Parse.htm

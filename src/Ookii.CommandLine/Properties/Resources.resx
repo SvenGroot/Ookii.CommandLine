@@ -1,17 +1,17 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
-  <!--
-    Microsoft ResX Schema
-
+  <!-- 
+    Microsoft ResX Schema 
+    
     Version 2.0
-
-    The primary goals of this format is to allow a simple XML format
-    that is mostly human readable. The generation and parsing of the
-    various data types are done through the TypeConverter classes
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
     associated with the data types.
-
+    
     Example:
-
+    
     ... ado.net/XML headers & schema ...
     <resheader name="resmimetype">text/microsoft-resx</resheader>
     <resheader name="version">2.0</resheader>
@@ -26,79 +26,79 @@
         <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
         <comment>This is a comment</comment>
     </data>
-
-    There are any number of "resheader" rows that contain simple
+                
+    There are any number of "resheader" rows that contain simple 
     name/value pairs.
-
-    Each data row contains a name, and value. The row also contains a
-    type or mimetype. Type corresponds to a .NET class that support
-    text/value conversion through the TypeConverter architecture.
-    Classes that don't support this are serialized and stored with the
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
     mimetype set.
-
-    The mimetype is used for serialized objects, and tells the
-    ResXResourceReader how to depersist the object. This is currently not
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
     extensible. For a given mimetype the value must be set accordingly:
-
-    Note - application/x-microsoft.net.object.binary.base64 is the format
-    that the ResXResourceWriter will generate, however the reader can
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
     read any of the formats listed below.
-
+    
     mimetype: application/x-microsoft.net.object.binary.base64
-    value   : The object must be serialized with
+    value   : The object must be serialized with 
             : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
             : and then encoded with base64 encoding.
-
+    
     mimetype: application/x-microsoft.net.object.soap.base64
-    value   : The object must be serialized with
+    value   : The object must be serialized with 
             : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
             : and then encoded with base64 encoding.
 
     mimetype: application/x-microsoft.net.object.bytearray.base64
-    value   : The object must be serialized into a byte array
+    value   : The object must be serialized into a byte array 
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
   <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
-    <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
         <xsd:choice maxOccurs="unbounded">
           <xsd:element name="metadata">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0"/>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
               </xsd:sequence>
-              <xsd:attribute name="name" use="required" type="xsd:string"/>
-              <xsd:attribute name="type" type="xsd:string"/>
-              <xsd:attribute name="mimetype" type="xsd:string"/>
-              <xsd:attribute ref="xml:space"/>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="assembly">
             <xsd:complexType>
-              <xsd:attribute name="alias" type="xsd:string"/>
-              <xsd:attribute name="name" type="xsd:string"/>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="data">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
-                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2"/>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
               </xsd:sequence>
-              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1"/>
-              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3"/>
-              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4"/>
-              <xsd:attribute ref="xml:space"/>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="resheader">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
               </xsd:sequence>
-              <xsd:attribute name="name" type="xsd:string" use="required"/>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
             </xsd:complexType>
           </xsd:element>
         </xsd:choice>
@@ -119,366 +119,278 @@
   </resheader>
   <data name="ArgumentConversionErrorFormat" xml:space="preserve">
     <value>The value '{0}' provided for argument '{1}' could not be interpreted as a '{2}'.</value>
-    <comment/>
   </data>
   <data name="ArrayNotLastArgument" xml:space="preserve">
     <value>A positional multi-value argument must be the last positional argument.</value>
-    <comment/>
   </data>
   <data name="DefaultArraySuffix" xml:space="preserve">
     <value>...</value>
-    <comment/>
   </data>
   <data name="DefaultAvailableCommandsHeader" xml:space="preserve">
     <value>The following commands are available:</value>
-    <comment/>
   </data>
   <data name="DefaultCommandUsageSuffix" xml:space="preserve">
     <value> &lt;command&gt; [arguments]</value>
-    <comment/>
   </data>
   <data name="DefaultUsagePrefix" xml:space="preserve">
     <value>Usage:</value>
-    <comment/>
   </data>
   <data name="DuplicateArgumentFormat" xml:space="preserve">
     <value>The argument '{0}' was supplied more than once.</value>
-    <comment/>
   </data>
   <data name="DuplicateArgumentPositionFormat" xml:space="preserve">
     <value>The argument '{0}' has the same position value as the argument '{1}'.</value>
-    <comment/>
   </data>
   <data name="EmptyArgumentNamePrefixes" xml:space="preserve">
     <value>You must specify at least one argument name prefix.</value>
-    <comment/>
   </data>
   <data name="EmptyArgumentNamePrefix" xml:space="preserve">
     <value>An argument name prefix may not be null or an empty string.</value>
-    <comment/>
   </data>
   <data name="IndentOutOfRange" xml:space="preserve">
     <value>The indent must be greater than or equal to zero, and less than the maximum line length.</value>
-    <comment/>
   </data>
   <data name="IndexCountOutOfRange" xml:space="preserve">
     <value>Offset and length were out of bounds for the array or count is greater than the number of elements from index to the end of the source collection.</value>
-    <comment/>
   </data>
   <data name="InvalidArrayRank" xml:space="preserve">
     <value>Multi-dimensional arrays are not supported for command line arguments.</value>
-    <comment/>
   </data>
   <data name="InvalidOptionalArgumentOrder" xml:space="preserve">
     <value>The command line constructor cannot have non-optional arguments after an optional argument.</value>
-    <comment/>
   </data>
   <data name="MissingArgumentAttribute" xml:space="preserve">
     <value>The specified property or method is not a command line argument.</value>
-    <comment/>
   </data>
   <data name="MissingRequiredArgumentFormat" xml:space="preserve">
     <value>The required argument '{0}' was not supplied.</value>
-    <comment/>
   </data>
   <data name="MissingValueForNamedArgumentFormat" xml:space="preserve">
     <value>No value was supplied for the argument '{0}'.</value>
-    <comment/>
   </data>
   <data name="MultipleMarkedConstructors" xml:space="preserve">
     <value>The command line arguments type has more than one constructor with the CommandLineConstructorAttribute attribute.</value>
-    <comment/>
   </data>
   <data name="ArgumentNameContainsSeparatorFormat" xml:space="preserve">
     <value>The name for argument '{0}' contains a colon (:), which is not allowed.</value>
-    <comment/>
   </data>
   <data name="NoConstructor" xml:space="preserve">
     <value>The command line arguments type does not have any public constructors.</value>
-    <comment/>
   </data>
   <data name="NoMarkedConstructor" xml:space="preserve">
     <value>The command line arguments type has more than one constructor, none of which has the CommandLineConstructorAttribute attribute.</value>
-    <comment/>
   </data>
   <data name="TooManyArguments" xml:space="preserve">
     <value>Too many arguments were supplied.</value>
-    <comment/>
   </data>
   <data name="TypeIsNotCommandFormat" xml:space="preserve">
     <value>The type '{0}' does not implement the ICommand interface or does not have the CommandAttribute attribute.</value>
-    <comment/>
   </data>
   <data name="UnknownArgumentFormat" xml:space="preserve">
     <value>Unknown argument name '{0}'.</value>
-    <comment/>
   </data>
   <data name="ValueMustBeNonNegative" xml:space="preserve">
     <value>The value must be zero or larger.</value>
-    <comment/>
   </data>
   <data name="PropertyIsReadOnlyFormat" xml:space="preserve">
     <value>The property defining the argument '{0}' doesn't have a public set accessor.</value>
-    <comment/>
   </data>
   <data name="TypeNotGenericDefinition" xml:space="preserve">
     <value>The type must be a generic type definition.</value>
-    <comment/>
   </data>
   <data name="InvalidDictionaryValueFormat" xml:space="preserve">
     <value>The value '{1}' provided for argument '{0}' was invalid: {2}</value>
-    <comment/>
   </data>
   <data name="NoKeyValuePairSeparatorFormat" xml:space="preserve">
     <value>A key/value pair must contain "{0}" as a separator.</value>
-    <comment/>
   </data>
   <data name="NoTypeConverterFormat" xml:space="preserve">
     <value>No type converter that can convert to and from a string exists for type '{0}'. Use the TypeConverterAttribute to specify a custom TypeConverter.</value>
-    <comment/>
   </data>
   <data name="CreateArgumentsTypeErrorFormat" xml:space="preserve">
     <value>An error occurred creating an instance of the arguments type: {0}</value>
-    <comment/>
   </data>
   <data name="SetValueErrorFormat" xml:space="preserve">
     <value>An error occurred setting the value of argument '{0}': {1}</value>
-    <comment/>
   </data>
   <data name="EmptyAliasFormat" xml:space="preserve">
     <value>The argument '{0}' cannot have an empty alias.</value>
-    <comment/>
   </data>
   <data name="DefaultDefaultValueFormat" xml:space="preserve">
     <value> Default value: {0}.</value>
-    <comment/>
   </data>
   <data name="NullArgumentValueFormat" xml:space="preserve">
     <value>The argument '{0}' cannot be null.</value>
-    <comment/>
   </data>
   <data name="EmptyKeyValueSeparator" xml:space="preserve">
     <value>The key-value separator cannot be an empty string.</value>
-    <comment/>
   </data>
   <data name="CombinedShortNameNonSwitchFormat" xml:space="preserve">
     <value>The combined short argument '{0}' contains an argument that is not a switch.</value>
-    <comment/>
   </data>
   <data name="NoLongOrShortName" xml:space="preserve">
     <value>The argument '{0}' cannot be accessed by either long or short name.</value>
-    <comment/>
   </data>
   <data name="DefaultAbbreviatedRemainingArguments" xml:space="preserve">
     <value>[arguments]</value>
-    <comment/>
   </data>
   <data name="InvalidStandardStream" xml:space="preserve">
     <value>Invalid standard stream value.</value>
-    <comment/>
   </data>
   <data name="AutomaticHelpDescription" xml:space="preserve">
     <value>Displays this help message.</value>
-    <comment/>
   </data>
   <data name="AutomaticHelpName" xml:space="preserve">
     <value>Help</value>
-    <comment/>
   </data>
   <data name="AutomaticHelpShortName" xml:space="preserve">
     <value>?</value>
-    <comment/>
   </data>
   <data name="InvalidMethodSignatureFormat" xml:space="preserve">
     <value>The method '{0}' has an unsupported signature.</value>
-    <comment/>
   </data>
   <data name="AutomaticVersionDescription" xml:space="preserve">
     <value>Displays version information.</value>
-    <comment/>
   </data>
   <data name="AutomaticVersionName" xml:space="preserve">
     <value>Version</value>
-    <comment/>
   </data>
   <data name="AutomaticVersionCommandName" xml:space="preserve">
     <value>version</value>
-    <comment/>
   </data>
   <data name="UnknownVersion" xml:space="preserve">
     <value>Unknown version.</value>
-    <comment/>
   </data>
   <data name="UnspecifiedError" xml:space="preserve">
     <value>An unspecified error has occurred.</value>
-    <comment/>
   </data>
   <data name="MinMaxBothNull" xml:space="preserve">
     <value>The 'minimum' and 'maximum' parameters cannot both be null.</value>
-    <comment/>
   </data>
   <data name="TypeConversionErrorFormat" xml:space="preserve">
     <value>Could not convert type '{0}' to '{1}' for argument '{2}'.</value>
-    <comment/>
   </data>
   <data name="ValidateCountBothFormat" xml:space="preserve">
     <value>The argument '{0}' must have between {1} and {2} items.</value>
-    <comment/>
   </data>
   <data name="ValidateCountMaxFormat" xml:space="preserve">
     <value>The argument '{0}' must have at most {1} items.</value>
-    <comment/>
   </data>
   <data name="ValidateCountMinFormat" xml:space="preserve">
     <value>The argument '{0}' must have at least {1} items.</value>
-    <comment/>
   </data>
   <data name="ValidateNotEmptyFailedFormat" xml:space="preserve">
     <value>The argument '{0}' must not be empty.</value>
-    <comment/>
   </data>
   <data name="ValidateRangeFailedBothFormat" xml:space="preserve">
     <value>The argument '{0}' must be between {1} and {2}.</value>
-    <comment/>
   </data>
   <data name="ValidateRangeFailedMaxFormat" xml:space="preserve">
     <value>The argument '{0}' must be most {1}.</value>
-    <comment/>
   </data>
   <data name="ValidateRangeFailedMinFormat" xml:space="preserve">
     <value>The argument '{0}' must be at least {1}.</value>
-    <comment/>
   </data>
   <data name="ValidateStringLengthBothFormat" xml:space="preserve">
     <value>The argument '{0}' must be between {1} and {2} characters.</value>
-    <comment/>
   </data>
   <data name="ValidateStringLengthMaxFormat" xml:space="preserve">
     <value>The argument '{0}' must be at most {1} characters.</value>
-    <comment/>
   </data>
   <data name="ValidateStringLengthMinFormat" xml:space="preserve">
     <value>The argument '{0}' must be at least {1} characters.</value>
-    <comment/>
   </data>
   <data name="ValidateNotWhiteSpaceFailedFormat" xml:space="preserve">
     <value>The argument '{0}' must not be empty or contain only white-space characters.</value>
-    <comment/>
   </data>
   <data name="ValidationFailedFormat" xml:space="preserve">
     <value>The value for the argument '{0}' is not valid.</value>
-    <comment/>
   </data>
   <data name="ValidateRequiresFailedFormat" xml:space="preserve">
     <value>The argument '{0}' must be used together with: {1}.</value>
-    <comment/>
   </data>
   <data name="ClassValidationFailed" xml:space="preserve">
     <value>The arguments are not valid.</value>
-    <comment/>
   </data>
   <data name="ValidateProhibitsFailedFormat" xml:space="preserve">
     <value>The argument '{0}' cannot be used together with: {1}.</value>
-    <comment/>
   </data>
   <data name="RequiresAnySingleArgument" xml:space="preserve">
     <value>RequiresAnyAttribute requires at least two arguments; use CommandLineArgumentAttribute.IsRequired to make a single argument required.</value>
-    <comment/>
   </data>
   <data name="ValidateRangeUsageHelpBothFormat" xml:space="preserve">
     <value>Must be between {0} and {1}.</value>
-    <comment/>
   </data>
   <data name="ValidateRangeUsageHelpMaxFormat" xml:space="preserve">
     <value>Must be at most {0}.</value>
-    <comment/>
   </data>
   <data name="ValidateRangeUsageHelpMinFormat" xml:space="preserve">
     <value>Must be at least {0}.</value>
-    <comment/>
   </data>
   <data name="ValidateRequiresAnyFailedFormat" xml:space="preserve">
     <value>You must use at least one of: {0}.</value>
-    <comment/>
   </data>
   <data name="ValidateCountUsageHelpBothFormat" xml:space="preserve">
     <value>Must have between {0} and {1} items.</value>
-    <comment/>
   </data>
   <data name="ValidateCountUsageHelpMaxFormat" xml:space="preserve">
     <value>Must have at most {0} items.</value>
-    <comment/>
   </data>
   <data name="ValidateCountUsageHelpMinFormat" xml:space="preserve">
     <value>Must have at least {0} items.</value>
-    <comment/>
   </data>
   <data name="ValidateNotEmptyUsageHelp" xml:space="preserve">
     <value>Must not be empty.</value>
-    <comment/>
   </data>
   <data name="ValidateNotWhiteSpaceUsageHelp" xml:space="preserve">
     <value>Must not be blank.</value>
-    <comment/>
   </data>
   <data name="ValidateProhibitsUsageHelpFormat" xml:space="preserve">
     <value>Cannot be used with: {0}.</value>
-    <comment/>
   </data>
   <data name="ValidateRequiresUsageHelpFormat" xml:space="preserve">
     <value>Must be used with: {0}.</value>
-    <comment/>
   </data>
   <data name="ValidateStringLengthUsageHelpBothFormat" xml:space="preserve">
     <value>Must be between {0} and {1} characters.</value>
-    <comment/>
   </data>
   <data name="ValidateStringLengthUsageHelpMaxFormat" xml:space="preserve">
     <value>Must be at most {0} characters.</value>
-    <comment/>
   </data>
   <data name="ValidateStringLengthUsageHelpMinFormat" xml:space="preserve">
     <value>Must be at least {0} characters.</value>
-    <comment/>
   </data>
   <data name="UnknownDependencyFormat" xml:space="preserve">
     <value>A {0} refers to an unknown argument '{1}'.</value>
-    <comment/>
   </data>
   <data name="CommandHelpInstructionFormat" xml:space="preserve">
     <value>Run '{0} &lt;command&gt; {1}{2}' for more information about a command.</value>
-    <comment/>
   </data>
   <data name="MoreInfoOnErrorFormat" xml:space="preserve">
     <value>Run '{0} {1}' for more information.</value>
-    <comment/>
   </data>
   <data name="DuplicateArgumentWarningFormat" xml:space="preserve">
     <value>Warning: the argument '{0}' was supplied more than once.</value>
-    <comment/>
   </data>
   <data name="ArgumentNotEnumFormat" xml:space="preserve">
     <value>The argument '{0}' is not an enumeration.</value>
-    <comment/>
   </data>
   <data name="ValidateEnumValueFailedFormat" xml:space="preserve">
     <value>The value '{0}' is not one of the valid values for the argument '{1}'.</value>
-    <comment/>
   </data>
   <data name="ValidateEnumValueFailedWithValuesFormat" xml:space="preserve">
     <value>The argument '{0}' must be one of the following values: {1}.</value>
-    <comment/>
   </data>
   <data name="ValidateEnumValueUsageHelpFormat" xml:space="preserve">
     <value>Possible values: {0}.</value>
-    <comment/>
   </data>
   <data name="UsageWriterPropertyNotAvailable" xml:space="preserve">
     <value>This property is only available during a write usage operation.</value>
-    <comment/>
   </data>
   <data name="NoParserForCustomParsingCommand" xml:space="preserve">
     <value>Cannot create a parser for a command with custom parsing.</value>
-    <comment/>
+  </data>
+  <data name="AsyncWriteInProgress" xml:space="preserve">
+    <value>An async write operation is already in progress.</value>
   </data>
 </root>

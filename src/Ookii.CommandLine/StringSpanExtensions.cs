@@ -2,73 +2,25 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Threading.Tasks;
 #if NET6_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
 using StringSpan = System.ReadOnlySpan<char>;
+using StringMemory = System.ReadOnlyMemory<char>;
 #endif
 
 namespace Ookii.CommandLine
 {
     // These methods are declared as extension methods so they can be used with StringSpan on
     // .Net Standard 2.0 and with ReadOnlySpan<char> on .Net Standard 2.1.
-    internal static class StringSpanExtensions
+    internal static partial class StringSpanExtensions
     {
         public delegate void Callback(StringSegmentType type, StringSpan span);
+        public delegate Task AsyncCallback(StringSegmentType type, StringMemory span);
 
         private static readonly char[] _segmentSeparators = { '\r', '\n', VirtualTerminal.Escape };
         private static readonly char[] _newLineSeparators = { '\r', '\n' };
 
-        public static void Split(this StringSpan self, bool newLinesOnly, Callback callback)
-        {
-            var separators = newLinesOnly ? _newLineSeparators : _segmentSeparators;
-            var remaining = self;
-            while (remaining.Length > 0)
-            {
-                var separatorIndex = remaining.IndexOfAny(separators);
-                if (separatorIndex < 0)
-                {
-                    callback(StringSegmentType.Text, remaining);
-                    break;
-                }
-
-                if (separatorIndex > 0)
-                {
-                    callback(StringSegmentType.Text, remaining.Slice(0, separatorIndex));
-                    remaining = remaining.Slice(separatorIndex);
-                }
-
-                if (remaining[0] == VirtualTerminal.Escape)
-                {
-                    // This is a VT sequence.
-                    // Find the end of the sequence.
-                    var end = VirtualTerminal.FindSequenceEnd(remaining.Slice(1));
-                    if (end == -1)
-                    {
-                        // No end? Should come in a following write.
-                        callback(StringSegmentType.PartialFormatting, remaining);
-                        break;
-                    }
-
-                    //end++;
-                    callback(StringSegmentType.Formatting, remaining.Slice(0, end));
-                    remaining = remaining.Slice(end);
-                }
-                else
-                {
-                    StringSpan lineBreak;
-                    (lineBreak, remaining) = remaining.SkipLineBreak();
-
-                    if (remaining.Length == 0 && lineBreak.Length == 1 && lineBreak[0] == '\r')
-                    {
-                        // This could be the start of a Windows-style break, the remainder of
-                        // which could follow in the next span.
-                        callback(StringSegmentType.PartialLineBreak, lineBreak);
-                        break;
-                    }
-
-                    callback(StringSegmentType.LineBreak, lineBreak);
-                }
-            }
-        }
+        public static partial void Split(this StringSpan self, bool newLinesOnly, Callback callback);
 
         public static StringSpanTuple SkipLineBreak(this StringSpan self)
         {
@@ -85,21 +37,37 @@ namespace Ookii.CommandLine
 
         // On .Net 6 StringSpanTuple is a ref struct so it can't be used with Nullable<T>, so use
         // an out param instead.
-        public static bool BreakLine(this StringSpan self, int startIndex, bool force, out StringSpanTuple splits)
+        public static bool BreakLine(this StringSpan self, int startIndex, BreakLineMode mode, out StringSpanTuple splits)
         {
-            if (force)
+            if (BreakLine(self, startIndex, mode) is var (end, start))
             {
-                splits = new(self.Slice(0, startIndex), self.Slice(startIndex));
+                splits = new(self.Slice(0, end), self.Slice(start));
                 return true;
             }
 
-            for (int index = startIndex; index >= 0; --index)
+            splits = default;
+            return false;
+        }
+
+        public static (StringMemory, StringMemory) SkipLineBreak(this StringMemory self)
+        {
+            Debug.Assert(self.Span[0] is '\r' or '\n');
+            var split = self.Span[0] == '\r' && self.Span.Length > 1 && self.Span[1] == '\n'
+                ? 2
+                : 1;
+
+            return self.Split(split);
+        }
+
+        public static (StringMemory, StringMemory) Split(this StringMemory self, int index)
+            => new(self.Slice(0, index), self.Slice(index));
+
+        public static bool BreakLine(this StringMemory self, int startIndex, BreakLineMode mode, out (StringMemory, StringMemory) splits)
+        {
+            if (BreakLine(self.Span, startIndex, mode) is var (end, start))
             {
-                if (char.IsWhiteSpace(self[index]))
-                {
-                    splits = new(self.Slice(0, index), self.Slice(index + 1));
-                    return true;
-                }
+                splits = new(self.Slice(0, end), self.Slice(start));
+                return true;
             }
 
             splits = default;
@@ -107,16 +75,59 @@ namespace Ookii.CommandLine
         }
 
 #if NET6_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+
         public static void CopyTo(this StringSpan self, char[] destination, int start)
         {
             self.CopyTo(destination.AsSpan(start));
         }
 
-        public static void WriteTo(this StringSpan self, TextWriter writer)
+        public static partial void WriteTo(this StringSpan self, TextWriter writer);
+
+#else
+
+        public static StringSpan AsSpan(this string self)
         {
-            writer.Write(self);
+            return new StringSpan(self);
+        }
+
+        public static StringMemory AsMemory(this string self)
+        {
+            return new StringMemory(self);
         }
 
 #endif
+
+        private static (int, int)? BreakLine(StringSpan span, int startIndex, BreakLineMode mode)
+        {
+            switch (mode)
+            {
+            case BreakLineMode.Force:
+                return (startIndex, startIndex);
+
+            case BreakLineMode.Backward:
+                for (int index = startIndex; index >= 0; --index)
+                {
+                    if (char.IsWhiteSpace(span[index]))
+                    {
+                        return (index, index + 1);
+                    }
+                }
+
+                break;
+
+            case BreakLineMode.Forward:
+                for (int index = 0; index <= startIndex; ++index)
+                {
+                    if (char.IsWhiteSpace(span[index]))
+                    {
+                        return (index, index + 1);
+                    }
+                }
+
+                break;
+            }
+
+            return null;
+        }
     }
 }

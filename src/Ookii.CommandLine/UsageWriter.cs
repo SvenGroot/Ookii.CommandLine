@@ -1795,7 +1795,7 @@ namespace Ookii.CommandLine
         ///   The base implementation writes the command's description, followed by a newline.
         /// </para>
         /// </remarks>
-        private void WriteCommandDescriptionBody(CommandInfo command)
+        protected virtual void WriteCommandDescriptionBody(CommandInfo command)
         {
             if (command.Description != null)
             {

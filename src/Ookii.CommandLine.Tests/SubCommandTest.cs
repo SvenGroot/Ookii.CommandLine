@@ -2,6 +2,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Ookii.CommandLine.Commands;
 using System;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -89,32 +90,47 @@ namespace Ookii.CommandLine.Tests
             var manager = new CommandManager(_commandAssembly, options);
             TestCommand command = (TestCommand)manager.CreateCommand("test", new[] { "-Argument", "Foo" }, 0);
             Assert.IsNotNull(command);
+            Assert.AreEqual(ParseStatus.Success, manager.ParseResult.Status);
             Assert.AreEqual("Foo", command.Argument);
             Assert.AreEqual("", writer.BaseWriter.ToString());
 
             command = (TestCommand)manager.CreateCommand(new[] { "test", "-Argument", "Bar" });
             Assert.IsNotNull(command);
+            Assert.AreEqual(ParseStatus.Success, manager.ParseResult.Status);
             Assert.AreEqual("Bar", command.Argument);
             Assert.AreEqual("", writer.BaseWriter.ToString());
 
             var command2 = (AnotherSimpleCommand)manager.CreateCommand("anothersimplecommand", new[] { "skip", "-Value", "42" }, 1);
             Assert.IsNotNull(command2);
+            Assert.AreEqual(ParseStatus.Success, manager.ParseResult.Status);
             Assert.AreEqual(42, command2.Value);
             Assert.AreEqual("", writer.BaseWriter.ToString());
 
             CustomParsingCommand command3 = (CustomParsingCommand)manager.CreateCommand(new[] { "custom", "hello" });
             Assert.IsNotNull(command3);
+            // None because of custom parsing.
+            Assert.AreEqual(ParseStatus.None, manager.ParseResult.Status);
             Assert.AreEqual("hello", command3.Value);
             Assert.AreEqual("", writer.BaseWriter.ToString());
 
             var versionCommand = manager.CreateCommand(new[] { "version" });
             Assert.IsNotNull(versionCommand);
+            Assert.AreEqual(ParseStatus.Success, manager.ParseResult.Status);
             Assert.AreEqual("", writer.BaseWriter.ToString());
 
             options.AutoVersionCommand = false;
             versionCommand = manager.CreateCommand(new[] { "version" });
             Assert.IsNull(versionCommand);
+            Assert.AreEqual(ParseStatus.None, manager.ParseResult.Status);
             Assert.AreEqual(_expectedUsageNoVersion, writer.BaseWriter.ToString());
+
+            ((StringWriter)writer.BaseWriter).GetStringBuilder().Clear();
+            versionCommand = manager.CreateCommand(new[] { "test", "-Foo" });
+            Assert.IsNull(versionCommand);
+            Assert.AreEqual(ParseStatus.Error, manager.ParseResult.Status);
+            Assert.AreEqual(CommandLineArgumentErrorCategory.UnknownArgument, manager.ParseResult.LastException.Category);
+            Assert.AreEqual(manager.ParseResult.ArgumentName, manager.ParseResult.LastException.ArgumentName);
+            Assert.AreNotEqual("", writer.BaseWriter.ToString());
 
         }
 
@@ -209,6 +225,8 @@ namespace Ookii.CommandLine.Tests
             var manager = new CommandManager(_commandAssembly, options);
             var result = manager.CreateCommand(new[] { "AsyncCommand", "-Help" });
             Assert.IsNull(result);
+            Assert.AreEqual(ParseStatus.Canceled, manager.ParseResult.Status);
+            Assert.AreEqual("Help", manager.ParseResult.ArgumentName);
             Assert.AreEqual(_expectedCommandUsage, writer.BaseWriter.ToString());
         }
 

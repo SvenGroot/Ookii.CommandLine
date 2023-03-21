@@ -1,12 +1,14 @@
 ﻿// Copyright (c) Sven Groot (Ookii.org)
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Ookii.CommandLine.Terminal;
 using System;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace Ookii.CommandLine.Tests
 {
     [TestClass()]
-    public class LineWrappingTextWriterTest
+    public partial class LineWrappingTextWriterTest
     {
         [TestMethod()]
         public void TestWriteCharArray()
@@ -31,6 +33,19 @@ namespace Ookii.CommandLine.Tests
             // And again, in pieces less than the max line length.
             Assert.AreEqual(_expectedNoIndent, WriteString(_input, maxLength, 50));
         }
+
+        [TestMethod()]
+        public async Task TestWriteStringAsync()
+        {
+            const int maxLength = 80;
+
+            Assert.AreEqual(_expectedNoIndent, await WriteStringAsync(_input, maxLength, _input.Length));
+            // Write it again, in pieces exactly as long as the max line length.
+            Assert.AreEqual(_expectedNoIndent, await WriteStringAsync(_input, maxLength, maxLength));
+            // And again, in pieces less than the max line length.
+            Assert.AreEqual(_expectedNoIndent, await WriteStringAsync(_input, maxLength, 50));
+        }
+
 
         [TestMethod()]
         public void TestWriteStringNoMaximum()
@@ -122,6 +137,25 @@ namespace Ookii.CommandLine.Tests
 
             Assert.AreEqual(_expectedIndentChanges, writer.BaseWriter.ToString());
         }
+
+        [TestMethod()]
+        public async Task TestIndentChangesAsync()
+        {
+            using var writer = LineWrappingTextWriter.ForStringWriter(80);
+            writer.Indent = 4;
+            await writer.WriteLineAsync(_input);
+            writer.Indent = 8;
+            await writer.WriteLineAsync(_input.Trim());
+            // Should add a new line.
+            await writer.ResetIndentAsync();
+            await writer.WriteLineAsync(_input.Trim());
+            // Should not add a new line.
+            await writer.ResetIndentAsync();
+            await writer.FlushAsync();
+
+            Assert.AreEqual(_expectedIndentChanges, writer.BaseWriter.ToString());
+        }
+
         [TestMethod()]
         public void TestIndentStringNoMaximum()
         {
@@ -152,16 +186,15 @@ namespace Ookii.CommandLine.Tests
         {
             int maximumLineLength = 85;
             bool disposeBaseWriter = true;
-            using (TextWriter baseWriter = new StringWriter())
-            using (LineWrappingTextWriter target = new LineWrappingTextWriter(baseWriter, maximumLineLength, disposeBaseWriter))
-            {
-                Assert.AreEqual(baseWriter, target.BaseWriter);
-                Assert.AreEqual(maximumLineLength, target.MaximumLineLength);
-                Assert.AreEqual(0, target.Indent);
-                Assert.AreEqual(baseWriter.Encoding, target.Encoding);
-                Assert.AreEqual(baseWriter.FormatProvider, target.FormatProvider);
-                Assert.AreEqual(baseWriter.NewLine, target.NewLine);
-            }
+            using TextWriter baseWriter = new StringWriter();
+            using LineWrappingTextWriter target = new LineWrappingTextWriter(baseWriter, maximumLineLength, disposeBaseWriter);
+            Assert.AreEqual(baseWriter, target.BaseWriter);
+            Assert.AreEqual(maximumLineLength, target.MaximumLineLength);
+            Assert.AreEqual(0, target.Indent);
+            Assert.AreEqual(baseWriter.Encoding, target.Encoding);
+            Assert.AreEqual(baseWriter.FormatProvider, target.FormatProvider);
+            Assert.AreEqual(baseWriter.NewLine, target.NewLine);
+            Assert.AreEqual(WrappingMode.Enabled, target.Wrapping);
         }
 
         [TestMethod()]
@@ -269,14 +302,30 @@ namespace Ookii.CommandLine.Tests
         }
 
         [TestMethod]
+        public void TestSplitLineBreak()
+        {
+            using var writer = LineWrappingTextWriter.ForStringWriter(80);
+            writer.Indent = 4;
+            writer.Write("Foo\r");
+            writer.Write("Bar\r");
+            writer.Write("\nBaz\r");
+            writer.Write("\rOne\r");
+            writer.Write("\r\nTwo\r\n");
+            string expected = "Foo\n    Bar\n    Baz\n\nOne\n\nTwo\n".ReplaceLineEndings();
+            Assert.AreEqual(expected, writer.BaseWriter.ToString());
+        }
+
+        [TestMethod]
         public void TestSplitLineBreakNoMaximum()
         {
             using var writer = LineWrappingTextWriter.ForStringWriter();
             writer.Indent = 4;
             writer.Write("Foo\r");
             writer.Write("Bar\r");
-            writer.Write("\nBaz");
-            string expected = "Foo\n    Bar\n    Baz".ReplaceLineEndings();
+            writer.Write("\nBaz\r");
+            writer.Write("\rOne\r");
+            writer.Write("\r\nTwo\r\n");
+            string expected = "Foo\n    Bar\n    Baz\n\nOne\n\nTwo\n".ReplaceLineEndings();
             Assert.AreEqual(expected, writer.BaseWriter.ToString());
         }
 
@@ -292,6 +341,146 @@ namespace Ookii.CommandLine.Tests
             Assert.AreEqual(_expectedFormatting, WriteChars(_inputFormatting.ToCharArray(), 80, 8));
         }
 
+        [TestMethod]
+        public void TestFlush()
+        {
+            using var writer = LineWrappingTextWriter.ForStringWriter(40);
+            writer.Write(TextFormat.ForegroundBlue);
+            writer.WriteLine("This is a test");
+            writer.Write(TextFormat.Default);
+            writer.Flush();
+
+            var expected = $"{TextFormat.ForegroundBlue}This is a test\n{TextFormat.Default}\n".ReplaceLineEndings();
+            Assert.AreEqual(expected, writer.BaseWriter.ToString());
+        }
+
+        [TestMethod]
+        public void TestFlushNoNewLine()
+        {
+            using var writer = LineWrappingTextWriter.ForStringWriter(40);
+            writer.Indent = 4;
+            writer.WriteLine("This is a test");
+            writer.Write("Unfinished second line");
+            writer.Flush(false);
+
+            var expected = "This is a test\n    Unfinished second line".ReplaceLineEndings();
+            Assert.AreEqual(expected, writer.BaseWriter.ToString());
+
+            writer.Write("more text");
+            writer.Flush(false);
+            expected = "This is a test\n    Unfinished second linemore text".ReplaceLineEndings();
+            Assert.AreEqual(expected, writer.BaseWriter.ToString());
+            writer.WriteLine();
+            writer.WriteLine("Another line");
+            writer.WriteLine("And another");
+            expected = "This is a test\n    Unfinished second linemore text\nAnother line\n    And another\n".ReplaceLineEndings();
+            Assert.AreEqual(expected, writer.BaseWriter.ToString());
+        }
+
+        [TestMethod]
+        public void TestResetIndent()
+        {
+            using var writer = LineWrappingTextWriter.ForStringWriter(40);
+            writer.Write(TextFormat.ForegroundBlue);
+            writer.WriteLine("This is a test");
+            writer.Write(TextFormat.Default);
+            writer.ResetIndent();
+            writer.WriteLine("Hello");
+
+            var expected = $"{TextFormat.ForegroundBlue}This is a test\n{TextFormat.Default}Hello\n".ReplaceLineEndings();
+            Assert.AreEqual(expected, writer.BaseWriter.ToString());
+        }
+
+        [TestMethod]
+        public void TestToString()
+        {
+            using var writer = LineWrappingTextWriter.ForStringWriter(40);
+            writer.WriteLine("This is a test");
+            writer.Write("Unfinished second\x1b[34m line\x1b[0m");
+            var expected = "This is a test\nUnfinished second\x1b[34m line\x1b[0m".ReplaceLineEndings();
+            Assert.AreEqual(expected, writer.ToString());
+            expected = "This is a test\n".ReplaceLineEndings();
+            Assert.AreEqual(expected, writer.BaseWriter.ToString());
+
+            using var writer2 = LineWrappingTextWriter.ForConsoleOut();
+            Assert.AreEqual(typeof(LineWrappingTextWriter).FullName, writer2.ToString());
+        }
+
+        [TestMethod]
+        public void TestWrappingMode()
+        {
+            {
+                using var writer = LineWrappingTextWriter.ForStringWriter(80);
+                writer.Indent = 4;
+                writer.WriteLine(_inputWrappingMode);
+                writer.Wrapping = WrappingMode.Disabled;
+                writer.WriteLine(_inputWrappingMode);
+                writer.Wrapping = WrappingMode.Enabled;
+                writer.WriteLine(_inputWrappingMode);
+                Assert.AreEqual(_expectedWrappingMode, writer.ToString());
+            }
+
+            // Make sure the buffer is cleared if not empty.
+            {
+                using var writer = LineWrappingTextWriter.ForStringWriter(80);
+                writer.Indent = 4;
+                writer.Write(_inputWrappingMode);
+                writer.Wrapping = WrappingMode.Disabled;
+                writer.Write(_inputWrappingMode);
+                writer.Wrapping = WrappingMode.Enabled;
+                writer.Write(_inputWrappingMode);
+                Assert.AreEqual(_expectedWrappingModeWrite, writer.ToString());
+            }
+
+            // Test EnabledNoForce
+            {
+                using var writer = LineWrappingTextWriter.ForStringWriter(80);
+                writer.Indent = 4;
+                writer.Wrapping = WrappingMode.EnabledNoForce;
+                writer.Write(_inputWrappingMode);
+                writer.Write(_inputWrappingMode);
+                writer.Wrapping = WrappingMode.Enabled;
+                writer.Write(_inputWrappingMode);
+                Assert.AreEqual(_expectedWrappingModeNoForce, writer.ToString());
+            }
+
+            // Should be false and unchangeable if no maximum length.
+            {
+                using var writer = LineWrappingTextWriter.ForStringWriter();
+                Assert.AreEqual(WrappingMode.Disabled, writer.Wrapping);
+                writer.Wrapping = WrappingMode.Enabled;
+                Assert.AreEqual(WrappingMode.Disabled, writer.Wrapping);
+            }
+        }
+
+        [TestMethod]
+        public void TestExactLineLength()
+        {
+            // This tests for a situation where a line is the exact length of the ring buffer,
+            // but the buffer start is not zero. This can only happen if countFormatting is true
+            // otherwise the buffer is made larger than the line length to begin with.
+            using var writer = LineWrappingTextWriter.ForStringWriter(40, null, true);
+            writer.WriteLine("test");
+            writer.Write("1234 1234 1234 1234 1234 1234 1234 12345");
+            writer.Write("1234 1234 1234 1234 1234 1234 1234 12345");
+            var expected = "test\n1234 1234 1234 1234 1234 1234 1234\n123451234 1234 1234 1234 1234 1234 1234\n12345".ReplaceLineEndings();
+            Assert.AreEqual(expected, writer.ToString());
+        }
+
+        [TestMethod]
+        public void TestResizeWithFullBuffer()
+        {
+            using var writer = LineWrappingTextWriter.ForStringWriter(40, null, true);
+            writer.Wrapping = WrappingMode.EnabledNoForce;
+
+            // As with the above test, we want the buffer start to be non-zero.
+            writer.WriteLine("test");
+            writer.Write("1234567890123456789012345678901234567890");
+            writer.Write('1');
+            writer.WriteLine();
+            var expected = "test\n12345678901234567890123456789012345678901\n".ReplaceLineEndings();
+            Assert.AreEqual(expected, writer.ToString());
+        }
 
         private static string WriteString(string value, int maxLength, int segmentSize, int indent = 0)
         {
@@ -309,8 +498,28 @@ namespace Ookii.CommandLine.Tests
             }
 
             writer.Flush();
-            return writer.BaseWriter.ToString();
+            return writer.ToString();
         }
+
+        private static async Task<string> WriteStringAsync(string value, int maxLength, int segmentSize, int indent = 0)
+        {
+            using var writer = LineWrappingTextWriter.ForStringWriter(maxLength);
+            writer.Indent = indent;
+            return await WriteStringAsync(writer, value, segmentSize);
+        }
+
+        private static async Task<string> WriteStringAsync(LineWrappingTextWriter writer, string value, int segmentSize)
+        {
+            for (int i = 0; i < value.Length; i += segmentSize)
+            {
+                // Ignore the suggestion to use AsSpan, we want to call the string overload.
+                await writer.WriteAsync(value.Substring(i, Math.Min(value.Length - i, segmentSize)));
+            }
+
+            await writer.FlushAsync();
+            return writer.ToString();
+        }
+
 
         private static string WriteCharArray(char[] value, int maxLength, int segmentSize, int indent = 0)
         {
@@ -337,160 +546,5 @@ namespace Ookii.CommandLine.Tests
             writer.Flush();
             return writer.BaseWriter.ToString();
         }
-
-        #region Input and expected values
-
-        private static readonly string _input = @"
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Donec adipiscing tristique risus nec feugiat in fermentum.
-
-Tincidunt vitae semper quis lectus nulla at volutpat diam ut. Vitae tempus
-quam pellentesque nec
-nam aliquam. Porta non pulvinar neque laoreet suspendisse interdum consectetur.
-Arcu risus quis varius quam. Cursus mattis molestie a iaculis at erat. Malesuada fames ac turpis egestas maecenas pharetra. Fringilla est
-ullamcorper eget nulla facilisi etiam dignissim diam. Condimentum vitae sapien pellentesque habitant morbi tristique senectus et netus.
-Augue neque gravida in
-fermentum et sollicitudin ac orci. Aliquam malesuada bibendum arcu vitae elementum curabitur.
-
-01234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789".ReplaceLineEndings();
-
-        private static readonly string _expectedNoIndent = @"
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
-incididunt ut labore et dolore magna aliqua. Donec adipiscing tristique risus
-nec feugiat in fermentum.
-
-Tincidunt vitae semper quis lectus nulla at volutpat diam ut. Vitae tempus
-quam pellentesque nec
-nam aliquam. Porta non pulvinar neque laoreet suspendisse interdum consectetur.
-Arcu risus quis varius quam. Cursus mattis molestie a iaculis at erat. Malesuada
-fames ac turpis egestas maecenas pharetra. Fringilla est
-ullamcorper eget nulla facilisi etiam dignissim diam. Condimentum vitae sapien
-pellentesque habitant morbi tristique senectus et netus.
-Augue neque gravida in
-fermentum et sollicitudin ac orci. Aliquam malesuada bibendum arcu vitae
-elementum curabitur.
-
-01234567890123456789012345678901234567890123456789012345678901234567890123456789
-01234567890123456789012345678901234567890123456789012345678901234567890123456789
-0123456789012345678901234567890123456789
-".ReplaceLineEndings();
-
-        private static readonly string _expectedIndent = @"
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
-        incididunt ut labore et dolore magna aliqua. Donec adipiscing tristique
-        risus nec feugiat in fermentum.
-
-Tincidunt vitae semper quis lectus nulla at volutpat diam ut. Vitae tempus
-        quam pellentesque nec
-        nam aliquam. Porta non pulvinar neque laoreet suspendisse interdum
-        consectetur.
-        Arcu risus quis varius quam. Cursus mattis molestie a iaculis at erat.
-        Malesuada fames ac turpis egestas maecenas pharetra. Fringilla est
-        ullamcorper eget nulla facilisi etiam dignissim diam. Condimentum vitae
-        sapien pellentesque habitant morbi tristique senectus et netus.
-        Augue neque gravida in
-        fermentum et sollicitudin ac orci. Aliquam malesuada bibendum arcu vitae
-        elementum curabitur.
-
-01234567890123456789012345678901234567890123456789012345678901234567890123456789
-        012345678901234567890123456789012345678901234567890123456789012345678901
-        234567890123456789012345678901234567890123456789
-".ReplaceLineEndings();
-
-        private static readonly string _expectedIndentChanges = @"
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
-    incididunt ut labore et dolore magna aliqua. Donec adipiscing tristique
-    risus nec feugiat in fermentum.
-
-Tincidunt vitae semper quis lectus nulla at volutpat diam ut. Vitae tempus
-    quam pellentesque nec
-    nam aliquam. Porta non pulvinar neque laoreet suspendisse interdum
-    consectetur.
-    Arcu risus quis varius quam. Cursus mattis molestie a iaculis at erat.
-    Malesuada fames ac turpis egestas maecenas pharetra. Fringilla est
-    ullamcorper eget nulla facilisi etiam dignissim diam. Condimentum vitae
-    sapien pellentesque habitant morbi tristique senectus et netus.
-    Augue neque gravida in
-    fermentum et sollicitudin ac orci. Aliquam malesuada bibendum arcu vitae
-    elementum curabitur.
-
-01234567890123456789012345678901234567890123456789012345678901234567890123456789
-    0123456789012345678901234567890123456789012345678901234567890123456789012345
-    67890123456789012345678901234567890123456789
-    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
-        tempor incididunt ut labore et dolore magna aliqua. Donec adipiscing
-        tristique risus nec feugiat in fermentum.
-
-Tincidunt vitae semper quis lectus nulla at volutpat diam ut. Vitae tempus
-        quam pellentesque nec
-        nam aliquam. Porta non pulvinar neque laoreet suspendisse interdum
-        consectetur.
-        Arcu risus quis varius quam. Cursus mattis molestie a iaculis at erat.
-        Malesuada fames ac turpis egestas maecenas pharetra. Fringilla est
-        ullamcorper eget nulla facilisi etiam dignissim diam. Condimentum vitae
-        sapien pellentesque habitant morbi tristique senectus et netus.
-        Augue neque gravida in
-        fermentum et sollicitudin ac orci. Aliquam malesuada bibendum arcu vitae
-        elementum curabitur.
-
-01234567890123456789012345678901234567890123456789012345678901234567890123456789
-        012345678901234567890123456789012345678901234567890123456789012345678901
-        234567890123456789012345678901234567890123456789
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
-        incididunt ut labore et dolore magna aliqua. Donec adipiscing tristique
-        risus nec feugiat in fermentum.
-
-Tincidunt vitae semper quis lectus nulla at volutpat diam ut. Vitae tempus
-        quam pellentesque nec
-        nam aliquam. Porta non pulvinar neque laoreet suspendisse interdum
-        consectetur.
-        Arcu risus quis varius quam. Cursus mattis molestie a iaculis at erat.
-        Malesuada fames ac turpis egestas maecenas pharetra. Fringilla est
-        ullamcorper eget nulla facilisi etiam dignissim diam. Condimentum vitae
-        sapien pellentesque habitant morbi tristique senectus et netus.
-        Augue neque gravida in
-        fermentum et sollicitudin ac orci. Aliquam malesuada bibendum arcu vitae
-        elementum curabitur.
-
-01234567890123456789012345678901234567890123456789012345678901234567890123456789
-        012345678901234567890123456789012345678901234567890123456789012345678901
-        234567890123456789012345678901234567890123456789
-".ReplaceLineEndings();
-
-        private static readonly string _expectedIndentNoMaximum = @"
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Donec adipiscing tristique risus nec feugiat in fermentum.
-
-Tincidunt vitae semper quis lectus nulla at volutpat diam ut. Vitae tempus
-        quam pellentesque nec
-        nam aliquam. Porta non pulvinar neque laoreet suspendisse interdum consectetur.
-        Arcu risus quis varius quam. Cursus mattis molestie a iaculis at erat. Malesuada fames ac turpis egestas maecenas pharetra. Fringilla est
-        ullamcorper eget nulla facilisi etiam dignissim diam. Condimentum vitae sapien pellentesque habitant morbi tristique senectus et netus.
-        Augue neque gravida in
-        fermentum et sollicitudin ac orci. Aliquam malesuada bibendum arcu vitae elementum curabitur.
-
-01234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789".ReplaceLineEndings();
-
-        private static readonly string _inputFormatting = "\x1b[34mLorem \x1b[34mipsum \x1b[34mdolor \x1b[34msit \x1b[34mamet, \x1b[34mconsectetur \x1b[34madipiscing \x1b[34melit, \x1b]0;new title\x1b\\sed do \x1b]0;new title2\x0007eiusmod \x1b(Btempor\x1bH incididunt\nut labore et dolore magna aliqua. Donec\x1b[38;2;1;2;3m adipiscing tristique risus nec feugiat in fermentum.\x1b[0m".ReplaceLineEndings();
-
-        private static readonly string _expectedFormatting = @"[34mLorem [34mipsum [34mdolor [34msit [34mamet, [34mconsectetur [34madipiscing [34melit, ]0;new title\sed do ]0;new title2eiusmod (BtemporH
-        incididunt
-        ut labore et dolore magna aliqua. Donec[38;2;1;2;3m adipiscing tristique risus nec
-        feugiat in fermentum.[0m
-".ReplaceLineEndings();
-
-        private static readonly string _expectedFormattingCounted = @"[34mLorem [34mipsum [34mdolor [34msit [34mamet, [34mconsectetur
-        [34madipiscing [34melit, ]0;new title\sed do ]0;new title2eiusmod
-        (BtemporH incididunt
-        ut labore et dolore magna aliqua. Donec[38;2;1;2;3m adipiscing
-        tristique risus nec feugiat in fermentum.[0m
-".ReplaceLineEndings();
-
-        private const string _inputLongFormatting = "Lorem ipsum dolor sit amet, consectetur\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m\x1b[34m adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Donec adipiscing tristique risus nec feugiat in fermentum.";
-
-        private static readonly string _expectedLongFormatting = @"Lorem ipsum dolor sit amet, consectetur[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m[34m adipiscing elit, sed do eiusmod tempor
-        incididunt ut labore et dolore magna aliqua. Donec adipiscing tristique
-        risus nec feugiat in fermentum.
-".ReplaceLineEndings();
-
-        #endregion
     }
 }
