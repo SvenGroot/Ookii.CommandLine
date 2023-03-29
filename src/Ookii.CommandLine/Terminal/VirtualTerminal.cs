@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Runtime.InteropServices;
-#if NET6_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-using StringSpan = System.ReadOnlySpan<char>;
-#endif
 
 namespace Ookii.CommandLine.Terminal
 {
@@ -106,7 +103,7 @@ namespace Ookii.CommandLine.Terminal
         }
 
         // Returns the index of the character after the end of the sequence.
-        internal static int FindSequenceEnd(StringSpan value, ref StringSegmentType type)
+        internal static int FindSequenceEnd(ReadOnlySpan<char> value, ref StringSegmentType type)
         {
             if (value.Length == 0)
             {
@@ -130,13 +127,13 @@ namespace Ookii.CommandLine.Terminal
             };
         }
 
-        private static int FindCsiEnd(StringSpan value, ref StringSegmentType type)
+        private static int FindCsiEnd(ReadOnlySpan<char> value, ref StringSegmentType type)
         {
             int result = FindCsiEndPartial(value.Slice(1), ref type);
             return result < 0 ? result : result + 1;
         }
 
-        private static int FindCsiEndPartial(StringSpan value, ref StringSegmentType type)
+        private static int FindCsiEndPartial(ReadOnlySpan<char> value, ref StringSegmentType type)
         {
             int index = 0;
             foreach (var ch in value)
@@ -153,13 +150,13 @@ namespace Ookii.CommandLine.Terminal
             return -1;
         }
 
-        private static int FindOscEnd(StringSpan value, ref StringSegmentType type)
+        private static int FindOscEnd(ReadOnlySpan<char> value, ref StringSegmentType type)
         {
             int result = FindOscEndPartial(value.Slice(1), ref type);
             return result < 0 ? result : result + 1;
         }
 
-        private static int FindOscEndPartial(StringSpan value, ref StringSegmentType type)
+        private static int FindOscEndPartial(ReadOnlySpan<char> value, ref StringSegmentType type)
         {
             int index = 0;
             bool hasEscape = type == StringSegmentType.PartialFormattingOscWithEscape;

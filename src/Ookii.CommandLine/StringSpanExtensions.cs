@@ -3,26 +3,22 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
-#if NET6_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-using StringSpan = System.ReadOnlySpan<char>;
-using StringMemory = System.ReadOnlyMemory<char>;
-#endif
 
 namespace Ookii.CommandLine
 {
-    // These methods are declared as extension methods so they can be used with StringSpan on
+    // These methods are declared as extension methods so they can be used with ReadOnlySpan<char> on
     // .Net Standard 2.0 and with ReadOnlySpan<char> on .Net Standard 2.1.
     internal static partial class StringSpanExtensions
     {
-        public delegate void Callback(StringSegmentType type, StringSpan span);
-        public delegate Task AsyncCallback(StringSegmentType type, StringMemory span);
+        public delegate void Callback(StringSegmentType type, ReadOnlySpan<char> span);
+        public delegate Task AsyncCallback(StringSegmentType type, ReadOnlyMemory<char> span);
 
         private static readonly char[] _segmentSeparators = { '\r', '\n', VirtualTerminal.Escape };
         private static readonly char[] _newLineSeparators = { '\r', '\n' };
 
-        public static partial void Split(this StringSpan self, bool newLinesOnly, Callback callback);
+        public static partial void Split(this ReadOnlySpan<char> self, bool newLinesOnly, Callback callback);
 
-        public static StringSpanTuple SkipLineBreak(this StringSpan self)
+        public static StringSpanTuple SkipLineBreak(this ReadOnlySpan<char> self)
         {
             Debug.Assert(self[0] is '\r' or '\n');
             var split = self[0] == '\r' && self.Length > 1 && self[1] == '\n'
@@ -32,12 +28,12 @@ namespace Ookii.CommandLine
             return self.Split(split);
         }
 
-        public static StringSpanTuple Split(this StringSpan self, int index)
+        public static StringSpanTuple Split(this ReadOnlySpan<char> self, int index)
             => new(self.Slice(0, index), self.Slice(index));
 
         // On .Net 6 StringSpanTuple is a ref struct so it can't be used with Nullable<T>, so use
         // an out param instead.
-        public static bool BreakLine(this StringSpan self, int startIndex, BreakLineMode mode, out StringSpanTuple splits)
+        public static bool BreakLine(this ReadOnlySpan<char> self, int startIndex, BreakLineMode mode, out StringSpanTuple splits)
         {
             if (BreakLine(self, startIndex, mode) is var (end, start))
             {
@@ -49,7 +45,7 @@ namespace Ookii.CommandLine
             return false;
         }
 
-        public static (StringMemory, StringMemory) SkipLineBreak(this StringMemory self)
+        public static (ReadOnlyMemory<char>, ReadOnlyMemory<char>) SkipLineBreak(this ReadOnlyMemory<char> self)
         {
             Debug.Assert(self.Span[0] is '\r' or '\n');
             var split = self.Span[0] == '\r' && self.Span.Length > 1 && self.Span[1] == '\n'
@@ -59,10 +55,10 @@ namespace Ookii.CommandLine
             return self.Split(split);
         }
 
-        public static (StringMemory, StringMemory) Split(this StringMemory self, int index)
+        public static (ReadOnlyMemory<char>, ReadOnlyMemory<char>) Split(this ReadOnlyMemory<char> self, int index)
             => new(self.Slice(0, index), self.Slice(index));
 
-        public static bool BreakLine(this StringMemory self, int startIndex, BreakLineMode mode, out (StringMemory, StringMemory) splits)
+        public static bool BreakLine(this ReadOnlyMemory<char> self, int startIndex, BreakLineMode mode, out (ReadOnlyMemory<char>, ReadOnlyMemory<char>) splits)
         {
             if (BreakLine(self.Span, startIndex, mode) is var (end, start))
             {
@@ -74,30 +70,14 @@ namespace Ookii.CommandLine
             return false;
         }
 
-#if NET6_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-
-        public static void CopyTo(this StringSpan self, char[] destination, int start)
+        public static void CopyTo(this ReadOnlySpan<char> self, char[] destination, int start)
         {
             self.CopyTo(destination.AsSpan(start));
         }
 
-        public static partial void WriteTo(this StringSpan self, TextWriter writer);
+        public static partial void WriteTo(this ReadOnlySpan<char> self, TextWriter writer);
 
-#else
-
-        public static StringSpan AsSpan(this string self)
-        {
-            return new StringSpan(self);
-        }
-
-        public static StringMemory AsMemory(this string self)
-        {
-            return new StringMemory(self);
-        }
-
-#endif
-
-        private static (int, int)? BreakLine(StringSpan span, int startIndex, BreakLineMode mode)
+        private static (int, int)? BreakLine(ReadOnlySpan<char> span, int startIndex, BreakLineMode mode)
         {
             switch (mode)
             {

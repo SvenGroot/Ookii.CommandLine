@@ -6,9 +6,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-#if NET6_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-using StringMemory = System.ReadOnlyMemory<char>;
-#endif
 
 namespace Ookii.CommandLine
 {
@@ -66,7 +63,7 @@ namespace Ookii.CommandLine
                 }
             }
 
-            public async Task<AsyncBreakLineResult> BreakLineAsync(TextWriter writer, StringMemory newSegment, int maxLength, int indent, WrappingMode mode)
+            public async Task<AsyncBreakLineResult> BreakLineAsync(TextWriter writer, ReadOnlyMemory<char> newSegment, int maxLength, int indent, WrappingMode mode)
             {
                 Debug.Assert(mode != WrappingMode.Disabled);
                 var forceMode = _hasOverflow ? BreakLineMode.Forward : BreakLineMode.Backward;
@@ -81,7 +78,7 @@ namespace Ookii.CommandLine
                 return result;
             }
 
-            private async Task<AsyncBreakLineResult> BreakLineAsync(TextWriter writer, StringMemory newSegment, int maxLength, int indent, BreakLineMode mode)
+            private async Task<AsyncBreakLineResult> BreakLineAsync(TextWriter writer, ReadOnlyMemory<char> newSegment, int maxLength, int indent, BreakLineMode mode)
             {
                 if (mode == BreakLineMode.Forward)
                 {
@@ -202,7 +199,7 @@ namespace Ookii.CommandLine
             }
         }
 
-        private async Task WriteNoMaximumAsync(StringMemory buffer)
+        private async Task WriteNoMaximumAsync(ReadOnlyMemory<char> buffer)
         {
             Debug.Assert(Wrapping == WrappingMode.Disabled);
 
@@ -279,7 +276,7 @@ namespace Ookii.CommandLine
             }
         }
 
-        private async Task WriteCoreAsync(StringMemory buffer)
+        private async Task WriteCoreAsync(ReadOnlyMemory<char> buffer)
         {
             ThrowIfWriteInProgress();
             if (Wrapping == WrappingMode.Disabled)

@@ -4,49 +4,23 @@ using Ookii.CommandLine.Terminal;
 using System;
 using System.IO;
 using System.Threading.Tasks;
-#if NET6_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-using StringMemory = System.ReadOnlyMemory<char>;
-#endif
 
 namespace Ookii.CommandLine
 {
 
-#if !NET6_0_OR_GREATER && !NETSTANDARD2_1_OR_GREATER
-
-    internal readonly partial struct StringSpan
-    {
-        public async Task WriteToAsync(TextWriter writer)
-        {
-            if (_stringValue != null)
-            {
-                await writer.WriteAsync(_stringValue.Substring(_offset, _length));
-            }
-            else if (_charArrayValue != null)
-            {
-                await writer.WriteAsync(_charArrayValue, _offset, _length);
-            }
-            else if (_length > 0)
-            {
-                await writer.WriteAsync(_charValue);
-            }
-        }
-    }
-
-#endif
-
     internal static partial class StringSpanExtensions
     {
 
-#if NET6_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-
-        public static async Task WriteToAsync(this StringMemory self, TextWriter writer)
+        public static async Task WriteToAsync(this ReadOnlyMemory<char> self, TextWriter writer)
         {
+#if NETSTANDARD2_1_OR_GREATER || NET6_0_OR_GREATER
             await writer.WriteAsync(self);
+#else
+            await writer.WriteAsync(self.ToString());
+#endif
         }
 
-#endif
-
-        public static async Task SplitAsync(this StringMemory self, bool newLinesOnly, AsyncCallback callback)
+        public static async Task SplitAsync(this ReadOnlyMemory<char> self, bool newLinesOnly, AsyncCallback callback)
         {
             var separators = newLinesOnly ? _newLineSeparators : _segmentSeparators;
             var remaining = self;
@@ -85,7 +59,7 @@ namespace Ookii.CommandLine
                 }
                 else
                 {
-                    StringMemory lineBreak;
+                    ReadOnlyMemory<char> lineBreak;
                     (lineBreak, remaining) = remaining.SkipLineBreak();
 
                     if (remaining.Span.Length == 0 && lineBreak.Span.Length == 1 && lineBreak.Span[0] == '\r')

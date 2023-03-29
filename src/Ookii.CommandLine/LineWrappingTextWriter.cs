@@ -10,10 +10,6 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Threading;
 using System.ComponentModel;
-#if NET6_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-using StringSpan = System.ReadOnlySpan<char>;
-using StringMemory = System.ReadOnlyMemory<char>;
-#endif
 
 namespace Ookii.CommandLine
 {
@@ -97,17 +93,13 @@ namespace Ookii.CommandLine
         private struct AsyncBreakLineResult
         {
             public bool Success { get; set; }
-            public StringMemory Remaining { get; set; }
+            public ReadOnlyMemory<char> Remaining { get; set; }
         }
 
-#if NET6_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
         private ref struct BreakLineResult
-#else
-        private struct BreakLineResult
-#endif
         {
             public bool Success { get; set; }
-            public StringSpan Remaining { get; set; }
+            public ReadOnlySpan<char> Remaining { get; set; }
         }
 
         private partial class LineBuffer
@@ -131,7 +123,7 @@ namespace Ookii.CommandLine
 
             public int LineLength => ContentLength + Indentation;
 
-            public void Append(StringSpan span, StringSegmentType type)
+            public void Append(ReadOnlySpan<char> span, StringSegmentType type)
             {
                 Debug.Assert(type != StringSegmentType.LineBreak);
 
@@ -212,19 +204,19 @@ namespace Ookii.CommandLine
                 return false;
             }
 
-            public StringSpan FindPartialFormattingEnd(StringSpan newSegment)
+            public ReadOnlySpan<char> FindPartialFormattingEnd(ReadOnlySpan<char> newSegment)
             {
                 return newSegment.Slice(FindPartialFormattingEndCore(newSegment));
             }
 
-            public StringMemory FindPartialFormattingEnd(StringMemory newSegment)
+            public ReadOnlyMemory<char> FindPartialFormattingEnd(ReadOnlyMemory<char> newSegment)
             {
                 return newSegment.Slice(FindPartialFormattingEndCore(newSegment.Span));
             }
 
             private partial void WriteTo(TextWriter writer, int indent, bool insertNewLine);
 
-            private int FindPartialFormattingEndCore(StringSpan newSegment)
+            private int FindPartialFormattingEndCore(ReadOnlySpan<char> newSegment)
             {
                 if (LastSegment is not Segment lastSegment || lastSegment.Type < StringSegmentType.PartialFormattingUnknown)
                 {
@@ -255,9 +247,9 @@ namespace Ookii.CommandLine
 
             private partial void WriteSegments(TextWriter writer, IEnumerable<Segment> segments);
 
-            public partial BreakLineResult BreakLine(TextWriter writer, StringSpan newSegment, int maxLength, int indent, WrappingMode mode);
+            public partial BreakLineResult BreakLine(TextWriter writer, ReadOnlySpan<char> newSegment, int maxLength, int indent, WrappingMode mode);
 
-            private partial BreakLineResult BreakLine(TextWriter writer, StringSpan newSegment, int maxLength, int indent, BreakLineMode mode);
+            private partial BreakLineResult BreakLine(TextWriter writer, ReadOnlySpan<char> newSegment, int maxLength, int indent, BreakLineMode mode);
 
             public void ClearCurrentLine(int indent, bool clearSegments = true)
             {
@@ -513,14 +505,10 @@ namespace Ookii.CommandLine
         /// <inheritdoc/>
         public override void Write(char value)
         {
-#if NET6_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
             unsafe
             {
-                WriteCore(new StringSpan(&value, 1));
+                WriteCore(new ReadOnlySpan<char>(&value, 1));
             }
-#else
-            WriteCore(new StringSpan(value));
-#endif
         }
 
         /// <inheritdoc/>
@@ -555,18 +543,14 @@ namespace Ookii.CommandLine
                 throw new ArgumentException(Properties.Resources.IndexCountOutOfRange);
             }
 
-            WriteCore(new StringSpan(buffer, index, count));
+            WriteCore(new ReadOnlySpan<char>(buffer, index, count));
         }
 
         /// <inheritdoc/>
         public override Task WriteAsync(char value)
         {
-#if NET6_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
             // Array creation is unavoidable here because ReadOnlyMemory can't use a pointer.
             var task = WriteCoreAsync(new[] { value });
-#else
-            var task = WriteCoreAsync(new StringMemory(value));
-#endif
             _asyncWriteTask = task;
             return task;
         }
@@ -607,7 +591,7 @@ namespace Ookii.CommandLine
                 throw new ArgumentException(Properties.Resources.IndexCountOutOfRange);
             }
 
-            var task = WriteCoreAsync(new StringMemory(buffer, index, count));
+            var task = WriteCoreAsync(new ReadOnlyMemory<char>(buffer, index, count));
             _asyncWriteTask = task;
             return task;
         }
@@ -661,10 +645,12 @@ namespace Ookii.CommandLine
             {
                 await _baseWriter.DisposeAsync();
             }
+
+            GC.SuppressFinalize(this);
         }
 
         /// <inheritdoc/>
-        public override Task WriteAsync(StringMemory buffer, CancellationToken cancellationToken = default)
+        public override Task WriteAsync(ReadOnlyMemory<char> buffer, CancellationToken cancellationToken = default)
         {
             if (cancellationToken.IsCancellationRequested)
             {
@@ -677,7 +663,7 @@ namespace Ookii.CommandLine
         }
 
         /// <inheritdoc/>
-        public override async Task WriteLineAsync(StringMemory buffer, CancellationToken cancellationToken = default)
+        public override async Task WriteLineAsync(ReadOnlyMemory<char> buffer, CancellationToken cancellationToken = default)
         {
             await WriteAsync(buffer, cancellationToken);
             await WriteAsync(CoreNewLine.AsMemory(), cancellationToken);
@@ -844,7 +830,7 @@ namespace Ookii.CommandLine
             }
         }
 
-        private partial void WriteNoMaximum(StringSpan buffer);
+        private partial void WriteNoMaximum(ReadOnlySpan<char> buffer);
 
         private partial void WriteLineBreakDirect();
 
@@ -852,7 +838,7 @@ namespace Ookii.CommandLine
 
         private static partial void WriteIndent(TextWriter writer, int indent);
 
-        private partial void WriteCore(StringSpan buffer);
+        private partial void WriteCore(ReadOnlySpan<char> buffer);
 
         private partial void FlushCore(bool insertNewLine);
 

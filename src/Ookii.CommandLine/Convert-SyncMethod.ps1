@@ -10,7 +10,6 @@ $replacements = @(
     @("async Task", "partial void"), # Function signature change
     @("await ", ""), # Remove await keyword
     @("ReadOnlyMemory", "ReadOnlySpan"), # Async stream functions uses Memory instead of span
-    @("StringMemory", "StringSpan"), # These are the .Net Standard 2.0 helper versions of that
     @(".Span", ""), # Needed to convert Memory usage to Span.
     @("async ", "") # Remove keyword from async lambda
 )

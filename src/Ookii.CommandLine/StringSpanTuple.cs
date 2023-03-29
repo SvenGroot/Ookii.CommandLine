@@ -1,26 +1,20 @@
-﻿#if NET6_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-using StringSpan = System.ReadOnlySpan<char>;
-#endif
+﻿using System;
 
 namespace Ookii.CommandLine
 {
-    // Since StringSpan is a ReadOnlySpan<char> on .Net 6, it cannot be used in a regular tuple.
-#if NET6_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+    // Since ReadOnlySpan<char> is a ref struct, it cannot be used in a regular tuple.
     internal ref struct StringSpanTuple
-#else
-    internal struct StringSpanTuple
-#endif
     {
-        public StringSpanTuple(StringSpan span1, StringSpan span2)
+        public StringSpanTuple(ReadOnlySpan<char> span1, ReadOnlySpan<char> span2)
         {
             Span1 = span1;
             Span2 = span2;
         }
 
-        public StringSpan Span1;
-        public StringSpan Span2;
+        public ReadOnlySpan<char> Span1;
+        public ReadOnlySpan<char> Span2;
 
-        public void Deconstruct(out StringSpan span1, out StringSpan span2)
+        public void Deconstruct(out ReadOnlySpan<char> span1, out ReadOnlySpan<char> span2)
         {
             span1 = Span1;
             span2 = Span2;

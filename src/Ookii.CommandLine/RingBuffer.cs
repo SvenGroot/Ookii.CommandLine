@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
-#if NET6_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-using StringSpan = System.ReadOnlySpan<char>;
-#endif
 
 namespace Ookii.CommandLine
 {
@@ -55,7 +52,7 @@ namespace Ookii.CommandLine
             }
         }
 
-        public void CopyFrom(StringSpan span)
+        public void CopyFrom(ReadOnlySpan<char> span)
         {
             int size = Size;
             if (span.Length > Capacity - size)
@@ -121,10 +118,10 @@ namespace Ookii.CommandLine
 
             if (start > _bufferEnd.Value)
             {
-                return new(new StringSpan(_buffer, _bufferStart, _buffer.Length - _bufferStart), new StringSpan(_buffer, 0, _bufferEnd.Value));
+                return new(new ReadOnlySpan<char>(_buffer, _bufferStart, _buffer.Length - _bufferStart), new ReadOnlySpan<char>(_buffer, 0, _bufferEnd.Value));
             }
 
-            return new(new StringSpan(_buffer, start, _bufferEnd.Value - start), default);
+            return new(new ReadOnlySpan<char>(_buffer, start, _bufferEnd.Value - start), default);
         }
 
         public void Peek(TextWriter writer, int offset, int length)
