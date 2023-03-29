@@ -67,9 +67,9 @@ namespace Ookii.CommandLine.Tests
             Assert.AreEqual(18, target.Arguments.Count);
             TestArguments(target.Arguments, new[]
             {
-                new ExpectedArgument("arg1", typeof(string)) { Position = 0, IsRequired = true, Description = "Arg1 description." },
-                new ExpectedArgument("other", typeof(int)) { MemberName = "arg2", Position = 1, DefaultValue = 42, Description = "Arg2 description.", ValueDescription = "Number" },
-                new ExpectedArgument("notSwitch", typeof(bool)) { Position = 2, DefaultValue = false },
+                new ExpectedArgument("arg1", typeof(string)) { MemberName = "Arg1", Position = 0, IsRequired = true, Description = "Arg1 description." },
+                new ExpectedArgument("other", typeof(int)) { MemberName = "Arg2", Position = 1, DefaultValue = 42, Description = "Arg2 description.", ValueDescription = "Number" },
+                new ExpectedArgument("notSwitch", typeof(bool)) { MemberName = "NotSwitch", Position = 2, DefaultValue = false },
                 new ExpectedArgument("Arg5", typeof(float)) { Position = 3, Description = "Arg5 description." },
                 new ExpectedArgument("other2", typeof(int)) { MemberName = "Arg4", Position = 4, DefaultValue = 47, Description = "Arg4 description.", ValueDescription = "Number" },
                 new ExpectedArgument("Arg8", typeof(DayOfWeek[]), ArgumentKind.MultiValue) { ElementType = typeof(DayOfWeek), Position = 5 },
@@ -84,29 +84,6 @@ namespace Ookii.CommandLine.Tests
                 new ExpectedArgument("Arg7", typeof(bool)) { Position = null, IsSwitch = true, Aliases = new[] { "Alias3" } },
                 new ExpectedArgument("Arg9", typeof(int?)) { ElementType = typeof(int), Position = null, ValueDescription = "Int32" },
                 new ExpectedArgument("Help", typeof(bool), ArgumentKind.Method) { MemberName = "AutomaticHelp", Description = "Displays this help message.", IsSwitch = true, Aliases = new[] { "?", "h" } },
-                new ExpectedArgument("Version", typeof(bool), ArgumentKind.Method) { MemberName = "AutomaticVersion", Description = "Displays version information.", IsSwitch = true },
-            });
-        }
-
-        [TestMethod]
-        public void ConstructorMultipleArgumentConstructorsTest()
-        {
-            Type argumentsType = typeof(MultipleConstructorsArguments);
-            CommandLineParser target = new CommandLineParser(argumentsType);
-            Assert.AreEqual(CultureInfo.InvariantCulture, target.Culture);
-            Assert.AreEqual(false, target.AllowDuplicateArguments);
-            Assert.AreEqual(true, target.AllowWhiteSpaceValueSeparator);
-            Assert.AreEqual(ParsingMode.Default, target.Mode);
-            CollectionAssert.AreEqual(CommandLineParser.GetDefaultArgumentNamePrefixes(), target.ArgumentNamePrefixes);
-            Assert.IsNull(target.LongArgumentNamePrefix);
-            Assert.AreEqual(argumentsType, target.ArgumentsType);
-            Assert.AreEqual("", target.Description);
-            Assert.AreEqual(4, target.Arguments.Count); // Constructor argument + one property argument.
-            TestArguments(target.Arguments, new[]
-            {
-                new ExpectedArgument("arg1", typeof(string)) { Position = 0, IsRequired = true },
-                new ExpectedArgument("Help", typeof(bool), ArgumentKind.Method) { MemberName = "AutomaticHelp", Description = "Displays this help message.", IsSwitch = true, Aliases = new[] { "?", "h" } },
-                new ExpectedArgument("ThrowingArgument", typeof(int)),
                 new ExpectedArgument("Version", typeof(bool), ArgumentKind.Method) { MemberName = "AutomaticVersion", Description = "Displays version information.", IsSwitch = true },
             });
         }
@@ -158,7 +135,7 @@ namespace Ookii.CommandLine.Tests
         [TestMethod]
         public void ParseTestTooManyArguments()
         {
-            Type argumentsType = typeof(MultipleConstructorsArguments);
+            Type argumentsType = typeof(ThrowingArguments);
             var options = new ParseOptions()
             {
                 ArgumentNamePrefixes = new[] { "/", "-" }
@@ -173,7 +150,7 @@ namespace Ookii.CommandLine.Tests
         [TestMethod]
         public void ParseTestPropertySetterThrows()
         {
-            Type argumentsType = typeof(MultipleConstructorsArguments);
+            Type argumentsType = typeof(ThrowingArguments);
             var options = new ParseOptions()
             {
                 ArgumentNamePrefixes = new[] { "/", "-" }
@@ -181,7 +158,7 @@ namespace Ookii.CommandLine.Tests
 
             var target = new CommandLineParser(argumentsType, options);
 
-            CheckThrows(() => target.Parse(new[] { "Foo", "-ThrowingArgument", "-5" }),
+            CheckThrows(() => target.Parse(new[] { "-ThrowingArgument", "-5" }),
                 target,
                 CommandLineArgumentErrorCategory.ApplyValueError,
                 "ThrowingArgument",
@@ -191,7 +168,7 @@ namespace Ookii.CommandLine.Tests
         [TestMethod]
         public void ParseTestConstructorThrows()
         {
-            Type argumentsType = typeof(MultipleConstructorsArguments);
+            Type argumentsType = typeof(ThrowingConstructor);
             var options = new ParseOptions()
             {
                 ArgumentNamePrefixes = new[] { "/", "-" }
@@ -199,7 +176,7 @@ namespace Ookii.CommandLine.Tests
 
             var target = new CommandLineParser(argumentsType, options);
 
-            CheckThrows(() => target.Parse(new[] { "invalid" }),
+            CheckThrows(() => target.Parse(Array.Empty<string>()),
                 target,
                 CommandLineArgumentErrorCategory.CreateArgumentsTypeError,
                 null,
@@ -1059,21 +1036,22 @@ namespace Ookii.CommandLine.Tests
             CheckThrows(() => parser.Parse(new[] { "1", "-Multi:2", "2", "3", "4", "-Other", "5", "6" }), parser, CommandLineArgumentErrorCategory.TooManyArguments);
         }
 
-        [TestMethod]
-        public void TestInjection()
-        {
-            var parser = new CommandLineParser<InjectionArguments>();
-            var result = parser.Parse(new[] { "-Arg", "1" });
-            Assert.AreSame(parser, result.Parser);
-            Assert.AreEqual(1, result.Arg);
+        // TODO:
+        //[TestMethod]
+        //public void TestInjection()
+        //{
+        //    var parser = new CommandLineParser<InjectionArguments>();
+        //    var result = parser.Parse(new[] { "-Arg", "1" });
+        //    Assert.AreSame(parser, result.Parser);
+        //    Assert.AreEqual(1, result.Arg);
 
-            var parser2 = new CommandLineParser<InjectionMixedArguments>();
-            var result2 = parser2.Parse(new[] { "-Arg1", "1", "-Arg2", "2", "-Arg3", "3" });
-            Assert.AreSame(parser2, result2.Parser);
-            Assert.AreEqual(1, result2.Arg1);
-            Assert.AreEqual(2, result2.Arg2);
-            Assert.AreEqual(3, result2.Arg3);
-        }
+        //    var parser2 = new CommandLineParser<InjectionMixedArguments>();
+        //    var result2 = parser2.Parse(new[] { "-Arg1", "1", "-Arg2", "2", "-Arg3", "3" });
+        //    Assert.AreSame(parser2, result2.Parser);
+        //    Assert.AreEqual(1, result2.Arg1);
+        //    Assert.AreEqual(2, result2.Arg2);
+        //    Assert.AreEqual(3, result2.Arg3);
+        //}
 
         [TestMethod]
         public void TestDuplicateArguments()

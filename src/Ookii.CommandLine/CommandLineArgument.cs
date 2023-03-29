@@ -423,7 +423,6 @@ namespace Ookii.CommandLine
         /// </para>
         /// </remarks>
         /// <seealso cref="CommandLineArgumentAttribute.ArgumentName"/>
-        /// <seealso cref="ArgumentNameAttribute"/>
         public string ArgumentName => _argumentName;
 
         /// <summary>
@@ -438,7 +437,6 @@ namespace Ookii.CommandLine
         /// </para>
         /// </remarks>
         /// <seealso cref="CommandLineArgumentAttribute.ShortName"/>
-        /// <seealso cref="ArgumentNameAttribute.ShortName"/>
         public char ShortName => _shortName;
 
         /// <summary>
@@ -525,7 +523,6 @@ namespace Ookii.CommandLine
         /// </para>
         /// </remarks>
         /// <seealso cref="CommandLineArgumentAttribute.IsShort"/>
-        /// <seealso cref="ArgumentNameAttribute.IsShort"/>
         public bool HasShortName => _shortName != '\0';
 
         /// <summary>
@@ -541,7 +538,6 @@ namespace Ookii.CommandLine
         /// </para>
         /// </remarks>
         /// <seealso cref="CommandLineArgumentAttribute.IsLong"/>
-        /// <seealso cref="ArgumentNameAttribute.IsLong"/>
         public bool HasLongName => _hasLongName;
 
         /// <summary>
@@ -1236,55 +1232,6 @@ namespace Ookii.CommandLine
 
             HasValue = true;
             return continueParsing;
-        }
-
-        internal static CommandLineArgument Create(CommandLineParser parser, ParameterInfo parameter)
-        {
-            if (parser == null)
-            {
-                throw new ArgumentNullException(nameof(parser));
-            }
-
-            if (parameter?.Name == null)
-            {
-                throw new ArgumentNullException(nameof(parameter));
-            }
-
-            var typeConverterAttribute = parameter.GetCustomAttribute<TypeConverterAttribute>();
-            var keyTypeConverterAttribute = parameter.GetCustomAttribute<KeyTypeConverterAttribute>();
-            var valueTypeConverterAttribute = parameter.GetCustomAttribute<ValueTypeConverterAttribute>();
-            var argumentNameAttribute = parameter.GetCustomAttribute<ArgumentNameAttribute>();
-            var multiValueSeparatorAttribute = parameter.GetCustomAttribute<MultiValueSeparatorAttribute>();
-            var argumentName = DetermineArgumentName(argumentNameAttribute?.ArgumentName, parameter.Name, parser.Options.ArgumentNameTransform);
-            var info = new ArgumentInfo()
-            {
-                Parser = parser,
-                Parameter = parameter,
-                ArgumentName = argumentName,
-                Long = argumentNameAttribute?.IsLong ?? true,
-                Short = argumentNameAttribute?.IsShort ?? false,
-                ShortName = argumentNameAttribute?.ShortName ?? '\0',
-                ArgumentType = parameter.ParameterType,
-                Description = parameter.GetCustomAttribute<DescriptionAttribute>()?.Description,
-                DefaultValue = (parameter.Attributes & ParameterAttributes.HasDefault) == ParameterAttributes.HasDefault ? parameter.DefaultValue : null,
-                ValueDescription = parameter.GetCustomAttribute<ValueDescriptionAttribute>()?.ValueDescription,
-                AllowDuplicateDictionaryKeys = Attribute.IsDefined(parameter, typeof(AllowDuplicateDictionaryKeysAttribute)),
-                ConverterType = typeConverterAttribute == null ? null : Type.GetType(typeConverterAttribute.ConverterTypeName, true),
-                KeyConverterType = keyTypeConverterAttribute == null ? null : Type.GetType(keyTypeConverterAttribute.ConverterTypeName, true),
-                ValueConverterType = valueTypeConverterAttribute == null ? null : Type.GetType(valueTypeConverterAttribute.ConverterTypeName, true),
-                MultiValueSeparator = GetMultiValueSeparator(multiValueSeparatorAttribute),
-                AllowMultiValueWhiteSpaceSeparator = multiValueSeparatorAttribute != null && multiValueSeparatorAttribute.Separator == null,
-                KeyValueSeparator = parameter.GetCustomAttribute<KeyValueSeparatorAttribute>()?.Separator,
-                Aliases = GetAliases(parameter.GetCustomAttributes<AliasAttribute>(), argumentName),
-                ShortAliases = GetShortAliases(parameter.GetCustomAttributes<ShortAliasAttribute>(), argumentName),
-                Position = parameter.Position,
-                IsRequired = !parameter.IsOptional,
-                MemberName = parameter.Name,
-                AllowNull = DetermineAllowsNull(parameter),
-                Validators = parameter.GetCustomAttributes<ArgumentValidationAttribute>(),
-            };
-
-            return new CommandLineArgument(info);
         }
 
         internal static CommandLineArgument Create(CommandLineParser parser, PropertyInfo property)

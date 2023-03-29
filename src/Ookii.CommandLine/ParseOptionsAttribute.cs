@@ -56,10 +56,8 @@ namespace Ookii.CommandLine
         /// <remarks>
         /// <para>
         ///   If an argument doesn't have the <see cref="CommandLineArgumentAttribute.ArgumentName"/>
-        ///   property set (or doesn't have an <see cref="ArgumentNameAttribute"/> attribute for
-        ///   constructor parameters), the argument name is determined by taking the name of the
-        ///   property, constructor parameter, or method that defines it, and applying the specified
-        ///   transformation.
+        ///   property set, the argument name is determined by taking the name of the property or
+        ///   method that defines it, and applying the specified transformation.
         /// </para>
         /// <para>
         ///   The name transformation will also be applied to the names of the automatically added
@@ -297,8 +295,8 @@ namespace Ookii.CommandLine
         /// <remarks>
         /// <para>
         ///   This property has no effect on explicit value description specified with the
-        ///   <see cref="CommandLineArgument.ValueDescription"/> property, the <see cref="ValueDescriptionAttribute"/>
-        ///   attribute, or the <see cref="ParseOptions.DefaultValueDescriptions"/> property.
+        ///   <see cref="CommandLineArgument.ValueDescription"/> property or the
+        ///   <see cref="ParseOptions.DefaultValueDescriptions"/> property.
         /// </para>
         /// <para>
         ///   This value can be overridden by the <see cref="ParseOptions.ValueDescriptionTransform"/>

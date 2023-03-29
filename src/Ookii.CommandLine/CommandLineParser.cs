@@ -20,20 +20,16 @@ namespace Ookii.CommandLine
     /// <remarks>
     /// <para>
     ///   The <see cref="CommandLineParser"/> class can parse a set of command line arguments into
-    ///   values. Which arguments are accepted is determined from the constructor parameters,
-    ///   properties, and methods of the type passed to the <see cref="CommandLineParser(Type, ParseOptions)"/>
-    ///   constructor. The result of a parsing operation is an instance of that type, created using
-    ///   the values that were supplied on the command line.
+    ///   values. Which arguments are accepted is determined from the properties and methods of the
+    ///   type passed to the <see cref="CommandLineParser(Type, ParseOptions)"/> constructor. The
+    ///   result of a parsing operation is an instance of that type, created using the values that
+    ///   were supplied on the command line.
     /// </para>
     /// <para>
-    ///   An argument defined by a constructor parameter is always positional, and is required if
-    ///   the parameter has no default value. If your type has multiple constructors, use the
-    ///   <see cref="CommandLineConstructorAttribute"/> attribute to indicate which one to use.
-    /// </para>
-    /// <para>
-    ///   A constructor parameter with the type <see cref="CommandLineParser"/> is not an argument,
-    ///   but will be passed the instance of the <see cref="CommandLineParser"/> class used to
-    ///   parse the arguments when the type is instantiated.
+    ///   The arguments type must have a constructor that has no parameter, or a single parameter
+    ///   with the type <see cref="CommandLineParser"/>, which will be passed the instance of the
+    ///   <see cref="CommandLineParser"/> class that was used to parse the arguments when the type
+    ///   is instantiated.
     /// </para>
     /// <para>
     ///   A property defines a command line argument if it is <see langword="public"/>, not
@@ -164,8 +160,6 @@ namespace Ookii.CommandLine
         // Uses string, even though short names are single char, so it can use the same comparer
         // as _argumentsByName.
         private readonly SortedDictionary<string, CommandLineArgument>? _argumentsByShortName;
-        private readonly ConstructorInfo _commandLineConstructor;
-        private readonly int _constructorArgumentCount;
         private readonly int _positionalArgumentCount;
 
         private readonly ParseOptions _parseOptions;
@@ -176,7 +170,6 @@ namespace Ookii.CommandLine
 
         private ReadOnlyCollection<CommandLineArgument>? _argumentsReadOnlyWrapper;
         private ReadOnlyCollection<string>? _argumentNamePrefixesReadOnlyWrapper;
-        private int _injectionIndex = -1;
 
         /// <summary>
         /// Gets the default character used to separate the name and the value of an argument.
@@ -307,17 +300,11 @@ namespace Ookii.CommandLine
             _sortedPrefixes = prefixInfos.OrderByDescending(info => info.Prefix.Length).ToArray();
             _argumentsByName = new(comparer);
 
-            _commandLineConstructor = GetCommandLineConstructor();
-            DetermineConstructorArguments();
-            _constructorArgumentCount = _arguments.Count;
-            _positionalArgumentCount = _constructorArgumentCount + DetermineMemberArguments(options, optionsAttribute);
+            _positionalArgumentCount = DetermineMemberArguments(options, optionsAttribute);
             DetermineAutomaticArguments(options, optionsAttribute);
-            if (_arguments.Count > _constructorArgumentCount)
-            {
-                // Sort the member arguments in usage order (positional first, then required
-                // non-positional arguments, then the rest by name.
-                _arguments.Sort(_constructorArgumentCount, _arguments.Count - _constructorArgumentCount, new CommandLineArgumentComparer(_argumentsByName.Comparer));
-            }
+            // Sort the member arguments in usage order (positional first, then required
+            // non-positional arguments, then the rest by name.
+            _arguments.Sort(new CommandLineArgumentComparer(_argumentsByName.Comparer));
 
             VerifyPositionalArgumentRules();
         }
@@ -1208,25 +1195,6 @@ namespace Ookii.CommandLine
             }
         }
 
-        private void DetermineConstructorArguments()
-        {
-            ParameterInfo[] parameters = _commandLineConstructor.GetParameters();
-            var valueDescriptionTransform = _parseOptions.ValueDescriptionTransform ?? default;
-
-            foreach (ParameterInfo parameter in parameters)
-            {
-                if (parameter.ParameterType == typeof(CommandLineParser) && _injectionIndex < 0)
-                {
-                    _injectionIndex = _arguments.Count;
-                }
-                else
-                {
-                    var argument = CommandLineArgument.Create(this, parameter);
-                    AddNamedArgument(argument);
-                }
-            }
-        }
-
         private int DetermineMemberArguments(ParseOptions? options, ParseOptionsAttribute? optionsAttribute)
         {
             var valueDescriptionTransform = options?.ValueDescriptionTransform ?? optionsAttribute?.ValueDescriptionTransform
@@ -1429,28 +1397,9 @@ namespace Ookii.CommandLine
                 validator.Validate(this);
             }
 
-            var count = _constructorArgumentCount;
-            if (_injectionIndex >= 0)
-            {
-                ++count;
-            }
-
-            var constructorArgumentValues = new object?[count];
-            int offset = 0;
-            for (int x = 0; x < count; ++x)
-            {
-                if (x == _injectionIndex)
-                {
-                    constructorArgumentValues[x] = this;
-                    offset = 1;
-                }
-                else
-                {
-                    constructorArgumentValues[x] = _arguments[x - offset].Value;
-                }
-            }
-
-            object commandLineArguments = CreateArgumentsTypeInstance(constructorArgumentValues);
+            // TODO: Integrate with new ctor argument support.
+            var inject = _argumentsType.GetConstructor(new[] { typeof(CommandLineParser) }) != null;
+            object commandLineArguments = CreateArgumentsTypeInstance(inject);
             foreach (CommandLineArgument argument in _arguments)
             {
                 // Apply property argument values (this does nothing for constructor or method arguments).
@@ -1610,36 +1559,18 @@ namespace Ookii.CommandLine
             return null;
         }
 
-        private ConstructorInfo GetCommandLineConstructor()
-        {
-            ConstructorInfo[] ctors = _argumentsType.GetConstructors();
-            if (ctors.Length < 1)
-            {
-                throw new NotSupportedException(Properties.Resources.NoConstructor);
-            }
-            else if (ctors.Length == 1)
-            {
-                return ctors[0];
-            }
-
-            var markedCtors = ctors.Where(c => Attribute.IsDefined(c, typeof(CommandLineConstructorAttribute)));
-            if (!markedCtors.Any())
-            {
-                throw new NotSupportedException(Properties.Resources.NoMarkedConstructor);
-            }
-            else if (markedCtors.Count() > 1)
-            {
-                throw new NotSupportedException(Properties.Resources.MultipleMarkedConstructors);
-            }
-
-            return markedCtors.First();
-        }
-
-        private object CreateArgumentsTypeInstance(object?[] constructorArgumentValues)
+        private object CreateArgumentsTypeInstance(bool inject)
         {
             try
             {
-                return _commandLineConstructor.Invoke(constructorArgumentValues);
+                if (inject)
+                {
+                    return Activator.CreateInstance(_argumentsType, this)!;
+                }
+                else
+                {
+                    return Activator.CreateInstance(_argumentsType)!;
+                }
             }
             catch (TargetInvocationException ex)
             {

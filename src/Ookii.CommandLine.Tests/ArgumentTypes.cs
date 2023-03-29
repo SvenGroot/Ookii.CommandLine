@@ -20,33 +20,27 @@ namespace Ookii.CommandLine.Tests
         private readonly Collection<int> _arg12 = new Collection<int>();
         private readonly Dictionary<string, int> _arg14 = new Dictionary<string, int>();
 
-        private TestArguments(string notAnArg)
-        {
-        }
+        [CommandLineArgument("arg1", Position = 1, IsRequired = true)]
+        [Description("Arg1 description.")]
+        public string Arg1 { get; set; }
 
-        public TestArguments([Description("Arg1 description.")] string arg1, [Description("Arg2 description."), ArgumentName("other"), ValueDescription("Number")] int arg2 = 42, bool notSwitch = false)
-        {
-            Arg1 = arg1;
-            Arg2 = arg2;
-            NotSwitch = notSwitch;
-        }
+        [CommandLineArgument("other", Position = 2, DefaultValue = 42, ValueDescription = "Number")]
+        [Description("Arg2 description.")]
+        public int Arg2 { get; set; }
 
-        public string Arg1 { get; private set; }
-
-        public int Arg2 { get; private set; }
-
-        public bool NotSwitch { get; private set; }
+        [CommandLineArgument("notSwitch", Position = 3, DefaultValue = false)]
+        public bool NotSwitch { get; set; }
 
         [CommandLineArgument()]
         public string Arg3 { get; set; }
 
         // Default value is intentionally a string to test default value conversion.
-        [CommandLineArgument("other2", DefaultValue = "47", ValueDescription = "Number", Position = 1), Description("Arg4 description.")]
+        [CommandLineArgument("other2", DefaultValue = "47", ValueDescription = "Number", Position = 5), Description("Arg4 description.")]
         [ValidateRange(0, 1000, IncludeInUsageHelp = false)]
         public int Arg4 { get; set; }
 
         // Short/long name stuff should be ignored if not using LongShort mode.
-        [CommandLineArgument(Position = 0, ShortName = 'a', IsLong = false), Description("Arg5 description.")]
+        [CommandLineArgument(Position = 4, ShortName = 'a', IsLong = false), Description("Arg5 description.")]
         public float Arg5 { get; set; }
 
         [Alias("Alias1")]
@@ -58,7 +52,7 @@ namespace Ookii.CommandLine.Tests
         [CommandLineArgument()]
         public bool Arg7 { get; set; }
 
-        [CommandLineArgument(Position = 2)]
+        [CommandLineArgument(Position = 6)]
         public DayOfWeek[] Arg8 { get; set; }
 
         [CommandLineArgument()]
@@ -98,20 +92,9 @@ namespace Ookii.CommandLine.Tests
         public static string NotAnArg3 { get; set; }
     }
 
-    class MultipleConstructorsArguments
+    class ThrowingArguments
     {
         private int _throwingArgument;
-
-        public MultipleConstructorsArguments() { }
-        public MultipleConstructorsArguments(string notArg1, int notArg2) { }
-        [CommandLineConstructor]
-        public MultipleConstructorsArguments(string arg1)
-        {
-            if (arg1 == "invalid")
-            {
-                throw new ArgumentException("Invalid argument value.", nameof(arg1));
-            }
-        }
 
         [CommandLineArgument]
         public int ThrowingArgument
@@ -127,6 +110,17 @@ namespace Ookii.CommandLine.Tests
                 _throwingArgument = value;
             }
         }
+    }
+
+    class ThrowingConstructor
+    {
+        public ThrowingConstructor()
+        {
+            throw new ArgumentException();
+        }
+
+        [CommandLineArgument]
+        public int Arg { get; set; }
     }
 
     class DictionaryArguments
@@ -202,18 +196,11 @@ namespace Ookii.CommandLine.Tests
     [ParseOptions(Mode = ParsingMode.LongShort)]
     class LongShortArguments
     {
-        public LongShortArguments([ArgumentName(IsShort = true), Description("Foo description.")] int foo = 0,
-            [Description("Bar description.")] int bar = 0)
-        {
-            Foo = foo;
-            Bar = bar;
-        }
-
         [CommandLineArgument, ShortAlias('c')]
         [Description("Arg1 description.")]
         public int Arg1 { get; set; }
 
-        [CommandLineArgument(ShortName = 'a', Position = 0), ShortAlias('b'), Alias("baz")]
+        [CommandLineArgument(ShortName = 'a', Position = 2), ShortAlias('b'), Alias("baz")]
         [Description("Arg2 description.")]
         public int Arg2 { get; set; }
 
@@ -229,8 +216,12 @@ namespace Ookii.CommandLine.Tests
         [Description("Switch3 description.")]
         public bool Switch3 { get; set; }
 
+        [CommandLineArgument("foo", Position = 0, IsShort = true, DefaultValue = 0)]
+        [Description("Foo description.")]
         public int Foo { get; set; }
 
+        [CommandLineArgument("bar", DefaultValue = 0, Position = 1)]
+        [Description("Bar description.")]
         public int Bar { get; set; }
     }
 
@@ -336,9 +327,8 @@ namespace Ookii.CommandLine.Tests
 
     class NameTransformArguments
     {
-        public NameTransformArguments(string testArg)
-        {
-        }
+        [CommandLineArgument(Position = 0, IsRequired = true)]
+        public string testArg { get; set; }
 
         [CommandLineArgument]
         public int TestArg2 { get; set; }
@@ -363,16 +353,13 @@ namespace Ookii.CommandLine.Tests
     {
         public static int Arg3Value { get; set; }
 
-        public ValidationArguments([ValidateNotEmpty, Description("Arg2 description.")] string arg2 = null)
-        {
-            Arg2 = arg2;
-        }
-
         [CommandLineArgument]
         [Description("Arg1 description.")]
         [ValidateRange(1, 5)]
         public int? Arg1 { get; set; }
 
+        [CommandLineArgument("arg2", Position = 0)]
+        [ValidateNotEmpty, Description("Arg2 description.")]
         public string Arg2 { get; set; }
 
         [CommandLineArgument]
@@ -473,28 +460,29 @@ namespace Ookii.CommandLine.Tests
         public int Arg { get; set; }
     }
 
-    class InjectionMixedArguments
-    {
-        private readonly CommandLineParser _parser;
-        private readonly int _arg1;
-        private readonly int _arg2;
+    // TODO: Test with new ctor argument style.
+    //class InjectionMixedArguments
+    //{
+    //    private readonly CommandLineParser _parser;
+    //    private readonly int _arg1;
+    //    private readonly int _arg2;
 
-        public InjectionMixedArguments(int arg1, CommandLineParser parser, int arg2)
-        {
-            _arg1 = arg1;
-            _parser = parser;
-            _arg2 = arg2;
-        }
+    //    public InjectionMixedArguments(int arg1, CommandLineParser parser, int arg2)
+    //    {
+    //        _arg1 = arg1;
+    //        _parser = parser;
+    //        _arg2 = arg2;
+    //    }
 
-        public CommandLineParser Parser => _parser;
+    //    public CommandLineParser Parser => _parser;
 
-        public int Arg1 => _arg1;
+    //    public int Arg1 => _arg1;
 
-        public int Arg2 => _arg2;
+    //    public int Arg2 => _arg2;
 
-        [CommandLineArgument]
-        public int Arg3 { get; set; }
-    }
+    //    [CommandLineArgument]
+    //    public int Arg3 { get; set; }
+    //}
 
     struct StructWithParseCulture
     {

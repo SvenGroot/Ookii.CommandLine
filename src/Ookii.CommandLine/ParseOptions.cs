@@ -67,10 +67,8 @@ namespace Ookii.CommandLine
         /// <remarks>
         /// <para>
         ///   If an argument doesn't have the <see cref="CommandLineArgumentAttribute.ArgumentName"/>
-        ///   property set (or doesn't have an <see cref="ArgumentNameAttribute"/> attribute for
-        ///   constructor parameters), the argument name is determined by taking the name of the
-        ///   property, constructor parameter, or method that defines it, and applying the specified
-        ///   transform.
+        ///   property set, the argument name is determined by taking the name of the property, or
+        ///   method that defines it, and applying the specified transform.
         /// </para>
         /// <para>
         ///   The name transform will also be applied to the names of the automatically added
@@ -452,10 +450,10 @@ namespace Ookii.CommandLine
         /// </para>
         /// <para>
         ///   If an argument doesn't have the <see cref="CommandLineArgumentAttribute.ValueDescription"/>
-        ///   property set or the <see cref="ValueDescriptionAttribute"/> attribute applied, the
-        ///   value description will be determined by first checking this dictionary. If the type
-        ///   of the argument isn't in the dictionary, the type name is used, applying the
-        ///   transformation specified by the <see cref="ValueDescriptionTransform"/> property.
+        ///   property set, the value description will be determined by first checking this
+        ///   dictionary. If the type of the argument isn't in the dictionary, the type name is
+        ///   used, applying the transformation specified by the <see cref="ValueDescriptionTransform"/>
+        ///   property.
         /// </para>
         /// </remarks>
         /// <seealso cref="CommandLineArgument.ValueDescription"/>
@@ -473,8 +471,8 @@ namespace Ookii.CommandLine
         /// <remarks>
         /// <para>
         ///   This property has no effect on explicit value description specified with the
-        ///   <see cref="CommandLineArgument.ValueDescription"/> property, the <see cref="ValueDescriptionAttribute"/>
-        ///   attribute, or the <see cref="ParseOptions.DefaultValueDescriptions"/> property.
+        ///   <see cref="CommandLineArgument.ValueDescription"/> property or the
+        ///   <see cref="DefaultValueDescriptions"/> property.
         /// </para>
         /// <para>
         ///   If not <see langword="null"/>, this property overrides the <see cref="ParseOptionsAttribute.ValueDescriptionTransform"/>

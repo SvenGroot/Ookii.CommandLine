@@ -79,21 +79,33 @@ namespace Ookii.CommandLine.Tests
 
         class TestArguments
         {
-            public TestArguments(
-                [TypeConverter(typeof(NullReturningStringConverter))] string? constructorNullable,
-                [TypeConverter(typeof(NullReturningStringConverter))] string constructorNonNullable,
-                [TypeConverter(typeof(NullReturningIntConverter))] int constructorValueType,
-                [TypeConverter(typeof(NullReturningIntConverter))] int? constructorNullableValueType)
-            {
-                ConstructorNullable = constructorNullable;
-                ConstructorNonNullable = constructorNonNullable;
-                ConstructorValueType = constructorValueType;
-                ConstructorNullableValueType = constructorNullableValueType;
-            }
+            // TODO: Put back with new ctor approach.
+            //public TestArguments(
+            //    [TypeConverter(typeof(NullReturningStringConverter))] string? constructorNullable,
+            //    [TypeConverter(typeof(NullReturningStringConverter))] string constructorNonNullable,
+            //    [TypeConverter(typeof(NullReturningIntConverter))] int constructorValueType,
+            //    [TypeConverter(typeof(NullReturningIntConverter))] int? constructorNullableValueType)
+            //{
+            //    ConstructorNullable = constructorNullable;
+            //    ConstructorNonNullable = constructorNonNullable;
+            //    ConstructorValueType = constructorValueType;
+            //    ConstructorNullableValueType = constructorNullableValueType;
+            //}
 
+            [CommandLineArgument("constructorNullable", Position = 0)]
+            [TypeConverter(typeof(NullReturningStringConverter))]
             public string? ConstructorNullable { get; set; }
-            public string ConstructorNonNullable { get; set; }
+
+            [CommandLineArgument("constructorNonNullable", Position = 1)]
+            [TypeConverter(typeof(NullReturningStringConverter))]
+            public string ConstructorNonNullable { get; set; } = default!;
+
+            [CommandLineArgument("constructorValueType", Position = 2)]
+            [TypeConverter(typeof(NullReturningIntConverter))]
             public int ConstructorValueType { get; set; }
+
+            [CommandLineArgument("constructorNullableValueType", Position = 3)]
+            [TypeConverter(typeof(NullReturningIntConverter))]
             public int? ConstructorNullableValueType { get; set; }
 
             [CommandLineArgument]
