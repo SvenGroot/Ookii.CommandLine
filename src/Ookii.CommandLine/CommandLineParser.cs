@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -84,11 +85,11 @@ namespace Ookii.CommandLine
 
         private sealed class CommandLineArgumentComparer : IComparer<CommandLineArgument>
         {
-            private readonly IComparer<string> _stringComparer;
+            private readonly StringComparison _comparison;
 
-            public CommandLineArgumentComparer(IComparer<string> stringComparer)
+            public CommandLineArgumentComparer(StringComparison comparison)
             {
-                _stringComparer = stringComparer;
+                _comparison = comparison;
             }
 
             public int Compare(CommandLineArgument? x, CommandLineArgument? y)
@@ -141,7 +142,41 @@ namespace Ookii.CommandLine
                 }
 
                 // Sort the rest by name
-                return _stringComparer.Compare(x.ArgumentName, y.ArgumentName);
+                return string.Compare(x.ArgumentName, y.ArgumentName, _comparison);
+            }
+        }
+
+        private sealed class MemoryComparer : IComparer<ReadOnlyMemory<char>>
+        {
+            private readonly StringComparison _comparison;
+
+            public MemoryComparer(StringComparison comparison)
+            {
+                _comparison = comparison;
+            }
+
+            public int Compare(ReadOnlyMemory<char> x, ReadOnlyMemory<char> y) => x.Span.CompareTo(y.Span, _comparison);
+        }
+
+        private sealed class CharComparer : IComparer<char>
+        {
+            private readonly StringComparison _comparison;
+
+            public CharComparer(StringComparison comparison)
+            {
+                _comparison = comparison;
+            }
+
+            public int Compare(char x, char y)
+            {
+                unsafe
+                {
+                    // If anyone knows a better way to compare individual chars according to a
+                    // StringComparison, I'd be happy to hear it.
+                    var spanX = new ReadOnlySpan<char>(&x, 1);
+                    var spanY = new ReadOnlySpan<char>(&y, 1);
+                    return spanX.CompareTo(spanY, _comparison);
+                }
             }
         }
 
@@ -155,11 +190,8 @@ namespace Ookii.CommandLine
 
         private readonly Type _argumentsType;
         private readonly List<CommandLineArgument> _arguments = new();
-        private readonly SortedDictionary<string, CommandLineArgument> _argumentsByName;
-
-        // Uses string, even though short names are single char, so it can use the same comparer
-        // as _argumentsByName.
-        private readonly SortedDictionary<string, CommandLineArgument>? _argumentsByShortName;
+        private readonly SortedDictionary<ReadOnlyMemory<char>, CommandLineArgument> _argumentsByName;
+        private readonly SortedDictionary<char, CommandLineArgument>? _argumentsByShortName;
         private readonly int _positionalArgumentCount;
 
         private readonly ParseOptions _parseOptions;
@@ -281,7 +313,8 @@ namespace Ookii.CommandLine
             }
 
             _mode = _parseOptions.Mode ?? default;
-            var comparer = _parseOptions.ArgumentNameComparer ?? StringComparer.OrdinalIgnoreCase;
+            var comparison = _parseOptions.ArgumentNameComparison ?? StringComparison.OrdinalIgnoreCase;
+            ArgumentNameComparison = comparison;
             _argumentNamePrefixes = DetermineArgumentNamePrefixes(_parseOptions);
             var prefixInfos = _argumentNamePrefixes.Select(p => new PrefixInfo { Prefix = p, Short = true });
             if (_mode == ParsingMode.LongShort)
@@ -294,17 +327,17 @@ namespace Ookii.CommandLine
 
                 var longInfo = new PrefixInfo { Prefix = _longArgumentNamePrefix, Short = false };
                 prefixInfos = prefixInfos.Append(longInfo);
-                _argumentsByShortName = new(comparer);
+                _argumentsByShortName = new(new CharComparer(comparison));
             }
 
             _sortedPrefixes = prefixInfos.OrderByDescending(info => info.Prefix.Length).ToArray();
-            _argumentsByName = new(comparer);
+            _argumentsByName = new(new MemoryComparer(comparison));
 
             _positionalArgumentCount = DetermineMemberArguments(options, optionsAttribute);
             DetermineAutomaticArguments(options, optionsAttribute);
             // Sort the member arguments in usage order (positional first, then required
             // non-positional arguments, then the rest by name.
-            _arguments.Sort(new CommandLineArgumentComparer(_argumentsByName.Comparer));
+            _arguments.Sort(new CommandLineArgumentComparer(comparison));
 
             VerifyPositionalArgumentRules();
         }
@@ -614,11 +647,11 @@ namespace Ookii.CommandLine
         /// Gets the string comparer used for argument names.
         /// </summary>
         /// <value>
-        /// An instance of a class implementing the <see cref="IComparer{T}"/> interface.
+        /// One of the members of the <see cref="StringComparison"/> enumeration.
         /// </value>
         /// <seealso cref="ParseOptionsAttribute.CaseSensitive"/>
-        /// <seealso cref="ParseOptions.ArgumentNameComparer"/>
-        public IComparer<string> ArgumentNameComparer => _argumentsByName.Comparer;
+        /// <seealso cref="ParseOptions.ArgumentNameComparison"/>
+        public StringComparison ArgumentNameComparison { get; }
 
         /// <summary>
         /// Gets the arguments supported by this <see cref="CommandLineParser"/> instance.
@@ -657,6 +690,9 @@ namespace Ookii.CommandLine
         /// </para>
         /// </remarks>
         public ParseResult ParseResult { get; private set; }
+
+        internal IComparer<char>? ShortArgumentNameComparer => _argumentsByShortName?.Comparer;
+
 
         /// <summary>
         /// Gets the name of the executable used to invoke the application.
@@ -1035,7 +1071,7 @@ namespace Ookii.CommandLine
                 throw new ArgumentNullException(nameof(name));
             }
 
-            if (_argumentsByName.TryGetValue(name, out var argument))
+            if (_argumentsByName.TryGetValue(name.AsMemory(), out var argument))
             {
                 return argument;
             }
@@ -1059,7 +1095,7 @@ namespace Ookii.CommandLine
         /// </remarks>
         public CommandLineArgument? GetShortArgument(char shortName)
         {
-            if (_argumentsByShortName != null && _argumentsByShortName.TryGetValue(shortName.ToString(), out var argument))
+            if (_argumentsByShortName != null && _argumentsByShortName.TryGetValue(shortName, out var argument))
             {
                 return argument;
             }
@@ -1266,24 +1302,24 @@ namespace Ookii.CommandLine
 
             if (argument.HasLongName)
             {
-                _argumentsByName.Add(argument.ArgumentName, argument);
+                _argumentsByName.Add(argument.ArgumentName.AsMemory(), argument);
                 if (argument.Aliases != null)
                 {
                     foreach (string alias in argument.Aliases)
                     {
-                        _argumentsByName.Add(alias, argument);
+                        _argumentsByName.Add(alias.AsMemory(), argument);
                     }
                 }
             }
 
             if (_argumentsByShortName != null && argument.HasShortName)
             {
-                _argumentsByShortName.Add(argument.ShortName.ToString(), argument);
+                _argumentsByShortName.Add(argument.ShortName, argument);
                 if (argument.ShortAliases != null)
                 {
                     foreach (var alias in argument.ShortAliases)
                     {
-                        _argumentsByShortName.Add(alias.ToString(), argument);
+                        _argumentsByShortName.Add(alias, argument);
                     }
                 }
             }
@@ -1453,29 +1489,30 @@ namespace Ookii.CommandLine
 
         private int ParseNamedArgument(string[] args, int index, PrefixInfo prefix)
         {
-            var (argumentName, argumentValue) = args[index].SplitOnce(NameValueSeparator, prefix.Prefix.Length);
+            var (argumentName, argumentValueSpan) = args[index].AsMemory(prefix.Prefix.Length).SplitOnce(NameValueSeparator);
+            var argumentValue = argumentValueSpan.HasValue ? argumentValueSpan.Value.ToString() : null;
 
             CommandLineArgument? argument = null;
             if (_argumentsByShortName != null && prefix.Short)
             {
                 if (argumentName.Length == 1)
                 {
-                    argument = GetShortArgumentOrThrow(argumentName);
+                    argument = GetShortArgumentOrThrow(argumentName.Span[0]);
                 }
                 else
                 {
                     // ParseShortArgument returns true if parsing was canceled by the
                     // ArgumentParsed event handler or the CancelParsing property.
-                    return ParseShortArgument(argumentName, argumentValue) ? -1 : index;
+                    return ParseShortArgument(argumentName.Span, argumentValue) ? -1 : index;
                 }
             }
 
             if (argument == null && !_argumentsByName.TryGetValue(argumentName, out argument))
             {
-                throw StringProvider.CreateException(CommandLineArgumentErrorCategory.UnknownArgument, argumentName);
+                throw StringProvider.CreateException(CommandLineArgumentErrorCategory.UnknownArgument, argumentName.ToString());
             }
 
-            argument.UsedArgumentName = argumentName;
+            argument.SetUsedArgumentName(argumentName);
             if (argumentValue == null && !argument.IsSwitch && AllowWhiteSpaceValueSeparator)
             {
                 // No separator was present but a value is required. We take the next argument as
@@ -1510,14 +1547,14 @@ namespace Ookii.CommandLine
             return ParseArgumentValue(argument, argumentValue) ? -1 : index;
         }
 
-        private bool ParseShortArgument(string name, string? value)
+        private bool ParseShortArgument(ReadOnlySpan<char> name, string? value)
         {
             foreach (var ch in name)
             {
-                var arg = GetShortArgumentOrThrow(ch.ToString());
+                var arg = GetShortArgumentOrThrow(ch);
                 if (!arg.IsSwitch)
                 {
-                    throw StringProvider.CreateException(CommandLineArgumentErrorCategory.CombinedShortNameNonSwitch, name);
+                    throw StringProvider.CreateException(CommandLineArgumentErrorCategory.CombinedShortNameNonSwitch, name.ToString());
                 }
 
                 if (ParseArgumentValue(arg, value))
@@ -1529,15 +1566,14 @@ namespace Ookii.CommandLine
             return false;
         }
 
-        private CommandLineArgument GetShortArgumentOrThrow(string shortName)
+        private CommandLineArgument GetShortArgumentOrThrow(char shortName)
         {
-            Debug.Assert(shortName.Length == 1);
             if (_argumentsByShortName!.TryGetValue(shortName, out CommandLineArgument? argument))
             {
                 return argument;
             }
 
-            throw StringProvider.CreateException(CommandLineArgumentErrorCategory.UnknownArgument, shortName);
+            throw StringProvider.CreateException(CommandLineArgumentErrorCategory.UnknownArgument, shortName.ToString());
         }
 
         private PrefixInfo? CheckArgumentNamePrefix(string argument)

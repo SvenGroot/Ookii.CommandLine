@@ -262,6 +262,7 @@ namespace Ookii.CommandLine
         private readonly bool _isHidden;
         private readonly IEnumerable<ArgumentValidationAttribute> _validators;
         private IValueHelper? _valueHelper;
+        private ReadOnlyMemory<char> _usedArgumentName;
 
         private CommandLineArgument(ArgumentInfo info)
         {
@@ -916,7 +917,7 @@ namespace Ookii.CommandLine
         ///   If the argument names are case-insensitive, the value of this property uses the casing as specified on the command line, not the original casing of the argument name or alias.
         /// </para>
         /// </remarks>
-        public string? UsedArgumentName { get; internal set; }
+        public string? UsedArgumentName => _usedArgumentName.Length > 0 ? _usedArgumentName.ToString() : null;
 
         /// <summary>
         /// Gets a value that indicates whether or not this argument accepts <see langword="null" /> values.
@@ -1359,18 +1360,18 @@ namespace Ookii.CommandLine
                 Validators = Enumerable.Empty<ArgumentValidationAttribute>(),
             };
 
-            var shortNameString = shortName.ToString();
-            var shortAliasString = shortAlias.ToString();
             if (parser.Mode == ParsingMode.LongShort)
             {
-                if (parser.ArgumentNameComparer.Compare(shortAliasString, shortNameString) != 0)
+                if (parser.ShortArgumentNameComparer!.Compare(shortAlias, shortName) != 0)
                 {
                     info.ShortAliases = new[] { shortAlias };
                 }
             }
             else
             {
-                info.Aliases = parser.ArgumentNameComparer.Compare(shortAliasString, shortNameString) == 0
+                var shortNameString = shortName.ToString();
+                var shortAliasString = shortAlias.ToString();
+                info.Aliases = string.Compare(shortAliasString, shortNameString, parser.ArgumentNameComparison) == 0
                     ? new[] { shortNameString }
                     : new[] { shortNameString, shortAliasString };
             }
@@ -1449,7 +1450,7 @@ namespace Ookii.CommandLine
             }
 
             HasValue = false;
-            UsedArgumentName = null;
+            _usedArgumentName = default;
         }
 
         internal static void ShowVersion(LocalizedStringProvider stringProvider, Assembly assembly, string friendlyName)
@@ -1472,6 +1473,11 @@ namespace Ookii.CommandLine
             {
                 throw _parser.StringProvider.CreateException(CommandLineArgumentErrorCategory.MissingRequiredArgument, ArgumentName);
             }
+        }
+
+        internal void SetUsedArgumentName(ReadOnlyMemory<char> name)
+        {
+            _usedArgumentName = name;
         }
 
         private static string? GetMultiValueSeparator(MultiValueSeparatorAttribute? attribute)

@@ -1599,7 +1599,16 @@ namespace Ookii.CommandLine
                 _ => false,
             });
 
-            var comparer = Parser.ArgumentNameComparer;
+            var comparer = Parser.ArgumentNameComparison switch
+            {
+                StringComparison.CurrentCulture => StringComparer.CurrentCulture,
+                StringComparison.CurrentCultureIgnoreCase => StringComparer.CurrentCultureIgnoreCase,
+                StringComparison.InvariantCulture => StringComparer.InvariantCulture,
+                StringComparison.InvariantCultureIgnoreCase => StringComparer.InvariantCultureIgnoreCase,
+                StringComparison.Ordinal => StringComparer.Ordinal,
+                _ => StringComparer.OrdinalIgnoreCase,
+            };
+
             return ArgumentDescriptionListOrder switch
             {
                 DescriptionListSortMode.Alphabetical => arguments.OrderBy(arg => arg.ArgumentName, comparer),

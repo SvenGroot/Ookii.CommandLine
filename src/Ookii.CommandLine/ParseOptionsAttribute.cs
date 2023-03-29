@@ -131,11 +131,11 @@ namespace Ookii.CommandLine
         ///   it will use <see cref="StringComparer.OrdinalIgnoreCase" />.
         /// </para>
         /// <para>
-        ///   This value can be overridden by the <see cref="ParseOptions.ArgumentNameComparer"/>
+        ///   This value can be overridden by the <see cref="ParseOptions.ArgumentNameComparison"/>
         ///   property.
         /// </para>
         /// </remarks>
-        /// <seealso cref="CommandLineParser.ArgumentNameComparer"/>
+        /// <seealso cref="CommandLineParser.ArgumentNameComparison"/>
         public bool CaseSensitive { get; set; }
 
         /// <summary>
@@ -306,17 +306,17 @@ namespace Ookii.CommandLine
         /// <seealso cref="CommandLineArgument.ValueDescription"/>
         public NameTransform ValueDescriptionTransform { get; set; }
 
-        internal IComparer<string> GetStringComparer()
+        internal StringComparison GetStringComparison()
         {
             if (CaseSensitive)
             {
                 // Do not use Ordinal for case-sensitive comparisons so that when sorting capitals
                 // and non-capitals are sorted together.
-                return StringComparer.InvariantCulture;
+                return StringComparison.InvariantCulture;
             }
             else
             {
-                return StringComparer.OrdinalIgnoreCase;
+                return StringComparison.OrdinalIgnoreCase;
             }
         }
     }

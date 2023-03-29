@@ -611,7 +611,7 @@ namespace Ookii.CommandLine.Tests
             var options = new ParseOptions()
             {
                 Mode = ParsingMode.Default,
-                ArgumentNameComparer = StringComparer.OrdinalIgnoreCase,
+                ArgumentNameComparison = StringComparison.OrdinalIgnoreCase,
                 AllowWhiteSpaceValueSeparator = true,
                 DuplicateArguments = ErrorMode.Error,
                 NameValueSeparator = ';',

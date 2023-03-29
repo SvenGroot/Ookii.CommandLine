@@ -137,13 +137,15 @@ namespace Ookii.CommandLine
         public string? LongArgumentNamePrefix { get; set; }
 
         /// <summary>
-        /// Gets or set the <see cref="IComparer{T}"/> to use to compare argument names.
+        /// Gets or set the type of string comparison to use for argument names.
         /// </summary>
         /// <value>
-        /// The <see cref="IComparer{T}"/> to use to compare the names of named arguments, or
-        /// <see langword="null"/> to use the one determined using the <see cref="ParseOptionsAttribute.CaseSensitive"/>
-        /// property, or if the <see cref="ParseOptionsAttribute"/> is not present, <see cref="StringComparer.OrdinalIgnoreCase"/>.
-        /// The default value is <see langword="null"/>.
+        /// One of the values of the <see cref="StringComparison"/> enumeration, or
+        /// <see langword="null"/> to use the one determined using the
+        /// <see cref="ParseOptionsAttribute.CaseSensitive"/> property, or if the
+        /// <see cref="ParseOptionsAttribute"/> is not present,
+        /// <see cref="StringComparison.OrdinalIgnoreCase"/>. The default value is
+        /// <see langword="null"/>.
         /// </value>
         /// <remarks>
         /// <para>
@@ -151,8 +153,8 @@ namespace Ookii.CommandLine
         ///   <see cref="ParseOptionsAttribute.CaseSensitive"/> property.
         /// </para>
         /// </remarks>
-        /// <seealso cref="CommandLineParser.ArgumentNameComparer"/>
-        public IComparer<string>? ArgumentNameComparer { get; set; }
+        /// <seealso cref="CommandLineParser.ArgumentNameComparison"/>
+        public StringComparison? ArgumentNameComparison { get; set; }
 
         /// <summary>
         /// Gets or sets the <see cref="TextWriter"/> used to print error information if argument
@@ -522,7 +524,7 @@ namespace Ookii.CommandLine
             ArgumentNameTransform ??= attribute.ArgumentNameTransform;
             ArgumentNamePrefixes ??= attribute.ArgumentNamePrefixes;
             LongArgumentNamePrefix ??= attribute.LongArgumentNamePrefix;
-            ArgumentNameComparer ??= attribute.GetStringComparer();
+            ArgumentNameComparison ??= attribute.GetStringComparison();
             DuplicateArguments ??= attribute.DuplicateArguments;
             AllowWhiteSpaceValueSeparator ??= attribute.AllowWhiteSpaceValueSeparator;
             NameValueSeparator ??= attribute.NameValueSeparator;
