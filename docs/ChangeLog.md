@@ -1,8 +1,13 @@
 # What’s new in Ookii.CommandLine
 
-## Ookii.CommandLine 3.1
-
 **IMPORTANT:** If you are upgrading from version 2.x, please check the [migration guide](Migrating.md).
+
+## Ookii.CommandLine 3.1.1
+
+- .Net Standard 2.0: use the System.Memory package to remove some downlevel-only code.
+- There are no changes for the .Net Standard 2.1 and .Net 6.0 assemblies.
+
+## Ookii.CommandLine 3.1
 
 - Added an instance [`CommandLineParser<T>.ParseWithErrorHandling()`][] method, which handles errors
   and displays usage help the same way as the static [`Parse<T>()`][Parse<T>()_1] method, but allows access to more
