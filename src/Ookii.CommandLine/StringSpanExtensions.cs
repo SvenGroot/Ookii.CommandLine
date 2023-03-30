@@ -12,6 +12,7 @@ namespace Ookii.CommandLine
     {
         public delegate void Callback(StringSegmentType type, ReadOnlySpan<char> span);
         public delegate Task AsyncCallback(StringSegmentType type, ReadOnlyMemory<char> span);
+        public delegate bool SplitCallback(ReadOnlySpan<char> span);
 
         private static readonly char[] _segmentSeparators = { '\r', '\n', VirtualTerminal.Escape };
         private static readonly char[] _newLineSeparators = { '\r', '\n' };
@@ -73,6 +74,20 @@ namespace Ookii.CommandLine
         public static void CopyTo(this ReadOnlySpan<char> self, char[] destination, int start)
         {
             self.CopyTo(destination.AsSpan(start));
+        }
+
+        public static void Split(this ReadOnlySpan<char> self, ReadOnlySpan<char> separator, SplitCallback callback)
+        {
+            while (!self.IsEmpty)
+            {
+                var (first, remaining) = self.SplitOnce(separator, out bool _);
+                if (!callback(first))
+                {
+                    break;
+                }
+
+                self = remaining;
+            }
         }
 
         public static partial void WriteTo(this ReadOnlySpan<char> self, TextWriter writer);

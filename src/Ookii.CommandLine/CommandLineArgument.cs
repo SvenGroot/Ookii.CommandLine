@@ -1043,59 +1043,24 @@ namespace Ookii.CommandLine
         /// <returns>The converted value.</returns>
         /// <remarks>
         /// <para>
-        ///   Conversion is done by one of several methods. First, if a <see cref="ArgumentConverterAttribute"/>
-        ///   was present on the constructor parameter, property, or method that defined the
-        ///   property, the specified <see cref="ArgumentConverter"/> is used. Otherwise, if the
-        ///   default <see cref="ArgumentConverter"/> for the <see cref="ElementType"/> can convert
-        ///   from a string, it is used. Otherwise, a static Parse(<see cref="string"/>, <see cref="IFormatProvider"/>) or
-        ///   Parse(<see cref="string"/>) method on the type is used. Finally, a constructor that
-        ///   takes a single parameter of type <see cref="string"/> will be used.
+        ///   Conversion is done by one of several methods. First, if a <see
+        ///   cref="ArgumentConverterAttribute"/> was present on the property, or method that
+        ///   defined the argument, the specified <see cref="ArgumentConverter"/> is used.
+        ///   Otherwise, the type must implement <see cref="ISpanParsable{TSelf}"/>, or have a
+        ///   static Parse(<see cref="string"/>, <see cref="IFormatProvider"/>) or Parse(<see
+        ///   cref="string"/>) method, or have a constructor that takes a single parameter of type
+        ///   <see cref="string"/>.
         /// </para>
         /// </remarks>
         /// <exception cref="ArgumentNullException">
         ///   <paramref name="culture"/> is <see langword="null"/>
         /// </exception>
         /// <exception cref="CommandLineArgumentException">
-        ///   <paramref name="argumentValue"/> could not be converted to the type specified in the <see cref="ArgumentType"/> property.
+        ///   <paramref name="argumentValue"/> could not be converted to the type specified in the
+        ///   <see cref="ArgumentType"/> property.
         /// </exception>
         public object? ConvertToArgumentType(CultureInfo culture, string? argumentValue)
-        {
-            if (culture == null)
-            {
-                throw new ArgumentNullException(nameof(culture));
-            }
-
-            if (argumentValue == null)
-            {
-                if (IsSwitch)
-                {
-                    return true;
-                }
-                else
-                {
-                    throw _parser.StringProvider.CreateException(CommandLineArgumentErrorCategory.MissingNamedArgumentValue, this);
-                }
-            }
-
-            try
-            {
-                var converted = _converter.Convert(argumentValue, culture);
-                if (converted == null && (!_allowNull || IsDictionary))
-                {
-                    throw _parser.StringProvider.CreateException(CommandLineArgumentErrorCategory.NullArgumentValue, this);
-                }
-
-                return converted;
-            }
-            catch (NotSupportedException ex)
-            {
-                throw _parser.StringProvider.CreateException(CommandLineArgumentErrorCategory.ArgumentValueConversion, ex, this, argumentValue);
-            }
-            catch (FormatException ex)
-            {
-                throw _parser.StringProvider.CreateException(CommandLineArgumentErrorCategory.ArgumentValueConversion, ex, this, argumentValue);
-            }
-        }
+            => ConvertToArgumentType(culture, argumentValue != null, argumentValue, argumentValue.AsSpan());
 
         /// <summary>
         /// Converts any type to the argument's <see cref="ElementType"/>.
@@ -1111,8 +1076,8 @@ namespace Ookii.CommandLine
         ///   If the type of <paramref name="value"/> is directly assignable to <see cref="ArgumentType"/>,
         ///   no conversion is done. If the <paramref name="value"/> is a <see cref="string"/>,
         ///   the same rules apply as for the <see cref="ConvertToArgumentType(CultureInfo, string?)"/>
-        ///   method, using <see cref="CultureInfo.InvariantCulture"/>. Otherwise, the
-        ///   <see cref="ArgumentConverter"/> for the argument is used to convert between the source.
+        ///   method, using <see cref="CultureInfo.InvariantCulture"/>. Other types cannot be
+        ///   converted.
         /// </para>
         /// <para>
         ///   This method is used to convert the <see cref="CommandLineArgumentAttribute.DefaultValue"/>
@@ -1150,6 +1115,48 @@ namespace Ookii.CommandLine
         public override string ToString()
         {
             return (new UsageWriter()).GetArgumentUsage(this);
+        }
+
+        internal object? ConvertToArgumentType(CultureInfo culture, bool hasValue, string? stringValue, ReadOnlySpan<char> spanValue)
+        {
+            if (culture == null)
+            {
+                throw new ArgumentNullException(nameof(culture));
+            }
+
+            if (!hasValue)
+            {
+                if (IsSwitch)
+                {
+                    return true;
+                }
+                else
+                {
+                    throw _parser.StringProvider.CreateException(CommandLineArgumentErrorCategory.MissingNamedArgumentValue, this);
+                }
+            }
+
+            try
+            {
+                var converted = stringValue == null
+                    ? _converter.Convert(spanValue, culture)
+                    : _converter.Convert(stringValue, culture);
+
+                if (converted == null && (!_allowNull || IsDictionary))
+                {
+                    throw _parser.StringProvider.CreateException(CommandLineArgumentErrorCategory.NullArgumentValue, this);
+                }
+
+                return converted;
+            }
+            catch (NotSupportedException ex)
+            {
+                throw _parser.StringProvider.CreateException(CommandLineArgumentErrorCategory.ArgumentValueConversion, ex, this, stringValue ?? spanValue.ToString());
+            }
+            catch (FormatException ex)
+            {
+                throw _parser.StringProvider.CreateException(CommandLineArgumentErrorCategory.ArgumentValueConversion, ex, this, stringValue ?? spanValue.ToString());
+            }
         }
 
         internal bool HasInformation(UsageWriter writer)
@@ -1196,32 +1203,33 @@ namespace Ookii.CommandLine
             return false;
         }
 
-        internal bool SetValue(CultureInfo culture, string? value)
+        internal bool SetValue(CultureInfo culture, bool hasValue, string? stringValue, ReadOnlySpan<char> spanValue)
         {
             _valueHelper ??= CreateValueHelper();
 
             bool continueParsing;
-            if (IsMultiValue && value != null && MultiValueSeparator != null)
+            if (IsMultiValue && hasValue && MultiValueSeparator != null)
             {
                 continueParsing = true;
-                string[] values = value.Split(new[] { MultiValueSeparator }, StringSplitOptions.None);
-                foreach (string separateValue in values)
+                spanValue.Split(MultiValueSeparator.AsSpan(), separateValue =>
                 {
-                    Validate(separateValue, ValidationMode.BeforeConversion);
-                    var converted = ConvertToArgumentType(culture, separateValue);
+                    string? separateValueString = null;
+                    PreValidate(ref separateValueString, separateValue);
+                    var converted = ConvertToArgumentType(culture, true, separateValueString, separateValue);
                     continueParsing = _valueHelper.SetValue(this, culture, converted);
                     if (!continueParsing)
                     {
-                        break;
+                        return false;
                     }
 
                     Validate(converted, ValidationMode.AfterConversion);
-                }
+                    return true;
+                });
             }
             else
             {
-                Validate(value, ValidationMode.BeforeConversion);
-                var converted = ConvertToArgumentType(culture, value);
+                PreValidate(ref stringValue, spanValue);
+                var converted = ConvertToArgumentType(culture, hasValue, stringValue, spanValue);
                 continueParsing = _valueHelper.SetValue(this, culture, converted);
                 Validate(converted, ValidationMode.AfterConversion);
             }
@@ -1834,6 +1842,17 @@ namespace Ookii.CommandLine
                 if (validator.Mode == mode)
                 {
                     validator.Validate(this, value);
+                }
+            }
+        }
+
+        private void PreValidate(ref string? stringValue, ReadOnlySpan<char> spanValue)
+        {
+            foreach (var validator in _validators)
+            {
+                if (validator.Mode == ValidationMode.BeforeConversion)
+                {
+                    validator.Validate(this, (stringValue ??= spanValue.ToString()));
                 }
             }
         }

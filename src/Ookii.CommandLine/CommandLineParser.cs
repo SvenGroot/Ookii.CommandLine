@@ -1414,7 +1414,7 @@ namespace Ookii.CommandLine
 
                     // ParseArgumentValue returns true if parsing was canceled by the ArgumentParsed event handler
                     // or the CancelParsing property.
-                    if (ParseArgumentValue(_arguments[positionalArgumentIndex], arg))
+                    if (ParseArgumentValue(_arguments[positionalArgumentIndex], arg, arg.AsMemory()))
                     {
                         return null;
                     }
@@ -1446,7 +1446,7 @@ namespace Ookii.CommandLine
             return commandLineArguments;
         }
 
-        private bool ParseArgumentValue(CommandLineArgument argument, string? value)
+        private bool ParseArgumentValue(CommandLineArgument argument, string? stringValue, ReadOnlyMemory<char>? memoryValue)
         {
             if (argument.HasValue && !argument.IsMultiValue)
             {
@@ -1455,7 +1455,10 @@ namespace Ookii.CommandLine
                     throw StringProvider.CreateException(CommandLineArgumentErrorCategory.DuplicateArgument, argument);
                 }
 
-                var duplicateEventArgs = new DuplicateArgumentEventArgs(argument, value);
+                var duplicateEventArgs = stringValue == null
+                    ? new DuplicateArgumentEventArgs(argument, memoryValue.HasValue, memoryValue ?? default)
+                    : new DuplicateArgumentEventArgs(argument, stringValue);
+
                 OnDuplicateArgument(duplicateEventArgs);
                 if (duplicateEventArgs.KeepOldValue)
                 {
@@ -1463,7 +1466,7 @@ namespace Ookii.CommandLine
                 }
             }
 
-            bool continueParsing = argument.SetValue(Culture, value);
+            bool continueParsing = argument.SetValue(Culture, memoryValue.HasValue, stringValue, (memoryValue ?? default).Span);
             var e = new ArgumentParsedEventArgs(argument)
             {
                 Cancel = !continueParsing
@@ -1489,8 +1492,7 @@ namespace Ookii.CommandLine
 
         private int ParseNamedArgument(string[] args, int index, PrefixInfo prefix)
         {
-            var (argumentName, argumentValueSpan) = args[index].AsMemory(prefix.Prefix.Length).SplitOnce(NameValueSeparator);
-            var argumentValue = argumentValueSpan.HasValue ? argumentValueSpan.Value.ToString() : null;
+            var (argumentName, argumentValue) = args[index].AsMemory(prefix.Prefix.Length).SplitOnce(NameValueSeparator);
 
             CommandLineArgument? argument = null;
             if (_argumentsByShortName != null && prefix.Short)
@@ -1513,19 +1515,21 @@ namespace Ookii.CommandLine
             }
 
             argument.SetUsedArgumentName(argumentName);
-            if (argumentValue == null && !argument.IsSwitch && AllowWhiteSpaceValueSeparator)
+            if (!argumentValue.HasValue && !argument.IsSwitch && AllowWhiteSpaceValueSeparator)
             {
+                string? argumentValueString = null;
+
                 // No separator was present but a value is required. We take the next argument as
                 // its value. For multi-value arguments that can consume multiple values, we keep
                 // going until we hit another argument name.
                 while (index + 1 < args.Length && CheckArgumentNamePrefix(args[index + 1]) == null)
                 {
                     ++index;
-                    argumentValue = args[index];
+                    argumentValueString = args[index];
 
                     // ParseArgumentValue returns true if parsing was canceled by the ArgumentParsed
                     // event handler or the CancelParsing property.
-                    if (ParseArgumentValue(argument, argumentValue))
+                    if (ParseArgumentValue(argument, argumentValueString, argumentValueString.AsMemory()))
                     {
                         return -1;
                     }
@@ -1536,7 +1540,7 @@ namespace Ookii.CommandLine
                     }
                 }
 
-                if (argumentValue != null)
+                if (argumentValueString != null)
                 {
                     return index;
                 }
@@ -1544,10 +1548,10 @@ namespace Ookii.CommandLine
 
             // ParseArgumentValue returns true if parsing was canceled by the ArgumentParsed event handler
             // or the CancelParsing property.
-            return ParseArgumentValue(argument, argumentValue) ? -1 : index;
+            return ParseArgumentValue(argument, null, argumentValue) ? -1 : index;
         }
 
-        private bool ParseShortArgument(ReadOnlySpan<char> name, string? value)
+        private bool ParseShortArgument(ReadOnlySpan<char> name, ReadOnlyMemory<char>? value)
         {
             foreach (var ch in name)
             {
@@ -1557,7 +1561,7 @@ namespace Ookii.CommandLine
                     throw StringProvider.CreateException(CommandLineArgumentErrorCategory.CombinedShortNameNonSwitch, name.ToString());
                 }
 
-                if (ParseArgumentValue(arg, value))
+                if (ParseArgumentValue(arg, null, value))
                 {
                     return true;
                 }

@@ -8,7 +8,9 @@ namespace Ookii.CommandLine
     public class DuplicateArgumentEventArgs : EventArgs
     {
         private readonly CommandLineArgument _argument;
-        private readonly string? _newValue;
+        private readonly ReadOnlyMemory<char> _memoryValue;
+        private readonly string? _stringValue;
+        private bool _hasValue;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DuplicateArgumentEventArgs"/> class.
@@ -21,7 +23,24 @@ namespace Ookii.CommandLine
         public DuplicateArgumentEventArgs(CommandLineArgument argument, string? newValue)
         {
             _argument = argument ?? throw new ArgumentNullException(nameof(argument));
-            _newValue = newValue;
+            _stringValue = newValue;
+            _hasValue = newValue != null;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DuplicateArgumentEventArgs"/> class.
+        /// </summary>
+        /// <param name="argument">The argument that was specified more than once.</param>
+        /// <param name="hasValue"><see langword="true"/> if the argument has a value; otherwise, <see langword="false"/>.</param>
+        /// <param name="newValue">The new value of the argument.</param>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="argument"/> is <see langword="null"/>
+        /// </exception>
+        public DuplicateArgumentEventArgs(CommandLineArgument argument, bool hasValue, ReadOnlyMemory<char> newValue)
+        {
+            _argument = argument ?? throw new ArgumentNullException(nameof(argument));
+            _memoryValue = newValue;
+            _hasValue = hasValue;
         }
 
         /// <summary>
@@ -38,7 +57,7 @@ namespace Ookii.CommandLine
         /// <value>
         /// The raw string value provided on the command line, before conversion.
         /// </value>
-        public string? NewValue => _newValue;
+        public string? NewValue => _hasValue ? (_stringValue ?? _memoryValue.ToString()) : null;
 
         /// <summary>
         /// Gets or sets a value that indicates whether the value of the argument should stay
