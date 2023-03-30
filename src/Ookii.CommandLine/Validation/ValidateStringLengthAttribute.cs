@@ -1,4 +1,6 @@
-﻿namespace Ookii.CommandLine.Validation
+﻿using System;
+
+namespace Ookii.CommandLine.Validation
 {
     /// <summary>
     /// Validates that the string length of an argument's value is in the specified range.
@@ -24,6 +26,7 @@
         {
             _minimum = minimum;
             _maximum = maximum;
+            CanValidateSpan = true;
         }
 
         /// <summary>
@@ -55,8 +58,7 @@
         /// </summary>
         /// <param name="argument">The argument being validated.</param>
         /// <param name="value">
-        ///   The argument value. If not <see langword="null"/>, this must be an instance of
-        ///   <see cref="CommandLineArgument.ArgumentType"/>.
+        ///   The raw string value of the argument.
         /// </param>
         /// <returns>
         ///   <see langword="true"/> if the value is valid; otherwise, <see langword="false"/>.
@@ -64,6 +66,13 @@
         public override bool IsValid(CommandLineArgument argument, object? value)
         {
             var length = (value as string)?.Length ?? 0;
+            return length >= _minimum && length <= _maximum;
+        }
+
+        /// <inheritdoc cref="IsValid(CommandLineArgument, object?)"/>
+        public override bool IsSpanValid(CommandLineArgument argument, ReadOnlySpan<char> value)
+        {
+            var length = value.Length;
             return length >= _minimum && length <= _maximum;
         }
 

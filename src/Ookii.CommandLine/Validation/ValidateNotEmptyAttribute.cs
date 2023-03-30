@@ -1,12 +1,14 @@
-﻿namespace Ookii.CommandLine.Validation
+﻿using System;
+
+namespace Ookii.CommandLine.Validation
 {
     /// <summary>
     /// Validates that the value of an argument is not an empty string.
     /// </summary>
     /// <remarks>
     /// <note>
-    ///   If the argument's type is not <see cref="string"/>, this validator uses the raw string
-    ///   value provided by the user, before type conversion takes place.
+    /// This validator uses the raw string value provided by the user, before type conversion takes
+    /// place.
     /// </note>
     /// <para>
     ///   If the argument is optional, validation is only performed if the argument is specified,
@@ -18,6 +20,14 @@
     public class ValidateNotEmptyAttribute : ArgumentValidationWithHelpAttribute
     {
         /// <summary>
+        /// Initializes a new instance of the <see cref="ValidateNotEmptyAttribute"/> class.
+        /// </summary>
+        public ValidateNotEmptyAttribute()
+        {
+            CanValidateSpan = true;
+        }
+
+        /// <summary>
         /// Gets a value that indicates when validation will run.
         /// </summary>
         /// <value>
@@ -26,12 +36,11 @@
         public override ValidationMode Mode => ValidationMode.BeforeConversion;
 
         /// <summary>
-        /// Determines if the argument's value is not null or empty.
+        /// Determines if the argument is valid.
         /// </summary>
         /// <param name="argument">The argument being validated.</param>
         /// <param name="value">
-        ///   The argument value. If not <see langword="null"/>, this must be an instance of
-        ///   <see cref="CommandLineArgument.ArgumentType"/>.
+        ///   The raw string argument value provided by the user on the command line.
         /// </param>
         /// <returns>
         ///   <see langword="true"/> if the value is valid; otherwise, <see langword="false"/>.
@@ -40,6 +49,10 @@
         {
             return !string.IsNullOrEmpty(value as string);
         }
+
+        /// <inheritdoc cref="IsValid(CommandLineArgument, object?)"/>
+        public override bool IsSpanValid(CommandLineArgument argument, ReadOnlySpan<char> value)
+            => !value.IsEmpty;
 
         /// <summary>
         /// Gets the error message to display if validation failed.

@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System;
+using System.Globalization;
 using System.Text.RegularExpressions;
 
 namespace Ookii.CommandLine.Validation
@@ -38,6 +39,9 @@ namespace Ookii.CommandLine.Validation
         {
             _pattern = pattern;
             _options = options;
+#if NET7_0_OR_GREATER
+            CanValidateSpan = true;
+#endif
         }
 
         /// <summary>
@@ -81,8 +85,7 @@ namespace Ookii.CommandLine.Validation
         /// </summary>
         /// <param name="argument">The argument being validated.</param>
         /// <param name="value">
-        ///   The argument value. If not <see langword="null"/>, this must be an instance of
-        ///   <see cref="CommandLineArgument.ArgumentType"/>.
+        ///   The raw string argument value.
         /// </param>
         /// <returns>
         ///   <see langword="true"/> if the value is valid; otherwise, <see langword="false"/>.
@@ -96,6 +99,23 @@ namespace Ookii.CommandLine.Validation
 
             return Pattern.IsMatch(stringValue);
         }
+
+#if NET7_0_OR_GREATER
+
+        /// <summary>
+        /// Determines if the argument's value matches the pattern.
+        /// </summary>
+        /// <param name="argument">The argument being validated.</param>
+        /// <param name="value">
+        ///   The raw string argument value.
+        /// </param>
+        /// <returns>
+        ///   <see langword="true"/> if the value is valid; otherwise, <see langword="false"/>.
+        /// </returns>
+        public override bool IsSpanValid(CommandLineArgument argument, ReadOnlySpan<char> value)
+            => Pattern.IsMatch(value);
+
+#endif
 
         /// <summary>
         /// Gets the error message to display if validation failed.

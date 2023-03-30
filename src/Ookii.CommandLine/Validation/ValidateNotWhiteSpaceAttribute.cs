@@ -1,4 +1,6 @@
-﻿namespace Ookii.CommandLine.Validation
+﻿using System;
+
+namespace Ookii.CommandLine.Validation
 {
 
     /// <summary>
@@ -20,6 +22,14 @@
     public class ValidateNotWhiteSpaceAttribute : ArgumentValidationWithHelpAttribute
     {
         /// <summary>
+        /// Initializes a new instance of the <see cref="ValidateNotWhiteSpaceAttribute"/> class.
+        /// </summary>
+        public ValidateNotWhiteSpaceAttribute()
+        {
+            CanValidateSpan = true;
+        }
+
+        /// <summary>
         /// Gets a value that indicates when validation will run.
         /// </summary>
         /// <value>
@@ -32,8 +42,7 @@
         /// </summary>
         /// <param name="argument">The argument being validated.</param>
         /// <param name="value">
-        ///   The argument value. If not <see langword="null"/>, this must be an instance of
-        ///   <see cref="CommandLineArgument.ArgumentType"/>.
+        ///   The raw string argument value.
         /// </param>
         /// <returns>
         ///   <see langword="true"/> if the value is valid; otherwise, <see langword="false"/>.
@@ -42,6 +51,10 @@
         {
             return !string.IsNullOrWhiteSpace(value as string);
         }
+
+        /// <inheritdoc cref="IsValid(CommandLineArgument, object?)"/>
+        public override bool IsSpanValid(CommandLineArgument argument, ReadOnlySpan<char> value)
+            => !value.IsWhiteSpace();
 
         /// <summary>
         /// Gets the error message to display if validation failed.

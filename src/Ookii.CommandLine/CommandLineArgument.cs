@@ -1852,7 +1852,20 @@ namespace Ookii.CommandLine
             {
                 if (validator.Mode == ValidationMode.BeforeConversion)
                 {
-                    validator.Validate(this, (stringValue ??= spanValue.ToString()));
+                    if (stringValue == null)
+                    {
+                        if (validator.CanValidateSpan)
+                        {
+                            validator.ValidateSpan(this, spanValue);
+                            continue;
+                        }
+                        else
+                        {
+                            stringValue = spanValue.ToString();
+                        }
+                    }
+
+                    validator.Validate(this, stringValue);
                 }
             }
         }

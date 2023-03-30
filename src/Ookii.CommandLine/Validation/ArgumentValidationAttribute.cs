@@ -48,6 +48,16 @@ namespace Ookii.CommandLine.Validation
         public virtual CommandLineArgumentErrorCategory ErrorCategory => CommandLineArgumentErrorCategory.ValidationFailed;
 
         /// <summary>
+        /// Gets a value that indicates whether this instance can validate a <see cref="ReadOnlySpan{T}"/>
+        /// when using <see cref="ValidationMode.BeforeConversion"/>.
+        /// </summary>
+        /// <value>
+        /// <see langword="true"/> if the validator implements <see cref="IsSpanValid"/>, otherwise,
+        /// <see langword="false"/>. The default value is <see langword="false"/>.
+        /// </value>
+        public bool CanValidateSpan { get; protected set; }
+
+        /// <summary>
         /// Validates the argument value, and throws an exception if validation failed.
         /// </summary>
         /// <param name="argument">The argument being validated.</param>
@@ -73,19 +83,58 @@ namespace Ookii.CommandLine.Validation
         }
 
         /// <summary>
-        /// When overridden in a derived class, determines if the argument is valid.
+        /// Validates the argument value, and throws an exception if validation failed.
         /// </summary>
         /// <param name="argument">The argument being validated.</param>
         /// <param name="value">
         ///   The argument value. If not <see langword="null"/>, this must be an instance of
         ///   <see cref="CommandLineArgument.ArgumentType"/>.
         /// </param>
+        /// <remarks>
+        /// <para>
+        ///   The <see cref="CommandLineParser"/> class will only call this method if the
+        ///   <see cref="CanValidateSpan"/> property is <see langword="true"/>, and the
+        ///   <see cref="Mode"/> property is <see cref="ValidationMode.BeforeConversion"/>.
+        /// </para>
+        /// </remarks>
+        /// <exception cref="CommandLineArgumentException">
+        ///   The <paramref name="value"/> parameter is not a valid value. The <see cref="CommandLineArgumentException.Category"/>
+        ///   property will be the value of the <see cref="ErrorCategory"/> property.
+        /// </exception>
+        public void ValidateSpan(CommandLineArgument argument, ReadOnlySpan<char> value)
+        {
+            if (argument == null)
+            {
+                throw new ArgumentNullException(nameof(argument));
+            }
+
+            if (!IsSpanValid(argument, value))
+            {
+                throw new CommandLineArgumentException(GetErrorMessage(argument, value.ToString()), argument.ArgumentName, ErrorCategory);
+            }
+        }
+
+
+        /// <summary>
+        /// When overridden in a derived class, determines if the argument is valid.
+        /// </summary>
+        /// <param name="argument">The argument being validated.</param>
+        /// <param name="value">
+        ///   The argument value. If not <see langword="null"/>, this must be a string or an
+        ///   instance of <see cref="CommandLineArgument.ArgumentType"/>.
+        /// </param>
         /// <returns>
         ///   <see langword="true"/> if the value is valid; otherwise, <see langword="false"/>.
         /// </returns>
         /// <remarks>
         /// <para>
-        ///   For regular arguments, the <paramref name="value"/> parameter will be identical to
+        ///   If the <see cref="Mode"/> property is <see cref="ValidationMode.BeforeConversion"/>,
+        ///   the <paramref name="value"/> parameter will be the raw string value provided by the
+        ///   user on the command line.
+        /// </para>
+        /// <para>
+        ///   If the <see cref="Mode"/> property is <see cref="ValidationMode.AfterConversion"/>,
+        ///   for regular arguments, the <paramref name="value"/> parameter will be identical to
         ///   the <see cref="CommandLineArgument.Value"/> property. For multi-value or dictionary
         ///   arguments, the <paramref name="value"/> parameter will equal the last value added
         ///   to the collection or dictionary.
@@ -102,6 +151,31 @@ namespace Ookii.CommandLine.Validation
         /// </para>
         /// </remarks>
         public abstract bool IsValid(CommandLineArgument argument, object? value);
+
+        /// <summary>
+        /// When overridden in a derived class, determines if the argument is valid.
+        /// </summary>
+        /// <param name="argument">The argument being validated.</param>
+        /// <param name="value">
+        ///   The raw string argument value provided by the user on the command line.
+        /// </param>
+        /// <returns>
+        ///   <see langword="true"/> if the value is valid; otherwise, <see langword="false"/>.
+        /// </returns>
+        /// <remarks>
+        /// <para>
+        ///   The <see cref="CommandLineParser"/> class will only call this method if the
+        ///   <see cref="CanValidateSpan"/> property is <see langword="true"/>, and the
+        ///   <see cref="Mode"/> property is <see cref="ValidationMode.BeforeConversion"/>.
+        /// </para>
+        /// <para>
+        ///   If you need to check the type of the argument, use the <see cref="CommandLineArgument.ElementType"/>
+        ///   property unless you want to get the collection type for a multi-value or dictionary
+        ///   argument.
+        /// </para>
+        /// </remarks>
+        public virtual bool IsSpanValid(CommandLineArgument argument, ReadOnlySpan<char> value)
+            => throw new NotImplementedException();
 
         /// <summary>
         /// Gets the error message to display if validation failed.
