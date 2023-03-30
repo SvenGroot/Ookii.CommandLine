@@ -46,9 +46,8 @@ class ProgramArguments
     // The argument's type is "int", so only valid integer values will be accepted. Anything else
     // will cause an error.
     //
-    // For types other than string, CommandLineParser will use the TypeConverter for the argument's
-    // type to try to convert the string to the correct type. It can also convert types with a
-    // public static Parse method, or with a constructor that takes a string.
+    // For types other than string, Ookii.CommandLine can use any type with a public static Parse
+    // method (preferably ISpanParsable<T> in .Net 7), or with a constructor that takes a string.
     [CommandLineArgument(Position = 2, DefaultValue = 1)]
     [Description("The operation's index.")]
     public int OperationIndex { get; set; }

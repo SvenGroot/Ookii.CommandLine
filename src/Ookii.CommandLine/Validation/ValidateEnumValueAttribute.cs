@@ -1,6 +1,6 @@
 ﻿using System;
-using System.ComponentModel;
 using System.Globalization;
+using Ookii.CommandLine.Conversion;
 
 namespace Ookii.CommandLine.Validation
 {
@@ -10,11 +10,10 @@ namespace Ookii.CommandLine.Validation
     /// </summary>
     /// <remarks>
     /// <para>
-    ///   The <see cref="EnumConverter"/> class, which is the default <see cref="TypeConverter"/>
-    ///   for enumerations, allows conversion using the string representation of the underlying
-    ///   value, as well as the name. While names are checked against the members, any underlying
-    ///   value can be converted to an enumeration, regardless of whether it's a defined value for
-    ///   the enumeration.
+    ///   The default <see cref="ArgumentConverter"/> for enumerations allows conversion using the
+    ///   string representation of the underlying value, as well as the name. While names are
+    ///   checked against the members, any underlying value can be converted to an enumeration,
+    ///   regardless of whether it's a defined value for the enumeration.
     /// </para>
     /// <para>
     ///   For example, using the <see cref="DayOfWeek"/> enumeration, converting a string value of

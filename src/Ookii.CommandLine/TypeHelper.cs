@@ -1,6 +1,6 @@
 ﻿// Copyright (c) Sven Groot (Ookii.org)
+using Ookii.CommandLine.Conversion;
 using System;
-using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
@@ -71,15 +71,15 @@ namespace Ookii.CommandLine
             return Activator.CreateInstance(type, args);
         }
 
-        public static TypeConverter GetStringConverter(this Type type, Type? converterType)
+        public static ArgumentConverter GetStringConverter(this Type type, Type? converterType)
         {
             if (type == null)
             {
                 throw new ArgumentNullException(nameof(type));
             }
 
-            var converter = (TypeConverter?)converterType?.CreateInstance() ?? TypeDescriptor.GetConverter(type);
-            if (converter != null && converter.CanConvertFrom(typeof(string)))
+            var converter = (ArgumentConverter?)converterType?.CreateInstance();
+            if (converter != null)
             {
                 return converter;
             }
@@ -91,12 +91,12 @@ namespace Ookii.CommandLine
                 if (converter != null)
                 {
                     return type.IsNullableValueType()
-                        ? new NullableConverterWrapper(underlyingType, converter)
+                        ? new NullableConverter(converter)
                         : converter;
                 }
             }
 
-            throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.NoTypeConverterFormat, type));
+            throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.NoArgumentConverterFormat, type));
         }
 
         public static bool IsNullableValueType(this Type type)
@@ -107,8 +107,25 @@ namespace Ookii.CommandLine
         public static Type GetUnderlyingType(this Type type)
             => type.IsNullableValueType() ? type.GetGenericArguments()[0] : type;
 
-        private static TypeConverter? GetDefaultConverter(this Type type)
+        private static ArgumentConverter? GetDefaultConverter(this Type type)
         {
+            if (type == typeof(string))
+            {
+                return StringConverter.Instance;
+            }
+
+            if (type.IsEnum)
+            {
+                return new EnumConverter(type);
+            }
+
+#if NET7_0_OR_GREATER
+            if (type.FindGenericInterface(typeof(ISpanParsable<>)) != null)
+            {
+                return (ArgumentConverter?)Activator.CreateInstance(typeof(SpanParsableConverter<>).MakeGenericType(type));
+            }
+#endif
+
             // If no explicit converter and the default one can't converter from string, see if
             // there's a Parse method we can use.
             var method = type.GetMethod(ParseMethodName, BindingFlags.Static | BindingFlags.Public,
@@ -116,7 +133,7 @@ namespace Ookii.CommandLine
 
             if (method != null && method.ReturnType == type)
             {
-                return new ParseTypeConverter(method, true);
+                return new ParseConverter(method, true);
             }
 
             // Check for Parse without a culture arguments.
@@ -125,13 +142,13 @@ namespace Ookii.CommandLine
 
             if (method != null && method.ReturnType == type)
             {
-                return new ParseTypeConverter(method, false);
+                return new ParseConverter(method, false);
             }
 
             // Check for a constructor with a string argument.
             if (type.GetConstructor(new[] { typeof(string) }) != null)
             {
-                return new ConstructorTypeConverter(type);
+                return new ConstructorConverter(type);
             }
 
             return null;

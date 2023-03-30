@@ -10,22 +10,10 @@ namespace Ookii.CommandLine
             return value.SplitAt(index, 1);
         }
 
-        public static (string, string?) SplitOnce(this string value, string separator, int start = 0)
+        public static StringSpanTuple SplitOnce(this ReadOnlySpan<char> value, ReadOnlySpan<char> separator, out bool hasSeparator)
         {
             var index = value.IndexOf(separator);
-            return value.SplitAt(index, start, separator.Length);
-        }
-
-        private static (string, string?) SplitAt(this string value, int index, int start, int skip)
-        {
-            if (index < 0)
-            {
-                return (value.Substring(start), null);
-            }
-
-            var before = value.Substring(start, index - start);
-            var after = value.Substring(index + skip);
-            return (before, after);
+            return value.SplitAt(index, separator.Length, out hasSeparator);
         }
 
         private static (ReadOnlyMemory<char>, ReadOnlyMemory<char>?) SplitAt(this ReadOnlyMemory<char> value, int index, int skip)
@@ -38,6 +26,20 @@ namespace Ookii.CommandLine
             var before = value.Slice(0, index);
             var after = value.Slice(index + skip);
             return (before, after);
+        }
+
+        private static StringSpanTuple SplitAt(this ReadOnlySpan<char> value, int index, int skip, out bool hasSeparator)
+        {
+            if (index < 0)
+            {
+                hasSeparator = false;
+                return new(value, default);
+            }
+
+            var before = value.Slice(0, index);
+            var after = value.Slice(index + skip);
+            hasSeparator = true;
+            return new(before, after);
         }
     }
 }

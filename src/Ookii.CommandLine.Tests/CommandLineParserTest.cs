@@ -17,13 +17,6 @@ namespace Ookii.CommandLine.Tests
     [TestClass()]
     public partial class CommandLineParserTest
     {
-#if NET6_0_OR_GREATER
-        private static readonly Type ArgumentConversionInner = typeof(ArgumentException);
-#else
-        // Number converters on .Net Framework throw Exception. It's not my fault.
-        private static readonly Type ArgumentConversionInner = typeof(Exception);
-#endif
-
         /// <summary>
         ///A test for CommandLineParser Constructor
         ///</summary>
@@ -273,13 +266,13 @@ namespace Ookii.CommandLine.Tests
                 "CustomSeparator",
                 typeof(FormatException));
 
-            // Inner exception is Argument exception because what throws here is trying to convert
+            // Inner exception is FormatException because what throws here is trying to convert
             // ">bar" to int.
             CheckThrows(() => target.Parse(new[] { "-DefaultSeparator", "foo<=>bar" }),
                 target,
                 CommandLineArgumentErrorCategory.ArgumentValueConversion,
                 "DefaultSeparator",
-                ArgumentConversionInner);
+                typeof(FormatException));
         }
 
         [TestMethod]
@@ -639,13 +632,19 @@ namespace Ookii.CommandLine.Tests
             var result = CommandLineParser.Parse<CultureArguments>(new[] { "-Argument", "5.5" });
             Assert.IsNotNull(result);
             Assert.AreEqual(5.5, result.Argument);
-            Assert.IsNull(CommandLineParser.Parse<CultureArguments>(new[] { "-Argument", "5,5" }));
+            result = CommandLineParser.Parse<CultureArguments>(new[] { "-Argument", "5,5" });
+            Assert.IsNotNull(result);
+            // , was interpreted as a thousands separator.
+            Assert.AreEqual(55, result.Argument);
 
             var options = new ParseOptions { Culture = new CultureInfo("nl-NL") };
             result = CommandLineParser.Parse<CultureArguments>(new[] { "-Argument", "5,5" }, options);
             Assert.IsNotNull(result);
             Assert.AreEqual(5.5, result.Argument);
-            Assert.IsNull(CommandLineParser.Parse<CultureArguments>(new[] { "-Argument", "5.5" }, options));
+            result = CommandLineParser.Parse<CultureArguments>(new[] { "-Argument", "5,5" });
+            Assert.IsNotNull(result);
+            // . was interpreted as a thousands separator.
+            Assert.AreEqual(55, result.Argument);
         }
 
         [TestMethod]
@@ -1031,7 +1030,7 @@ namespace Ookii.CommandLine.Tests
             CollectionAssert.AreEqual(new[] { 1, 2 }, result.Multi);
 
             CheckThrows(() => parser.Parse(new[] { "1", "-Multi", "-Other", "5", "6" }), parser, CommandLineArgumentErrorCategory.MissingNamedArgumentValue, "Multi");
-            CheckThrows(() => parser.Parse(new[] { "-MultiSwitch", "true", "false" }), parser, CommandLineArgumentErrorCategory.ArgumentValueConversion, "Arg1", ArgumentConversionInner);
+            CheckThrows(() => parser.Parse(new[] { "-MultiSwitch", "true", "false" }), parser, CommandLineArgumentErrorCategory.ArgumentValueConversion, "Arg1", typeof(FormatException));
             parser.Options.AllowWhiteSpaceValueSeparator = false;
             CheckThrows(() => parser.Parse(new[] { "1", "-Multi:2", "2", "3", "4", "-Other", "5", "6" }), parser, CommandLineArgumentErrorCategory.TooManyArguments);
         }

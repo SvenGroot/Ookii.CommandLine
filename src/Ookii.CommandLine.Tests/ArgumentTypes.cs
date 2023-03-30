@@ -1,4 +1,5 @@
-﻿using Ookii.CommandLine.Validation;
+﻿using Ookii.CommandLine.Conversion;
+using Ookii.CommandLine.Validation;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -80,7 +81,7 @@ namespace Ookii.CommandLine.Tests
             get { return _arg14; }
         }
 
-        [CommandLineArgument, TypeConverter(typeof(KeyValuePairConverter<string, int>))]
+        [CommandLineArgument, ArgumentConverter(typeof(KeyValuePairConverter<string, int>))]
         public KeyValuePair<string, int> Arg15 { get; set; }
 
         public string NotAnArg { get; set; }

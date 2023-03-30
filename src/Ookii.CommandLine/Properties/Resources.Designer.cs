@@ -430,6 +430,15 @@ namespace Ookii.CommandLine.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to No argument converter exists for type &apos;{0}&apos;. Use the ArgumentConverterAttribute to specify a custom ArgumentConverter..
+        /// </summary>
+        internal static string NoArgumentConverterFormat {
+            get {
+                return ResourceManager.GetString("NoArgumentConverterFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The command line arguments type does not have any public constructors..
         /// </summary>
         internal static string NoConstructor {
@@ -471,15 +480,6 @@ namespace Ookii.CommandLine.Properties {
         internal static string NoParserForCustomParsingCommand {
             get {
                 return ResourceManager.GetString("NoParserForCustomParsingCommand", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to No type converter that can convert to and from a string exists for type &apos;{0}&apos;. Use the TypeConverterAttribute to specify a custom TypeConverter..
-        /// </summary>
-        internal static string NoTypeConverterFormat {
-            get {
-                return ResourceManager.GetString("NoTypeConverterFormat", resourceCulture);
             }
         }
         

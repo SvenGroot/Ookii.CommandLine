@@ -1,5 +1,6 @@
 ﻿using Ookii.CommandLine;
 using Ookii.CommandLine.Commands;
+using Ookii.CommandLine.Conversion;
 using Ookii.CommandLine.Validation;
 using System;
 using System.Collections.Generic;
@@ -45,11 +46,11 @@ class WriteCommand : AsyncCommandBase
     public string[]? Lines { get; set; }
 
     // An argument to specify the encoding.
-    // Because Encoding doesn't have a default TypeConverter, we use a custom one provided in
+    // Because Encoding doesn't have a default ArgumentConverter, we use a custom one provided in
     // this sample.
     [CommandLineArgument]
     [Description("The encoding to use to write the file. Default value: utf-8.")]
-    [TypeConverter(typeof(EncodingConverter))]
+    [ArgumentConverter(typeof(EncodingConverter))]
     public Encoding Encoding { get; set; } = Encoding.UTF8;
 
     // An argument that specifies the maximum line length of the output.

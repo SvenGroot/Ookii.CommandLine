@@ -1,4 +1,4 @@
-﻿using Ookii.CommandLine;
+﻿using Ookii.CommandLine.Conversion;
 using System;
 using System.ComponentModel;
 using System.Globalization;
@@ -6,11 +6,11 @@ using System.Text;
 
 namespace SubcommandSample;
 
-// A TypeConverter for the Encoding class, using the utility base class provided by
+// A ArgumentConverter for the Encoding class, using the utility base class provided by
 // Ookii.CommandLine.
-internal class EncodingConverter : TypeConverterBase<Encoding>
+internal class EncodingConverter : ArgumentConverter
 {
-    protected override Encoding? Convert(ITypeDescriptorContext? context, CultureInfo? culture, string value)
+    public override object? Convert(string value, CultureInfo culture)
     {
         try
         {
@@ -18,7 +18,7 @@ internal class EncodingConverter : TypeConverterBase<Encoding>
         }
         catch (ArgumentException ex)
         {
-            // This is the expected exception type for a type converter.
+            // This is the expected exception type for a converter.
             throw new FormatException(ex.Message, ex);
         }
     }

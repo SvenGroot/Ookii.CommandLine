@@ -1,4 +1,5 @@
 ﻿// Copyright (c) Sven Groot (Ookii.org)
+using Ookii.CommandLine.Conversion;
 using Ookii.CommandLine.Validation;
 using System;
 using System.Collections.Generic;
@@ -236,7 +237,7 @@ namespace Ookii.CommandLine
         #endregion
 
         private readonly CommandLineParser _parser;
-        private readonly TypeConverter _converter;
+        private readonly ArgumentConverter _converter;
         private readonly PropertyInfo? _property;
         private readonly MethodArgumentInfo? _method;
         private readonly string _valueDescription;
@@ -336,7 +337,7 @@ namespace Ookii.CommandLine
                     if (converterType == null)
                     {
                         converterType = typeof(KeyValuePairConverter<,>).MakeGenericType(genericArguments);
-                        _converter = (TypeConverter)Activator.CreateInstance(converterType, _parser.StringProvider, _argumentName, _allowNull, info.KeyConverterType, info.ValueConverterType, _keyValueSeparator)!;
+                        _converter = (ArgumentConverter)Activator.CreateInstance(converterType, _parser.StringProvider, _argumentName, _allowNull, info.KeyConverterType, info.ValueConverterType, _keyValueSeparator)!;
                     }
 
                     var valueDescription = info.ValueDescription ?? GetDefaultValueDescription(_elementTypeWithNullable,
@@ -941,8 +942,8 @@ namespace Ookii.CommandLine
         ///   a value type.
         /// </para>
         /// <para>
-        ///   This property indicates what happens when the <see cref="TypeConverter"/> used for this argument returns
-        ///   <see langword="null" /> from its <see cref="TypeConverter.ConvertFrom(ITypeDescriptorContext?, CultureInfo?, object)"/>
+        ///   This property indicates what happens when the <see cref="ArgumentConverter"/> used for this argument returns
+        ///   <see langword="null" /> from its <see cref="ArgumentConverter.Convert(string, CultureInfo)"/>
         ///   method.
         /// </para>
         /// <para>
@@ -1042,10 +1043,10 @@ namespace Ookii.CommandLine
         /// <returns>The converted value.</returns>
         /// <remarks>
         /// <para>
-        ///   Conversion is done by one of several methods. First, if a <see cref="TypeConverterAttribute"/>
+        ///   Conversion is done by one of several methods. First, if a <see cref="ArgumentConverterAttribute"/>
         ///   was present on the constructor parameter, property, or method that defined the
-        ///   property, the specified <see cref="TypeConverter"/> is used. Otherwise, if the
-        ///   default <see cref="TypeConverter"/> for the <see cref="ElementType"/> can convert
+        ///   property, the specified <see cref="ArgumentConverter"/> is used. Otherwise, if the
+        ///   default <see cref="ArgumentConverter"/> for the <see cref="ElementType"/> can convert
         ///   from a string, it is used. Otherwise, a static Parse(<see cref="string"/>, <see cref="IFormatProvider"/>) or
         ///   Parse(<see cref="string"/>) method on the type is used. Finally, a constructor that
         ///   takes a single parameter of type <see cref="string"/> will be used.
@@ -1078,7 +1079,7 @@ namespace Ookii.CommandLine
 
             try
             {
-                var converted = _converter.ConvertFrom(null, culture, argumentValue);
+                var converted = _converter.Convert(argumentValue, culture);
                 if (converted == null && (!_allowNull || IsDictionary))
                 {
                     throw _parser.StringProvider.CreateException(CommandLineArgumentErrorCategory.NullArgumentValue, this);
@@ -1094,18 +1095,6 @@ namespace Ookii.CommandLine
             {
                 throw _parser.StringProvider.CreateException(CommandLineArgumentErrorCategory.ArgumentValueConversion, ex, this, argumentValue);
             }
-            catch (Exception ex)
-            {
-                // Yeah, I don't like catching Exception, but unfortunately BaseNumberConverter (e.g. used for int) can *throw* a System.Exception (not a derived class) so there's nothing I can do about it.
-                if (ex.InnerException is FormatException)
-                {
-                    throw _parser.StringProvider.CreateException(CommandLineArgumentErrorCategory.ArgumentValueConversion, ex, this, argumentValue);
-                }
-                else
-                {
-                    throw;
-                }
-            }
         }
 
         /// <summary>
@@ -1114,7 +1103,7 @@ namespace Ookii.CommandLine
         /// <param name="value">The value to convert.</param>
         /// <returns>The converted value.</returns>
         /// <exception cref="NotSupportedException">
-        ///   The argument's <see cref="TypeConverter"/> cannot convert between the type of
+        ///   The argument's <see cref="ArgumentConverter"/> cannot convert between the type of
         ///   <paramref name="value"/> and the <see cref="ArgumentType"/>.
         /// </exception>
         /// <remarks>
@@ -1123,7 +1112,7 @@ namespace Ookii.CommandLine
         ///   no conversion is done. If the <paramref name="value"/> is a <see cref="string"/>,
         ///   the same rules apply as for the <see cref="ConvertToArgumentType(CultureInfo, string?)"/>
         ///   method, using <see cref="CultureInfo.InvariantCulture"/>. Otherwise, the
-        ///   <see cref="TypeConverter"/> for the argument is used to convert between the source.
+        ///   <see cref="ArgumentConverter"/> for the argument is used to convert between the source.
         /// </para>
         /// <para>
         ///   This method is used to convert the <see cref="CommandLineArgumentAttribute.DefaultValue"/>
@@ -1139,7 +1128,13 @@ namespace Ookii.CommandLine
                 return value;
             }
 
-            return _converter.ConvertFrom(null, CultureInfo.InvariantCulture, value);
+            var stringValue = value.ToString();
+            if (stringValue == null)
+            {
+                return null;
+            }
+
+            return _converter.Convert(stringValue, CultureInfo.InvariantCulture);
         }
 
         /// <summary>
@@ -1282,9 +1277,9 @@ namespace Ookii.CommandLine
                 throw new ArgumentException(Properties.Resources.MissingArgumentAttribute, nameof(method));
             }
 
-            var typeConverterAttribute = member.GetCustomAttribute<TypeConverterAttribute>();
-            var keyTypeConverterAttribute = member.GetCustomAttribute<KeyTypeConverterAttribute>();
-            var valueTypeConverterAttribute = member.GetCustomAttribute<ValueTypeConverterAttribute>();
+            var converterAttribute = member.GetCustomAttribute<ArgumentConverterAttribute>();
+            var keyArgumentConverterAttribute = member.GetCustomAttribute<KeyConverterAttribute>();
+            var valueArgumentConverterAttribute = member.GetCustomAttribute<ValueConverterAttribute>();
             var multiValueSeparatorAttribute = member.GetCustomAttribute<MultiValueSeparatorAttribute>();
             var argumentName = DetermineArgumentName(attribute.ArgumentName, member.Name, parser.Options.ArgumentNameTransform);
             var info = new ArgumentInfo()
@@ -1301,9 +1296,9 @@ namespace Ookii.CommandLine
                 ValueDescription = attribute.ValueDescription,  // If null, the constructor will sort it out.
                 Position = attribute.Position < 0 ? null : attribute.Position,
                 AllowDuplicateDictionaryKeys = Attribute.IsDefined(member, typeof(AllowDuplicateDictionaryKeysAttribute)),
-                ConverterType = typeConverterAttribute == null ? null : Type.GetType(typeConverterAttribute.ConverterTypeName, true),
-                KeyConverterType = keyTypeConverterAttribute == null ? null : Type.GetType(keyTypeConverterAttribute.ConverterTypeName, true),
-                ValueConverterType = valueTypeConverterAttribute == null ? null : Type.GetType(valueTypeConverterAttribute.ConverterTypeName, true),
+                ConverterType = converterAttribute == null ? null : Type.GetType(converterAttribute.ConverterTypeName, true),
+                KeyConverterType = keyArgumentConverterAttribute == null ? null : Type.GetType(keyArgumentConverterAttribute.ConverterTypeName, true),
+                ValueConverterType = valueArgumentConverterAttribute == null ? null : Type.GetType(valueArgumentConverterAttribute.ConverterTypeName, true),
                 MultiValueSeparator = GetMultiValueSeparator(multiValueSeparatorAttribute),
                 AllowMultiValueWhiteSpaceSeparator = multiValueSeparatorAttribute != null && multiValueSeparatorAttribute.Separator == null,
                 KeyValueSeparator = member.GetCustomAttribute<KeyValueSeparatorAttribute>()?.Separator,

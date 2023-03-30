@@ -1,4 +1,5 @@
-﻿using Ookii.CommandLine.Properties;
+﻿using Ookii.CommandLine.Conversion;
+using Ookii.CommandLine.Properties;
 using System;
 using System.Diagnostics;
 

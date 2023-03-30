@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Ookii.CommandLine.Conversion;
+using System;
 using System.ComponentModel;
 
 namespace Ookii.CommandLine.Validation
@@ -8,8 +9,8 @@ namespace Ookii.CommandLine.Validation
     /// </summary>
     /// <remarks>
     /// <para>
-    ///   An argument's value can only be <see langword="null"/> if its <see cref="TypeConverter"/>
-    ///   returns <see langword="null"/> from the <see cref="TypeConverter.ConvertFrom(ITypeDescriptorContext?, System.Globalization.CultureInfo?, object)"/>
+    ///   An argument's value can only be <see langword="null"/> if its <see cref="ArgumentConverter"/>
+    ///   returns <see langword="null"/> from the <see cref="ArgumentConverter.Convert(string, System.Globalization.CultureInfo)"/>
     ///   method. For example, the <see cref="NullableConverter"/> can return <see langword="null"/>.
     /// </para>
     /// <para>

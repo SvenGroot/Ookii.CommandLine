@@ -1,5 +1,6 @@
 ﻿using Ookii.CommandLine;
 using Ookii.CommandLine.Commands;
+using Ookii.CommandLine.Conversion;
 using System;
 using System.ComponentModel;
 using System.IO;
@@ -37,11 +38,11 @@ class ReadCommand : AsyncCommandBase
     }
 
     // An argument to specify the encoding.
-    // Because Encoding doesn't have a default TypeConverter, we use a custom one provided in
+    // Because Encoding doesn't have a default ArgumentConverter, we use a custom one provided in
     // this sample.
     [CommandLineArgument]
     [Description("The encoding to use to read the file. The default value is utf-8.")]
-    [TypeConverter(typeof(EncodingConverter))]
+    [ArgumentConverter(typeof(EncodingConverter))]
     public Encoding Encoding { get; set; } = Encoding.UTF8;
 
     // Run the command after the arguments have been parsed.

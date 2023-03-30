@@ -31,8 +31,7 @@ namespace Ookii.CommandLine.Validation
         /// <remarks>
         /// <para>
         ///   When not <see langword="null"/>, both <paramref name="minimum"/> and <paramref name="maximum"/>
-        ///   must be an instance of the argument type, or a type that can be converted to the
-        ///   argument type using its <see cref="TypeConverter"/>.
+        ///   must be an instance of the argument type, or a string.
         /// </para>
         /// </remarks>
         /// <exception cref="ArgumentException">
