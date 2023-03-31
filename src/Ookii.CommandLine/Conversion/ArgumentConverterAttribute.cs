@@ -71,4 +71,9 @@ public sealed class ArgumentConverterAttribute : Attribute
     [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
 #endif
     public string ConverterTypeName { get; }
+
+    internal Type GetConverterType()
+    {
+        return Type.GetType(ConverterTypeName, true)!;
+    }
 }

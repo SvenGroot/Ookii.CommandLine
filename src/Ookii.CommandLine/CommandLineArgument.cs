@@ -18,7 +18,7 @@ namespace Ookii.CommandLine
     /// </summary>
     /// <threadsafety static="true" instance="false"/>
     /// <seealso cref="CommandLineArgumentAttribute"/>
-    public sealed class CommandLineArgument
+    public class CommandLineArgument
     {
         #region Nested types
 
@@ -195,12 +195,9 @@ namespace Ookii.CommandLine
             }
         }
 
-        private struct ArgumentInfo
+        internal struct ArgumentInfo
         {
             public CommandLineParser Parser { get; set; }
-            public PropertyInfo? Property { get; set; }
-            public MethodArgumentInfo? Method { get; set; }
-            public ParameterInfo? Parameter { get; set; }
             public string MemberName { get; set; }
             public string ArgumentName { get; set; }
             public bool Long { get; set; }
@@ -209,9 +206,10 @@ namespace Ookii.CommandLine
             public IEnumerable<string>? Aliases { get; set; }
             public IEnumerable<char>? ShortAliases { get; set; }
             public Type ArgumentType { get; set; }
-            public Type? ConverterType { get; set; }
-            public Type? KeyConverterType { get; set; }
-            public Type? ValueConverterType { get; set; }
+            public Type ElementType { get; set; }
+            public Type ElementTypeWithNullable { get; set; }
+            public ArgumentKind Kind { get; set; }
+            public ArgumentConverter Converter { get; set; }
             public int? Position { get; set; }
             public bool IsRequired { get; set; }
             public object? DefaultValue { get; set; }
@@ -227,19 +225,10 @@ namespace Ookii.CommandLine
             public IEnumerable<ArgumentValidationAttribute> Validators { get; set; }
         }
 
-        private struct MethodArgumentInfo
-        {
-            public MethodInfo Method { get; set; }
-            public bool HasValueParameter { get; set; }
-            public bool HasParserParameter { get; set; }
-        }
-
         #endregion
 
         private readonly CommandLineParser _parser;
         private readonly ArgumentConverter _converter;
-        private readonly PropertyInfo? _property;
-        private readonly MethodArgumentInfo? _method;
         private readonly string _valueDescription;
         private readonly string _argumentName;
         private readonly bool _hasLongName = true;
@@ -265,12 +254,10 @@ namespace Ookii.CommandLine
         private IValueHelper? _valueHelper;
         private ReadOnlyMemory<char> _usedArgumentName;
 
-        private CommandLineArgument(ArgumentInfo info)
+        internal CommandLineArgument(ArgumentInfo info)
         {
             // If this method throws anything other than a NotSupportedException, it constitutes a bug in the Ookii.CommandLine library.
             _parser = info.Parser;
-            _property = info.Property;
-            _method = info.Method;
             _memberName = info.MemberName;
             _argumentName = info.ArgumentName;
             if (_parser.Mode == ParsingMode.LongShort)
@@ -319,72 +306,6 @@ namespace Ookii.CommandLine
             // Required or positional arguments cannot be hidden.
             _isHidden = info.IsHidden && !info.IsRequired && info.Position == null;
             Position = info.Position;
-            var converterType = info.ConverterType;
-
-            if (_method == null)
-            {
-                var (collectionType, dictionaryType, elementType) = DetermineMultiValueType();
-
-                if (dictionaryType != null)
-                {
-                    Debug.Assert(elementType != null);
-                    _argumentKind = ArgumentKind.Dictionary;
-                    _elementTypeWithNullable = elementType!;
-                    _allowDuplicateDictionaryKeys = info.AllowDuplicateDictionaryKeys;
-                    _allowNull = DetermineDictionaryValueTypeAllowsNull(dictionaryType, info.Property, info.Parameter);
-                    _keyValueSeparator = info.KeyValueSeparator ?? KeyValuePairConverter.DefaultSeparator;
-                    var genericArguments = dictionaryType.GetGenericArguments();
-                    if (converterType == null)
-                    {
-                        converterType = typeof(KeyValuePairConverter<,>).MakeGenericType(genericArguments);
-                        _converter = (ArgumentConverter)Activator.CreateInstance(converterType, _parser.StringProvider, _argumentName, _allowNull, info.KeyConverterType, info.ValueConverterType, _keyValueSeparator)!;
-                    }
-
-                    var valueDescription = info.ValueDescription ?? GetDefaultValueDescription(_elementTypeWithNullable,
-                        _parser.Options.DefaultValueDescriptions);
-
-                    if (valueDescription == null)
-                    {
-                        var key = DetermineValueDescription(genericArguments[0].GetUnderlyingType(), _parser.Options);
-                        var value = DetermineValueDescription(genericArguments[1].GetUnderlyingType(), _parser.Options);
-                        valueDescription = $"{key}{_keyValueSeparator}{value}";
-                    }
-
-                    _valueDescription = valueDescription;
-                }
-                else if (collectionType != null)
-                {
-                    Debug.Assert(elementType != null);
-                    _argumentKind = ArgumentKind.MultiValue;
-                    _elementTypeWithNullable = elementType!;
-                    _allowNull = DetermineCollectionElementTypeAllowsNull(collectionType, info.Property, info.Parameter);
-                }
-            }
-            else
-            {
-                _argumentKind = ArgumentKind.Method;
-            }
-
-            // If it's a Nullable<T>, now get the underlying type.
-            _elementType = _elementTypeWithNullable.GetUnderlyingType();
-
-            if (IsMultiValue)
-            {
-                _multiValueSeparator = info.MultiValueSeparator;
-                _allowMultiValueWhiteSpaceSeparator = !IsSwitch && info.AllowMultiValueWhiteSpaceSeparator;
-            }
-
-            // Use the original Nullable<T> for this if it is one.
-            if (_converter == null)
-            {
-                _converter = _elementTypeWithNullable.GetStringConverter(converterType);
-            }
-
-            if (_valueDescription == null)
-            {
-                _valueDescription = info.ValueDescription ?? DetermineValueDescription(_elementType, _parser.Options);
-            }
-
             _defaultValue = ConvertToArgumentTypeInvariant(info.DefaultValue);
         }
 
@@ -1238,92 +1159,6 @@ namespace Ookii.CommandLine
             return continueParsing;
         }
 
-        internal static CommandLineArgument Create(CommandLineParser parser, PropertyInfo property)
-        {
-            if (parser == null)
-            {
-                throw new ArgumentNullException(nameof(parser));
-            }
-
-            if (property == null)
-            {
-                throw new ArgumentNullException(nameof(property));
-            }
-
-            return Create(parser, property, null, property.PropertyType, DetermineAllowsNull(property));
-        }
-
-        internal static CommandLineArgument Create(CommandLineParser parser, MethodInfo method)
-        {
-            if (parser == null)
-            {
-                throw new ArgumentNullException(nameof(parser));
-            }
-
-            if (method == null)
-            {
-                throw new ArgumentNullException(nameof(method));
-            }
-
-            var infoTuple = DetermineMethodArgumentInfo(method);
-            if (infoTuple == null)
-            {
-                throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.InvalidMethodSignatureFormat, method.Name));
-            }
-
-            var (methodInfo, argumentType, allowsNull) = infoTuple.Value;
-            return Create(parser, null, methodInfo, argumentType, allowsNull);
-        }
-
-        private static CommandLineArgument Create(CommandLineParser parser, PropertyInfo? property, MethodArgumentInfo? method,
-            Type argumentType, bool allowsNull)
-        {
-            var member = ((MemberInfo?)property ?? method?.Method)!;
-            var attribute = member.GetCustomAttribute<CommandLineArgumentAttribute>();
-            if (attribute == null)
-            {
-                throw new ArgumentException(Properties.Resources.MissingArgumentAttribute, nameof(method));
-            }
-
-            var converterAttribute = member.GetCustomAttribute<ArgumentConverterAttribute>();
-            var keyArgumentConverterAttribute = member.GetCustomAttribute<KeyConverterAttribute>();
-            var valueArgumentConverterAttribute = member.GetCustomAttribute<ValueConverterAttribute>();
-            var multiValueSeparatorAttribute = member.GetCustomAttribute<MultiValueSeparatorAttribute>();
-            var argumentName = DetermineArgumentName(attribute.ArgumentName, member.Name, parser.Options.ArgumentNameTransform);
-            var info = new ArgumentInfo()
-            {
-                Parser = parser,
-                Property = property,
-                Method = method,
-                ArgumentName = argumentName,
-                Long = attribute.IsLong,
-                Short = attribute.IsShort,
-                ShortName = attribute.ShortName,
-                ArgumentType = argumentType,
-                Description = member.GetCustomAttribute<DescriptionAttribute>()?.Description,
-                ValueDescription = attribute.ValueDescription,  // If null, the constructor will sort it out.
-                Position = attribute.Position < 0 ? null : attribute.Position,
-                AllowDuplicateDictionaryKeys = Attribute.IsDefined(member, typeof(AllowDuplicateDictionaryKeysAttribute)),
-                ConverterType = converterAttribute == null ? null : Type.GetType(converterAttribute.ConverterTypeName, true),
-                KeyConverterType = keyArgumentConverterAttribute == null ? null : Type.GetType(keyArgumentConverterAttribute.ConverterTypeName, true),
-                ValueConverterType = valueArgumentConverterAttribute == null ? null : Type.GetType(valueArgumentConverterAttribute.ConverterTypeName, true),
-                MultiValueSeparator = GetMultiValueSeparator(multiValueSeparatorAttribute),
-                AllowMultiValueWhiteSpaceSeparator = multiValueSeparatorAttribute != null && multiValueSeparatorAttribute.Separator == null,
-                KeyValueSeparator = member.GetCustomAttribute<KeyValueSeparatorAttribute>()?.Separator,
-                Aliases = GetAliases(member.GetCustomAttributes<AliasAttribute>(), argumentName),
-                ShortAliases = GetShortAliases(member.GetCustomAttributes<ShortAliasAttribute>(), argumentName),
-                DefaultValue = attribute.DefaultValue,
-                IsRequired = attribute.IsRequired,
-                MemberName = member.Name,
-                AllowNull = allowsNull,
-                CancelParsing = attribute.CancelParsing,
-                IsHidden = attribute.IsHidden,
-                Validators = member.GetCustomAttributes<ArgumentValidationAttribute>(),
-            };
-
-            return new CommandLineArgument(info);
-        }
-
         internal static (CommandLineArgument, bool) CreateAutomaticHelp(CommandLineParser parser, IDictionary<Type, string>? defaultValueDescriptions, NameTransform valueDescriptionTransform)
         {
             if (parser == null)
@@ -1483,52 +1318,6 @@ namespace Ookii.CommandLine
             _usedArgumentName = name;
         }
 
-        private static string? GetMultiValueSeparator(MultiValueSeparatorAttribute? attribute)
-        {
-            var separator = attribute?.Separator;
-            if (string.IsNullOrEmpty(separator))
-            {
-                return null;
-            }
-            else
-            {
-                return separator;
-            }
-        }
-
-        private static string GetFriendlyTypeName(Type type)
-        {
-            // This is used to generate a value description from a type name if no custom value description was supplied.
-            if (type.IsGenericType)
-            {
-                var name = new StringBuilder(type.FullName?.Length ?? 0);
-                name.Append(type.Name, 0, type.Name.IndexOf("`", StringComparison.Ordinal));
-                name.Append('<');
-                // If only I was targeting .Net 4, I could use string.Join for this.
-                bool first = true;
-                foreach (Type typeArgument in type.GetGenericArguments())
-                {
-                    if (first)
-                    {
-                        first = false;
-                    }
-                    else
-                    {
-                        name.Append(", ");
-                    }
-
-                    name.Append(GetFriendlyTypeName(typeArgument));
-                }
-
-                name.Append('>');
-                return name.ToString();
-            }
-            else
-            {
-                return type.Name;
-            }
-        }
-
         private IValueHelper CreateValueHelper()
         {
             Debug.Assert(_valueHelper == null);
@@ -1552,7 +1341,7 @@ namespace Ookii.CommandLine
             }
         }
 
-        private static IEnumerable<string>? GetAliases(IEnumerable<AliasAttribute> aliasAttributes, string argumentName)
+        internal static IEnumerable<string>? GetAliases(IEnumerable<AliasAttribute> aliasAttributes, string argumentName)
         {
             if (!aliasAttributes.Any())
             {
@@ -1570,7 +1359,7 @@ namespace Ookii.CommandLine
             });
         }
 
-        private static IEnumerable<char>? GetShortAliases(IEnumerable<ShortAliasAttribute> aliasAttributes, string argumentName)
+        internal static IEnumerable<char>? GetShortAliases(IEnumerable<ShortAliasAttribute> aliasAttributes, string argumentName)
         {
             if (!aliasAttributes.Any())
             {
@@ -1588,230 +1377,6 @@ namespace Ookii.CommandLine
             });
         }
 
-        private static bool DetermineDictionaryValueTypeAllowsNull(Type type, PropertyInfo? property, ParameterInfo? parameter)
-        {
-            var valueTypeNull = DetermineValueTypeNullable(type.GetGenericArguments()[1]);
-            if (valueTypeNull != null)
-            {
-                return valueTypeNull.Value;
-            }
-
-#if NET6_0_OR_GREATER
-            // Type is the IDictionary<,> implemented interface, not the actual type of the property
-            // or parameter, which is what we need here.
-            var actualType = property?.PropertyType ?? parameter?.ParameterType;
-
-            // We can only determine the nullability state if the property or parameter's actual
-            // type is Dictionary<,> or IDictionary<,>. Otherwise, we just assume nulls are
-            // allowed.
-            if (actualType != null && actualType.IsGenericType &&
-                (actualType.GetGenericTypeDefinition() == typeof(Dictionary<,>) || actualType.GetGenericTypeDefinition() == typeof(IDictionary<,>)))
-            {
-                var context = new NullabilityInfoContext();
-                NullabilityInfo info;
-                if (property != null)
-                {
-                    info = context.Create(property);
-                }
-                else
-                {
-                    info = context.Create(parameter!);
-                }
-
-                return info.GenericTypeArguments[1].ReadState != NullabilityState.NotNull;
-            }
-#endif
-
-            return true;
-        }
-
-        private static bool DetermineCollectionElementTypeAllowsNull(Type type, PropertyInfo? property, ParameterInfo? parameter)
-        {
-            Type elementType = type.IsArray ? type.GetElementType()! : type.GetGenericArguments()[0];
-            var valueTypeNull = DetermineValueTypeNullable(elementType);
-            if (valueTypeNull != null)
-            {
-                return valueTypeNull.Value;
-            }
-
-#if NET6_0_OR_GREATER
-            // Type is the ICollection<> implemented interface, not the actual type of the property
-            // or parameter, which is what we need here.
-            var actualType = property?.PropertyType ?? parameter?.ParameterType;
-
-            // We can only determine the nullability state if the property or parameter's actual
-            // type is an array or ICollection<>. Otherwise, we just assume nulls are allowed.
-            if (actualType != null && (actualType.IsArray || (actualType.IsGenericType &&
-                actualType.GetGenericTypeDefinition() == typeof(ICollection<>))))
-            {
-                var context = new NullabilityInfoContext();
-                NullabilityInfo info;
-                if (property != null)
-                {
-                    info = context.Create(property);
-                }
-                else
-                {
-                    info = context.Create(parameter!);
-                }
-
-                if (actualType.IsArray)
-                {
-                    return info.ElementType?.ReadState != NullabilityState.NotNull;
-                }
-                else
-                {
-                    return info.GenericTypeArguments[0].ReadState != NullabilityState.NotNull;
-                }
-            }
-#endif
-
-            return true;
-        }
-
-        private static bool DetermineAllowsNull(ParameterInfo parameter)
-        {
-            var valueTypeNull = DetermineValueTypeNullable(parameter.ParameterType);
-            if (valueTypeNull != null)
-            {
-                return valueTypeNull.Value;
-            }
-
-#if NET6_0_OR_GREATER
-            var context = new NullabilityInfoContext();
-            var info = context.Create(parameter);
-            return info.WriteState != NullabilityState.NotNull;
-#else
-            return true;
-#endif
-        }
-
-        private static bool DetermineAllowsNull(PropertyInfo property)
-        {
-            var valueTypeNull = DetermineValueTypeNullable(property.PropertyType);
-            if (valueTypeNull != null)
-            {
-                return valueTypeNull.Value;
-            }
-
-#if NET6_0_OR_GREATER
-            var context = new NullabilityInfoContext();
-            var info = context.Create(property);
-            return info.WriteState != NullabilityState.NotNull;
-#else
-            return true;
-#endif
-        }
-
-        private static bool? DetermineValueTypeNullable(Type type)
-        {
-            if (type.IsValueType)
-            {
-                return type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>);
-            }
-
-            return null;
-        }
-
-        // Returns a tuple of (collectionType, dictionaryType, elementType)
-        private (Type?, Type?, Type?) DetermineMultiValueType()
-        {
-            // If the type is Dictionary<TKey, TValue> it doesn't matter if the property is
-            // read-only or not.
-            if (_argumentType.IsGenericType && _argumentType.GetGenericTypeDefinition() == typeof(Dictionary<,>))
-            {
-                var elementType = typeof(KeyValuePair<,>).MakeGenericType(_argumentType.GetGenericArguments());
-                return (null, _argumentType, elementType);
-            }
-
-            if (_argumentType.IsArray)
-            {
-                if (_argumentType.GetArrayRank() != 1)
-                {
-                    throw new NotSupportedException(Properties.Resources.InvalidArrayRank);
-                }
-
-                if (_property != null && _property.GetSetMethod() == null)
-                {
-                    throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.PropertyIsReadOnlyFormat, _argumentName));
-                }
-
-                var elementType = _argumentType.GetElementType()!;
-                return (_argumentType, null, elementType);
-            }
-
-            // The interface approach requires a read-only property. If it's read-write, treat it
-            // like a non-multi-value argument.
-            // Don't use CanWrite because that returns true for properties with a private set
-            // accessor.
-            if (_property == null || _property.GetSetMethod() != null)
-            {
-                return (null, null, null);
-            }
-
-            var dictionaryType = TypeHelper.FindGenericInterface(_argumentType, typeof(IDictionary<,>));
-            if (dictionaryType != null)
-            {
-                var elementType = typeof(KeyValuePair<,>).MakeGenericType(dictionaryType.GetGenericArguments());
-                return (null, dictionaryType, elementType);
-            }
-
-            var collectionType = TypeHelper.FindGenericInterface(_argumentType, typeof(ICollection<>));
-            if (collectionType != null)
-            {
-                var elementType = collectionType.GetGenericArguments()[0];
-                return (collectionType, null, elementType);
-            }
-
-            // This is a read-only property with an unsupported type.
-            throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.PropertyIsReadOnlyFormat, _argumentName));
-        }
-
-        private static (MethodArgumentInfo, Type, bool)? DetermineMethodArgumentInfo(MethodInfo method)
-        {
-            var parameters = method.GetParameters();
-            if (!method.IsStatic ||
-                (method.ReturnType != typeof(bool) && method.ReturnType != typeof(void)) ||
-                parameters.Length > 2)
-            {
-                return null;
-            }
-
-            bool allowsNull = false;
-            var argumentType = typeof(bool);
-            var info = new MethodArgumentInfo() { Method = method };
-            if (parameters.Length == 2)
-            {
-                argumentType = parameters[0].ParameterType;
-                if (parameters[1].ParameterType != typeof(CommandLineParser))
-                {
-                    return null;
-                }
-
-                info.HasValueParameter = true;
-                info.HasParserParameter = true;
-            }
-            else if (parameters.Length == 1)
-            {
-                if (parameters[0].ParameterType == typeof(CommandLineParser))
-                {
-                    info.HasParserParameter = true;
-                }
-                else
-                {
-                    argumentType = parameters[0].ParameterType;
-                    info.HasValueParameter = true;
-                }
-            }
-
-            if (info.HasValueParameter)
-            {
-                allowsNull = DetermineAllowsNull(parameters[0]);
-            }
-
-            return (info, argumentType, allowsNull);
-        }
-
         private static void AutomaticHelp()
         {
             // Intentionally blank.
@@ -1825,7 +1390,7 @@ namespace Ookii.CommandLine
             return false;
         }
 
-        private static string DetermineArgumentName(string? explicitName, string memberName, NameTransform? transform)
+        internal static string DetermineArgumentName(string? explicitName, string memberName, NameTransform? transform)
         {
             if (explicitName != null)
             {
@@ -1868,33 +1433,6 @@ namespace Ookii.CommandLine
                     validator.Validate(this, stringValue);
                 }
             }
-        }
-
-        private static string? GetDefaultValueDescription(Type type, IDictionary<Type, string>? defaultValueDescriptions)
-        {
-            if (defaultValueDescriptions == null)
-            {
-                return null;
-            }
-
-            if (defaultValueDescriptions.TryGetValue(type, out string? value))
-            {
-                return value;
-            }
-
-            return null;
-        }
-
-        private static string DetermineValueDescription(Type type, ParseOptions options)
-        {
-            var result = GetDefaultValueDescription(type, options.DefaultValueDescriptions);
-            if (result == null)
-            {
-                var typeName = GetFriendlyTypeName(type);
-                result = options.ValueDescriptionTransform?.Apply(typeName) ?? typeName;
-            }
-
-            return result;
         }
     }
 }
