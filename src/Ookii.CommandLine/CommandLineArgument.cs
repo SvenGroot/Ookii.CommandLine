@@ -4,7 +4,6 @@ using Ookii.CommandLine.Validation;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
@@ -18,15 +17,15 @@ namespace Ookii.CommandLine
     /// </summary>
     /// <threadsafety static="true" instance="false"/>
     /// <seealso cref="CommandLineArgumentAttribute"/>
-    public class CommandLineArgument
+    public abstract class CommandLineArgument
     {
         #region Nested types
 
         private interface IValueHelper
         {
             object? Value { get; }
-            bool SetValue(CommandLineArgument argument, CultureInfo culture, object? value);
-            void ApplyValue(object target, PropertyInfo property);
+            bool SetValue(CommandLineArgument argument, object? value);
+            void ApplyValue(CommandLineArgument argument, object target);
         }
 
         private class SingleValueHelper : IValueHelper
@@ -38,12 +37,12 @@ namespace Ookii.CommandLine
 
             public object? Value { get; private set; }
 
-            public void ApplyValue(object target, PropertyInfo property)
+            public void ApplyValue(CommandLineArgument argument, object target)
             {
-                property.SetValue(target, Value);
+                argument.SetProperty(target, Value);
             }
 
-            public bool SetValue(CommandLineArgument argument, CultureInfo culture, object? value)
+            public bool SetValue(CommandLineArgument argument, object? value)
             {
                 Value = value;
                 return true;
@@ -58,21 +57,15 @@ namespace Ookii.CommandLine
 
             public object? Value => _values.ToArray();
 
-            public void ApplyValue(object target, PropertyInfo property)
+            public void ApplyValue(CommandLineArgument argument, object target)
             {
-                if (property.PropertyType.IsArray)
+                if (argument.CanSetProperty)
                 {
-                    property.SetValue(target, Value);
+                    argument.SetProperty(target, Value);
                     return;
                 }
 
-                object? collection = property.GetValue(target, null);
-                if (collection == null)
-                {
-                    throw new InvalidOperationException();
-                }
-
-                var list = (ICollection<T?>)collection;
+                var list = (ICollection<T?>?)argument.GetProperty(target) ?? throw new InvalidOperationException();
                 list.Clear();
                 foreach (var value in _values)
                 {
@@ -80,7 +73,7 @@ namespace Ookii.CommandLine
                 }
             }
 
-            public bool SetValue(CommandLineArgument argument, CultureInfo culture, object? value)
+            public bool SetValue(CommandLineArgument argument, object? value)
             {
                 _values.Add((T?)value);
                 return true;
@@ -103,19 +96,16 @@ namespace Ookii.CommandLine
 
             public object? Value => _dictionary;
 
-            public void ApplyValue(object target, PropertyInfo property)
+            public void ApplyValue(CommandLineArgument argument, object target)
             {
-                if (property.GetSetMethod() != null)
+                if (argument.CanSetProperty)
                 {
-                    property.SetValue(target, _dictionary);
+                    argument.SetProperty(target, _dictionary);
                     return;
                 }
 
-                var dictionary = (IDictionary<TKey, TValue?>?)property.GetValue(target, null);
-                if (dictionary == null)
-                {
-                    throw new InvalidOperationException();
-                }
+                var dictionary = (IDictionary<TKey, TValue?>?)argument.GetProperty(target)
+                    ?? throw new InvalidOperationException();
 
                 dictionary.Clear();
                 foreach (var pair in _dictionary)
@@ -124,7 +114,7 @@ namespace Ookii.CommandLine
                 }
             }
 
-            public bool SetValue(CommandLineArgument argument, CultureInfo culture, object? value)
+            public bool SetValue(CommandLineArgument argument, object? value)
             {
                 // ConvertToArgumentType is guaranteed to return non-null for dictionary arguments.
                 var pair = (KeyValuePair<TKey?, TValue?>)value!;
@@ -160,39 +150,101 @@ namespace Ookii.CommandLine
         {
             public object? Value { get; private set; }
 
-            public void ApplyValue(object target, PropertyInfo property)
+            public void ApplyValue(CommandLineArgument argument, object target)
             {
                 throw new InvalidOperationException();
             }
 
-            public bool SetValue(CommandLineArgument argument, CultureInfo culture, object? value)
+            public bool SetValue(CommandLineArgument argument, object? value)
             {
                 Value = value;
-                var info = argument._method!.Value;
-                int parameterCount = (info.HasValueParameter ? 1 : 0) + (info.HasParserParameter ? 1 : 0);
-                var parameters = new object?[parameterCount];
-                int index = 0;
-                if (info.HasValueParameter)
-                {
-                    parameters[index] = Value;
-                    ++index;
-                }
+                return argument.CallMethod(value);
+            }
+        }
 
-                if (info.HasParserParameter)
-                {
-                    parameters[index] = argument._parser;
-                }
+        private class HelpArgument : CommandLineArgument
+        {
+            public HelpArgument(CommandLineParser parser, string argumentName, char shortName, char shortAlias)
+                : base(CreateInfo(parser, argumentName, shortName, shortAlias))
+            { 
+            }
 
-                var returnValue = info.Method.Invoke(null, parameters);
-                if (returnValue == null)
+            protected override bool CanSetProperty => false;
+
+            private static ArgumentInfo CreateInfo(CommandLineParser parser, string argumentName, char shortName, char shortAlias)
+            {
+                var info = new ArgumentInfo()
                 {
-                    return true;
+                    Parser = parser,
+                    ArgumentName = argumentName,
+                    Kind = ArgumentKind.Method,
+                    Long = true,
+                    Short = true,
+                    ShortName = parser.StringProvider.AutomaticHelpShortName(),
+                    ArgumentType = typeof(bool),
+                    ElementTypeWithNullable = typeof(bool),
+                    ElementType = typeof(bool),
+                    Description = parser.StringProvider.AutomaticHelpDescription(),
+                    MemberName = "AutomaticHelp",
+                    CancelParsing = true,
+                    Validators = Enumerable.Empty<ArgumentValidationAttribute>(),
+                    Converter = BooleanConverter.Instance,
+                };
+
+                if (parser.Mode == ParsingMode.LongShort)
+                {
+                    if (parser.ShortArgumentNameComparer!.Compare(shortAlias, shortName) != 0)
+                    {
+                        info.ShortAliases = new[] { shortAlias };
+                    }
                 }
                 else
                 {
-                    return (bool)returnValue;
+                    var shortNameString = shortName.ToString();
+                    var shortAliasString = shortAlias.ToString();
+                    info.Aliases = string.Compare(shortAliasString, shortNameString, parser.ArgumentNameComparison) == 0
+                        ? new[] { shortNameString }
+                        : new[] { shortNameString, shortAliasString };
                 }
+
+                return info;
             }
+
+            protected override bool CallMethod(object? value) => true;
+            protected override object? GetProperty(object target) => throw new InvalidOperationException();
+            protected override void SetProperty(object target, object? value) => throw new InvalidOperationException();
+        }
+
+        private class VersionArgument : CommandLineArgument
+        {
+            public VersionArgument(CommandLineParser parser, string argumentName)
+                : base(CreateInfo(parser, argumentName))
+            {
+            }
+
+            protected override bool CanSetProperty => false;
+
+            private static ArgumentInfo CreateInfo(CommandLineParser parser, string argumentName)
+            {
+                return new ArgumentInfo()
+                {
+                    Parser = parser,
+                    ArgumentName = argumentName,
+                    Kind = ArgumentKind.Method,
+                    Long = true,
+                    ArgumentType = typeof(bool),
+                    ElementTypeWithNullable = typeof(bool),
+                    ElementType = typeof(bool),
+                    Description = parser.StringProvider.AutomaticVersionDescription(),
+                    MemberName = nameof(AutomaticVersion),
+                    Validators = Enumerable.Empty<ArgumentValidationAttribute>(),
+                    Converter = BooleanConverter.Instance
+                };
+            }
+
+            protected override bool CallMethod(object? value) => AutomaticVersion(Parser);
+            protected override object? GetProperty(object target) => throw new InvalidOperationException();
+            protected override void SetProperty(object target, object? value) => throw new InvalidOperationException();
         }
 
         internal struct ArgumentInfo
@@ -222,6 +274,8 @@ namespace Ookii.CommandLine
             public bool AllowNull { get; set; }
             public bool CancelParsing { get; set; }
             public bool IsHidden { get; set; }
+            public Type? KeyType { get; set; }
+            public Type? ValueType { get; set; }
             public IEnumerable<ArgumentValidationAttribute> Validators { get; set; }
         }
 
@@ -229,7 +283,6 @@ namespace Ookii.CommandLine
 
         private readonly CommandLineParser _parser;
         private readonly ArgumentConverter _converter;
-        private readonly string _valueDescription;
         private readonly string _argumentName;
         private readonly bool _hasLongName = true;
         private readonly char _shortName;
@@ -238,6 +291,8 @@ namespace Ookii.CommandLine
         private readonly Type _argumentType;
         private readonly Type _elementType;
         private readonly Type _elementTypeWithNullable;
+        private readonly Type? _keyType;
+        private readonly Type? _valueType;
         private readonly string? _description;
         private readonly bool _isRequired;
         private readonly string _memberName;
@@ -251,6 +306,7 @@ namespace Ookii.CommandLine
         private readonly bool _cancelParsing;
         private readonly bool _isHidden;
         private readonly IEnumerable<ArgumentValidationAttribute> _validators;
+        private string? _valueDescription;
         private IValueHelper? _valueHelper;
         private ReadOnlyMemory<char> _usedArgumentName;
 
@@ -297,7 +353,11 @@ namespace Ookii.CommandLine
             }
 
             _argumentType = info.ArgumentType;
-            _elementTypeWithNullable = info.ArgumentType;
+            _argumentKind = info.Kind;
+            _elementTypeWithNullable = info.ElementTypeWithNullable;
+            _elementType = info.ElementType;
+            _keyType = info.KeyType;
+            _valueType = info.ValueType;
             _description = info.Description;
             _isRequired = info.IsRequired;
             _allowNull = info.AllowNull;
@@ -306,7 +366,14 @@ namespace Ookii.CommandLine
             // Required or positional arguments cannot be hidden.
             _isHidden = info.IsHidden && !info.IsRequired && info.Position == null;
             Position = info.Position;
+            _converter = info.Converter;
             _defaultValue = ConvertToArgumentTypeInvariant(info.DefaultValue);
+            _valueDescription = info.ValueDescription;
+            _allowDuplicateDictionaryKeys = info.AllowDuplicateDictionaryKeys;
+            _allowMultiValueWhiteSpaceSeparator = IsMultiValue && !IsSwitch && info.AllowMultiValueWhiteSpaceSeparator;
+            _allowNull = info.AllowNull;
+            _keyValueSeparator = info.KeyValueSeparator;
+            _multiValueSeparator = info.MultiValueSeparator;
         }
 
         /// <summary>
@@ -619,10 +686,7 @@ namespace Ookii.CommandLine
         /// </note>
         /// </remarks>
         /// <seealso cref="CommandLineArgumentAttribute.ValueDescription"/>
-        public string ValueDescription
-        {
-            get { return _valueDescription; }
-        }
+        public string ValueDescription => _valueDescription ??= DetermineValueDescription();
 
         /// <summary>
         /// Gets a value indicating whether this argument is a switch argument.
@@ -917,7 +981,8 @@ namespace Ookii.CommandLine
         /// </para>
         /// <para>
         ///   Canceling parsing in this way is identical to handling the <see cref="CommandLineParser.ArgumentParsed"/>
-        ///   event and setting <see cref="CancelEventArgs.Cancel"/> to <see langword="true" />.
+        ///   event and setting <see cref="System.ComponentModel.CancelEventArgs.Cancel"/> to
+        ///   <see langword="true" />.
         /// </para>
         /// <para>
         ///   It's possible to prevent cancellation when an argument has this property set by
@@ -955,6 +1020,16 @@ namespace Ookii.CommandLine
         /// A list of objects deriving from the <see cref="ArgumentValidationAttribute"/> class.
         /// </value>
         public IEnumerable<ArgumentValidationAttribute> Validators => _validators;
+
+        /// <summary>
+        /// When implemented in a derived class, gets a value that indicates whether this argument
+        /// is backed by a property with a public set method.
+        /// </summary>
+        /// <value>
+        /// <see langword="true"/> if this argument's value will be stored in a writable property;
+        /// otherwise, <see langword="false"/>.
+        /// </value>
+        protected abstract bool CanSetProperty { get; }
 
         /// <summary>
         /// Converts the specified string to the <see cref="ElementType"/>.
@@ -1036,6 +1111,102 @@ namespace Ookii.CommandLine
         public override string ToString()
         {
             return (new UsageWriter()).GetArgumentUsage(this);
+        }
+
+        /// <summary>
+        /// When implemented in a derived class, sets the property for this argument.
+        /// </summary>
+        /// <param name="target">An instance of the type that defined the argument.</param>
+        /// <param name="value">The value of the argument.</param>
+        /// <exception cref="InvalidOperationException">
+        ///   This argument does not use a writable property.
+        /// </exception>
+        protected abstract void SetProperty(object target, object? value);
+
+        /// <summary>
+        /// When implemented in a derived class, gets the value of the property for this argument.
+        /// </summary>
+        /// <param name="target">An instance of the type that defined the argument.</param>
+        /// <returns>The value of the property</returns>
+        /// <exception cref="InvalidOperationException">
+        ///   This argument does not use a property.
+        /// </exception>
+        protected abstract object? GetProperty(object target);
+
+        /// <summary>
+        /// When implemented in a derived class, calls the method that defined the property.
+        /// </summary>
+        /// <param name="value">The argument value.</param>
+        /// <returns>The return value of the argument's method.</returns>
+        /// <exception cref="InvalidOperationException">
+        ///   This argument does not use a method.
+        /// </exception>
+        protected abstract bool CallMethod(object? value);
+
+        /// <summary>
+        /// Determines the value description if one wasn't explicitly given.
+        /// </summary>
+        /// <param name="type">
+        /// The type to get the description for, or null to use the value of the <see cref="ElementType"/>
+        /// property.
+        /// </param>
+        /// <returns>The value description.</returns>
+        /// <remarks>
+        /// <para>
+        ///   This method is responsible for applying the <see cref="ParseOptions.ValueDescriptionTransform"/>,
+        ///   if one is specified.
+        /// </para>
+        /// </remarks>
+        protected virtual string DetermineValueDescription(Type? type = null)
+        {
+            if (Kind == ArgumentKind.Dictionary && type == null)
+            {
+                var key = DetermineValueDescription(_keyType!.GetUnderlyingType());
+                var value = DetermineValueDescription(_valueType!.GetUnderlyingType());
+                return $"{key}{KeyValueSeparator}{value}";
+            }
+
+            var result = GetDefaultValueDescription(type);
+            if (result != null)
+            {
+                return result;
+            }
+
+            var typeName = GetFriendlyTypeName(type ?? ElementType);
+            return Parser.Options.ValueDescriptionTransform?.Apply(typeName) ?? typeName;
+        }
+
+        private static string GetFriendlyTypeName(Type type)
+        {
+            // This is used to generate a value description from a type name if no custom value description was supplied.
+            if (type.IsGenericType)
+            {
+                var name = new StringBuilder(type.FullName?.Length ?? 0);
+                name.Append(type.Name, 0, type.Name.IndexOf("`", StringComparison.Ordinal));
+                name.Append('<');
+                // AppendJoin is not supported in .Net Standard 2.0
+                bool first = true;
+                foreach (Type typeArgument in type.GetGenericArguments())
+                {
+                    if (first)
+                    {
+                        first = false;
+                    }
+                    else
+                    {
+                        name.Append(", ");
+                    }
+
+                    name.Append(GetFriendlyTypeName(typeArgument));
+                }
+
+                name.Append('>');
+                return name.ToString();
+            }
+            else
+            {
+                return type.Name;
+            }
         }
 
         internal object? ConvertToArgumentType(CultureInfo culture, bool hasValue, string? stringValue, ReadOnlySpan<char> spanValue)
@@ -1137,7 +1308,7 @@ namespace Ookii.CommandLine
                     string? separateValueString = null;
                     PreValidate(ref separateValueString, separateValue);
                     var converted = ConvertToArgumentType(culture, true, separateValueString, separateValue);
-                    continueParsing = _valueHelper.SetValue(this, culture, converted);
+                    continueParsing = _valueHelper.SetValue(this, converted);
                     if (!continueParsing)
                     {
                         return false;
@@ -1151,7 +1322,7 @@ namespace Ookii.CommandLine
             {
                 PreValidate(ref stringValue, spanValue);
                 var converted = ConvertToArgumentType(culture, hasValue, stringValue, spanValue);
-                continueParsing = _valueHelper.SetValue(this, culture, converted);
+                continueParsing = _valueHelper.SetValue(this, converted);
                 Validate(converted, ValidationMode.AfterConversion);
             }
 
@@ -1159,7 +1330,7 @@ namespace Ookii.CommandLine
             return continueParsing;
         }
 
-        internal static (CommandLineArgument, bool) CreateAutomaticHelp(CommandLineParser parser, IDictionary<Type, string>? defaultValueDescriptions, NameTransform valueDescriptionTransform)
+        internal static (CommandLineArgument, bool) CreateAutomaticHelp(CommandLineParser parser)
         {
             if (parser == null)
             {
@@ -1179,45 +1350,10 @@ namespace Ookii.CommandLine
                 return (existingArg, false);
             }
 
-            var memberName = nameof(AutomaticHelp);
-            var info = new ArgumentInfo()
-            {
-                Parser = parser,
-                Method = new()
-                {
-                    Method = typeof(CommandLineArgument).GetMethod(memberName, BindingFlags.NonPublic | BindingFlags.Static)!,
-                },
-                ArgumentName = argumentName,
-                Long = true,
-                Short = true,
-                ShortName = parser.StringProvider.AutomaticHelpShortName(),
-                ArgumentType = typeof(bool),
-                Description = parser.StringProvider.AutomaticHelpDescription(),
-                MemberName = memberName,
-                CancelParsing = true,
-                Validators = Enumerable.Empty<ArgumentValidationAttribute>(),
-            };
-
-            if (parser.Mode == ParsingMode.LongShort)
-            {
-                if (parser.ShortArgumentNameComparer!.Compare(shortAlias, shortName) != 0)
-                {
-                    info.ShortAliases = new[] { shortAlias };
-                }
-            }
-            else
-            {
-                var shortNameString = shortName.ToString();
-                var shortAliasString = shortAlias.ToString();
-                info.Aliases = string.Compare(shortAliasString, shortNameString, parser.ArgumentNameComparison) == 0
-                    ? new[] { shortNameString }
-                    : new[] { shortNameString, shortAliasString };
-            }
-
-            return (new CommandLineArgument(info), true);
+            return (new HelpArgument(parser, argumentName, shortName, shortAlias), true);
         }
 
-        internal static CommandLineArgument? CreateAutomaticVersion(CommandLineParser parser, IDictionary<Type, string>? defaultValueDescriptions, NameTransform valueDescriptionTransform)
+        internal static CommandLineArgument? CreateAutomaticVersion(CommandLineParser parser)
         {
             if (parser == null)
             {
@@ -1230,24 +1366,7 @@ namespace Ookii.CommandLine
                 return null;
             }
 
-            var memberName = nameof(AutomaticVersion);
-            var info = new ArgumentInfo()
-            {
-                Parser = parser,
-                Method = new()
-                {
-                    Method = typeof(CommandLineArgument).GetMethod(memberName, BindingFlags.NonPublic | BindingFlags.Static)!,
-                    HasParserParameter = true,
-                },
-                ArgumentName = argumentName,
-                Long = true,
-                ArgumentType = typeof(bool),
-                Description = parser.StringProvider.AutomaticVersionDescription(),
-                MemberName = memberName,
-                Validators = Enumerable.Empty<ArgumentValidationAttribute>(),
-            };
-
-            return new CommandLineArgument(info);
+            return new VersionArgument(parser, argumentName);
         }
 
         internal object? GetConstructorParameterValue()
@@ -1257,18 +1376,16 @@ namespace Ookii.CommandLine
 
         internal void ApplyPropertyValue(object target)
         {
-            // Do nothing for parameter-based values
-            if (_property == null)
+            // Do nothing for method-based values.
+            // TODO: Handle new style constructor parameters.
+            if (Kind == ArgumentKind.Method)
             {
                 return;
             }
 
             try
             {
-                if (_valueHelper != null)
-                {
-                    _valueHelper.ApplyValue(target, _property);
-                }
+                _valueHelper?.ApplyValue(this, target);
             }
             catch (TargetInvocationException ex)
             {
@@ -1377,11 +1494,6 @@ namespace Ookii.CommandLine
             });
         }
 
-        private static void AutomaticHelp()
-        {
-            // Intentionally blank.
-        }
-
         private static bool AutomaticVersion(CommandLineParser parser)
         {
             ShowVersion(parser.StringProvider, parser.ArgumentsType.Assembly, parser.ApplicationFriendlyName);
@@ -1398,6 +1510,17 @@ namespace Ookii.CommandLine
             }
 
             return transform?.Apply(memberName) ?? memberName;
+        }
+
+        private string? GetDefaultValueDescription(Type? type)
+        {
+            if (Parser.Options.DefaultValueDescriptions == null || 
+                !Parser.Options.DefaultValueDescriptions.TryGetValue(type ?? ElementType, out string? value))
+            {
+                return null;
+            }
+
+            return value;
         }
 
         private void Validate(object? value, ValidationMode mode)

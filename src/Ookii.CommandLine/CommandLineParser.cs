@@ -333,8 +333,8 @@ namespace Ookii.CommandLine
             _sortedPrefixes = prefixInfos.OrderByDescending(info => info.Prefix.Length).ToArray();
             _argumentsByName = new(new MemoryComparer(comparison));
 
-            _positionalArgumentCount = DetermineMemberArguments(options, optionsAttribute);
-            DetermineAutomaticArguments(options, optionsAttribute);
+            _positionalArgumentCount = DetermineMemberArguments();
+            DetermineAutomaticArguments();
             // Sort the member arguments in usage order (positional first, then required
             // non-positional arguments, then the rest by name.
             _arguments.Sort(new CommandLineArgumentComparer(comparison));
@@ -1231,11 +1231,8 @@ namespace Ookii.CommandLine
             }
         }
 
-        private int DetermineMemberArguments(ParseOptions? options, ParseOptionsAttribute? optionsAttribute)
+        private int DetermineMemberArguments()
         {
-            var valueDescriptionTransform = options?.ValueDescriptionTransform ?? optionsAttribute?.ValueDescriptionTransform
-                ?? NameTransform.None;
-
             int additionalPositionalArgumentCount = 0;
             MemberInfo[] properties = _argumentsType.GetProperties(BindingFlags.Public | BindingFlags.Instance);
             MethodInfo[] methods = _argumentsType.GetMethods(BindingFlags.Public | BindingFlags.Static);
@@ -1245,8 +1242,8 @@ namespace Ookii.CommandLine
                 {
                     var argument = member switch
                     {
-                        PropertyInfo prop => CommandLineArgument.Create(this, prop),
-                        MethodInfo method => CommandLineArgument.Create(this, method),
+                        PropertyInfo prop => ReflectionArgument.Create(this, prop),
+                        MethodInfo method => ReflectionArgument.Create(this, method),
                         _ => throw new InvalidOperationException(),
                     };
 
@@ -1261,16 +1258,12 @@ namespace Ookii.CommandLine
             return additionalPositionalArgumentCount;
         }
 
-        private void DetermineAutomaticArguments(ParseOptions? options, ParseOptionsAttribute? optionsAttribute)
+        private void DetermineAutomaticArguments()
         {
-            var valueDescriptionTransform = options?.ValueDescriptionTransform ?? optionsAttribute?.ValueDescriptionTransform
-                ?? NameTransform.None;
-
-            bool autoHelp = options?.AutoHelpArgument ?? optionsAttribute?.AutoHelpArgument ?? true;
+            bool autoHelp = Options.AutoHelpArgument ?? true;
             if (autoHelp)
             {
-                var (argument, created) = CommandLineArgument.CreateAutomaticHelp(this, options?.DefaultValueDescriptions,
-                    valueDescriptionTransform);
+                var (argument, created) = CommandLineArgument.CreateAutomaticHelp(this);
 
                 if (created)
                 {
@@ -1280,11 +1273,10 @@ namespace Ookii.CommandLine
                 HelpArgument = argument;
             }
 
-            bool autoVersion = options?.AutoVersionArgument ?? optionsAttribute?.AutoVersionArgument ?? true;
+            bool autoVersion = Options.AutoVersionArgument ?? true;
             if (autoVersion && !CommandInfo.IsCommand(_argumentsType))
             {
-                var argument = CommandLineArgument.CreateAutomaticVersion(this, options?.DefaultValueDescriptions,
-                    valueDescriptionTransform);
+                var argument = CommandLineArgument.CreateAutomaticVersion(this);
 
                 if (argument != null)
                 {

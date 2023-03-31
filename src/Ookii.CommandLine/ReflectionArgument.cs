@@ -33,6 +33,60 @@ internal class ReflectionArgument : CommandLineArgument
         _method = method;
     }
 
+    protected override bool CanSetProperty => _property?.GetSetMethod() != null;
+
+    protected override void SetProperty(object target, object? value)
+    {
+        if (_property == null)
+        {
+            throw new InvalidOperationException();
+        }
+
+        _property.SetValue(target, value);
+    }
+
+    protected override object? GetProperty(object target)
+    {
+        if (_property == null)
+        {
+            throw new InvalidOperationException();
+        }
+
+        return _property.GetValue(target);
+    }
+
+    protected override bool CallMethod(object? value)
+    {
+        if (_method is not MethodArgumentInfo info)
+        {
+            throw new InvalidOperationException();
+        }
+
+        int parameterCount = (info.HasValueParameter ? 1 : 0) + (info.HasParserParameter ? 1 : 0);
+        var parameters = new object?[parameterCount];
+        int index = 0;
+        if (info.HasValueParameter)
+        {
+            parameters[index] = Value;
+            ++index;
+        }
+
+        if (info.HasParserParameter)
+        {
+            parameters[index] = Parser;
+        }
+
+        var returnValue = info.Method.Invoke(null, parameters);
+        if (returnValue == null)
+        {
+            return true;
+        }
+        else
+        {
+            return (bool)returnValue;
+        }
+    }
+
     internal static CommandLineArgument Create(CommandLineParser parser, PropertyInfo property)
     {
         if (parser == null)
@@ -60,13 +114,9 @@ internal class ReflectionArgument : CommandLineArgument
             throw new ArgumentNullException(nameof(method));
         }
 
-        var infoTuple = DetermineMethodArgumentInfo(method);
-        if (infoTuple == null)
-        {
-            throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.InvalidMethodSignatureFormat, method.Name));
-        }
+        var (methodInfo, argumentType, allowsNull) = DetermineMethodArgumentInfo(method)
+            ?? throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.InvalidMethodSignatureFormat, method.Name));
 
-        var (methodInfo, argumentType, allowsNull) = infoTuple.Value;
         return Create(parser, null, methodInfo, argumentType, allowsNull);
     }
 
@@ -88,8 +138,9 @@ internal class ReflectionArgument : CommandLineArgument
             Short = attribute.IsShort,
             ShortName = attribute.ShortName,
             ArgumentType = argumentType,
+            ElementTypeWithNullable = argumentType,
             Description = member.GetCustomAttribute<DescriptionAttribute>()?.Description,
-            ValueDescription = attribute.ValueDescription,  // If null, the constructor will sort it out.
+            ValueDescription = attribute.ValueDescription,
             Position = attribute.Position < 0 ? null : attribute.Position,
             AllowDuplicateDictionaryKeys = Attribute.IsDefined(member, typeof(AllowDuplicateDictionaryKeysAttribute)),
             MultiValueSeparator = GetMultiValueSeparator(multiValueSeparatorAttribute),
@@ -106,11 +157,11 @@ internal class ReflectionArgument : CommandLineArgument
             Validators = member.GetCustomAttributes<ArgumentValidationAttribute>(),
         };
 
-        DetermineAdditionalInfo(ref info, member, argumentType, argumentName);
+        DetermineAdditionalInfo(ref info, member);
         return new ReflectionArgument(info, property, method);
     }
 
-    private static void DetermineAdditionalInfo(ref ArgumentInfo info, MemberInfo member, Type argumentType, string argumentName)
+    private static void DetermineAdditionalInfo(ref ArgumentInfo info, MemberInfo member)
     {
         var converterAttribute = member.GetCustomAttribute<ArgumentConverterAttribute>();
         var keyArgumentConverterAttribute = member.GetCustomAttribute<KeyConverterAttribute>();
@@ -119,7 +170,8 @@ internal class ReflectionArgument : CommandLineArgument
 
         if (member is PropertyInfo property)
         {
-            var (collectionType, dictionaryType, elementType) = DetermineMultiValueType(argumentName, argumentType, property);
+            var (collectionType, dictionaryType, elementType) = 
+                DetermineMultiValueType(info.ArgumentName, info.ArgumentType, property);
 
             if (dictionaryType != null)
             {
@@ -129,6 +181,8 @@ internal class ReflectionArgument : CommandLineArgument
                 info.AllowNull = DetermineDictionaryValueTypeAllowsNull(dictionaryType, property);
                 info.KeyValueSeparator ??= KeyValuePairConverter.DefaultSeparator;
                 var genericArguments = dictionaryType.GetGenericArguments();
+                info.KeyType = genericArguments[0];
+                info.ValueType = genericArguments[1];
                 if (converterType == null)
                 {
                     converterType = typeof(KeyValuePairConverter<,>).MakeGenericType(genericArguments);
@@ -137,18 +191,6 @@ internal class ReflectionArgument : CommandLineArgument
                     info.Converter = (ArgumentConverter)Activator.CreateInstance(converterType, info.Parser.StringProvider,
                         info.ArgumentName, info.AllowNull, keyConverterType, valueConverterType, info.KeyValueSeparator)!;
                 }
-
-                var valueDescription = info.ValueDescription ?? GetDefaultValueDescription(info.ElementTypeWithNullable,
-                    info.Parser.Options.DefaultValueDescriptions);
-
-                if (valueDescription == null)
-                {
-                    var key = DetermineValueDescription(genericArguments[0].GetUnderlyingType(), info.Parser.Options);
-                    var value = DetermineValueDescription(genericArguments[1].GetUnderlyingType(), info.Parser.Options);
-                    valueDescription = $"{key}{info.KeyValueSeparator}{value}";
-                }
-
-                info.ValueDescription = valueDescription;
             }
             else if (collectionType != null)
             {
@@ -168,67 +210,6 @@ internal class ReflectionArgument : CommandLineArgument
 
         // Use the original Nullable<T> for this if it is one.
         info.Converter ??= info.ElementTypeWithNullable.GetStringConverter(converterType);
-        info.ValueDescription ??= info.ValueDescription ?? DetermineValueDescription(info.ElementType, info.Parser.Options);
-    }
-
-    private static string? GetDefaultValueDescription(Type type, IDictionary<Type, string>? defaultValueDescriptions)
-    {
-        if (defaultValueDescriptions == null)
-        {
-            return null;
-        }
-
-        if (defaultValueDescriptions.TryGetValue(type, out string? value))
-        {
-            return value;
-        }
-
-        return null;
-    }
-
-    private static string DetermineValueDescription(Type type, ParseOptions options)
-    {
-        var result = GetDefaultValueDescription(type, options.DefaultValueDescriptions);
-        if (result == null)
-        {
-            var typeName = GetFriendlyTypeName(type);
-            result = options.ValueDescriptionTransform?.Apply(typeName) ?? typeName;
-        }
-
-        return result;
-    }
-
-    private static string GetFriendlyTypeName(Type type)
-    {
-        // This is used to generate a value description from a type name if no custom value description was supplied.
-        if (type.IsGenericType)
-        {
-            var name = new StringBuilder(type.FullName?.Length ?? 0);
-            name.Append(type.Name, 0, type.Name.IndexOf("`", StringComparison.Ordinal));
-            name.Append('<');
-            // AppendJoin is not supported in .Net Standard 2.0
-            bool first = true;
-            foreach (Type typeArgument in type.GetGenericArguments())
-            {
-                if (first)
-                {
-                    first = false;
-                }
-                else
-                {
-                    name.Append(", ");
-                }
-
-                name.Append(GetFriendlyTypeName(typeArgument));
-            }
-
-            name.Append('>');
-            return name.ToString();
-        }
-        else
-        {
-            return type.Name;
-        }
     }
 
     // Returns a tuple of (collectionType, dictionaryType, elementType)

@@ -114,6 +114,11 @@ namespace Ookii.CommandLine
                 return StringConverter.Instance;
             }
 
+            if (type == typeof(bool))
+            {
+                return BooleanConverter.Instance;
+            }
+
             if (type.IsEnum)
             {
                 return new EnumConverter(type);
