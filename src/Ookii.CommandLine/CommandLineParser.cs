@@ -1,5 +1,6 @@
 ﻿// Copyright (c) Sven Groot (Ookii.org)
 using Ookii.CommandLine.Commands;
+using Ookii.CommandLine.Support;
 using Ookii.CommandLine.Validation;
 using System;
 using System.Collections.Generic;
@@ -188,7 +189,7 @@ namespace Ookii.CommandLine
 
         #endregion
 
-        private readonly Type _argumentsType;
+        private readonly IArgumentProvider _provider;
         private readonly List<CommandLineArgument> _arguments = new();
         private readonly SortedDictionary<ReadOnlyMemory<char>, CommandLineArgument> _argumentsByName;
         private readonly SortedDictionary<char, CommandLineArgument>? _argumentsByShortName;
@@ -302,11 +303,50 @@ namespace Ookii.CommandLine
         /// </para>
         /// </remarks>
         public CommandLineParser(Type argumentsType, ParseOptions? options = null)
+            : this(new ReflectionArgumentProvider(argumentsType ?? throw new ArgumentNullException(nameof(argumentsType))), options)
         {
-            _argumentsType = argumentsType ?? throw new ArgumentNullException(nameof(argumentsType));
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CommandLineParser"/> class using the
+        /// specified arguments type and options.
+        /// </summary>
+        /// <param name="argumentsType">The <see cref="Type"/> of the class that defines the command line arguments.</param>
+        /// <param name="options">
+        ///   The options that control parsing behavior, or <see langword="null"/> to use the
+        ///   default options.
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        ///   <paramref name="argumentsType"/> is <see langword="null"/>.
+        /// </exception>
+        /// <exception cref="NotSupportedException">
+        ///   The <see cref="CommandLineParser"/> cannot use <paramref name="argumentsType"/> as the command line arguments type,
+        ///   because it violates one of the rules concerning argument names or positions, or has an argument type that cannot
+        ///   be parsed.
+        /// </exception>
+        /// <remarks>
+        /// <para>
+        ///   If the <paramref name="options"/> parameter is not <see langword="null"/>, the
+        ///   instance passed in will be modified to reflect the options from the arguments class's
+        ///   <see cref="ParseOptionsAttribute"/> attribute, if it has one.
+        /// </para>
+        /// <para>
+        ///   Certain properties of the <see cref="ParseOptions"/> class can be changed after the
+        ///   <see cref="CommandLineParser"/> class has been constructed, and still affect the
+        ///   parsing behavior. See the <see cref="Options"/> property for details.
+        /// </para>
+        /// <para>
+        ///   Some of the properties of the <see cref="ParseOptions"/> class, like anything related
+        ///   to error output, are only used by the static <see cref="Parse{T}(ParseOptions?)"/>
+        ///   class and are not used here.
+        /// </para>
+        /// </remarks>
+        public CommandLineParser(IArgumentProvider provider, ParseOptions? options = null)
+        {
+            _provider = provider ?? throw new ArgumentNullException(nameof(provider));
             _parseOptions = options ?? new();
 
-            var optionsAttribute = _argumentsType.GetCustomAttribute<ParseOptionsAttribute>();
+            var optionsAttribute = _provider.OptionsAttribute;
             if (optionsAttribute != null)
             {
                 _parseOptions.Merge(optionsAttribute);
@@ -398,10 +438,7 @@ namespace Ookii.CommandLine
         /// <value>
         /// The <see cref="Type"/> that was used to define the arguments.
         /// </value>
-        public Type ArgumentsType
-        {
-            get { return _argumentsType; }
-        }
+        public Type ArgumentsType => _provider.ArgumentsType;
 
         /// <summary>
         /// Gets the friendly name of the application.
@@ -420,16 +457,7 @@ namespace Ookii.CommandLine
         ///   attribute.
         /// </para>
         /// </remarks>
-        public string ApplicationFriendlyName
-        {
-            get
-            {
-                var attribute = _argumentsType.GetCustomAttribute<ApplicationFriendlyNameAttribute>() ??
-                    _argumentsType.Assembly.GetCustomAttribute<ApplicationFriendlyNameAttribute>();
-
-                return attribute?.Name ?? _argumentsType.Assembly.GetName().Name ?? string.Empty;
-            }
-        }
+        public string ApplicationFriendlyName => _provider.ApplicationFriendlyName;
 
         /// <summary>
         /// Gets a description that is used when generating usage information.
@@ -444,8 +472,7 @@ namespace Ookii.CommandLine
         ///   to the command line arguments type.
         /// </para>
         /// </remarks>
-        public string Description
-            => _argumentsType.GetCustomAttribute<DescriptionAttribute>()?.Description ?? string.Empty;
+        public string Description => _provider.Description;
 
         /// <summary>
         /// Gets the options used by this instance.
@@ -1234,24 +1261,12 @@ namespace Ookii.CommandLine
         private int DetermineMemberArguments()
         {
             int additionalPositionalArgumentCount = 0;
-            MemberInfo[] properties = _argumentsType.GetProperties(BindingFlags.Public | BindingFlags.Instance);
-            MethodInfo[] methods = _argumentsType.GetMethods(BindingFlags.Public | BindingFlags.Static);
-            foreach (var member in properties.Concat(methods))
+            foreach (var argument in _provider.GetArguments(this))
             {
-                if (Attribute.IsDefined(member, typeof(CommandLineArgumentAttribute)))
+                AddNamedArgument(argument);
+                if (argument.Position != null)
                 {
-                    var argument = member switch
-                    {
-                        PropertyInfo prop => ReflectionArgument.Create(this, prop),
-                        MethodInfo method => ReflectionArgument.Create(this, method),
-                        _ => throw new InvalidOperationException(),
-                    };
-
-                    AddNamedArgument(argument);
-                    if (argument.Position != null)
-                    {
-                        ++additionalPositionalArgumentCount;
-                    }
+                    ++additionalPositionalArgumentCount;
                 }
             }
 
@@ -1274,7 +1289,7 @@ namespace Ookii.CommandLine
             }
 
             bool autoVersion = Options.AutoVersionArgument ?? true;
-            if (autoVersion && !CommandInfo.IsCommand(_argumentsType))
+            if (autoVersion && !CommandInfo.IsCommand(_provider.ArgumentsType))
             {
                 var argument = CommandLineArgument.CreateAutomaticVersion(this);
 
@@ -1420,14 +1435,10 @@ namespace Ookii.CommandLine
             }
 
             // Run class validators.
-            foreach (var validator in _argumentsType.GetCustomAttributes<ClassValidationAttribute>())
-            {
-                validator.Validate(this);
-            }
+            _provider.RunValidators(this);
 
             // TODO: Integrate with new ctor argument support.
-            var inject = _argumentsType.GetConstructor(new[] { typeof(CommandLineParser) }) != null;
-            object commandLineArguments = CreateArgumentsTypeInstance(inject);
+            object commandLineArguments = _provider.CreateInstance(this);
             foreach (CommandLineArgument argument in _arguments)
             {
                 // Apply property argument values (this does nothing for constructor or method arguments).
@@ -1589,25 +1600,6 @@ namespace Ookii.CommandLine
             }
 
             return null;
-        }
-
-        private object CreateArgumentsTypeInstance(bool inject)
-        {
-            try
-            {
-                if (inject)
-                {
-                    return Activator.CreateInstance(_argumentsType, this)!;
-                }
-                else
-                {
-                    return Activator.CreateInstance(_argumentsType)!;
-                }
-            }
-            catch (TargetInvocationException ex)
-            {
-                throw StringProvider.CreateException(CommandLineArgumentErrorCategory.CreateArgumentsTypeError, ex.InnerException);
-            }
         }
     }
 }
