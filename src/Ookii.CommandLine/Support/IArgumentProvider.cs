@@ -13,6 +13,8 @@ public interface IArgumentProvider
 
     public ParseOptionsAttribute? OptionsAttribute { get; }
 
+    public bool IsCommand { get; }
+
     public IEnumerable<CommandLineArgument> GetArguments(CommandLineParser parser);
 
     public void RunValidators(CommandLineParser parser);

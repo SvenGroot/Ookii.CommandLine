@@ -1,4 +1,5 @@
-﻿using Ookii.CommandLine.Validation;
+﻿using Ookii.CommandLine.Commands;
+using Ookii.CommandLine.Validation;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -34,6 +35,8 @@ internal class ReflectionArgumentProvider : IArgumentProvider
     }
 
     public string Description => _type.GetCustomAttribute<DescriptionAttribute>()?.Description ?? string.Empty;
+
+    public bool IsCommand => CommandInfo.IsCommand(_type);
 
     public object CreateInstance(CommandLineParser parser)
     {

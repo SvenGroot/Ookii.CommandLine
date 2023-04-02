@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Sven Groot (Ookii.org)
 using Ookii.CommandLine.Conversion;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;

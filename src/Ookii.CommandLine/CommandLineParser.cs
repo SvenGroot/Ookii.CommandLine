@@ -1289,7 +1289,7 @@ namespace Ookii.CommandLine
             }
 
             bool autoVersion = Options.AutoVersionArgument ?? true;
-            if (autoVersion && !CommandInfo.IsCommand(_provider.ArgumentsType))
+            if (autoVersion && !_provider.IsCommand)
             {
                 var argument = CommandLineArgument.CreateAutomaticVersion(this);
 
