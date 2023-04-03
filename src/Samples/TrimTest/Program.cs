@@ -1,6 +1,8 @@
 ﻿// See https://aka.ms/new-console-template for more information
 using Ookii.CommandLine;
+using Ookii.CommandLine.Conversion;
 using Ookii.CommandLine.Support;
+using Ookii.CommandLine.Validation;
 
 var parser = new CommandLineParser(new MyProvider());
 var arguments = (Arguments?)parser.ParseWithErrorHandling();
@@ -16,27 +18,23 @@ class Arguments
     public string? Test { get; set; }
 }
 
-class MyProvider : IArgumentProvider
+class MyProvider : GeneratedArgumentProvider
 {
-    public Type ArgumentsType => typeof(Arguments);
+    public MyProvider()
+        : base(typeof(Arguments), null, Enumerable.Empty<ClassValidationAttribute>(), null, null)
+    {
+    }
 
-    public string ApplicationFriendlyName => "Test";
+    public override bool IsCommand => false;
 
-    public string Description => string.Empty;
-
-    public ParseOptionsAttribute? OptionsAttribute => null;
-
-    public bool IsCommand => false;
-
-    public object CreateInstance(CommandLineParser parser)
+    public override object CreateInstance(CommandLineParser parser)
     {
         return new Arguments();
     }
-    public IEnumerable<CommandLineArgument> GetArguments(CommandLineParser parser)
+
+    public override IEnumerable<CommandLineArgument> GetArguments(CommandLineParser parser)
     {
-        yield return CustomArgument.Create(parser, "Test", typeof(string), (target, value) => ((Arguments)target).Test = (string?)value);
-    }
-    public void RunValidators(CommandLineParser parser)
-    {
+        yield return GeneratedArgument.Create(parser, typeof(string), "Test", new CommandLineArgumentAttribute(),
+            new StringConverter(), setProperty: (target, value) => ((Arguments)target).Test = (string?)value);
     }
 }

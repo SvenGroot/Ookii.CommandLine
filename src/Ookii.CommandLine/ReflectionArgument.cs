@@ -7,6 +7,7 @@ using Ookii.CommandLine.Conversion;
 using System.Diagnostics;
 using System.Text;
 using Ookii.CommandLine.Validation;
+using System.Threading;
 
 namespace Ookii.CommandLine;
 
@@ -127,35 +128,15 @@ internal class ReflectionArgument : CommandLineArgument
         var attribute = member.GetCustomAttribute<CommandLineArgumentAttribute>()
             ?? throw new ArgumentException(Properties.Resources.MissingArgumentAttribute, nameof(method));
 
-        var argumentName = DetermineArgumentName(attribute.ArgumentName, member.Name, parser.Options.ArgumentNameTransform);
         var multiValueSeparatorAttribute = member.GetCustomAttribute<MultiValueSeparatorAttribute>();
+        var descriptionAttribute = member.GetCustomAttribute<DescriptionAttribute>();
+        var allowDuplicateDictionaryKeys = Attribute.IsDefined(member, typeof(AllowDuplicateDictionaryKeysAttribute));
+        var keyValueSeparatorAttribute = member.GetCustomAttribute<KeyValueSeparatorAttribute>();
+        var aliasAttributes = member.GetCustomAttributes<AliasAttribute>();
+        var shortAliasAttributes = member.GetCustomAttributes<ShortAliasAttribute>();
+        var validationAttributes = member.GetCustomAttributes<ArgumentValidationAttribute>();
 
-        var info = new ArgumentInfo()
-        {
-            Parser = parser,
-            ArgumentName = argumentName,
-            Long = attribute.IsLong,
-            Short = attribute.IsShort,
-            ShortName = attribute.ShortName,
-            ArgumentType = argumentType,
-            ElementTypeWithNullable = argumentType,
-            Description = member.GetCustomAttribute<DescriptionAttribute>()?.Description,
-            ValueDescription = attribute.ValueDescription,
-            Position = attribute.Position < 0 ? null : attribute.Position,
-            AllowDuplicateDictionaryKeys = Attribute.IsDefined(member, typeof(AllowDuplicateDictionaryKeysAttribute)),
-            MultiValueSeparator = GetMultiValueSeparator(multiValueSeparatorAttribute),
-            AllowMultiValueWhiteSpaceSeparator = multiValueSeparatorAttribute != null && multiValueSeparatorAttribute.Separator == null,
-            KeyValueSeparator = member.GetCustomAttribute<KeyValueSeparatorAttribute>()?.Separator,
-            Aliases = GetAliases(member.GetCustomAttributes<AliasAttribute>(), argumentName),
-            ShortAliases = GetShortAliases(member.GetCustomAttributes<ShortAliasAttribute>(), argumentName),
-            DefaultValue = attribute.DefaultValue,
-            IsRequired = attribute.IsRequired,
-            MemberName = member.Name,
-            AllowNull = allowsNull,
-            CancelParsing = attribute.CancelParsing,
-            IsHidden = attribute.IsHidden,
-            Validators = member.GetCustomAttributes<ArgumentValidationAttribute>(),
-        };
+        ArgumentInfo info = CreateArgumentInfo(parser, argumentType, allowsNull, member.Name, attribute, multiValueSeparatorAttribute, descriptionAttribute, allowDuplicateDictionaryKeys, keyValueSeparatorAttribute, aliasAttributes, shortAliasAttributes, validationAttributes);
 
         DetermineAdditionalInfo(ref info, member);
         return new ReflectionArgument(info, property, method);
@@ -416,18 +397,5 @@ internal class ReflectionArgument : CommandLineArgument
         }
 
         return (info, argumentType, allowsNull);
-    }
-
-    private static string? GetMultiValueSeparator(MultiValueSeparatorAttribute? attribute)
-    {
-        var separator = attribute?.Separator;
-        if (string.IsNullOrEmpty(separator))
-        {
-            return null;
-        }
-        else
-        {
-            return separator;
-        }
     }
 }

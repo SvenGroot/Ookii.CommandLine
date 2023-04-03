@@ -10,46 +10,40 @@ using System.Threading.Tasks;
 
 namespace Ookii.CommandLine.Support;
 
-internal class ReflectionArgumentProvider : IArgumentProvider
+internal class ReflectionArgumentProvider : ArgumentProvider
 {
-    private readonly Type _type;
-
     public ReflectionArgumentProvider(Type type)
+        : base(type, type.GetCustomAttribute<ParseOptionsAttribute>(), type.GetCustomAttributes<ClassValidationAttribute>())
     {
-        _type = type;
     }
 
-    public Type ArgumentsType => _type;
-
-    public ParseOptionsAttribute? OptionsAttribute => _type.GetCustomAttribute<ParseOptionsAttribute>();
-
-    public string ApplicationFriendlyName
+    public override string ApplicationFriendlyName
     {
         get
         {
-            var attribute = _type.GetCustomAttribute<ApplicationFriendlyNameAttribute>() ??
-                _type.Assembly.GetCustomAttribute<ApplicationFriendlyNameAttribute>();
+            var attribute = ArgumentsType.GetCustomAttribute<ApplicationFriendlyNameAttribute>() ??
+                ArgumentsType.Assembly.GetCustomAttribute<ApplicationFriendlyNameAttribute>();
 
-            return attribute?.Name ?? _type.Assembly.GetName().Name ?? string.Empty;
+            return attribute?.Name ?? ArgumentsType.Assembly.GetName().Name ?? string.Empty;
         }
     }
 
-    public string Description => _type.GetCustomAttribute<DescriptionAttribute>()?.Description ?? string.Empty;
+    public override string Description => ArgumentsType.GetCustomAttribute<DescriptionAttribute>()?.Description ?? string.Empty;
 
-    public bool IsCommand => CommandInfo.IsCommand(_type);
+    public override bool IsCommand => CommandInfo.IsCommand(ArgumentsType);
 
-    public object CreateInstance(CommandLineParser parser)
+    public override object CreateInstance(CommandLineParser parser)
     {
-        var inject = _type.GetConstructor(new[] { typeof(CommandLineParser) }) != null;
+        var inject = ArgumentsType.GetConstructor(new[] { typeof(CommandLineParser) }) != null;
         try
         {
             if (inject)
             {
-                return Activator.CreateInstance(_type, parser)!;
+                return Activator.CreateInstance(ArgumentsType, parser)!;
             }
             else
             {
-                return Activator.CreateInstance(_type)!;
+                return Activator.CreateInstance(ArgumentsType)!;
             }
         }
         catch (TargetInvocationException ex)
@@ -58,24 +52,16 @@ internal class ReflectionArgumentProvider : IArgumentProvider
         }
     }
 
-    public IEnumerable<CommandLineArgument> GetArguments(CommandLineParser parser)
+    public override IEnumerable<CommandLineArgument> GetArguments(CommandLineParser parser)
     {
-        var properties = _type.GetProperties(BindingFlags.Public | BindingFlags.Instance)
+        var properties = ArgumentsType.GetProperties(BindingFlags.Public | BindingFlags.Instance)
             .Where(p => Attribute.IsDefined(p, typeof(CommandLineArgumentAttribute)))
             .Select(p => ReflectionArgument.Create(parser, p));
 
-        var methods = _type.GetMethods(BindingFlags.Public | BindingFlags.Static)
+        var methods = ArgumentsType.GetMethods(BindingFlags.Public | BindingFlags.Static)
             .Where(m => Attribute.IsDefined(m, typeof(CommandLineArgumentAttribute)))
             .Select(m => ReflectionArgument.Create(parser, m));
 
         return properties.Concat(methods);
-    }
-
-    public void RunValidators(CommandLineParser parser)
-    {
-        foreach (var validator in _type.GetCustomAttributes<ClassValidationAttribute>())
-        {
-            validator.Validate(parser);
-        }
     }
 }

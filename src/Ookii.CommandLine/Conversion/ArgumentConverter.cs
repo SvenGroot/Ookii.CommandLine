@@ -17,7 +17,7 @@ namespace Ookii.CommandLine.Conversion;
 public abstract class ArgumentConverter
 {
     /// <summary>
-    /// Convert a string to the type of the argument.
+    /// Converts a string to the type of the argument.
     /// </summary>
     /// <param name="value">The string to convert.</param>
     /// <param name="culture">The culture to use for the conversion.</param>
@@ -28,7 +28,7 @@ public abstract class ArgumentConverter
     public abstract object? Convert(string value, CultureInfo culture);
 
     /// <summary>
-    /// Convert a string to the type of the argument.
+    /// Converts a string to the type of the argument.
     /// </summary>
     /// <param name="value">The <see cref="ReadOnlySpan{T}"/> containing the string to convert.</param>
     /// <param name="culture">The culture to use for the conversion.</param>
