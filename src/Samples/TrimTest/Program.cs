@@ -4,37 +4,24 @@ using Ookii.CommandLine.Conversion;
 using Ookii.CommandLine.Support;
 using Ookii.CommandLine.Validation;
 
-var parser = new CommandLineParser(new MyProvider());
-var arguments = (Arguments?)parser.ParseWithErrorHandling();
+var arguments = Arguments.Parse();
 if (arguments != null)
 {
     Console.WriteLine($"Hello, World! {arguments.Test}");
 }
 
-
-class Arguments
+[GeneratedParser]
+partial class Arguments
 {
     [CommandLineArgument]
     public string? Test { get; set; }
-}
 
-class MyProvider : GeneratedArgumentProvider
-{
-    public MyProvider()
-        : base(typeof(Arguments), null, Enumerable.Empty<ClassValidationAttribute>(), null, null)
-    {
-    }
+    [CommandLineArgument(ValueDescription = "Stuff")]
+    public Dictionary<string, string?>? Test2 { get; set; } = default!;
 
-    public override bool IsCommand => false;
+    [CommandLineArgument]
+    public int Test3 { get; set; }
 
-    public override object CreateInstance(CommandLineParser parser)
-    {
-        return new Arguments();
-    }
-
-    public override IEnumerable<CommandLineArgument> GetArguments(CommandLineParser parser)
-    {
-        yield return GeneratedArgument.Create(parser, typeof(string), "Test", new CommandLineArgumentAttribute(),
-            new StringConverter(), setProperty: (target, value) => ((Arguments)target).Test = (string?)value);
-    }
+    [CommandLineArgument]
+    public int? Test4 { get; set; }
 }

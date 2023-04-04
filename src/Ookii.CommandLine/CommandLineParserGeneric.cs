@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Ookii.CommandLine.Support;
+using System;
+using System.Globalization;
 
 namespace Ookii.CommandLine
 {
@@ -40,6 +42,33 @@ namespace Ookii.CommandLine
         public CommandLineParser(ParseOptions? options = null)
             : base(typeof(T), options)
         {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CommandLineParser"/> class using the
+        /// specified options.
+        /// </summary>
+        /// <param name="provider">
+        ///   <inheritdoc cref="CommandLineParser(ArgumentProvider, ParseOptions?)"/>
+        /// </param>
+        /// <param name="options">
+        ///   <inheritdoc cref="CommandLineParser(ArgumentProvider, ParseOptions?)"/>
+        /// </param>
+        /// <exception cref="NotSupportedException">
+        ///   The <see cref="CommandLineParser"/> cannot use type <typeparamref name="T"/> as the
+        ///   command line arguments type, because it violates one of the rules concerning argument
+        ///   names or positions, or has an argument type that cannot be parsed.
+        /// </exception>
+        /// <remarks>
+        ///   <inheritdoc cref="CommandLineParser(ArgumentProvider, ParseOptions?)"/>
+        /// </remarks>
+        public CommandLineParser(ArgumentProvider provider, ParseOptions? options = null)
+            : base(provider, options)
+        {
+            if (provider.ArgumentsType != typeof(T))
+            {
+                throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.IncorrectProviderTypeFormat, typeof(T)), nameof(provider));
+            }
         }
 
         /// <inheritdoc cref="CommandLineParser.Parse()"/>

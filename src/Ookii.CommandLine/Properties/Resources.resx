@@ -393,4 +393,7 @@
   <data name="AsyncWriteInProgress" xml:space="preserve">
     <value>An async write operation is already in progress.</value>
   </data>
+  <data name="IncorrectProviderTypeFormat" xml:space="preserve">
+    <value>The provided ArgumentProvider is not for the type '{0}'.</value>
+  </data>
 </root>

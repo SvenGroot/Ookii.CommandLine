@@ -313,6 +313,15 @@ namespace Ookii.CommandLine.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The provided ArgumentProvider is not for the type &apos;{0}&apos;..
+        /// </summary>
+        internal static string IncorrectProviderTypeFormat {
+            get {
+                return ResourceManager.GetString("IncorrectProviderTypeFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The indent must be greater than or equal to zero, and less than the maximum line length..
         /// </summary>
         internal static string IndentOutOfRange {

@@ -32,7 +32,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ArgumentDependencies", "Sam
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Wpf", "Samples\Wpf\Wpf.csproj", "{1D7E3B10-D99E-4DF9-9AB7-5DDFF61B275D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrimTest", "Samples\TrimTest\TrimTest.csproj", "{D3422CDA-6FAF-4EED-9CB1-814A0D519373}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TrimTest", "Samples\TrimTest\TrimTest.csproj", "{D3422CDA-6FAF-4EED-9CB1-814A0D519373}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ookii.CommandLine.Generator", "Ookii.CommandLine.Generator\Ookii.CommandLine.Generator.csproj", "{9C027C37-4BEA-422F-A148-1F73C6FFEF45}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -80,6 +82,10 @@ Global
 		{D3422CDA-6FAF-4EED-9CB1-814A0D519373}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D3422CDA-6FAF-4EED-9CB1-814A0D519373}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D3422CDA-6FAF-4EED-9CB1-814A0D519373}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9C027C37-4BEA-422F-A148-1F73C6FFEF45}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9C027C37-4BEA-422F-A148-1F73C6FFEF45}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9C027C37-4BEA-422F-A148-1F73C6FFEF45}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9C027C37-4BEA-422F-A148-1F73C6FFEF45}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

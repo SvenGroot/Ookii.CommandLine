@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace Ookii.CommandLine.Support;
 
 /// <summary>
-/// A base class for argument providers created by the <see cref="GeneratedArgumentsAttribute"/>.
+/// A base class for argument providers created by the <see cref="GeneratedParserAttribute"/>.
 /// </summary>
 /// <remarks>
 /// This type is for internal use and should not be used by your code.
