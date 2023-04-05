@@ -34,13 +34,18 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <!-- This is just here to ensure this is built before this project -->
+    <ProjectReference Include="../Ookii.CommandLine.Generator/Ookii.CommandLine.Generator.csproj" ReferenceOutputAssembly="false" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Include="icon.png" Pack="True" PackagePath="" />
+    <None Include="../Ookii.CommandLine.Generator/$(OutputPath)/netstandard2.0/**/*.dll" Pack="True" PackagePath="analyzers/dotnet/cs" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="System.Memory" Version="4.5.5" Condition="'$(TargetFramework)'=='netstandard2.0'" />
   </ItemGroup>
-
 
   <ItemGroup>
     <Compile Update="Properties/Resources.Designer.cs">
