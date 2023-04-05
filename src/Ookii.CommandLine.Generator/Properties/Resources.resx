@@ -123,4 +123,22 @@
   <data name="ArgumentsClassIsGenericTitle" xml:space="preserve">
     <value>The arguments class may not be a generic type.</value>
   </data>
+  <data name="ArgumentsClassNotPartialMessageFormat" xml:space="preserve">
+    <value>The arguments class {0} must use the 'partial' modifier.</value>
+  </data>
+  <data name="ArgumentsClassNotPartialTitle" xml:space="preserve">
+    <value>The arguments class must be a partial class.</value>
+  </data>
+  <data name="ArgumentsTypeNotReferenceTypeMessageFormat" xml:space="preserve">
+    <value>The arguments type {0} must be a reference type (class).</value>
+  </data>
+  <data name="ArgumentsTypeNotReferenceTypeTitle" xml:space="preserve">
+    <value>The arguments type must be a reference type.</value>
+  </data>
+  <data name="UnknownAttributeMessageFormat" xml:space="preserve">
+    <value>The attribute {0} is unknown and will be ignored by the GeneratedParserAttribute.</value>
+  </data>
+  <data name="UnknownAttributeTitle" xml:space="preserve">
+    <value>Unknown attribute will be ignored.</value>
+  </data>
 </root>

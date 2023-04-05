@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 
 namespace Ookii.CommandLine.Support;
 
@@ -25,11 +26,11 @@ public abstract class ArgumentProvider
     /// if there is none.
     /// </param>
     /// <param name="validators">The class validators for the arguments type.</param>
-    protected ArgumentProvider(Type argumentsType, ParseOptionsAttribute? options, IEnumerable<ClassValidationAttribute> validators)
+    protected ArgumentProvider(Type argumentsType, ParseOptionsAttribute? options, IEnumerable<ClassValidationAttribute>? validators)
     {
         ArgumentsType = argumentsType ?? throw new ArgumentNullException(nameof(argumentsType));
         OptionsAttribute = options;
-        _validators = validators ?? throw new ArgumentNullException(nameof(validators));
+        _validators = validators ?? Enumerable.Empty<ClassValidationAttribute>();
     }
 
     /// <summary>

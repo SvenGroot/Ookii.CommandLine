@@ -3,6 +3,7 @@ using Ookii.CommandLine;
 using Ookii.CommandLine.Conversion;
 using Ookii.CommandLine.Support;
 using Ookii.CommandLine.Validation;
+using System.ComponentModel;
 
 var arguments = Arguments.Parse();
 if (arguments != null)
@@ -11,6 +12,10 @@ if (arguments != null)
 }
 
 [GeneratedParser]
+[ParseOptions(Mode = ParsingMode.LongShort, CaseSensitive = true)]
+[Description("This is a test")]
+[ApplicationFriendlyName("Trim Test")]
+[RequiresAny(nameof(Test), nameof(Test2))]
 partial class Arguments
 {
     [CommandLineArgument]

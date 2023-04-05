@@ -37,7 +37,7 @@ public abstract class GeneratedArgumentProvider : ArgumentProvider
     /// there is none.
     /// </param>
     protected GeneratedArgumentProvider(Type argumentsType, ParseOptionsAttribute? options,
-        IEnumerable<ClassValidationAttribute> validators, ApplicationFriendlyNameAttribute? friendlyName,
+        IEnumerable<ClassValidationAttribute>? validators, ApplicationFriendlyNameAttribute? friendlyName,
         DescriptionAttribute? description)
         : base(argumentsType, options, validators)
     {

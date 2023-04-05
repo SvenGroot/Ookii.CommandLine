@@ -77,5 +77,59 @@ namespace Ookii.CommandLine.Generator.Properties {
                 return ResourceManager.GetString("ArgumentsClassIsGenericTitle", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The arguments class {0} must use the &apos;partial&apos; modifier..
+        /// </summary>
+        internal static string ArgumentsClassNotPartialMessageFormat {
+            get {
+                return ResourceManager.GetString("ArgumentsClassNotPartialMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The arguments class must be a partial class..
+        /// </summary>
+        internal static string ArgumentsClassNotPartialTitle {
+            get {
+                return ResourceManager.GetString("ArgumentsClassNotPartialTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The arguments type {0} must be a reference type (class)..
+        /// </summary>
+        internal static string ArgumentsTypeNotReferenceTypeMessageFormat {
+            get {
+                return ResourceManager.GetString("ArgumentsTypeNotReferenceTypeMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The arguments type must be a reference type..
+        /// </summary>
+        internal static string ArgumentsTypeNotReferenceTypeTitle {
+            get {
+                return ResourceManager.GetString("ArgumentsTypeNotReferenceTypeTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The attribute {0} is unknown and will be ignored by the GeneratedParserAttribute..
+        /// </summary>
+        internal static string UnknownAttributeMessageFormat {
+            get {
+                return ResourceManager.GetString("UnknownAttributeMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unknown attribute will be ignored..
+        /// </summary>
+        internal static string UnknownAttributeTitle {
+            get {
+                return ResourceManager.GetString("UnknownAttributeTitle", resourceCulture);
+            }
+        }
     }
 }

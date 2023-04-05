@@ -4,63 +4,114 @@ using System.Text;
 
 namespace Ookii.CommandLine.Generator;
 
-internal static class ParserGenerator
+internal class ParserGenerator
 {
-    public static string Generate(SourceProductionContext context, INamedTypeSymbol symbol)
-    {
-        // TODO: Make sure it's a reference type and partial.
-        if (symbol.IsGenericType)
-        {
-            // TODO: Helper for reporting diagnostics.
-            context.ReportDiagnostic(Diagnostic.Create(Diagnostics.ArgumentsClassIsGeneric, symbol.Locations.FirstOrDefault(), symbol.ToDisplayString()));
-            return string.Empty;
-        }
+    private readonly SourceProductionContext _context;
+    private readonly INamedTypeSymbol _argumentsClass;
+    private readonly SourceBuilder _builder;
 
-        var builder = new SourceBuilder(symbol.ContainingNamespace);
-        builder.AppendLine($"partial class {symbol.Name}");
-        builder.OpenBlock();
-        GenerateProvider(builder, symbol);
-        builder.AppendLine($"public static Ookii.CommandLine.CommandLineParser<{symbol.Name}> CreateParser(Ookii.CommandLine.ParseOptions? options = null) => new(new GeneratedProvider(), options);");
-        builder.AppendLine();
-        var nullableType = symbol.WithNullableAnnotation(NullableAnnotation.Annotated);
-        builder.AppendLine($"public static {nullableType.ToDisplayString()} Parse(Ookii.CommandLine.ParseOptions? options = null) => CreateParser(options).ParseWithErrorHandling();");
-        builder.AppendLine();
-        builder.AppendLine($"public static {nullableType.ToDisplayString()} Parse(string[] args, Ookii.CommandLine.ParseOptions? options = null) => CreateParser(options).ParseWithErrorHandling(args);");
-        builder.AppendLine();
-        builder.AppendLine($"public static {nullableType.ToDisplayString()} Parse(string[] args, int index, Ookii.CommandLine.ParseOptions? options = null) => CreateParser(options).ParseWithErrorHandling(args, index);");
-        builder.CloseBlock(); // class
-        return builder.GetSource();
+    public ParserGenerator(SourceProductionContext context, INamedTypeSymbol argumentsClass)
+    {
+        _context = context;
+        _argumentsClass = argumentsClass;
+        _builder = new(argumentsClass.ContainingNamespace);
     }
 
-    private static void GenerateProvider(SourceBuilder builder, INamedTypeSymbol symbol)
+    public static string? Generate(SourceProductionContext context, INamedTypeSymbol _argumentsClass)
     {
-        builder.AppendLine("private class GeneratedProvider : Ookii.CommandLine.Support.GeneratedArgumentProvider");
-        builder.OpenBlock();
-        // TODO: attributes
-        builder.AppendLine($"public GeneratedProvider() : base(typeof({symbol.Name}), null, System.Linq.Enumerable.Empty<Ookii.CommandLine.Validation.ClassValidationAttribute>(), null, null) {{}}");
-        builder.AppendLine();
+        var generator = new ParserGenerator(context, _argumentsClass);
+        return generator.Generate();
+    }
+
+    public string? Generate()
+    {
+        _builder.AppendLine($"partial class {_argumentsClass.Name}");
+        _builder.OpenBlock();
+        GenerateProvider();
+        _builder.AppendLine($"public static Ookii.CommandLine.CommandLineParser<{_argumentsClass.Name}> CreateParser(Ookii.CommandLine.ParseOptions? options = null) => new(new GeneratedProvider(), options);");
+        _builder.AppendLine();
+        var nullableType = _argumentsClass.WithNullableAnnotation(NullableAnnotation.Annotated);
+        _builder.AppendLine($"public static {nullableType.ToDisplayString()} Parse(Ookii.CommandLine.ParseOptions? options = null) => CreateParser(options).ParseWithErrorHandling();");
+        _builder.AppendLine();
+        _builder.AppendLine($"public static {nullableType.ToDisplayString()} Parse(string[] args, Ookii.CommandLine.ParseOptions? options = null) => CreateParser(options).ParseWithErrorHandling(args);");
+        _builder.AppendLine();
+        _builder.AppendLine($"public static {nullableType.ToDisplayString()} Parse(string[] args, int index, Ookii.CommandLine.ParseOptions? options = null) => CreateParser(options).ParseWithErrorHandling(args, index);");
+        _builder.CloseBlock(); // class
+        return _builder.GetSource();
+    }
+
+    private void GenerateProvider()
+    {
+        AttributeData? parseOptions = null;
+        AttributeData? description = null;
+        AttributeData? applicationFriendlyName = null;
+        AttributeData? commandAttribute = null;
+        List<AttributeData>? classValidators = null;
+        foreach (var attribute in _argumentsClass.GetAttributes())
+        {
+            if (CheckAttribute(attribute, AttributeNames.ParseOptions, ref parseOptions) ||
+                CheckAttribute(attribute, AttributeNames.Description, ref description) ||
+                CheckAttribute(attribute, AttributeNames.ApplicationFriendlyName, ref applicationFriendlyName) ||
+                CheckAttribute(attribute, AttributeNames.Command, ref commandAttribute))
+            {
+                continue;
+            }
+
+            if (attribute.AttributeClass?.DerivesFrom(AttributeNames.ClassValidation) ?? false)
+            {
+                classValidators ??= new();
+                classValidators.Add(attribute);
+                continue;
+            }
+
+            if (!attribute.AttributeClass?.DerivesFrom(AttributeNames.GeneratedParser) ?? false)
+            {
+                _context.ReportDiagnostic(Diagnostics.UnknownAttribute(attribute));
+            }
+        }
+
+        _builder.AppendLine("private class GeneratedProvider : Ookii.CommandLine.Support.GeneratedArgumentProvider");
+        _builder.OpenBlock();
+        _builder.AppendLine("public GeneratedProvider()");
+        _builder.IncreaseIndent();
+        _builder.AppendLine($": base(typeof({_argumentsClass.Name}),");
+        _builder.AppendLine($"       {parseOptions?.CreateInstantiation() ?? "null"},");
+        if (classValidators == null)
+        {
+            _builder.AppendLine($"       null,");
+        }
+        else
+        {
+            _builder.AppendLine($"       new Ookii.CommandLine.Validation.ClassValidationAttribute[] {{ {string.Join(", ", classValidators.Select(v => v.CreateInstantiation()))} }},");
+        }
+
+        _builder.AppendLine($"       {applicationFriendlyName?.CreateInstantiation() ?? "null"},");
+        _builder.AppendLine($"       {description?.CreateInstantiation() ?? "null"})");
+        _builder.DecreaseIndent();
+        _builder.AppendLine("{}");
+        _builder.AppendLine();
         // TODO: IsCommand
-        builder.AppendLine("public override bool IsCommand => false;");
-        builder.AppendLine();
+        _builder.AppendLine("public override bool IsCommand => false;");
+        _builder.AppendLine();
         // TODO: Injection
-        builder.AppendLine($"public override object CreateInstance(Ookii.CommandLine.CommandLineParser parser) => new {symbol.Name}();");
-        builder.AppendLine();
-        builder.AppendLine("public override System.Collections.Generic.IEnumerable<Ookii.CommandLine.CommandLineArgument> GetArguments(Ookii.CommandLine.CommandLineParser parser)");
-        builder.OpenBlock();
+        _builder.AppendLine($"public override object CreateInstance(Ookii.CommandLine.CommandLineParser parser) => new {_argumentsClass.Name}();");
+        _builder.AppendLine();
+        _builder.AppendLine("public override System.Collections.Generic.IEnumerable<Ookii.CommandLine.CommandLineArgument> GetArguments(Ookii.CommandLine.CommandLineParser parser)");
+        _builder.OpenBlock();
 
         //Debugger.Launch();
-        foreach (var member in symbol.GetMembers())
+        foreach (var member in _argumentsClass.GetMembers())
         {
-            GenerateArgument(builder, symbol.Name, member);
+            GenerateArgument(member);
         }
 
         // Makes sure the function compiles if there are no arguments.
-        builder.AppendLine("yield break;");
-        builder.CloseBlock(); // GetArguments()
-        builder.CloseBlock(); // GeneratedProvider class
+        _builder.AppendLine("yield break;");
+        _builder.CloseBlock(); // GetArguments()
+        _builder.CloseBlock(); // GeneratedProvider class
     }
 
-    private static void GenerateArgument(SourceBuilder builder, string className, ISymbol member)
+    private void GenerateArgument(ISymbol member)
     {
         // Check if the member can be an argument.
         if (member.DeclaredAccessibility != Accessibility.Public ||
@@ -105,13 +156,25 @@ internal static class ParserGenerator
         }
 
         // The leading commas are not a formatting I like but it does make things easier here.
-        builder.AppendLine($"yield return Ookii.CommandLine.Support.GeneratedArgument.Create(");
-        builder.AppendLine("    parser");
-        builder.AppendLine($"    , argumentType: typeof({argumentType.ToDisplayString()})");
-        builder.AppendLine($"    , memberName: \"{member.Name}\"");
-        builder.AppendLine($"    , attribute: {commandLineArgumentAttribute.CreateInstantiation()}");
-        builder.AppendLine("    , converter: Ookii.CommandLine.Conversion.StringConverter.Instance");
-        builder.AppendLine($"    , setProperty: (target, value) => (({className})target).{member.Name} = ({nullableArgumentType.ToDisplayString()})value{extra}");
-        builder.AppendLine($");");
+        _builder.AppendLine($"yield return Ookii.CommandLine.Support.GeneratedArgument.Create(");
+        _builder.AppendLine("    parser");
+        _builder.AppendLine($"    , argumentType: typeof({argumentType.ToDisplayString()})");
+        _builder.AppendLine($"    , memberName: \"{member.Name}\"");
+        _builder.AppendLine($"    , attribute: {commandLineArgumentAttribute.CreateInstantiation()}");
+        _builder.AppendLine("    , converter: Ookii.CommandLine.Conversion.StringConverter.Instance");
+        _builder.AppendLine($"    , setProperty: (target, value) => (({_argumentsClass.Name})target).{member.Name} = ({nullableArgumentType.ToDisplayString()})value{extra}");
+        _builder.AppendLine($");");
+    }
+
+    // Using a ref parameter with bool return allows me to chain these together.
+    private static bool CheckAttribute(AttributeData data, string name, ref AttributeData? attribute)
+    {
+        if (attribute != null || !(data.AttributeClass?.DerivesFrom(name) ?? false))
+        {
+            return false;
+        }
+
+        attribute = data;
+        return true;
     }
 }

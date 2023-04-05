@@ -1,4 +1,5 @@
 ﻿using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 using System.Collections.Immutable;
@@ -41,8 +42,29 @@ public class ParserIncrementalGenerator : IIncrementalGenerator
                 continue;
             }
 
+            if (!symbol.IsReferenceType)
+            {
+                context.ReportDiagnostic(Diagnostics.ArgumentsTypeNotReferenceType(symbol));
+                continue;
+            }
+
+            if (!syntax.Modifiers.Any(m => m.IsKind(SyntaxKind.PartialKeyword)))
+            {
+                context.ReportDiagnostic(Diagnostics.ArgumentsClassNotPartial(symbol));
+                continue;
+            }
+
+            if (symbol.IsGenericType)
+            {
+                context.ReportDiagnostic(Diagnostics.ArgumentsClassIsGeneric(symbol));
+                continue;
+            }
+
             var source = ParserGenerator.Generate(context, symbol);
-            context.AddSource(symbol.Name + ".g.cs", SourceText.From(source, Encoding.UTF8));
+            if (source != null)
+            {
+                context.AddSource(symbol.Name + ".g.cs", SourceText.From(source, Encoding.UTF8));
+            }
         }
     }
 
