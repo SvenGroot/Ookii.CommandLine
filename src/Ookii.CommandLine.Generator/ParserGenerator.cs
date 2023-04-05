@@ -11,9 +11,8 @@ internal static class ParserGenerator
         // TODO: Make sure it's a reference type and partial.
         if (symbol.IsGenericType)
         {
-            // TODO: Helper for reporting diagnostics. Maybe use exceptions?
-            // TODO: Use resources using LocalizableString
-            context.ReportDiagnostic(Diagnostic.Create(new DiagnosticDescriptor("CL0001", "Generic arguments class", "The arguments class {0} may not be a generic class when the GeneratedParserAttribute is used.", "Ookii.CommandLine", DiagnosticSeverity.Error, true), symbol.Locations.FirstOrDefault(), symbol.ToDisplayString()));
+            // TODO: Helper for reporting diagnostics.
+            context.ReportDiagnostic(Diagnostic.Create(Diagnostics.ArgumentsClassIsGeneric, symbol.Locations.FirstOrDefault(), symbol.ToDisplayString()));
             return string.Empty;
         }
 
