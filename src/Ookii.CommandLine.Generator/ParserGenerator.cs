@@ -1,4 +1,5 @@
 ﻿using Microsoft.CodeAnalysis;
+using System;
 using System.Diagnostics;
 using System.Text;
 
@@ -42,6 +43,10 @@ internal class ParserGenerator
 
     private void GenerateProvider()
     {
+        // Find the attribute that can apply to an arguments class.
+        // This code also finds attributes that inherit from those attribute. By instantiating the
+        // possibly derived attribute classes, we can support for example a class that derives from
+        // DescriptionAttribute that gets the description from a resource.
         AttributeData? parseOptions = null;
         AttributeData? description = null;
         AttributeData? applicationFriendlyName = null;
@@ -52,15 +57,9 @@ internal class ParserGenerator
             if (CheckAttribute(attribute, AttributeNames.ParseOptions, ref parseOptions) ||
                 CheckAttribute(attribute, AttributeNames.Description, ref description) ||
                 CheckAttribute(attribute, AttributeNames.ApplicationFriendlyName, ref applicationFriendlyName) ||
-                CheckAttribute(attribute, AttributeNames.Command, ref commandAttribute))
+                CheckAttribute(attribute, AttributeNames.Command, ref commandAttribute) ||
+                CheckAttribute(attribute, AttributeNames.ClassValidation, ref classValidators))
             {
-                continue;
-            }
-
-            if (attribute.AttributeClass?.DerivesFrom(AttributeNames.ClassValidation) ?? false)
-            {
-                classValidators ??= new();
-                classValidators.Add(attribute);
                 continue;
             }
 
@@ -121,17 +120,30 @@ internal class ParserGenerator
         }
 
         AttributeData? commandLineArgumentAttribute = null;
+        AttributeData? multiValueSeparator = null;
+        AttributeData? description = null;
+        AttributeData? allowDuplicateDictionaryKeys = null;
+        AttributeData? keyValueSeparator = null;
+        AttributeData? converter = null;
+        List<AttributeData>? aliases = null;
+        List<AttributeData>? shortAliases = null;
+        List<AttributeData>? validators = null;
         foreach (var attribute in member.GetAttributes())
         {
-            if (attribute.AttributeClass == null)
+            if (CheckAttribute(attribute, AttributeNames.CommandLineArgument, ref commandLineArgumentAttribute) ||
+                CheckAttribute(attribute, AttributeNames.MultiValueSeparator, ref multiValueSeparator) ||
+                CheckAttribute(attribute, AttributeNames.Description, ref description) ||
+                CheckAttribute(attribute, AttributeNames.AllowDuplicateDictionaryKeys, ref allowDuplicateDictionaryKeys) ||
+                CheckAttribute(attribute, AttributeNames.KeyValueSeparator, ref keyValueSeparator) ||
+                CheckAttribute(attribute, AttributeNames.ArgumentConverter, ref converter) ||
+                CheckAttribute(attribute, AttributeNames.Alias, ref aliases) ||
+                CheckAttribute(attribute, AttributeNames.ShortAlias, ref shortAliases) ||
+                CheckAttribute(attribute, AttributeNames.ArgumentValidation, ref validators))
             {
                 continue;
             }
 
-            if (attribute.AttributeClass.DerivesFrom(AttributeNames.CommandLineArgument))
-            {
-                commandLineArgumentAttribute = attribute;
-            }
+            _context.ReportDiagnostic(Diagnostics.UnknownAttribute(attribute));
         }
 
         // Check if it is an attribute.
@@ -155,14 +167,54 @@ internal class ParserGenerator
             extra = "!";
         }
 
+        // TODO: key/value converters
+        // TODO: AllowsNull
+
         // The leading commas are not a formatting I like but it does make things easier here.
         _builder.AppendLine($"yield return Ookii.CommandLine.Support.GeneratedArgument.Create(");
-        _builder.AppendLine("    parser");
-        _builder.AppendLine($"    , argumentType: typeof({argumentType.ToDisplayString()})");
-        _builder.AppendLine($"    , memberName: \"{member.Name}\"");
-        _builder.AppendLine($"    , attribute: {commandLineArgumentAttribute.CreateInstantiation()}");
-        _builder.AppendLine("    , converter: Ookii.CommandLine.Conversion.StringConverter.Instance");
-        _builder.AppendLine($"    , setProperty: (target, value) => (({_argumentsClass.Name})target).{member.Name} = ({nullableArgumentType.ToDisplayString()})value{extra}");
+        _builder.IncreaseIndent();
+        _builder.AppendLine("parser");
+        _builder.AppendLine($", argumentType: typeof({argumentType.ToDisplayString()})");
+        _builder.AppendLine($", memberName: \"{member.Name}\"");
+        _builder.AppendLine($", attribute: {commandLineArgumentAttribute.CreateInstantiation()}");
+        _builder.AppendLine(", converter: Ookii.CommandLine.Conversion.StringConverter.Instance");
+        if (multiValueSeparator != null)
+        {
+            _builder.AppendLine($", multiValueSeparatorAttribute: {multiValueSeparator.CreateInstantiation()}");
+        }
+
+        if (description != null)
+        {
+            _builder.AppendLine($", descriptionAttribute: {description.CreateInstantiation()}");
+        }
+
+        if (allowDuplicateDictionaryKeys != null)
+        {
+            _builder.AppendLine(", allowDuplicateDictionaryKeys: true");
+        }
+
+        if (keyValueSeparator != null)
+        {
+            _builder.AppendLine($", keyValueSeparatorAttribute: {keyValueSeparator.CreateInstantiation()}");
+        }
+
+        if (aliases != null)
+        {
+            _builder.AppendLine($", aliasAttributes: new Ookii.CommandLine.AliasAttribute[] {{ {string.Join(", ", aliases.Select(a => a.CreateInstantiation()))} }}");
+        }
+
+        if (shortAliases != null)
+        {
+            _builder.AppendLine($", shortAliasAttributes: new Ookii.CommandLine.ShortAliasAttribute[] {{ {string.Join(", ", shortAliases.Select(a => a.CreateInstantiation()))} }}");
+        }
+
+        if (validators != null)
+        {
+            _builder.AppendLine($", validationAttributes: new Ookii.CommandLine.Validation.ArgumentValidationAttribute[] {{ {string.Join(", ", validators.Select(a => a.CreateInstantiation()))} }}");
+        }
+
+        _builder.AppendLine($", setProperty: (target, value) => (({_argumentsClass.Name})target).{member.Name} = ({nullableArgumentType.ToDisplayString()})value{extra}");
+        _builder.DecreaseIndent();
         _builder.AppendLine($");");
     }
 
@@ -175,6 +227,19 @@ internal class ParserGenerator
         }
 
         attribute = data;
+        return true;
+    }
+
+    // Using a ref parameter with bool return allows me to chain these together.
+    private static bool CheckAttribute(AttributeData data, string name, ref List<AttributeData>? attributes)
+    {
+        if (!(data.AttributeClass?.DerivesFrom(name) ?? false))
+        {
+            return false;
+        }
+
+        attributes ??= new();
+        attributes.Add(data);
         return true;
     }
 }

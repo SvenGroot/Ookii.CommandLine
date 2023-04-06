@@ -58,7 +58,7 @@ public class GeneratedArgument : CommandLineArgument
             multiValueSeparatorAttribute, descriptionAttribute, allowDuplicateDictionaryKeys, keyValueSeparatorAttribute,
             aliasAttributes, shortAliasAttributes, validationAttributes);
 
-        // TODO: Set property for multi-value and Nullable<T>.
+        // TODO: Set properly for multi-value and Nullable<T>.
         info.ElementType = argumentType;
         info.Converter = converter;
 
