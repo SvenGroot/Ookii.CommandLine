@@ -56,7 +56,7 @@ namespace Ookii.CommandLine
     /// <seealso cref="CommandLineParser"/>
     /// <seealso cref="CommandLineArgument"/>
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Method)]
-    public sealed class CommandLineArgumentAttribute : Attribute
+    public class CommandLineArgumentAttribute : Attribute
     {
         private readonly string? _argumentName;
         private bool _short;
