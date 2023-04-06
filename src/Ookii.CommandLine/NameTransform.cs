@@ -27,14 +27,15 @@ namespace Ookii.CommandLine
         /// </summary>
         CamelCase,
         /// <summary>
-        /// The names are transformed to snake_case. This removes leading and trailing underscores,
-        /// changes all characters to lower-case, and reduces consecutive underscores to a single
-        /// underscore. An underscore is inserted before previously capitalized letters.
+        /// The names are transformed to dash-case. This removes leading and trailing underscores,
+        /// changes all characters to lower-case, replaces underscores with a dash, and reduces
+        /// consecutive underscores to a single dash. A dash is inserted before previously
+        /// capitalized letters.
         /// </summary>
         DashCase,
         /// <summary>
-        /// The names are transformed to dash-case. Similar to <see cref="SnakeCase"/>, but uses a
-        /// dash instead of an underscore.
+        /// The names are transformed to snake_case. Similar to <see cref="DashCase"/>, but uses an
+        /// underscore instead of a dash.
         /// </summary>
         SnakeCase
     }
