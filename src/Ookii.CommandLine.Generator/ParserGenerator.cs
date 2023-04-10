@@ -1,6 +1,8 @@
 ﻿using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Operations;
 using System;
+using System.Data;
 using System.Diagnostics;
 using System.Globalization;
 using System.Reflection;
@@ -129,7 +131,9 @@ internal class ParserGenerator
         AttributeData? description = null;
         AttributeData? allowDuplicateDictionaryKeys = null;
         AttributeData? keyValueSeparator = null;
-        AttributeData? converter = null;
+        AttributeData? converterAttribute = null;
+        AttributeData? keyConverterAttribute = null;
+        AttributeData? valueConverterAttribute = null;
         List<AttributeData>? aliases = null;
         List<AttributeData>? shortAliases = null;
         List<AttributeData>? validators = null;
@@ -140,7 +144,9 @@ internal class ParserGenerator
                 CheckAttribute(attribute, AttributeNames.Description, ref description) ||
                 CheckAttribute(attribute, AttributeNames.AllowDuplicateDictionaryKeys, ref allowDuplicateDictionaryKeys) ||
                 CheckAttribute(attribute, AttributeNames.KeyValueSeparator, ref keyValueSeparator) ||
-                CheckAttribute(attribute, AttributeNames.ArgumentConverter, ref converter) ||
+                CheckAttribute(attribute, AttributeNames.ArgumentConverter, ref converterAttribute) ||
+                CheckAttribute(attribute, AttributeNames.KeyConverter, ref keyConverterAttribute) ||
+                CheckAttribute(attribute, AttributeNames.ValueConverter, ref valueConverterAttribute) ||
                 CheckAttribute(attribute, AttributeNames.Alias, ref aliases) ||
                 CheckAttribute(attribute, AttributeNames.ShortAlias, ref shortAliases) ||
                 CheckAttribute(attribute, AttributeNames.ArgumentValidation, ref validators))
@@ -178,6 +184,7 @@ internal class ParserGenerator
         INamedTypeSymbol? valueType = null;
         var allowsNull = originalArgumentType.AllowsNull();
         var kind = "Ookii.CommandLine.ArgumentKind.SingleValue";
+        string? converter = null;
         if (property != null)
         {
             var multiValueType = DetermineMultiValueType(property, argumentType);
@@ -196,14 +203,27 @@ internal class ParserGenerator
                 allowsNull = valueType.AllowsNull();
                 valueType = (INamedTypeSymbol)valueType.WithNullableAnnotation(NullableAnnotation.NotAnnotated);
                 // TODO: Converter
-                //if (converterType == null)
-                //{
-                //    converterType = typeof(KeyValuePairConverter<,>).MakeGenericType(genericArguments);
-                //    var keyConverterType = keyArgumentConverterAttribute?.GetConverterType();
-                //    var valueConverterType = valueArgumentConverterAttribute?.GetConverterType();
-                //    info.Converter = (ArgumentConverter)Activator.CreateInstance(converterType, info.Parser.StringProvider,
-                //        info.ArgumentName, info.AllowNull, keyConverterType, valueConverterType, info.KeyValueSeparator)!;
-                //}
+                if (converterAttribute == null)
+                {
+                    var keyConverter = DetermineConverter(keyType.GetUnderlyingType(), keyConverterAttribute, keyType.IsNullableValueType());
+                    if (keyConverter == null)
+                    {
+                        _context.ReportDiagnostic(Diagnostics.NoConverter(member, keyType.GetUnderlyingType()));
+                        return;
+                    }
+
+                    var valueConverter = DetermineConverter(valueType.GetUnderlyingType(), valueConverterAttribute, valueType.IsNullableValueType());
+                    if (keyConverter == null)
+                    {
+                        _context.ReportDiagnostic(Diagnostics.NoConverter(member, keyType.GetUnderlyingType()));
+                        return;
+                    }
+
+                    // TODO: Need to create this in argument, change approach: instead of passing KeyType/ValueType,
+                    // pass KeyConverter/ValueConverter in info so code can be used for both reflection and generated.
+                    //info.Converter = (ArgumentConverter)Activator.CreateInstance(converterType, info.Parser.StringProvider,
+                    //    info.ArgumentName, info.AllowNull, keyConverterType, valueConverterType, info.KeyValueSeparator)!;
+                }
             }
             else if (collectionType != null)
             {
@@ -219,13 +239,16 @@ internal class ParserGenerator
         }
 
         var elementType = elementTypeWithNullable;
-        if (elementType.IsNullableValueType())
+        elementType = elementTypeWithNullable.GetUnderlyingType();
+        converter ??= DetermineConverter(elementType, converterAttribute, elementTypeWithNullable.IsNullableValueType());
+        if (converter == null)
         {
-            elementType = (INamedTypeSymbol)elementType.TypeArguments[0];
+            _context.ReportDiagnostic(Diagnostics.NoConverter(member, elementType));
+            return;
         }
 
-        // TODO: Converters
-
+        // TODO: Default value description. Can make DetermineValueDescription abstract and move
+        // to ReflectionArgument when done.
         // The leading commas are not a formatting I like but it does make things easier here.
         _builder.AppendLine($"yield return Ookii.CommandLine.Support.GeneratedArgument.Create(");
         _builder.IncreaseIndent();
@@ -236,7 +259,7 @@ internal class ParserGenerator
         _builder.AppendLine($", memberName: \"{member.Name}\"");
         _builder.AppendLine($", kind: {kind}");
         _builder.AppendLine($", attribute: {commandLineArgumentAttribute.CreateInstantiation()}");
-        _builder.AppendLine(", converter: Ookii.CommandLine.Conversion.StringConverter.Instance");
+        _builder.AppendLine($", converter: {converter}");
         _builder.AppendLine($", allowsNull: {(allowsNull ? "true" : "false")}");
         if (keyType != null)
         {
@@ -375,6 +398,61 @@ internal class ParserGenerator
 
         // This is a read-only property with an unsupported type.
         _context.ReportDiagnostic(Diagnostics.PropertyIsReadOnly(property));
+        return null;
+    }
+
+    public static string? DetermineConverter(INamedTypeSymbol elementType, AttributeData? converterAttribute, bool isNullableValueType)
+    {
+        var converter = DetermineElementConverter(elementType, converterAttribute);
+        if (converter != null && isNullableValueType)
+        {
+            converter = $"new Ookii.CommandLine.Conversion.NullableConverter({converter})";
+        }
+
+        return converter;
+    }
+
+    public static string? DetermineElementConverter(INamedTypeSymbol elementType, AttributeData? converterAttribute)
+    {
+        if (converterAttribute != null)
+        {
+            var argument = converterAttribute.ConstructorArguments[0];
+            if (argument.Kind != TypedConstantKind.Type)
+            {
+                // TODO: Either support this or emit error.
+                throw new NotSupportedException();
+            }
+
+            var converterType = (INamedTypeSymbol)argument.Value!;
+            return $"new {converterType.ToDisplayString()}()";
+        }
+
+        var typeName = elementType.ToDisplayString();
+        switch (typeName)
+        {
+        case "string":
+            return "Ookii.CommandLine.Conversion.StringConverter.Instance";
+
+        case "bool":
+            return "Ookii.CommandLine.Conversion.BooleanConverter.Instance";
+        }
+
+        if (elementType.IsEnum())
+        {
+            return $"new Ookii.CommandLine.Conversion.EnumConverter(typeof({elementType.ToDisplayString()}))";
+        }
+
+        if (elementType.ImplementsInterface($"System.ISpanParsable<{elementType.ToDisplayString()}>"))
+        {
+            return $"new Ookii.CommandLine.Conversion.SpanParsableConverter<{elementType.ToDisplayString()}>()";
+        }
+
+        if (elementType.ImplementsInterface($"System.IParsable<{elementType.ToDisplayString()}>"))
+        {
+            return $"new Ookii.CommandLine.Conversion.ParsableConverter<{elementType.ToDisplayString()}>()";
+        }
+
+        // TODO: Generate a converter.
         return null;
     }
 }

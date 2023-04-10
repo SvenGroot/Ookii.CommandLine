@@ -20,6 +20,8 @@ internal static class AttributeNames
     public const string ShortAlias = NamespacePrefix + "ShortAliasAttribute";
     public const string ArgumentValidation = NamespacePrefix + "Validation.ArgumentValidationAttribute";
     public const string ArgumentConverter = NamespacePrefix + "Conversion.ArgumentConverterAttribute";
+    public const string KeyConverter = NamespacePrefix + "Conversion.KeyConverterAttribute";
+    public const string ValueConverter = NamespacePrefix + "Conversion.ValueConverterAttribute";
 
     public const string Description = "System.ComponentModel.DescriptionAttribute";
 }

@@ -48,7 +48,7 @@ internal static class Diagnostics
             Category,
             DiagnosticSeverity.Error,
             isEnabledByDefault: true),
-        property.Locations.FirstOrDefault(), property.Type.ToDisplayString(), property.Name);
+        property.Locations.FirstOrDefault(), property.ContainingType?.ToDisplayString(), property.Name);
 
     public static Diagnostic PropertyIsReadOnly(IPropertySymbol property) => Diagnostic.Create(
         new DiagnosticDescriptor(
@@ -58,7 +58,17 @@ internal static class Diagnostics
             Category,
             DiagnosticSeverity.Error,
             isEnabledByDefault: true),
-        property.Locations.FirstOrDefault(), property.Type.ToDisplayString(), property.Name);
+        property.Locations.FirstOrDefault(), property.ContainingType?.ToDisplayString(), property.Name);
+
+    public static Diagnostic NoConverter(ISymbol member, ITypeSymbol elementType) => Diagnostic.Create(
+        new DiagnosticDescriptor(
+            "CL1006",
+            new LocalizableResourceString(nameof(Resources.NoConverterTitle), Resources.ResourceManager, typeof(Resources)),
+            new LocalizableResourceString(nameof(Resources.NoConverterMessageFormat), Resources.ResourceManager, typeof(Resources)),
+            Category,
+            DiagnosticSeverity.Error,
+            isEnabledByDefault: true),
+        member.Locations.FirstOrDefault(), elementType.ToDisplayString(), member.ContainingType?.ToDisplayString(), member.Name);
 
     public static Diagnostic UnknownAttribute(AttributeData attribute) => Diagnostic.Create(
         new DiagnosticDescriptor(

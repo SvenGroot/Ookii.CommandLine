@@ -133,6 +133,24 @@ namespace Ookii.CommandLine.Generator.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to No argument converter exists for type {0} used by the argument defined by {1}.{2}, and none could be generated. Use the Ookii.CommandLine.Conversion.ArgumentConverterAttribute to specify a custom converter..
+        /// </summary>
+        internal static string NoConverterMessageFormat {
+            get {
+                return ResourceManager.GetString("NoConverterMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No argument converter exists for the argument&apos;s type..
+        /// </summary>
+        internal static string NoConverterTitle {
+            get {
+                return ResourceManager.GetString("NoConverterTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The property {0}.{1} must have a public set accessor..
         /// </summary>
         internal static string PropertyIsReadOnlyMessageFormat {

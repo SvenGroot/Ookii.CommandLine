@@ -29,6 +29,11 @@ internal static class SymbolExtensions
     public static bool AllowsNull(this INamedTypeSymbol type)
         => type.IsNullableValueType() || (type.IsReferenceType && type.NullableAnnotation != NullableAnnotation.NotAnnotated);
 
+    public static INamedTypeSymbol GetUnderlyingType(this INamedTypeSymbol type)
+        => type.IsNullableValueType() ? (INamedTypeSymbol)type.TypeArguments[0] : type;
+
+    public static bool IsEnum(this ITypeSymbol type) => type.BaseType?.ToDisplayString() == "System.Enum";
+
     public static INamedTypeSymbol? FindGenericInterface(this INamedTypeSymbol symbol, string interfaceName)
     {
         foreach (var iface in symbol.AllInterfaces)
@@ -46,6 +51,19 @@ internal static class SymbolExtensions
         }
 
         return null;
+    }
+
+    public static bool ImplementsInterface(this INamedTypeSymbol symbol, string interfaceName)
+    {
+        foreach (var iface in symbol.AllInterfaces)
+        {
+            if (iface.ToDisplayString() == interfaceName)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public static string CreateInstantiation(this AttributeData attribute)
