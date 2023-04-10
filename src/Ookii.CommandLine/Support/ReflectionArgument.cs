@@ -9,7 +9,7 @@ using System.Text;
 using Ookii.CommandLine.Validation;
 using System.Threading;
 
-namespace Ookii.CommandLine;
+namespace Ookii.CommandLine.Support;
 
 internal class ReflectionArgument : CommandLineArgument
 {
@@ -151,7 +151,7 @@ internal class ReflectionArgument : CommandLineArgument
 
         if (member is PropertyInfo property)
         {
-            var (collectionType, dictionaryType, elementType) = 
+            var (collectionType, dictionaryType, elementType) =
                 DetermineMultiValueType(info.ArgumentName, info.ArgumentType, property);
 
             if (dictionaryType != null)
@@ -229,14 +229,14 @@ internal class ReflectionArgument : CommandLineArgument
             return (null, null, null);
         }
 
-        var dictionaryType = TypeHelper.FindGenericInterface(argumentType, typeof(IDictionary<,>));
+        var dictionaryType = argumentType.FindGenericInterface(typeof(IDictionary<,>));
         if (dictionaryType != null)
         {
             var elementType = typeof(KeyValuePair<,>).MakeGenericType(dictionaryType.GetGenericArguments());
             return (null, dictionaryType, elementType);
         }
 
-        var collectionType = TypeHelper.FindGenericInterface(argumentType, typeof(ICollection<>));
+        var collectionType = argumentType.FindGenericInterface(typeof(ICollection<>));
         if (collectionType != null)
         {
             var elementType = collectionType.GetGenericArguments()[0];
@@ -291,8 +291,8 @@ internal class ReflectionArgument : CommandLineArgument
 
         // We can only determine the nullability state if the property or parameter's actual
         // type is an array or ICollection<>. Otherwise, we just assume nulls are allowed.
-        if (actualType != null && (actualType.IsArray || (actualType.IsGenericType &&
-            actualType.GetGenericTypeDefinition() == typeof(ICollection<>))))
+        if (actualType != null && (actualType.IsArray || actualType.IsGenericType &&
+            actualType.GetGenericTypeDefinition() == typeof(ICollection<>)))
         {
             var context = new NullabilityInfoContext();
             var info = context.Create(property);
@@ -323,7 +323,7 @@ internal class ReflectionArgument : CommandLineArgument
         var info = context.Create(property);
         return info.WriteState != NullabilityState.NotNull;
 #else
-            return true;
+        return true;
 #endif
     }
 
@@ -340,7 +340,7 @@ internal class ReflectionArgument : CommandLineArgument
         var info = context.Create(parameter);
         return info.WriteState != NullabilityState.NotNull;
 #else
-            return true;
+        return true;
 #endif
     }
 
@@ -358,7 +358,7 @@ internal class ReflectionArgument : CommandLineArgument
     {
         var parameters = method.GetParameters();
         if (!method.IsStatic ||
-            (method.ReturnType != typeof(bool) && method.ReturnType != typeof(void)) ||
+            method.ReturnType != typeof(bool) && method.ReturnType != typeof(void) ||
             parameters.Length > 2)
         {
             return null;

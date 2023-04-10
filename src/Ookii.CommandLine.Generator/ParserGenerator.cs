@@ -1,26 +1,31 @@
 ﻿using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.Operations;
 using System;
 using System.Diagnostics;
+using System.Globalization;
+using System.Reflection;
 using System.Text;
 
 namespace Ookii.CommandLine.Generator;
 
 internal class ParserGenerator
 {
+    private readonly Compilation _compilation;
     private readonly SourceProductionContext _context;
     private readonly INamedTypeSymbol _argumentsClass;
     private readonly SourceBuilder _builder;
 
-    public ParserGenerator(SourceProductionContext context, INamedTypeSymbol argumentsClass)
+    public ParserGenerator(Compilation compilation, SourceProductionContext context, INamedTypeSymbol argumentsClass)
     {
+        _compilation = compilation;
         _context = context;
         _argumentsClass = argumentsClass;
         _builder = new(argumentsClass.ContainingNamespace);
     }
 
-    public static string? Generate(SourceProductionContext context, INamedTypeSymbol _argumentsClass)
+    public static string? Generate(Compilation compilation, SourceProductionContext context, INamedTypeSymbol argumentsClass)
     {
-        var generator = new ParserGenerator(context, _argumentsClass);
+        var generator = new ParserGenerator(compilation, context, argumentsClass);
         return generator.Generate();
     }
 
@@ -159,7 +164,8 @@ internal class ParserGenerator
             throw new NotImplementedException();
         }
 
-        var argumentType = (INamedTypeSymbol)property!.Type.WithNullableAnnotation(NullableAnnotation.NotAnnotated);
+        var originalArgumentType = (INamedTypeSymbol)property!.Type;
+        var argumentType = (INamedTypeSymbol)originalArgumentType.WithNullableAnnotation(NullableAnnotation.NotAnnotated);
         var nullableArgumentType = argumentType.WithNullableAnnotation(NullableAnnotation.Annotated);
         string extra = string.Empty;
         if (!argumentType.IsReferenceType && !argumentType.IsNullableValueType())
@@ -167,17 +173,81 @@ internal class ParserGenerator
             extra = "!";
         }
 
-        // TODO: key/value converters
-        // TODO: AllowsNull
+        INamedTypeSymbol elementTypeWithNullable = argumentType;
+        INamedTypeSymbol? keyType = null;
+        INamedTypeSymbol? valueType = null;
+        var allowsNull = originalArgumentType.AllowsNull();
+        var kind = "Ookii.CommandLine.ArgumentKind.SingleValue";
+        if (property != null)
+        {
+            var multiValueType = DetermineMultiValueType(property, argumentType);
+            if (multiValueType is not var (collectionType, dictionaryType, multiValueElementType))
+            {
+                return;
+            }
+
+            if (dictionaryType != null)
+            {
+                Debug.Assert(multiValueElementType != null);
+                kind = "Ookii.CommandLine.ArgumentKind.Dictionary";
+                elementTypeWithNullable = multiValueElementType!;
+                keyType = (INamedTypeSymbol)elementTypeWithNullable.TypeArguments[0].WithNullableAnnotation(NullableAnnotation.NotAnnotated);
+                valueType = ((INamedTypeSymbol)elementTypeWithNullable.TypeArguments[1]);
+                allowsNull = valueType.AllowsNull();
+                valueType = (INamedTypeSymbol)valueType.WithNullableAnnotation(NullableAnnotation.NotAnnotated);
+                // TODO: Converter
+                //if (converterType == null)
+                //{
+                //    converterType = typeof(KeyValuePairConverter<,>).MakeGenericType(genericArguments);
+                //    var keyConverterType = keyArgumentConverterAttribute?.GetConverterType();
+                //    var valueConverterType = valueArgumentConverterAttribute?.GetConverterType();
+                //    info.Converter = (ArgumentConverter)Activator.CreateInstance(converterType, info.Parser.StringProvider,
+                //        info.ArgumentName, info.AllowNull, keyConverterType, valueConverterType, info.KeyValueSeparator)!;
+                //}
+            }
+            else if (collectionType != null)
+            {
+                Debug.Assert(multiValueElementType != null);
+                kind = "Ookii.CommandLine.ArgumentKind.MultiValue";
+                elementTypeWithNullable = multiValueElementType!;
+                allowsNull = elementTypeWithNullable.AllowsNull();
+            }
+        }
+        else
+        {
+            kind = "Ookii.CommandLine.ArgumentKind.Method";
+        }
+
+        var elementType = elementTypeWithNullable;
+        if (elementType.IsNullableValueType())
+        {
+            elementType = (INamedTypeSymbol)elementType.TypeArguments[0];
+        }
+
+        // TODO: Converters
 
         // The leading commas are not a formatting I like but it does make things easier here.
         _builder.AppendLine($"yield return Ookii.CommandLine.Support.GeneratedArgument.Create(");
         _builder.IncreaseIndent();
         _builder.AppendLine("parser");
         _builder.AppendLine($", argumentType: typeof({argumentType.ToDisplayString()})");
+        _builder.AppendLine($", elementTypeWithNullable: typeof({elementTypeWithNullable.ToDisplayString()})");
+        _builder.AppendLine($", elementType: typeof({elementType.ToDisplayString()})");
         _builder.AppendLine($", memberName: \"{member.Name}\"");
+        _builder.AppendLine($", kind: {kind}");
         _builder.AppendLine($", attribute: {commandLineArgumentAttribute.CreateInstantiation()}");
         _builder.AppendLine(", converter: Ookii.CommandLine.Conversion.StringConverter.Instance");
+        _builder.AppendLine($", allowsNull: {(allowsNull ? "true" : "false")}");
+        if (keyType != null)
+        {
+            _builder.AppendLine($", keyType: typeof({keyType.ToDisplayString()})");
+        }
+
+        if (valueType != null)
+        {
+            _builder.AppendLine($", valueType: typeof({valueType.ToDisplayString()})");
+        }
+
         if (multiValueSeparator != null)
         {
             _builder.AppendLine($", multiValueSeparatorAttribute: {multiValueSeparator.CreateInstantiation()}");
@@ -213,7 +283,16 @@ internal class ParserGenerator
             _builder.AppendLine($", validationAttributes: new Ookii.CommandLine.Validation.ArgumentValidationAttribute[] {{ {string.Join(", ", validators.Select(a => a.CreateInstantiation()))} }}");
         }
 
-        _builder.AppendLine($", setProperty: (target, value) => (({_argumentsClass.Name})target).{member.Name} = ({nullableArgumentType.ToDisplayString()})value{extra}");
+        if (property?.SetMethod?.DeclaredAccessibility == Accessibility.Public)
+        {
+            _builder.AppendLine($", setProperty: (target, value) => (({_argumentsClass.Name})target).{member.Name} = ({nullableArgumentType.ToDisplayString()})value{extra}");
+        }
+
+        if (property != null)
+        {
+            _builder.AppendLine($", getProperty: (target) => (({_argumentsClass.Name})target).{member.Name}");
+        }
+
         _builder.DecreaseIndent();
         _builder.AppendLine($");");
     }
@@ -241,5 +320,61 @@ internal class ParserGenerator
         attributes ??= new();
         attributes.Add(data);
         return true;
+    }
+
+    private (INamedTypeSymbol?, INamedTypeSymbol?, INamedTypeSymbol?)? DetermineMultiValueType(IPropertySymbol property, INamedTypeSymbol argumentType)
+    {
+        // If the type is Dictionary<TKey, TValue> it doesn't matter if the property is
+        // read-only or not.
+        if (argumentType.IsGenericType && argumentType.ConstructedFrom.ToDisplayString() == "System.Collections.Generic.Dictionary<TKey, TValue>")
+        {
+            var keyValuePair = _compilation.GetTypeByMetadataName(typeof(KeyValuePair<,>).FullName)!;
+            var elementType = keyValuePair.Construct(argumentType.TypeArguments, argumentType.TypeArgumentNullableAnnotations);
+            return (null, argumentType, elementType);
+        }
+
+        if (argumentType is IArrayTypeSymbol arrayType)
+        {
+            if (arrayType.Rank != 1)
+            {
+                _context.ReportDiagnostic(Diagnostics.InvalidArrayRank(property));
+                return null;
+            }
+
+            if (property.SetMethod?.DeclaredAccessibility != Accessibility.Public)
+            {
+                _context.ReportDiagnostic(Diagnostics.PropertyIsReadOnly(property));
+                return null;
+            }
+
+            var elementType = (INamedTypeSymbol)arrayType.ElementType;
+            return (argumentType, null, elementType);
+        }
+
+        // The interface approach requires a read-only property. If it's read-write, treat it
+        // like a non-multi-value argument.
+        if (property.SetMethod?.DeclaredAccessibility == Accessibility.Public)
+        {
+            return (null, null, null);
+        }
+
+        var dictionaryType = argumentType.FindGenericInterface("System.Collections.Generic.IDictionary<TKey, TValue>");
+        if (dictionaryType != null)
+        {
+            var keyValuePair = _compilation.GetTypeByMetadataName(typeof(KeyValuePair<,>).FullName)!;
+            var elementType = keyValuePair.Construct(dictionaryType.TypeArguments, dictionaryType.TypeArgumentNullableAnnotations);
+            return (null, dictionaryType, elementType);
+        }
+
+        var collectionType = argumentType.FindGenericInterface("System.Collection.Generic.ICollection<T>");
+        if (collectionType != null)
+        {
+            var elementType = (INamedTypeSymbol)collectionType.TypeArguments[0];
+            return (collectionType, null, elementType);
+        }
+
+        // This is a read-only property with an unsupported type.
+        _context.ReportDiagnostic(Diagnostics.PropertyIsReadOnly(property));
+        return null;
     }
 }

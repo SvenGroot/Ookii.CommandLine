@@ -40,6 +40,26 @@ internal static class Diagnostics
             isEnabledByDefault: true),
         symbol.Locations.FirstOrDefault(), symbol.ToDisplayString());
 
+    public static Diagnostic InvalidArrayRank(IPropertySymbol property) => Diagnostic.Create(
+        new DiagnosticDescriptor(
+            "CL1004",
+            new LocalizableResourceString(nameof(Resources.InvalidArrayRankTitle), Resources.ResourceManager, typeof(Resources)),
+            new LocalizableResourceString(nameof(Resources.InvalidArrayRankMessageFormat), Resources.ResourceManager, typeof(Resources)),
+            Category,
+            DiagnosticSeverity.Error,
+            isEnabledByDefault: true),
+        property.Locations.FirstOrDefault(), property.Type.ToDisplayString(), property.Name);
+
+    public static Diagnostic PropertyIsReadOnly(IPropertySymbol property) => Diagnostic.Create(
+        new DiagnosticDescriptor(
+            "CL1005",
+            new LocalizableResourceString(nameof(Resources.PropertyIsReadOnlyTitle), Resources.ResourceManager, typeof(Resources)),
+            new LocalizableResourceString(nameof(Resources.PropertyIsReadOnlyMessageFormat), Resources.ResourceManager, typeof(Resources)),
+            Category,
+            DiagnosticSeverity.Error,
+            isEnabledByDefault: true),
+        property.Locations.FirstOrDefault(), property.Type.ToDisplayString(), property.Name);
+
     public static Diagnostic UnknownAttribute(AttributeData attribute) => Diagnostic.Create(
         new DiagnosticDescriptor(
             "CLW1001",

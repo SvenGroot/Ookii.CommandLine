@@ -115,6 +115,42 @@ namespace Ookii.CommandLine.Generator.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The multi-value argument defined by {0}.{1} must have an array rank of one..
+        /// </summary>
+        internal static string InvalidArrayRankMessageFormat {
+            get {
+                return ResourceManager.GetString("InvalidArrayRankMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A multi-value argument defined by an array properties must have an array rank of one..
+        /// </summary>
+        internal static string InvalidArrayRankTitle {
+            get {
+                return ResourceManager.GetString("InvalidArrayRankTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The property {0}.{1} must have a public set accessor..
+        /// </summary>
+        internal static string PropertyIsReadOnlyMessageFormat {
+            get {
+                return ResourceManager.GetString("PropertyIsReadOnlyMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to An argument property must have a public set accessor..
+        /// </summary>
+        internal static string PropertyIsReadOnlyTitle {
+            get {
+                return ResourceManager.GetString("PropertyIsReadOnlyTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The attribute {0} is unknown and will be ignored by the GeneratedParserAttribute..
         /// </summary>
         internal static string UnknownAttributeMessageFormat {

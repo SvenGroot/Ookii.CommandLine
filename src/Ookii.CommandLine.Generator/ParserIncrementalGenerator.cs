@@ -35,7 +35,6 @@ public class ParserIncrementalGenerator : IIncrementalGenerator
         foreach (var syntax in classes)
         {
             context.CancellationToken.ThrowIfCancellationRequested();
-
             var semanticModel = compilation.GetSemanticModel(syntax.SyntaxTree);
             if (semanticModel.GetDeclaredSymbol(syntax, context.CancellationToken) is not INamedTypeSymbol symbol)
             {
@@ -60,7 +59,7 @@ public class ParserIncrementalGenerator : IIncrementalGenerator
                 continue;
             }
 
-            var source = ParserGenerator.Generate(context, symbol);
+            var source = ParserGenerator.Generate(compilation, context, symbol);
             if (source != null)
             {
                 context.AddSource(symbol.Name + ".g.cs", SourceText.From(source, Encoding.UTF8));
