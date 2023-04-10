@@ -20,5 +20,5 @@ public class StringConverter : ArgumentConverter
     public static readonly StringConverter Instance = new();
 
     /// <inheritdoc/>
-    public override object? Convert(string value, CultureInfo culture) => value;
+    public override object? Convert(string value, CultureInfo culture, CommandLineArgument argument) => value;
 }

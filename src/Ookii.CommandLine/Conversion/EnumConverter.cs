@@ -12,7 +12,7 @@ internal class EnumConverter : ArgumentConverter
         _enumType = enumType;
     }
 
-    public override object? Convert(string value, CultureInfo culture)
+    public override object? Convert(string value, CultureInfo culture, CommandLineArgument argument)
     {
         try
         {
@@ -29,7 +29,7 @@ internal class EnumConverter : ArgumentConverter
     }
 
 #if NET6_0_OR_GREATER
-    public override object? Convert(ReadOnlySpan<char> value, CultureInfo culture)
+    public override object? Convert(ReadOnlySpan<char> value, CultureInfo culture, CommandLineArgument argument)
     {
         try
         {

@@ -28,24 +28,24 @@ public class NullableConverter : ArgumentConverter
     }
 
     /// <inheritdoc/>
-    public override object? Convert(string value, CultureInfo culture)
+    public override object? Convert(string value, CultureInfo culture, CommandLineArgument argument)
     {
         if (value.Length == 0)
         {
             return null;
         }
 
-        return _baseConverter.Convert(value, culture);
+        return _baseConverter.Convert(value, culture, argument);
     }
 
     /// <inheritdoc/>
-    public override object? Convert(ReadOnlySpan<char> value, CultureInfo culture)
+    public override object? Convert(ReadOnlySpan<char> value, CultureInfo culture, CommandLineArgument argument)
     {
         if (value.Length == 0)
         {
             return null;
         }
 
-        return _baseConverter.Convert(value, culture);
+        return _baseConverter.Convert(value, culture, argument);
     }
 }

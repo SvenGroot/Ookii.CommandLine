@@ -1,6 +1,6 @@
-﻿using Ookii.CommandLine.Conversion;
+﻿using Ookii.CommandLine;
+using Ookii.CommandLine.Conversion;
 using System;
-using System.ComponentModel;
 using System.Globalization;
 using System.Text;
 
@@ -10,7 +10,7 @@ namespace SubcommandSample;
 // Ookii.CommandLine.
 internal class EncodingConverter : ArgumentConverter
 {
-    public override object? Convert(string value, CultureInfo culture)
+    public override object? Convert(string value, CultureInfo culture, CommandLineArgument argument)
     {
         try
         {

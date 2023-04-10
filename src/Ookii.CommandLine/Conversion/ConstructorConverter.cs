@@ -12,15 +12,16 @@ internal class ConstructorConverter : ArgumentConverter
         _type = type;
     }
 
-    public override object? Convert(string value, CultureInfo culture)
+    public override object? Convert(string value, CultureInfo culture, CommandLineArgument argument)
     {
         try
         {
             return _type.CreateInstance(value);
         }
-        catch (CommandLineArgumentException)
+        catch (CommandLineArgumentException ex)
         {
-            throw;
+            // Patch the exception with the argument name.
+            throw new CommandLineArgumentException(ex.Message, argument.ArgumentName, ex.Category, ex.InnerException);
         }
         catch (FormatException)
         {

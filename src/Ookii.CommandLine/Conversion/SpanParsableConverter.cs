@@ -23,10 +23,11 @@ public class SpanParsableConverter<T> : ArgumentConverter
     where T : ISpanParsable<T>
 {
     /// <inheritdoc/>
-    public override object? Convert(string value, CultureInfo culture) => T.Parse(value, culture);
+    public override object? Convert(string value, CultureInfo culture, CommandLineArgument argument) => T.Parse(value, culture);
 
     /// <inheritdoc/>
-    public override object? Convert(ReadOnlySpan<char> value, CultureInfo culture) => T.Parse(value, culture);
+    public override object? Convert(ReadOnlySpan<char> value, CultureInfo culture, CommandLineArgument argument)
+        => T.Parse(value, culture);
 }
 
 #endif

@@ -929,7 +929,7 @@ public abstract class CommandLineArgument
     /// </para>
     /// <para>
     ///   This property indicates what happens when the <see cref="ArgumentConverter"/> used for this argument returns
-    ///   <see langword="null" /> from its <see cref="ArgumentConverter.Convert(string, CultureInfo)"/>
+    ///   <see langword="null" /> from its <see cref="ArgumentConverter.Convert(string, CultureInfo, CommandLineArgument)"/>
     ///   method.
     /// </para>
     /// <para>
@@ -1096,7 +1096,7 @@ public abstract class CommandLineArgument
             return null;
         }
 
-        return _converter.Convert(stringValue, CultureInfo.InvariantCulture);
+        return _converter.Convert(stringValue, CultureInfo.InvariantCulture, this);
     }
 
     /// <summary>
@@ -1268,8 +1268,8 @@ public abstract class CommandLineArgument
         try
         {
             var converted = stringValue == null
-                ? _converter.Convert(spanValue, culture)
-                : _converter.Convert(stringValue, culture);
+                ? _converter.Convert(spanValue, culture, this)
+                : _converter.Convert(stringValue, culture, this);
 
             if (converted == null && (!_allowNull || IsDictionary))
             {

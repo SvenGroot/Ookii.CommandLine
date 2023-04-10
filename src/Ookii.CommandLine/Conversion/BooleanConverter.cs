@@ -15,10 +15,10 @@ public class BooleanConverter : ArgumentConverter
     public static readonly BooleanConverter Instance = new();
 
     /// <inheritdoc/>
-    public override object? Convert(string value, CultureInfo culture) => bool.Parse(value);
+    public override object? Convert(string value, CultureInfo culture, CommandLineArgument argument) => bool.Parse(value);
 
 #if NETSTANDARD2_1_OR_GREATER || NET6_0_OR_GREATER
     /// <inheritdoc/>
-    public override object? Convert(ReadOnlySpan<char> value, CultureInfo culture) => bool.Parse(value);
+    public override object? Convert(ReadOnlySpan<char> value, CultureInfo culture, CommandLineArgument argument) => bool.Parse(value);
 #endif
 }

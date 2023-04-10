@@ -167,10 +167,10 @@ internal class ReflectionArgument : CommandLineArgument
                 if (converterType == null)
                 {
                     converterType = typeof(KeyValuePairConverter<,>).MakeGenericType(genericArguments);
-                    var keyConverterType = keyArgumentConverterAttribute?.GetConverterType();
-                    var valueConverterType = valueArgumentConverterAttribute?.GetConverterType();
-                    info.Converter = (ArgumentConverter)Activator.CreateInstance(converterType, info.Parser.StringProvider,
-                        info.ArgumentName, info.AllowNull, keyConverterType, valueConverterType, info.KeyValueSeparator)!;
+                    var keyConverter = info.KeyType.GetStringConverter(keyArgumentConverterAttribute?.GetConverterType());
+                    var valueConverter = info.ValueType.GetStringConverter(valueArgumentConverterAttribute?.GetConverterType());
+                    info.Converter = (ArgumentConverter)Activator.CreateInstance(converterType, keyConverter, valueConverter,
+                        info.KeyValueSeparator, info.AllowNull)!;
                 }
             }
             else if (collectionType != null)

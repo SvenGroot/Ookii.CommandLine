@@ -15,7 +15,7 @@ namespace Ookii.CommandLine.Conversion
             _hasCulture = hasCulture;
         }
 
-        public override object? Convert(string value, CultureInfo culture)
+        public override object? Convert(string value, CultureInfo culture, CommandLineArgument argument)
         {
             var parameters = _hasCulture
                 ? new object?[] { value, culture }
@@ -25,9 +25,10 @@ namespace Ookii.CommandLine.Conversion
             {
                 return _method.Invoke(null, parameters);
             }
-            catch (CommandLineArgumentException)
+            catch (CommandLineArgumentException ex)
             {
-                throw;
+                // Patch the exception with the argument name.
+                throw new CommandLineArgumentException(ex.Message, argument.ArgumentName, ex.Category, ex.InnerException);
             }
             catch (FormatException)
             {

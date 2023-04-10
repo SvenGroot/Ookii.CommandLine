@@ -19,7 +19,7 @@ namespace Ookii.CommandLine.Tests
 
         class NullReturningStringConverter : ArgumentConverter
         {
-            public override object? Convert(string value, CultureInfo culture)
+            public override object? Convert(string value, CultureInfo culture, CommandLineArgument argument)
             {
                 if (value == "(null)")
                 {
@@ -34,7 +34,7 @@ namespace Ookii.CommandLine.Tests
 
         class NullReturningIntConverter : ArgumentConverter
         {
-            public override object? Convert(string value, CultureInfo culture)
+            public override object? Convert(string value, CultureInfo culture, CommandLineArgument argument)
             {
                 if (value == "(null)")
                 {

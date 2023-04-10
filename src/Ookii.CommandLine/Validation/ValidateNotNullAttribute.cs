@@ -10,7 +10,8 @@ namespace Ookii.CommandLine.Validation
     /// <remarks>
     /// <para>
     ///   An argument's value can only be <see langword="null"/> if its <see cref="ArgumentConverter"/>
-    ///   returns <see langword="null"/> from the <see cref="ArgumentConverter.Convert(string, System.Globalization.CultureInfo)"/>
+    ///   returns <see langword="null"/> from the
+    ///   <see cref="ArgumentConverter.Convert(string, System.Globalization.CultureInfo, CommandLineArgument)"/>
     ///   method. For example, the <see cref="NullableConverter"/> can return <see langword="null"/>.
     /// </para>
     /// <para>
