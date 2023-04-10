@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Ookii.CommandLine.Generator;
 
-internal static class SymbolExtensions
+internal static class Extensions
 {
     public static bool DerivesFrom(this INamedTypeSymbol symbol, string baseClassName)
     {
@@ -71,5 +71,10 @@ internal static class SymbolExtensions
         var ctorArgs = attribute.ConstructorArguments.Select(c => c.ToCSharpString());
         var namedArgs = attribute.NamedArguments.Select(n => $"{n.Key} = {n.Value.ToCSharpString()}");
         return $"new {attribute.AttributeClass?.ToDisplayString()}({string.Join(", ", ctorArgs)}) {{ {string.Join(", ", namedArgs)} }}";
+    }
+
+    public static string ToCSharpString(this bool value)
+    {
+        return value ? "true" : "false";
     }
 }

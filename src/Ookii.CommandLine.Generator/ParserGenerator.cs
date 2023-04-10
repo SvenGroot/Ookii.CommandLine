@@ -119,7 +119,7 @@ internal class ParserGenerator
 
     private void GenerateArgument(ISymbol member)
     {
-        // Check if the member can be an argument.
+        // Check if the member can be an argument. TODO: warning if private.
         if (member.DeclaredAccessibility != Accessibility.Public ||
             member.Kind is not (SymbolKind.Method or SymbolKind.Property))
         {
@@ -172,9 +172,9 @@ internal class ParserGenerator
 
         var originalArgumentType = (INamedTypeSymbol)property!.Type;
         var argumentType = (INamedTypeSymbol)originalArgumentType.WithNullableAnnotation(NullableAnnotation.NotAnnotated);
-        var nullableArgumentType = argumentType.WithNullableAnnotation(NullableAnnotation.Annotated);
         string extra = string.Empty;
-        if (!argumentType.IsReferenceType && !argumentType.IsNullableValueType())
+        var allowsNull = originalArgumentType.AllowsNull();
+        if (!allowsNull)
         {
             extra = "!";
         }
@@ -182,7 +182,11 @@ internal class ParserGenerator
         INamedTypeSymbol elementTypeWithNullable = argumentType;
         INamedTypeSymbol? keyType = null;
         INamedTypeSymbol? valueType = null;
-        var allowsNull = originalArgumentType.AllowsNull();
+        if (keyValueSeparator != null)
+        {
+            _builder.AppendLine($"var keyValueSeparatorAttribute{member.Name} = {keyValueSeparator.CreateInstantiation()};");
+        }
+
         var kind = "Ookii.CommandLine.ArgumentKind.SingleValue";
         string? converter = null;
         if (property != null)
@@ -199,9 +203,9 @@ internal class ParserGenerator
                 kind = "Ookii.CommandLine.ArgumentKind.Dictionary";
                 elementTypeWithNullable = multiValueElementType!;
                 keyType = (INamedTypeSymbol)elementTypeWithNullable.TypeArguments[0].WithNullableAnnotation(NullableAnnotation.NotAnnotated);
-                valueType = ((INamedTypeSymbol)elementTypeWithNullable.TypeArguments[1]);
-                allowsNull = valueType.AllowsNull();
-                valueType = (INamedTypeSymbol)valueType.WithNullableAnnotation(NullableAnnotation.NotAnnotated);
+                var rawValueType = ((INamedTypeSymbol)elementTypeWithNullable.TypeArguments[1]);
+                allowsNull = rawValueType.AllowsNull();
+                valueType = (INamedTypeSymbol)rawValueType.WithNullableAnnotation(NullableAnnotation.NotAnnotated);
                 // TODO: Converter
                 if (converterAttribute == null)
                 {
@@ -213,16 +217,17 @@ internal class ParserGenerator
                     }
 
                     var valueConverter = DetermineConverter(valueType.GetUnderlyingType(), valueConverterAttribute, valueType.IsNullableValueType());
-                    if (keyConverter == null)
+                    if (valueConverter == null)
                     {
                         _context.ReportDiagnostic(Diagnostics.NoConverter(member, keyType.GetUnderlyingType()));
                         return;
                     }
 
-                    // TODO: Need to create this in argument, change approach: instead of passing KeyType/ValueType,
-                    // pass KeyConverter/ValueConverter in info so code can be used for both reflection and generated.
-                    //info.Converter = (ArgumentConverter)Activator.CreateInstance(converterType, info.Parser.StringProvider,
-                    //    info.ArgumentName, info.AllowNull, keyConverterType, valueConverterType, info.KeyValueSeparator)!;
+                    var separator = keyValueSeparator == null 
+                        ? "null"
+                        : $"keyValueSeparatorAttribute{member.Name}.Separator";
+
+                    converter = $"new Ookii.CommandLine.Conversion.KeyValuePairConverter<{keyType.ToDisplayString()}, {rawValueType.ToDisplayString()}>({keyConverter}, {valueConverter}, {separator}, {allowsNull.ToCSharpString()})";
                 }
             }
             else if (collectionType != null)
@@ -260,7 +265,7 @@ internal class ParserGenerator
         _builder.AppendLine($", kind: {kind}");
         _builder.AppendLine($", attribute: {commandLineArgumentAttribute.CreateInstantiation()}");
         _builder.AppendLine($", converter: {converter}");
-        _builder.AppendLine($", allowsNull: {(allowsNull ? "true" : "false")}");
+        _builder.AppendLine($", allowsNull: {(allowsNull.ToCSharpString())}");
         if (keyType != null)
         {
             _builder.AppendLine($", keyType: typeof({keyType.ToDisplayString()})");
@@ -288,7 +293,7 @@ internal class ParserGenerator
 
         if (keyValueSeparator != null)
         {
-            _builder.AppendLine($", keyValueSeparatorAttribute: {keyValueSeparator.CreateInstantiation()}");
+            _builder.AppendLine($", keyValueSeparatorAttribute: keyValueSeparatorAttribute{member.Name}");
         }
 
         if (aliases != null)
@@ -308,7 +313,7 @@ internal class ParserGenerator
 
         if (property?.SetMethod?.DeclaredAccessibility == Accessibility.Public)
         {
-            _builder.AppendLine($", setProperty: (target, value) => (({_argumentsClass.Name})target).{member.Name} = ({nullableArgumentType.ToDisplayString()})value{extra}");
+            _builder.AppendLine($", setProperty: (target, value) => (({_argumentsClass.Name})target).{member.Name} = ({originalArgumentType.ToDisplayString()})value{extra}");
         }
 
         if (property != null)

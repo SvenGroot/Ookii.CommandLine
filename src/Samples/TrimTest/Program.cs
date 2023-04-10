@@ -28,7 +28,7 @@ partial class Arguments
     [CommandLineArgument(ValueDescription = "Stuff")]
     [KeyValueSeparator("==")]
     [MultiValueSeparator]
-    public bool Test2 { get; set; } = default!;
+    public Dictionary<int, string?> Test2 { get; set; } = default!;
 
     [CommandLineArgument]
     public int Test3 { get; set; }
