@@ -7,12 +7,28 @@ namespace Ookii.CommandLine.Generator;
 
 internal static class Extensions
 {
-    public static bool DerivesFrom(this INamedTypeSymbol symbol, string baseClassName)
+    public static bool DerivesFrom(this ITypeSymbol symbol, string baseClassName)
     {
-        INamedTypeSymbol? current = symbol;
+        var current = symbol;
         while (current != null)
         {
             if (current.ToDisplayString() == baseClassName)
+            {
+                return true;
+            }
+
+            current = current.BaseType;
+        }
+
+        return false;
+    }
+
+    public static bool DerivesFrom(this ITypeSymbol type, ITypeSymbol baseClass)
+    {
+        var current = type;
+        while (current != null)
+        {
+            if (SymbolEqualityComparer.Default.Equals(current, baseClass))
             {
                 return true;
             }
@@ -34,7 +50,7 @@ internal static class Extensions
 
     public static bool IsEnum(this ITypeSymbol type) => type.BaseType?.ToDisplayString() == "System.Enum";
 
-    public static INamedTypeSymbol? FindGenericInterface(this INamedTypeSymbol symbol, string interfaceName)
+    public static INamedTypeSymbol? FindGenericInterface(this ITypeSymbol symbol, string interfaceName)
     {
         foreach (var iface in symbol.AllInterfaces)
         {
@@ -53,7 +69,7 @@ internal static class Extensions
         return null;
     }
 
-    public static bool ImplementsInterface(this INamedTypeSymbol symbol, string interfaceName)
+    public static bool ImplementsInterface(this ITypeSymbol symbol, string interfaceName)
     {
         foreach (var iface in symbol.AllInterfaces)
         {
@@ -65,6 +81,23 @@ internal static class Extensions
 
         return false;
     }
+
+    public static bool ImplementsInterface(this ITypeSymbol type, ITypeSymbol interfaceType)
+    {
+        foreach (var iface in type.AllInterfaces)
+        {
+            if (SymbolEqualityComparer.Default.Equals(iface, interfaceType))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public static bool CanAssignFrom(this ITypeSymbol targetType, ITypeSymbol sourceType)
+        => SymbolEqualityComparer.Default.Equals(targetType, sourceType) || sourceType.DerivesFrom(targetType)
+            || sourceType.ImplementsInterface(targetType);
 
     public static string CreateInstantiation(this AttributeData attribute)
     {

@@ -35,4 +35,7 @@ partial class Arguments
 
     [CommandLineArgument]
     public int? Test4 { get; set; }
+
+    [CommandLineArgument]
+    public FileInfo? File { get; set; }
 }

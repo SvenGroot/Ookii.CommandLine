@@ -32,6 +32,7 @@ public class ParserIncrementalGenerator : IIncrementalGenerator
             return;
         }
 
+        var converterGenerator = new ConverterGenerator(compilation);
         foreach (var syntax in classes)
         {
             context.CancellationToken.ThrowIfCancellationRequested();
@@ -59,11 +60,18 @@ public class ParserIncrementalGenerator : IIncrementalGenerator
                 continue;
             }
 
-            var source = ParserGenerator.Generate(compilation, context, symbol);
+            var source = ParserGenerator.Generate(compilation, context, symbol, converterGenerator);
             if (source != null)
             {
+                // TODO: File name should include namespace.
                 context.AddSource(symbol.Name + ".g.cs", SourceText.From(source, Encoding.UTF8));
             }
+        }
+
+        var converterSource = converterGenerator.Generate();
+        if (converterSource != null)
+        {
+            context.AddSource("GeneratedConverters.g.cs", SourceText.From(converterSource, Encoding.UTF8));
         }
     }
 

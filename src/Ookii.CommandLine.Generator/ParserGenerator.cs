@@ -16,18 +16,20 @@ internal class ParserGenerator
     private readonly SourceProductionContext _context;
     private readonly INamedTypeSymbol _argumentsClass;
     private readonly SourceBuilder _builder;
+    private readonly ConverterGenerator _converterGenerator;
 
-    public ParserGenerator(Compilation compilation, SourceProductionContext context, INamedTypeSymbol argumentsClass)
+    public ParserGenerator(Compilation compilation, SourceProductionContext context, INamedTypeSymbol argumentsClass, ConverterGenerator converterGenerator)
     {
         _compilation = compilation;
         _context = context;
         _argumentsClass = argumentsClass;
         _builder = new(argumentsClass.ContainingNamespace);
+        _converterGenerator = converterGenerator;
     }
 
-    public static string? Generate(Compilation compilation, SourceProductionContext context, INamedTypeSymbol argumentsClass)
+    public static string? Generate(Compilation compilation, SourceProductionContext context, INamedTypeSymbol argumentsClass, ConverterGenerator converterGenerator)
     {
-        var generator = new ParserGenerator(compilation, context, argumentsClass);
+        var generator = new ParserGenerator(compilation, context, argumentsClass, converterGenerator);
         return generator.Generate();
     }
 
@@ -406,7 +408,7 @@ internal class ParserGenerator
         return null;
     }
 
-    public static string? DetermineConverter(INamedTypeSymbol elementType, AttributeData? converterAttribute, bool isNullableValueType)
+    public string? DetermineConverter(INamedTypeSymbol elementType, AttributeData? converterAttribute, bool isNullableValueType)
     {
         var converter = DetermineElementConverter(elementType, converterAttribute);
         if (converter != null && isNullableValueType)
@@ -417,7 +419,7 @@ internal class ParserGenerator
         return converter;
     }
 
-    public static string? DetermineElementConverter(INamedTypeSymbol elementType, AttributeData? converterAttribute)
+    public string? DetermineElementConverter(INamedTypeSymbol elementType, AttributeData? converterAttribute)
     {
         if (converterAttribute != null)
         {
@@ -457,7 +459,6 @@ internal class ParserGenerator
             return $"new Ookii.CommandLine.Conversion.ParsableConverter<{elementType.ToDisplayString()}>()";
         }
 
-        // TODO: Generate a converter.
-        return null;
+        return _converterGenerator.GetConverter(elementType);
     }
 }
