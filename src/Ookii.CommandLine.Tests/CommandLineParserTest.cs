@@ -1257,7 +1257,7 @@ namespace Ookii.CommandLine.Tests
             }
         }
 
-        private static CommandLineParser<T> CreateParser<T>(ArgumentProviderKind kind, ParseOptions options = null)
+        internal static CommandLineParser<T> CreateParser<T>(ArgumentProviderKind kind, ParseOptions options = null)
             where T: class
         {
             var parser = kind switch
@@ -1293,6 +1293,5 @@ namespace Ookii.CommandLine.Tests
                 new object[] { ArgumentProviderKind.Reflection },
                 new object[] { ArgumentProviderKind.Generated }
             };
-
     }
 }

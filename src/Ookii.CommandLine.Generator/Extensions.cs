@@ -139,4 +139,16 @@ internal static class Extensions
     }
 
     public static bool DefaultEquals(this ISymbol left, ISymbol? right) => SymbolEqualityComparer.Default.Equals(left, right);
+
+    public static string ToIdentifier(this string displayName, string suffix)
+    {
+        var builder = new StringBuilder(displayName.Length + suffix.Length);
+        foreach (var ch in displayName)
+        {
+            builder.Append(char.IsLetterOrDigit(ch) ? ch : '_');
+        }
+
+        builder.Append(suffix);
+        return builder.ToString();
+    }
 }

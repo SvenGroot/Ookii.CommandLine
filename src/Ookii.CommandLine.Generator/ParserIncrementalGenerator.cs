@@ -60,11 +60,16 @@ public class ParserIncrementalGenerator : IIncrementalGenerator
                 continue;
             }
 
+            if (symbol.ContainingType != null)
+            {
+                context.ReportDiagnostic(Diagnostics.ArgumentsClassIsNested(symbol));
+                continue;
+            }
+
             var source = ParserGenerator.Generate(compilation, context, symbol, converterGenerator);
             if (source != null)
             {
-                // TODO: File name should include namespace.
-                context.AddSource(symbol.Name + ".g.cs", SourceText.From(source, Encoding.UTF8));
+                context.AddSource(symbol.ToDisplayString().ToIdentifier(".g.cs"), SourceText.From(source, Encoding.UTF8));
             }
         }
 

@@ -81,6 +81,16 @@ internal static class Diagnostics
             isEnabledByDefault: true),
         method.Locations.FirstOrDefault(), method.ContainingType?.ToDisplayString(), method.Name);
 
+    public static Diagnostic ArgumentsClassIsNested(INamedTypeSymbol symbol) => Diagnostic.Create(
+        new DiagnosticDescriptor(
+            "CL1008",
+            new LocalizableResourceString(nameof(Resources.ArgumentsClassIsNestedTitle), Resources.ResourceManager, typeof(Resources)),
+            new LocalizableResourceString(nameof(Resources.ArgumentsClassIsNestedMessageFormat), Resources.ResourceManager, typeof(Resources)),
+            Category,
+            DiagnosticSeverity.Error,
+            isEnabledByDefault: true),
+        symbol.Locations.FirstOrDefault(), symbol.ToDisplayString());
+
     public static Diagnostic UnknownAttribute(AttributeData attribute) => Diagnostic.Create(
         new DiagnosticDescriptor(
             "CLW1001",

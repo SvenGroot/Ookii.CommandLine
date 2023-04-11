@@ -123,6 +123,12 @@
   <data name="ArgumentsClassIsGenericTitle" xml:space="preserve">
     <value>The arguments class may not be a generic type.</value>
   </data>
+  <data name="ArgumentsClassIsNestedMessageFormat" xml:space="preserve">
+    <value>The arguments class {0} may not be nested in another type when the GeneratedParserAttribute is used.</value>
+  </data>
+  <data name="ArgumentsClassIsNestedTitle" xml:space="preserve">
+    <value>The arguments class may not be a nested type.</value>
+  </data>
   <data name="ArgumentsClassNotPartialMessageFormat" xml:space="preserve">
     <value>The arguments class {0} must use the 'partial' modifier.</value>
   </data>

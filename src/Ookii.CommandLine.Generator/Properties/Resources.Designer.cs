@@ -79,6 +79,24 @@ namespace Ookii.CommandLine.Generator.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The arguments class {0} may not be nested in another type when the GeneratedParserAttribute is used..
+        /// </summary>
+        internal static string ArgumentsClassIsNestedMessageFormat {
+            get {
+                return ResourceManager.GetString("ArgumentsClassIsNestedMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The arguments class may not be a nested type..
+        /// </summary>
+        internal static string ArgumentsClassIsNestedTitle {
+            get {
+                return ResourceManager.GetString("ArgumentsClassIsNestedTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The arguments class {0} must use the &apos;partial&apos; modifier..
         /// </summary>
         internal static string ArgumentsClassNotPartialMessageFormat {

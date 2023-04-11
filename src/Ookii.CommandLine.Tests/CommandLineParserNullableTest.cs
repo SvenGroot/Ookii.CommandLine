@@ -6,180 +6,22 @@
 #nullable enable
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Ookii.CommandLine.Conversion;
+using Ookii.CommandLine.Support;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Reflection;
 
 namespace Ookii.CommandLine.Tests
 {
     [TestClass]
     public class CommandLineParserNullableTest
     {
-#region Nested types
-
-        class NullReturningStringConverter : ArgumentConverter
-        {
-            public override object? Convert(string value, CultureInfo culture, CommandLineArgument argument)
-            {
-                if (value == "(null)")
-                {
-                    return null;
-                }
-                else
-                {
-                    return value;
-                }
-            }
-        }
-
-        class NullReturningIntConverter : ArgumentConverter
-        {
-            public override object? Convert(string value, CultureInfo culture, CommandLineArgument argument)
-            {
-                if (value == "(null)")
-                {
-                    return null;
-                }
-                else
-                {
-                    return int.Parse(value);
-                }
-            }
-        }
-
-        class TestArguments
-        {
-            // TODO: Put back with new ctor approach.
-            //public TestArguments(
-            //    [ArgumentConverter(typeof(NullReturningStringConverter))] string? constructorNullable,
-            //    [ArgumentConverter(typeof(NullReturningStringConverter))] string constructorNonNullable,
-            //    [ArgumentConverter(typeof(NullReturningIntConverter))] int constructorValueType,
-            //    [ArgumentConverter(typeof(NullReturningIntConverter))] int? constructorNullableValueType)
-            //{
-            //    ConstructorNullable = constructorNullable;
-            //    ConstructorNonNullable = constructorNonNullable;
-            //    ConstructorValueType = constructorValueType;
-            //    ConstructorNullableValueType = constructorNullableValueType;
-            //}
-
-            [CommandLineArgument("constructorNullable", Position = 0)]
-            [ArgumentConverter(typeof(NullReturningStringConverter))]
-            public string? ConstructorNullable { get; set; }
-
-            [CommandLineArgument("constructorNonNullable", Position = 1)]
-            [ArgumentConverter(typeof(NullReturningStringConverter))]
-            public string ConstructorNonNullable { get; set; } = default!;
-
-            [CommandLineArgument("constructorValueType", Position = 2)]
-            [ArgumentConverter(typeof(NullReturningIntConverter))]
-            public int ConstructorValueType { get; set; }
-
-            [CommandLineArgument("constructorNullableValueType", Position = 3)]
-            [ArgumentConverter(typeof(NullReturningIntConverter))]
-            public int? ConstructorNullableValueType { get; set; }
-
-            [CommandLineArgument]
-            [ArgumentConverter(typeof(NullReturningStringConverter))]
-            public string? Nullable { get; set; } = "NotNullDefaultValue";
-
-            [CommandLineArgument]
-            [ArgumentConverter(typeof(NullReturningStringConverter))]
-            public string NonNullable { get; set; } = string.Empty;
-
-            [CommandLineArgument]
-            [ArgumentConverter(typeof(NullReturningIntConverter))]
-            public int ValueType { get; set; }
-
-            [CommandLineArgument]
-            [ArgumentConverter(typeof(NullReturningIntConverter))]
-            public int? NullableValueType { get; set; } = 42;
-
-            [CommandLineArgument]
-            [ArgumentConverter(typeof(NullReturningStringConverter))]
-            public string[]? NonNullableArray { get; set; }
-
-            [CommandLineArgument]
-            [ArgumentConverter(typeof(NullReturningIntConverter))]
-            public int[]? ValueArray { get; set; }
-
-            [CommandLineArgument]
-            [ArgumentConverter(typeof(NullReturningStringConverter))]
-            public ICollection<string> NonNullableCollection { get; } = new List<string>();
-
-            [CommandLineArgument]
-            [ArgumentConverter(typeof(NullReturningIntConverter))]
-            [MultiValueSeparator(";")]
-            public ICollection<int> ValueCollection { get; } = new List<int>();
-
-            [CommandLineArgument]
-            [ArgumentConverter(typeof(NullReturningStringConverter))]
-            public string?[]? NullableArray { get; set; }
-
-            [CommandLineArgument]
-            [ArgumentConverter(typeof(NullReturningIntConverter))]
-            public string?[]? NullableValueArray { get; set; }
-
-            [CommandLineArgument]
-            [ArgumentConverter(typeof(NullReturningStringConverter))]
-            public ICollection<string?> NullableCollection { get; } = new List<string?>();
-
-            [CommandLineArgument]
-            [ArgumentConverter(typeof(NullReturningStringConverter))]
-            public ICollection<int?> NullableValueCollection { get; } = new List<int?>();
-
-            [CommandLineArgument]
-            [KeyConverter(typeof(NullReturningStringConverter))]
-            [ValueConverter(typeof(NullReturningStringConverter))]
-            public Dictionary<string, string>? NonNullableDictionary { get; set; }
-
-            [CommandLineArgument]
-            [ValueConverter(typeof(NullReturningIntConverter))]
-            public Dictionary<string, int>? ValueDictionary { get; set; }
-
-            [CommandLineArgument]
-            [ValueConverter(typeof(NullReturningStringConverter))]
-            public IDictionary<string, string> NonNullableIDictionary { get; } = new Dictionary<string, string>();
-
-            [CommandLineArgument]
-            [KeyConverter(typeof(NullReturningStringConverter))]
-            [ValueConverter(typeof(NullReturningIntConverter))]
-            [MultiValueSeparator(";")]
-            public IDictionary<string, int> ValueIDictionary { get; } = new Dictionary<string, int>();
-
-            [CommandLineArgument]
-            [KeyConverter(typeof(NullReturningStringConverter))]
-            [ValueConverter(typeof(NullReturningStringConverter))]
-            public Dictionary<string, string?>? NullableDictionary { get; set; }
-
-            [CommandLineArgument]
-            [KeyConverter(typeof(NullReturningStringConverter))]
-            [ValueConverter(typeof(NullReturningIntConverter))]
-            public Dictionary<string, int?>? NullableValueDictionary { get; set; }
-
-            [CommandLineArgument]
-            [KeyConverter(typeof(NullReturningStringConverter))]
-            [ValueConverter(typeof(NullReturningStringConverter))]
-            public IDictionary<string, string?> NullableIDictionary { get; } = new Dictionary<string, string?>();
-
-            [CommandLineArgument]
-            [KeyConverter(typeof(NullReturningStringConverter))]
-            [ValueConverter(typeof(NullReturningIntConverter))]
-            [MultiValueSeparator(";")]
-            public IDictionary<string, int?> NullableValueIDictionary { get; } = new Dictionary<string, int?>();
-
-            // This is an incorrect type converter (doesn't return KeyValuePair), but it doesn't
-            // matter since it'll only be used to test null values.
-            [CommandLineArgument]
-            [ArgumentConverter(typeof(NullReturningStringConverter))]
-            public Dictionary<string, string?>? InvalidDictionary { get; set; }
-        }
-
-#endregion
-
         [TestMethod]
-        public void TestAllowNull()
+        [DynamicData(nameof(ProviderKinds), DynamicDataDisplayName = nameof(GetCustomDynamicDataDisplayName))]
+        public void TestAllowNull(ArgumentProviderKind kind)
         {
-            var parser = new CommandLineParser(typeof(TestArguments));
+            var parser = CommandLineParserTest.CreateParser<NullableArguments>(kind);
             Assert.IsTrue(parser.GetArgument("constructorNullable")!.AllowNull);
             Assert.IsFalse(parser.GetArgument("constructorNonNullable")!.AllowNull);
             Assert.IsFalse(parser.GetArgument("constructorValueType")!.AllowNull);
@@ -210,9 +52,11 @@ namespace Ookii.CommandLine.Tests
         }
 
         [TestMethod]
-        public void TestNonNullableConstructor()
+        [DynamicData(nameof(ProviderKinds), DynamicDataDisplayName = nameof(GetCustomDynamicDataDisplayName))]
+        public void TestNonNullableConstructor(ArgumentProviderKind kind)
         {
-            var parser = new CommandLineParser(typeof(TestArguments));
+            // TODO: Update for new ctor arguments style.
+            var parser = CommandLineParserTest.CreateParser<NullableArguments>(kind);
             ExpectNullException(parser, "constructorNonNullable", "foo", "(null)", "4", "5");
             ExpectNullException(parser, "constructorValueType", "foo", "bar", "(null)", "5");
             var result = ExpectSuccess(parser, "(null)", "bar", "4", "(null)");
@@ -223,9 +67,10 @@ namespace Ookii.CommandLine.Tests
         }
 
         [TestMethod]
-        public void TestNonNullableProperties()
+        [DynamicData(nameof(ProviderKinds), DynamicDataDisplayName = nameof(GetCustomDynamicDataDisplayName))]
+        public void TestNonNullableProperties(ArgumentProviderKind kind)
         {
-            var parser = new CommandLineParser(typeof(TestArguments));
+            var parser = CommandLineParserTest.CreateParser<NullableArguments>(kind);
             ExpectNullException(parser, "NonNullable", "foo", "bar", "4", "5", "-NonNullable", "(null)");
             ExpectNullException(parser, "ValueType", "foo", "bar", "4", "5", "-ValueType", "(null)");
             var result = ExpectSuccess(parser, "foo", "bar", "4", "5", "-NonNullable", "baz", "-ValueType", "47", "-Nullable", "(null)", "-NullableValueType", "(null)");
@@ -236,9 +81,10 @@ namespace Ookii.CommandLine.Tests
         }
 
         [TestMethod]
-        public void TestNonNullableMultiValue()
+        [DynamicData(nameof(ProviderKinds), DynamicDataDisplayName = nameof(GetCustomDynamicDataDisplayName))]
+        public void TestNonNullableMultiValue(ArgumentProviderKind kind)
         {
-            var parser = new CommandLineParser(typeof(TestArguments));
+            var parser = CommandLineParserTest.CreateParser<NullableArguments>(kind);
             ExpectNullException(parser, "NonNullableArray", "-NonNullableArray", "foo", "-NonNullableArray", "(null)");
             ExpectNullException(parser, "NonNullableCollection", "-NonNullableCollection", "foo", "-NonNullableCollection", "(null)");
             ExpectNullException(parser, "ValueArray", "-ValueArray", "5", "-ValueArray", "(null)");
@@ -264,9 +110,10 @@ namespace Ookii.CommandLine.Tests
         }
 
         [TestMethod]
-        public void TestNonNullableDictionary()
+        [DynamicData(nameof(ProviderKinds), DynamicDataDisplayName = nameof(GetCustomDynamicDataDisplayName))]
+        public void TestNonNullableDictionary(ArgumentProviderKind kind)
         {
-            var parser = new CommandLineParser(typeof(TestArguments));
+            var parser = CommandLineParserTest.CreateParser<NullableArguments>(kind);
             ExpectNullException(parser, "NonNullableDictionary", "-NonNullableDictionary", "foo=bar", "-NonNullableDictionary", "baz=(null)");
             ExpectNullException(parser, "NonNullableIDictionary", "-NonNullableIDictionary", "foo=bar", "-NonNullableIDictionary", "baz=(null)");
             ExpectNullException(parser, "ValueDictionary", "-ValueDictionary", "foo=5", "-ValueDictionary", "foo=(null)");
@@ -310,13 +157,183 @@ namespace Ookii.CommandLine.Tests
             }
         }
 
-        private static TestArguments ExpectSuccess(CommandLineParser parser, params string[] args)
+        private static NullableArguments ExpectSuccess(CommandLineParser parser, params string[] args)
         {
-            var result = (TestArguments?)parser.Parse(args);
+            var result = (NullableArguments?)parser.Parse(args);
             Assert.IsNotNull(result);
             return result;
         }
+
+        public static string GetCustomDynamicDataDisplayName(MethodInfo methodInfo, object[] data)
+            => $"{methodInfo.Name} ({data[0]})";
+
+
+        public static IEnumerable<object[]> ProviderKinds
+            => new[]
+            {
+                new object[] { ArgumentProviderKind.Reflection },
+                new object[] { ArgumentProviderKind.Generated }
+            };
     }
+
+    class NullReturningStringConverter : ArgumentConverter
+    {
+        public override object? Convert(string value, CultureInfo culture, CommandLineArgument argument)
+        {
+            if (value == "(null)")
+            {
+                return null;
+            }
+            else
+            {
+                return value;
+            }
+        }
+    }
+
+    class NullReturningIntConverter : ArgumentConverter
+    {
+        public override object? Convert(string value, CultureInfo culture, CommandLineArgument argument)
+        {
+            if (value == "(null)")
+            {
+                return null;
+            }
+            else
+            {
+                return int.Parse(value);
+            }
+        }
+    }
+
+    [GeneratedParser]
+    partial class NullableArguments
+    {
+        // TODO: Put back with new ctor approach.
+        //public TestArguments(
+        //    [ArgumentConverter(typeof(NullReturningStringConverter))] string? constructorNullable,
+        //    [ArgumentConverter(typeof(NullReturningStringConverter))] string constructorNonNullable,
+        //    [ArgumentConverter(typeof(NullReturningIntConverter))] int constructorValueType,
+        //    [ArgumentConverter(typeof(NullReturningIntConverter))] int? constructorNullableValueType)
+        //{
+        //    ConstructorNullable = constructorNullable;
+        //    ConstructorNonNullable = constructorNonNullable;
+        //    ConstructorValueType = constructorValueType;
+        //    ConstructorNullableValueType = constructorNullableValueType;
+        //}
+
+        [CommandLineArgument("constructorNullable", Position = 0)]
+        [ArgumentConverter(typeof(NullReturningStringConverter))]
+        public string? ConstructorNullable { get; set; }
+
+        [CommandLineArgument("constructorNonNullable", Position = 1)]
+        [ArgumentConverter(typeof(NullReturningStringConverter))]
+        public string ConstructorNonNullable { get; set; } = default!;
+
+        [CommandLineArgument("constructorValueType", Position = 2)]
+        [ArgumentConverter(typeof(NullReturningIntConverter))]
+        public int ConstructorValueType { get; set; }
+
+        [CommandLineArgument("constructorNullableValueType", Position = 3)]
+        [ArgumentConverter(typeof(NullReturningIntConverter))]
+        public int? ConstructorNullableValueType { get; set; }
+
+        [CommandLineArgument]
+        [ArgumentConverter(typeof(NullReturningStringConverter))]
+        public string? Nullable { get; set; } = "NotNullDefaultValue";
+
+        [CommandLineArgument]
+        [ArgumentConverter(typeof(NullReturningStringConverter))]
+        public string NonNullable { get; set; } = string.Empty;
+
+        [CommandLineArgument]
+        [ArgumentConverter(typeof(NullReturningIntConverter))]
+        public int ValueType { get; set; }
+
+        [CommandLineArgument]
+        [ArgumentConverter(typeof(NullReturningIntConverter))]
+        public int? NullableValueType { get; set; } = 42;
+
+        [CommandLineArgument]
+        [ArgumentConverter(typeof(NullReturningStringConverter))]
+        public string[]? NonNullableArray { get; set; }
+
+        [CommandLineArgument]
+        [ArgumentConverter(typeof(NullReturningIntConverter))]
+        public int[]? ValueArray { get; set; }
+
+        [CommandLineArgument]
+        [ArgumentConverter(typeof(NullReturningStringConverter))]
+        public ICollection<string> NonNullableCollection { get; } = new List<string>();
+
+        [CommandLineArgument]
+        [ArgumentConverter(typeof(NullReturningIntConverter))]
+        [MultiValueSeparator(";")]
+        public ICollection<int> ValueCollection { get; } = new List<int>();
+
+        [CommandLineArgument]
+        [ArgumentConverter(typeof(NullReturningStringConverter))]
+        public string?[]? NullableArray { get; set; }
+
+        [CommandLineArgument]
+        [ArgumentConverter(typeof(NullReturningIntConverter))]
+        public string?[]? NullableValueArray { get; set; }
+
+        [CommandLineArgument]
+        [ArgumentConverter(typeof(NullReturningStringConverter))]
+        public ICollection<string?> NullableCollection { get; } = new List<string?>();
+
+        [CommandLineArgument]
+        [ArgumentConverter(typeof(NullReturningStringConverter))]
+        public ICollection<int?> NullableValueCollection { get; } = new List<int?>();
+
+        [CommandLineArgument]
+        [KeyConverter(typeof(NullReturningStringConverter))]
+        [ValueConverter(typeof(NullReturningStringConverter))]
+        public Dictionary<string, string>? NonNullableDictionary { get; set; }
+
+        [CommandLineArgument]
+        [ValueConverter(typeof(NullReturningIntConverter))]
+        public Dictionary<string, int>? ValueDictionary { get; set; }
+
+        [CommandLineArgument]
+        [ValueConverter(typeof(NullReturningStringConverter))]
+        public IDictionary<string, string> NonNullableIDictionary { get; } = new Dictionary<string, string>();
+
+        [CommandLineArgument]
+        [KeyConverter(typeof(NullReturningStringConverter))]
+        [ValueConverter(typeof(NullReturningIntConverter))]
+        [MultiValueSeparator(";")]
+        public IDictionary<string, int> ValueIDictionary { get; } = new Dictionary<string, int>();
+
+        [CommandLineArgument]
+        [KeyConverter(typeof(NullReturningStringConverter))]
+        [ValueConverter(typeof(NullReturningStringConverter))]
+        public Dictionary<string, string?>? NullableDictionary { get; set; }
+
+        [CommandLineArgument]
+        [KeyConverter(typeof(NullReturningStringConverter))]
+        [ValueConverter(typeof(NullReturningIntConverter))]
+        public Dictionary<string, int?>? NullableValueDictionary { get; set; }
+
+        [CommandLineArgument]
+        [KeyConverter(typeof(NullReturningStringConverter))]
+        [ValueConverter(typeof(NullReturningStringConverter))]
+        public IDictionary<string, string?> NullableIDictionary { get; } = new Dictionary<string, string?>();
+
+        [CommandLineArgument]
+        [KeyConverter(typeof(NullReturningStringConverter))]
+        [ValueConverter(typeof(NullReturningIntConverter))]
+        [MultiValueSeparator(";")]
+        public IDictionary<string, int?> NullableValueIDictionary { get; } = new Dictionary<string, int?>();
+
+        // This is an incorrect type converter (doesn't return KeyValuePair), but it doesn't
+        // matter since it'll only be used to test null values.
+        [CommandLineArgument]
+        [ArgumentConverter(typeof(NullReturningStringConverter))]
+        public Dictionary<string, string?>? InvalidDictionary { get; set; }
+    }
+
 }
 
 #endif

@@ -274,9 +274,9 @@ internal class ParserGenerator
             {
                 Debug.Assert(multiValueElementType != null);
                 kind = "Ookii.CommandLine.ArgumentKind.MultiValue";
-                elementTypeWithNullable = multiValueElementType!;
+                allowsNull = multiValueElementType!.AllowsNull();
+                elementTypeWithNullable = multiValueElementType!.WithNullableAnnotation(NullableAnnotation.NotAnnotated);
                 namedElementTypeWithNullable = elementTypeWithNullable as INamedTypeSymbol;
-                allowsNull = elementTypeWithNullable.AllowsNull();
             }
         }
         else

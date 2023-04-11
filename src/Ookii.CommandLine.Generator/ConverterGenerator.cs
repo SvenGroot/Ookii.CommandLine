@@ -178,14 +178,7 @@ internal class ConverterGenerator
 
     private static string GenerateName(string displayName)
     {
-        var builder = new StringBuilder(displayName.Length + ConverterSuffix.Length);
-        foreach (var ch in displayName)
-        {
-            builder.Append(char.IsLetterOrDigit(ch) ? ch : '_');
-        }
-
-        builder.Append(ConverterSuffix);
-        return builder.ToString();
+        return displayName.ToIdentifier(ConverterSuffix);
     }
 
     private static void CreateConverter(SourceBuilder builder, ITypeSymbol type, ConverterInfo info)
