@@ -45,4 +45,9 @@ partial class Arguments
 
     [CommandLineArgument]
     public IDictionary<string, int> Arg14 { get; } = new SortedDictionary<string, int>();
+
+    [CommandLineArgument]
+    public static void Foo(CommandLineParser p)
+    {
+    }
 }

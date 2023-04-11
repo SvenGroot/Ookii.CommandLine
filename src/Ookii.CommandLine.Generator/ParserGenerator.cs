@@ -12,6 +12,15 @@ namespace Ookii.CommandLine.Generator;
 
 internal class ParserGenerator
 {
+    private struct MethodArgumentInfo
+    {
+        public ITypeSymbol ArgumentType { get; set; }
+        public bool HasValueParameter { get; set; }
+        public bool HasParserParameter { get; set; }
+        public bool HasBooleanReturn { get; set; }
+    }
+
+    private readonly TypeHelper _typeHelper;
     private readonly Compilation _compilation;
     private readonly SourceProductionContext _context;
     private readonly INamedTypeSymbol _argumentsClass;
@@ -20,6 +29,7 @@ internal class ParserGenerator
 
     public ParserGenerator(Compilation compilation, SourceProductionContext context, INamedTypeSymbol argumentsClass, ConverterGenerator converterGenerator)
     {
+        _typeHelper = new TypeHelper(compilation);
         _compilation = compilation;
         _context = context;
         _argumentsClass = argumentsClass;
@@ -164,19 +174,36 @@ internal class ParserGenerator
             return;
         }
 
+        ITypeSymbol originalArgumentType;
+        MethodArgumentInfo? methodInfo = null;
         var property = member as IPropertySymbol;
-        var method = member as IMethodSymbol;
-        if (method != null)
+        if (property != null)
         {
-            throw new NotImplementedException();
-        }
+            if (property.IsStatic)
+            {
+                // TODO: Warning or error?
+                return;
+            }
 
-        if (property == null || property.IsStatic)
+            originalArgumentType = property.Type;
+        }
+        else if (member is IMethodSymbol method)
         {
+            methodInfo = DetermineMethodArgumentInfo(method);
+            if (methodInfo is not MethodArgumentInfo methodInfoValue)
+            {
+                _context.ReportDiagnostic(Diagnostics.InvalidMethodSignature(method));
+                return;
+            }
+
+            originalArgumentType = methodInfoValue.ArgumentType;
+        }
+        else
+        {
+            // How did we get here? Already checked above.
             return;
         }
 
-        var originalArgumentType = property!.Type;
         var argumentType = originalArgumentType.WithNullableAnnotation(NullableAnnotation.NotAnnotated);
         var notNullAnnotation = string.Empty;
         var allowsNull = originalArgumentType.AllowsNull();
@@ -326,12 +353,41 @@ internal class ParserGenerator
 
         if (property?.SetMethod?.DeclaredAccessibility == Accessibility.Public)
         {
-            _builder.AppendLine($", setProperty: (target, value) => (({_argumentsClass.Name})target).{member.Name} = ({originalArgumentType.ToDisplayString()})value{notNullAnnotation}");
+            _builder.AppendLine($", setProperty: (target, value) => (({_argumentsClass.ToDisplayString()})target).{member.Name} = ({originalArgumentType.ToDisplayString()})value{notNullAnnotation}");
         }
 
         if (property != null)
         {
-            _builder.AppendLine($", getProperty: (target) => (({_argumentsClass.Name})target).{member.Name}");
+            _builder.AppendLine($", getProperty: (target) => (({_argumentsClass.ToDisplayString()})target).{member.Name}");
+        }
+
+        if (methodInfo is MethodArgumentInfo info)
+        {
+            string arguments = string.Empty;
+            if (info.HasValueParameter)
+            {
+                if (info.HasParserParameter)
+                {
+                    arguments = $"({originalArgumentType.ToDisplayString()})value{notNullAnnotation}, parser";
+                }
+                else
+                {
+                    arguments = $"({originalArgumentType.ToDisplayString()})value{notNullAnnotation}";
+                }    
+            }
+            else if (info.HasParserParameter)
+            {
+                arguments = "parser";
+            }
+
+            if (info.HasBooleanReturn)
+            {
+                _builder.AppendLine($", callMethod: (value, parser) => {_argumentsClass.ToDisplayString()}.{member.Name}({arguments})");
+            }
+            else
+            {
+                _builder.AppendLine($", callMethod: (value, parser) => {{ {_argumentsClass.ToDisplayString()}.{member.Name}({arguments}); return true; }}");
+            }
         }
 
         _builder.DecreaseIndent();
@@ -474,5 +530,55 @@ internal class ParserGenerator
         }
 
         return _converterGenerator.GetConverter(elementType);
+    }
+
+    private MethodArgumentInfo? DetermineMethodArgumentInfo(IMethodSymbol method)
+    {
+        var parameters = method.Parameters;
+        if (!method.IsStatic || parameters.Length > 2)
+        {
+            return null;
+        }
+
+        var info = new MethodArgumentInfo();
+        if (method.ReturnType.DefaultEquals(_typeHelper.Boolean))
+        {
+            info.HasBooleanReturn = true;
+        }
+        else if (!method.ReturnType.DefaultEquals(_typeHelper.Void))
+        {
+            return null;
+        }
+
+        if (parameters.Length == 2)
+        {
+            info.ArgumentType = parameters[0].Type;
+            if (!parameters[1].Type.DefaultEquals(_typeHelper.CommandLineParser))
+            {
+                return null;
+            }
+
+            info.HasValueParameter = true;
+            info.HasParserParameter = true;
+        }
+        else if (parameters.Length == 1)
+        {
+            if (parameters[0].Type.DefaultEquals(_typeHelper.CommandLineParser))
+            {
+                info.ArgumentType = _typeHelper.Boolean!;
+                info.HasParserParameter = true;
+            }
+            else
+            {
+                info.ArgumentType = parameters[0].Type;
+                info.HasValueParameter = true;
+            }
+        }
+        else
+        {
+            info.ArgumentType = _typeHelper.Boolean!;
+        }
+
+        return info;
     }
 }

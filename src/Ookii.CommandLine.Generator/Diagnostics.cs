@@ -6,6 +6,7 @@ using System.Text;
 
 namespace Ookii.CommandLine.Generator;
 
+// TODO: Help URIs.
 internal static class Diagnostics
 {
     private const string Category = "Ookii.CommandLine";
@@ -69,6 +70,16 @@ internal static class Diagnostics
             DiagnosticSeverity.Error,
             isEnabledByDefault: true),
         member.Locations.FirstOrDefault(), elementType.ToDisplayString(), member.ContainingType?.ToDisplayString(), member.Name);
+
+    public static Diagnostic InvalidMethodSignature(ISymbol method) => Diagnostic.Create(
+        new DiagnosticDescriptor(
+            "CL1007",
+            new LocalizableResourceString(nameof(Resources.InvalidMethodSignatureTitle), Resources.ResourceManager, typeof(Resources)),
+            new LocalizableResourceString(nameof(Resources.InvalidMethodSignatureMessageFormat), Resources.ResourceManager, typeof(Resources)),
+            Category,
+            DiagnosticSeverity.Error,
+            isEnabledByDefault: true),
+        method.Locations.FirstOrDefault(), method.ContainingType?.ToDisplayString(), method.Name);
 
     public static Diagnostic UnknownAttribute(AttributeData attribute) => Diagnostic.Create(
         new DiagnosticDescriptor(

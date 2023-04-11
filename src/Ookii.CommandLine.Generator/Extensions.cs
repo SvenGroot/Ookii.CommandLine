@@ -137,4 +137,6 @@ internal static class Extensions
             _ => constant.ToCSharpString(),
         };
     }
+
+    public static bool DefaultEquals(this ISymbol left, ISymbol? right) => SymbolEqualityComparer.Default.Equals(left, right);
 }

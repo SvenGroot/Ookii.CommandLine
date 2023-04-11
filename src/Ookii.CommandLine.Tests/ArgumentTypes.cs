@@ -238,7 +238,8 @@ namespace Ookii.CommandLine.Tests
         public int Bar { get; set; }
     }
 
-    class MethodArguments
+    [GeneratedParser]
+    partial class MethodArguments
     {
         // Using method arguments to store stuff in static fields isn't really recommended. It's
         // done here for testing purposes only.
@@ -296,11 +297,6 @@ namespace Ookii.CommandLine.Tests
         {
             CalledMethodName = nameof(Positional);
             Value = value;
-        }
-
-        [CommandLineArgument]
-        public void NotStatic()
-        {
         }
 
         [CommandLineArgument]
@@ -367,7 +363,8 @@ namespace Ookii.CommandLine.Tests
         public int Arg2 { get; set; }
     }
 
-    class ValidationArguments
+    [GeneratedParser]
+    partial class ValidationArguments
     {
         public static int Arg3Value { get; set; }
 

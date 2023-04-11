@@ -141,6 +141,12 @@
   <data name="InvalidArrayRankTitle" xml:space="preserve">
     <value>A multi-value argument defined by an array properties must have an array rank of one.</value>
   </data>
+  <data name="InvalidMethodSignatureMessageFormat" xml:space="preserve">
+    <value>The method {0}.{1} does not have a valid signature for a method argument.</value>
+  </data>
+  <data name="InvalidMethodSignatureTitle" xml:space="preserve">
+    <value>A method argument has an invalid signature.</value>
+  </data>
   <data name="NoConverterMessageFormat" xml:space="preserve">
     <value>No argument converter exists for type {0} used by the argument defined by {1}.{2}, and none could be generated. Use the Ookii.CommandLine.Conversion.ArgumentConverterAttribute to specify a custom converter.</value>
   </data>

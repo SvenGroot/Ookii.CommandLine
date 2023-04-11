@@ -159,7 +159,18 @@ public abstract class CommandLineArgument
         public bool SetValue(CommandLineArgument argument, object? value)
         {
             Value = value;
-            return argument.CallMethod(value);
+            try
+            {
+                return argument.CallMethod(value);
+            }
+            catch (TargetInvocationException ex)
+            {
+                throw argument._parser.StringProvider.CreateException(CommandLineArgumentErrorCategory.ApplyValueError, ex.InnerException, argument, value?.ToString());
+            }
+            catch (Exception ex)
+            {
+                throw argument._parser.StringProvider.CreateException(CommandLineArgumentErrorCategory.ApplyValueError, ex, argument, value?.ToString());
+            }
         }
     }
 

@@ -17,11 +17,14 @@ public class GeneratedArgument : CommandLineArgument
 {
     private readonly Action<object, object?>? _setProperty;
     private readonly Func<object, object?>? _getProperty;
+    private readonly Func<object?, CommandLineParser, bool>? _callMethod;
 
-    private GeneratedArgument(ArgumentInfo info, Action<object, object?>? setProperty, Func<object, object?>? getProperty) : base(info)
+    private GeneratedArgument(ArgumentInfo info, Action<object, object?>? setProperty, Func<object, object?>? getProperty,
+        Func<object?, CommandLineParser, bool>? callMethod) : base(info)
     {
         _setProperty = setProperty;
         _getProperty = getProperty;
+        _callMethod = callMethod;
     }
 
     /// <summary>
@@ -47,6 +50,7 @@ public class GeneratedArgument : CommandLineArgument
     /// <param name="validationAttributes"></param>
     /// <param name="setProperty"></param>
     /// <param name="getProperty"></param>
+    /// <param name="callMethod"></param>
     /// <returns></returns>
     public static GeneratedArgument Create(CommandLineParser parser,
                                            Type argumentType,
@@ -67,7 +71,8 @@ public class GeneratedArgument : CommandLineArgument
                                            IEnumerable<ShortAliasAttribute>? shortAliasAttributes = null,
                                            IEnumerable<ArgumentValidationAttribute>? validationAttributes = null,
                                            Action<object, object?>? setProperty = null,
-                                           Func<object, object?>? getProperty = null)
+                                           Func<object, object?>? getProperty = null,
+                                           Func<object?, CommandLineParser, bool>? callMethod = null)
     {
         var info = CreateArgumentInfo(parser, argumentType, allowsNull, memberName, attribute,
             multiValueSeparatorAttribute, descriptionAttribute, allowDuplicateDictionaryKeys, keyValueSeparatorAttribute,
@@ -84,14 +89,22 @@ public class GeneratedArgument : CommandLineArgument
             info.ValueType = valueType;
         }
 
-        return new GeneratedArgument(info, setProperty, getProperty);
+        return new GeneratedArgument(info, setProperty, getProperty, callMethod);
     }
 
     /// <inheritdoc/>
     protected override bool CanSetProperty => _setProperty != null;
 
     /// <inheritdoc/>
-    protected override bool CallMethod(object? value) => throw new NotImplementedException();
+    protected override bool CallMethod(object? value)
+    {
+        if (_callMethod == null)
+        {
+            throw new InvalidOperationException();
+        }
+
+        return _callMethod(value, this.Parser);
+    }
 
     /// <inheritdoc/>
     protected override object? GetProperty(object target)
@@ -101,14 +114,7 @@ public class GeneratedArgument : CommandLineArgument
             throw new InvalidOperationException();
         }
 
-        try
-        { 
-            return _getProperty(target);
-        }
-        catch (Exception ex)
-        {
-            throw new TargetInvocationException(ex);
-        }
+        return _getProperty(target);
     }
 
     /// <inheritdoc/>
@@ -119,13 +125,6 @@ public class GeneratedArgument : CommandLineArgument
             throw new InvalidOperationException();
         }
 
-        try
-        {
-            _setProperty(target, value);
-        }
-        catch (Exception ex)
-        {
-            throw new TargetInvocationException(ex);
-        }
+        _setProperty(target, value);
     }
 }

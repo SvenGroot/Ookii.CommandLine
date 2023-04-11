@@ -133,6 +133,24 @@ namespace Ookii.CommandLine.Generator.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The method {0}.{1} does not have a valid signature for a method argument..
+        /// </summary>
+        internal static string InvalidMethodSignatureMessageFormat {
+            get {
+                return ResourceManager.GetString("InvalidMethodSignatureMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A method argument has an invalid signature..
+        /// </summary>
+        internal static string InvalidMethodSignatureTitle {
+            get {
+                return ResourceManager.GetString("InvalidMethodSignatureTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to No argument converter exists for type {0} used by the argument defined by {1}.{2}, and none could be generated. Use the Ookii.CommandLine.Conversion.ArgumentConverterAttribute to specify a custom converter..
         /// </summary>
         internal static string NoConverterMessageFormat {

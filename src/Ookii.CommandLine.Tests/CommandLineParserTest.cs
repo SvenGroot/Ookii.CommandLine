@@ -674,9 +674,10 @@ namespace Ookii.CommandLine.Tests
         }
 
         [TestMethod]
-        public void TestMethodArguments()
+        [DynamicData(nameof(ProviderKinds), DynamicDataDisplayName = nameof(GetCustomDynamicDataDisplayName))]
+        public void TestMethodArguments(ArgumentProviderKind kind)
         {
-            var parser = new CommandLineParser<MethodArguments>();
+            var parser = CreateParser<MethodArguments>(kind);
 
             Assert.AreEqual(ArgumentKind.Method, parser.GetArgument("NoCancel").Kind);
             Assert.IsNull(parser.GetArgument("NotAnArgument"));
@@ -861,9 +862,12 @@ namespace Ookii.CommandLine.Tests
         }
 
         [TestMethod]
-        public void TestValidation()
+        [DynamicData(nameof(ProviderKinds), DynamicDataDisplayName = nameof(GetCustomDynamicDataDisplayName))]
+        public void TestValidation(ArgumentProviderKind kind)
         {
-            var parser = new CommandLineParser<ValidationArguments>();
+            // Reset for multiple runs.
+            ValidationArguments.Arg3Value = 0;
+            var parser = CreateParser<ValidationArguments>(kind);
 
             // Range validator on property
             CheckThrows(() => parser.Parse(new[] { "-Arg1", "0" }), parser, CommandLineArgumentErrorCategory.ValidationFailed, "Arg1");
@@ -963,9 +967,10 @@ namespace Ookii.CommandLine.Tests
         }
 
         [TestMethod]
-        public void TestValidatorUsageHelp()
+        [DynamicData(nameof(ProviderKinds), DynamicDataDisplayName = nameof(GetCustomDynamicDataDisplayName))]
+        public void TestValidatorUsageHelp(ArgumentProviderKind kind)
         {
-            CommandLineParser parser = new CommandLineParser<ValidationArguments>();
+            CommandLineParser parser = CreateParser<ValidationArguments>(kind);
             var options = new UsageWriter()
             {
                 ExecutableName = _executableName,
@@ -973,7 +978,7 @@ namespace Ookii.CommandLine.Tests
 
             Assert.AreEqual(_expectedUsageValidators, parser.GetUsage(options));
 
-            parser = new CommandLineParser<DependencyArguments>();
+            parser = CreateParser<DependencyArguments>(kind);
             Assert.AreEqual(_expectedUsageDependencies, parser.GetUsage(options));
 
             options.IncludeValidatorsInDescription = false;
