@@ -38,8 +38,11 @@ partial class Arguments
     public int? Test4 { get; set; }
 
     [CommandLineArgument]
-    public FileInfo? File { get; set; }
+    public FileInfo[]? File { get; set; }
 
     [CommandLineArgument]
     public IPAddress? Ip { get; set; }
+
+    [CommandLineArgument]
+    public IDictionary<string, int> Arg14 { get; } = new SortedDictionary<string, int>();
 }

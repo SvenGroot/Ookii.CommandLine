@@ -1,7 +1,9 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using System;
+using System.Diagnostics;
 using System.Text;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Ookii.CommandLine.Generator;
 
@@ -39,34 +41,50 @@ internal static class Extensions
         return false;
     }
 
-    public static bool IsNullableValueType(this INamedTypeSymbol symbol)
-        => !symbol.IsReferenceType && symbol.IsGenericType && symbol.ConstructedFrom.ToDisplayString() == "System.Nullable<T>";
+    public static bool IsNullableValueType(this INamedTypeSymbol type)
+        => !type.IsReferenceType && type.IsGenericType && type.ConstructedFrom.ToDisplayString() == "System.Nullable<T>";
 
-    public static bool AllowsNull(this INamedTypeSymbol type)
-        => type.IsNullableValueType() || (type.IsReferenceType && type.NullableAnnotation != NullableAnnotation.NotAnnotated);
+    public static bool IsNullableValueType(this ITypeSymbol type)
+        => type is INamedTypeSymbol namedType && namedType.IsNullableValueType();
+
+    public static bool AllowsNull(this ITypeSymbol type)
+        => (type is not INamedTypeSymbol namedType || namedType.IsNullableValueType()) || (type.IsReferenceType && type.NullableAnnotation != NullableAnnotation.NotAnnotated);
 
     public static INamedTypeSymbol GetUnderlyingType(this INamedTypeSymbol type)
         => type.IsNullableValueType() ? (INamedTypeSymbol)type.TypeArguments[0] : type;
 
+    public static ITypeSymbol GetUnderlyingType(this ITypeSymbol type)
+        => type is INamedTypeSymbol namedType && namedType.IsNullableValueType() ? (INamedTypeSymbol)namedType.TypeArguments[0] : type;
+
     public static bool IsEnum(this ITypeSymbol type) => type.BaseType?.ToDisplayString() == "System.Enum";
 
-    public static INamedTypeSymbol? FindGenericInterface(this ITypeSymbol symbol, string interfaceName)
+    public static INamedTypeSymbol? FindGenericInterface(this ITypeSymbol type, string interfaceName)
     {
-        foreach (var iface in symbol.AllInterfaces)
+        if (type.TypeKind == TypeKind.Interface && ((INamedTypeSymbol)type).IsTypeOrConstructedFrom(interfaceName))
         {
-            var realIface = iface;
-            if (iface.IsGenericType)
-            {
-                realIface = iface.ConstructedFrom;
-            }
+            return (INamedTypeSymbol)type;
+        }
 
-            if (realIface.ToDisplayString() == interfaceName)
+        foreach (var iface in type.AllInterfaces)
+        {
+            if (iface.IsTypeOrConstructedFrom(interfaceName))
             {
                 return iface;
             }
         }
 
         return null;
+    }
+
+    public static bool IsTypeOrConstructedFrom(this INamedTypeSymbol type, string name)
+    {
+        var realType = type;
+        if (realType.IsGenericType)
+        {
+            realType = realType.ConstructedFrom;
+        }
+
+        return realType.ToDisplayString() == name;
     }
 
     public static bool ImplementsInterface(this ITypeSymbol symbol, string interfaceName)

@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFrameworks>net7.0;net6.0;net48</TargetFrameworks>
@@ -6,6 +6,7 @@
     <Description>Tests for Ookii.CommandLine.</Description>
     <IsPackable>false</IsPackable>
     <LangVersion>9.0</LangVersion>
+    <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
   </PropertyGroup>
 
   <ItemGroup>
@@ -20,6 +21,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Ookii.CommandLine\Ookii.CommandLine.csproj" />
+    <ProjectReference Include="..\Ookii.CommandLine.Generator\Ookii.CommandLine.Generator.csproj"
+                      OutputItemType="Analyzer"
+                      ReferenceOutputAssembly="false" />    
   </ItemGroup>
-
 </Project>

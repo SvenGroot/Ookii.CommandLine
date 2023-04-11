@@ -107,7 +107,6 @@ internal class ParserGenerator
         _builder.AppendLine("public override System.Collections.Generic.IEnumerable<Ookii.CommandLine.CommandLineArgument> GetArguments(Ookii.CommandLine.CommandLineParser parser)");
         _builder.OpenBlock();
 
-        //Debugger.Launch();
         foreach (var member in _argumentsClass.GetMembers())
         {
             GenerateArgument(member);
@@ -172,18 +171,29 @@ internal class ParserGenerator
             throw new NotImplementedException();
         }
 
-        var originalArgumentType = (INamedTypeSymbol)property!.Type;
-        var argumentType = (INamedTypeSymbol)originalArgumentType.WithNullableAnnotation(NullableAnnotation.NotAnnotated);
-        string extra = string.Empty;
-        var allowsNull = originalArgumentType.AllowsNull();
-        if (!allowsNull)
+        if (property == null || property.IsStatic)
         {
-            extra = "!";
+            return;
         }
 
-        INamedTypeSymbol elementTypeWithNullable = argumentType;
-        INamedTypeSymbol? keyType = null;
-        INamedTypeSymbol? valueType = null;
+        var originalArgumentType = property!.Type;
+        var argumentType = originalArgumentType.WithNullableAnnotation(NullableAnnotation.NotAnnotated);
+        var notNullAnnotation = string.Empty;
+        var allowsNull = originalArgumentType.AllowsNull();
+        if (allowsNull)
+        {
+            // Needed in case the original definition was in a context without NRT support.
+            originalArgumentType = originalArgumentType.WithNullableAnnotation(NullableAnnotation.Annotated);
+        }
+        else
+        {
+            notNullAnnotation = "!";
+        }
+
+        ITypeSymbol elementTypeWithNullable = argumentType;
+        var namedElementTypeWithNullable = elementTypeWithNullable as INamedTypeSymbol;
+        ITypeSymbol? keyType = null;
+        ITypeSymbol? valueType = null;
         if (keyValueSeparator != null)
         {
             _builder.AppendLine($"var keyValueSeparatorAttribute{member.Name} = {keyValueSeparator.CreateInstantiation()};");
@@ -204,11 +214,12 @@ internal class ParserGenerator
                 Debug.Assert(multiValueElementType != null);
                 kind = "Ookii.CommandLine.ArgumentKind.Dictionary";
                 elementTypeWithNullable = multiValueElementType!;
-                keyType = (INamedTypeSymbol)elementTypeWithNullable.TypeArguments[0].WithNullableAnnotation(NullableAnnotation.NotAnnotated);
-                var rawValueType = ((INamedTypeSymbol)elementTypeWithNullable.TypeArguments[1]);
+                // KeyValuePair is guaranteed a named type.
+                namedElementTypeWithNullable = (INamedTypeSymbol)elementTypeWithNullable;
+                keyType = namedElementTypeWithNullable.TypeArguments[0].WithNullableAnnotation(NullableAnnotation.NotAnnotated);
+                var rawValueType = namedElementTypeWithNullable.TypeArguments[1];
                 allowsNull = rawValueType.AllowsNull();
-                valueType = (INamedTypeSymbol)rawValueType.WithNullableAnnotation(NullableAnnotation.NotAnnotated);
-                // TODO: Converter
+                valueType = rawValueType.WithNullableAnnotation(NullableAnnotation.NotAnnotated);
                 if (converterAttribute == null)
                 {
                     var keyConverter = DetermineConverter(keyType.GetUnderlyingType(), keyConverterAttribute, keyType.IsNullableValueType());
@@ -237,6 +248,7 @@ internal class ParserGenerator
                 Debug.Assert(multiValueElementType != null);
                 kind = "Ookii.CommandLine.ArgumentKind.MultiValue";
                 elementTypeWithNullable = multiValueElementType!;
+                namedElementTypeWithNullable = elementTypeWithNullable as INamedTypeSymbol;
                 allowsNull = elementTypeWithNullable.AllowsNull();
             }
         }
@@ -245,9 +257,8 @@ internal class ParserGenerator
             kind = "Ookii.CommandLine.ArgumentKind.Method";
         }
 
-        var elementType = elementTypeWithNullable;
-        elementType = elementTypeWithNullable.GetUnderlyingType();
-        converter ??= DetermineConverter(elementType, converterAttribute, elementTypeWithNullable.IsNullableValueType());
+        var elementType = namedElementTypeWithNullable?.GetUnderlyingType() ?? elementTypeWithNullable;
+        converter ??= DetermineConverter(elementType, converterAttribute, ((INamedTypeSymbol)elementTypeWithNullable).IsNullableValueType());
         if (converter == null)
         {
             _context.ReportDiagnostic(Diagnostics.NoConverter(member, elementType));
@@ -315,7 +326,7 @@ internal class ParserGenerator
 
         if (property?.SetMethod?.DeclaredAccessibility == Accessibility.Public)
         {
-            _builder.AppendLine($", setProperty: (target, value) => (({_argumentsClass.Name})target).{member.Name} = ({originalArgumentType.ToDisplayString()})value{extra}");
+            _builder.AppendLine($", setProperty: (target, value) => (({_argumentsClass.Name})target).{member.Name} = ({originalArgumentType.ToDisplayString()})value{notNullAnnotation}");
         }
 
         if (property != null)
@@ -352,15 +363,18 @@ internal class ParserGenerator
         return true;
     }
 
-    private (INamedTypeSymbol?, INamedTypeSymbol?, INamedTypeSymbol?)? DetermineMultiValueType(IPropertySymbol property, INamedTypeSymbol argumentType)
+    private (ITypeSymbol?, INamedTypeSymbol?, ITypeSymbol?)? DetermineMultiValueType(IPropertySymbol property, ITypeSymbol argumentType)
     {
-        // If the type is Dictionary<TKey, TValue> it doesn't matter if the property is
-        // read-only or not.
-        if (argumentType.IsGenericType && argumentType.ConstructedFrom.ToDisplayString() == "System.Collections.Generic.Dictionary<TKey, TValue>")
+        if (argumentType is INamedTypeSymbol namedType)
         {
-            var keyValuePair = _compilation.GetTypeByMetadataName(typeof(KeyValuePair<,>).FullName)!;
-            var elementType = keyValuePair.Construct(argumentType.TypeArguments, argumentType.TypeArgumentNullableAnnotations);
-            return (null, argumentType, elementType);
+            // If the type is Dictionary<TKey, TValue> it doesn't matter if the property is
+            // read-only or not.
+            if (namedType.IsGenericType && namedType.ConstructedFrom.ToDisplayString() == "System.Collections.Generic.Dictionary<TKey, TValue>")
+            {
+                var keyValuePair = _compilation.GetTypeByMetadataName(typeof(KeyValuePair<,>).FullName)!;
+                var elementType = keyValuePair.Construct(namedType.TypeArguments, namedType.TypeArgumentNullableAnnotations);
+                return (null, namedType, elementType);
+            }
         }
 
         if (argumentType is IArrayTypeSymbol arrayType)
@@ -377,7 +391,7 @@ internal class ParserGenerator
                 return null;
             }
 
-            var elementType = (INamedTypeSymbol)arrayType.ElementType;
+            var elementType = arrayType.ElementType;
             return (argumentType, null, elementType);
         }
 
@@ -396,10 +410,10 @@ internal class ParserGenerator
             return (null, dictionaryType, elementType);
         }
 
-        var collectionType = argumentType.FindGenericInterface("System.Collection.Generic.ICollection<T>");
+        var collectionType = argumentType.FindGenericInterface("System.Collections.Generic.ICollection<T>");
         if (collectionType != null)
         {
-            var elementType = (INamedTypeSymbol)collectionType.TypeArguments[0];
+            var elementType = collectionType.TypeArguments[0];
             return (collectionType, null, elementType);
         }
 
@@ -408,7 +422,7 @@ internal class ParserGenerator
         return null;
     }
 
-    public string? DetermineConverter(INamedTypeSymbol elementType, AttributeData? converterAttribute, bool isNullableValueType)
+    public string? DetermineConverter(ITypeSymbol elementType, AttributeData? converterAttribute, bool isNullableValueType)
     {
         var converter = DetermineElementConverter(elementType, converterAttribute);
         if (converter != null && isNullableValueType)
@@ -419,7 +433,7 @@ internal class ParserGenerator
         return converter;
     }
 
-    public string? DetermineElementConverter(INamedTypeSymbol elementType, AttributeData? converterAttribute)
+    public string? DetermineElementConverter(ITypeSymbol elementType, AttributeData? converterAttribute)
     {
         if (converterAttribute != null)
         {

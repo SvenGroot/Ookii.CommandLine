@@ -14,9 +14,10 @@ namespace Ookii.CommandLine.Tests
     {
     }
 
+    [GeneratedParser]
     [ApplicationFriendlyName("Friendly name")]
     [Description("Test arguments description.")]
-    class TestArguments
+    partial class TestArguments
     {
         private readonly Collection<int> _arg12 = new Collection<int>();
         private readonly Dictionary<string, int> _arg14 = new Dictionary<string, int>();

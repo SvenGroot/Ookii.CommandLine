@@ -48,6 +48,7 @@ internal class ConverterGenerator
     private readonly INamedTypeSymbol? _readOnlySpanType;
     private readonly INamedTypeSymbol? _stringType;
     private readonly INamedTypeSymbol? _cultureType;
+    private readonly Dictionary<ITypeSymbol, ConverterInfo> _converters = new(SymbolEqualityComparer.Default);
 
     public ConverterGenerator(Compilation compilation)
     {
@@ -60,9 +61,7 @@ internal class ConverterGenerator
         }
     }
 
-    private readonly Dictionary<INamedTypeSymbol, ConverterInfo> _converters = new(SymbolEqualityComparer.Default);
-
-    public string? GetConverter(INamedTypeSymbol type)
+    public string? GetConverter(ITypeSymbol type)
     {
         if (_converters.TryGetValue(type, out var converter))
         {
@@ -96,10 +95,15 @@ internal class ConverterGenerator
         return builder.GetSource();
     }
 
-    private ConverterInfo? FindConstructor(INamedTypeSymbol type)
+    private ConverterInfo? FindConstructor(ITypeSymbol type)
     {
+        if (type is not INamedTypeSymbol namedType)
+        {
+            return null;
+        }
+
         ConverterInfo? info = null;
-        foreach (var ctor in type.Constructors)
+        foreach (var ctor in namedType.Constructors)
         {
             if (ctor.IsStatic || ctor.DeclaredAccessibility != Accessibility.Public || ctor.Parameters.Length != 1)
             {
@@ -125,7 +129,7 @@ internal class ConverterGenerator
         return info;
     }
 
-    private ConverterInfo? FindParseMethod(INamedTypeSymbol type)
+    private ConverterInfo? FindParseMethod(ITypeSymbol type)
     {
         ConverterInfo? info = null;
         foreach (var member in type.GetMembers("Parse"))
@@ -184,8 +188,9 @@ internal class ConverterGenerator
         return builder.ToString();
     }
 
-    private static void CreateConverter(SourceBuilder builder, INamedTypeSymbol type, ConverterInfo info)
+    private static void CreateConverter(SourceBuilder builder, ITypeSymbol type, ConverterInfo info)
     {
+        // TODO: Handle exceptions similar to reflection versions.
         builder.AppendLine($"internal class {info.Name} : Ookii.CommandLine.Conversion.ArgumentConverter");
         builder.OpenBlock();
         string inputType = info.UseSpan ? "System.ReadOnlySpan<char>" : "string";
