@@ -86,7 +86,7 @@ namespace Ookii.CommandLine.Tests
         public override async Task<int> RunAsync()
         {
             // Do something actually async to test the wait in Run().
-            await Task.Delay(100);
+            await Task.Yield();
             return 42;
         }
     }

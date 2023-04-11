@@ -1,6 +1,6 @@
 ﻿namespace Ookii.CommandLine.Tests
 {
-    public partial class CommandLineParserTest
+    partial class CommandLineParserTest
     {
         private const string _executableName = "test";
 

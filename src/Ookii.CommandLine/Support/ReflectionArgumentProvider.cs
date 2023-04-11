@@ -17,6 +17,8 @@ internal class ReflectionArgumentProvider : ArgumentProvider
     {
     }
 
+    public override ArgumentProviderKind Kind => ArgumentProviderKind.Reflection;
+
     public override string ApplicationFriendlyName
     {
         get
@@ -35,20 +37,13 @@ internal class ReflectionArgumentProvider : ArgumentProvider
     public override object CreateInstance(CommandLineParser parser)
     {
         var inject = ArgumentsType.GetConstructor(new[] { typeof(CommandLineParser) }) != null;
-        try
+        if (inject)
         {
-            if (inject)
-            {
-                return Activator.CreateInstance(ArgumentsType, parser)!;
-            }
-            else
-            {
-                return Activator.CreateInstance(ArgumentsType)!;
-            }
+            return Activator.CreateInstance(ArgumentsType, parser)!;
         }
-        catch (TargetInvocationException ex)
+        else
         {
-            throw parser.StringProvider.CreateException(CommandLineArgumentErrorCategory.CreateArgumentsTypeError, ex.InnerException);
+            return Activator.CreateInstance(ArgumentsType)!;
         }
     }
 

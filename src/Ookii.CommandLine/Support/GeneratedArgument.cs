@@ -73,7 +73,6 @@ public class GeneratedArgument : CommandLineArgument
             multiValueSeparatorAttribute, descriptionAttribute, allowDuplicateDictionaryKeys, keyValueSeparatorAttribute,
             aliasAttributes, shortAliasAttributes, validationAttributes);
 
-        // TODO: Set properly for multi-value and Nullable<T>.
         info.ElementType = elementType;
         info.ElementTypeWithNullable = elementTypeWithNullable;
         info.Converter = converter;
@@ -102,7 +101,14 @@ public class GeneratedArgument : CommandLineArgument
             throw new InvalidOperationException();
         }
 
-        return _getProperty(target);
+        try
+        { 
+            return _getProperty(target);
+        }
+        catch (Exception ex)
+        {
+            throw new TargetInvocationException(ex);
+        }
     }
 
     /// <inheritdoc/>
@@ -113,6 +119,13 @@ public class GeneratedArgument : CommandLineArgument
             throw new InvalidOperationException();
         }
 
-        _setProperty(target, value);
+        try
+        {
+            _setProperty(target, value);
+        }
+        catch (Exception ex)
+        {
+            throw new TargetInvocationException(ex);
+        }
     }
 }

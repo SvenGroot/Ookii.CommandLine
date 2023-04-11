@@ -1428,6 +1428,10 @@ public abstract class CommandLineArgument
         {
             throw _parser.StringProvider.CreateException(CommandLineArgumentErrorCategory.ApplyValueError, ex.InnerException, this);
         }
+        catch (Exception ex)
+        {
+            throw _parser.StringProvider.CreateException(CommandLineArgumentErrorCategory.ApplyValueError, ex, this);
+        }
     }
 
     internal void Reset()

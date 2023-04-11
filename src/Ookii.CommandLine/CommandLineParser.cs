@@ -721,6 +721,14 @@ public class CommandLineParser
     /// </remarks>
     public ParseResult ParseResult { get; private set; }
 
+    /// <summary>
+    /// Gets the kind of provider that was used to determine the available arguments.
+    /// </summary>
+    /// <value>
+    /// One of the values of the <see cref="ArgumentProviderKind"/> enumeration.
+    /// </value>
+    public ArgumentProviderKind ProviderKind => _provider.Kind;
+
     internal IComparer<char>? ShortArgumentNameComparer => _argumentsByShortName?.Comparer;
 
 
@@ -1440,8 +1448,21 @@ public class CommandLineParser
         // Run class validators.
         _provider.RunValidators(this);
 
+        object commandLineArguments;
         // TODO: Integrate with new ctor argument support.
-        object commandLineArguments = _provider.CreateInstance(this);
+        try
+        {
+            commandLineArguments = _provider.CreateInstance(this);
+        }
+        catch (TargetInvocationException ex)
+        {
+            throw StringProvider.CreateException(CommandLineArgumentErrorCategory.CreateArgumentsTypeError, ex.InnerException);
+        }
+        catch (Exception ex)
+        {
+            throw StringProvider.CreateException(CommandLineArgumentErrorCategory.CreateArgumentsTypeError, ex);
+        }
+
         foreach (CommandLineArgument argument in _arguments)
         {
             // Apply property argument values (this does nothing for constructor or method arguments).

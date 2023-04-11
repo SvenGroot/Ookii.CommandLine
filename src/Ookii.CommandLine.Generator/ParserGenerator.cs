@@ -190,7 +190,7 @@ internal class ParserGenerator
             notNullAnnotation = "!";
         }
 
-        ITypeSymbol elementTypeWithNullable = argumentType;
+        var elementTypeWithNullable = argumentType;
         var namedElementTypeWithNullable = elementTypeWithNullable as INamedTypeSymbol;
         ITypeSymbol? keyType = null;
         ITypeSymbol? valueType = null;

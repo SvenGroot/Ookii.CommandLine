@@ -10,10 +10,8 @@ namespace Ookii.CommandLine.Support;
 
 /// <summary>
 /// A base class for argument providers created by the <see cref="GeneratedParserAttribute"/>.
+/// This type is for internal use only and should not be used by your code.
 /// </summary>
-/// <remarks>
-/// This type is for internal use and should not be used by your code.
-/// </remarks>
 public abstract class GeneratedArgumentProvider : ArgumentProvider
 {
     private readonly ApplicationFriendlyNameAttribute? _friendlyNameAttribute;
@@ -44,6 +42,9 @@ public abstract class GeneratedArgumentProvider : ArgumentProvider
         _friendlyNameAttribute = friendlyName;
         _descriptionAttribute = description;
     }
+
+    /// <inheritdoc/>
+    public override ArgumentProviderKind Kind => ArgumentProviderKind.Generated;
 
     /// <inheritdoc/>
     public override string ApplicationFriendlyName

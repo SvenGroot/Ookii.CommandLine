@@ -10,7 +10,8 @@ using System.Net;
 
 namespace Ookii.CommandLine.Tests
 {
-    class EmptyArguments
+    [GeneratedParser]
+    partial class EmptyArguments
     {
     }
 
@@ -94,7 +95,8 @@ namespace Ookii.CommandLine.Tests
         public static string NotAnArg3 { get; set; }
     }
 
-    class ThrowingArguments
+    [GeneratedParser]
+    partial class ThrowingArguments
     {
         private int _throwingArgument;
 
@@ -114,7 +116,8 @@ namespace Ookii.CommandLine.Tests
         }
     }
 
-    class ThrowingConstructor
+    [GeneratedParser]
+    partial class ThrowingConstructor
     {
         public ThrowingConstructor()
         {
@@ -125,7 +128,8 @@ namespace Ookii.CommandLine.Tests
         public int Arg { get; set; }
     }
 
-    class DictionaryArguments
+    [GeneratedParser]
+    partial class DictionaryArguments
     {
         [CommandLineArgument]
         public Dictionary<string, int> NoDuplicateKeys { get; set; }
@@ -133,7 +137,8 @@ namespace Ookii.CommandLine.Tests
         public Dictionary<string, int> DuplicateKeys { get; set; }
     }
 
-    class MultiValueSeparatorArguments
+    [GeneratedParser]
+    partial class MultiValueSeparatorArguments
     {
         [CommandLineArgument]
         public string[] NoSeparator { get; set; }
@@ -141,7 +146,8 @@ namespace Ookii.CommandLine.Tests
         public string[] Separator { get; set; }
     }
 
-    class SimpleArguments
+    [GeneratedParser]   
+    partial class SimpleArguments
     {
         [CommandLineArgument]
         public string Argument1 { get; set; }
@@ -149,7 +155,8 @@ namespace Ookii.CommandLine.Tests
         public string Argument2 { get; set; }
     }
 
-    class KeyValueSeparatorArguments
+    [GeneratedParser]
+    partial class KeyValueSeparatorArguments
     {
         [CommandLineArgument]
         public Dictionary<string, int> DefaultSeparator { get; set; }
@@ -159,7 +166,8 @@ namespace Ookii.CommandLine.Tests
         public Dictionary<string, string> CustomSeparator { get; set; }
     }
 
-    class CancelArguments
+    [GeneratedParser]
+    partial class CancelArguments
     {
         [CommandLineArgument]
         public string Argument1 { get; set; }
@@ -174,6 +182,7 @@ namespace Ookii.CommandLine.Tests
         public bool DoesCancel { get; set; }
     }
 
+    [GeneratedParser]
     [ParseOptions(
         Mode = ParsingMode.LongShort,
         DuplicateArguments = ErrorMode.Allow,
@@ -183,20 +192,22 @@ namespace Ookii.CommandLine.Tests
         CaseSensitive = true,
         NameValueSeparator = '=',
         AutoHelpArgument = false)]
-    class ParseOptionsArguments
+    partial class ParseOptionsArguments
     {
         [CommandLineArgument]
         public string Argument { get; set; }
     }
 
-    class CultureArguments
+    [GeneratedParser]
+    partial class CultureArguments
     {
         [CommandLineArgument]
         public float Argument { get; set; }
     }
 
+    [GeneratedParser]
     [ParseOptions(Mode = ParsingMode.LongShort)]
-    class LongShortArguments
+    partial class LongShortArguments
     {
         [CommandLineArgument, ShortAlias('c')]
         [Description("Arg1 description.")]
@@ -302,7 +313,8 @@ namespace Ookii.CommandLine.Tests
         }
     }
 
-    class AutomaticConflictingNameArguments
+    [GeneratedParser]
+    partial class AutomaticConflictingNameArguments
     {
         [CommandLineArgument]
         public int Help { get; set; }
@@ -311,14 +323,16 @@ namespace Ookii.CommandLine.Tests
         public int Version { get; set; }
     }
 
+    [GeneratedParser]
     [ParseOptions(Mode = ParsingMode.LongShort)]
-    class AutomaticConflictingShortNameArguments
+    partial class AutomaticConflictingShortNameArguments
     {
         [CommandLineArgument(ShortName = '?')]
         public int Foo { get; set; }
     }
 
-    class HiddenArguments
+    [GeneratedParser]
+    partial class HiddenArguments
     {
         [CommandLineArgument]
         public int Foo { get; set; }
@@ -327,7 +341,8 @@ namespace Ookii.CommandLine.Tests
         public int Hidden { get; set; }
     }
 
-    class NameTransformArguments
+    [GeneratedParser]
+    partial class NameTransformArguments
     {
         [CommandLineArgument(Position = 0, IsRequired = true)]
         public string testArg { get; set; }
@@ -342,7 +357,8 @@ namespace Ookii.CommandLine.Tests
         public int Explicit { get; set; }
     }
 
-    class ValueDescriptionTransformArguments
+    [GeneratedParser]
+    partial class ValueDescriptionTransformArguments
     {
         [CommandLineArgument]
         public FileInfo Arg1 { get; set; }
@@ -396,9 +412,10 @@ namespace Ookii.CommandLine.Tests
         public int? NotNull { get; set; }
     }
 
+    [GeneratedParser]
     // N.B. nameof is only safe if the argument name matches the property name.
     [RequiresAny(nameof(Address), nameof(Path))]
-    class DependencyArguments
+    partial class DependencyArguments
     {
         [CommandLineArgument]
         [Description("The address.")]
@@ -424,7 +441,8 @@ namespace Ookii.CommandLine.Tests
         public FileInfo Path { get; set; }
     }
 
-    class MultiValueWhiteSpaceArguments
+    [GeneratedParser]
+    partial class MultiValueWhiteSpaceArguments
     {
 
         [CommandLineArgument(Position = 0)]
@@ -522,13 +540,14 @@ namespace Ookii.CommandLine.Tests
         public int Value { get; set; }
     }
 
-    class ConversionArguments
+    [GeneratedParser]
+    partial class ConversionArguments
     {
         [CommandLineArgument]
         public StructWithParseCulture ParseCulture { get; set; }
 
         [CommandLineArgument]
-        public StructWithParse Parse { get; set; }
+        public StructWithParse ParseStruct { get; set; }
 
         [CommandLineArgument]
         public StructWithCtor Ctor { get; set; }

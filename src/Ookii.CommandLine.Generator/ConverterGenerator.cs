@@ -206,7 +206,7 @@ internal class ConverterGenerator
 
         if (info.UseSpan)
         {
-            builder.AppendLine("public override object? Convert(string value, System.Globalization.CultureInfo culture, Ookii.CommandLine.CommandLineArgument argument) => Convert(value.AsSpan(), culture, argument);");
+            builder.AppendLine("public override object? Convert(string value, System.Globalization.CultureInfo culture, Ookii.CommandLine.CommandLineArgument argument) => Convert(System.MemoryExtensions.AsSpan(value), culture, argument);");
         }
 
         builder.CloseBlock(); // class

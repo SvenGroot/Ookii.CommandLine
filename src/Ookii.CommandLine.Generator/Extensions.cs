@@ -119,13 +119,22 @@ internal static class Extensions
 
     public static string CreateInstantiation(this AttributeData attribute)
     {
-        var ctorArgs = attribute.ConstructorArguments.Select(c => c.ToCSharpString());
-        var namedArgs = attribute.NamedArguments.Select(n => $"{n.Key} = {n.Value.ToCSharpString()}");
+        var ctorArgs = attribute.ConstructorArguments.Select(c => c.ToFullCSharpString());
+        var namedArgs = attribute.NamedArguments.Select(n => $"{n.Key} = {n.Value.ToFullCSharpString()}");
         return $"new {attribute.AttributeClass?.ToDisplayString()}({string.Join(", ", ctorArgs)}) {{ {string.Join(", ", namedArgs)} }}";
     }
 
     public static string ToCSharpString(this bool value)
     {
         return value ? "true" : "false";
+    }
+
+    public static string ToFullCSharpString(this TypedConstant constant)
+    {
+        return constant.Kind switch
+        {
+            TypedConstantKind.Array => $"new {constant.Type?.ToDisplayString()} {constant.ToCSharpString()}",
+            _ => constant.ToCSharpString(),
+        };
     }
 }
