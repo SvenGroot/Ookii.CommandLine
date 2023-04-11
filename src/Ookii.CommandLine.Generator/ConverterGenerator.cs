@@ -186,29 +186,22 @@ internal class ConverterGenerator
 
     private static void CreateConverter(SourceBuilder builder, INamedTypeSymbol type, ConverterInfo info)
     {
+        builder.AppendLine($"internal class {info.Name} : Ookii.CommandLine.Conversion.ArgumentConverter");
+        builder.OpenBlock();
+        string inputType = info.UseSpan ? "System.ReadOnlySpan<char>" : "string";
+        string culture = info.HasCulture ? ", culture" : string.Empty;
         if (info.ParseMethod)
         {
-            throw new NotImplementedException();
+            builder.AppendLine($"public override object? Convert({inputType} value, System.Globalization.CultureInfo culture, Ookii.CommandLine.CommandLineArgument argument) => {type.ToDisplayString()}.Parse(value{culture});");
         }
         else
         {
-            CreateConstructorConverter(builder, type, info);
+            builder.AppendLine($"public override object? Convert({inputType} value, System.Globalization.CultureInfo culture, Ookii.CommandLine.CommandLineArgument argument) => new {type.ToDisplayString()}(value);");
         }
-    }
 
-    private static void CreateConstructorConverter(SourceBuilder builder, INamedTypeSymbol type, ConverterInfo info)
-    {
-        builder.AppendLine($"internal class {info.Name} : Ookii.CommandLine.Conversion.ArgumentConverter");
-        builder.OpenBlock();
         if (info.UseSpan)
         {
             builder.AppendLine("public override object? Convert(string value, System.Globalization.CultureInfo culture, Ookii.CommandLine.CommandLineArgument argument) => Convert(value.AsSpan(), culture, argument);");
-            builder.AppendLine();
-            builder.AppendLine($"public override object? Convert(System.ReadOnlySpan<char> value, System.Globalization.CultureInfo culture, Ookii.CommandLine.CommandLineArgument argument) => new {type.ToDisplayString()}(value);");
-        }
-        else
-        {
-            builder.AppendLine($"public override object? Convert(string value, System.Globalization.CultureInfo culture, Ookii.CommandLine.CommandLineArgument argument) => new {type.ToDisplayString()}(value);");
         }
 
         builder.CloseBlock(); // class

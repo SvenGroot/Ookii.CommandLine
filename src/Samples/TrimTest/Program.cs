@@ -5,6 +5,7 @@ using Ookii.CommandLine.Support;
 using Ookii.CommandLine.Validation;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
+using System.Net;
 
 var arguments = Arguments.Parse();
 if (arguments != null)
@@ -38,4 +39,7 @@ partial class Arguments
 
     [CommandLineArgument]
     public FileInfo? File { get; set; }
+
+    [CommandLineArgument]
+    public IPAddress? Ip { get; set; }
 }
