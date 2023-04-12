@@ -17,8 +17,7 @@ namespace Ookii.CommandLine;
 ///   <see cref="GeneratedParserAttribute"/> is used. Classes without that attribute must parse
 ///   arguments using the <see cref="CommandLineParser.Parse{T}(Ookii.CommandLine.ParseOptions?)"/>
 ///   method, or create the parser directly by using the <see cref="CommandLineParser{T}.CommandLineParser(Ookii.CommandLine.ParseOptions?)"/>
-///   constructor directly; these classes do not support this interface unless it is manually
-///   implemented.
+///   constructor; these classes do not support this interface unless it is manually implemented.
 /// </para>
 /// </remarks>
 public interface IParser<TSelf> : IParserProvider<TSelf>
