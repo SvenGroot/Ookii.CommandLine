@@ -151,9 +151,8 @@ internal class ParserGenerator
 
     private void GenerateArgument(ISymbol member)
     {
-        // Check if the member can be an argument. TODO: warning if private.
-        if (member.DeclaredAccessibility != Accessibility.Public ||
-            member.Kind is not (SymbolKind.Method or SymbolKind.Property))
+        // This shouldn't happen because of attribute targets, but check anyway.
+        if (member.Kind is not (SymbolKind.Method or SymbolKind.Property))
         {
             return;
         }
@@ -200,9 +199,9 @@ internal class ParserGenerator
         var property = member as IPropertySymbol;
         if (property != null)
         {
-            if (property.IsStatic)
+            if (property.DeclaredAccessibility != Accessibility.Public || property.IsStatic)
             {
-                // TODO: Warning or error?
+                _context.ReportDiagnostic(Diagnostics.NonPublicInstanceProperty(property));
                 return;
             }
 
@@ -210,6 +209,12 @@ internal class ParserGenerator
         }
         else if (member is IMethodSymbol method)
         {
+            if (method.DeclaredAccessibility != Accessibility.Public || !method.IsStatic)
+            {
+                _context.ReportDiagnostic(Diagnostics.NonPublicStaticMethod(method));
+                return;
+            }
+
             methodInfo = DetermineMethodArgumentInfo(method);
             if (methodInfo is not MethodArgumentInfo methodInfoValue)
             {

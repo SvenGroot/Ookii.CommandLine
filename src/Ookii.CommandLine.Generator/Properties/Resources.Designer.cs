@@ -61,7 +61,7 @@ namespace Ookii.CommandLine.Generator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The arguments class {0} may not be a generic class when the GeneratedParserAttribute is used..
+        ///   Looks up a localized string similar to The command line arguments class {0} may not be a generic class when the GeneratedParserAttribute is used..
         /// </summary>
         internal static string ArgumentsClassIsGenericMessageFormat {
             get {
@@ -70,7 +70,7 @@ namespace Ookii.CommandLine.Generator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The arguments class may not be a generic type..
+        ///   Looks up a localized string similar to The command line arguments class may not be a generic type..
         /// </summary>
         internal static string ArgumentsClassIsGenericTitle {
             get {
@@ -79,7 +79,7 @@ namespace Ookii.CommandLine.Generator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The arguments class {0} may not be nested in another type when the GeneratedParserAttribute is used..
+        ///   Looks up a localized string similar to The command line arguments class {0} may not be nested in another type when the GeneratedParserAttribute is used..
         /// </summary>
         internal static string ArgumentsClassIsNestedMessageFormat {
             get {
@@ -88,7 +88,7 @@ namespace Ookii.CommandLine.Generator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The arguments class may not be a nested type..
+        ///   Looks up a localized string similar to The command line arguments class may not be a nested type..
         /// </summary>
         internal static string ArgumentsClassIsNestedTitle {
             get {
@@ -97,7 +97,7 @@ namespace Ookii.CommandLine.Generator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The arguments class {0} must use the &apos;partial&apos; modifier..
+        ///   Looks up a localized string similar to The command line arguments class {0} must use the &apos;partial&apos; modifier..
         /// </summary>
         internal static string ArgumentsClassNotPartialMessageFormat {
             get {
@@ -106,7 +106,7 @@ namespace Ookii.CommandLine.Generator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The arguments class must be a partial class..
+        ///   Looks up a localized string similar to The command line arguments class must be a partial class..
         /// </summary>
         internal static string ArgumentsClassNotPartialTitle {
             get {
@@ -115,7 +115,7 @@ namespace Ookii.CommandLine.Generator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The arguments type {0} must be a reference type (class)..
+        ///   Looks up a localized string similar to The command line arguments type {0} must be a reference type (class)..
         /// </summary>
         internal static string ArgumentsTypeNotReferenceTypeMessageFormat {
             get {
@@ -124,7 +124,7 @@ namespace Ookii.CommandLine.Generator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The arguments type must be a reference type..
+        ///   Looks up a localized string similar to The command line arguments type must be a reference type..
         /// </summary>
         internal static string ArgumentsTypeNotReferenceTypeTitle {
             get {
@@ -133,7 +133,7 @@ namespace Ookii.CommandLine.Generator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The multi-value argument defined by {0}.{1} must have an array rank of one..
+        ///   Looks up a localized string similar to The multi-value command line argument defined by {0}.{1} must have an array rank of one..
         /// </summary>
         internal static string InvalidArrayRankMessageFormat {
             get {
@@ -142,7 +142,7 @@ namespace Ookii.CommandLine.Generator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to A multi-value argument defined by an array properties must have an array rank of one..
+        ///   Looks up a localized string similar to A multi-value command line argument defined by an array properties must have an array rank of one..
         /// </summary>
         internal static string InvalidArrayRankTitle {
             get {
@@ -151,7 +151,7 @@ namespace Ookii.CommandLine.Generator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The method {0}.{1} does not have a valid signature for a method argument..
+        ///   Looks up a localized string similar to The method {0}.{1} does not have a valid signature for a command line argument..
         /// </summary>
         internal static string InvalidMethodSignatureMessageFormat {
             get {
@@ -160,7 +160,7 @@ namespace Ookii.CommandLine.Generator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to A method argument has an invalid signature..
+        ///   Looks up a localized string similar to A method command line argument has an invalid signature..
         /// </summary>
         internal static string InvalidMethodSignatureTitle {
             get {
@@ -169,7 +169,7 @@ namespace Ookii.CommandLine.Generator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to No argument converter exists for type {0} used by the argument defined by {1}.{2}, and none could be generated. Use the Ookii.CommandLine.Conversion.ArgumentConverterAttribute to specify a custom converter..
+        ///   Looks up a localized string similar to No command line argument converter exists for type {0} used by the argument defined by {1}.{2}, and none could be generated. Use the Ookii.CommandLine.Conversion.ArgumentConverterAttribute to specify a custom converter..
         /// </summary>
         internal static string NoConverterMessageFormat {
             get {
@@ -178,11 +178,47 @@ namespace Ookii.CommandLine.Generator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to No argument converter exists for the argument&apos;s type..
+        ///   Looks up a localized string similar to No acommand line rgument converter exists for the argument&apos;s type..
         /// </summary>
         internal static string NoConverterTitle {
             get {
                 return ResourceManager.GetString("NoConverterTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The property {0}.{1} will not create a command line argument because it is not a public instance property..
+        /// </summary>
+        internal static string NonPublicInstancePropertyMessageFormat {
+            get {
+                return ResourceManager.GetString("NonPublicInstancePropertyMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Properties that are not public instance will be ignored..
+        /// </summary>
+        internal static string NonPublicInstancePropertyTitle {
+            get {
+                return ResourceManager.GetString("NonPublicInstancePropertyTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The method {0}.{1} will not create a command line argument because it is not a public static method..
+        /// </summary>
+        internal static string NonPublicStaticMethodMessageFormat {
+            get {
+                return ResourceManager.GetString("NonPublicStaticMethodMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Methods that are not public and static will be ignored..
+        /// </summary>
+        internal static string NonPublicStaticMethodTitle {
+            get {
+                return ResourceManager.GetString("NonPublicStaticMethodTitle", resourceCulture);
             }
         }
         
@@ -196,7 +232,7 @@ namespace Ookii.CommandLine.Generator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to An argument property must have a public set accessor..
+        ///   Looks up a localized string similar to A command line argument property must have a public set accessor..
         /// </summary>
         internal static string PropertyIsReadOnlyTitle {
             get {

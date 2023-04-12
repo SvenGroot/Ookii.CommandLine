@@ -12,7 +12,7 @@ internal static class Diagnostics
     private const string Category = "Ookii.CommandLine";
 
     public static Diagnostic ArgumentsTypeNotReferenceType(INamedTypeSymbol symbol) => CreateDiagnostic(
-        "CL1001",
+        "CL0001",
         nameof(Resources.ArgumentsTypeNotReferenceTypeTitle),
         nameof(Resources.ArgumentsTypeNotReferenceTypeMessageFormat),
         DiagnosticSeverity.Error,
@@ -20,7 +20,7 @@ internal static class Diagnostics
         symbol.ToDisplayString());
 
     public static Diagnostic ArgumentsClassNotPartial(INamedTypeSymbol symbol) => CreateDiagnostic(
-        "CL1002",
+        "CL0002",
         nameof(Resources.ArgumentsClassNotPartialTitle),
         nameof(Resources.ArgumentsClassNotPartialMessageFormat),
         DiagnosticSeverity.Error,
@@ -28,7 +28,7 @@ internal static class Diagnostics
         symbol.ToDisplayString());
 
     public static Diagnostic ArgumentsClassIsGeneric(INamedTypeSymbol symbol) => CreateDiagnostic(
-        "CL1003",
+        "CL0003",
         nameof(Resources.ArgumentsClassIsGenericTitle),
         nameof(Resources.ArgumentsClassIsGenericMessageFormat),
         DiagnosticSeverity.Error,
@@ -36,7 +36,7 @@ internal static class Diagnostics
         symbol.ToDisplayString());
 
     public static Diagnostic InvalidArrayRank(IPropertySymbol property) => CreateDiagnostic(
-        "CL1004",
+        "CL0004",
         nameof(Resources.InvalidArrayRankTitle),
         nameof(Resources.InvalidArrayRankMessageFormat),
         DiagnosticSeverity.Error,
@@ -45,7 +45,7 @@ internal static class Diagnostics
         property.Name);
 
     public static Diagnostic PropertyIsReadOnly(IPropertySymbol property) => CreateDiagnostic(
-        "CL1005",
+        "CL0005",
         nameof(Resources.PropertyIsReadOnlyTitle),
         nameof(Resources.PropertyIsReadOnlyMessageFormat),
         DiagnosticSeverity.Error,
@@ -53,7 +53,7 @@ internal static class Diagnostics
         property.ContainingType?.ToDisplayString(), property.Name);
 
     public static Diagnostic NoConverter(ISymbol member, ITypeSymbol elementType) => CreateDiagnostic(
-        "CL1006",
+        "CL0006",
         nameof(Resources.NoConverterTitle),
         nameof(Resources.NoConverterMessageFormat),
         DiagnosticSeverity.Error,
@@ -63,7 +63,7 @@ internal static class Diagnostics
         member.Name);
 
     public static Diagnostic InvalidMethodSignature(ISymbol method) => CreateDiagnostic(
-        "CL1007",
+        "CL0007",
         nameof(Resources.InvalidMethodSignatureTitle),
         nameof(Resources.InvalidMethodSignatureMessageFormat),
         DiagnosticSeverity.Error,
@@ -72,7 +72,7 @@ internal static class Diagnostics
         method.Name);
 
     public static Diagnostic ArgumentsClassIsNested(INamedTypeSymbol symbol) => CreateDiagnostic(
-        "CL1008",
+        "CL0008",
         nameof(Resources.ArgumentsClassIsNestedTitle),
         nameof(Resources.ArgumentsClassIsNestedMessageFormat),
         DiagnosticSeverity.Error,
@@ -80,12 +80,30 @@ internal static class Diagnostics
         symbol.ToDisplayString());
 
     public static Diagnostic UnknownAttribute(AttributeData attribute) => CreateDiagnostic(
-        "CLW1001",
+        "CLW0001",
         nameof(Resources.UnknownAttributeTitle),
         nameof(Resources.UnknownAttributeMessageFormat),
         DiagnosticSeverity.Warning,
         attribute.ApplicationSyntaxReference?.SyntaxTree.GetLocation(attribute.ApplicationSyntaxReference.Span),
         attribute.AttributeClass?.Name);
+
+    public static Diagnostic NonPublicStaticMethod(ISymbol method) => CreateDiagnostic(
+        "CLW0002",
+        nameof(Resources.NonPublicStaticMethodTitle),
+        nameof(Resources.NonPublicStaticMethodMessageFormat),
+        DiagnosticSeverity.Warning,
+        method.Locations.FirstOrDefault(),
+        method.ContainingType?.ToDisplayString(),
+        method.Name);
+
+    public static Diagnostic NonPublicInstanceProperty(ISymbol property) => CreateDiagnostic(
+        "CLW0003",
+        nameof(Resources.NonPublicInstancePropertyTitle),
+        nameof(Resources.NonPublicInstancePropertyMessageFormat),
+        DiagnosticSeverity.Warning,
+        property.Locations.FirstOrDefault(),
+        property.ContainingType?.ToDisplayString(),
+        property.Name);
 
     private static Diagnostic CreateDiagnostic(string id, string titleResource, string messageResource, DiagnosticSeverity severity, Location? location, params object?[]? messageArgs)
         => Diagnostic.Create(
@@ -95,6 +113,7 @@ internal static class Diagnostics
                 new LocalizableResourceString(messageResource, Resources.ResourceManager, typeof(Resources)),
                 Category,
                 severity,
-                isEnabledByDefault: true),
+                isEnabledByDefault: true,
+                helpLinkUri: $"https://www.ookii.org/Link/CommandLineGeneratorError#{id}"),
             location, messageArgs);
 }
