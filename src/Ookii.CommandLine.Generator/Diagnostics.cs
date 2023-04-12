@@ -53,11 +53,14 @@ internal static class Diagnostics
         property.ContainingType?.ToDisplayString(), property.Name);
 
     public static Diagnostic NoConverter(ISymbol member, ITypeSymbol elementType) => CreateDiagnostic(
-            "CL1006",
-            nameof(Resources.NoConverterTitle),
-            nameof(Resources.NoConverterMessageFormat),
-            DiagnosticSeverity.Error,
-        member.Locations.FirstOrDefault(), elementType.ToDisplayString(), member.ContainingType?.ToDisplayString(), member.Name);
+        "CL1006",
+        nameof(Resources.NoConverterTitle),
+        nameof(Resources.NoConverterMessageFormat),
+        DiagnosticSeverity.Error,
+        member.Locations.FirstOrDefault(),
+        elementType.ToDisplayString(),
+        member.ContainingType?.ToDisplayString(),
+        member.Name);
 
     public static Diagnostic InvalidMethodSignature(ISymbol method) => CreateDiagnostic(
         "CL1007",
