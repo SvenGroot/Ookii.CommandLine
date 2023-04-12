@@ -567,4 +567,17 @@ namespace Ookii.CommandLine.Tests
         [CommandLineArgument]
         public int? Nullable { get; set; }
     }
+
+    class BaseArguments
+    {
+        [CommandLineArgument]
+        public string BaseArg { get; set; }
+    }
+
+    [GeneratedParser]
+    partial class DerivedArguments : BaseArguments
+    {
+        [CommandLineArgument]
+        public int DerivedArg { get; set; }
+    }
 }

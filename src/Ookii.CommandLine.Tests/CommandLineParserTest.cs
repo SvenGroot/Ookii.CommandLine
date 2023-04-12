@@ -1119,6 +1119,21 @@ namespace Ookii.CommandLine.Tests
             Assert.AreEqual(4, result.ParseNullableMulti[2].Value.Value);
         }
 
+        [TestMethod]
+        [DynamicData(nameof(ProviderKinds), DynamicDataDisplayName = nameof(GetCustomDynamicDataDisplayName))]
+        public void TestDerivedClass(ArgumentProviderKind kind)
+        {
+            var parser = CreateParser<DerivedArguments>(kind);
+            Assert.AreEqual(4, parser.Arguments.Count);
+            VerifyArguments(parser.Arguments, new[]
+            {
+                new ExpectedArgument("BaseArg", typeof(string), ArgumentKind.SingleValue),
+                new ExpectedArgument("DerivedArg", typeof(int), ArgumentKind.SingleValue),
+                new ExpectedArgument("Help", typeof(bool), ArgumentKind.Method) { MemberName = "AutomaticHelp", Description = "Displays this help message.", IsSwitch = true, Aliases = new[] { "?", "h" } },
+                new ExpectedArgument("Version", typeof(bool), ArgumentKind.Method) { MemberName = "AutomaticVersion", Description = "Displays version information.", IsSwitch = true },
+            });
+        }
+
         private class ExpectedArgument
         {
             public ExpectedArgument(string name, Type type, ArgumentKind kind = ArgumentKind.SingleValue)

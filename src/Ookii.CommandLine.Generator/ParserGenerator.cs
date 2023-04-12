@@ -125,9 +125,15 @@ internal class ParserGenerator
         _builder.AppendLine("public override System.Collections.Generic.IEnumerable<Ookii.CommandLine.CommandLineArgument> GetArguments(Ookii.CommandLine.CommandLineParser parser)");
         _builder.OpenBlock();
 
-        foreach (var member in _argumentsClass.GetMembers())
+        var current = _argumentsClass;
+        while (current != null && current.SpecialType != SpecialType.System_Object)
         {
-            GenerateArgument(member);
+            foreach (var member in current.GetMembers())
+            {
+                GenerateArgument(member);
+            }
+
+            current = current.BaseType;
         }
 
         // Makes sure the function compiles if there are no arguments.
