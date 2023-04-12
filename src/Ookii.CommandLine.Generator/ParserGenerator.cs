@@ -81,16 +81,16 @@ internal class ParserGenerator
         List<AttributeData>? classValidators = null;
         foreach (var attribute in _argumentsClass.GetAttributes())
         {
-            if (CheckAttribute(attribute, AttributeNames.ParseOptions, ref parseOptions) ||
-                CheckAttribute(attribute, AttributeNames.Description, ref description) ||
-                CheckAttribute(attribute, AttributeNames.ApplicationFriendlyName, ref applicationFriendlyName) ||
-                CheckAttribute(attribute, AttributeNames.Command, ref commandAttribute) ||
-                CheckAttribute(attribute, AttributeNames.ClassValidation, ref classValidators))
+            if (CheckAttribute(attribute, _typeHelper.ParseOptionsAttribute, ref parseOptions) ||
+                CheckAttribute(attribute, _typeHelper.DescriptionAttribute, ref description) ||
+                CheckAttribute(attribute, _typeHelper.ApplicationFriendlyNameAttribute, ref applicationFriendlyName) ||
+                CheckAttribute(attribute, _typeHelper.CommandAttribute, ref commandAttribute) ||
+                CheckAttribute(attribute, _typeHelper.ClassValidationAttribute, ref classValidators))
             {
                 continue;
             }
 
-            if (!attribute.AttributeClass?.DerivesFrom(AttributeNames.GeneratedParser) ?? false)
+            if (!attribute.AttributeClass?.DerivesFrom(_typeHelper.GeneratedParserAttribute) ?? false)
             {
                 _context.ReportDiagnostic(Diagnostics.UnknownAttribute(attribute));
             }
@@ -158,17 +158,17 @@ internal class ParserGenerator
         List<AttributeData>? validators = null;
         foreach (var attribute in member.GetAttributes())
         {
-            if (CheckAttribute(attribute, AttributeNames.CommandLineArgument, ref commandLineArgumentAttribute) ||
-                CheckAttribute(attribute, AttributeNames.MultiValueSeparator, ref multiValueSeparator) ||
-                CheckAttribute(attribute, AttributeNames.Description, ref description) ||
-                CheckAttribute(attribute, AttributeNames.AllowDuplicateDictionaryKeys, ref allowDuplicateDictionaryKeys) ||
-                CheckAttribute(attribute, AttributeNames.KeyValueSeparator, ref keyValueSeparator) ||
-                CheckAttribute(attribute, AttributeNames.ArgumentConverter, ref converterAttribute) ||
-                CheckAttribute(attribute, AttributeNames.KeyConverter, ref keyConverterAttribute) ||
-                CheckAttribute(attribute, AttributeNames.ValueConverter, ref valueConverterAttribute) ||
-                CheckAttribute(attribute, AttributeNames.Alias, ref aliases) ||
-                CheckAttribute(attribute, AttributeNames.ShortAlias, ref shortAliases) ||
-                CheckAttribute(attribute, AttributeNames.ArgumentValidation, ref validators))
+            if (CheckAttribute(attribute, _typeHelper.CommandLineArgumentAttribute, ref commandLineArgumentAttribute) ||
+                CheckAttribute(attribute, _typeHelper.MultiValueSeparatorAttribute, ref multiValueSeparator) ||
+                CheckAttribute(attribute, _typeHelper.DescriptionAttribute, ref description) ||
+                CheckAttribute(attribute, _typeHelper.AllowDuplicateDictionaryKeysAttribute, ref allowDuplicateDictionaryKeys) ||
+                CheckAttribute(attribute, _typeHelper.KeyValueSeparatorAttribute, ref keyValueSeparator) ||
+                CheckAttribute(attribute, _typeHelper.ArgumentConverterAttribute, ref converterAttribute) ||
+                CheckAttribute(attribute, _typeHelper.KeyConverterAttribute, ref keyConverterAttribute) ||
+                CheckAttribute(attribute, _typeHelper.ValueConverterAttribute, ref valueConverterAttribute) ||
+                CheckAttribute(attribute, _typeHelper.AliasAttribute, ref aliases) ||
+                CheckAttribute(attribute, _typeHelper.ShortAliasAttribute, ref shortAliases) ||
+                CheckAttribute(attribute, _typeHelper.ArgumentValidationAttribute, ref validators))
             {
                 continue;
             }
@@ -403,9 +403,9 @@ internal class ParserGenerator
     }
 
     // Using a ref parameter with bool return allows me to chain these together.
-    private static bool CheckAttribute(AttributeData data, string name, ref AttributeData? attribute)
+    private static bool CheckAttribute(AttributeData data, ITypeSymbol? attributeType, ref AttributeData? attribute)
     {
-        if (attribute != null || !(data.AttributeClass?.DerivesFrom(name) ?? false))
+        if (attribute != null || !(data.AttributeClass?.DerivesFrom(attributeType) ?? false))
         {
             return false;
         }
@@ -415,9 +415,9 @@ internal class ParserGenerator
     }
 
     // Using a ref parameter with bool return allows me to chain these together.
-    private static bool CheckAttribute(AttributeData data, string name, ref List<AttributeData>? attributes)
+    private static bool CheckAttribute(AttributeData data, ITypeSymbol? attributeType, ref List<AttributeData>? attributes)
     {
-        if (!(data.AttributeClass?.DerivesFrom(name) ?? false))
+        if (!(data.AttributeClass?.DerivesFrom(attributeType) ?? false))
         {
             return false;
         }

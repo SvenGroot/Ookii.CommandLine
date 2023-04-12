@@ -9,28 +9,17 @@ namespace Ookii.CommandLine.Generator;
 
 internal static class Extensions
 {
-    public static bool DerivesFrom(this ITypeSymbol symbol, string baseClassName)
+    public static bool DerivesFrom(this ITypeSymbol symbol, ITypeSymbol? baseClass)
     {
+        if (baseClass == null)
+        {
+            return false;
+        }
+
         var current = symbol;
         while (current != null)
         {
-            if (current.ToDisplayString() == baseClassName)
-            {
-                return true;
-            }
-
-            current = current.BaseType;
-        }
-
-        return false;
-    }
-
-    public static bool DerivesFrom(this ITypeSymbol type, ITypeSymbol baseClass)
-    {
-        var current = type;
-        while (current != null)
-        {
-            if (SymbolEqualityComparer.Default.Equals(current, baseClass))
+            if (current.SymbolEquals(baseClass))
             {
                 return true;
             }

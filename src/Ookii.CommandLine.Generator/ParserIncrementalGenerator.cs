@@ -83,6 +83,7 @@ public class ParserIncrementalGenerator : IIncrementalGenerator
     private static ClassDeclarationSyntax? GetClassToGenerate(GeneratorSyntaxContext context)
     {
         var classDeclaration = (ClassDeclarationSyntax)context.Node;
+        var generatedParserType = new TypeHelper(context.SemanticModel.Compilation).GeneratedParserAttribute;
         foreach (var attributeList in classDeclaration.AttributeLists)
         {
             foreach (var attribute in attributeList.Attributes)
@@ -94,8 +95,7 @@ public class ParserIncrementalGenerator : IIncrementalGenerator
                 }
 
                 var attributeType = attributeSymbol.ContainingType;
-                var name = attributeType.ToDisplayString();
-                if (name == AttributeNames.GeneratedParser)
+                if (attributeType.SymbolEquals(generatedParserType))
                 {
                     return classDeclaration;
                 }
