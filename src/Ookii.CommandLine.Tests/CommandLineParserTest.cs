@@ -1028,22 +1028,23 @@ namespace Ookii.CommandLine.Tests
             CheckThrows(() => parser.Parse(new[] { "1", "-Multi:2", "2", "3", "4", "-Other", "5", "6" }), parser, CommandLineArgumentErrorCategory.TooManyArguments);
         }
 
-        // TODO:
-        //[TestMethod]
-        //public void TestInjection()
-        //{
-        //    var parser = new CommandLineParser<InjectionArguments>();
-        //    var result = parser.Parse(new[] { "-Arg", "1" });
-        //    Assert.AreSame(parser, result.Parser);
-        //    Assert.AreEqual(1, result.Arg);
+        [TestMethod]
+        [DynamicData(nameof(ProviderKinds), DynamicDataDisplayName = nameof(GetCustomDynamicDataDisplayName))]
+        public void TestInjection(ArgumentProviderKind kind)
+        {
+            var parser = CreateParser<InjectionArguments>(kind);
+            var result = parser.Parse(new[] { "-Arg", "1" });
+            Assert.AreSame(parser, result.Parser);
+            Assert.AreEqual(1, result.Arg);
 
-        //    var parser2 = new CommandLineParser<InjectionMixedArguments>();
-        //    var result2 = parser2.Parse(new[] { "-Arg1", "1", "-Arg2", "2", "-Arg3", "3" });
-        //    Assert.AreSame(parser2, result2.Parser);
-        //    Assert.AreEqual(1, result2.Arg1);
-        //    Assert.AreEqual(2, result2.Arg2);
-        //    Assert.AreEqual(3, result2.Arg3);
-        //}
+            // TODO:
+            //var parser2 = new CommandLineParser<InjectionMixedArguments>();
+            //var result2 = parser2.Parse(new[] { "-Arg1", "1", "-Arg2", "2", "-Arg3", "3" });
+            //Assert.AreSame(parser2, result2.Parser);
+            //Assert.AreEqual(1, result2.Arg1);
+            //Assert.AreEqual(2, result2.Arg2);
+            //Assert.AreEqual(3, result2.Arg3);
+        }
 
         [TestMethod]
         [DynamicData(nameof(ProviderKinds), DynamicDataDisplayName = nameof(GetCustomDynamicDataDisplayName))]

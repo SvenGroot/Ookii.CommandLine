@@ -142,4 +142,18 @@ internal static class Extensions
         builder.Append(suffix);
         return builder.ToString();
     }
+
+    public static IMethodSymbol? FindConstructor(this INamedTypeSymbol type, ITypeSymbol? argumentType)
+    {
+        foreach (var ctor in type.Constructors)
+        {
+            if (!ctor.IsStatic && ctor.DeclaredAccessibility == Accessibility.Public && ctor.Parameters.Length == 1 &&
+                ctor.Parameters[0].Type.SymbolEquals(argumentType))
+            {
+                return ctor;
+            }
+        }
+
+        return null;
+    }
 }

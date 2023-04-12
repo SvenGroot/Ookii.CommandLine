@@ -462,7 +462,8 @@ namespace Ookii.CommandLine.Tests
         public bool[] MultiSwitch { get; set; }
     }
 
-    class InjectionArguments
+    [GeneratedParser]
+    partial class InjectionArguments
     {
         private readonly CommandLineParser _parser;
 

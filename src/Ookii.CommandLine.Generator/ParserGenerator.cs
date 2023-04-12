@@ -119,8 +119,15 @@ internal class ParserGenerator
         // TODO: IsCommand
         _builder.AppendLine("public override bool IsCommand => false;");
         _builder.AppendLine();
-        // TODO: Injection
-        _builder.AppendLine($"public override object CreateInstance(Ookii.CommandLine.CommandLineParser parser) => new {_argumentsClass.Name}();");
+        if (_argumentsClass.FindConstructor(_typeHelper.CommandLineParser) != null)
+        {
+            _builder.AppendLine($"public override object CreateInstance(Ookii.CommandLine.CommandLineParser parser) => new {_argumentsClass.Name}(parser);");
+        }
+        else
+        {
+            _builder.AppendLine($"public override object CreateInstance(Ookii.CommandLine.CommandLineParser parser) => new {_argumentsClass.Name}();");
+        }
+
         _builder.AppendLine();
         _builder.AppendLine("public override System.Collections.Generic.IEnumerable<Ookii.CommandLine.CommandLineArgument> GetArguments(Ookii.CommandLine.CommandLineParser parser)");
         _builder.OpenBlock();
