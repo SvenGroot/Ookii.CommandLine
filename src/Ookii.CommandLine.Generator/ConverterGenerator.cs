@@ -188,17 +188,37 @@ internal class ConverterGenerator
         builder.OpenBlock();
         string inputType = info.UseSpan ? "System.ReadOnlySpan<char>" : "string";
         string culture = info.HasCulture ? ", culture" : string.Empty;
+        builder.AppendLine($"public override object? Convert({inputType} value, System.Globalization.CultureInfo culture, Ookii.CommandLine.CommandLineArgument argument)");
+        builder.OpenBlock();
+        builder.AppendLine("try");
+        builder.OpenBlock();
         if (info.ParseMethod)
         {
-            builder.AppendLine($"public override object? Convert({inputType} value, System.Globalization.CultureInfo culture, Ookii.CommandLine.CommandLineArgument argument) => {type.ToDisplayString()}.Parse(value{culture});");
+            builder.AppendLine($"return {type.ToDisplayString()}.Parse(value{culture});");
         }
         else
         {
-            builder.AppendLine($"public override object? Convert({inputType} value, System.Globalization.CultureInfo culture, Ookii.CommandLine.CommandLineArgument argument) => new {type.ToDisplayString()}(value);");
+            builder.AppendLine($"return new {type.ToDisplayString()}(value);");
         }
 
+        builder.CloseBlock(); // try
+        builder.AppendLine("catch (Ookii.CommandLine.CommandLineArgumentException ex)");
+        builder.OpenBlock();
+        // Patch the exception with the argument name.
+        builder.AppendLine("throw new CommandLineArgumentException(ex.Message, argument.ArgumentName, ex.Category, ex.InnerException);");
+        builder.CloseBlock(); // catch
+        builder.AppendLine("catch (System.FormatException)");
+        builder.OpenBlock();
+        builder.AppendLine("throw;");
+        builder.CloseBlock(); // catch
+        builder.AppendLine("catch (System.Exception ex)");
+        builder.OpenBlock();
+        builder.AppendLine("throw new System.FormatException(ex.Message, ex);");
+        builder.CloseBlock(); // catch
+        builder.CloseBlock(); // Convert method
         if (info.UseSpan)
         {
+            builder.AppendLine();
             builder.AppendLine("public override object? Convert(string value, System.Globalization.CultureInfo culture, Ookii.CommandLine.CommandLineArgument argument) => Convert(System.MemoryExtensions.AsSpan(value), culture, argument);");
         }
 
