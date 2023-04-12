@@ -433,7 +433,7 @@ internal class ParserGenerator
         {
             // If the type is Dictionary<TKey, TValue> it doesn't matter if the property is
             // read-only or not.
-            if (namedType.IsGenericType && namedType.ConstructedFrom.ToDisplayString() == "System.Collections.Generic.Dictionary<TKey, TValue>")
+            if (namedType.IsGenericType && namedType.ConstructedFrom.SymbolEquals(_typeHelper.Dictionary))
             {
                 var keyValuePair = _compilation.GetTypeByMetadataName(typeof(KeyValuePair<,>).FullName)!;
                 var elementType = keyValuePair.Construct(namedType.TypeArguments, namedType.TypeArgumentNullableAnnotations);
@@ -466,7 +466,7 @@ internal class ParserGenerator
             return (null, null, null);
         }
 
-        var dictionaryType = argumentType.FindGenericInterface("System.Collections.Generic.IDictionary<TKey, TValue>");
+        var dictionaryType = argumentType.FindGenericInterface(_typeHelper.IDictionary);
         if (dictionaryType != null)
         {
             var keyValuePair = _compilation.GetTypeByMetadataName(typeof(KeyValuePair<,>).FullName)!;
@@ -474,7 +474,7 @@ internal class ParserGenerator
             return (null, dictionaryType, elementType);
         }
 
-        var collectionType = argumentType.FindGenericInterface("System.Collections.Generic.ICollection<T>");
+        var collectionType = argumentType.FindGenericInterface(_typeHelper.ICollection);
         if (collectionType != null)
         {
             var elementType = collectionType.TypeArguments[0];
@@ -512,13 +512,12 @@ internal class ParserGenerator
             return $"new {converterType.ToDisplayString()}()";
         }
 
-        var typeName = elementType.ToDisplayString();
-        switch (typeName)
+        if (elementType.SpecialType == SpecialType.System_String)
         {
-        case "string":
             return "Ookii.CommandLine.Conversion.StringConverter.Instance";
-
-        case "bool":
+        }
+        else if (elementType.SpecialType == SpecialType.System_Boolean)
+        {
             return "Ookii.CommandLine.Conversion.BooleanConverter.Instance";
         }
 
@@ -527,12 +526,12 @@ internal class ParserGenerator
             return $"new Ookii.CommandLine.Conversion.EnumConverter(typeof({elementType.ToDisplayString()}))";
         }
 
-        if (elementType.ImplementsInterface($"System.ISpanParsable<{elementType.ToDisplayString()}>"))
+        if (elementType.ImplementsInterface(_typeHelper.ISpanParsable?.Construct(elementType)))
         {
             return $"new Ookii.CommandLine.Conversion.SpanParsableConverter<{elementType.ToDisplayString()}>()";
         }
 
-        if (elementType.ImplementsInterface($"System.IParsable<{elementType.ToDisplayString()}>"))
+        if (elementType.ImplementsInterface(_typeHelper.IParsable?.Construct(elementType)))
         {
             return $"new Ookii.CommandLine.Conversion.ParsableConverter<{elementType.ToDisplayString()}>()";
         }
@@ -549,11 +548,11 @@ internal class ParserGenerator
         }
 
         var info = new MethodArgumentInfo();
-        if (method.ReturnType.DefaultEquals(_typeHelper.Boolean))
+        if (method.ReturnType.SpecialType == SpecialType.System_Boolean)
         {
             info.HasBooleanReturn = true;
         }
-        else if (!method.ReturnType.DefaultEquals(_typeHelper.Void))
+        else if (method.ReturnType.SpecialType != SpecialType.System_Void)
         {
             return null;
         }
@@ -561,7 +560,7 @@ internal class ParserGenerator
         if (parameters.Length == 2)
         {
             info.ArgumentType = parameters[0].Type;
-            if (!parameters[1].Type.DefaultEquals(_typeHelper.CommandLineParser))
+            if (!parameters[1].Type.SymbolEquals(_typeHelper.CommandLineParser))
             {
                 return null;
             }
@@ -571,7 +570,7 @@ internal class ParserGenerator
         }
         else if (parameters.Length == 1)
         {
-            if (parameters[0].Type.DefaultEquals(_typeHelper.CommandLineParser))
+            if (parameters[0].Type.SymbolEquals(_typeHelper.CommandLineParser))
             {
                 info.ArgumentType = _typeHelper.Boolean!;
                 info.HasParserParameter = true;

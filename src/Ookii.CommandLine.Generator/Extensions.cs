@@ -42,7 +42,7 @@ internal static class Extensions
     }
 
     public static bool IsNullableValueType(this INamedTypeSymbol type)
-        => !type.IsReferenceType && type.IsGenericType && type.ConstructedFrom.ToDisplayString() == "System.Nullable<T>";
+        => !type.IsReferenceType && type.IsGenericType && type.ConstructedFrom.SpecialType == SpecialType.System_Nullable_T;
 
     public static bool IsNullableValueType(this ITypeSymbol type)
         => type is INamedTypeSymbol namedType && namedType.IsNullableValueType();
@@ -56,18 +56,23 @@ internal static class Extensions
     public static ITypeSymbol GetUnderlyingType(this ITypeSymbol type)
         => type is INamedTypeSymbol namedType && namedType.IsNullableValueType() ? (INamedTypeSymbol)namedType.TypeArguments[0] : type;
 
-    public static bool IsEnum(this ITypeSymbol type) => type.BaseType?.ToDisplayString() == "System.Enum";
+    public static bool IsEnum(this ITypeSymbol type) => type.BaseType?.SpecialType == SpecialType.System_Enum;
 
-    public static INamedTypeSymbol? FindGenericInterface(this ITypeSymbol type, string interfaceName)
+    public static INamedTypeSymbol? FindGenericInterface(this ITypeSymbol type, ITypeSymbol? interfaceToFind)
     {
-        if (type.TypeKind == TypeKind.Interface && ((INamedTypeSymbol)type).IsTypeOrConstructedFrom(interfaceName))
+        if (interfaceToFind == null)
+        {
+            return null;
+        }
+
+        if (type.TypeKind == TypeKind.Interface && ((INamedTypeSymbol)type).IsConstructedFrom(interfaceToFind))
         {
             return (INamedTypeSymbol)type;
         }
 
         foreach (var iface in type.AllInterfaces)
         {
-            if (iface.IsTypeOrConstructedFrom(interfaceName))
+            if (iface.IsConstructedFrom(interfaceToFind))
             {
                 return iface;
             }
@@ -76,7 +81,7 @@ internal static class Extensions
         return null;
     }
 
-    public static bool IsTypeOrConstructedFrom(this INamedTypeSymbol type, string name)
+    public static bool IsConstructedFrom(this INamedTypeSymbol type, ITypeSymbol typeDefinition)
     {
         var realType = type;
         if (realType.IsGenericType)
@@ -84,27 +89,24 @@ internal static class Extensions
             realType = realType.ConstructedFrom;
         }
 
-        return realType.ToDisplayString() == name;
+        return realType.SymbolEquals(typeDefinition);
     }
 
-    public static bool ImplementsInterface(this ITypeSymbol symbol, string interfaceName)
+    public static bool ImplementsInterface(this ITypeSymbol type, ITypeSymbol? interfaceType)
     {
-        foreach (var iface in symbol.AllInterfaces)
+        if (interfaceType == null)
         {
-            if (iface.ToDisplayString() == interfaceName)
-            {
-                return true;
-            }
+            return false;
         }
 
-        return false;
-    }
+        if (type.SymbolEquals(interfaceType))
+        {
+            return true;
+        }
 
-    public static bool ImplementsInterface(this ITypeSymbol type, ITypeSymbol interfaceType)
-    {
         foreach (var iface in type.AllInterfaces)
         {
-            if (SymbolEqualityComparer.Default.Equals(iface, interfaceType))
+            if (iface.SymbolEquals(interfaceType))
             {
                 return true;
             }
@@ -138,7 +140,7 @@ internal static class Extensions
         };
     }
 
-    public static bool DefaultEquals(this ISymbol left, ISymbol? right) => SymbolEqualityComparer.Default.Equals(left, right);
+    public static bool SymbolEquals(this ISymbol left, ISymbol? right) => SymbolEqualityComparer.Default.Equals(left, right);
 
     public static string ToIdentifier(this string displayName, string suffix)
     {

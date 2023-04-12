@@ -7,6 +7,6 @@ namespace Ookii.CommandLine;
 /// TODO: Better help.
 /// </summary>
 [AttributeUsage(AttributeTargets.Class)]
-public class GeneratedParserAttribute : Attribute
+public sealed class GeneratedParserAttribute : Attribute
 {
 }
