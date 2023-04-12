@@ -12,11 +12,13 @@ internal class TypeHelper
         _compilation = compilation;
     }
 
-    public INamedTypeSymbol? String => _compilation.GetTypeByMetadataName("System.String");
+    public INamedTypeSymbol? String => _compilation.GetSpecialType(SpecialType.System_String);
 
-    public INamedTypeSymbol? Void => _compilation.GetTypeByMetadataName("System.Void");
+    public INamedTypeSymbol? Void => _compilation.GetSpecialType(SpecialType.System_Void);
 
-    public INamedTypeSymbol? Boolean => _compilation.GetTypeByMetadataName("System.Boolean");
+    public INamedTypeSymbol? Boolean => _compilation.GetSpecialType(SpecialType.System_Boolean);
 
     public INamedTypeSymbol? CommandLineParser => _compilation.GetTypeByMetadataName(NamespacePrefix + "CommandLineParser");
+
+    public INamedTypeSymbol? IParser => _compilation.GetTypeByMetadataName(NamespacePrefix + "IParserProvider`1");
 }

@@ -46,11 +46,19 @@ internal class ParserGenerator
     public string? Generate()
     {
         _builder.AppendLine($"partial class {_argumentsClass.Name}");
+        if (_typeHelper.IParser != null)
+        {
+            _builder.AppendLine($"    : Ookii.CommandLine.IParser<{_argumentsClass.Name}>");
+        }
+
         _builder.OpenBlock();
         GenerateProvider();
         _builder.AppendLine($"public static Ookii.CommandLine.CommandLineParser<{_argumentsClass.Name}> CreateParser(Ookii.CommandLine.ParseOptions? options = null) => new(new GeneratedProvider(), options);");
         _builder.AppendLine();
         var nullableType = _argumentsClass.WithNullableAnnotation(NullableAnnotation.Annotated);
+        // TODO: Optionally implement these.
+        // We cannot rely on default implementations, because that makes the methods uncallable
+        // without a generic type argument.
         _builder.AppendLine($"public static {nullableType.ToDisplayString()} Parse(Ookii.CommandLine.ParseOptions? options = null) => CreateParser(options).ParseWithErrorHandling();");
         _builder.AppendLine();
         _builder.AppendLine($"public static {nullableType.ToDisplayString()} Parse(string[] args, Ookii.CommandLine.ParseOptions? options = null) => CreateParser(options).ParseWithErrorHandling(args);");

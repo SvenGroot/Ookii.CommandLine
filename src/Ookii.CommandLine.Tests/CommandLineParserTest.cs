@@ -1258,12 +1258,20 @@ namespace Ookii.CommandLine.Tests
         }
 
         internal static CommandLineParser<T> CreateParser<T>(ArgumentProviderKind kind, ParseOptions options = null)
-            where T: class
+#if NET7_0_OR_GREATER
+            where T : class, IParserProvider<T>
+#else
+            where T : class
+#endif
         {
             var parser = kind switch
             {
                 ArgumentProviderKind.Reflection => new CommandLineParser<T>(options),
+#if NET7_0_OR_GREATER
+                ArgumentProviderKind.Generated => T.CreateParser(options),
+#else
                 ArgumentProviderKind.Generated => (CommandLineParser<T>)typeof(T).InvokeMember("CreateParser", BindingFlags.Public | BindingFlags.Static | BindingFlags.InvokeMethod, null, null, new object[] { options }),
+#endif
                 _ => throw new InvalidOperationException()
             };
 
@@ -1272,12 +1280,20 @@ namespace Ookii.CommandLine.Tests
         }
 
         private static T StaticParse<T>(ArgumentProviderKind kind, string[] args, ParseOptions options = null)
+#if NET7_0_OR_GREATER
+            where T : class, IParser<T>
+#else
             where T : class
+#endif
         {
             return kind switch
             {
                 ArgumentProviderKind.Reflection => CommandLineParser.Parse<T>(args, options),
+#if NET7_0_OR_GREATER
+                ArgumentProviderKind.Generated => T.Parse(args, options),
+#else
                 ArgumentProviderKind.Generated => (T)typeof(T).InvokeMember("Parse", BindingFlags.Public | BindingFlags.Static | BindingFlags.InvokeMethod, null, null, new object[] { args, options }),
+#endif
                 _ => throw new InvalidOperationException()
             };
         }

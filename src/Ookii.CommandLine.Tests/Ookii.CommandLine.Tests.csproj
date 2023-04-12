@@ -5,7 +5,7 @@
     <Nullable>disable</Nullable>
     <Description>Tests for Ookii.CommandLine.</Description>
     <IsPackable>false</IsPackable>
-    <LangVersion>9.0</LangVersion>
+    <LangVersion>11.0</LangVersion>
     <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
   </PropertyGroup>
 

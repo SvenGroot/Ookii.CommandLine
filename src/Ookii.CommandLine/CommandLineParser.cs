@@ -996,9 +996,6 @@ public class CommandLineParser
     ///   error occurred, or argument parsing was canceled by the <see cref="CommandLineArgumentAttribute.CancelParsing"/>
     ///   property or a method argument that returned <see langword="false"/>.
     /// </returns>
-    /// <exception cref="CommandLineArgumentException">
-    ///   <inheritdoc cref="Parse()"/>
-    /// </exception>
     /// <remarks>
     /// <para>
     ///   This is a convenience function that instantiates a <see cref="CommandLineParser"/>,
