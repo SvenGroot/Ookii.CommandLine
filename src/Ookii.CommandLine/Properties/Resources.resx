@@ -396,4 +396,7 @@
   <data name="IncorrectProviderTypeFormat" xml:space="preserve">
     <value>The provided ArgumentProvider is not for the type '{0}'.</value>
   </data>
+  <data name="NoCustomParsing" xml:space="preserve">
+    <value>The command does not use custom parsing.</value>
+  </data>
 </root>

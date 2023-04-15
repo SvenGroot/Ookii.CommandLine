@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Data;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
@@ -13,18 +14,18 @@ namespace Ookii.CommandLine.Commands
     /// <seealso cref="CommandManager"/>
     /// <seealso cref="ICommand"/>
     /// <seealso cref="CommandAttribute"/>
-    public struct CommandInfo
+    public abstract class CommandInfo
     {
         private readonly CommandManager _manager;
         private readonly string _name;
         private readonly Type _commandType;
         private readonly CommandAttribute _attribute;
-        private string? _description;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="CommandInfo"/> structure.
+        /// Initializes a new instance of the <see cref="CommandInfo"/> class.
         /// </summary>
         /// <param name="commandType">The type that implements the subcommand.</param>
+        /// <param name="attribute">The <see cref="CommandAttribute"/> for the subcommand type.</param>
         /// <param name="manager">
         ///   The <see cref="CommandManager"/> that is managing this command.
         /// </param>
@@ -34,28 +35,29 @@ namespace Ookii.CommandLine.Commands
         /// <exception cref="ArgumentException">
         ///   <paramref name="commandType"/> is not a command type.
         /// </exception>
-        public CommandInfo(Type commandType, CommandManager manager)
-            : this(commandType, GetCommandAttributeOrThrow(commandType), manager)
-        {
-        }
-
-        private CommandInfo(string name, Type commandType, string description, CommandManager manager)
-        {
-            _manager = manager;
-            _attribute = GetCommandAttribute(commandType)!;
-            _name = name;
-            _commandType = commandType;
-            _description = description;
-        }
-
-        private CommandInfo(Type commandType, CommandAttribute attribute, CommandManager manager)
+        protected CommandInfo(Type commandType, CommandAttribute attribute, CommandManager manager)
         {
             _manager = manager ?? throw new ArgumentNullException(nameof(manager));
             _name = GetName(attribute, commandType, manager.Options);
             _commandType = commandType;
-            _description = null;
             _attribute = attribute;
         }
+
+        internal CommandInfo(Type commandType, string name, CommandManager manager)
+        {
+            _manager = manager;
+            _name = name;
+            _commandType = commandType;
+            _attribute = new();
+        }
+
+        /// <summary>
+        /// Gets the <see cref="CommandManager"/> that this instance belongs to.
+        /// </summary>
+        /// <value>
+        /// An instance of the <see cref="CommandManager"/> class.
+        /// </value>
+        public CommandManager Manager => _manager;
 
         /// <summary>
         /// Gets the name of the command.
@@ -88,7 +90,7 @@ namespace Ookii.CommandLine.Commands
         /// The description of the command, determined using the <see cref="DescriptionAttribute"/>
         /// attribute.
         /// </value>
-        public string? Description => _description ??= GetCommandDescription();
+        public abstract string? Description { get; }
 
         /// <summary>
         /// Gets a value that indicates if the command uses custom parsing.
@@ -97,7 +99,7 @@ namespace Ookii.CommandLine.Commands
         /// <see langword="true"/> if the command type implements the <see cref="ICommandWithCustomParsing"/>
         /// interface; otherwise, <see langword="false"/>.
         /// </value>
-        public bool UseCustomArgumentParsing => _commandType.ImplementsInterface(typeof(ICommandWithCustomParsing));
+        public abstract bool UseCustomArgumentParsing { get; }
 
         /// <summary>
         /// Gets or sets a value that indicates whether the command is hidden from the usage help.
@@ -127,7 +129,7 @@ namespace Ookii.CommandLine.Commands
         ///   class implementing the <see cref="ICommand"/> interface.
         /// </para>
         /// </remarks>
-        public IEnumerable<string> Aliases => _commandType.GetCustomAttributes<AliasAttribute>().Select(a => a.Alias);
+        public abstract IEnumerable<string> Aliases { get; }
 
         /// <summary>
         /// Creates an instance of the command type.
@@ -181,7 +183,7 @@ namespace Ookii.CommandLine.Commands
 
             if (UseCustomArgumentParsing)
             {
-                var command = (ICommandWithCustomParsing)Activator.CreateInstance(CommandType)!;
+                var command = CreateInstanceWithCustomParsing();
                 command.Parse(args, index, _manager.Options);
                 return (command, default);
             }
@@ -209,15 +211,25 @@ namespace Ookii.CommandLine.Commands
         ///   must use the <see cref="CreateInstance"/> method.
         /// </para>
         /// </remarks>
-        public CommandLineParser CreateParser()
+        public virtual CommandLineParser CreateParser()
         {
             if (UseCustomArgumentParsing)
             {
                 throw new InvalidOperationException(Properties.Resources.NoParserForCustomParsingCommand);
             }
 
-            return new CommandLineParser(CommandType, _manager.Options);
+            return new CommandLineParser(CommandType, Manager.Options);
         }
+
+        /// <summary>
+        /// Creates an instance of a command that uses the <see cref="ICommandWithCustomParsing"/>
+        /// interface.
+        /// </summary>
+        /// <returns>An instance of the command type.</returns>
+        /// <exception cref="InvalidOperationException">
+        ///   The command does not use the <see cref="ICommandWithCustomParsing"/> interface.
+        /// </exception>
+        public abstract ICommandWithCustomParsing CreateInstanceWithCustomParsing();
 
         /// <summary>
         /// Checks whether the command's name or aliases match the specified name.
@@ -251,7 +263,7 @@ namespace Ookii.CommandLine.Commands
         }
 
         /// <summary>
-        /// Creates an instance of the <see cref="CommandInfo"/> structure only if <paramref name="commandType"/>
+        /// Creates an instance of the <see cref="CommandInfo"/> class only if <paramref name="commandType"/>
         /// represents a command type.
         /// </summary>
         /// <param name="commandType">The type that implements the subcommand.</param>
@@ -262,19 +274,31 @@ namespace Ookii.CommandLine.Commands
         ///   <paramref name="commandType"/> or <paramref name="manager"/> is <see langword="null"/>.
         /// </exception>
         /// <returns>
-        ///   A <see cref="CommandInfo"/> structure with information about the command, or
+        ///   A <see cref="CommandInfo"/> class with information about the command, or
         ///   <see langword="null"/> if <paramref name="commandType"/> was not a command.
         /// </returns>
         public static CommandInfo? TryCreate(Type commandType, CommandManager manager)
-        {
-            var attribute = GetCommandAttribute(commandType);
-            if (attribute == null)
-            {
-                return null;
-            }
+            => ReflectionCommandInfo.TryCreate(commandType, manager);
 
-            return new CommandInfo(commandType, attribute, manager);
-        }
+        /// <summary>
+        /// Creates an instance of the <see cref="CommandInfo"/> class for the specified command
+        /// type.
+        /// </summary>
+        /// <param name="commandType">The type that implements the subcommand.</param>
+        /// <param name="manager">
+        ///   The <see cref="CommandManager"/> that is managing this command.
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        ///   <paramref name="commandType"/> or <paramref name="manager"/> is <see langword="null"/>.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        ///   <paramref name="commandType"/> is not a command.
+        /// </exception>
+        /// <returns>
+        ///   A <see cref="CommandInfo"/> class with information about the command.
+        /// </returns>
+        public static CommandInfo Create(Type commandType, CommandManager manager)
+            => new ReflectionCommandInfo(commandType, manager);
 
         /// <summary>
         /// Returns a value indicating if the specified type is a subcommand.
@@ -287,38 +311,13 @@ namespace Ookii.CommandLine.Commands
         /// <exception cref="ArgumentNullException">
         /// <paramref name="commandType"/> is <see langword="null"/>.
         /// </exception>
-        public static bool IsCommand(Type commandType)
-        {
-            return GetCommandAttribute(commandType) != null;
-        }
+        public static bool IsCommand(Type commandType) => ReflectionCommandInfo.GetCommandAttribute(commandType) != null;
 
         internal static CommandInfo GetAutomaticVersionCommand(CommandManager manager)
         {
             var name = manager.Options.AutoVersionCommandName();
             var description = manager.Options.StringProvider.AutomaticVersionCommandDescription();
-            return new CommandInfo(name, typeof(AutomaticVersionCommand), description, manager);
-        }
-
-        private static CommandAttribute? GetCommandAttribute(Type commandType)
-        {
-            if (commandType == null)
-            {
-                throw new ArgumentNullException(nameof(commandType));
-            }
-
-            if (commandType.IsAbstract || !commandType.ImplementsInterface(typeof(ICommand)))
-            {
-                return null;
-            }
-
-            return commandType.GetCustomAttribute<CommandAttribute>();
-        }
-
-        private static CommandAttribute GetCommandAttributeOrThrow(Type commandType)
-        {
-            return GetCommandAttribute(commandType) ??
-                throw new ArgumentException(string.Format(CultureInfo.CurrentCulture,
-                    Properties.Resources.TypeIsNotCommandFormat, commandType.FullName));
+            return new BasicCommandInfo(typeof(AutomaticVersionCommand), name, description, manager);
         }
 
         private static string GetName(CommandAttribute attribute, Type commandType, CommandOptions? options)
@@ -326,11 +325,6 @@ namespace Ookii.CommandLine.Commands
             return attribute.CommandName ??
                 options?.CommandNameTransform.Apply(commandType.Name, options.StripCommandNameSuffix) ??
                 commandType.Name;
-        }
-
-        private string? GetCommandDescription()
-        {
-            return _commandType.GetCustomAttribute<DescriptionAttribute>()?.Description;
         }
     }
 }

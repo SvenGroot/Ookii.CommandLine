@@ -38,16 +38,16 @@ namespace Ookii.CommandLine.Tests
             var manager = new CommandManager(_commandAssembly);
             var command = manager.GetCommand("test");
             Assert.IsNotNull(command);
-            Assert.AreEqual("test", command.Value.Name);
-            Assert.AreEqual(typeof(TestCommand), command.Value.CommandType);
+            Assert.AreEqual("test", command.Name);
+            Assert.AreEqual(typeof(TestCommand), command.CommandType);
 
             command = manager.GetCommand("wrong");
             Assert.IsNull(command);
 
             command = manager.GetCommand("Test"); // default is case-insensitive
             Assert.IsNotNull(command);
-            Assert.AreEqual("test", command.Value.Name);
-            Assert.AreEqual(typeof(TestCommand), command.Value.CommandType);
+            Assert.AreEqual("test", command.Name);
+            Assert.AreEqual(typeof(TestCommand), command.CommandType);
 
             var manager2 = new CommandManager(_commandAssembly, new CommandOptions() { CommandNameComparer = StringComparer.Ordinal });
             command = manager2.GetCommand("Test");
@@ -55,13 +55,13 @@ namespace Ookii.CommandLine.Tests
 
             command = manager.GetCommand("AnotherSimpleCommand");
             Assert.IsNotNull(command);
-            Assert.AreEqual("AnotherSimpleCommand", command.Value.Name);
-            Assert.AreEqual(typeof(AnotherSimpleCommand), command.Value.CommandType);
+            Assert.AreEqual("AnotherSimpleCommand", command.Name);
+            Assert.AreEqual(typeof(AnotherSimpleCommand), command.CommandType);
 
             command = manager.GetCommand("alias");
             Assert.IsNotNull(command);
-            Assert.AreEqual("AnotherSimpleCommand", command.Value.Name);
-            Assert.AreEqual(typeof(AnotherSimpleCommand), command.Value.CommandType);
+            Assert.AreEqual("AnotherSimpleCommand", command.Name);
+            Assert.AreEqual(typeof(AnotherSimpleCommand), command.CommandType);
         }
 
         [TestMethod]
@@ -239,23 +239,23 @@ namespace Ookii.CommandLine.Tests
             };
 
             var manager = new CommandManager(_commandAssembly, options);
-            var info = new CommandInfo(typeof(AnotherSimpleCommand), manager);
+            var info = CommandInfo.Create(typeof(AnotherSimpleCommand), manager);
             Assert.AreEqual("AnotherSimple", info.Name);
 
             options.CommandNameTransform = NameTransform.CamelCase;
-            info = new CommandInfo(typeof(AnotherSimpleCommand), manager);
+            info = CommandInfo.Create(typeof(AnotherSimpleCommand), manager);
             Assert.AreEqual("anotherSimple", info.Name);
 
             options.CommandNameTransform = NameTransform.SnakeCase;
-            info = new CommandInfo(typeof(AnotherSimpleCommand), manager);
+            info = CommandInfo.Create(typeof(AnotherSimpleCommand), manager);
             Assert.AreEqual("another_simple", info.Name);
 
             options.CommandNameTransform = NameTransform.DashCase;
-            info = new CommandInfo(typeof(AnotherSimpleCommand), manager);
+            info = CommandInfo.Create(typeof(AnotherSimpleCommand), manager);
             Assert.AreEqual("another-simple", info.Name);
 
             options.StripCommandNameSuffix = null;
-            info = new CommandInfo(typeof(AnotherSimpleCommand), manager);
+            info = CommandInfo.Create(typeof(AnotherSimpleCommand), manager);
             Assert.AreEqual("another-simple-command", info.Name);
 
             options.StripCommandNameSuffix = "Command";

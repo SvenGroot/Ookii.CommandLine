@@ -457,6 +457,15 @@ namespace Ookii.CommandLine.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The command does not use custom parsing..
+        /// </summary>
+        internal static string NoCustomParsing {
+            get {
+                return ResourceManager.GetString("NoCustomParsing", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to A key/value pair must contain &quot;{0}&quot; as a separator..
         /// </summary>
         internal static string NoKeyValuePairSeparatorFormat {

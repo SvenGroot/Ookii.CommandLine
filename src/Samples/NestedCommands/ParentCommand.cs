@@ -29,7 +29,7 @@ internal abstract class ParentCommand : AsyncCommandBase, ICommandWithCustomPars
             (command) => command.CommandType.GetCustomAttribute<ParentCommandAttribute>()?.ParentCommand == GetType();
 
         var manager = new CommandManager(options);
-        var info = new CommandInfo(GetType(), manager);
+        var info = CommandInfo.Create(GetType(), manager);
 
         // Use a custom UsageWriter to replace the application description with the
         // description of this command.
