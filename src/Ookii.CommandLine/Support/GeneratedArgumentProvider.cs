@@ -44,7 +44,7 @@ public abstract class GeneratedArgumentProvider : ArgumentProvider
     }
 
     /// <inheritdoc/>
-    public override ArgumentProviderKind Kind => ArgumentProviderKind.Generated;
+    public override ProviderKind Kind => ProviderKind.Generated;
 
     /// <inheritdoc/>
     public override string ApplicationFriendlyName

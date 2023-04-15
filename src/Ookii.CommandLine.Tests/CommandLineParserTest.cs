@@ -20,7 +20,7 @@ namespace Ookii.CommandLine.Tests
     {
         [TestMethod]
         [DynamicData(nameof(ProviderKinds), DynamicDataDisplayName = nameof(GetCustomDynamicDataDisplayName))]
-        public void ConstructorEmptyArgumentsTest(ArgumentProviderKind kind)
+        public void ConstructorEmptyArgumentsTest(ProviderKind kind)
         {
             Type argumentsType = typeof(EmptyArguments);
             var target = CreateParser<EmptyArguments>(kind);
@@ -44,7 +44,7 @@ namespace Ookii.CommandLine.Tests
 
         [TestMethod]
         [DynamicData(nameof(ProviderKinds), DynamicDataDisplayName = nameof(GetCustomDynamicDataDisplayName))]
-        public void ConstructorTest(ArgumentProviderKind kind)
+        public void ConstructorTest(ProviderKind kind)
         {
             Type argumentsType = typeof(TestArguments);
             var target = CreateParser<TestArguments>(kind);
@@ -83,7 +83,7 @@ namespace Ookii.CommandLine.Tests
 
         [TestMethod]
         [DynamicData(nameof(ProviderKinds), DynamicDataDisplayName = nameof(GetCustomDynamicDataDisplayName))]
-        public void ParseTest(ArgumentProviderKind kind)
+        public void ParseTest(ProviderKind kind)
         {
             var target = CreateParser<TestArguments>(kind);
             // Only required arguments
@@ -112,7 +112,7 @@ namespace Ookii.CommandLine.Tests
 
         [TestMethod]
         [DynamicData(nameof(ProviderKinds), DynamicDataDisplayName = nameof(GetCustomDynamicDataDisplayName))]
-        public void ParseTestEmptyArguments(ArgumentProviderKind kind)
+        public void ParseTestEmptyArguments(ProviderKind kind)
         {
             var target = CreateParser<EmptyArguments>(kind);
             // This test was added because version 2.0 threw an IndexOutOfRangeException when you tried to specify a positional argument when there were no positional arguments defined.
@@ -121,7 +121,7 @@ namespace Ookii.CommandLine.Tests
 
         [TestMethod]
         [DynamicData(nameof(ProviderKinds), DynamicDataDisplayName = nameof(GetCustomDynamicDataDisplayName))]
-        public void ParseTestTooManyArguments(ArgumentProviderKind kind)
+        public void ParseTestTooManyArguments(ProviderKind kind)
         {
             var target = CreateParser<ThrowingArguments>(kind);
 
@@ -131,7 +131,7 @@ namespace Ookii.CommandLine.Tests
 
         [TestMethod]
         [DynamicData(nameof(ProviderKinds), DynamicDataDisplayName = nameof(GetCustomDynamicDataDisplayName))]
-        public void ParseTestPropertySetterThrows(ArgumentProviderKind kind)
+        public void ParseTestPropertySetterThrows(ProviderKind kind)
         {
             var target = CreateParser<ThrowingArguments>(kind);
 
@@ -144,7 +144,7 @@ namespace Ookii.CommandLine.Tests
 
         [TestMethod]
         [DynamicData(nameof(ProviderKinds), DynamicDataDisplayName = nameof(GetCustomDynamicDataDisplayName))]
-        public void ParseTestConstructorThrows(ArgumentProviderKind kind)
+        public void ParseTestConstructorThrows(ProviderKind kind)
         {
             var target = CreateParser<ThrowingConstructor>(kind);
 
@@ -157,7 +157,7 @@ namespace Ookii.CommandLine.Tests
 
         [TestMethod]
         [DynamicData(nameof(ProviderKinds), DynamicDataDisplayName = nameof(GetCustomDynamicDataDisplayName))]
-        public void ParseTestDuplicateDictionaryKeys(ArgumentProviderKind kind)
+        public void ParseTestDuplicateDictionaryKeys(ProviderKind kind)
         {
             var target = CreateParser<DictionaryArguments>(kind);
 
@@ -176,7 +176,7 @@ namespace Ookii.CommandLine.Tests
 
         [TestMethod]
         [DynamicData(nameof(ProviderKinds), DynamicDataDisplayName = nameof(GetCustomDynamicDataDisplayName))]
-        public void ParseTestMultiValueSeparator(ArgumentProviderKind kind)
+        public void ParseTestMultiValueSeparator(ProviderKind kind)
         {
             var target = CreateParser<MultiValueSeparatorArguments>(kind);
 
@@ -188,7 +188,7 @@ namespace Ookii.CommandLine.Tests
 
         [TestMethod]
         [DynamicData(nameof(ProviderKinds), DynamicDataDisplayName = nameof(GetCustomDynamicDataDisplayName))]
-        public void ParseTestNameValueSeparator(ArgumentProviderKind kind)
+        public void ParseTestNameValueSeparator(ProviderKind kind)
         {
             var target = CreateParser<SimpleArguments>(kind);
             Assert.AreEqual(CommandLineParser.DefaultNameValueSeparator, target.NameValueSeparator);
@@ -214,7 +214,7 @@ namespace Ookii.CommandLine.Tests
 
         [TestMethod]
         [DynamicData(nameof(ProviderKinds), DynamicDataDisplayName = nameof(GetCustomDynamicDataDisplayName))]
-        public void ParseTestKeyValueSeparator(ArgumentProviderKind kind)
+        public void ParseTestKeyValueSeparator(ProviderKind kind)
         {
             var target = CreateParser<KeyValueSeparatorArguments>(kind);
             Assert.AreEqual("=", target.GetArgument("DefaultSeparator")!.KeyValueSeparator);
@@ -242,7 +242,7 @@ namespace Ookii.CommandLine.Tests
 
         [TestMethod]
         [DynamicData(nameof(ProviderKinds), DynamicDataDisplayName = nameof(GetCustomDynamicDataDisplayName))]
-        public void TestWriteUsage(ArgumentProviderKind kind)
+        public void TestWriteUsage(ProviderKind kind)
         {
             var options = new ParseOptions()
             {
@@ -261,7 +261,7 @@ namespace Ookii.CommandLine.Tests
 
         [TestMethod]
         [DynamicData(nameof(ProviderKinds), DynamicDataDisplayName = nameof(GetCustomDynamicDataDisplayName))]
-        public void TestWriteUsageLongShort(ArgumentProviderKind kind)
+        public void TestWriteUsageLongShort(ProviderKind kind)
         {
             var target = CreateParser<LongShortArguments>(kind);
             var options = new UsageWriter()
@@ -288,7 +288,7 @@ namespace Ookii.CommandLine.Tests
 
         [TestMethod]
         [DynamicData(nameof(ProviderKinds), DynamicDataDisplayName = nameof(GetCustomDynamicDataDisplayName))]
-        public void TestWriteUsageFilter(ArgumentProviderKind kind)
+        public void TestWriteUsageFilter(ProviderKind kind)
         {
             var target = CreateParser<TestArguments>(kind);
             var options = new UsageWriter()
@@ -311,7 +311,7 @@ namespace Ookii.CommandLine.Tests
 
         [TestMethod]
         [DynamicData(nameof(ProviderKinds), DynamicDataDisplayName = nameof(GetCustomDynamicDataDisplayName))]
-        public void TestWriteUsageColor(ArgumentProviderKind kind)
+        public void TestWriteUsageColor(ProviderKind kind)
         {
             var options = new ParseOptions()
             {
@@ -334,7 +334,7 @@ namespace Ookii.CommandLine.Tests
 
         [TestMethod]
         [DynamicData(nameof(ProviderKinds), DynamicDataDisplayName = nameof(GetCustomDynamicDataDisplayName))]
-        public void TestWriteUsageOrder(ArgumentProviderKind kind)
+        public void TestWriteUsageOrder(ProviderKind kind)
         {
             var parser = CreateParser<LongShortArguments>(kind);
             var options = new UsageWriter()
@@ -379,7 +379,7 @@ namespace Ookii.CommandLine.Tests
 
         [TestMethod]
         [DynamicData(nameof(ProviderKinds), DynamicDataDisplayName = nameof(GetCustomDynamicDataDisplayName))]
-        public void TestWriteUsageSeparator(ArgumentProviderKind kind)
+        public void TestWriteUsageSeparator(ProviderKind kind)
         {
             var options = new ParseOptions()
             {
@@ -397,7 +397,7 @@ namespace Ookii.CommandLine.Tests
 
         [TestMethod]
         [DynamicData(nameof(ProviderKinds), DynamicDataDisplayName = nameof(GetCustomDynamicDataDisplayName))]
-        public void TestWriteUsageCustomIndent(ArgumentProviderKind kind)
+        public void TestWriteUsageCustomIndent(ProviderKind kind)
         {
             var options = new ParseOptions()
             {
@@ -414,7 +414,7 @@ namespace Ookii.CommandLine.Tests
 
         [TestMethod]
         [DynamicData(nameof(ProviderKinds), DynamicDataDisplayName = nameof(GetCustomDynamicDataDisplayName))]
-        public void TestStaticParse(ArgumentProviderKind kind)
+        public void TestStaticParse(ProviderKind kind)
         {
             using var output = new StringWriter();
             using var lineWriter = new LineWrappingTextWriter(output, 0);
@@ -475,7 +475,7 @@ namespace Ookii.CommandLine.Tests
 
         [TestMethod]
         [DynamicData(nameof(ProviderKinds), DynamicDataDisplayName = nameof(GetCustomDynamicDataDisplayName))]
-        public void TestCancelParsing(ArgumentProviderKind kind)
+        public void TestCancelParsing(ProviderKind kind)
         {
             var parser = CreateParser<CancelArguments>(kind);
 
@@ -559,7 +559,7 @@ namespace Ookii.CommandLine.Tests
 
         [TestMethod]
         [DynamicData(nameof(ProviderKinds), DynamicDataDisplayName = nameof(GetCustomDynamicDataDisplayName))]
-        public void TestParseOptionsAttribute(ArgumentProviderKind kind)
+        public void TestParseOptionsAttribute(ProviderKind kind)
         {
             var parser = CreateParser<ParseOptionsArguments>(kind);
             Assert.IsFalse(parser.AllowWhiteSpaceValueSeparator);
@@ -602,7 +602,7 @@ namespace Ookii.CommandLine.Tests
 
         [TestMethod]
         [DynamicData(nameof(ProviderKinds), DynamicDataDisplayName = nameof(GetCustomDynamicDataDisplayName))]
-        public void TestCulture(ArgumentProviderKind kind)
+        public void TestCulture(ProviderKind kind)
         {
             var result = StaticParse<CultureArguments>(kind, new[] { "-Argument", "5.5" });
             Assert.IsNotNull(result);
@@ -624,7 +624,7 @@ namespace Ookii.CommandLine.Tests
 
         [TestMethod]
         [DynamicData(nameof(ProviderKinds), DynamicDataDisplayName = nameof(GetCustomDynamicDataDisplayName))]
-        public void TestLongShortMode(ArgumentProviderKind kind)
+        public void TestLongShortMode(ProviderKind kind)
         {
             var parser = CreateParser<LongShortArguments>(kind);
             Assert.AreEqual(ParsingMode.LongShort, parser.Mode);
@@ -675,7 +675,7 @@ namespace Ookii.CommandLine.Tests
 
         [TestMethod]
         [DynamicData(nameof(ProviderKinds), DynamicDataDisplayName = nameof(GetCustomDynamicDataDisplayName))]
-        public void TestMethodArguments(ArgumentProviderKind kind)
+        public void TestMethodArguments(ProviderKind kind)
         {
             var parser = CreateParser<MethodArguments>(kind);
 
@@ -728,7 +728,7 @@ namespace Ookii.CommandLine.Tests
 
         [TestMethod]
         [DynamicData(nameof(ProviderKinds), DynamicDataDisplayName = nameof(GetCustomDynamicDataDisplayName))]
-        public void TestAutomaticArgumentConflict(ArgumentProviderKind kind)
+        public void TestAutomaticArgumentConflict(ProviderKind kind)
         {
             CommandLineParser parser = CreateParser<AutomaticConflictingNameArguments>(kind);
             VerifyArgument(parser.GetArgument("Help"), new ExpectedArgument("Help", typeof(int)));
@@ -740,7 +740,7 @@ namespace Ookii.CommandLine.Tests
 
         [TestMethod]
         [DynamicData(nameof(ProviderKinds), DynamicDataDisplayName = nameof(GetCustomDynamicDataDisplayName))]
-        public void TestHiddenArgument(ArgumentProviderKind kind)
+        public void TestHiddenArgument(ProviderKind kind)
         {
             var parser = CreateParser<HiddenArguments>(kind);
 
@@ -760,7 +760,7 @@ namespace Ookii.CommandLine.Tests
 
         [TestMethod]
         [DynamicData(nameof(ProviderKinds), DynamicDataDisplayName = nameof(GetCustomDynamicDataDisplayName))]
-        public void TestNameTransformPascalCase(ArgumentProviderKind kind)
+        public void TestNameTransformPascalCase(ProviderKind kind)
         {
             var options = new ParseOptions
             {
@@ -781,7 +781,7 @@ namespace Ookii.CommandLine.Tests
 
         [TestMethod]
         [DynamicData(nameof(ProviderKinds), DynamicDataDisplayName = nameof(GetCustomDynamicDataDisplayName))]
-        public void TestNameTransformCamelCase(ArgumentProviderKind kind)
+        public void TestNameTransformCamelCase(ProviderKind kind)
         {
             var options = new ParseOptions
             {
@@ -802,7 +802,7 @@ namespace Ookii.CommandLine.Tests
 
         [TestMethod]
         [DynamicData(nameof(ProviderKinds), DynamicDataDisplayName = nameof(GetCustomDynamicDataDisplayName))]
-        public void TestNameTransformSnakeCase(ArgumentProviderKind kind)
+        public void TestNameTransformSnakeCase(ProviderKind kind)
         {
             var options = new ParseOptions
             {
@@ -823,7 +823,7 @@ namespace Ookii.CommandLine.Tests
 
         [TestMethod]
         [DynamicData(nameof(ProviderKinds), DynamicDataDisplayName = nameof(GetCustomDynamicDataDisplayName))]
-        public void TestNameTransformDashCase(ArgumentProviderKind kind)
+        public void TestNameTransformDashCase(ProviderKind kind)
         {
             var options = new ParseOptions
             {
@@ -844,7 +844,7 @@ namespace Ookii.CommandLine.Tests
 
         [TestMethod]
         [DynamicData(nameof(ProviderKinds), DynamicDataDisplayName = nameof(GetCustomDynamicDataDisplayName))]
-        public void TestValueDescriptionTransform(ArgumentProviderKind kind)
+        public void TestValueDescriptionTransform(ProviderKind kind)
         {
             var options = new ParseOptions
             {
@@ -863,7 +863,7 @@ namespace Ookii.CommandLine.Tests
 
         [TestMethod]
         [DynamicData(nameof(ProviderKinds), DynamicDataDisplayName = nameof(GetCustomDynamicDataDisplayName))]
-        public void TestValidation(ArgumentProviderKind kind)
+        public void TestValidation(ProviderKind kind)
         {
             // Reset for multiple runs.
             ValidationArguments.Arg3Value = 0;
@@ -926,7 +926,7 @@ namespace Ookii.CommandLine.Tests
 
         [TestMethod]
         [DynamicData(nameof(ProviderKinds), DynamicDataDisplayName = nameof(GetCustomDynamicDataDisplayName))]
-        public void TestRequires(ArgumentProviderKind kind)
+        public void TestRequires(ProviderKind kind)
         {
             var parser = CreateParser<DependencyArguments>(kind);
 
@@ -947,7 +947,7 @@ namespace Ookii.CommandLine.Tests
 
         [TestMethod]
         [DynamicData(nameof(ProviderKinds), DynamicDataDisplayName = nameof(GetCustomDynamicDataDisplayName))]
-        public void TestProhibits(ArgumentProviderKind kind)
+        public void TestProhibits(ProviderKind kind)
         {
             var parser = CreateParser<DependencyArguments>(kind);
 
@@ -958,7 +958,7 @@ namespace Ookii.CommandLine.Tests
 
         [TestMethod]
         [DynamicData(nameof(ProviderKinds), DynamicDataDisplayName = nameof(GetCustomDynamicDataDisplayName))]
-        public void TestRequiresAny(ArgumentProviderKind kind)
+        public void TestRequiresAny(ProviderKind kind)
         {
             var parser = CreateParser<DependencyArguments>(kind);
 
@@ -968,7 +968,7 @@ namespace Ookii.CommandLine.Tests
 
         [TestMethod]
         [DynamicData(nameof(ProviderKinds), DynamicDataDisplayName = nameof(GetCustomDynamicDataDisplayName))]
-        public void TestValidatorUsageHelp(ArgumentProviderKind kind)
+        public void TestValidatorUsageHelp(ProviderKind kind)
         {
             CommandLineParser parser = CreateParser<ValidationArguments>(kind);
             var options = new UsageWriter()
@@ -987,7 +987,7 @@ namespace Ookii.CommandLine.Tests
 
         [TestMethod]
         [DynamicData(nameof(ProviderKinds), DynamicDataDisplayName = nameof(GetCustomDynamicDataDisplayName))]
-        public void TestDefaultValueDescriptions(ArgumentProviderKind kind)
+        public void TestDefaultValueDescriptions(ProviderKind kind)
         {
             var options = new ParseOptions()
             {
@@ -1006,7 +1006,7 @@ namespace Ookii.CommandLine.Tests
 
         [TestMethod]
         [DynamicData(nameof(ProviderKinds), DynamicDataDisplayName = nameof(GetCustomDynamicDataDisplayName))]
-        public void TestMultiValueWhiteSpaceSeparator(ArgumentProviderKind kind)
+        public void TestMultiValueWhiteSpaceSeparator(ProviderKind kind)
         {
             var parser = CreateParser<MultiValueWhiteSpaceArguments>(kind);
             Assert.IsTrue(parser.GetArgument("Multi").AllowMultiValueWhiteSpaceSeparator);
@@ -1030,7 +1030,7 @@ namespace Ookii.CommandLine.Tests
 
         [TestMethod]
         [DynamicData(nameof(ProviderKinds), DynamicDataDisplayName = nameof(GetCustomDynamicDataDisplayName))]
-        public void TestInjection(ArgumentProviderKind kind)
+        public void TestInjection(ProviderKind kind)
         {
             var parser = CreateParser<InjectionArguments>(kind);
             var result = parser.Parse(new[] { "-Arg", "1" });
@@ -1048,7 +1048,7 @@ namespace Ookii.CommandLine.Tests
 
         [TestMethod]
         [DynamicData(nameof(ProviderKinds), DynamicDataDisplayName = nameof(GetCustomDynamicDataDisplayName))]
-        public void TestDuplicateArguments(ArgumentProviderKind kind)
+        public void TestDuplicateArguments(ProviderKind kind)
         {
             var parser = CreateParser<SimpleArguments>(kind);
             CheckThrows(() => parser.Parse(new[] { "-Argument1", "foo", "-Argument1", "bar" }), parser, CommandLineArgumentErrorCategory.DuplicateArgument, "Argument1");
@@ -1094,7 +1094,7 @@ namespace Ookii.CommandLine.Tests
 
         [TestMethod]
         [DynamicData(nameof(ProviderKinds), DynamicDataDisplayName = nameof(GetCustomDynamicDataDisplayName))]
-        public void TestConversion(ArgumentProviderKind kind)
+        public void TestConversion(ProviderKind kind)
         {
             var parser = CreateParser<ConversionArguments>(kind);
             var result = parser.Parse("-ParseCulture 1 -ParseStruct 2 -Ctor 3 -ParseNullable 4 -ParseMulti 5 6 -ParseNullableMulti 7 8 -NullableMulti 9 10 -Nullable 11".Split(' '));
@@ -1122,7 +1122,7 @@ namespace Ookii.CommandLine.Tests
 
         [TestMethod]
         [DynamicData(nameof(ProviderKinds), DynamicDataDisplayName = nameof(GetCustomDynamicDataDisplayName))]
-        public void TestDerivedClass(ArgumentProviderKind kind)
+        public void TestDerivedClass(ProviderKind kind)
         {
             var parser = CreateParser<DerivedArguments>(kind);
             Assert.AreEqual(4, parser.Arguments.Count);
@@ -1273,7 +1273,7 @@ namespace Ookii.CommandLine.Tests
             }
         }
 
-        internal static CommandLineParser<T> CreateParser<T>(ArgumentProviderKind kind, ParseOptions options = null)
+        internal static CommandLineParser<T> CreateParser<T>(ProviderKind kind, ParseOptions options = null)
 #if NET7_0_OR_GREATER
             where T : class, IParserProvider<T>
 #else
@@ -1282,11 +1282,11 @@ namespace Ookii.CommandLine.Tests
         {
             var parser = kind switch
             {
-                ArgumentProviderKind.Reflection => new CommandLineParser<T>(options),
+                ProviderKind.Reflection => new CommandLineParser<T>(options),
 #if NET7_0_OR_GREATER
-                ArgumentProviderKind.Generated => T.CreateParser(options),
+                ProviderKind.Generated => T.CreateParser(options),
 #else
-                ArgumentProviderKind.Generated => (CommandLineParser<T>)typeof(T).InvokeMember("CreateParser", BindingFlags.Public | BindingFlags.Static | BindingFlags.InvokeMethod, null, null, new object[] { options }),
+                ProviderKind.Generated => (CommandLineParser<T>)typeof(T).InvokeMember("CreateParser", BindingFlags.Public | BindingFlags.Static | BindingFlags.InvokeMethod, null, null, new object[] { options }),
 #endif
                 _ => throw new InvalidOperationException()
             };
@@ -1295,7 +1295,7 @@ namespace Ookii.CommandLine.Tests
             return parser;
         }
 
-        private static T StaticParse<T>(ArgumentProviderKind kind, string[] args, ParseOptions options = null)
+        private static T StaticParse<T>(ProviderKind kind, string[] args, ParseOptions options = null)
 #if NET7_0_OR_GREATER
             where T : class, IParser<T>
 #else
@@ -1304,11 +1304,11 @@ namespace Ookii.CommandLine.Tests
         {
             return kind switch
             {
-                ArgumentProviderKind.Reflection => CommandLineParser.Parse<T>(args, options),
+                ProviderKind.Reflection => CommandLineParser.Parse<T>(args, options),
 #if NET7_0_OR_GREATER
-                ArgumentProviderKind.Generated => T.Parse(args, options),
+                ProviderKind.Generated => T.Parse(args, options),
 #else
-                ArgumentProviderKind.Generated => (T)typeof(T).InvokeMember("Parse", BindingFlags.Public | BindingFlags.Static | BindingFlags.InvokeMethod, null, null, new object[] { args, options }),
+                ProviderKind.Generated => (T)typeof(T).InvokeMember("Parse", BindingFlags.Public | BindingFlags.Static | BindingFlags.InvokeMethod, null, null, new object[] { args, options }),
 #endif
                 _ => throw new InvalidOperationException()
             };
@@ -1322,8 +1322,8 @@ namespace Ookii.CommandLine.Tests
         public static IEnumerable<object[]> ProviderKinds
             => new[]
             {
-                new object[] { ArgumentProviderKind.Reflection },
-                new object[] { ArgumentProviderKind.Generated }
+                new object[] { ProviderKind.Reflection },
+                new object[] { ProviderKind.Generated }
             };
     }
 }

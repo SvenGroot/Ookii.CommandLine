@@ -3,7 +3,7 @@
 /// <summary>
 /// Specifies the kind of provider that was the source of the arguments.
 /// </summary>
-public enum ArgumentProviderKind
+public enum ProviderKind
 {
     /// <summary>
     /// A custom provider that was not part of Ookii.CommandLine.

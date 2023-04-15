@@ -37,9 +37,9 @@ public abstract class ArgumentProvider
     /// Gets the kind of argument provider.
     /// </summary>
     /// <value>
-    /// One of the values of the <see cref="ArgumentProviderKind"/> enumeration.
+    /// One of the values of the <see cref="ProviderKind"/> enumeration.
     /// </value>
-    public virtual ArgumentProviderKind Kind => ArgumentProviderKind.Unknown;
+    public virtual ProviderKind Kind => ProviderKind.Unknown;
 
     /// <summary>
     /// Gets the type that will hold the argument values.

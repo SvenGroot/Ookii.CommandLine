@@ -17,7 +17,7 @@ internal class ReflectionArgumentProvider : ArgumentProvider
     {
     }
 
-    public override ArgumentProviderKind Kind => ArgumentProviderKind.Reflection;
+    public override ProviderKind Kind => ProviderKind.Reflection;
 
     public override string ApplicationFriendlyName
     {

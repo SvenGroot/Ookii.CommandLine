@@ -725,9 +725,9 @@ public class CommandLineParser
     /// Gets the kind of provider that was used to determine the available arguments.
     /// </summary>
     /// <value>
-    /// One of the values of the <see cref="ArgumentProviderKind"/> enumeration.
+    /// One of the values of the <see cref="Support.ProviderKind"/> enumeration.
     /// </value>
-    public ArgumentProviderKind ProviderKind => _provider.Kind;
+    public ProviderKind ProviderKind => _provider.Kind;
 
     internal IComparer<char>? ShortArgumentNameComparer => _argumentsByShortName?.Comparer;
 

@@ -19,7 +19,7 @@ namespace Ookii.CommandLine.Tests
     {
         [TestMethod]
         [DynamicData(nameof(ProviderKinds), DynamicDataDisplayName = nameof(GetCustomDynamicDataDisplayName))]
-        public void TestAllowNull(ArgumentProviderKind kind)
+        public void TestAllowNull(ProviderKind kind)
         {
             var parser = CommandLineParserTest.CreateParser<NullableArguments>(kind);
             Assert.IsTrue(parser.GetArgument("constructorNullable")!.AllowNull);
@@ -53,7 +53,7 @@ namespace Ookii.CommandLine.Tests
 
         [TestMethod]
         [DynamicData(nameof(ProviderKinds), DynamicDataDisplayName = nameof(GetCustomDynamicDataDisplayName))]
-        public void TestNonNullableConstructor(ArgumentProviderKind kind)
+        public void TestNonNullableConstructor(ProviderKind kind)
         {
             // TODO: Update for new ctor arguments style.
             var parser = CommandLineParserTest.CreateParser<NullableArguments>(kind);
@@ -68,7 +68,7 @@ namespace Ookii.CommandLine.Tests
 
         [TestMethod]
         [DynamicData(nameof(ProviderKinds), DynamicDataDisplayName = nameof(GetCustomDynamicDataDisplayName))]
-        public void TestNonNullableProperties(ArgumentProviderKind kind)
+        public void TestNonNullableProperties(ProviderKind kind)
         {
             var parser = CommandLineParserTest.CreateParser<NullableArguments>(kind);
             ExpectNullException(parser, "NonNullable", "foo", "bar", "4", "5", "-NonNullable", "(null)");
@@ -82,7 +82,7 @@ namespace Ookii.CommandLine.Tests
 
         [TestMethod]
         [DynamicData(nameof(ProviderKinds), DynamicDataDisplayName = nameof(GetCustomDynamicDataDisplayName))]
-        public void TestNonNullableMultiValue(ArgumentProviderKind kind)
+        public void TestNonNullableMultiValue(ProviderKind kind)
         {
             var parser = CommandLineParserTest.CreateParser<NullableArguments>(kind);
             ExpectNullException(parser, "NonNullableArray", "-NonNullableArray", "foo", "-NonNullableArray", "(null)");
@@ -111,7 +111,7 @@ namespace Ookii.CommandLine.Tests
 
         [TestMethod]
         [DynamicData(nameof(ProviderKinds), DynamicDataDisplayName = nameof(GetCustomDynamicDataDisplayName))]
-        public void TestNonNullableDictionary(ArgumentProviderKind kind)
+        public void TestNonNullableDictionary(ProviderKind kind)
         {
             var parser = CommandLineParserTest.CreateParser<NullableArguments>(kind);
             ExpectNullException(parser, "NonNullableDictionary", "-NonNullableDictionary", "foo=bar", "-NonNullableDictionary", "baz=(null)");
@@ -171,8 +171,8 @@ namespace Ookii.CommandLine.Tests
         public static IEnumerable<object[]> ProviderKinds
             => new[]
             {
-                new object[] { ArgumentProviderKind.Reflection },
-                new object[] { ArgumentProviderKind.Generated }
+                new object[] { ProviderKind.Reflection },
+                new object[] { ProviderKind.Generated }
             };
     }
 

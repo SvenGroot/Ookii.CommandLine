@@ -48,8 +48,7 @@ namespace Ookii.CommandLine.Commands
     /// <seealso href="https://www.github.com/SvenGroot/ookii.commandline">Usage documentation</seealso>
     public class CommandManager
     {
-        private readonly Assembly? _assembly;
-        private readonly IEnumerable<Assembly>? _assemblies;
+        private readonly CommandProvider _provider;
         private readonly CommandOptions _options;
 
         /// <summary>
@@ -63,6 +62,12 @@ namespace Ookii.CommandLine.Commands
         public CommandManager(CommandOptions? options = null)
             : this(Assembly.GetCallingAssembly(), options)
         {
+        }
+
+        public CommandManager(CommandProvider provider, CommandOptions? options = null)
+        {
+            _provider = provider ?? throw new ArgumentNullException(nameof(provider));
+            _options = options ?? new();
         }
 
         /// <summary>
@@ -85,9 +90,8 @@ namespace Ookii.CommandLine.Commands
         /// </note>
         /// </remarks>
         public CommandManager(Assembly assembly, CommandOptions? options = null)
+            : this(new ReflectionCommandProvider(assembly ?? throw new ArgumentNullException(nameof(assembly))), options)
         {
-            _assembly = assembly ?? throw new ArgumentNullException(nameof(assembly));
-            _options = options ?? new();
         }
 
         /// <summary>
@@ -102,14 +106,8 @@ namespace Ookii.CommandLine.Commands
         /// <paramref name="assemblies"/> or one of its elements is <see langword="null"/>.
         /// </exception>
         public CommandManager(IEnumerable<Assembly> assemblies, CommandOptions? options = null)
+            : this(new ReflectionCommandProvider(assemblies ?? throw new ArgumentNullException(nameof(assemblies))), options)
         {
-            _assemblies = assemblies ?? throw new ArgumentNullException(nameof(assemblies));
-            _options = options ?? new();
-
-            if (_assemblies.Any(a => a == null))
-            {
-                throw new ArgumentNullException(nameof(assemblies));
-            }
         }
 
         /// <summary>
@@ -168,7 +166,7 @@ namespace Ookii.CommandLine.Commands
         /// </remarks>
         public IEnumerable<CommandInfo> GetCommands()
         {
-            var commands = GetCommandsUnsorted();
+            var commands = _provider.GetCommandsUnsorted(this);
             if (_options.AutoVersionCommand &&
                 !commands.Any(c => _options.CommandNameComparer.Compare(c.Name, Properties.Resources.AutomaticVersionCommandName) == 0))
             {
@@ -219,12 +217,10 @@ namespace Ookii.CommandLine.Commands
                 throw new ArgumentNullException(nameof(commandName));
             }
 
-            var commands = GetCommandsUnsorted()
-                .Where(c => c.MatchesName(commandName, _options.CommandNameComparer));
-
-            if (commands.Any())
+            var command = _provider.GetCommand(commandName, this);
+            if (command != null)
             {
-                return commands.First();
+                return command;
             }
 
             if (_options.AutoVersionCommand &&
@@ -540,27 +536,6 @@ namespace Ookii.CommandLine.Commands
         /// The value of the <see cref="AssemblyDescriptionAttribute"/> for the first assembly
         /// used by this instance.
         /// </returns>
-        public string? GetApplicationDescription()
-            => (_assembly ?? _assemblies?.FirstOrDefault())?.GetCustomAttribute<AssemblyDescriptionAttribute>()?.Description;
-
-        // Return value does not include the automatic version command.
-        private IEnumerable<CommandInfo> GetCommandsUnsorted()
-        {
-            IEnumerable<Type> types;
-            if (_assembly != null)
-            {
-                types = _assembly.GetTypes();
-            }
-            else
-            {
-                Debug.Assert(_assemblies != null);
-                types = _assemblies.SelectMany(a => a.GetTypes());
-            }
-
-            return from type in types
-                   let info = CommandInfo.TryCreate(type, this)
-                   where info != null && (_options.CommandFilter?.Invoke(info) ?? true)
-                   select info;
-        }
+        public string? GetApplicationDescription() => _provider.GetApplicationDescription();
     }
 }
