@@ -60,4 +60,8 @@ internal class TypeHelper
 
     public INamedTypeSymbol? ValueConverterAttribute => _compilation.GetTypeByMetadataName(NamespacePrefix + "Conversion.ValueConverterAttribute");
 
+    public INamedTypeSymbol? ICommand => _compilation.GetTypeByMetadataName(NamespacePrefix + "Commands.ICommand");
+
+    public INamedTypeSymbol? ICommandWithCustomParsing => _compilation.GetTypeByMetadataName(NamespacePrefix + "Commands.ICommandWithCustomParsing");
+
 }

@@ -141,6 +141,12 @@
   <data name="ArgumentsTypeNotReferenceTypeTitle" xml:space="preserve">
     <value>The command line arguments type must be a reference type.</value>
   </data>
+  <data name="CommandAttributeWithoutInterfaceMessageFormat" xml:space="preserve">
+    <value>The command line arguments class {0} has the CommandAttribute but does not implement the ICommand interface.</value>
+  </data>
+  <data name="CommandAttributeWithoutInterfaceTitle" xml:space="preserve">
+    <value>The command line arguments class has the CommandAttribute but does not implement ICommand.</value>
+  </data>
   <data name="InvalidArrayRankMessageFormat" xml:space="preserve">
     <value>The multi-value command line argument defined by {0}.{1} must have an array rank of one.</value>
   </data>

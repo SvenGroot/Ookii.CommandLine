@@ -105,6 +105,14 @@ internal static class Diagnostics
         property.ContainingType?.ToDisplayString(),
         property.Name);
 
+    public static Diagnostic CommandAttributeWithoutInterface(INamedTypeSymbol symbol) => CreateDiagnostic(
+        "CLW0004",
+        nameof(Resources.CommandAttributeWithoutInterfaceTitle),
+        nameof(Resources.CommandAttributeWithoutInterfaceMessageFormat),
+        DiagnosticSeverity.Warning,
+        symbol.Locations.FirstOrDefault(),
+        symbol.ToDisplayString());
+
     private static Diagnostic CreateDiagnostic(string id, string titleResource, string messageResource, DiagnosticSeverity severity, Location? location, params object?[]? messageArgs)
         => Diagnostic.Create(
             new DiagnosticDescriptor(

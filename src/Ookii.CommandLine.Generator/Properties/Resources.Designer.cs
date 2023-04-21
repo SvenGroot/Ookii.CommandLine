@@ -133,6 +133,24 @@ namespace Ookii.CommandLine.Generator.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The command line arguments class {0} has the CommandAttribute but does not implement the ICommand interface..
+        /// </summary>
+        internal static string CommandAttributeWithoutInterfaceMessageFormat {
+            get {
+                return ResourceManager.GetString("CommandAttributeWithoutInterfaceMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The command line arguments class has the CommandAttribute but does not implement ICommand..
+        /// </summary>
+        internal static string CommandAttributeWithoutInterfaceTitle {
+            get {
+                return ResourceManager.GetString("CommandAttributeWithoutInterfaceTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The multi-value command line argument defined by {0}.{1} must have an array rank of one..
         /// </summary>
         internal static string InvalidArrayRankMessageFormat {

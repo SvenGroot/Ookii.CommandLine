@@ -96,6 +96,22 @@ internal class ParserGenerator
             }
         }
 
+        var isCommand = false;
+        if (commandAttribute != null)
+        {
+            if (_argumentsClass.ImplementsInterface(_typeHelper.ICommand))
+            {
+                isCommand = true;
+            }
+            else
+            {
+                // The other way around (interface without attribute) doesn't need a warning since
+                // it could be a base class for a command (though it's kind of weird that the
+                // GeneratedParserAttribute was used on a base class).
+                _context.ReportDiagnostic(Diagnostics.CommandAttributeWithoutInterface(_argumentsClass));
+            }
+        }
+
         _builder.AppendLine("private class GeneratedProvider : Ookii.CommandLine.Support.GeneratedArgumentProvider");
         _builder.OpenBlock();
         _builder.AppendLine("public GeneratedProvider()");
@@ -116,8 +132,7 @@ internal class ParserGenerator
         _builder.DecreaseIndent();
         _builder.AppendLine("{}");
         _builder.AppendLine();
-        // TODO: IsCommand
-        _builder.AppendLine("public override bool IsCommand => false;");
+        _builder.AppendLine($"public override bool IsCommand => {isCommand.ToCSharpString()};");
         _builder.AppendLine();
         if (_argumentsClass.FindConstructor(_typeHelper.CommandLineParser) != null)
         {
