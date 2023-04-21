@@ -45,8 +45,6 @@ internal static class Extensions
     public static ITypeSymbol GetUnderlyingType(this ITypeSymbol type)
         => type is INamedTypeSymbol namedType && namedType.IsNullableValueType() ? (INamedTypeSymbol)namedType.TypeArguments[0] : type;
 
-    public static bool IsEnum(this ITypeSymbol type) => type.BaseType?.SpecialType == SpecialType.System_Enum;
-
     public static INamedTypeSymbol? FindGenericInterface(this ITypeSymbol type, ITypeSymbol? interfaceToFind)
     {
         if (interfaceToFind == null)
@@ -83,7 +81,7 @@ internal static class Extensions
 
     public static bool ImplementsInterface(this ITypeSymbol type, ITypeSymbol? interfaceType)
     {
-        if (interfaceType == null)
+        if (interfaceType == null || interfaceType.TypeKind != TypeKind.Interface)
         {
             return false;
         }

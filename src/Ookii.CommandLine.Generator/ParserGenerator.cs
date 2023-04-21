@@ -554,7 +554,7 @@ internal class ParserGenerator
             return "Ookii.CommandLine.Conversion.BooleanConverter.Instance";
         }
 
-        if (elementType.IsEnum())
+        if (elementType.TypeKind == TypeKind.Enum)
         {
             return $"new Ookii.CommandLine.Conversion.EnumConverter(typeof({elementType.ToDisplayString()}))";
         }
