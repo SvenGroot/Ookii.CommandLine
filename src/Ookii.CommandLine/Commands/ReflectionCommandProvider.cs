@@ -28,13 +28,6 @@ internal class ReflectionCommandProvider : CommandProvider
 
     public override ProviderKind Kind => ProviderKind.Reflection;
 
-    public override CommandInfo? GetCommand(string commandName, CommandManager manager)
-    {
-        return GetCommandsUnsorted(manager)
-            .Where(c => c.MatchesName(commandName, manager.Options.CommandNameComparer))
-            .FirstOrDefault();
-    }
-
     public override IEnumerable<CommandInfo> GetCommandsUnsorted(CommandManager manager)
     {
         {

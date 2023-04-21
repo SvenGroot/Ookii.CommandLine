@@ -1,5 +1,6 @@
 ﻿// See https://aka.ms/new-console-template for more information
 using Ookii.CommandLine;
+using Ookii.CommandLine.Commands;
 using Ookii.CommandLine.Conversion;
 using Ookii.CommandLine.Support;
 using Ookii.CommandLine.Validation;
@@ -7,10 +8,22 @@ using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
 
-var arguments = Arguments.Parse();
-if (arguments != null)
+var manager = new CommandManager(new MyProvider());
+return manager.RunCommand() ?? 1;
+
+//var arguments = Arguments.Parse();
+//if (arguments != null)
+//{
+//    Console.WriteLine($"Hello, World! {arguments.Test}");
+//}
+
+class MyProvider : CommandProvider
 {
-    Console.WriteLine($"Hello, World! {arguments.Test}");
+    public override string? GetApplicationDescription() => "Trim Test";
+    public override IEnumerable<CommandInfo> GetCommandsUnsorted(CommandManager manager)
+    {
+        yield return new GeneratedCommandInfo(manager, typeof(Arguments), new CommandAttribute(), new DescriptionAttribute("This is a command test"), createParser: options => Arguments.CreateParser(options));
+    }
 }
 
 [GeneratedParser]
@@ -18,7 +31,8 @@ if (arguments != null)
 [Description("This is a test")]
 [ApplicationFriendlyName("Trim Test")]
 [RequiresAny(nameof(Test), nameof(Test2))]
-partial class Arguments
+[Command]
+partial class Arguments : ICommand
 {
     [CommandLineArgument]
     [Description("Test argument")]
@@ -49,5 +63,11 @@ partial class Arguments
     [CommandLineArgument]
     public static void Foo(CommandLineParser p)
     {
+    }
+
+    public int Run()
+    {
+        Console.WriteLine("Hello");
+        return 0;
     }
 }

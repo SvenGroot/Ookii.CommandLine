@@ -28,7 +28,7 @@ public class GeneratedArgument : CommandLineArgument
     }
 
     /// <summary>
-    /// 
+    /// This class is for internal use by the source generator, and should not be used in your code.
     /// </summary>
     /// <param name="parser"></param>
     /// <param name="argumentType"></param>

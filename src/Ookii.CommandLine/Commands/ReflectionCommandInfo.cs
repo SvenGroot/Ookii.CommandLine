@@ -41,6 +41,16 @@ internal class ReflectionCommandInfo : CommandInfo
         return new ReflectionCommandInfo(commandType, attribute, manager);
     }
 
+    public override CommandLineParser CreateParser()
+    {
+        if (UseCustomArgumentParsing)
+        {
+            throw new InvalidOperationException(Properties.Resources.NoParserForCustomParsingCommand);
+        }
+
+        return new CommandLineParser(CommandType, Manager.Options);
+    }
+
     public override ICommandWithCustomParsing CreateInstanceWithCustomParsing()
     {
         if (!UseCustomArgumentParsing)

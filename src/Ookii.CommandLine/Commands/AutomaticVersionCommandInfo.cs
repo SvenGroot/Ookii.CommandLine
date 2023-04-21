@@ -6,17 +6,14 @@ using System.Threading.Tasks;
 
 namespace Ookii.CommandLine.Commands;
 
-internal class BasicCommandInfo : CommandInfo
+internal class AutomaticVersionCommandInfo : CommandInfo
 {
-    private readonly string _description;
-
-    public BasicCommandInfo(Type commandType, string name, string description, CommandManager manager)
-        : base(commandType, name, manager)
+    public AutomaticVersionCommandInfo(CommandManager manager)
+        : base(typeof(AutomaticVersionCommand), manager.Options.AutoVersionCommandName(), manager)
     {
-        _description = description;
     }
 
-    public override string? Description => _description;
+    public override string? Description => Manager.Options.StringProvider.AutomaticVersionCommandDescription();
 
     public override bool UseCustomArgumentParsing => false;
 
@@ -24,4 +21,7 @@ internal class BasicCommandInfo : CommandInfo
 
     public override ICommandWithCustomParsing CreateInstanceWithCustomParsing()
         => throw new InvalidOperationException(Properties.Resources.NoCustomParsing);
+
+    public override CommandLineParser CreateParser()
+        => AutomaticVersionCommand.CreateParser(Manager.Options);
 }

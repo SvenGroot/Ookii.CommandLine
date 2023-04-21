@@ -211,15 +211,7 @@ namespace Ookii.CommandLine.Commands
         ///   must use the <see cref="CreateInstance"/> method.
         /// </para>
         /// </remarks>
-        public virtual CommandLineParser CreateParser()
-        {
-            if (UseCustomArgumentParsing)
-            {
-                throw new InvalidOperationException(Properties.Resources.NoParserForCustomParsingCommand);
-            }
-
-            return new CommandLineParser(CommandType, Manager.Options);
-        }
+        public abstract CommandLineParser CreateParser();
 
         /// <summary>
         /// Creates an instance of a command that uses the <see cref="ICommandWithCustomParsing"/>
@@ -314,11 +306,7 @@ namespace Ookii.CommandLine.Commands
         public static bool IsCommand(Type commandType) => ReflectionCommandInfo.GetCommandAttribute(commandType) != null;
 
         internal static CommandInfo GetAutomaticVersionCommand(CommandManager manager)
-        {
-            var name = manager.Options.AutoVersionCommandName();
-            var description = manager.Options.StringProvider.AutomaticVersionCommandDescription();
-            return new BasicCommandInfo(typeof(AutomaticVersionCommand), name, description, manager);
-        }
+            => new AutomaticVersionCommandInfo(manager);
 
         private static string GetName(CommandAttribute attribute, Type commandType, CommandOptions? options)
         {

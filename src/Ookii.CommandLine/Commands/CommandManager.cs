@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Ookii.CommandLine.Support;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -64,6 +65,18 @@ namespace Ookii.CommandLine.Commands
         {
         }
 
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CommandManager"/> class using the
+        /// specified <see cref="CommandProvider"/>.
+        /// </summary>
+        /// <param name="provider">
+        /// The <see cref="CommandProvider"/> that determines which commands are available.
+        /// </param>
+        /// <param name="options">
+        ///   The options to use for parsing and usage help, or <see langword="null"/> to use
+        ///   the default options.
+        /// </param>
         public CommandManager(CommandProvider provider, CommandOptions? options = null)
         {
             _provider = provider ?? throw new ArgumentNullException(nameof(provider));
@@ -217,7 +230,10 @@ namespace Ookii.CommandLine.Commands
                 throw new ArgumentNullException(nameof(commandName));
             }
 
-            var command = _provider.GetCommand(commandName, this);
+            var command = _provider.GetCommandsUnsorted(this)
+                .Where(c => c.MatchesName(commandName, Options.CommandNameComparer))
+                .FirstOrDefault();
+
             if (command != null)
             {
                 return command;

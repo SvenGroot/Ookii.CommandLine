@@ -10,8 +10,8 @@ namespace Ookii.CommandLine.Support;
 /// A source of arguments for the <see cref="CommandLineParser"/>.
 /// </summary>
 /// <remarks>
-/// This interface is used by the source generator when using <see cref="GeneratedParserAttribute"/>
-/// attribute. It should not normally be used by regular code.
+/// This class is used by the source generator when using <see cref="GeneratedParserAttribute"/>
+/// attribute. It should not normally be used by other code.
 /// </remarks>
 public abstract class ArgumentProvider
 {
