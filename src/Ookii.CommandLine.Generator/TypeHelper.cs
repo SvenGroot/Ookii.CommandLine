@@ -1,5 +1,6 @@
 ﻿using Microsoft.CodeAnalysis;
 using System.ComponentModel;
+using System.Globalization;
 using System.Reflection;
 
 namespace Ookii.CommandLine.Generator;
@@ -16,7 +17,9 @@ internal class TypeHelper
 
     public Compilation Compilation => _compilation;
 
-    public INamedTypeSymbol? Boolean => _compilation.GetSpecialType(SpecialType.System_Boolean);
+    public INamedTypeSymbol Boolean => _compilation.GetSpecialType(SpecialType.System_Boolean);
+
+    public INamedTypeSymbol Char => _compilation.GetSpecialType(SpecialType.System_Char);
 
     public INamedTypeSymbol? Dictionary => _compilation.GetTypeByMetadataName(typeof(Dictionary<,>).FullName);
 
@@ -31,6 +34,12 @@ internal class TypeHelper
     public INamedTypeSymbol? ISpanParsable => _compilation.GetTypeByMetadataName("System.ISpanParsable`1");
 
     public INamedTypeSymbol? IParsable => _compilation.GetTypeByMetadataName("System.IParsable`1");
+
+    public INamedTypeSymbol? ReadOnlySpan => _compilation.GetTypeByMetadataName("System.ReadOnlySpan`1");
+
+    public INamedTypeSymbol? ReadOnlySpanOfChar => ReadOnlySpan?.Construct(Char);
+
+    public INamedTypeSymbol? CultureInfo => _compilation.GetTypeByMetadataName(typeof(CultureInfo).FullName);
 
     public INamedTypeSymbol? CommandLineParser => _compilation.GetTypeByMetadataName(NamespacePrefix + "CommandLineParser");
 

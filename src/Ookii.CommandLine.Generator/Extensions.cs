@@ -103,7 +103,7 @@ internal static class Extensions
     }
 
     public static bool CanAssignFrom(this ITypeSymbol targetType, ITypeSymbol sourceType)
-        => SymbolEqualityComparer.Default.Equals(targetType, sourceType) || sourceType.DerivesFrom(targetType)
+        => targetType.SymbolEquals(sourceType) || sourceType.DerivesFrom(targetType)
             || sourceType.ImplementsInterface(targetType);
 
     public static string CreateInstantiation(this AttributeData attribute)

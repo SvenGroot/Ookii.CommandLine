@@ -45,21 +45,14 @@ internal class ConverterGenerator
     // TODO: Customizable or random namespace?
     private const string GeneratedNamespace = "Ookii.CommandLine.Conversion.Generated";
     private const string ConverterSuffix = "Converter";
-    // TODO: Use typehelper and/or specialtype.
     private readonly INamedTypeSymbol? _readOnlySpanType;
-    private readonly INamedTypeSymbol? _stringType;
     private readonly INamedTypeSymbol? _cultureType;
     private readonly Dictionary<ITypeSymbol, ConverterInfo> _converters = new(SymbolEqualityComparer.Default);
 
-    public ConverterGenerator(Compilation compilation)
+    public ConverterGenerator(TypeHelper typeHelper)
     {
-        _stringType = compilation.GetTypeByMetadataName("System.String");
-        _cultureType = compilation.GetTypeByMetadataName("System.Globalization.CultureInfo");
-        var charType = compilation.GetTypeByMetadataName("System.Char");
-        if (charType != null)
-        {
-            _readOnlySpanType = compilation.GetTypeByMetadataName("System.ReadOnlySpan`1")?.Construct(charType);
-        }
+        _cultureType = typeHelper.CultureInfo;
+        _readOnlySpanType = typeHelper.ReadOnlySpanOfChar;
     }
 
     public string? GetConverter(ITypeSymbol type)
@@ -112,14 +105,14 @@ internal class ConverterGenerator
             }
 
             var newInfo = new ConverterInfo();
-            if (SymbolEqualityComparer.Default.Equals(_readOnlySpanType, ctor.Parameters[0].Type))
+            if (ctor.Parameters[0].Type.SymbolEquals(_readOnlySpanType))
             {
                 newInfo.UseSpan = true;
                 info = newInfo;
                 // Won't find a better one
                 break;
             }
-            else if (!SymbolEqualityComparer.Default.Equals(_stringType, ctor.Parameters[0].Type))
+            else if (ctor.Parameters[0].Type.SpecialType != SpecialType.System_String)
             {
                 continue;
             }
@@ -142,11 +135,11 @@ internal class ConverterGenerator
             }
 
             var newInfo = new ConverterInfo() { ParseMethod = true };
-            if (SymbolEqualityComparer.Default.Equals(_readOnlySpanType, method.Parameters[0].Type))
+            if (method.Parameters[0].Type.SymbolEquals(_readOnlySpanType))
             {
                 newInfo.UseSpan = true;
             }
-            else if (!SymbolEqualityComparer.Default.Equals(_stringType, method.Parameters[0].Type))
+            else if (method.Parameters[0].Type.SpecialType != SpecialType.System_String)
             {
                 continue;
             }
