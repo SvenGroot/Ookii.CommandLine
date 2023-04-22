@@ -11,6 +11,8 @@ namespace Ookii.CommandLine.Generator;
 [Generator]
 public class ParserIncrementalGenerator : IIncrementalGenerator
 {
+    private record struct ClassInfo(ClassDeclarationSyntax Syntax, bool IsCommandProvider);
+
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
         var classDeclarations = context.SyntaxProvider
@@ -25,16 +27,20 @@ public class ParserIncrementalGenerator : IIncrementalGenerator
         context.RegisterSourceOutput(compilationAndClasses, static (spc, source) => Execute(source.Left, source.Right!, spc));
     }
 
-    private static void Execute(Compilation compilation, ImmutableArray<ClassDeclarationSyntax> classes, SourceProductionContext context)
+    private static void Execute(Compilation compilation, ImmutableArray<ClassInfo?> classes, SourceProductionContext context)
     {
         if (classes.IsDefaultOrEmpty)
         {
             return;
         }
 
+        var typeHelper = new TypeHelper(compilation);
         var converterGenerator = new ConverterGenerator(compilation);
-        foreach (var syntax in classes)
+        var commandGenerator = new CommandGenerator(typeHelper, context);
+        foreach (var cls in classes)
         {
+            var info = cls!.Value;
+            var syntax = info.Syntax;
             context.CancellationToken.ThrowIfCancellationRequested();
             var semanticModel = compilation.GetSemanticModel(syntax.SyntaxTree);
             if (semanticModel.GetDeclaredSymbol(syntax, context.CancellationToken) is not INamedTypeSymbol symbol)
@@ -42,6 +48,7 @@ public class ParserIncrementalGenerator : IIncrementalGenerator
                 continue;
             }
 
+            // TODO: Custom messages for provider types.
             if (!symbol.IsReferenceType)
             {
                 context.ReportDiagnostic(Diagnostics.ArgumentsTypeNotReferenceType(symbol));
@@ -66,7 +73,13 @@ public class ParserIncrementalGenerator : IIncrementalGenerator
                 continue;
             }
 
-            var source = ParserGenerator.Generate(compilation, context, symbol, converterGenerator);
+            if (info.IsCommandProvider)
+            {
+                commandGenerator.AddProvider(symbol);
+                continue;
+            }
+
+            var source = ParserGenerator.Generate(context, symbol, typeHelper, converterGenerator, commandGenerator);
             if (source != null)
             {
                 context.AddSource(symbol.ToDisplayString().ToIdentifier(".g.cs"), SourceText.From(source, Encoding.UTF8));
@@ -78,12 +91,16 @@ public class ParserIncrementalGenerator : IIncrementalGenerator
         {
             context.AddSource("GeneratedConverters.g.cs", SourceText.From(converterSource, Encoding.UTF8));
         }
+
+        commandGenerator.Generate();
     }
 
-    private static ClassDeclarationSyntax? GetClassToGenerate(GeneratorSyntaxContext context)
+    private static ClassInfo? GetClassToGenerate(GeneratorSyntaxContext context)
     {
         var classDeclaration = (ClassDeclarationSyntax)context.Node;
-        var generatedParserType = new TypeHelper(context.SemanticModel.Compilation).GeneratedParserAttribute;
+        var typeHelper = new TypeHelper(context.SemanticModel.Compilation);
+        var generatedParserType = typeHelper.GeneratedParserAttribute;
+        var generatedCommandProviderType = typeHelper.GeneratedCommandProviderAttribute;
         foreach (var attributeList in classDeclaration.AttributeLists)
         {
             foreach (var attribute in attributeList.Attributes)
@@ -97,7 +114,12 @@ public class ParserIncrementalGenerator : IIncrementalGenerator
                 var attributeType = attributeSymbol.ContainingType;
                 if (attributeType.SymbolEquals(generatedParserType))
                 {
-                    return classDeclaration;
+                    return new(classDeclaration, false);
+                }
+
+                if (attributeType.SymbolEquals(generatedCommandProviderType))
+                {
+                    return new(classDeclaration, true);
                 }
             }
         }

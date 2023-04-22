@@ -45,6 +45,7 @@ internal class ConverterGenerator
     // TODO: Customizable or random namespace?
     private const string GeneratedNamespace = "Ookii.CommandLine.Conversion.Generated";
     private const string ConverterSuffix = "Converter";
+    // TODO: Use typehelper and/or specialtype.
     private readonly INamedTypeSymbol? _readOnlySpanType;
     private readonly INamedTypeSymbol? _stringType;
     private readonly INamedTypeSymbol? _cultureType;

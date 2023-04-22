@@ -8,7 +8,7 @@ using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
 
-var manager = new CommandManager(new MyProvider());
+var manager = TestProvider.CreateCommandManager();
 return manager.RunCommand() ?? 1;
 
 //var arguments = Arguments.Parse();
@@ -25,6 +25,9 @@ class MyProvider : CommandProvider
         yield return new GeneratedCommandInfo(manager, typeof(Arguments), new CommandAttribute(), new DescriptionAttribute("This is a command test"), createParser: options => Arguments.CreateParser(options));
     }
 }
+
+[GeneratedCommandProvider]
+partial class TestProvider { }
 
 [GeneratedParser]
 [ParseOptions(CaseSensitive = true)]

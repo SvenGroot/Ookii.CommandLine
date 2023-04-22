@@ -26,20 +26,22 @@ internal class ParserGenerator
     private readonly INamedTypeSymbol _argumentsClass;
     private readonly SourceBuilder _builder;
     private readonly ConverterGenerator _converterGenerator;
+    private readonly CommandGenerator _commandGenerator;
 
-    public ParserGenerator(Compilation compilation, SourceProductionContext context, INamedTypeSymbol argumentsClass, ConverterGenerator converterGenerator)
+    public ParserGenerator(SourceProductionContext context, INamedTypeSymbol argumentsClass, TypeHelper typeHelper, ConverterGenerator converterGenerator, CommandGenerator commandGenerator)
     {
-        _typeHelper = new TypeHelper(compilation);
-        _compilation = compilation;
+        _typeHelper = typeHelper;
+        _compilation = typeHelper.Compilation;
         _context = context;
         _argumentsClass = argumentsClass;
         _builder = new(argumentsClass.ContainingNamespace);
         _converterGenerator = converterGenerator;
+        _commandGenerator = commandGenerator;
     }
 
-    public static string? Generate(Compilation compilation, SourceProductionContext context, INamedTypeSymbol argumentsClass, ConverterGenerator converterGenerator)
+    public static string? Generate(SourceProductionContext context, INamedTypeSymbol argumentsClass, TypeHelper typeHelper, ConverterGenerator converterGenerator, CommandGenerator commandGenerator)
     {
-        var generator = new ParserGenerator(compilation, context, argumentsClass, converterGenerator);
+        var generator = new ParserGenerator(context, argumentsClass, typeHelper, converterGenerator, commandGenerator);
         return generator.Generate();
     }
 
@@ -79,13 +81,15 @@ internal class ParserGenerator
         AttributeData? applicationFriendlyName = null;
         AttributeData? commandAttribute = null;
         List<AttributeData>? classValidators = null;
+        List<AttributeData>? aliasAttributes = null; // for command usage.
         foreach (var attribute in _argumentsClass.GetAttributes())
         {
             if (CheckAttribute(attribute, _typeHelper.ParseOptionsAttribute, ref parseOptions) ||
                 CheckAttribute(attribute, _typeHelper.DescriptionAttribute, ref description) ||
                 CheckAttribute(attribute, _typeHelper.ApplicationFriendlyNameAttribute, ref applicationFriendlyName) ||
                 CheckAttribute(attribute, _typeHelper.CommandAttribute, ref commandAttribute) ||
-                CheckAttribute(attribute, _typeHelper.ClassValidationAttribute, ref classValidators))
+                CheckAttribute(attribute, _typeHelper.ClassValidationAttribute, ref classValidators) ||
+                CheckAttribute(attribute, _typeHelper.AliasAttribute, ref aliasAttributes))
             {
                 continue;
             }
@@ -96,12 +100,14 @@ internal class ParserGenerator
             }
         }
 
+        // TODO: Warn if AliasAttribute without CommandAttribute.
         var isCommand = false;
         if (commandAttribute != null)
         {
             if (_argumentsClass.ImplementsInterface(_typeHelper.ICommand))
             {
                 isCommand = true;
+                _commandGenerator.AddCommand(_argumentsClass, commandAttribute, description, aliasAttributes);
             }
             else
             {
@@ -432,7 +438,7 @@ internal class ParserGenerator
         }
 
         _builder.DecreaseIndent();
-        _builder.AppendLine($");");
+        _builder.AppendLine(");");
     }
 
     // Using a ref parameter with bool return allows me to chain these together.

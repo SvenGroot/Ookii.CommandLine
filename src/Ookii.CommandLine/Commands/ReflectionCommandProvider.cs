@@ -44,7 +44,7 @@ internal class ReflectionCommandProvider : CommandProvider
 
             return from type in types
                    let info = CommandInfo.TryCreate(type, manager)
-                   where info != null && (manager.Options.CommandFilter?.Invoke(info) ?? true)
+                   where info != null
                    select info;
         }
     }

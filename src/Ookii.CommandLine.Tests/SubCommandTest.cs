@@ -1,7 +1,9 @@
 ﻿// Copyright (c) Sven Groot (Ookii.org)
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Ookii.CommandLine.Commands;
+using Ookii.CommandLine.Support;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -15,9 +17,10 @@ namespace Ookii.CommandLine.Tests
         private static readonly Assembly _commandAssembly = Assembly.GetExecutingAssembly();
 
         [TestMethod]
-        public void GetCommandsTest()
+        [DynamicData(nameof(ProviderKinds), DynamicDataDisplayName = nameof(GetCustomDynamicDataDisplayName))]
+        public void GetCommandsTest(ProviderKind kind)
         {
-            var manager = new CommandManager(_commandAssembly);
+            var manager = CreateManager(kind);
             var commands = manager.GetCommands().ToArray();
 
             Assert.IsNotNull(commands);
@@ -33,9 +36,10 @@ namespace Ookii.CommandLine.Tests
         }
 
         [TestMethod]
-        public void GetCommandTest()
+        [DynamicData(nameof(ProviderKinds), DynamicDataDisplayName = nameof(GetCustomDynamicDataDisplayName))]
+        public void GetCommandTest(ProviderKind kind)
         {
-            var manager = new CommandManager(_commandAssembly);
+            var manager = CreateManager(kind);
             var command = manager.GetCommand("test");
             Assert.IsNotNull(command);
             Assert.AreEqual("test", command.Name);
@@ -75,7 +79,8 @@ namespace Ookii.CommandLine.Tests
         }
 
         [TestMethod]
-        public void CreateCommandTest()
+        [DynamicData(nameof(ProviderKinds), DynamicDataDisplayName = nameof(GetCustomDynamicDataDisplayName))]
+        public void CreateCommandTest(ProviderKind kind)
         {
             using var writer = LineWrappingTextWriter.ForStringWriter(0);
             var options = new CommandOptions()
@@ -87,7 +92,7 @@ namespace Ookii.CommandLine.Tests
                 }
             };
 
-            var manager = new CommandManager(_commandAssembly, options);
+            var manager = CreateManager(kind, options);
             TestCommand command = (TestCommand)manager.CreateCommand("test", new[] { "-Argument", "Foo" }, 0);
             Assert.IsNotNull(command);
             Assert.AreEqual(ParseStatus.Success, manager.ParseResult.Status);
@@ -135,7 +140,8 @@ namespace Ookii.CommandLine.Tests
         }
 
         [TestMethod]
-        public void TestWriteUsage()
+        [DynamicData(nameof(ProviderKinds), DynamicDataDisplayName = nameof(GetCustomDynamicDataDisplayName))]
+        public void TestWriteUsage(ProviderKind kind)
         {
             using var writer = LineWrappingTextWriter.ForStringWriter(0);
             var options = new CommandOptions()
@@ -147,13 +153,14 @@ namespace Ookii.CommandLine.Tests
                 }
             };
 
-            var manager = new CommandManager(_commandAssembly, options);
+            var manager = CreateManager(kind, options);
             manager.WriteUsage();
             Assert.AreEqual(_expectedUsage, writer.BaseWriter.ToString());
         }
 
         [TestMethod]
-        public void TestWriteUsageColor()
+        [DynamicData(nameof(ProviderKinds), DynamicDataDisplayName = nameof(GetCustomDynamicDataDisplayName))]
+        public void TestWriteUsageColor(ProviderKind kind)
         {
             using var writer = LineWrappingTextWriter.ForStringWriter(0);
             var options = new CommandOptions()
@@ -165,13 +172,14 @@ namespace Ookii.CommandLine.Tests
                 }
             };
 
-            var manager = new CommandManager(_commandAssembly, options);
+            var manager = CreateManager(kind, options);
             manager.WriteUsage();
             Assert.AreEqual(_expectedUsageColor, writer.BaseWriter.ToString());
         }
 
         [TestMethod]
-        public void TestWriteUsageInstruction()
+        [DynamicData(nameof(ProviderKinds), DynamicDataDisplayName = nameof(GetCustomDynamicDataDisplayName))]
+        public void TestWriteUsageInstruction(ProviderKind kind)
         {
             using var writer = LineWrappingTextWriter.ForStringWriter(0);
             var options = new CommandOptions()
@@ -184,13 +192,14 @@ namespace Ookii.CommandLine.Tests
                 }
             };
 
-            var manager = new CommandManager(_commandAssembly, options);
+            var manager = CreateManager(kind, options);
             manager.WriteUsage();
             Assert.AreEqual(_expectedUsageInstruction, writer.BaseWriter.ToString());
         }
 
         [TestMethod]
-        public void TestWriteUsageApplicationDescription()
+        [DynamicData(nameof(ProviderKinds), DynamicDataDisplayName = nameof(GetCustomDynamicDataDisplayName))]
+        public void TestWriteUsageApplicationDescription(ProviderKind kind)
         {
             using var writer = LineWrappingTextWriter.ForStringWriter(0);
             var options = new CommandOptions()
@@ -203,13 +212,14 @@ namespace Ookii.CommandLine.Tests
                 }
             };
 
-            var manager = new CommandManager(_commandAssembly, options);
+            var manager = CreateManager(kind, options);
             manager.WriteUsage();
             Assert.AreEqual(_expectedUsageWithDescription, writer.BaseWriter.ToString());
         }
 
         [TestMethod]
-        public void TestCommandUsage()
+        [DynamicData(nameof(ProviderKinds), DynamicDataDisplayName = nameof(GetCustomDynamicDataDisplayName))]
+        public void TestCommandUsage(ProviderKind kind)
         {
             using var writer = LineWrappingTextWriter.ForStringWriter(0);
             var options = new CommandOptions()
@@ -222,7 +232,7 @@ namespace Ookii.CommandLine.Tests
             };
 
             // This tests whether the command name is included in the help for the command.
-            var manager = new CommandManager(_commandAssembly, options);
+            var manager = CreateManager(kind, options);
             var result = manager.CreateCommand(new[] { "AsyncCommand", "-Help" });
             Assert.IsNull(result);
             Assert.AreEqual(ParseStatus.Canceled, manager.ParseResult.Status);
@@ -231,14 +241,15 @@ namespace Ookii.CommandLine.Tests
         }
 
         [TestMethod]
-        public void TestCommandNameTransform()
+        [DynamicData(nameof(ProviderKinds), DynamicDataDisplayName = nameof(GetCustomDynamicDataDisplayName))]
+        public void TestCommandNameTransform(ProviderKind kind)
         {
             var options = new CommandOptions()
             {
                 CommandNameTransform = NameTransform.PascalCase
             };
 
-            var manager = new CommandManager(_commandAssembly, options);
+            var manager = CreateManager(kind, options);
             var info = CommandInfo.Create(typeof(AnotherSimpleCommand), manager);
             Assert.AreEqual("AnotherSimple", info.Name);
 
@@ -267,14 +278,15 @@ namespace Ookii.CommandLine.Tests
         }
 
         [TestMethod]
-        public void TestCommandFilter()
+        [DynamicData(nameof(ProviderKinds), DynamicDataDisplayName = nameof(GetCustomDynamicDataDisplayName))]
+        public void TestCommandFilter(ProviderKind kind)
         {
             var options = new CommandOptions()
             {
                 CommandFilter = cmd => !cmd.UseCustomArgumentParsing,
             };
 
-            var manager = new CommandManager(_commandAssembly, options);
+            var manager = CreateManager(kind, options);
             Assert.IsNull(manager.GetCommand("custom"));
             Assert.IsNotNull(manager.GetCommand("test"));
             Assert.IsNotNull(manager.GetCommand("AnotherSimpleCommand"));
@@ -282,9 +294,10 @@ namespace Ookii.CommandLine.Tests
         }
 
         [TestMethod]
-        public async Task TestAsyncCommand()
+        [DynamicData(nameof(ProviderKinds), DynamicDataDisplayName = nameof(GetCustomDynamicDataDisplayName))]
+        public async Task TestAsyncCommand(ProviderKind kind)
         {
-            var manager = new CommandManager(_commandAssembly);
+            var manager = CreateManager(kind);
             var result = await manager.RunCommandAsync(new[] { "AsyncCommand", "5" });
             Assert.AreEqual(5, result);
 
@@ -320,6 +333,30 @@ namespace Ookii.CommandLine.Tests
             Assert.AreEqual(customParsing, command.UseCustomArgumentParsing);
             CollectionAssert.AreEqual(aliases ?? Array.Empty<string>(), command.Aliases.ToArray());
         }
+
+        public static CommandManager CreateManager(ProviderKind kind, CommandOptions options = null)
+        {
+            var manager = kind switch
+            {
+                ProviderKind.Reflection => new CommandManager(_commandAssembly, options),
+                ProviderKind.Generated => GeneratedProvider.CreateCommandManager(options),
+                _ => throw new InvalidOperationException()
+            };
+
+            Assert.AreEqual(kind, manager.ProviderKind);
+            return manager;
+        }
+
+        public static string GetCustomDynamicDataDisplayName(MethodInfo methodInfo, object[] data)
+            => $"{methodInfo.Name} ({data[0]})";
+
+
+        public static IEnumerable<object[]> ProviderKinds
+            => new[]
+            {
+                new object[] { ProviderKind.Reflection },
+                new object[] { ProviderKind.Generated }
+            };
 
         #region Expected usage
 

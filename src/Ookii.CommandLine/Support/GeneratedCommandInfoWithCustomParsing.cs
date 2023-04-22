@@ -11,11 +11,10 @@ public class GeneratedCommandInfoWithCustomParsing<T> : GeneratedCommandInfo
 {
     /// <inheritdoc/>
     public GeneratedCommandInfoWithCustomParsing(CommandManager manager,
-                                                 Type commandType,
                                                  CommandAttribute attribute,
                                                  DescriptionAttribute? descriptionAttribute = null,
                                                  IEnumerable<AliasAttribute>? aliasAttributes = null)
-        : base(manager, commandType, attribute, descriptionAttribute, aliasAttributes)
+        : base(manager, typeof(T), attribute, descriptionAttribute, aliasAttributes)
     {
     }
 

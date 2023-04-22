@@ -1,4 +1,6 @@
 ﻿using Microsoft.CodeAnalysis;
+using System.ComponentModel;
+using System.Reflection;
 
 namespace Ookii.CommandLine.Generator;
 
@@ -12,6 +14,8 @@ internal class TypeHelper
         _compilation = compilation;
     }
 
+    public Compilation Compilation => _compilation;
+
     public INamedTypeSymbol? Boolean => _compilation.GetSpecialType(SpecialType.System_Boolean);
 
     public INamedTypeSymbol? Dictionary => _compilation.GetTypeByMetadataName(typeof(Dictionary<,>).FullName);
@@ -20,7 +24,9 @@ internal class TypeHelper
 
     public INamedTypeSymbol? ICollection => _compilation.GetTypeByMetadataName(typeof(ICollection<>).FullName);
 
-    public INamedTypeSymbol? DescriptionAttribute => _compilation.GetTypeByMetadataName("System.ComponentModel.DescriptionAttribute");
+    public INamedTypeSymbol? DescriptionAttribute => _compilation.GetTypeByMetadataName(typeof(DescriptionAttribute).FullName);
+
+    public INamedTypeSymbol? AssemblyDescriptionAttribute => _compilation.GetTypeByMetadataName(typeof(AssemblyDescriptionAttribute).FullName);
 
     public INamedTypeSymbol? ISpanParsable => _compilation.GetTypeByMetadataName("System.ISpanParsable`1");
 
@@ -31,6 +37,8 @@ internal class TypeHelper
     public INamedTypeSymbol? IParser => _compilation.GetTypeByMetadataName(NamespacePrefix + "IParserProvider`1");
 
     public INamedTypeSymbol? GeneratedParserAttribute => _compilation.GetTypeByMetadataName(NamespacePrefix + "GeneratedParserAttribute");
+
+    public INamedTypeSymbol? GeneratedCommandProviderAttribute => _compilation.GetTypeByMetadataName(NamespacePrefix + "Commands.GeneratedCommandProviderAttribute");
 
     public INamedTypeSymbol? CommandLineArgumentAttribute => _compilation.GetTypeByMetadataName(NamespacePrefix + "CommandLineArgumentAttribute");
 

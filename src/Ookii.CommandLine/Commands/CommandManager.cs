@@ -162,6 +162,14 @@ namespace Ookii.CommandLine.Commands
         public ParseResult ParseResult { get; private set; }
 
         /// <summary>
+        /// Gets the kind of <see cref="CommandProvider"/> used to supply the commands.
+        /// </summary>
+        /// <value>
+        /// One of the values of the <see cref="Support.ProviderKind"/> enumeration.
+        /// </value>
+        public ProviderKind ProviderKind => _provider.Kind;
+
+        /// <summary>
         /// Gets information about the commands.
         /// </summary>
         /// <returns>
@@ -179,7 +187,7 @@ namespace Ookii.CommandLine.Commands
         /// </remarks>
         public IEnumerable<CommandInfo> GetCommands()
         {
-            var commands = _provider.GetCommandsUnsorted(this);
+            var commands = GetCommandsUnsortedAndFiltered();
             if (_options.AutoVersionCommand &&
                 !commands.Any(c => _options.CommandNameComparer.Compare(c.Name, Properties.Resources.AutomaticVersionCommandName) == 0))
             {
@@ -230,7 +238,7 @@ namespace Ookii.CommandLine.Commands
                 throw new ArgumentNullException(nameof(commandName));
             }
 
-            var command = _provider.GetCommandsUnsorted(this)
+            var command = GetCommandsUnsortedAndFiltered()
                 .Where(c => c.MatchesName(commandName, Options.CommandNameComparer))
                 .FirstOrDefault();
 
@@ -553,5 +561,16 @@ namespace Ookii.CommandLine.Commands
         /// used by this instance.
         /// </returns>
         public string? GetApplicationDescription() => _provider.GetApplicationDescription();
+
+        private IEnumerable<CommandInfo> GetCommandsUnsortedAndFiltered()
+        {
+            var commands = _provider.GetCommandsUnsorted(this);
+            if (_options.CommandFilter != null)
+            {
+                commands = commands.Where(c => _options.CommandFilter(c));
+            }
+
+            return commands;
+        }
     }
 }
