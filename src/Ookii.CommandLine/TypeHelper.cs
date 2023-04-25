@@ -14,7 +14,7 @@ namespace Ookii.CommandLine
 
         public static Type? FindGenericInterface(
 #if NET6_0_OR_GREATER
-        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.Interfaces)]
+            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.Interfaces)]
 #endif
             this Type type, Type interfaceType)
         {
@@ -43,7 +43,7 @@ namespace Ookii.CommandLine
 
         public static bool ImplementsInterface(
 #if NET6_0_OR_GREATER
-        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.Interfaces)]
+            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.Interfaces)]
 #endif            
             this Type type, Type interfaceType)
         {
