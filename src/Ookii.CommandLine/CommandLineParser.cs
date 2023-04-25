@@ -302,6 +302,9 @@ public class CommandLineParser
     ///   class and are not used here.
     /// </para>
     /// </remarks>
+#if NET6_0_OR_GREATER
+    [RequiresUnreferencedCode("Trimming cannot be used when determining the default converter via reflection.")]
+#endif
     public CommandLineParser(Type argumentsType, ParseOptions? options = null)
         : this(new ReflectionArgumentProvider(argumentsType ?? throw new ArgumentNullException(nameof(argumentsType))), options)
     {
@@ -1022,6 +1025,9 @@ public class CommandLineParser
     ///   method.
     /// </para>
     /// </remarks>
+#if NET6_0_OR_GREATER
+    [RequiresUnreferencedCode("Trimming cannot be used when determining arguments via reflection. Use the GeneratedArgumentsParserAttribute instead.")]
+#endif
     public static T? Parse<T>(ParseOptions? options = null)
         where T : class
     {
@@ -1055,10 +1061,15 @@ public class CommandLineParser
     /// <remarks>
     ///   <inheritdoc cref="Parse{T}(ParseOptions?)"/>
     /// </remarks>
+#if NET6_0_OR_GREATER
+    [RequiresUnreferencedCode("Trimming cannot be used when determining arguments via reflection. Use the GeneratedArgumentsParserAttribute instead.")]
+#endif
     public static T? Parse<T>(string[] args, int index, ParseOptions? options = null)
         where T : class
     {
-        return (T?)ParseInternal(typeof(T), args, index, options);
+        options ??= new();
+        var parser = new CommandLineParser(typeof(T), options);
+        return (T?)parser.ParseWithErrorHandling(args, index);
     }
 
     /// <summary>
@@ -1082,6 +1093,9 @@ public class CommandLineParser
     /// <remarks>
     ///   <inheritdoc cref="Parse{T}(ParseOptions?)"/>
     /// </remarks>
+#if NET6_0_OR_GREATER
+    [RequiresUnreferencedCode("Trimming cannot be used when determining arguments via reflection. Use the GeneratedArgumentsParserAttribute instead.")]
+#endif
     public static T? Parse<T>(string[] args, ParseOptions? options = null)
         where T : class
     {
@@ -1196,13 +1210,6 @@ public class CommandLineParser
     protected virtual void OnDuplicateArgument(DuplicateArgumentEventArgs e)
     {
         DuplicateArgument?.Invoke(this, e);
-    }
-
-    internal static object? ParseInternal(Type argumentsType, string[] args, int index, ParseOptions? options)
-    {
-        options ??= new();
-        var parser = new CommandLineParser(argumentsType, options);
-        return parser.ParseWithErrorHandling(args, index);
     }
 
     internal static bool ShouldIndent(LineWrappingTextWriter writer)

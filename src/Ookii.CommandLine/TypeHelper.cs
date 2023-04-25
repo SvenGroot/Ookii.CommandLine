@@ -12,7 +12,11 @@ namespace Ookii.CommandLine
     {
         private const string ParseMethodName = "Parse";
 
-        public static Type? FindGenericInterface(this Type type, Type interfaceType)
+        public static Type? FindGenericInterface(
+#if NET6_0_OR_GREATER
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.Interfaces)]
+#endif
+            this Type type, Type interfaceType)
         {
             if (type == null)
             {
@@ -37,7 +41,11 @@ namespace Ookii.CommandLine
             return type.GetInterfaces().FirstOrDefault(i => i.IsGenericType && i.GetGenericTypeDefinition() == interfaceType);
         }
 
-        public static bool ImplementsInterface(this Type type, Type interfaceType)
+        public static bool ImplementsInterface(
+#if NET6_0_OR_GREATER
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.Interfaces)]
+#endif            
+            this Type type, Type interfaceType)
         {
             if (type == null)
             {
@@ -52,7 +60,11 @@ namespace Ookii.CommandLine
             return type.GetInterfaces().Any(i => i == interfaceType);
         }
 
-        public static object? CreateInstance(this Type type)
+        public static object? CreateInstance(
+#if NET6_0_OR_GREATER
+            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)]
+#endif
+            this Type type)
         {
             if (type == null)
             {
@@ -62,7 +74,11 @@ namespace Ookii.CommandLine
             return Activator.CreateInstance(type);
         }
 
-        public static object? CreateInstance(this Type type, params object?[]? args)
+        public static object? CreateInstance(
+#if NET6_0_OR_GREATER
+            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
+#endif
+            this Type type, params object?[]? args)
         {
             if (type == null)
             {
@@ -72,6 +88,9 @@ namespace Ookii.CommandLine
             return Activator.CreateInstance(type, args);
         }
 
+#if NET6_0_OR_GREATER
+        [RequiresUnreferencedCode("Trimming cannot be used when determining the default converter via reflection.")]
+#endif
         public static ArgumentConverter GetStringConverter(this Type type, Type? converterType)
         {
             if (type == null)
@@ -87,7 +106,7 @@ namespace Ookii.CommandLine
 
             if (converterType == null)
             {
-                var underlyingType = type.GetUnderlyingType();
+                var underlyingType = type.IsNullableValueType() ? type.GetGenericArguments()[0] : type;
                 converter = GetDefaultConverter(underlyingType);
                 if (converter != null)
                 {
@@ -108,7 +127,13 @@ namespace Ookii.CommandLine
         public static Type GetUnderlyingType(this Type type)
             => type.IsNullableValueType() ? type.GetGenericArguments()[0] : type;
 
-        private static ArgumentConverter? GetDefaultConverter(this Type type)
+        private static ArgumentConverter? GetDefaultConverter(
+#if NET7_0_OR_GREATER
+            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicMethods | DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.Interfaces)]
+#elif NET6_0_OR_GREATER
+            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicMethods | DynamicallyAccessedMemberTypes.PublicConstructors)]
+#endif
+            this Type type)
         {
             if (type == typeof(string))
             {

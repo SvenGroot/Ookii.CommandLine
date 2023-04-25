@@ -3,6 +3,7 @@ using Ookii.CommandLine.Validation;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -10,6 +11,9 @@ using System.Threading.Tasks;
 
 namespace Ookii.CommandLine.Support;
 
+#if NET6_0_OR_GREATER
+[RequiresUnreferencedCode("Trimming cannot be used when determining the default converter via reflection.")]
+#endif
 internal class ReflectionArgumentProvider : ArgumentProvider
 {
     public ReflectionArgumentProvider(Type type)

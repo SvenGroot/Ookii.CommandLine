@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -60,6 +61,9 @@ namespace Ookii.CommandLine.Commands
         ///   The options to use for parsing and usage help, or <see langword="null"/> to use
         ///   the default options.
         /// </param>
+#if NET6_0_OR_GREATER
+        [RequiresUnreferencedCode("Trimming cannot be used when determining the default converter via reflection.")]
+#endif
         public CommandManager(CommandOptions? options = null)
             : this(Assembly.GetCallingAssembly(), options)
         {
@@ -102,6 +106,9 @@ namespace Ookii.CommandLine.Commands
         ///   <see cref="CommandOptions"/> instance to create multiple commands.
         /// </note>
         /// </remarks>
+#if NET6_0_OR_GREATER
+        [RequiresUnreferencedCode("Trimming is not possible when determining commands using reflection. Use the GeneratedCommandProviderAttribute instead.")]
+#endif
         public CommandManager(Assembly assembly, CommandOptions? options = null)
             : this(new ReflectionCommandProvider(assembly ?? throw new ArgumentNullException(nameof(assembly))), options)
         {
@@ -118,6 +125,9 @@ namespace Ookii.CommandLine.Commands
         /// <exception cref="ArgumentNullException">
         /// <paramref name="assemblies"/> or one of its elements is <see langword="null"/>.
         /// </exception>
+#if NET6_0_OR_GREATER
+        [RequiresUnreferencedCode("Trimming is not possible when determining commands using reflection. Use the GeneratedCommandProviderAttribute instead.")]
+#endif
         public CommandManager(IEnumerable<Assembly> assemblies, CommandOptions? options = null)
             : this(new ReflectionCommandProvider(assemblies ?? throw new ArgumentNullException(nameof(assemblies))), options)
         {

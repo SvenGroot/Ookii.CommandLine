@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
@@ -269,6 +270,9 @@ namespace Ookii.CommandLine.Commands
         ///   A <see cref="CommandInfo"/> class with information about the command, or
         ///   <see langword="null"/> if <paramref name="commandType"/> was not a command.
         /// </returns>
+#if NET6_0_OR_GREATER
+        [RequiresUnreferencedCode("Trimming cannot be used when determining commands via reflection. Use the GeneratedCommandProviderAttribute instead.")]
+#endif
         public static CommandInfo? TryCreate(Type commandType, CommandManager manager)
             => ReflectionCommandInfo.TryCreate(commandType, manager);
 
@@ -289,8 +293,11 @@ namespace Ookii.CommandLine.Commands
         /// <returns>
         ///   A <see cref="CommandInfo"/> class with information about the command.
         /// </returns>
+#if NET6_0_OR_GREATER
+        [RequiresUnreferencedCode("Trimming cannot be used when determining commands via reflection. Use the GeneratedCommandProviderAttribute instead.")]
+#endif
         public static CommandInfo Create(Type commandType, CommandManager manager)
-            => new ReflectionCommandInfo(commandType, manager);
+            => new ReflectionCommandInfo(commandType, null, manager);
 
         /// <summary>
         /// Returns a value indicating if the specified type is a subcommand.
@@ -303,6 +310,9 @@ namespace Ookii.CommandLine.Commands
         /// <exception cref="ArgumentNullException">
         /// <paramref name="commandType"/> is <see langword="null"/>.
         /// </exception>
+#if NET6_0_OR_GREATER
+        [RequiresUnreferencedCode("Trimming cannot be used when determining commands via reflection. Use the GeneratedCommandProviderAttribute instead.")]
+#endif
         public static bool IsCommand(Type commandType) => ReflectionCommandInfo.GetCommandAttribute(commandType) != null;
 
         internal static CommandInfo GetAutomaticVersionCommand(CommandManager manager)

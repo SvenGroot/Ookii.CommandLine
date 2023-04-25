@@ -1,13 +1,22 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 
 namespace Ookii.CommandLine.Conversion;
 
 internal class ConstructorConverter : ArgumentConverter
 {
+#if NET6_0_OR_GREATER
+    [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
+#endif
+
     private readonly Type _type;
 
-    public ConstructorConverter(Type type)
+    public ConstructorConverter(
+#if NET6_0_OR_GREATER
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
+#endif
+        Type type)
     {
         _type = type;
     }

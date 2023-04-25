@@ -2,11 +2,15 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 
 namespace Ookii.CommandLine.Commands;
 
+#if NET6_0_OR_GREATER
+[RequiresUnreferencedCode("Trimming is not possible when determining commands using reflection. Use the GeneratedCommandProviderAttribute instead.")]
+#endif
 internal class ReflectionCommandProvider : CommandProvider
 {
     private readonly Assembly? _assembly;

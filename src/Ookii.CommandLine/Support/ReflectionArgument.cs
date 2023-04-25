@@ -8,9 +8,13 @@ using System.Diagnostics;
 using System.Text;
 using Ookii.CommandLine.Validation;
 using System.Threading;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Ookii.CommandLine.Support;
 
+#if NET6_0_OR_GREATER
+[RequiresUnreferencedCode("Trimming cannot be used when determining the default converter via reflection.")]
+#endif
 internal class ReflectionArgument : CommandLineArgument
 {
     #region Nested types

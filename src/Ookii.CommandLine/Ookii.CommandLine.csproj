@@ -6,6 +6,7 @@
     <LangVersion>11.0</LangVersion>
     <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <IsTrimmable>True</IsTrimmable>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/SvenGroot/ookii.commandline</PackageProjectUrl>
     <RepositoryUrl>https://github.com/SvenGroot/ookii.commandline</RepositoryUrl>

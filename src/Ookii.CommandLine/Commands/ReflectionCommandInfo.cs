@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
@@ -10,17 +11,16 @@ using System.Threading.Tasks;
 
 namespace Ookii.CommandLine.Commands;
 
+
+#if NET6_0_OR_GREATER
+[RequiresUnreferencedCode("Trimming is not possible when determining commands using reflection. Use the GeneratedCommandProviderAttribute instead.")]
+#endif
 internal class ReflectionCommandInfo : CommandInfo
 {
     private string? _description;
 
-    public ReflectionCommandInfo(Type commandType, CommandManager manager)
-        : base(commandType, GetCommandAttributeOrThrow(commandType), manager)
-    {
-    }
-
-    private ReflectionCommandInfo(Type commandType, CommandAttribute attribute, CommandManager manager)
-        : base(commandType, attribute, manager)
+    public ReflectionCommandInfo(Type commandType, CommandAttribute? attribute, CommandManager manager)
+        : base(commandType, attribute ?? GetCommandAttributeOrThrow(commandType), manager)
     {
     }
 

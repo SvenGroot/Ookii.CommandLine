@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Sven Groot (Ookii.org)
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 
 namespace Ookii.CommandLine.Conversion;
@@ -71,6 +72,9 @@ public class KeyValuePairConverter<TKey, TValue> : ArgumentConverter
     /// <summary>
     /// Initializes a new instance of the <see cref="KeyValuePairConverter{TKey, TValue}"/> class.
     /// </summary>
+#if NET6_0_OR_GREATER
+    [RequiresUnreferencedCode("Trimming cannot be used when determining converter types via reflection.")]
+#endif
     public KeyValuePairConverter()
         : this(typeof(TKey).GetStringConverter(null), typeof(TValue).GetStringConverter(null), null, true)
     {
