@@ -62,7 +62,7 @@ namespace Ookii.CommandLine.Commands
         ///   the default options.
         /// </param>
 #if NET6_0_OR_GREATER
-        [RequiresUnreferencedCode("Trimming cannot be used when determining the default converter via reflection.")]
+        [RequiresUnreferencedCode("Trimming is not possible when determining commands using reflection. Use the GeneratedCommandProviderAttribute instead.")]
 #endif
         public CommandManager(CommandOptions? options = null)
             : this(Assembly.GetCallingAssembly(), options)
