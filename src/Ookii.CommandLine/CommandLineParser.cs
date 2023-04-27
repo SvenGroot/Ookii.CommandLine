@@ -203,6 +203,7 @@ public class CommandLineParser
 
     private ReadOnlyCollection<CommandLineArgument>? _argumentsReadOnlyWrapper;
     private ReadOnlyCollection<string>? _argumentNamePrefixesReadOnlyWrapper;
+    private List<CommandLineArgument>? _requiredPropertyArguments;
 
     /// <summary>
     /// Gets the default character used to separate the name and the value of an argument.
@@ -1346,6 +1347,16 @@ public class CommandLineParser
             }
         }
 
+        // The generated provider needs values for arguments that use a required property to be
+        // supplied to the CreateInstance method in the exact order they were originally returned,
+        // so a separate list is maintained for that. The reflection provider doesn't need these
+        // values at all.
+        if (_provider.Kind != ProviderKind.Reflection && argument.IsRequiredProperty)
+        {
+            _requiredPropertyArguments ??= new();
+            _requiredPropertyArguments.Add(argument);
+        }
+
         _arguments.Add(argument);
     }
 
@@ -1456,7 +1467,17 @@ public class CommandLineParser
         // TODO: Integrate with new ctor argument support.
         try
         {
-            commandLineArguments = _provider.CreateInstance(this);
+            object?[]? requiredPropertyValues = null;
+            if (_requiredPropertyArguments != null)
+            {
+                requiredPropertyValues = new object?[_requiredPropertyArguments.Count];
+                for (int i = 0; i < requiredPropertyValues.Length; ++i)
+                {
+                    requiredPropertyValues[i] = _requiredPropertyArguments[i].Value;
+                }
+            }
+
+            commandLineArguments = _provider.CreateInstance(this, requiredPropertyValues);
         }
         catch (TargetInvocationException ex)
         {

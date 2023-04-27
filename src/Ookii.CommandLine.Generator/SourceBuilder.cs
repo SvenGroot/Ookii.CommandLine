@@ -7,6 +7,7 @@ internal class SourceBuilder
 {
     private readonly StringBuilder _builder = new();
     private int _indentLevel;
+    private bool _startOfLine = true;
 
     public SourceBuilder(INamespaceSymbol ns)
         : this(ns.IsGlobalNamespace ? null : ns.ToDisplayString())
@@ -25,15 +26,24 @@ internal class SourceBuilder
         }
     }
 
+    public void Append(string text)
+    {
+        WriteIndent();
+        _builder.Append(text);
+        _startOfLine = false;
+    }
+
     public void AppendLine()
     {
         _builder.AppendLine();
+        _startOfLine = true;
     }
 
     public void AppendLine(string text)
     {
         WriteIndent();
         _builder.AppendLine(text);
+        _startOfLine = true;
     }
 
     public void OpenBlock()
@@ -64,6 +74,9 @@ internal class SourceBuilder
 
     private void WriteIndent()
     {
-        _builder.Append(' ', _indentLevel * 4);
+        if (_startOfLine)
+        {
+            _builder.Append(' ', _indentLevel * 4);
+        }
     }
 }

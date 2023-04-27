@@ -37,7 +37,7 @@ internal static class Extensions
         => type is INamedTypeSymbol namedType && namedType.IsNullableValueType();
 
     public static bool AllowsNull(this ITypeSymbol type)
-        => (type is not INamedTypeSymbol namedType || namedType.IsNullableValueType()) || (type.IsReferenceType && type.NullableAnnotation != NullableAnnotation.NotAnnotated);
+        => (type is INamedTypeSymbol namedType && namedType.IsNullableValueType()) || (type.IsReferenceType && type.NullableAnnotation != NullableAnnotation.NotAnnotated);
 
     public static INamedTypeSymbol GetUnderlyingType(this INamedTypeSymbol type)
         => type.IsNullableValueType() ? (INamedTypeSymbol)type.TypeArguments[0] : type;

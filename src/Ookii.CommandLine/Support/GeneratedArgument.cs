@@ -41,6 +41,7 @@ public class GeneratedArgument : CommandLineArgument
     /// <param name="keyType"></param>
     /// <param name="valueType"></param>
     /// <param name="allowsNull"></param>
+    /// <param name="requiredProperty"></param>
     /// <param name="multiValueSeparatorAttribute"></param>
     /// <param name="descriptionAttribute"></param>
     /// <param name="allowDuplicateDictionaryKeys"></param>
@@ -61,6 +62,7 @@ public class GeneratedArgument : CommandLineArgument
                                            ArgumentKind kind,
                                            ArgumentConverter converter,
                                            bool allowsNull,
+                                           bool requiredProperty = false,
                                            Type? keyType = null,
                                            Type? valueType = null,
                                            MultiValueSeparatorAttribute? multiValueSeparatorAttribute = null,
@@ -74,7 +76,7 @@ public class GeneratedArgument : CommandLineArgument
                                            Func<object, object?>? getProperty = null,
                                            Func<object?, CommandLineParser, bool>? callMethod = null)
     {
-        var info = CreateArgumentInfo(parser, argumentType, allowsNull, memberName, attribute,
+        var info = CreateArgumentInfo(parser, argumentType, allowsNull, requiredProperty, memberName, attribute,
             multiValueSeparatorAttribute, descriptionAttribute, allowDuplicateDictionaryKeys, keyValueSeparatorAttribute,
             aliasAttributes, shortAliasAttributes, validationAttributes);
 

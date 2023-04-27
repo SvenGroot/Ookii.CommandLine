@@ -9,6 +9,7 @@ using System.Text;
 using Ookii.CommandLine.Validation;
 using System.Threading;
 using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 
 namespace Ookii.CommandLine.Support;
 
@@ -139,8 +140,15 @@ internal class ReflectionArgument : CommandLineArgument
         var aliasAttributes = member.GetCustomAttributes<AliasAttribute>();
         var shortAliasAttributes = member.GetCustomAttributes<ShortAliasAttribute>();
         var validationAttributes = member.GetCustomAttributes<ArgumentValidationAttribute>();
+#if NET7_0_OR_GREATER
+        var requiredProperty = Attribute.IsDefined(member, typeof(RequiredMemberAttribute));
+#else
+        var requiredProperty = false;
+#endif
 
-        ArgumentInfo info = CreateArgumentInfo(parser, argumentType, allowsNull, member.Name, attribute, multiValueSeparatorAttribute, descriptionAttribute, allowDuplicateDictionaryKeys, keyValueSeparatorAttribute, aliasAttributes, shortAliasAttributes, validationAttributes);
+        ArgumentInfo info = CreateArgumentInfo(parser, argumentType, allowsNull, requiredProperty, member.Name, attribute,
+            multiValueSeparatorAttribute, descriptionAttribute, allowDuplicateDictionaryKeys, keyValueSeparatorAttribute,
+            aliasAttributes, shortAliasAttributes, validationAttributes);
 
         DetermineAdditionalInfo(ref info, member);
         return new ReflectionArgument(info, property, method);

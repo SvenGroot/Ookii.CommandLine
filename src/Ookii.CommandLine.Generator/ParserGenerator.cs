@@ -140,25 +140,16 @@ internal class ParserGenerator
         _builder.AppendLine();
         _builder.AppendLine($"public override bool IsCommand => {isCommand.ToCSharpString()};");
         _builder.AppendLine();
-        if (_argumentsClass.FindConstructor(_typeHelper.CommandLineParser) != null)
-        {
-            _builder.AppendLine($"public override object CreateInstance(Ookii.CommandLine.CommandLineParser parser) => new {_argumentsClass.Name}(parser);");
-        }
-        else
-        {
-            _builder.AppendLine($"public override object CreateInstance(Ookii.CommandLine.CommandLineParser parser) => new {_argumentsClass.Name}();");
-        }
-
-        _builder.AppendLine();
         _builder.AppendLine("public override System.Collections.Generic.IEnumerable<Ookii.CommandLine.CommandLineArgument> GetArguments(Ookii.CommandLine.CommandLineParser parser)");
         _builder.OpenBlock();
 
         var current = _argumentsClass;
+        List<(string, string, string)>? requiredProperties = null;
         while (current != null && current.SpecialType != SpecialType.System_Object)
         {
             foreach (var member in current.GetMembers())
             {
-                GenerateArgument(member);
+                GenerateArgument(member, ref requiredProperties);
             }
 
             current = current.BaseType;
@@ -167,10 +158,47 @@ internal class ParserGenerator
         // Makes sure the function compiles if there are no arguments.
         _builder.AppendLine("yield break;");
         _builder.CloseBlock(); // GetArguments()
+        _builder.AppendLine();
+        _builder.AppendLine("public override object CreateInstance(Ookii.CommandLine.CommandLineParser parser, object?[]? requiredPropertyValues)");
+        _builder.OpenBlock();
+        if (_argumentsClass.FindConstructor(_typeHelper.CommandLineParser) != null)
+        {
+            _builder.Append($"return new {_argumentsClass.Name}(parser)");
+        }
+        else
+        {
+            _builder.Append($"return new {_argumentsClass.Name}()");
+        }
+
+        if (requiredProperties == null)
+        {
+            _builder.AppendLine(";");
+        }
+        else
+        {
+            _builder.AppendLine();
+            _builder.OpenBlock();
+            for (int i = 0; i < requiredProperties.Count; ++i)
+            {
+                var property = requiredProperties[i];
+                _builder.Append($"{property.Item1} = ({property.Item2})requiredPropertyValues![{i}]{property.Item3}");
+                if (i < requiredProperties.Count - 1)
+                {
+                    _builder.Append(",");
+                }
+
+                _builder.AppendLine();
+            }
+
+            _builder.DecreaseIndent();
+            _builder.AppendLine("};");
+        }
+
+        _builder.CloseBlock(); // CreateInstance()
         _builder.CloseBlock(); // GeneratedProvider class
     }
 
-    private void GenerateArgument(ISymbol member)
+    private void GenerateArgument(ISymbol member, ref List<(string, string, string)>? requiredProperties)
     {
         // This shouldn't happen because of attribute targets, but check anyway.
         if (member.Kind is not (SymbolKind.Method or SymbolKind.Property))
@@ -325,6 +353,12 @@ internal class ParserGenerator
                 elementTypeWithNullable = multiValueElementType!.WithNullableAnnotation(NullableAnnotation.NotAnnotated);
                 namedElementTypeWithNullable = elementTypeWithNullable as INamedTypeSymbol;
             }
+
+            if (property.IsRequired)
+            {
+                requiredProperties ??= new();
+                requiredProperties.Add((member.Name, property.Type.ToDisplayString(), notNullAnnotation));
+            }
         }
         else
         {
@@ -398,14 +432,15 @@ internal class ParserGenerator
             _builder.AppendLine($", validationAttributes: new Ookii.CommandLine.Validation.ArgumentValidationAttribute[] {{ {string.Join(", ", validators.Select(a => a.CreateInstantiation()))} }}");
         }
 
-        if (property?.SetMethod?.DeclaredAccessibility == Accessibility.Public)
-        {
-            _builder.AppendLine($", setProperty: (target, value) => (({_argumentsClass.ToDisplayString()})target).{member.Name} = ({originalArgumentType.ToDisplayString()})value{notNullAnnotation}");
-        }
-
         if (property != null)
         {
+            if (property.SetMethod?.DeclaredAccessibility == Accessibility.Public)
+            {
+                _builder.AppendLine($", setProperty: (target, value) => (({_argumentsClass.ToDisplayString()})target).{member.Name} = ({originalArgumentType.ToDisplayString()})value{notNullAnnotation}");
+            }
+
             _builder.AppendLine($", getProperty: (target) => (({_argumentsClass.ToDisplayString()})target).{member.Name}");
+            _builder.AppendLine($", requiredProperty: {property.IsRequired.ToCSharpString()}");
         }
 
         if (methodInfo is MethodArgumentInfo info)

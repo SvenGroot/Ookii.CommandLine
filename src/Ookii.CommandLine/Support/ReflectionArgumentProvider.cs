@@ -38,7 +38,7 @@ internal class ReflectionArgumentProvider : ArgumentProvider
 
     public override bool IsCommand => CommandInfo.IsCommand(ArgumentsType);
 
-    public override object CreateInstance(CommandLineParser parser)
+    public override object CreateInstance(CommandLineParser parser, object?[]? requiredPropertyValues)
     {
         var inject = ArgumentsType.GetConstructor(new[] { typeof(CommandLineParser) }) != null;
         if (inject)

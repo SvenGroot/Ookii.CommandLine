@@ -113,6 +113,11 @@ public abstract class ArgumentProvider
     /// Creates an instance of the arguments type.
     /// </summary>
     /// <param name="parser">The <see cref="CommandLineParser"/> that is parsing the arguments.</param>
+    /// <param name="requiredPropertyValues">
+    /// An array with the values of any arguments backed by required properties, or <see langword="null"/>
+    /// if there are no required properties, or if the <see cref="Kind"/> property equals
+    /// <see cref="ProviderKind.Reflection"/>.
+    /// </param>
     /// <returns>An instance of the type indicated by <see cref="ArgumentsType"/>.</returns>
-    public abstract object CreateInstance(CommandLineParser parser);
+    public abstract object CreateInstance(CommandLineParser parser, object?[]? requiredPropertyValues);
 }

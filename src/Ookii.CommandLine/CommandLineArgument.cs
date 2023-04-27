@@ -276,6 +276,7 @@ public abstract class CommandLineArgument
         public ArgumentConverter Converter { get; set; }
         public int? Position { get; set; }
         public bool IsRequired { get; set; }
+        public bool IsRequiredProperty { get; set; }
         public object? DefaultValue { get; set; }
         public string? Description { get; set; }
         public string? ValueDescription { get; set; }
@@ -372,6 +373,7 @@ public abstract class CommandLineArgument
         _valueType = info.ValueType;
         _description = info.Description;
         _isRequired = info.IsRequired;
+        IsRequiredProperty = info.IsRequiredProperty;
         _allowNull = info.AllowNull;
         _cancelParsing = info.CancelParsing;
         _validators = info.Validators;
@@ -631,6 +633,21 @@ public abstract class CommandLineArgument
     {
         get { return _isRequired; }
     }
+
+    /// <summary>
+    /// Gets a value that indicates whether the argument is backed by a required property.
+    /// </summary>
+    /// <value>
+    ///   <see langword="true"/> if the argument is defined by a property with the C# 11
+    ///   <c>required</c> keyword; otherwise, <see langword="false"/>.
+    /// </value>
+    /// <remarks>
+    /// <para>
+    ///   If the <see cref="IsRequiredProperty"/> property is <see langword="true"/>, the
+    ///   <see cref="IsRequired"/> property is guaranteed to also be <see langword="true"/>.
+    /// </para>
+    /// </remarks>
+    public bool IsRequiredProperty { get; }
 
     /// <summary>
     /// Gets the default value for an argument.
@@ -1188,12 +1205,19 @@ public abstract class CommandLineArgument
         return Parser.Options.ValueDescriptionTransform?.Apply(typeName) ?? typeName;
     }
 
-    internal static ArgumentInfo CreateArgumentInfo(CommandLineParser parser, Type argumentType, bool allowsNull,
-        string memberName, CommandLineArgumentAttribute attribute,
-        MultiValueSeparatorAttribute? multiValueSeparatorAttribute, DescriptionAttribute? descriptionAttribute,
-        bool allowDuplicateDictionaryKeys, KeyValueSeparatorAttribute? keyValueSeparatorAttribute,
-        IEnumerable<AliasAttribute>? aliasAttributes, IEnumerable<ShortAliasAttribute>? shortAliasAttributes,
-        IEnumerable<ArgumentValidationAttribute>? validationAttributes)
+    internal static ArgumentInfo CreateArgumentInfo(CommandLineParser parser,
+                                                    Type argumentType,
+                                                    bool allowsNull,
+                                                    bool requiredProperty,
+                                                    string memberName,
+                                                    CommandLineArgumentAttribute attribute,
+                                                    MultiValueSeparatorAttribute? multiValueSeparatorAttribute,
+                                                    DescriptionAttribute? descriptionAttribute,
+                                                    bool allowDuplicateDictionaryKeys,
+                                                    KeyValueSeparatorAttribute? keyValueSeparatorAttribute,
+                                                    IEnumerable<AliasAttribute>? aliasAttributes,
+                                                    IEnumerable<ShortAliasAttribute>? shortAliasAttributes,
+                                                    IEnumerable<ArgumentValidationAttribute>? validationAttributes)
     {
         var argumentName = DetermineArgumentName(attribute.ArgumentName, memberName, parser.Options.ArgumentNameTransform);
         return new ArgumentInfo()
@@ -1215,7 +1239,8 @@ public abstract class CommandLineArgument
             Aliases = GetAliases(aliasAttributes, argumentName),
             ShortAliases = GetShortAliases(shortAliasAttributes, argumentName),
             DefaultValue = attribute.DefaultValue,
-            IsRequired = attribute.IsRequired,
+            IsRequired = attribute.IsRequired || requiredProperty,
+            IsRequiredProperty = requiredProperty,
             MemberName = memberName,
             AllowNull = allowsNull,
             CancelParsing = attribute.CancelParsing,
