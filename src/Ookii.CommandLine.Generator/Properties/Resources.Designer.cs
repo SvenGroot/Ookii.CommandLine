@@ -241,6 +241,24 @@ namespace Ookii.CommandLine.Generator.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The command line argument property {0}.{1} may only have an &apos;init&apos; accessor if the property is also declared as &apos;required&apos;..
+        /// </summary>
+        internal static string NonRequiredInitOnlyPropertyMessageFormat {
+            get {
+                return ResourceManager.GetString("NonRequiredInitOnlyPropertyMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Init accessors may only be used on required properties..
+        /// </summary>
+        internal static string NonRequiredInitOnlyPropertyTitle {
+            get {
+                return ResourceManager.GetString("NonRequiredInitOnlyPropertyTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The property {0}.{1} must have a public set accessor..
         /// </summary>
         internal static string PropertyIsReadOnlyMessageFormat {

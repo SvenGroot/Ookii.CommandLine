@@ -180,7 +180,7 @@ partial class RequiredPropertyArguments
 
     // IsRequired is ignored
     [CommandLineArgument(IsRequired = false)]
-    public required string? Foo { get; set; }
+    public required string? Foo { get; init; }
 
     [CommandLineArgument]
     public required int[] Bar { get; set; }

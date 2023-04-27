@@ -79,6 +79,14 @@ internal static class Diagnostics
         symbol.Locations.FirstOrDefault(),
         symbol.ToDisplayString());
 
+    public static Diagnostic NonRequiredInitOnlyProperty(IPropertySymbol property) => CreateDiagnostic(
+        "CL0009",
+        nameof(Resources.NonRequiredInitOnlyPropertyTitle),
+        nameof(Resources.NonRequiredInitOnlyPropertyMessageFormat),
+        DiagnosticSeverity.Error,
+        property.Locations.FirstOrDefault(),
+        property.ContainingType?.ToDisplayString(), property.Name);
+
     public static Diagnostic UnknownAttribute(AttributeData attribute) => CreateDiagnostic(
         "CLW0001",
         nameof(Resources.UnknownAttributeTitle),

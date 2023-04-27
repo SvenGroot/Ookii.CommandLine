@@ -354,6 +354,12 @@ internal class ParserGenerator
                 namedElementTypeWithNullable = elementTypeWithNullable as INamedTypeSymbol;
             }
 
+            if (property.SetMethod != null && property.SetMethod.IsInitOnly && !property.IsRequired)
+            {
+                _context.ReportDiagnostic(Diagnostics.NonRequiredInitOnlyProperty(property));
+                return;
+            }
+
             if (property.IsRequired)
             {
                 requiredProperties ??= new();
@@ -434,7 +440,7 @@ internal class ParserGenerator
 
         if (property != null)
         {
-            if (property.SetMethod?.DeclaredAccessibility == Accessibility.Public)
+            if (property.SetMethod != null && property.SetMethod.DeclaredAccessibility == Accessibility.Public && !property.SetMethod.IsInitOnly)
             {
                 _builder.AppendLine($", setProperty: (target, value) => (({_argumentsClass.ToDisplayString()})target).{member.Name} = ({originalArgumentType.ToDisplayString()})value{notNullAnnotation}");
             }

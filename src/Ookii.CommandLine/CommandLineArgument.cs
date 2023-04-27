@@ -1,5 +1,6 @@
 ﻿// Copyright (c) Sven Groot (Ookii.org)
 using Ookii.CommandLine.Conversion;
+using Ookii.CommandLine.Support;
 using Ookii.CommandLine.Validation;
 using System;
 using System.Collections.Generic;
@@ -1449,9 +1450,10 @@ public abstract class CommandLineArgument
 
     internal void ApplyPropertyValue(object target)
     {
-        // Do nothing for method-based values.
+        // Do nothing for method-based values, or for required properties if the provider is not
+        // using reflection.
         // TODO: Handle new style constructor parameters.
-        if (Kind == ArgumentKind.Method)
+        if (Kind == ArgumentKind.Method || (IsRequiredProperty && _parser.ProviderKind != ProviderKind.Reflection))
         {
             return;
         }

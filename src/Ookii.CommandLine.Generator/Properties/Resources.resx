@@ -177,6 +177,12 @@
   <data name="NonPublicStaticMethodTitle" xml:space="preserve">
     <value>Methods that are not public and static will be ignored.</value>
   </data>
+  <data name="NonRequiredInitOnlyPropertyMessageFormat" xml:space="preserve">
+    <value>The command line argument property {0}.{1} may only have an 'init' accessor if the property is also declared as 'required'.</value>
+  </data>
+  <data name="NonRequiredInitOnlyPropertyTitle" xml:space="preserve">
+    <value>Init accessors may only be used on required properties.</value>
+  </data>
   <data name="PropertyIsReadOnlyMessageFormat" xml:space="preserve">
     <value>The property {0}.{1} must have a public set accessor.</value>
   </data>
