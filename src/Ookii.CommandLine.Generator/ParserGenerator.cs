@@ -54,7 +54,11 @@ internal class ParserGenerator
         }
 
         _builder.OpenBlock();
-        GenerateProvider();
+        if (!GenerateProvider())
+        {
+            return null;
+        }
+
         _builder.AppendLine($"public static Ookii.CommandLine.CommandLineParser<{_argumentsClass.Name}> CreateParser(Ookii.CommandLine.ParseOptions? options = null) => new(new GeneratedProvider(), options);");
         _builder.AppendLine();
         var nullableType = _argumentsClass.WithNullableAnnotation(NullableAnnotation.Annotated);
@@ -70,7 +74,7 @@ internal class ParserGenerator
         return _builder.GetSource();
     }
 
-    private void GenerateProvider()
+    private bool GenerateProvider()
     {
         // Find the attributes that can apply to an arguments class.
         // This code also finds attributes that inherit from those attribute. By instantiating the
@@ -82,7 +86,12 @@ internal class ParserGenerator
         var isCommand = false;
         if (attributes.Command != null)
         {
-            if (_argumentsClass.ImplementsInterface(_typeHelper.ICommand))
+            if (_argumentsClass.ImplementsInterface(_typeHelper.ICommandWithCustomParsing))
+            {
+                _context.ReportDiagnostic(Diagnostics.GeneratedCustomParsingCommand(_argumentsClass));
+                return false;
+            }
+            else if (_argumentsClass.ImplementsInterface(_typeHelper.ICommand))
             {
                 isCommand = true;
                 _commandGenerator.AddGeneratedCommand(_argumentsClass, attributes);
@@ -174,6 +183,7 @@ internal class ParserGenerator
 
         _builder.CloseBlock(); // CreateInstance()
         _builder.CloseBlock(); // GeneratedProvider class
+        return true;
     }
 
     private void GenerateArgument(ISymbol member, ref List<(string, string, string)>? requiredProperties)
@@ -212,7 +222,7 @@ internal class ParserGenerator
                 continue;
             }
 
-            _context.ReportDiagnostic(Diagnostics.UnknownAttribute(attribute));
+            _context.ReportDiagnostic(Diagnostics.IgnoredAttribute(attribute));
         }
 
         // Check if it is an attribute.

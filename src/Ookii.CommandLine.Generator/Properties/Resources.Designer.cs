@@ -151,6 +151,24 @@ namespace Ookii.CommandLine.Generator.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The command class {0} cannot use the GeneratedParserAttribute class, because it implements the ICommandWithCustomParsing interface..
+        /// </summary>
+        internal static string GeneratedCustomParsingCommandMessageFormat {
+            get {
+                return ResourceManager.GetString("GeneratedCustomParsingCommandMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The GeneratedParserAttribute cannot be used with a class that implements the ICommandWithCustomParsing interface..
+        /// </summary>
+        internal static string GeneratedCustomParsingCommandTitle {
+            get {
+                return ResourceManager.GetString("GeneratedCustomParsingCommandTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The multi-value command line argument defined by {0}.{1} must have an array rank of one..
         /// </summary>
         internal static string InvalidArrayRankMessageFormat {
@@ -196,7 +214,7 @@ namespace Ookii.CommandLine.Generator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to No acommand line rgument converter exists for the argument&apos;s type..
+        ///   Looks up a localized string similar to No command line argument converter exists for the argument&apos;s type..
         /// </summary>
         internal static string NoConverterTitle {
             get {

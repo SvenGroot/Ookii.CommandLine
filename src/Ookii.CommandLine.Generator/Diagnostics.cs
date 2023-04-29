@@ -87,7 +87,15 @@ internal static class Diagnostics
         property.Locations.FirstOrDefault(),
         property.ContainingType?.ToDisplayString(), property.Name);
 
-    public static Diagnostic UnknownAttribute(AttributeData attribute) => CreateDiagnostic(
+    public static Diagnostic GeneratedCustomParsingCommand(INamedTypeSymbol symbol) => CreateDiagnostic(
+        "CL0010",
+        nameof(Resources.GeneratedCustomParsingCommandTitle),
+        nameof(Resources.GeneratedCustomParsingCommandMessageFormat),
+        DiagnosticSeverity.Error,
+        symbol.Locations.FirstOrDefault(),
+        symbol.ToDisplayString());
+
+    public static Diagnostic IgnoredAttribute(AttributeData attribute) => CreateDiagnostic(
         "CLW0001",
         nameof(Resources.UnknownAttributeTitle),
         nameof(Resources.UnknownAttributeMessageFormat),

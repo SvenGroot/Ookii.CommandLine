@@ -27,7 +27,7 @@ internal readonly struct ArgumentsClassAttributes
                 continue;
             }
 
-            context.ReportDiagnostic(Diagnostics.UnknownAttribute(attribute));
+            context.ReportDiagnostic(Diagnostics.IgnoredAttribute(attribute));
         }
     }
 
