@@ -578,6 +578,7 @@ partial class ConversionArguments
     public int? Nullable { get; set; }
 }
 
+[Description("Base class attribute.")]
 class BaseArguments
 {
     [CommandLineArgument]

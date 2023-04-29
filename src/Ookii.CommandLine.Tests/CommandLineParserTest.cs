@@ -1125,6 +1125,7 @@ namespace Ookii.CommandLine.Tests
         public void TestDerivedClass(ProviderKind kind)
         {
             var parser = CreateParser<DerivedArguments>(kind);
+            Assert.AreEqual("Base class attribute.", parser.Description);
             Assert.AreEqual(4, parser.Arguments.Count);
             VerifyArguments(parser.Arguments, new[]
             {

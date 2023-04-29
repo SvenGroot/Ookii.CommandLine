@@ -158,12 +158,12 @@ internal static class Extensions
     // Using a ref parameter with bool return allows me to chain these together.
     public static bool CheckType(this AttributeData data, ITypeSymbol? attributeType, ref AttributeData? attribute)
     {
-        if (attribute != null || !(data.AttributeClass?.DerivesFrom(attributeType) ?? false))
+        if (!(data.AttributeClass?.DerivesFrom(attributeType) ?? false))
         {
             return false;
         }
 
-        attribute = data;
+        attribute ??= data;
         return true;
     }
 
