@@ -72,42 +72,20 @@ internal class ParserGenerator
 
     private void GenerateProvider()
     {
-        // Find the attribute that can apply to an arguments class.
+        // Find the attributes that can apply to an arguments class.
         // This code also finds attributes that inherit from those attribute. By instantiating the
         // possibly derived attribute classes, we can support for example a class that derives from
         // DescriptionAttribute that gets the description from a resource.
-        AttributeData? parseOptions = null;
-        AttributeData? description = null;
-        AttributeData? applicationFriendlyName = null;
-        AttributeData? commandAttribute = null;
-        List<AttributeData>? classValidators = null;
-        List<AttributeData>? aliasAttributes = null; // for command usage.
-        foreach (var attribute in _argumentsClass.GetAttributes())
-        {
-            if (CheckAttribute(attribute, _typeHelper.ParseOptionsAttribute, ref parseOptions) ||
-                CheckAttribute(attribute, _typeHelper.DescriptionAttribute, ref description) ||
-                CheckAttribute(attribute, _typeHelper.ApplicationFriendlyNameAttribute, ref applicationFriendlyName) ||
-                CheckAttribute(attribute, _typeHelper.CommandAttribute, ref commandAttribute) ||
-                CheckAttribute(attribute, _typeHelper.ClassValidationAttribute, ref classValidators) ||
-                CheckAttribute(attribute, _typeHelper.AliasAttribute, ref aliasAttributes))
-            {
-                continue;
-            }
-
-            if (!attribute.AttributeClass?.DerivesFrom(_typeHelper.GeneratedParserAttribute) ?? false)
-            {
-                _context.ReportDiagnostic(Diagnostics.UnknownAttribute(attribute));
-            }
-        }
+        var attributes = new ArgumentsClassAttributes(_argumentsClass, _typeHelper, _context);
 
         // TODO: Warn if AliasAttribute without CommandAttribute.
         var isCommand = false;
-        if (commandAttribute != null)
+        if (attributes.Command != null)
         {
             if (_argumentsClass.ImplementsInterface(_typeHelper.ICommand))
             {
                 isCommand = true;
-                _commandGenerator.AddCommand(_argumentsClass, commandAttribute, description, aliasAttributes);
+                _commandGenerator.AddGeneratedCommand(_argumentsClass, attributes);
             }
             else
             {
@@ -123,18 +101,18 @@ internal class ParserGenerator
         _builder.AppendLine("public GeneratedProvider()");
         _builder.IncreaseIndent();
         _builder.AppendLine($": base(typeof({_argumentsClass.Name}),");
-        _builder.AppendLine($"       {parseOptions?.CreateInstantiation() ?? "null"},");
-        if (classValidators == null)
+        _builder.AppendLine($"       {attributes.ParseOptions?.CreateInstantiation() ?? "null"},");
+        if (attributes.ClassValidators == null)
         {
             _builder.AppendLine($"       null,");
         }
         else
         {
-            _builder.AppendLine($"       new Ookii.CommandLine.Validation.ClassValidationAttribute[] {{ {string.Join(", ", classValidators.Select(v => v.CreateInstantiation()))} }},");
+            _builder.AppendLine($"       new Ookii.CommandLine.Validation.ClassValidationAttribute[] {{ {string.Join(", ", attributes.ClassValidators.Select(v => v.CreateInstantiation()))} }},");
         }
 
-        _builder.AppendLine($"       {applicationFriendlyName?.CreateInstantiation() ?? "null"},");
-        _builder.AppendLine($"       {description?.CreateInstantiation() ?? "null"})");
+        _builder.AppendLine($"       {attributes.ApplicationFriendlyName?.CreateInstantiation() ?? "null"},");
+        _builder.AppendLine($"       {attributes.Description?.CreateInstantiation() ?? "null"})");
         _builder.DecreaseIndent();
         _builder.AppendLine("{}");
         _builder.AppendLine();
@@ -219,17 +197,17 @@ internal class ParserGenerator
         List<AttributeData>? validators = null;
         foreach (var attribute in member.GetAttributes())
         {
-            if (CheckAttribute(attribute, _typeHelper.CommandLineArgumentAttribute, ref commandLineArgumentAttribute) ||
-                CheckAttribute(attribute, _typeHelper.MultiValueSeparatorAttribute, ref multiValueSeparator) ||
-                CheckAttribute(attribute, _typeHelper.DescriptionAttribute, ref description) ||
-                CheckAttribute(attribute, _typeHelper.AllowDuplicateDictionaryKeysAttribute, ref allowDuplicateDictionaryKeys) ||
-                CheckAttribute(attribute, _typeHelper.KeyValueSeparatorAttribute, ref keyValueSeparator) ||
-                CheckAttribute(attribute, _typeHelper.ArgumentConverterAttribute, ref converterAttribute) ||
-                CheckAttribute(attribute, _typeHelper.KeyConverterAttribute, ref keyConverterAttribute) ||
-                CheckAttribute(attribute, _typeHelper.ValueConverterAttribute, ref valueConverterAttribute) ||
-                CheckAttribute(attribute, _typeHelper.AliasAttribute, ref aliases) ||
-                CheckAttribute(attribute, _typeHelper.ShortAliasAttribute, ref shortAliases) ||
-                CheckAttribute(attribute, _typeHelper.ArgumentValidationAttribute, ref validators))
+            if (attribute.CheckType(_typeHelper.CommandLineArgumentAttribute, ref commandLineArgumentAttribute) ||
+                attribute.CheckType(_typeHelper.MultiValueSeparatorAttribute, ref multiValueSeparator) ||
+                attribute.CheckType(_typeHelper.DescriptionAttribute, ref description) ||
+                attribute.CheckType(_typeHelper.AllowDuplicateDictionaryKeysAttribute, ref allowDuplicateDictionaryKeys) ||
+                attribute.CheckType(_typeHelper.KeyValueSeparatorAttribute, ref keyValueSeparator) ||
+                attribute.CheckType(_typeHelper.ArgumentConverterAttribute, ref converterAttribute) ||
+                attribute.CheckType(_typeHelper.KeyConverterAttribute, ref keyConverterAttribute) ||
+                attribute.CheckType(_typeHelper.ValueConverterAttribute, ref valueConverterAttribute) ||
+                attribute.CheckType(_typeHelper.AliasAttribute, ref aliases) ||
+                attribute.CheckType(_typeHelper.ShortAliasAttribute, ref shortAliases) ||
+                attribute.CheckType(_typeHelper.ArgumentValidationAttribute, ref validators))
             {
                 continue;
             }
@@ -480,31 +458,6 @@ internal class ParserGenerator
 
         _builder.DecreaseIndent();
         _builder.AppendLine(");");
-    }
-
-    // Using a ref parameter with bool return allows me to chain these together.
-    private static bool CheckAttribute(AttributeData data, ITypeSymbol? attributeType, ref AttributeData? attribute)
-    {
-        if (attribute != null || !(data.AttributeClass?.DerivesFrom(attributeType) ?? false))
-        {
-            return false;
-        }
-
-        attribute = data;
-        return true;
-    }
-
-    // Using a ref parameter with bool return allows me to chain these together.
-    private static bool CheckAttribute(AttributeData data, ITypeSymbol? attributeType, ref List<AttributeData>? attributes)
-    {
-        if (!(data.AttributeClass?.DerivesFrom(attributeType) ?? false))
-        {
-            return false;
-        }
-
-        attributes ??= new();
-        attributes.Add(data);
-        return true;
     }
 
     private (ITypeSymbol?, INamedTypeSymbol?, ITypeSymbol?)? DetermineMultiValueType(IPropertySymbol property, ITypeSymbol argumentType)

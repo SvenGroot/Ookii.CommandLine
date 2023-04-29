@@ -11,7 +11,14 @@ namespace Ookii.CommandLine.Generator;
 [Generator]
 public class ParserIncrementalGenerator : IIncrementalGenerator
 {
-    private record struct ClassInfo(ClassDeclarationSyntax Syntax, bool IsCommandProvider);
+    private enum ClassKind
+    {
+        Arguments,
+        CommandProvider,
+        Command,
+    }
+
+    private record struct ClassInfo(ClassDeclarationSyntax Syntax, ClassKind ClassKind);
 
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
@@ -48,6 +55,22 @@ public class ParserIncrementalGenerator : IIncrementalGenerator
                 continue;
             }
 
+            // If this is a command without the GeneratedParserAttribute, add it and do nothing
+            // else.
+            if (info.ClassKind == ClassKind.Command)
+            {
+                if (symbol.ImplementsInterface(typeHelper.ICommand))
+                {
+                    commandGenerator.AddCommand(symbol);
+                }
+                else
+                {
+                    context.ReportDiagnostic(Diagnostics.CommandAttributeWithoutInterface(symbol));
+                }
+
+                continue;
+            }
+
             // TODO: Custom messages for provider types.
             if (!symbol.IsReferenceType)
             {
@@ -73,7 +96,7 @@ public class ParserIncrementalGenerator : IIncrementalGenerator
                 continue;
             }
 
-            if (info.IsCommandProvider)
+            if (info.ClassKind == ClassKind.CommandProvider)
             {
                 commandGenerator.AddProvider(symbol);
                 continue;
@@ -101,6 +124,8 @@ public class ParserIncrementalGenerator : IIncrementalGenerator
         var typeHelper = new TypeHelper(context.SemanticModel.Compilation);
         var generatedParserType = typeHelper.GeneratedParserAttribute;
         var generatedCommandProviderType = typeHelper.GeneratedCommandProviderAttribute;
+        var commandType = typeHelper.CommandAttribute;
+        var isCommand = false;
         foreach (var attributeList in classDeclaration.AttributeLists)
         {
             foreach (var attribute in attributeList.Attributes)
@@ -114,16 +139,21 @@ public class ParserIncrementalGenerator : IIncrementalGenerator
                 var attributeType = attributeSymbol.ContainingType;
                 if (attributeType.SymbolEquals(generatedParserType))
                 {
-                    return new(classDeclaration, false);
+                    return new(classDeclaration, ClassKind.Arguments);
                 }
 
                 if (attributeType.SymbolEquals(generatedCommandProviderType))
                 {
-                    return new(classDeclaration, true);
+                    return new(classDeclaration, ClassKind.CommandProvider);
+                }
+
+                if (attributeType.SymbolEquals(commandType))
+                {
+                    isCommand = true;
                 }
             }
         }
 
-        return null;
+        return isCommand ? new(classDeclaration, ClassKind.Command) : null;
     }
 }

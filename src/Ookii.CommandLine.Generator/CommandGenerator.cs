@@ -8,8 +8,7 @@ internal class CommandGenerator
 {
     private readonly TypeHelper _typeHelper;
     private readonly SourceProductionContext _context;
-    private readonly List<(INamedTypeSymbol Type, AttributeData CommandAttribute, AttributeData? DescriptionAttribute,
-        List<AttributeData>? AliasAttributes)> _commands = new();
+    private readonly List<(INamedTypeSymbol Type, ArgumentsClassAttributes? Attributes)> _commands = new();
 
     private readonly List<INamedTypeSymbol> _providers = new();
 
@@ -19,9 +18,14 @@ internal class CommandGenerator
         _context = context;
     }
 
-    public void AddCommand(INamedTypeSymbol type, AttributeData commandAttribute, AttributeData? descriptionAttribute, List<AttributeData>? aliasAttributes)
+    public void AddGeneratedCommand(INamedTypeSymbol type, ArgumentsClassAttributes attributes)
     {
-        _commands.Add((type, commandAttribute, descriptionAttribute, aliasAttributes));
+        _commands.Add((type, attributes));
+    }
+
+    public void AddCommand(INamedTypeSymbol type)
+    {
+        _commands.Add((type, null));
     }
 
     public void AddProvider(INamedTypeSymbol provider)
@@ -75,6 +79,7 @@ internal class CommandGenerator
         // TODO: Providers with custom command lists.
         foreach (var command in _commands)
         {
+            var isGenerated = command.Attributes != null;
             var useCustomParsing = command.Type.ImplementsInterface(_typeHelper.ICommandWithCustomParsing);
             var commandTypeName = command.Type.ToDisplayString();
             if (useCustomParsing)
@@ -93,20 +98,28 @@ internal class CommandGenerator
                 builder.AppendLine($", typeof({commandTypeName})");
             }
 
-            builder.AppendLine($", {command.CommandAttribute.CreateInstantiation()}");
-            if (command.DescriptionAttribute != null)
+            var attributes = command.Attributes ?? new ArgumentsClassAttributes(command.Type, _typeHelper, _context);
+            builder.AppendLine($", {attributes.Command!.CreateInstantiation()}");
+            if (attributes.Description != null)
             {
-                builder.AppendLine($", descriptionAttribute: {command.DescriptionAttribute.CreateInstantiation()}");
+                builder.AppendLine($", descriptionAttribute: {attributes.Description.CreateInstantiation()}");
             }
 
-            if (command.AliasAttributes != null)
+            if (attributes.Aliases != null)
             {
-                builder.AppendLine($", aliasAttributes: new Ookii.CommandLine.AliasAttribute[] {{ {string.Join(", ", command.AliasAttributes.Select(a => a.CreateInstantiation()))} }}");
+                builder.AppendLine($", aliasAttributes: new Ookii.CommandLine.AliasAttribute[] {{ {string.Join(", ", attributes.Aliases.Select(a => a.CreateInstantiation()))} }}");
             }
 
             if (!useCustomParsing)
             {
-                builder.AppendLine($", createParser: options => {commandTypeName}.CreateParser(options)");
+                if (isGenerated)
+                {
+                    builder.AppendLine($", createParser: options => {commandTypeName}.CreateParser(options)");
+                }
+                else
+                {
+                    builder.AppendLine($", createParser: options => new CommandLineParser<{commandTypeName}>(options)");
+                }
             }
 
             builder.DecreaseIndent();

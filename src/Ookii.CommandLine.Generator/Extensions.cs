@@ -154,4 +154,29 @@ internal static class Extensions
 
         return null;
     }
+
+    // Using a ref parameter with bool return allows me to chain these together.
+    public static bool CheckType(this AttributeData data, ITypeSymbol? attributeType, ref AttributeData? attribute)
+    {
+        if (attribute != null || !(data.AttributeClass?.DerivesFrom(attributeType) ?? false))
+        {
+            return false;
+        }
+
+        attribute = data;
+        return true;
+    }
+
+    // Using a ref parameter with bool return allows me to chain these together.
+    public  static bool CheckType(this AttributeData data, ITypeSymbol? attributeType, ref List<AttributeData>? attributes)
+    {
+        if (!(data.AttributeClass?.DerivesFrom(attributeType) ?? false))
+        {
+            return false;
+        }
+
+        attributes ??= new();
+        attributes.Add(data);
+        return true;
+    }
 }

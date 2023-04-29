@@ -37,7 +37,6 @@ public partial class AnotherSimpleCommand : ICommand
     }
 }
 
-[GeneratedParser]
 [Command("custom")]
 [Description("Custom parsing command.")]
 partial class CustomParsingCommand : ICommandWithCustomParsing
@@ -66,7 +65,7 @@ partial class HiddenCommand : ICommand
 }
 
 // Hidden so I don't have to update the expected usage.
-[GeneratedParser]
+// Not generated to test registration of plain commands without generation.
 [Command(IsHidden = true)]
 [Description("Async command description.")]
 partial class AsyncCommand : IAsyncCommand
@@ -77,7 +76,7 @@ partial class AsyncCommand : IAsyncCommand
 
     public int Run()
     {
-        // Do somehting different than RunAsync so the test can differentiate which one was
+        // Do something different than RunAsync so the test can differentiate which one was
         // called.
         return Value + 1;
     }
