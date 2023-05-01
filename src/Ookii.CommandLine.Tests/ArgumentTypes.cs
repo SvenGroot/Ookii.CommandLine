@@ -31,7 +31,8 @@ partial class TestArguments
     [Description("Arg1 description.")]
     public string Arg1 { get; set; }
 
-    [CommandLineArgument("other", Position = 2, DefaultValue = 42, ValueDescription = "Number")]
+    [CommandLineArgument("other", Position = 2, DefaultValue = 42)]
+    [ValueDescription("Number")]
     [Description("Arg2 description.")]
     public int Arg2 { get; set; }
 
@@ -42,7 +43,8 @@ partial class TestArguments
     public string Arg3 { get; set; }
 
     // Default value is intentionally a string to test default value conversion.
-    [CommandLineArgument("other2", DefaultValue = "47", ValueDescription = "Number", Position = 5), Description("Arg4 description.")]
+    [CommandLineArgument("other2", DefaultValue = "47", Position = 5), Description("Arg4 description.")]
+    [ValueDescription("Number")]
     [ValidateRange(0, 1000, IncludeInUsageHelp = false)]
     public int Arg4 { get; set; }
 

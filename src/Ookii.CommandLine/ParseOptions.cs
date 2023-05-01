@@ -451,11 +451,10 @@ namespace Ookii.CommandLine
         ///   describe the purpose of the argument.
         /// </para>
         /// <para>
-        ///   If an argument doesn't have the <see cref="CommandLineArgumentAttribute.ValueDescription"/>
-        ///   property set, the value description will be determined by first checking this
-        ///   dictionary. If the type of the argument isn't in the dictionary, the type name is
-        ///   used, applying the transformation specified by the <see cref="ValueDescriptionTransform"/>
-        ///   property.
+        ///   If an argument doesn't have the <see cref="ValueDescriptionAttribute"/> attribute
+        ///   applied, the value description will be determined by first checking this dictionary.
+        ///   If the type of the argument isn't in the dictionary, the type name is used, applying
+        ///   the transformation specified by the <see cref="ValueDescriptionTransform"/> property.
         /// </para>
         /// </remarks>
         /// <seealso cref="CommandLineArgument.ValueDescription"/>

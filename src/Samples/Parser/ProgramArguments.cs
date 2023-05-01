@@ -73,7 +73,8 @@ class ProgramArguments
     //
     // It uses a validator that ensures the value is within the specified range. The usage help will
     // show that requirement as well.
-    [CommandLineArgument(ValueDescription = "Number")]
+    [CommandLineArgument]
+    [ValueDescription("Number")]
     [Description("Provides the count for something to the application.")]
     [ValidateRange(0, 100)]
     public int Count { get; set; }

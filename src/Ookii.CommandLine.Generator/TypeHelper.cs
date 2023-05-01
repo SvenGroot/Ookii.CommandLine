@@ -47,21 +47,13 @@ internal class TypeHelper
 
     public INamedTypeSymbol? GeneratedParserAttribute => _compilation.GetTypeByMetadataName(NamespacePrefix + "GeneratedParserAttribute");
 
-    public INamedTypeSymbol? GeneratedCommandProviderAttribute => _compilation.GetTypeByMetadataName(NamespacePrefix + "Commands.GeneratedCommandProviderAttribute");
-
     public INamedTypeSymbol? CommandLineArgumentAttribute => _compilation.GetTypeByMetadataName(NamespacePrefix + "CommandLineArgumentAttribute");
 
     public INamedTypeSymbol? ParseOptionsAttribute => _compilation.GetTypeByMetadataName(NamespacePrefix + "ParseOptionsAttribute");
 
     public INamedTypeSymbol? ApplicationFriendlyNameAttribute => _compilation.GetTypeByMetadataName(NamespacePrefix + "ApplicationFriendlyNameAttribute");
 
-    public INamedTypeSymbol? CommandAttribute => _compilation.GetTypeByMetadataName(NamespacePrefix + "Commands.CommandAttribute");
-
-    public INamedTypeSymbol? ClassValidationAttribute => _compilation.GetTypeByMetadataName(NamespacePrefix + "Validation.ClassValidationAttribute");
-
     public INamedTypeSymbol? MultiValueSeparatorAttribute => _compilation.GetTypeByMetadataName(NamespacePrefix + "MultiValueSeparatorAttribute");
-
-    public INamedTypeSymbol? KeyValueSeparatorAttribute => _compilation.GetTypeByMetadataName(NamespacePrefix + "Conversion.KeyValueSeparatorAttribute");
 
     public INamedTypeSymbol? AllowDuplicateDictionaryKeysAttribute => _compilation.GetTypeByMetadataName(NamespacePrefix + "AllowDuplicateDictionaryKeysAttribute");
 
@@ -69,13 +61,23 @@ internal class TypeHelper
 
     public INamedTypeSymbol? ShortAliasAttribute => _compilation.GetTypeByMetadataName(NamespacePrefix + "ShortAliasAttribute");
 
+    public INamedTypeSymbol? ValueDescriptionAttribute => _compilation.GetTypeByMetadataName(NamespacePrefix + "ValueDescriptionAttribute");
+
     public INamedTypeSymbol? ArgumentValidationAttribute => _compilation.GetTypeByMetadataName(NamespacePrefix + "Validation.ArgumentValidationAttribute");
+
+    public INamedTypeSymbol? ClassValidationAttribute => _compilation.GetTypeByMetadataName(NamespacePrefix + "Validation.ClassValidationAttribute");
+
+    public INamedTypeSymbol? KeyValueSeparatorAttribute => _compilation.GetTypeByMetadataName(NamespacePrefix + "Conversion.KeyValueSeparatorAttribute");
 
     public INamedTypeSymbol? ArgumentConverterAttribute => _compilation.GetTypeByMetadataName(NamespacePrefix + "Conversion.ArgumentConverterAttribute"
     );
     public INamedTypeSymbol? KeyConverterAttribute => _compilation.GetTypeByMetadataName(NamespacePrefix + "Conversion.KeyConverterAttribute");
 
     public INamedTypeSymbol? ValueConverterAttribute => _compilation.GetTypeByMetadataName(NamespacePrefix + "Conversion.ValueConverterAttribute");
+
+    public INamedTypeSymbol? CommandAttribute => _compilation.GetTypeByMetadataName(NamespacePrefix + "Commands.CommandAttribute");
+
+    public INamedTypeSymbol? GeneratedCommandProviderAttribute => _compilation.GetTypeByMetadataName(NamespacePrefix + "Commands.GeneratedCommandProviderAttribute");
 
     public INamedTypeSymbol? ICommand => _compilation.GetTypeByMetadataName(NamespacePrefix + "Commands.ICommand");
 

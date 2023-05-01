@@ -63,7 +63,8 @@ public class Arguments
     [Description("Provides a date to the application.")]
     public DateTime? Date { get; set; }
 
-    [CommandLineArgument(ValueDescription = "Number")]
+    [CommandLineArgument]
+    [ValueDescription("Number")]
     [Description("Provides the count for something to the application.")]
     [ValidateRange(0, 100)]
     public int Count { get; set; }

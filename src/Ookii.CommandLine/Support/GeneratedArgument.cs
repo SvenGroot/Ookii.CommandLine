@@ -44,6 +44,7 @@ public class GeneratedArgument : CommandLineArgument
     /// <param name="requiredProperty"></param>
     /// <param name="multiValueSeparatorAttribute"></param>
     /// <param name="descriptionAttribute"></param>
+    /// <param name="valueDescriptionAttribute"></param>
     /// <param name="allowDuplicateDictionaryKeys"></param>
     /// <param name="keyValueSeparatorAttribute"></param>
     /// <param name="aliasAttributes"></param>
@@ -67,6 +68,7 @@ public class GeneratedArgument : CommandLineArgument
                                            Type? valueType = null,
                                            MultiValueSeparatorAttribute? multiValueSeparatorAttribute = null,
                                            DescriptionAttribute? descriptionAttribute = null,
+                                           ValueDescriptionAttribute? valueDescriptionAttribute = null,
                                            bool allowDuplicateDictionaryKeys = false,
                                            KeyValueSeparatorAttribute? keyValueSeparatorAttribute = null,
                                            IEnumerable<AliasAttribute>? aliasAttributes = null,
@@ -77,8 +79,8 @@ public class GeneratedArgument : CommandLineArgument
                                            Func<object?, CommandLineParser, bool>? callMethod = null)
     {
         var info = CreateArgumentInfo(parser, argumentType, allowsNull, requiredProperty, memberName, attribute,
-            multiValueSeparatorAttribute, descriptionAttribute, allowDuplicateDictionaryKeys, keyValueSeparatorAttribute,
-            aliasAttributes, shortAliasAttributes, validationAttributes);
+            multiValueSeparatorAttribute, descriptionAttribute, valueDescriptionAttribute, allowDuplicateDictionaryKeys,
+            keyValueSeparatorAttribute, aliasAttributes, shortAliasAttributes, validationAttributes);
 
         info.ElementType = elementType;
         info.ElementTypeWithNullable = elementTypeWithNullable;

@@ -43,7 +43,8 @@ partial class Arguments : ICommand
     [ValidateNotEmpty]
     public string? Test { get; set; }
 
-    [CommandLineArgument(ValueDescription = "Stuff")]
+    [CommandLineArgument]
+    [ValueDescription("Stuff")]
     [KeyValueSeparator("==")]
     [MultiValueSeparator]
     public Dictionary<int, string?> Test2 { get; set; } = default!;

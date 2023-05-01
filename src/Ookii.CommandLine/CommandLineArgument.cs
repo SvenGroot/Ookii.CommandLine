@@ -715,7 +715,8 @@ public abstract class CommandLineArgument
     ///   using the <see cref="Description"/> property.
     /// </note>
     /// </remarks>
-    /// <seealso cref="CommandLineArgumentAttribute.ValueDescription"/>
+    /// <seealso cref="ValueDescriptionAttribute"/>
+    /// <seealso cref="ParseOptions.DefaultValueDescriptions"/>
     public string ValueDescription => _valueDescription ??= DetermineValueDescription();
 
     /// <summary>
@@ -1214,6 +1215,7 @@ public abstract class CommandLineArgument
                                                     CommandLineArgumentAttribute attribute,
                                                     MultiValueSeparatorAttribute? multiValueSeparatorAttribute,
                                                     DescriptionAttribute? descriptionAttribute,
+                                                    ValueDescriptionAttribute? valueDescriptionAttribute,
                                                     bool allowDuplicateDictionaryKeys,
                                                     KeyValueSeparatorAttribute? keyValueSeparatorAttribute,
                                                     IEnumerable<AliasAttribute>? aliasAttributes,
@@ -1231,7 +1233,7 @@ public abstract class CommandLineArgument
             ArgumentType = argumentType,
             ElementTypeWithNullable = argumentType,
             Description = descriptionAttribute?.Description,
-            ValueDescription = attribute.ValueDescription,
+            ValueDescription = valueDescriptionAttribute?.ValueDescription,
             Position = attribute.Position < 0 ? null : attribute.Position,
             AllowDuplicateDictionaryKeys = allowDuplicateDictionaryKeys,
             MultiValueSeparator = GetMultiValueSeparator(multiValueSeparatorAttribute),

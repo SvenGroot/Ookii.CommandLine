@@ -135,6 +135,7 @@ internal class ReflectionArgument : CommandLineArgument
 
         var multiValueSeparatorAttribute = member.GetCustomAttribute<MultiValueSeparatorAttribute>();
         var descriptionAttribute = member.GetCustomAttribute<DescriptionAttribute>();
+        var valueDescriptionAttribute = member.GetCustomAttribute<ValueDescriptionAttribute>();
         var allowDuplicateDictionaryKeys = Attribute.IsDefined(member, typeof(AllowDuplicateDictionaryKeysAttribute));
         var keyValueSeparatorAttribute = member.GetCustomAttribute<KeyValueSeparatorAttribute>();
         var aliasAttributes = member.GetCustomAttributes<AliasAttribute>();
@@ -147,8 +148,8 @@ internal class ReflectionArgument : CommandLineArgument
 #endif
 
         ArgumentInfo info = CreateArgumentInfo(parser, argumentType, allowsNull, requiredProperty, member.Name, attribute,
-            multiValueSeparatorAttribute, descriptionAttribute, allowDuplicateDictionaryKeys, keyValueSeparatorAttribute,
-            aliasAttributes, shortAliasAttributes, validationAttributes);
+            multiValueSeparatorAttribute, descriptionAttribute, valueDescriptionAttribute, allowDuplicateDictionaryKeys,
+            keyValueSeparatorAttribute, aliasAttributes, shortAliasAttributes, validationAttributes);
 
         DetermineAdditionalInfo(ref info, member);
         return new ReflectionArgument(info, property, method);

@@ -197,6 +197,7 @@ internal class ParserGenerator
         AttributeData? commandLineArgumentAttribute = null;
         AttributeData? multiValueSeparator = null;
         AttributeData? description = null;
+        AttributeData? valueDescription = null;
         AttributeData? allowDuplicateDictionaryKeys = null;
         AttributeData? keyValueSeparator = null;
         AttributeData? converterAttribute = null;
@@ -210,6 +211,7 @@ internal class ParserGenerator
             if (attribute.CheckType(_typeHelper.CommandLineArgumentAttribute, ref commandLineArgumentAttribute) ||
                 attribute.CheckType(_typeHelper.MultiValueSeparatorAttribute, ref multiValueSeparator) ||
                 attribute.CheckType(_typeHelper.DescriptionAttribute, ref description) ||
+                attribute.CheckType(_typeHelper.ValueDescriptionAttribute, ref valueDescription) ||
                 attribute.CheckType(_typeHelper.AllowDuplicateDictionaryKeysAttribute, ref allowDuplicateDictionaryKeys) ||
                 attribute.CheckType(_typeHelper.KeyValueSeparatorAttribute, ref keyValueSeparator) ||
                 attribute.CheckType(_typeHelper.ArgumentConverterAttribute, ref converterAttribute) ||
@@ -399,6 +401,11 @@ internal class ParserGenerator
         if (description != null)
         {
             _builder.AppendLine($", descriptionAttribute: {description.CreateInstantiation()}");
+        }
+
+        if (valueDescription != null)
+        {
+            _builder.AppendLine($", valueDescriptionAttribute: {valueDescription.CreateInstantiation()}");
         }
 
         if (allowDuplicateDictionaryKeys != null)
