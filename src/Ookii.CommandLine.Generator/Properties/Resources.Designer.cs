@@ -151,20 +151,38 @@ namespace Ookii.CommandLine.Generator.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The default value is ignored if the argument is required, multi-value, or a method argument..
+        /// </summary>
+        internal static string DefaultValueIgnoredTitle {
+            get {
+                return ResourceManager.GetString("DefaultValueIgnoredTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The default value of the argument defined by {0} is ignored because it is a method argument..
+        /// </summary>
+        internal static string DefaultValueWithMethodMessageFormat {
+            get {
+                return ResourceManager.GetString("DefaultValueWithMethodMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The default value of the argument defined by {0} is ignored because it is a multi-value argument..
+        /// </summary>
+        internal static string DefaultValueWithMultiValueMessageFormat {
+            get {
+                return ResourceManager.GetString("DefaultValueWithMultiValueMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The default value of the argument defined by {0} is ignored because the argument is required..
         /// </summary>
         internal static string DefaultValueWithRequiredMessageFormat {
             get {
                 return ResourceManager.GetString("DefaultValueWithRequiredMessageFormat", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The default value is ignored if the argument is required..
-        /// </summary>
-        internal static string DefaultValueWithRequiredTitle {
-            get {
-                return ResourceManager.GetString("DefaultValueWithRequiredTitle", resourceCulture);
             }
         }
         

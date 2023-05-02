@@ -147,11 +147,17 @@
   <data name="CommandAttributeWithoutInterfaceTitle" xml:space="preserve">
     <value>The command line arguments class has the CommandAttribute but does not implement ICommand.</value>
   </data>
+  <data name="DefaultValueIgnoredTitle" xml:space="preserve">
+    <value>The default value is ignored if the argument is required, multi-value, or a method argument.</value>
+  </data>
+  <data name="DefaultValueWithMethodMessageFormat" xml:space="preserve">
+    <value>The default value of the argument defined by {0} is ignored because it is a method argument.</value>
+  </data>
+  <data name="DefaultValueWithMultiValueMessageFormat" xml:space="preserve">
+    <value>The default value of the argument defined by {0} is ignored because it is a multi-value argument.</value>
+  </data>
   <data name="DefaultValueWithRequiredMessageFormat" xml:space="preserve">
     <value>The default value of the argument defined by {0} is ignored because the argument is required.</value>
-  </data>
-  <data name="DefaultValueWithRequiredTitle" xml:space="preserve">
-    <value>The default value is ignored if the argument is required.</value>
   </data>
   <data name="GeneratedCustomParsingCommandMessageFormat" xml:space="preserve">
     <value>The command class {0} cannot use the GeneratedParserAttribute class, because it implements the ICommandWithCustomParsing interface.</value>

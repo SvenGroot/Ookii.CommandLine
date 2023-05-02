@@ -8,9 +8,8 @@ using System.Globalization;
 using System.IO;
 using System.Net;
 
-// We deliberately have some properties and methods that don't generate arguments, so disable the
-// warnings for them from the generator.
-#pragma warning disable CLW0002,CLW0003
+// We deliberately have some properties and methods that cause warnings, so disable those.
+#pragma warning disable CLW0002,CLW0003,CLW0005
 
 namespace Ookii.CommandLine.Tests;
 

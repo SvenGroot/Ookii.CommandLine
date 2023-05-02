@@ -199,6 +199,7 @@ internal class ParserGenerator
             return;
         }
 
+        var argumentInfo = new CommandLineArgumentAttributeInfo(attributes.CommandLineArgument);
         ITypeSymbol originalArgumentType;
         MethodArgumentInfo? methodInfo = null;
         var property = member as IPropertySymbol;
@@ -257,6 +258,7 @@ internal class ParserGenerator
             _builder.AppendLine($"var keyValueSeparatorAttribute{member.Name} = {attributes.KeyValueSeparator.CreateInstantiation()};");
         }
 
+        var isMultiValue = false;
         var kind = "Ookii.CommandLine.ArgumentKind.SingleValue";
         string? converter = null;
         if (property != null)
@@ -271,6 +273,7 @@ internal class ParserGenerator
             {
                 Debug.Assert(multiValueElementType != null);
                 kind = "Ookii.CommandLine.ArgumentKind.Dictionary";
+                isMultiValue = true;
                 elementTypeWithNullable = multiValueElementType!;
                 // KeyValuePair is guaranteed a named type.
                 namedElementTypeWithNullable = (INamedTypeSymbol)elementTypeWithNullable;
@@ -305,6 +308,7 @@ internal class ParserGenerator
             {
                 Debug.Assert(multiValueElementType != null);
                 kind = "Ookii.CommandLine.ArgumentKind.MultiValue";
+                isMultiValue = true;
                 allowsNull = multiValueElementType!.AllowsNull();
                 elementTypeWithNullable = multiValueElementType!.WithNullableAnnotation(NullableAnnotation.NotAnnotated);
                 namedElementTypeWithNullable = elementTypeWithNullable as INamedTypeSymbol;
@@ -384,10 +388,16 @@ internal class ParserGenerator
 
             _builder.AppendLine($", getProperty: (target) => (({_argumentsClass.ToDisplayString()})target).{member.Name}");
             _builder.AppendLine($", requiredProperty: {property.IsRequired.ToCSharpString()}");
-            var argumentInfo = new CommandLineArgumentAttributeInfo(attributes.CommandLineArgument);
-            if ((property.IsRequired || argumentInfo.IsRequired) && argumentInfo.DefaultValue != null)
+            if (argumentInfo.DefaultValue != null)
             {
-                _context.ReportDiagnostic(Diagnostics.DefaultValueWithRequired(member));
+                if (isMultiValue)
+                {
+                    _context.ReportDiagnostic(Diagnostics.DefaultValueWithMultiValue(member));
+                }
+                else if (property.IsRequired || argumentInfo.IsRequired)
+                {
+                    _context.ReportDiagnostic(Diagnostics.DefaultValueWithRequired(member));
+                }
             }
         }
 
@@ -417,6 +427,11 @@ internal class ParserGenerator
             else
             {
                 _builder.AppendLine($", callMethod: (value, parser) => {{ {_argumentsClass.ToDisplayString()}.{member.Name}({arguments}); return true; }}");
+            }
+
+            if (argumentInfo.DefaultValue != null)
+            {
+                _context.ReportDiagnostic(Diagnostics.DefaultValueWithMethod(member));
             }
         }
 
