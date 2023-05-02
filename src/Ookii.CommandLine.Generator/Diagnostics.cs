@@ -129,6 +129,14 @@ internal static class Diagnostics
         symbol.Locations.FirstOrDefault(),
         symbol.ToDisplayString());
 
+    public static Diagnostic DefaultValueWithRequired(ISymbol symbol) => CreateDiagnostic(
+        "CLW0005",
+        nameof(Resources.DefaultValueWithRequiredTitle),
+        nameof(Resources.DefaultValueWithRequiredMessageFormat),
+        DiagnosticSeverity.Warning,
+        symbol.Locations.FirstOrDefault(),
+        symbol.ToDisplayString());
+    
     private static Diagnostic CreateDiagnostic(string id, string titleResource, string messageResource, DiagnosticSeverity severity, Location? location, params object?[]? messageArgs)
         => Diagnostic.Create(
             new DiagnosticDescriptor(

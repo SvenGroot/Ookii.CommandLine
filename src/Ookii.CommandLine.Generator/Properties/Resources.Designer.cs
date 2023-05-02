@@ -151,6 +151,24 @@ namespace Ookii.CommandLine.Generator.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The default value of the argument defined by {0} is ignored because the argument is required..
+        /// </summary>
+        internal static string DefaultValueWithRequiredMessageFormat {
+            get {
+                return ResourceManager.GetString("DefaultValueWithRequiredMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The default value is ignored if the argument is required..
+        /// </summary>
+        internal static string DefaultValueWithRequiredTitle {
+            get {
+                return ResourceManager.GetString("DefaultValueWithRequiredTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The command class {0} cannot use the GeneratedParserAttribute class, because it implements the ICommandWithCustomParsing interface..
         /// </summary>
         internal static string GeneratedCustomParsingCommandMessageFormat {

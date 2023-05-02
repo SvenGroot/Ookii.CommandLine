@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Reflection;
 using System.Text;
+using System.Xml.Linq;
 
 namespace Ookii.CommandLine.Generator;
 
@@ -109,19 +110,15 @@ internal class ParserGenerator
         _builder.OpenBlock();
         _builder.AppendLine("public GeneratedProvider()");
         _builder.IncreaseIndent();
-        _builder.AppendLine($": base(typeof({_argumentsClass.Name}),");
-        _builder.AppendLine($"       {attributes.ParseOptions?.CreateInstantiation() ?? "null"},");
-        if (attributes.ClassValidators == null)
-        {
-            _builder.AppendLine($"       null,");
-        }
-        else
-        {
-            _builder.AppendLine($"       new Ookii.CommandLine.Validation.ClassValidationAttribute[] {{ {string.Join(", ", attributes.ClassValidators.Select(v => v.CreateInstantiation()))} }},");
-        }
-
-        _builder.AppendLine($"       {attributes.ApplicationFriendlyName?.CreateInstantiation() ?? "null"},");
-        _builder.AppendLine($"       {attributes.Description?.CreateInstantiation() ?? "null"})");
+        _builder.AppendLine(": base(");
+        _builder.IncreaseIndent();
+        _builder.AppendLine($"typeof({_argumentsClass.Name})");
+        AppendOptionalAttribute(attributes.ParseOptions, "options");
+        AppendOptionalAttribute(attributes.ClassValidators, "validators", "Ookii.CommandLine.Validation.ClassValidationAttribute");
+        AppendOptionalAttribute(attributes.ApplicationFriendlyName, "friendlyName");
+        AppendOptionalAttribute(attributes.Description, "description");
+        _builder.DecreaseIndent();
+        _builder.AppendLine(")");
         _builder.DecreaseIndent();
         _builder.AppendLine("{}");
         _builder.AppendLine();
@@ -194,41 +191,10 @@ internal class ParserGenerator
             return;
         }
 
-        AttributeData? commandLineArgumentAttribute = null;
-        AttributeData? multiValueSeparator = null;
-        AttributeData? description = null;
-        AttributeData? valueDescription = null;
-        AttributeData? allowDuplicateDictionaryKeys = null;
-        AttributeData? keyValueSeparator = null;
-        AttributeData? converterAttribute = null;
-        AttributeData? keyConverterAttribute = null;
-        AttributeData? valueConverterAttribute = null;
-        List<AttributeData>? aliases = null;
-        List<AttributeData>? shortAliases = null;
-        List<AttributeData>? validators = null;
-        foreach (var attribute in member.GetAttributes())
-        {
-            if (attribute.CheckType(_typeHelper.CommandLineArgumentAttribute, ref commandLineArgumentAttribute) ||
-                attribute.CheckType(_typeHelper.MultiValueSeparatorAttribute, ref multiValueSeparator) ||
-                attribute.CheckType(_typeHelper.DescriptionAttribute, ref description) ||
-                attribute.CheckType(_typeHelper.ValueDescriptionAttribute, ref valueDescription) ||
-                attribute.CheckType(_typeHelper.AllowDuplicateDictionaryKeysAttribute, ref allowDuplicateDictionaryKeys) ||
-                attribute.CheckType(_typeHelper.KeyValueSeparatorAttribute, ref keyValueSeparator) ||
-                attribute.CheckType(_typeHelper.ArgumentConverterAttribute, ref converterAttribute) ||
-                attribute.CheckType(_typeHelper.KeyConverterAttribute, ref keyConverterAttribute) ||
-                attribute.CheckType(_typeHelper.ValueConverterAttribute, ref valueConverterAttribute) ||
-                attribute.CheckType(_typeHelper.AliasAttribute, ref aliases) ||
-                attribute.CheckType(_typeHelper.ShortAliasAttribute, ref shortAliases) ||
-                attribute.CheckType(_typeHelper.ArgumentValidationAttribute, ref validators))
-            {
-                continue;
-            }
-
-            _context.ReportDiagnostic(Diagnostics.IgnoredAttribute(attribute));
-        }
+        var attributes = new ArgumentAttributes(member.GetAttributes(), _typeHelper, _context);
 
         // Check if it is an attribute.
-        if (commandLineArgumentAttribute == null)
+        if (attributes.CommandLineArgument == null)
         {
             return;
         }
@@ -286,9 +252,9 @@ internal class ParserGenerator
         var namedElementTypeWithNullable = elementTypeWithNullable as INamedTypeSymbol;
         ITypeSymbol? keyType = null;
         ITypeSymbol? valueType = null;
-        if (keyValueSeparator != null)
+        if (attributes.KeyValueSeparator != null)
         {
-            _builder.AppendLine($"var keyValueSeparatorAttribute{member.Name} = {keyValueSeparator.CreateInstantiation()};");
+            _builder.AppendLine($"var keyValueSeparatorAttribute{member.Name} = {attributes.KeyValueSeparator.CreateInstantiation()};");
         }
 
         var kind = "Ookii.CommandLine.ArgumentKind.SingleValue";
@@ -312,23 +278,23 @@ internal class ParserGenerator
                 var rawValueType = namedElementTypeWithNullable.TypeArguments[1];
                 allowsNull = rawValueType.AllowsNull();
                 valueType = rawValueType.WithNullableAnnotation(NullableAnnotation.NotAnnotated);
-                if (converterAttribute == null)
+                if (attributes.Converter == null)
                 {
-                    var keyConverter = DetermineConverter(keyType.GetUnderlyingType(), keyConverterAttribute, keyType.IsNullableValueType());
+                    var keyConverter = DetermineConverter(keyType.GetUnderlyingType(), attributes.KeyConverter, keyType.IsNullableValueType());
                     if (keyConverter == null)
                     {
                         _context.ReportDiagnostic(Diagnostics.NoConverter(member, keyType.GetUnderlyingType()));
                         return;
                     }
 
-                    var valueConverter = DetermineConverter(valueType.GetUnderlyingType(), valueConverterAttribute, valueType.IsNullableValueType());
+                    var valueConverter = DetermineConverter(valueType.GetUnderlyingType(), attributes.ValueConverter, valueType.IsNullableValueType());
                     if (valueConverter == null)
                     {
                         _context.ReportDiagnostic(Diagnostics.NoConverter(member, keyType.GetUnderlyingType()));
                         return;
                     }
 
-                    var separator = keyValueSeparator == null 
+                    var separator = attributes.KeyValueSeparator == null 
                         ? "null"
                         : $"keyValueSeparatorAttribute{member.Name}.Separator";
 
@@ -362,7 +328,7 @@ internal class ParserGenerator
         }
 
         var elementType = namedElementTypeWithNullable?.GetUnderlyingType() ?? elementTypeWithNullable;
-        converter ??= DetermineConverter(elementType, converterAttribute, ((INamedTypeSymbol)elementTypeWithNullable).IsNullableValueType());
+        converter ??= DetermineConverter(elementType, attributes.Converter, ((INamedTypeSymbol)elementTypeWithNullable).IsNullableValueType());
         if (converter == null)
         {
             _context.ReportDiagnostic(Diagnostics.NoConverter(member, elementType));
@@ -380,7 +346,7 @@ internal class ParserGenerator
         _builder.AppendLine($", elementType: typeof({elementType.ToDisplayString()})");
         _builder.AppendLine($", memberName: \"{member.Name}\"");
         _builder.AppendLine($", kind: {kind}");
-        _builder.AppendLine($", attribute: {commandLineArgumentAttribute.CreateInstantiation()}");
+        _builder.AppendLine($", attribute: {attributes.CommandLineArgument.CreateInstantiation()}");
         _builder.AppendLine($", converter: {converter}");
         _builder.AppendLine($", allowsNull: {(allowsNull.ToCSharpString())}");
         if (keyType != null)
@@ -393,46 +359,22 @@ internal class ParserGenerator
             _builder.AppendLine($", valueType: typeof({valueType.ToDisplayString()})");
         }
 
-        if (multiValueSeparator != null)
-        {
-            _builder.AppendLine($", multiValueSeparatorAttribute: {multiValueSeparator.CreateInstantiation()}");
-        }
-
-        if (description != null)
-        {
-            _builder.AppendLine($", descriptionAttribute: {description.CreateInstantiation()}");
-        }
-
-        if (valueDescription != null)
-        {
-            _builder.AppendLine($", valueDescriptionAttribute: {valueDescription.CreateInstantiation()}");
-        }
-
-        if (allowDuplicateDictionaryKeys != null)
+        AppendOptionalAttribute(attributes.MultiValueSeparator, "multiValueSeparatorAttribute");
+        AppendOptionalAttribute(attributes.Description, "descriptionAttribute");
+        AppendOptionalAttribute(attributes.ValueDescription, "valueDescriptionAttribute");
+        if (attributes.AllowDuplicateDictionaryKeys != null)
         {
             _builder.AppendLine(", allowDuplicateDictionaryKeys: true");
         }
 
-        if (keyValueSeparator != null)
+        if (attributes.KeyValueSeparator != null)
         {
             _builder.AppendLine($", keyValueSeparatorAttribute: keyValueSeparatorAttribute{member.Name}");
         }
 
-        if (aliases != null)
-        {
-            _builder.AppendLine($", aliasAttributes: new Ookii.CommandLine.AliasAttribute[] {{ {string.Join(", ", aliases.Select(a => a.CreateInstantiation()))} }}");
-        }
-
-        if (shortAliases != null)
-        {
-            _builder.AppendLine($", shortAliasAttributes: new Ookii.CommandLine.ShortAliasAttribute[] {{ {string.Join(", ", shortAliases.Select(a => a.CreateInstantiation()))} }}");
-        }
-
-        if (validators != null)
-        {
-            _builder.AppendLine($", validationAttributes: new Ookii.CommandLine.Validation.ArgumentValidationAttribute[] {{ {string.Join(", ", validators.Select(a => a.CreateInstantiation()))} }}");
-        }
-
+        AppendOptionalAttribute(attributes.Aliases, "aliasAttributes", "Ookii.CommandLine.AliasAttribute");
+        AppendOptionalAttribute(attributes.ShortAliases, "shortAliasAttributes", "Ookii.CommandLine.ShortAliasAttribute");
+        AppendOptionalAttribute(attributes.Validators, "validationAttributes", "Ookii.CommandLine.Validation.ArgumentValidationAttribute");
         if (property != null)
         {
             if (property.SetMethod != null && property.SetMethod.DeclaredAccessibility == Accessibility.Public && !property.SetMethod.IsInitOnly)
@@ -442,6 +384,11 @@ internal class ParserGenerator
 
             _builder.AppendLine($", getProperty: (target) => (({_argumentsClass.ToDisplayString()})target).{member.Name}");
             _builder.AppendLine($", requiredProperty: {property.IsRequired.ToCSharpString()}");
+            var argumentInfo = new CommandLineArgumentAttributeInfo(attributes.CommandLineArgument);
+            if ((property.IsRequired || argumentInfo.IsRequired) && argumentInfo.DefaultValue != null)
+            {
+                _context.ReportDiagnostic(Diagnostics.DefaultValueWithRequired(member));
+            }
         }
 
         if (methodInfo is MethodArgumentInfo info)
@@ -637,5 +584,21 @@ internal class ParserGenerator
         }
 
         return info;
+    }
+
+    private void AppendOptionalAttribute(AttributeData? attribute, string name)
+    {
+        if (attribute != null)
+        {
+            _builder.AppendLine($", {name}: {attribute.CreateInstantiation()}");
+        }
+    }
+
+    private void AppendOptionalAttribute(List<AttributeData>? attributes, string name, string typeName)
+    {
+        if (attributes != null)
+        {
+            _builder.AppendLine($", {name}: new {typeName}[] {{ {string.Join(", ", attributes.Select(a => a.CreateInstantiation()))} }}");
+        }
     }
 }

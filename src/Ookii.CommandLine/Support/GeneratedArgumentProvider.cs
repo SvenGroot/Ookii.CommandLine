@@ -34,9 +34,11 @@ public abstract class GeneratedArgumentProvider : ArgumentProvider
     /// The <see cref="DescriptionAttribute"/> for the arguments type, or <see langword="null"/> if
     /// there is none.
     /// </param>
-    protected GeneratedArgumentProvider(Type argumentsType, ParseOptionsAttribute? options,
-        IEnumerable<ClassValidationAttribute>? validators, ApplicationFriendlyNameAttribute? friendlyName,
-        DescriptionAttribute? description)
+    protected GeneratedArgumentProvider(Type argumentsType,
+                                        ParseOptionsAttribute? options = null,
+                                        IEnumerable<ClassValidationAttribute>? validators = null,
+                                        ApplicationFriendlyNameAttribute? friendlyName = null,
+                                        DescriptionAttribute? description = null)
         : base(argumentsType, options, validators)
     {
         _friendlyNameAttribute = friendlyName;
