@@ -520,6 +520,15 @@ namespace Ookii.CommandLine.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The arguments type {0} has the GeneratedParserAttribute applied, but reflection is being used to create a parser for it. Use the generated {0}.CreateParser() or {0}.Parse() methods to use the generated parser. For subcommands, use the GeneratedCommandProviderAttribute..
+        /// </summary>
+        internal static string ReflectionWithGeneratedParserFormat {
+            get {
+                return ResourceManager.GetString("ReflectionWithGeneratedParserFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to RequiresAnyAttribute requires at least two arguments; use CommandLineArgumentAttribute.IsRequired to make a single argument required..
         /// </summary>
         internal static string RequiresAnySingleArgument {

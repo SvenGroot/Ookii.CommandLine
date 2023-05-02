@@ -286,7 +286,23 @@ public class CommandLineParser
     ///   because it violates one of the rules concerning argument names or positions, or has an argument type that cannot
     ///   be parsed.
     /// </exception>
+    /// <exception cref="InvalidOperationException">
+    ///   The type indicated by <paramref name="argumentsType"/> has the <see cref="GeneratedParserAttribute"/>
+    ///   attribute applied. Use the generated static <c>CreateParser()</c> or <c>Parse()</c>
+    ///   methods on the arguments type to access the generated parser. For subcommands, use a
+    ///   command provider with the <see cref="GeneratedCommandProviderAttribute"/> attribute to
+    ///   create a <see cref="CommandManager"/> that will use generated parsers for subcommands. Set
+    ///   the <see cref="ParseOptions.AllowReflectionWithGeneratedParser"/> property to
+    ///   <see langword="true"/> to disable this exception.
+    /// </exception>
     /// <remarks>
+    /// <para>
+    ///   This constructor uses reflection to determine the arguments defined by the type indicated
+    ///   by <paramref name="argumentsType"/> at runtime. To determine the arguments at compile
+    ///   time instead, apply the <see cref="GeneratedParserAttribute"/> to the arguments type
+    ///   and use the generated static <c>CreateParser()</c> or <c>Parse()</c> methods on that type
+    ///   instead.
+    /// </para>
     /// <para>
     ///   If the <paramref name="options"/> parameter is not <see langword="null"/>, the
     ///   instance passed in will be modified to reflect the options from the arguments class's
@@ -296,11 +312,6 @@ public class CommandLineParser
     ///   Certain properties of the <see cref="ParseOptions"/> class can be changed after the
     ///   <see cref="CommandLineParser"/> class has been constructed, and still affect the
     ///   parsing behavior. See the <see cref="Options"/> property for details.
-    /// </para>
-    /// <para>
-    ///   Some of the properties of the <see cref="ParseOptions"/> class, like anything related
-    ///   to error output, are only used by the static <see cref="Parse{T}(ParseOptions?)"/>
-    ///   class and are not used here.
     /// </para>
     /// </remarks>
 #if NET6_0_OR_GREATER
@@ -331,6 +342,16 @@ public class CommandLineParser
     ///   positions, or has an argument type that cannot
     ///   be parsed.
     /// </exception>
+    /// <exception cref="InvalidOperationException">
+    ///   The provider uses <see cref="ProviderKind.Reflection"/>, but the type indicated by the
+    ///   <see cref="ArgumentProvider.ArgumentsType"/> property has the <see cref="GeneratedParserAttribute"/>
+    ///   attribute applied. Use the generated static <c>CreateParser()</c> or <c>Parse()</c>
+    ///   methods on the arguments type to access the generated parser. For subcommands, use a
+    ///   command provider with the <see cref="GeneratedCommandProviderAttribute"/> attribute to
+    ///   create a <see cref="CommandManager"/> that will use generated parsers for subcommands. Set
+    ///   the <see cref="ParseOptions.AllowReflectionWithGeneratedParser"/> property to
+    ///   <see langword="true"/> to disable this exception.
+    /// </exception>
     /// <remarks>
     /// <para>
     ///   If the <paramref name="options"/> parameter is not <see langword="null"/>, the
@@ -342,16 +363,18 @@ public class CommandLineParser
     ///   <see cref="CommandLineParser"/> class has been constructed, and still affect the
     ///   parsing behavior. See the <see cref="Options"/> property for details.
     /// </para>
-    /// <para>
-    ///   Some of the properties of the <see cref="ParseOptions"/> class, like anything related
-    ///   to error output, are only used by the static <see cref="Parse{T}(ParseOptions?)"/>
-    ///   class and are not used here.
-    /// </para>
     /// </remarks>
     public CommandLineParser(ArgumentProvider provider, ParseOptions? options = null)
     {
         _provider = provider ?? throw new ArgumentNullException(nameof(provider));
         _parseOptions = options ?? new();
+        if (provider.Kind == ProviderKind.Reflection &&
+            !_parseOptions.AllowReflectionWithGeneratedParser &&
+            Attribute.IsDefined(provider.ArgumentsType, typeof(GeneratedParserAttribute)))
+        {
+            throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture,
+                Properties.Resources.ReflectionWithGeneratedParserFormat, provider.ArgumentsType.FullName));
+        }
 
         var optionsAttribute = _provider.OptionsAttribute;
         if (optionsAttribute != null)
@@ -1000,6 +1023,23 @@ public class CommandLineParser
     ///   error occurred, or argument parsing was canceled by the <see cref="CommandLineArgumentAttribute.CancelParsing"/>
     ///   property or a method argument that returned <see langword="false"/>.
     /// </returns>
+    /// <exception cref="CommandLineArgumentException">
+    ///   <inheritdoc cref="Parse()"/>
+    /// </exception>
+    /// <exception cref="InvalidOperationException">
+    ///   The type indicated by <typeparamref name="T"/> has the <see cref="GeneratedParserAttribute"/>
+    ///   attribute applied. Use the generated static <c>CreateParser()</c> or <c>Parse()</c>
+    ///   methods on the arguments type to access the generated parser. For subcommands, use a
+    ///   command provider with the <see cref="GeneratedCommandProviderAttribute"/> attribute to
+    ///   create a <see cref="CommandManager"/> that will use generated parsers for subcommands. Set
+    ///   the <see cref="ParseOptions.AllowReflectionWithGeneratedParser"/> property to
+    ///   <see langword="true"/> to disable this exception.
+    /// </exception>
+    /// <exception cref="NotSupportedException">
+    ///   The <see cref="CommandLineParser"/> cannot use <typeparamref name="T"/> as the command
+    ///   line arguments type, because it violates one of the rules concerning argument names or
+    ///   positions, or has an argument type that cannot be parsed.
+    /// </exception>
     /// <remarks>
     /// <para>
     ///   This is a convenience function that instantiates a <see cref="CommandLineParser"/>,
@@ -1024,6 +1064,13 @@ public class CommandLineParser
     ///   or handling the <see cref="ArgumentParsed"/> event, you should manually create an
     ///   instance of the <see cref="CommandLineParser{T}"/> class and call its <see cref="CommandLineParser{T}.Parse()"/>
     ///   method.
+    /// </para>
+    /// <para>
+    ///   This method uses reflection to determine the arguments defined by the type indicated
+    ///   by <typeparamref name="T"/> at runtime. To determine the arguments at compile
+    ///   time instead, apply the <see cref="GeneratedParserAttribute"/> to the arguments type
+    ///   and use the generated static <c>CreateParser()</c> or <c>Parse()</c> methods on that type
+    ///   instead.
     /// </para>
     /// </remarks>
 #if NET6_0_OR_GREATER
@@ -1055,6 +1102,12 @@ public class CommandLineParser
     /// </exception>
     /// <exception cref="ArgumentOutOfRangeException">
     ///   <paramref name="index"/> does not fall within the bounds of <paramref name="args"/>.
+    /// </exception>
+    /// <exception cref="InvalidOperationException">
+    ///   <inheritdoc cref="Parse{T}(ParseOptions?)"/>
+    /// </exception>
+    /// <exception cref="NotSupportedException">
+    ///   <inheritdoc cref="Parse{T}(ParseOptions?)"/>
     /// </exception>
     /// <exception cref="CommandLineArgumentException">
     ///   <inheritdoc cref="Parse()"/>
@@ -1090,6 +1143,12 @@ public class CommandLineParser
     /// </exception>
     /// <exception cref="CommandLineArgumentException">
     ///   <inheritdoc cref="Parse()"/>
+    /// </exception>
+    /// <exception cref="NotSupportedException">
+    ///   <inheritdoc cref="Parse{T}(ParseOptions?)"/>
+    /// </exception>
+    /// <exception cref="InvalidOperationException">
+    ///   <inheritdoc cref="Parse{T}(ParseOptions?)"/>
     /// </exception>
     /// <remarks>
     ///   <inheritdoc cref="Parse{T}(ParseOptions?)"/>

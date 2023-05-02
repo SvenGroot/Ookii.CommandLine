@@ -8,6 +8,14 @@ namespace Ookii.CommandLine.Tests
     [TestClass]
     public class KeyValuePairConverterTest
     {
+        [ClassInitialize]
+        public static void TestFixtureSetup(TestContext context)
+        {
+            // Avoid exception when testing reflection on argument types that also have the
+            // GeneratedParseAttribute set.
+            ParseOptions.AllowReflectionWithGeneratedParserDefault = true;
+        }
+
         // Needed because SpanParsableConverter only exists on .Net 7.
         private class IntConverter : ArgumentConverter
         {

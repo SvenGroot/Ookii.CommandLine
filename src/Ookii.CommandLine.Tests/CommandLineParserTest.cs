@@ -18,6 +18,14 @@ namespace Ookii.CommandLine.Tests
     [TestClass()]
     public partial class CommandLineParserTest
     {
+        [ClassInitialize]
+        public static void TestFixtureSetup(TestContext context)
+        {
+            // Avoid exception when testing reflection on argument types that also have the
+            // GeneratedParseAttribute set.
+            ParseOptions.AllowReflectionWithGeneratedParserDefault = true;
+        }
+
         [TestMethod]
         [DynamicData(nameof(ProviderKinds), DynamicDataDisplayName = nameof(GetCustomDynamicDataDisplayName))]
         public void ConstructorEmptyArgumentsTest(ProviderKind kind)

@@ -14,6 +14,14 @@ namespace Ookii.CommandLine.Tests
         CommandLineParser _parser;
         CommandLineArgument _argument;
 
+        [ClassInitialize]
+        public static void TestFixtureSetup(TestContext context)
+        {
+            // Avoid exception when testing reflection on argument types that also have the
+            // GeneratedParseAttribute set.
+            ParseOptions.AllowReflectionWithGeneratedParserDefault = true;
+        }
+
         [TestInitialize]
         public void Initialize()
         {

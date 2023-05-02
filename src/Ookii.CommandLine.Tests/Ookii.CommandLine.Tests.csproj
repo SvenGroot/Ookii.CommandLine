@@ -7,6 +7,9 @@
     <IsPackable>false</IsPackable>
     <LangVersion>11.0</LangVersion>
     <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>ookii.snk</AssemblyOriginatorKeyFile>
+    <DelaySign>false</DelaySign>
   </PropertyGroup>
 
   <ItemGroup>

@@ -16,6 +16,14 @@ namespace Ookii.CommandLine.Tests
     {
         private static readonly Assembly _commandAssembly = Assembly.GetExecutingAssembly();
 
+        [ClassInitialize]
+        public static void TestFixtureSetup(TestContext context)
+        {
+            // Avoid exception when testing reflection on argument types that also have the
+            // GeneratedParseAttribute set.
+            ParseOptions.AllowReflectionWithGeneratedParserDefault = true;
+        }
+
         [TestMethod]
         [DynamicData(nameof(ProviderKinds), DynamicDataDisplayName = nameof(GetCustomDynamicDataDisplayName))]
         public void GetCommandsTest(ProviderKind kind)
