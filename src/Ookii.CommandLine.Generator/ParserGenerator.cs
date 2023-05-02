@@ -332,7 +332,7 @@ internal class ParserGenerator
         }
 
         var elementType = namedElementTypeWithNullable?.GetUnderlyingType() ?? elementTypeWithNullable;
-        converter ??= DetermineConverter(elementType, attributes.Converter, ((INamedTypeSymbol)elementTypeWithNullable).IsNullableValueType());
+        converter ??= DetermineConverter(elementType, attributes.Converter, elementTypeWithNullable.IsNullableValueType());
         if (converter == null)
         {
             _context.ReportDiagnostic(Diagnostics.NoConverter(member, elementType));
