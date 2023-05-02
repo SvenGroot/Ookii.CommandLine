@@ -24,6 +24,12 @@ internal static class Extensions
                 return true;
             }
 
+            // No point checking base classes if the type we're looking for is sealed.
+            if (baseClass.IsSealed)
+            {
+                break;
+            }
+
             current = current.BaseType;
         }
 
