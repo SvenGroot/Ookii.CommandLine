@@ -225,6 +225,18 @@
   <data name="NonRequiredInitOnlyPropertyTitle" xml:space="preserve">
     <value>Init accessors may only be used on required properties.</value>
   </data>
+  <data name="PositionalArgumentAfterMultiValueMessageFormat" xml:space="preserve">
+    <value>The positional argument defined by {0} comes after {1}, which is a multi-value argument and must come last.</value>
+  </data>
+  <data name="PositionalArgumentAfterMultiValueTitle" xml:space="preserve">
+    <value>A positional multi-value argument must be the last positional argument.</value>
+  </data>
+  <data name="PositionalRequiredArgumentAfterOptionalMessageFormat" xml:space="preserve">
+    <value>The required positional argument defined by {0} comes after {1}, which is optional.</value>
+  </data>
+  <data name="PositionalRequiredArgumentAfterOptionalTitle" xml:space="preserve">
+    <value>Required positional arguments must come before optional positional arguments.</value>
+  </data>
   <data name="PropertyIsReadOnlyMessageFormat" xml:space="preserve">
     <value>The property {0}.{1} must have a public set accessor.</value>
   </data>

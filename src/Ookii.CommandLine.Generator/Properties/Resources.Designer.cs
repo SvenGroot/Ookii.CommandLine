@@ -385,6 +385,42 @@ namespace Ookii.CommandLine.Generator.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The positional argument defined by {0} comes after {1}, which is a multi-value argument and must come last..
+        /// </summary>
+        internal static string PositionalArgumentAfterMultiValueMessageFormat {
+            get {
+                return ResourceManager.GetString("PositionalArgumentAfterMultiValueMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A positional multi-value argument must be the last positional argument..
+        /// </summary>
+        internal static string PositionalArgumentAfterMultiValueTitle {
+            get {
+                return ResourceManager.GetString("PositionalArgumentAfterMultiValueTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The required positional argument defined by {0} comes after {1}, which is optional..
+        /// </summary>
+        internal static string PositionalRequiredArgumentAfterOptionalMessageFormat {
+            get {
+                return ResourceManager.GetString("PositionalRequiredArgumentAfterOptionalMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Required positional arguments must come before optional positional arguments..
+        /// </summary>
+        internal static string PositionalRequiredArgumentAfterOptionalTitle {
+            get {
+                return ResourceManager.GetString("PositionalRequiredArgumentAfterOptionalTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The property {0}.{1} must have a public set accessor..
         /// </summary>
         internal static string PropertyIsReadOnlyMessageFormat {

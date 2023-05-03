@@ -43,7 +43,7 @@ partial class Arguments : ICommand
     [ValidateNotEmpty]
     public string? Test { get; set; }
 
-    [CommandLineArgument]
+    [CommandLineArgument(Position = 1)]
     [ValueDescription("Stuff")]
     [KeyValueSeparator("==")]
     [MultiValueSeparator]

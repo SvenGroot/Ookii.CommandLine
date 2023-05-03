@@ -95,6 +95,24 @@ internal static class Diagnostics
         symbol.Locations.FirstOrDefault(),
         symbol.ToDisplayString());
 
+    public static Diagnostic PositionalArgumentAfterMultiValue(ISymbol symbol, string other) => CreateDiagnostic(
+        "CL0011",
+        nameof(Resources.PositionalArgumentAfterMultiValueTitle),
+        nameof(Resources.PositionalArgumentAfterMultiValueMessageFormat),
+        DiagnosticSeverity.Error,
+        symbol.Locations.FirstOrDefault(),
+        symbol.ToDisplayString(),
+        other);
+
+    public static Diagnostic PositionalRequiredArgumentAfterOptional(ISymbol symbol, string other) => CreateDiagnostic(
+        "CL0012",
+        nameof(Resources.PositionalRequiredArgumentAfterOptionalTitle),
+        nameof(Resources.PositionalRequiredArgumentAfterOptionalMessageFormat),
+        DiagnosticSeverity.Error,
+        symbol.Locations.FirstOrDefault(),
+        symbol.ToDisplayString(),
+        other);
+
     public static Diagnostic IgnoredAttribute(AttributeData attribute) => CreateDiagnostic(
         "CLW0001",
         nameof(Resources.UnknownAttributeTitle),

@@ -21,6 +21,14 @@ internal class ParserGenerator
         public bool HasBooleanReturn { get; set; }
     }
 
+    private struct PositionalArgumentInfo
+    {
+        public int Position { get; set; }
+        public ISymbol Member { get; set; }
+        public bool IsRequired { get; set; }
+        public bool IsMultiValue { get; set; }
+    }
+
     private readonly TypeHelper _typeHelper;
     private readonly Compilation _compilation;
     private readonly SourceProductionContext _context;
@@ -29,6 +37,7 @@ internal class ParserGenerator
     private readonly ConverterGenerator _converterGenerator;
     private readonly CommandGenerator _commandGenerator;
     private Dictionary<int, string>? _positions;
+    private List<PositionalArgumentInfo>? _positionalArguments;
 
     public ParserGenerator(SourceProductionContext context, INamedTypeSymbol argumentsClass, TypeHelper typeHelper, ConverterGenerator converterGenerator, CommandGenerator commandGenerator)
     {
@@ -138,6 +147,11 @@ internal class ParserGenerator
             }
 
             current = current.BaseType;
+        }
+
+        if (!VerifyPositionalArgumentRules())
+        {
+            return false;
         }
 
         // Makes sure the function compiles if there are no arguments.
@@ -260,6 +274,7 @@ internal class ParserGenerator
         }
 
         var isMultiValue = false;
+        var isRequired = argumentInfo.IsRequired;
         var kind = "Ookii.CommandLine.ArgumentKind.SingleValue";
         string? converter = null;
         if (property != null)
@@ -323,6 +338,7 @@ internal class ParserGenerator
 
             if (property.IsRequired)
             {
+                isRequired = true;
                 requiredProperties ??= new();
                 requiredProperties.Add((member.Name, property.Type.ToDisplayString(), notNullAnnotation));
             }
@@ -454,6 +470,15 @@ internal class ParserGenerator
             {
                 _positions.Add(position, member.Name);
             }
+
+            _positionalArguments ??= new();
+            _positionalArguments.Add(new PositionalArgumentInfo()
+            {
+                Member = member,
+                Position = position,
+                IsRequired = isRequired,
+                IsMultiValue = isMultiValue
+            });
         }
 
         if (!argumentInfo.IsShort && attributes.ShortAliases != null)
@@ -648,5 +673,45 @@ internal class ParserGenerator
         {
             _builder.AppendLine($", {name}: new {typeName}[] {{ {string.Join(", ", attributes.Select(a => a.CreateInstantiation()))} }}");
         }
+    }
+
+    private bool VerifyPositionalArgumentRules()
+    {
+        if (_positionalArguments == null)
+        {
+            return true;
+        }
+
+        // This mirrors the logic in CommandLineParser.VerifyPositionalArgumentRules.
+        _positionalArguments.Sort((x, y) => x.Position.CompareTo(y.Position));
+        string? multiValueArgument = null;
+        string? optionalArgument = null;
+        var result = true;
+        foreach (var argument in  _positionalArguments) 
+        {
+            if (multiValueArgument != null)
+            {
+                _context.ReportDiagnostic(Diagnostics.PositionalArgumentAfterMultiValue(argument.Member, multiValueArgument));
+                result = false;
+            }
+
+            if (argument.IsRequired && optionalArgument != null)
+            {
+                _context.ReportDiagnostic(Diagnostics.PositionalRequiredArgumentAfterOptional(argument.Member, optionalArgument));
+                result = false;
+            }
+
+            if (!argument.IsRequired)
+            {
+                optionalArgument = argument.Member.Name;
+            }
+
+            if (argument.IsMultiValue)
+            {
+                multiValueArgument = argument.Member.Name;
+            }
+        }
+
+        return result;
     }
 }
