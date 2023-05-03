@@ -18,6 +18,15 @@ internal class CommandLineArgumentAttributeInfo
             case nameof(DefaultValue):
                 DefaultValue = named.Value.Value;
                 break;
+
+            case nameof(Position):
+                var position = (int)named.Value.Value!;
+                if (position >= 0)
+                {
+                    Position = position;
+                }
+
+                break;
             }
         }
     }
@@ -25,6 +34,8 @@ internal class CommandLineArgumentAttributeInfo
     public bool IsRequired { get; }
 
     public bool HasIsRequired { get; }
+
+    public int? Position { get; }
 
     public object? DefaultValue { get; }
 }

@@ -28,6 +28,7 @@ internal class ParserGenerator
     private readonly SourceBuilder _builder;
     private readonly ConverterGenerator _converterGenerator;
     private readonly CommandGenerator _commandGenerator;
+    private Dictionary<int, string>? _positions;
 
     public ParserGenerator(SourceProductionContext context, INamedTypeSymbol argumentsClass, TypeHelper typeHelper, ConverterGenerator converterGenerator, CommandGenerator commandGenerator)
     {
@@ -442,6 +443,19 @@ internal class ParserGenerator
 
         _builder.DecreaseIndent();
         _builder.AppendLine(");");
+
+        if (argumentInfo.Position is int position)
+        {
+            _positions ??= new();
+            if (_positions.TryGetValue(position, out string name))
+            {
+                _context.ReportDiagnostic(Diagnostics.DuplicatePosition(member, name));
+            }
+            else
+            {
+                _positions.Add(position, member.Name);
+            }
+        }
     }
 
     private (ITypeSymbol?, INamedTypeSymbol?, ITypeSymbol?)? DetermineMultiValueType(IPropertySymbol property, ITypeSymbol argumentType)

@@ -7,6 +7,9 @@ using System.Globalization;
 
 namespace Ookii.CommandLine.Tests;
 
+// We deliberately have some properties and methods that cause warnings, so disable those.
+#pragma warning disable CLW0006
+
 class NullReturningStringConverter : ArgumentConverter
 {
     public override object? Convert(string value, CultureInfo culture, CommandLineArgument argument)

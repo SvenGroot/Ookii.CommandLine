@@ -187,6 +187,24 @@ namespace Ookii.CommandLine.Generator.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The argument defined by {0} uses the same position value as {1}..
+        /// </summary>
+        internal static string DuplicatePositionMessageFormat {
+            get {
+                return ResourceManager.GetString("DuplicatePositionMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Two or more arguments use the same position value..
+        /// </summary>
+        internal static string DuplicatePositionTitle {
+            get {
+                return ResourceManager.GetString("DuplicatePositionTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The command class {0} cannot use the GeneratedParserAttribute class, because it implements the ICommandWithCustomParsing interface..
         /// </summary>
         internal static string GeneratedCustomParsingCommandMessageFormat {

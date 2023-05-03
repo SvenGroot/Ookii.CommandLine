@@ -154,12 +154,22 @@ internal static class Diagnostics
         symbol.ToDisplayString());
 
     public static Diagnostic IsRequiredWithRequiredProperty(ISymbol symbol) => CreateDiagnostic(
-        "CLW0006", // Deliberately the same as above.
+        "CLW0006",
         nameof(Resources.IsRequiredWithRequiredPropertyTitle),
         nameof(Resources.IsRequiredWithRequiredPropertyMessageFormat),
         DiagnosticSeverity.Warning,
         symbol.Locations.FirstOrDefault(),
         symbol.ToDisplayString());
+
+    public static Diagnostic DuplicatePosition(ISymbol symbol, string otherName) => CreateDiagnostic(
+        "CLW0007",
+        nameof(Resources.DuplicatePositionTitle),
+        nameof(Resources.DuplicatePositionMessageFormat),
+        DiagnosticSeverity.Warning,
+        symbol.Locations.FirstOrDefault(),
+        symbol.ToDisplayString(),
+        otherName);
+
 
     private static Diagnostic CreateDiagnostic(string id, string titleResource, string messageResource, DiagnosticSeverity severity, Location? location, params object?[]? messageArgs)
         => Diagnostic.Create(

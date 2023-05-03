@@ -159,6 +159,12 @@
   <data name="DefaultValueWithRequiredMessageFormat" xml:space="preserve">
     <value>The default value of the argument defined by {0} is ignored because the argument is required.</value>
   </data>
+  <data name="DuplicatePositionMessageFormat" xml:space="preserve">
+    <value>The argument defined by {0} uses the same position value as {1}.</value>
+  </data>
+  <data name="DuplicatePositionTitle" xml:space="preserve">
+    <value>Two or more arguments use the same position value.</value>
+  </data>
   <data name="GeneratedCustomParsingCommandMessageFormat" xml:space="preserve">
     <value>The command class {0} cannot use the GeneratedParserAttribute class, because it implements the ICommandWithCustomParsing interface.</value>
   </data>
