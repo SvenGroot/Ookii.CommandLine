@@ -177,6 +177,12 @@
   <data name="InvalidMethodSignatureTitle" xml:space="preserve">
     <value>A method command line argument has an invalid signature.</value>
   </data>
+  <data name="IsRequiredWithRequiredPropertyMessageFormat" xml:space="preserve">
+    <value>The CommandLineArgumentAttribute.IsRequired property is ignored for the required property {0}.</value>
+  </data>
+  <data name="IsRequiredWithRequiredPropertyTitle" xml:space="preserve">
+    <value>The CommandLineArgumentAttribute.IsRequired property is ignored for a required property.</value>
+  </data>
   <data name="NoConverterMessageFormat" xml:space="preserve">
     <value>No command line argument converter exists for type {0} used by the argument defined by {1}.{2}, and none could be generated. Use the Ookii.CommandLine.Conversion.ArgumentConverterAttribute to specify a custom converter.</value>
   </data>

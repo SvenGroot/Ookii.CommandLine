@@ -399,6 +399,11 @@ internal class ParserGenerator
                     _context.ReportDiagnostic(Diagnostics.DefaultValueWithRequired(member));
                 }
             }
+
+            if (argumentInfo.HasIsRequired && property.IsRequired)
+            {
+                _context.ReportDiagnostic(Diagnostics.IsRequiredWithRequiredProperty(member));
+            }
         }
 
         if (methodInfo is MethodArgumentInfo info)

@@ -12,6 +12,7 @@ internal class CommandLineArgumentAttributeInfo
             {
             case nameof(IsRequired):
                 IsRequired = (bool)named.Value.Value!;
+                HasIsRequired = true;
                 break;
 
             case nameof(DefaultValue):
@@ -22,6 +23,8 @@ internal class CommandLineArgumentAttributeInfo
     }
 
     public bool IsRequired { get; }
+
+    public bool HasIsRequired { get; }
 
     public object? DefaultValue { get; }
 }

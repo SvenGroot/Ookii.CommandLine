@@ -241,6 +241,24 @@ namespace Ookii.CommandLine.Generator.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The CommandLineArgumentAttribute.IsRequired property is ignored for the required property {0}..
+        /// </summary>
+        internal static string IsRequiredWithRequiredPropertyMessageFormat {
+            get {
+                return ResourceManager.GetString("IsRequiredWithRequiredPropertyMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The CommandLineArgumentAttribute.IsRequired property is ignored for a required property..
+        /// </summary>
+        internal static string IsRequiredWithRequiredPropertyTitle {
+            get {
+                return ResourceManager.GetString("IsRequiredWithRequiredPropertyTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to No command line argument converter exists for type {0} used by the argument defined by {1}.{2}, and none could be generated. Use the Ookii.CommandLine.Conversion.ArgumentConverterAttribute to specify a custom converter..
         /// </summary>
         internal static string NoConverterMessageFormat {
