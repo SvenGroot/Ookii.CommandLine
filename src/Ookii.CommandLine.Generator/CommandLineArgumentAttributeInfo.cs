@@ -41,6 +41,10 @@ internal class CommandLineArgumentAttributeInfo
             case nameof(IsLong):
                 IsLong = (bool)named.Value.Value!;
                 break;
+
+            case nameof(IsHidden):
+                IsHidden = (bool)named.Value.Value!;
+                break;
             }
         }
     }
@@ -58,4 +62,6 @@ internal class CommandLineArgumentAttributeInfo
     public char ShortName { get; }
 
     public bool IsLong { get; } = true;
+
+    public bool IsHidden { get; }
 }

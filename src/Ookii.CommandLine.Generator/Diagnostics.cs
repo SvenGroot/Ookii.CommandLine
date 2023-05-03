@@ -186,6 +186,14 @@ internal static class Diagnostics
         symbol.Locations.FirstOrDefault(),
         symbol.ToDisplayString());
 
+    public static Diagnostic IsHiddenWithPositional(ISymbol symbol) => CreateDiagnostic(
+        "CLW0010",
+        nameof(Resources.IsHiddenWithPositionalTitle),
+        nameof(Resources.IsHiddenWithPositionalMessageFormat),
+        DiagnosticSeverity.Warning,
+        symbol.Locations.FirstOrDefault(),
+        symbol.ToDisplayString());
+
     private static Diagnostic CreateDiagnostic(string id, string titleResource, string messageResource, DiagnosticSeverity severity, Location? location, params object?[]? messageArgs)
         => Diagnostic.Create(
             new DiagnosticDescriptor(

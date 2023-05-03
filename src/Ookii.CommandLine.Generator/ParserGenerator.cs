@@ -465,6 +465,11 @@ internal class ParserGenerator
         {
             _context.ReportDiagnostic(Diagnostics.AliasWithoutLongName(member));
         }
+
+        if (argumentInfo.IsHidden && argumentInfo.Position != null)
+        {
+            _context.ReportDiagnostic(Diagnostics.IsHiddenWithPositional(member));
+        }
     }
 
     private (ITypeSymbol?, INamedTypeSymbol?, ITypeSymbol?)? DetermineMultiValueType(IPropertySymbol property, ITypeSymbol argumentType)

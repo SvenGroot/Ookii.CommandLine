@@ -189,6 +189,12 @@
   <data name="InvalidMethodSignatureTitle" xml:space="preserve">
     <value>A method command line argument has an invalid signature.</value>
   </data>
+  <data name="IsHiddenWithPositionalMessageFormat" xml:space="preserve">
+    <value>The CommandLineArgumentAttribute.IsHidden property is ignored for the argument defined by {0} because it is positional.</value>
+  </data>
+  <data name="IsHiddenWithPositionalTitle" xml:space="preserve">
+    <value>The CommandLineArgumentAttribute.IsHidden property is ignored for positional arguments.</value>
+  </data>
   <data name="IsRequiredWithRequiredPropertyMessageFormat" xml:space="preserve">
     <value>The CommandLineArgumentAttribute.IsRequired property is ignored for the required property {0}.</value>
   </data>

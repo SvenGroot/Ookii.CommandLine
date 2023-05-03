@@ -37,7 +37,7 @@ partial class TestProvider { }
 [Command]
 partial class Arguments : ICommand
 {
-    [CommandLineArgument]
+    [CommandLineArgument(Position = 0)]
     [Description("Test argument")]
     [Alias("t")]
     [ValidateNotEmpty]

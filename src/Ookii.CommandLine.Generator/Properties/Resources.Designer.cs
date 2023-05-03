@@ -277,6 +277,24 @@ namespace Ookii.CommandLine.Generator.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The CommandLineArgumentAttribute.IsHidden property is ignored for the argument defined by {0} because it is positional..
+        /// </summary>
+        internal static string IsHiddenWithPositionalMessageFormat {
+            get {
+                return ResourceManager.GetString("IsHiddenWithPositionalMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The CommandLineArgumentAttribute.IsHidden property is ignored for positional arguments..
+        /// </summary>
+        internal static string IsHiddenWithPositionalTitle {
+            get {
+                return ResourceManager.GetString("IsHiddenWithPositionalTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The CommandLineArgumentAttribute.IsRequired property is ignored for the required property {0}..
         /// </summary>
         internal static string IsRequiredWithRequiredPropertyMessageFormat {
