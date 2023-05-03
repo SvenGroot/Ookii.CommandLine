@@ -4,6 +4,8 @@ namespace Ookii.CommandLine.Generator;
 
 internal class CommandLineArgumentAttributeInfo
 {
+    private readonly bool _isShort;
+
     public CommandLineArgumentAttributeInfo(AttributeData data)
     {
         foreach (var named in data.NamedArguments)
@@ -27,6 +29,18 @@ internal class CommandLineArgumentAttributeInfo
                 }
 
                 break;
+
+            case nameof(IsShort):
+                _isShort = (bool)named.Value.Value!;
+                break;
+
+            case nameof(ShortName):
+                ShortName = (char)named.Value.Value!;
+                break;
+
+            case nameof(IsLong):
+                IsLong = (bool)named.Value.Value!;
+                break;
             }
         }
     }
@@ -38,4 +52,10 @@ internal class CommandLineArgumentAttributeInfo
     public int? Position { get; }
 
     public object? DefaultValue { get; }
+
+    public bool IsShort => _isShort || ShortName != '\0';
+
+    public char ShortName { get; }
+
+    public bool IsLong { get; } = true;
 }

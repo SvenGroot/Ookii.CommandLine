@@ -170,6 +170,21 @@ internal static class Diagnostics
         symbol.ToDisplayString(),
         otherName);
 
+    public static Diagnostic ShortAliasWithoutShortName(ISymbol symbol) => CreateDiagnostic(
+        "CLW0008",
+        nameof(Resources.ShortAliasWithoutShortNameTitle),
+        nameof(Resources.ShortAliasWithoutShortNameMessageFormat),
+        DiagnosticSeverity.Warning,
+        symbol.Locations.FirstOrDefault(),
+        symbol.ToDisplayString());
+
+    public static Diagnostic AliasWithoutLongName(ISymbol symbol) => CreateDiagnostic(
+        "CLW0009",
+        nameof(Resources.AliasWithoutLongNameTitle),
+        nameof(Resources.AliasWithoutLongNameMessageFormat),
+        DiagnosticSeverity.Warning,
+        symbol.Locations.FirstOrDefault(),
+        symbol.ToDisplayString());
 
     private static Diagnostic CreateDiagnostic(string id, string titleResource, string messageResource, DiagnosticSeverity severity, Location? location, params object?[]? messageArgs)
         => Diagnostic.Create(

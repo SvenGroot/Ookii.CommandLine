@@ -61,6 +61,24 @@ namespace Ookii.CommandLine.Generator.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The AliasAttribute is ignored on the argument defined by {0} because it has no long name..
+        /// </summary>
+        internal static string AliasWithoutLongNameMessageFormat {
+            get {
+                return ResourceManager.GetString("AliasWithoutLongNameMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The AliasAttribute is ignored on an argument with no long name..
+        /// </summary>
+        internal static string AliasWithoutLongNameTitle {
+            get {
+                return ResourceManager.GetString("AliasWithoutLongNameTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The command line arguments class {0} may not be a generic class when the GeneratedParserAttribute is used..
         /// </summary>
         internal static string ArgumentsClassIsGenericMessageFormat {
@@ -363,6 +381,24 @@ namespace Ookii.CommandLine.Generator.Properties {
         internal static string PropertyIsReadOnlyTitle {
             get {
                 return ResourceManager.GetString("PropertyIsReadOnlyTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The ShortAliasAttribute is ignored on the argument defined by {0} because it has no short name..
+        /// </summary>
+        internal static string ShortAliasWithoutShortNameMessageFormat {
+            get {
+                return ResourceManager.GetString("ShortAliasWithoutShortNameMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The ShortAliasAttribute is ignored on an argument with no short name..
+        /// </summary>
+        internal static string ShortAliasWithoutShortNameTitle {
+            get {
+                return ResourceManager.GetString("ShortAliasWithoutShortNameTitle", resourceCulture);
             }
         }
         

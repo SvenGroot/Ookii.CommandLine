@@ -443,7 +443,6 @@ internal class ParserGenerator
 
         _builder.DecreaseIndent();
         _builder.AppendLine(");");
-
         if (argumentInfo.Position is int position)
         {
             _positions ??= new();
@@ -455,6 +454,16 @@ internal class ParserGenerator
             {
                 _positions.Add(position, member.Name);
             }
+        }
+
+        if (!argumentInfo.IsShort && attributes.ShortAliases != null)
+        {
+            _context.ReportDiagnostic(Diagnostics.ShortAliasWithoutShortName(member));
+        }
+
+        if (!argumentInfo.IsLong && attributes.Aliases != null)
+        {
+            _context.ReportDiagnostic(Diagnostics.AliasWithoutLongName(member));
         }
     }
 
