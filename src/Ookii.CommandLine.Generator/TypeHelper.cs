@@ -75,6 +75,8 @@ internal class TypeHelper
 
     public INamedTypeSymbol? ValueConverterAttribute => _compilation.GetTypeByMetadataName(NamespacePrefix + "Conversion.ValueConverterAttribute");
 
+    public INamedTypeSymbol? GeneratedConverterNamespaceAttribute => _compilation.GetTypeByMetadataName(NamespacePrefix + "Conversion.GeneratedConverterNamespaceAttribute");
+
     public INamedTypeSymbol? CommandAttribute => _compilation.GetTypeByMetadataName(NamespacePrefix + "Commands.CommandAttribute");
 
     public INamedTypeSymbol? GeneratedCommandProviderAttribute => _compilation.GetTypeByMetadataName(NamespacePrefix + "Commands.GeneratedCommandProviderAttribute");

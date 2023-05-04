@@ -259,6 +259,24 @@ namespace Ookii.CommandLine.Generator.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The value &apos;{0}&apos; is not a valid C# namespace name. The default namespace will be used instead..
+        /// </summary>
+        internal static string InvalidGeneratedConverterNamespaceMessageFormat {
+            get {
+                return ResourceManager.GetString("InvalidGeneratedConverterNamespaceMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The specified namespace for generated converters is not valid..
+        /// </summary>
+        internal static string InvalidGeneratedConverterNamespaceTitle {
+            get {
+                return ResourceManager.GetString("InvalidGeneratedConverterNamespaceTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The method {0}.{1} does not have a valid signature for a command line argument..
         /// </summary>
         internal static string InvalidMethodSignatureMessageFormat {

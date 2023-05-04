@@ -1,5 +1,7 @@
 ﻿using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using System.Text;
+using System.Xml.Linq;
 
 namespace Ookii.CommandLine.Generator;
 
@@ -13,8 +15,6 @@ internal class ConverterGenerator
         public bool ParseMethod { get; set; }
         public bool HasCulture { get; set; }
         public bool UseSpan { get; set; }
-
-        public string ConstructorCall => $"new {GeneratedNamespace}.{Name}()";
 
         public bool IsBetter(ConverterInfo other)
         {
@@ -43,34 +43,37 @@ internal class ConverterGenerator
     #endregion
 
     // TODO: Customizable or random namespace?
-    private const string GeneratedNamespace = "Ookii.CommandLine.Conversion.Generated";
+    private const string DefaultGeneratedNamespace = "Ookii.CommandLine.Conversion.Generated";
     private const string ConverterSuffix = "Converter";
     private readonly INamedTypeSymbol? _readOnlySpanType;
     private readonly INamedTypeSymbol? _cultureType;
     private readonly Dictionary<ITypeSymbol, ConverterInfo> _converters = new(SymbolEqualityComparer.Default);
 
-    public ConverterGenerator(TypeHelper typeHelper)
+    public ConverterGenerator(TypeHelper typeHelper, SourceProductionContext context)
     {
         _cultureType = typeHelper.CultureInfo;
         _readOnlySpanType = typeHelper.ReadOnlySpanOfChar;
+        GeneratedNamespace = GetGeneratedNamespace(typeHelper, context);
     }
+
+    public string GeneratedNamespace { get; }
 
     public string? GetConverter(ITypeSymbol type)
     {
-        if (_converters.TryGetValue(type, out var converter))
+        if (!_converters.TryGetValue(type, out var converter))
         {
-            return converter.ConstructorCall;
+            var optionalInfo = FindParseMethod(type) ?? FindConstructor(type);
+            if (optionalInfo is not ConverterInfo info)
+            {
+                return null;
+            }
+
+            info.Name = GenerateName(type.ToDisplayString());
+            _converters.Add(type, info);
+            converter = info;
         }
 
-        var optionalInfo = FindParseMethod(type) ?? FindConstructor(type);
-        if (optionalInfo is not ConverterInfo info)
-        {
-            return null;
-        }
-
-        info.Name = GenerateName(type.ToDisplayString());
-        _converters.Add(type, info);
-        return info.ConstructorCall;
+        return $"new {GeneratedNamespace}.{converter.Name}()";
     }
 
     public string? Generate()
@@ -199,7 +202,7 @@ internal class ConverterGenerator
         builder.AppendLine("catch (Ookii.CommandLine.CommandLineArgumentException ex)");
         builder.OpenBlock();
         // Patch the exception with the argument name.
-        builder.AppendLine("throw new CommandLineArgumentException(ex.Message, argument.ArgumentName, ex.Category, ex.InnerException);");
+        builder.AppendLine("throw new Ookii.CommandLine.CommandLineArgumentException(ex.Message, argument.ArgumentName, ex.Category, ex.InnerException);");
         builder.CloseBlock(); // catch
         builder.AppendLine("catch (System.FormatException)");
         builder.OpenBlock();
@@ -218,5 +221,47 @@ internal class ConverterGenerator
 
         builder.CloseBlock(); // class
         builder.AppendLine();
+    }
+
+    private static string GetGeneratedNamespace(TypeHelper typeHelper, SourceProductionContext context)
+    {
+        var attributeType = typeHelper.GeneratedConverterNamespaceAttribute;
+        if (attributeType == null)
+        {
+            return DefaultGeneratedNamespace;
+        }
+
+        AttributeData? attribute = null;
+        foreach (var attr in typeHelper.Compilation.Assembly.GetAttributes())
+        {
+            if (attributeType.SymbolEquals(attr.AttributeClass))
+            {
+                attribute = attr;
+                break;
+            }
+        }
+
+        if (attribute == null)
+        {
+            return DefaultGeneratedNamespace;
+        }
+
+        var ns = attribute.ConstructorArguments.FirstOrDefault().Value as string;
+        if (ns == null)
+        {
+            return DefaultGeneratedNamespace;
+        }
+
+        var elements = ns.Split('.');
+        foreach (var element in elements)
+        {
+            if (!SyntaxFacts.IsValidIdentifier(element)) 
+            {
+                context.ReportDiagnostic(Diagnostics.InvalidGeneratedConverterNamespace(ns, attribute));
+                return DefaultGeneratedNamespace;
+            }
+        }
+
+        return ns;
     }
 }

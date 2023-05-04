@@ -42,7 +42,7 @@ public class ParserIncrementalGenerator : IIncrementalGenerator
         }
 
         var typeHelper = new TypeHelper(compilation);
-        var converterGenerator = new ConverterGenerator(typeHelper);
+        var converterGenerator = new ConverterGenerator(typeHelper, context);
         var commandGenerator = new CommandGenerator(typeHelper, context);
         foreach (var cls in classes)
         {

@@ -183,6 +183,12 @@
   <data name="InvalidArrayRankTitle" xml:space="preserve">
     <value>A multi-value command line argument defined by an array properties must have an array rank of one.</value>
   </data>
+  <data name="InvalidGeneratedConverterNamespaceMessageFormat" xml:space="preserve">
+    <value>The value '{0}' is not a valid C# namespace name. The default namespace will be used instead.</value>
+  </data>
+  <data name="InvalidGeneratedConverterNamespaceTitle" xml:space="preserve">
+    <value>The specified namespace for generated converters is not valid.</value>
+  </data>
   <data name="InvalidMethodSignatureMessageFormat" xml:space="preserve">
     <value>The method {0}.{1} does not have a valid signature for a command line argument.</value>
   </data>
