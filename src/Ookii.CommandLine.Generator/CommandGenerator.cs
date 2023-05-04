@@ -58,7 +58,13 @@ internal class CommandGenerator
         }
 
         var builder = new SourceBuilder(provider.ContainingNamespace);
-        builder.AppendLine($"partial class {provider.Name} : Ookii.CommandLine.Support.CommandProvider");
+        builder.Append($"partial class {provider.Name} : Ookii.CommandLine.Support.CommandProvider");
+        if (_typeHelper.ICommandProvider != null)
+        {
+            builder.Append(", Ookii.CommandLine.Commands.ICommandProvider");
+        }
+
+        builder.AppendLine();
         builder.OpenBlock();
         builder.AppendLine("public override Ookii.CommandLine.Support.ProviderKind Kind => Ookii.CommandLine.Support.ProviderKind.Generated;");
         builder.AppendLine();
@@ -130,8 +136,6 @@ internal class CommandGenerator
         builder.AppendLine("yield break;");
         builder.CloseBlock(); // GetCommandsUnsorted
         builder.AppendLine();
-
-        // TODO: Make optional.
         builder.AppendLine("public static Ookii.CommandLine.Commands.CommandManager CreateCommandManager(Ookii.CommandLine.Commands.CommandOptions? options = null)");
         builder.AppendLine($"    => new Ookii.CommandLine.Commands.CommandManager(new {provider.ToDisplayString()}(), options);");
         builder.CloseBlock(); // class

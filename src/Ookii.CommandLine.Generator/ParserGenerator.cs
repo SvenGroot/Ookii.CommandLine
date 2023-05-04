@@ -58,35 +58,6 @@ internal class ParserGenerator
 
     public string? Generate()
     {
-        _builder.AppendLine($"partial class {_argumentsClass.Name}");
-        if (_typeHelper.IParser != null)
-        {
-            _builder.AppendLine($"    : Ookii.CommandLine.IParser<{_argumentsClass.Name}>");
-        }
-
-        _builder.OpenBlock();
-        if (!GenerateProvider())
-        {
-            return null;
-        }
-
-        _builder.AppendLine($"public static Ookii.CommandLine.CommandLineParser<{_argumentsClass.Name}> CreateParser(Ookii.CommandLine.ParseOptions? options = null) => new(new GeneratedProvider(), options);");
-        _builder.AppendLine();
-        var nullableType = _argumentsClass.WithNullableAnnotation(NullableAnnotation.Annotated);
-        // TODO: Optionally implement these.
-        // We cannot rely on default implementations, because that makes the methods uncallable
-        // without a generic type argument.
-        _builder.AppendLine($"public static {nullableType.ToDisplayString()} Parse(Ookii.CommandLine.ParseOptions? options = null) => CreateParser(options).ParseWithErrorHandling();");
-        _builder.AppendLine();
-        _builder.AppendLine($"public static {nullableType.ToDisplayString()} Parse(string[] args, Ookii.CommandLine.ParseOptions? options = null) => CreateParser(options).ParseWithErrorHandling(args);");
-        _builder.AppendLine();
-        _builder.AppendLine($"public static {nullableType.ToDisplayString()} Parse(string[] args, int index, Ookii.CommandLine.ParseOptions? options = null) => CreateParser(options).ParseWithErrorHandling(args, index);");
-        _builder.CloseBlock(); // class
-        return _builder.GetSource();
-    }
-
-    private bool GenerateProvider()
-    {
         // Find the attributes that can apply to an arguments class.
         // This code also finds attributes that inherit from those attribute. By instantiating the
         // possibly derived attribute classes, we can support for example a class that derives from
@@ -100,7 +71,7 @@ internal class ParserGenerator
             if (_argumentsClass.ImplementsInterface(_typeHelper.ICommandWithCustomParsing))
             {
                 _context.ReportDiagnostic(Diagnostics.GeneratedCustomParsingCommand(_argumentsClass));
-                return false;
+                return null;
             }
             else if (_argumentsClass.ImplementsInterface(_typeHelper.ICommand))
             {
@@ -116,6 +87,57 @@ internal class ParserGenerator
             }
         }
 
+        // Don't generate the parse methods for commands unless explicitly asked for.
+        var generateParseMethods = !isCommand;
+        foreach (var arg in attributes.GeneratedParser!.NamedArguments)
+        {
+            if (arg.Key == "GenerateParseMethods")
+            {
+                generateParseMethods = (bool)arg.Value.Value!;
+                break;
+            }
+        }
+
+        _builder.AppendLine($"partial class {_argumentsClass.Name}");
+        if (_typeHelper.IParser != null)
+        {
+            if (generateParseMethods)
+            {
+                _builder.AppendLine($"    : Ookii.CommandLine.IParser<{_argumentsClass.Name}>");
+            }
+            else
+            {
+                _builder.AppendLine($"    : Ookii.CommandLine.IParserProvider<{_argumentsClass.Name}>");
+            }
+        }
+
+        _builder.OpenBlock();
+        if (!GenerateProvider(attributes, isCommand))
+        {
+            return null;
+        }
+
+        _builder.AppendLine($"public static Ookii.CommandLine.CommandLineParser<{_argumentsClass.Name}> CreateParser(Ookii.CommandLine.ParseOptions? options = null) => new(new GeneratedProvider(), options);");
+        _builder.AppendLine();
+        var nullableType = _argumentsClass.WithNullableAnnotation(NullableAnnotation.Annotated);
+
+        if (generateParseMethods)
+        {
+            // We cannot rely on default interface implementations, because that makes the methods
+            // uncallable without a generic type argument.
+            _builder.AppendLine($"public static {nullableType.ToDisplayString()} Parse(Ookii.CommandLine.ParseOptions? options = null) => CreateParser(options).ParseWithErrorHandling();");
+            _builder.AppendLine();
+            _builder.AppendLine($"public static {nullableType.ToDisplayString()} Parse(string[] args, Ookii.CommandLine.ParseOptions? options = null) => CreateParser(options).ParseWithErrorHandling(args);");
+            _builder.AppendLine();
+            _builder.AppendLine($"public static {nullableType.ToDisplayString()} Parse(string[] args, int index, Ookii.CommandLine.ParseOptions? options = null) => CreateParser(options).ParseWithErrorHandling(args, index);");
+            _builder.CloseBlock(); // class
+        }
+
+        return _builder.GetSource();
+    }
+
+    private bool GenerateProvider(ArgumentsClassAttributes attributes, bool isCommand)
+    {
         _builder.AppendLine("private class GeneratedProvider : Ookii.CommandLine.Support.GeneratedArgumentProvider");
         _builder.OpenBlock();
         _builder.AppendLine("public GeneratedProvider()");

@@ -17,14 +17,6 @@ return manager.RunCommand() ?? 1;
 //    Console.WriteLine($"Hello, World! {arguments.Test}");
 //}
 
-class MyProvider : CommandProvider
-{
-    public override string? GetApplicationDescription() => "Trim Test";
-    public override IEnumerable<CommandInfo> GetCommandsUnsorted(CommandManager manager)
-    {
-        yield return new GeneratedCommandInfo(manager, typeof(Arguments), new CommandAttribute(), new DescriptionAttribute("This is a command test"), createParser: options => Arguments.CreateParser(options));
-    }
-}
 
 [GeneratedCommandProvider]
 partial class TestProvider { }

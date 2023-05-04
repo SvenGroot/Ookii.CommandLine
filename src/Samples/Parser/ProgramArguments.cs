@@ -145,7 +145,7 @@ class ProgramArguments
             // causes an error. By changing this option, we set it to show a warning instead, and
             // use the last value supplied.
             DuplicateArguments = ErrorMode.Warning,
-        };
+        }; 
 
         // The static Parse method parses the arguments, handles errors, and shows usage help if
         // necessary (using a LineWrappingTextWriter to neatly white-space wrap console output).
