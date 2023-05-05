@@ -42,7 +42,7 @@ namespace Ookii.CommandLine
         ///   The type indicated by <typeparamref name="T"/> has the <see cref="GeneratedParserAttribute"/>
         ///   attribute applied. Use the generated static <c>CreateParser()</c> or <c>Parse()</c>
         ///   methods on the arguments type to access the generated parser. For subcommands, use a
-        ///   command provider with the <see cref="GeneratedCommandProviderAttribute"/> attribute to
+        ///   command provider with the <see cref="GeneratedCommandManagerAttribute"/> attribute to
         ///   create a <see cref="CommandManager"/> that will use generated parsers for subcommands. Set
         ///   the <see cref="ParseOptions.AllowReflectionWithGeneratedParser"/> property to
         ///   <see langword="true"/> to disable this exception.
@@ -82,7 +82,7 @@ namespace Ookii.CommandLine
         ///   <typeparamref name="T"/> property has the <see cref="GeneratedParserAttribute"/>
         ///   attribute applied. Use the generated static <c>CreateParser()</c> or <c>Parse()</c>
         ///   methods on the arguments type to access the generated parser. For subcommands, use a
-        ///   command provider with the <see cref="GeneratedCommandProviderAttribute"/> attribute to
+        ///   command provider with the <see cref="GeneratedCommandManagerAttribute"/> attribute to
         ///   create a <see cref="CommandManager"/> that will use generated parsers for subcommands. Set
         ///   the <see cref="ParseOptions.AllowReflectionWithGeneratedParser"/> property to
         ///   <see langword="true"/> to disable this exception.

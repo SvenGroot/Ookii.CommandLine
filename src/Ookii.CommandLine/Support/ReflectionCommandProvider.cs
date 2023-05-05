@@ -1,4 +1,4 @@
-﻿using Ookii.CommandLine.Support;
+﻿using Ookii.CommandLine.Commands;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -6,10 +6,10 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 
-namespace Ookii.CommandLine.Commands;
+namespace Ookii.CommandLine.Support;
 
 #if NET6_0_OR_GREATER
-[RequiresUnreferencedCode("Trimming is not possible when determining commands using reflection. Use the GeneratedCommandProviderAttribute instead.")]
+[RequiresUnreferencedCode("Trimming is not possible when determining commands using reflection. Use the GeneratedCommandManagerAttribute instead.")]
 #endif
 internal class ReflectionCommandProvider : CommandProvider
 {

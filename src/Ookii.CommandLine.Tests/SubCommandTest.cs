@@ -347,7 +347,7 @@ namespace Ookii.CommandLine.Tests
             var manager = kind switch
             {
                 ProviderKind.Reflection => new CommandManager(_commandAssembly, options),
-                ProviderKind.Generated => GeneratedProvider.CreateCommandManager(options),
+                ProviderKind.Generated => new GeneratedManager(options),
                 _ => throw new InvalidOperationException()
             };
 

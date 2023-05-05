@@ -10,6 +10,6 @@ namespace Ookii.CommandLine.Commands;
 /// TODO: Better docs.
 /// </remarks>
 [AttributeUsage(AttributeTargets.Class)]
-public sealed class GeneratedCommandProviderAttribute : Attribute
+public sealed class GeneratedCommandManagerAttribute : Attribute
 {
 }

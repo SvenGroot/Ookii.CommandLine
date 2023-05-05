@@ -8,7 +8,7 @@ using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
 
-var manager = TestProvider.CreateCommandManager();
+var manager = new TestManager();
 return manager.RunCommand() ?? 1;
 
 //var arguments = Arguments.Parse();
@@ -18,8 +18,8 @@ return manager.RunCommand() ?? 1;
 //}
 
 
-[GeneratedCommandProvider]
-partial class TestProvider { }
+[GeneratedCommandManager]
+partial class TestManager { }
 
 [GeneratedParser]
 [ParseOptions(CaseSensitive = true)]

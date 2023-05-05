@@ -9,8 +9,7 @@ internal class CommandGenerator
     private readonly TypeHelper _typeHelper;
     private readonly SourceProductionContext _context;
     private readonly List<(INamedTypeSymbol Type, ArgumentsClassAttributes? Attributes)> _commands = new();
-
-    private readonly List<INamedTypeSymbol> _providers = new();
+    private readonly List<INamedTypeSymbol> _managers = new();
 
     public CommandGenerator(TypeHelper typeHelper, SourceProductionContext context)
     {
@@ -28,27 +27,27 @@ internal class CommandGenerator
         _commands.Add((type, null));
     }
 
-    public void AddProvider(INamedTypeSymbol provider)
+    public void AddManager(INamedTypeSymbol provider)
     {
-        _providers.Add(provider);
+        _managers.Add(provider);
     }
 
     public void Generate()
     {
-        foreach (var provider in _providers)
+        foreach (var manager in _managers)
         {
-            var source = GenerateProvider(provider);
+            var source = GenerateManager(manager);
             if (source != null)
             {
-                _context.AddSource(provider.ToDisplayString().ToIdentifier(".g.cs"), SourceText.From(source, Encoding.UTF8));
+                _context.AddSource(manager.ToDisplayString().ToIdentifier(".g.cs"), SourceText.From(source, Encoding.UTF8));
             }
         }
     }
 
-    private string? GenerateProvider(INamedTypeSymbol provider)
+    private string? GenerateManager(INamedTypeSymbol manager)
     {
         AttributeData? descriptionAttribute = null;
-        foreach (var attribute in provider.ContainingAssembly.GetAttributes())
+        foreach (var attribute in manager.ContainingAssembly.GetAttributes())
         {
             if (attribute.AttributeClass?.DerivesFrom(_typeHelper.AssemblyDescriptionAttribute) ?? false)
             {
@@ -57,14 +56,10 @@ internal class CommandGenerator
             }
         }
 
-        var builder = new SourceBuilder(provider.ContainingNamespace);
-        builder.Append($"partial class {provider.Name} : Ookii.CommandLine.Support.CommandProvider");
-        if (_typeHelper.ICommandProvider != null)
-        {
-            builder.Append(", Ookii.CommandLine.Commands.ICommandProvider");
-        }
-
-        builder.AppendLine();
+        var builder = new SourceBuilder(manager.ContainingNamespace);
+        builder.AppendLine($"partial class {manager.Name} : Ookii.CommandLine.Commands.CommandManager");
+        builder.OpenBlock();
+        builder.AppendLine("private class GeneratedProvider : Ookii.CommandLine.Support.CommandProvider");
         builder.OpenBlock();
         builder.AppendLine("public override Ookii.CommandLine.Support.ProviderKind Kind => Ookii.CommandLine.Support.ProviderKind.Generated;");
         builder.AppendLine();
@@ -135,10 +130,13 @@ internal class CommandGenerator
         // Makes sure the function compiles if there are no commands.
         builder.AppendLine("yield break;");
         builder.CloseBlock(); // GetCommandsUnsorted
+        builder.CloseBlock(); // provider class
         builder.AppendLine();
-        builder.AppendLine("public static Ookii.CommandLine.Commands.CommandManager CreateCommandManager(Ookii.CommandLine.Commands.CommandOptions? options = null)");
-        builder.AppendLine($"    => new Ookii.CommandLine.Commands.CommandManager(new {provider.ToDisplayString()}(), options);");
-        builder.CloseBlock(); // class
+        builder.AppendLine($"public {manager.Name}(Ookii.CommandLine.Commands.CommandOptions? options = null)");
+        builder.AppendLine($"    : base(new GeneratedProvider(), options)");
+        builder.OpenBlock();
+        builder.CloseBlock(); // ctor
+        builder.CloseBlock(); // manager class
         return builder.GetSource();
     }
 }

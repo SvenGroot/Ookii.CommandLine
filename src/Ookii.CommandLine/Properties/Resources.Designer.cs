@@ -520,7 +520,7 @@ namespace Ookii.CommandLine.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The arguments type {0} has the GeneratedParserAttribute applied, but reflection is being used to create a parser for it. Use the generated {0}.CreateParser() or {0}.Parse() methods to use the generated parser. For subcommands, use the GeneratedCommandProviderAttribute..
+        ///   Looks up a localized string similar to The arguments type {0} has the GeneratedParserAttribute applied, but reflection is being used to create a parser for it. Use the generated {0}.CreateParser() or {0}.Parse() methods to use the generated parser. For subcommands, use the GeneratedCommandManagerAttribute..
         /// </summary>
         internal static string ReflectionWithGeneratedParserFormat {
             get {

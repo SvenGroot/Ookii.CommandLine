@@ -14,7 +14,7 @@ public class ParserIncrementalGenerator : IIncrementalGenerator
     private enum ClassKind
     {
         Arguments,
-        CommandProvider,
+        CommandManager,
         Command,
     }
 
@@ -96,9 +96,9 @@ public class ParserIncrementalGenerator : IIncrementalGenerator
                 continue;
             }
 
-            if (info.ClassKind == ClassKind.CommandProvider)
+            if (info.ClassKind == ClassKind.CommandManager)
             {
-                commandGenerator.AddProvider(symbol);
+                commandGenerator.AddManager(symbol);
                 continue;
             }
 
@@ -123,7 +123,7 @@ public class ParserIncrementalGenerator : IIncrementalGenerator
         var classDeclaration = (ClassDeclarationSyntax)context.Node;
         var typeHelper = new TypeHelper(context.SemanticModel.Compilation);
         var generatedParserType = typeHelper.GeneratedParserAttribute;
-        var generatedCommandProviderType = typeHelper.GeneratedCommandProviderAttribute;
+        var GeneratedCommandManagerType = typeHelper.GeneratedCommandManagerAttribute;
         var commandType = typeHelper.CommandAttribute;
         var isCommand = false;
         foreach (var attributeList in classDeclaration.AttributeLists)
@@ -142,9 +142,9 @@ public class ParserIncrementalGenerator : IIncrementalGenerator
                     return new(classDeclaration, ClassKind.Arguments);
                 }
 
-                if (attributeType.SymbolEquals(generatedCommandProviderType))
+                if (attributeType.SymbolEquals(GeneratedCommandManagerType))
                 {
-                    return new(classDeclaration, ClassKind.CommandProvider);
+                    return new(classDeclaration, ClassKind.CommandManager);
                 }
 
                 if (attributeType.SymbolEquals(commandType))

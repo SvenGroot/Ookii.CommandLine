@@ -5,8 +5,8 @@ using System.Threading.Tasks;
 
 namespace Ookii.CommandLine.Tests;
 
-[GeneratedCommandProvider]
-partial class GeneratedProvider { }
+[GeneratedCommandManager]
+partial class GeneratedManager { }
 
 [GeneratedParser]
 [Command("test")]

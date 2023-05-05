@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Ookii.CommandLine.Support;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -271,7 +272,7 @@ namespace Ookii.CommandLine.Commands
         ///   <see langword="null"/> if <paramref name="commandType"/> was not a command.
         /// </returns>
 #if NET6_0_OR_GREATER
-        [RequiresUnreferencedCode("Trimming cannot be used when determining commands via reflection. Use the GeneratedCommandProviderAttribute instead.")]
+        [RequiresUnreferencedCode("Trimming cannot be used when determining commands via reflection. Use the GeneratedCommandManagerAttribute instead.")]
 #endif
         public static CommandInfo? TryCreate(Type commandType, CommandManager manager)
             => ReflectionCommandInfo.TryCreate(commandType, manager);
@@ -294,7 +295,7 @@ namespace Ookii.CommandLine.Commands
         ///   A <see cref="CommandInfo"/> class with information about the command.
         /// </returns>
 #if NET6_0_OR_GREATER
-        [RequiresUnreferencedCode("Trimming cannot be used when determining commands via reflection. Use the GeneratedCommandProviderAttribute instead.")]
+        [RequiresUnreferencedCode("Trimming cannot be used when determining commands via reflection. Use the GeneratedCommandManagerAttribute instead.")]
 #endif
         public static CommandInfo Create(Type commandType, CommandManager manager)
             => new ReflectionCommandInfo(commandType, null, manager);
@@ -311,7 +312,7 @@ namespace Ookii.CommandLine.Commands
         /// <paramref name="commandType"/> is <see langword="null"/>.
         /// </exception>
 #if NET6_0_OR_GREATER
-        [RequiresUnreferencedCode("Trimming cannot be used when determining commands via reflection. Use the GeneratedCommandProviderAttribute instead.")]
+        [RequiresUnreferencedCode("Trimming cannot be used when determining commands via reflection. Use the GeneratedCommandManagerAttribute instead.")]
 #endif
         public static bool IsCommand(Type commandType) => ReflectionCommandInfo.GetCommandAttribute(commandType) != null;
 

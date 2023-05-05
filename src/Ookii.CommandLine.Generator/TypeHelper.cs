@@ -79,7 +79,7 @@ internal class TypeHelper
 
     public INamedTypeSymbol? CommandAttribute => _compilation.GetTypeByMetadataName(NamespacePrefix + "Commands.CommandAttribute");
 
-    public INamedTypeSymbol? GeneratedCommandProviderAttribute => _compilation.GetTypeByMetadataName(NamespacePrefix + "Commands.GeneratedCommandProviderAttribute");
+    public INamedTypeSymbol? GeneratedCommandManagerAttribute => _compilation.GetTypeByMetadataName(NamespacePrefix + "Commands.GeneratedCommandManagerAttribute");
 
     public INamedTypeSymbol? ICommand => _compilation.GetTypeByMetadataName(NamespacePrefix + "Commands.ICommand");
 
