@@ -558,8 +558,8 @@ functionality.
 
 Providing native support for nested subcommands is planned for a future release.
 
-The next page will take a look at several [utility classes](Utilities.md) provided, and used, by
-Ookii.CommandLine.
+The next page will discuss Ookii.CommandLine's [source generation](SourceGeneration.md) in more
+detail.
 
 [`AliasAttribute`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_AliasAttribute.htm
 [`ApplicationFriendlyNameAttribute`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_ApplicationFriendlyNameAttribute.htm
