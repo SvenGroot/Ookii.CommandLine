@@ -531,6 +531,11 @@ internal class ParserGenerator
         {
             _context.ReportDiagnostic(Diagnostics.IgnoredAttributeForNonMultiValue(member, attributes.MultiValueSeparator));
         }
+
+        if (!isDictionary && attributes.AllowDuplicateDictionaryKeys != null)
+        {
+            _context.ReportDiagnostic(Diagnostics.IgnoredAttributeForNonDictionary(member, attributes.AllowDuplicateDictionaryKeys));
+        }
     }
 
     private (ITypeSymbol?, INamedTypeSymbol?, ITypeSymbol?)? DetermineMultiValueType(IPropertySymbol property, ITypeSymbol argumentType)
