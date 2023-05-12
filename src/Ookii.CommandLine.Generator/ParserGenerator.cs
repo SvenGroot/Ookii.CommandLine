@@ -511,12 +511,12 @@ internal class ParserGenerator
 
         if (!argumentInfo.IsShort && attributes.ShortAliases != null)
         {
-            _context.ReportDiagnostic(Diagnostics.ShortAliasWithoutShortName(member));
+            _context.ReportDiagnostic(Diagnostics.ShortAliasWithoutShortName(attributes.ShortAliases.First(), member));
         }
 
         if (!argumentInfo.IsLong && attributes.Aliases != null)
         {
-            _context.ReportDiagnostic(Diagnostics.AliasWithoutLongName(member));
+            _context.ReportDiagnostic(Diagnostics.AliasWithoutLongName(attributes.Aliases.First(), member));
         }
 
         if (argumentInfo.IsHidden && argumentInfo.Position != null)
@@ -615,7 +615,7 @@ internal class ParserGenerator
             var argument = converterAttribute.ConstructorArguments[0];
             if (argument.Kind != TypedConstantKind.Type)
             {
-                _context.ReportDiagnostic(Diagnostics.ArgumentConverterStringNotSupported(member));
+                _context.ReportDiagnostic(Diagnostics.ArgumentConverterStringNotSupported(converterAttribute, member));
                 return null;
             }
 

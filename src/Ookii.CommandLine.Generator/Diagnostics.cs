@@ -135,12 +135,12 @@ internal static class Diagnostics
         symbol.Locations.FirstOrDefault(),
         name);
 
-    public static Diagnostic ArgumentConverterStringNotSupported(ISymbol symbol) => CreateDiagnostic(
+    public static Diagnostic ArgumentConverterStringNotSupported(AttributeData attribute, ISymbol symbol) => CreateDiagnostic(
         "CL0015",
         nameof(Resources.ArgumentConverterStringNotSupportedTitle),
         nameof(Resources.ArgumentConverterStringNotSupportedMessageFormat),
         DiagnosticSeverity.Error,
-        symbol.Locations.FirstOrDefault(),
+        attribute.GetLocation(),
         symbol.ToDisplayString());
 
     public static Diagnostic IgnoredAttribute(AttributeData attribute) => CreateDiagnostic(
@@ -148,7 +148,7 @@ internal static class Diagnostics
         nameof(Resources.UnknownAttributeTitle),
         nameof(Resources.UnknownAttributeMessageFormat),
         DiagnosticSeverity.Warning,
-        attribute.ApplicationSyntaxReference?.SyntaxTree.GetLocation(attribute.ApplicationSyntaxReference.Span),
+        attribute.GetLocation(),
         attribute.AttributeClass?.Name);
 
     public static Diagnostic NonPublicStaticMethod(ISymbol method) => CreateDiagnostic(
@@ -218,20 +218,20 @@ internal static class Diagnostics
         symbol.ToDisplayString(),
         otherName);
 
-    public static Diagnostic ShortAliasWithoutShortName(ISymbol symbol) => CreateDiagnostic(
+    public static Diagnostic ShortAliasWithoutShortName(AttributeData attribute, ISymbol symbol) => CreateDiagnostic(
         "CLW0008",
         nameof(Resources.ShortAliasWithoutShortNameTitle),
         nameof(Resources.ShortAliasWithoutShortNameMessageFormat),
         DiagnosticSeverity.Warning,
-        symbol.Locations.FirstOrDefault(),
+        attribute.GetLocation(),
         symbol.ToDisplayString());
 
-    public static Diagnostic AliasWithoutLongName(ISymbol symbol) => CreateDiagnostic(
+    public static Diagnostic AliasWithoutLongName(AttributeData attribute, ISymbol symbol) => CreateDiagnostic(
         "CLW0009",
         nameof(Resources.AliasWithoutLongNameTitle),
         nameof(Resources.AliasWithoutLongNameMessageFormat),
         DiagnosticSeverity.Warning,
-        symbol.Locations.FirstOrDefault(),
+        attribute.GetLocation(),
         symbol.ToDisplayString());
 
     public static Diagnostic IsHiddenWithPositional(ISymbol symbol) => CreateDiagnostic(
@@ -247,7 +247,7 @@ internal static class Diagnostics
         nameof(Resources.InvalidGeneratedConverterNamespaceTitle),
         nameof(Resources.InvalidGeneratedConverterNamespaceMessageFormat),
         DiagnosticSeverity.Warning,
-        attribute.ApplicationSyntaxReference?.SyntaxTree.GetLocation(attribute.ApplicationSyntaxReference.Span),
+        attribute.GetLocation(),
         ns);
 
     public static Diagnostic IgnoredAttributeForNonDictionary(ISymbol member, AttributeData attribute) => CreateDiagnostic(
@@ -255,7 +255,7 @@ internal static class Diagnostics
         nameof(Resources.IgnoredAttributeForNonDictionaryTitle),
         nameof(Resources.IgnoredAttributeForNonDictionaryMessageFormat),
         DiagnosticSeverity.Warning,
-        attribute.ApplicationSyntaxReference?.SyntaxTree.GetLocation(attribute.ApplicationSyntaxReference.Span),
+        attribute.GetLocation(),
         attribute.AttributeClass?.Name,
         member.ToDisplayString());
 
@@ -264,7 +264,7 @@ internal static class Diagnostics
         nameof(Resources.IgnoredAttributeForDictionaryWithConverterTitle),
         nameof(Resources.IgnoredAttributeForDictionaryWithConverterMessageFormat),
         DiagnosticSeverity.Warning,
-        attribute.ApplicationSyntaxReference?.SyntaxTree.GetLocation(attribute.ApplicationSyntaxReference.Span),
+        attribute.GetLocation(),
         attribute.AttributeClass?.Name,
         member.ToDisplayString());
 
@@ -273,7 +273,7 @@ internal static class Diagnostics
         nameof(Resources.IgnoredAttributeForNonMultiValueTitle),
         nameof(Resources.IgnoredAttributeForNonMultiValueMessageFormat),
         DiagnosticSeverity.Warning,
-        attribute.ApplicationSyntaxReference?.SyntaxTree.GetLocation(attribute.ApplicationSyntaxReference.Span),
+        attribute.GetLocation(),
         attribute.AttributeClass?.Name,
         member.ToDisplayString());
 

@@ -211,4 +211,7 @@ internal static class Extensions
 
         return null;
     }
+
+    public static Location? GetLocation(this AttributeData attribute)
+        => attribute.ApplicationSyntaxReference?.SyntaxTree.GetLocation(attribute.ApplicationSyntaxReference.Span);
 }
