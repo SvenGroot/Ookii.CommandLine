@@ -54,18 +54,29 @@ public class CommandManager
     private readonly CommandOptions _options;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="CommandManager"/> class for the calling
-    /// assembly.
+    /// Initializes a new instance of the <see cref="CommandManager"/> class for the assembly that
+    /// is calling the constructor.
     /// </summary>
     /// <param name="options">
     ///   The options to use for parsing and usage help, or <see langword="null"/> to use
     ///   the default options.
     /// </param>
+    /// <remarks>
+    /// <para>
+    ///   Both public and internal command classes will be used.
+    /// </para>
+    /// <note>
+    ///   Once a command is created, the <paramref name="options"/> instance may be modified
+    ///   with the options of the <see cref="ParseOptionsAttribute"/> attribute applied to the
+    ///   command class. Be aware of this if reusing the same <see cref="CommandManager"/> or
+    ///   <see cref="CommandOptions"/> instance to create multiple commands.
+    /// </note>
+    /// </remarks>
 #if NET6_0_OR_GREATER
     [RequiresUnreferencedCode("Trimming is not possible when determining commands using reflection. Use the GeneratedCommandManagerAttribute instead.")]
 #endif
     public CommandManager(CommandOptions? options = null)
-        : this(Assembly.GetCallingAssembly(), options)
+        : this(new ReflectionCommandProvider(Assembly.GetCallingAssembly(), Assembly.GetCallingAssembly()), options)
     {
     }
 
@@ -99,6 +110,11 @@ public class CommandManager
     /// <paramref name="assembly"/> is <see langword="null"/>.
     /// </exception>
     /// <remarks>
+    /// <para>
+    ///   If <paramref name="assembly"/> is the assembly that called this constructor, both public
+    ///   and internal command classes will be used. Otherwise, only public command classes are
+    ///   used.
+    /// </para>
     /// <note>
     ///   Once a command is created, the <paramref name="options"/> instance may be modified
     ///   with the options of the <see cref="ParseOptionsAttribute"/> attribute applied to the
@@ -110,7 +126,7 @@ public class CommandManager
     [RequiresUnreferencedCode("Trimming is not possible when determining commands using reflection. Use the GeneratedCommandManagerAttribute instead.")]
 #endif
     public CommandManager(Assembly assembly, CommandOptions? options = null)
-        : this(new ReflectionCommandProvider(assembly ?? throw new ArgumentNullException(nameof(assembly))), options)
+        : this(new ReflectionCommandProvider(assembly ?? throw new ArgumentNullException(nameof(assembly)), Assembly.GetCallingAssembly()), options)
     {
     }
 
@@ -125,11 +141,24 @@ public class CommandManager
     /// <exception cref="ArgumentNullException">
     /// <paramref name="assemblies"/> or one of its elements is <see langword="null"/>.
     /// </exception>
+    /// <remarks>
+    /// <para>
+    ///   If an assembly in <paramref name="assemblies"/> is the assembly that called this
+    ///   constructor, both public and internal command classes will be used. Otherwise, only public
+    ///   command classes are used for that assembly.
+    /// </para>
+    /// <note>
+    ///   Once a command is created, the <paramref name="options"/> instance may be modified
+    ///   with the options of the <see cref="ParseOptionsAttribute"/> attribute applied to the
+    ///   command class. Be aware of this if reusing the same <see cref="CommandManager"/> or
+    ///   <see cref="CommandOptions"/> instance to create multiple commands.
+    /// </note>
+    /// </remarks>
 #if NET6_0_OR_GREATER
     [RequiresUnreferencedCode("Trimming is not possible when determining commands using reflection. Use the GeneratedCommandManagerAttribute instead.")]
 #endif
     public CommandManager(IEnumerable<Assembly> assemblies, CommandOptions? options = null)
-        : this(new ReflectionCommandProvider(assemblies ?? throw new ArgumentNullException(nameof(assemblies))), options)
+        : this(new ReflectionCommandProvider(assemblies ?? throw new ArgumentNullException(nameof(assemblies)), Assembly.GetCallingAssembly()), options)
     {
     }
 

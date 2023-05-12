@@ -2,8 +2,10 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Ookii.CommandLine.Commands;
 using Ookii.CommandLine.Support;
+using Ookii.CommandLine.Tests.Commands;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -29,18 +31,15 @@ namespace Ookii.CommandLine.Tests
         public void GetCommandsTest(ProviderKind kind)
         {
             var manager = CreateManager(kind);
-            var commands = manager.GetCommands().ToArray();
-
-            Assert.IsNotNull(commands);
-            Assert.AreEqual(6, commands.Length);
-
-            int index = 0;
-            VerifyCommand(commands[index++], "AnotherSimpleCommand", typeof(AnotherSimpleCommand), false, new[] { "alias" });
-            VerifyCommand(commands[index++], "AsyncCommand", typeof(AsyncCommand));
-            VerifyCommand(commands[index++], "custom", typeof(CustomParsingCommand), true);
-            VerifyCommand(commands[index++], "HiddenCommand", typeof(HiddenCommand));
-            VerifyCommand(commands[index++], "test", typeof(TestCommand));
-            VerifyCommand(commands[index++], "version", null);
+            VerifyCommands(
+                manager.GetCommands(),
+                new("AnotherSimpleCommand", typeof(AnotherSimpleCommand), false, "alias"),
+                new("AsyncCommand", typeof(AsyncCommand)),
+                new("custom", typeof(CustomParsingCommand), true),
+                new("HiddenCommand", typeof(HiddenCommand)),
+                new("test", typeof(TestCommand)),
+                new("version", null)
+            );
         }
 
         [TestMethod]
@@ -330,6 +329,39 @@ namespace Ookii.CommandLine.Tests
             Assert.AreEqual(42, actual);
         }
 
+        [TestMethod]
+        public void TestExplicitAssembly()
+        {
+            // Using the calling assembly explicitly loads all the commands, including internal,
+            // same as the default constructor.
+            var manager = new CommandManager(_commandAssembly);
+            Assert.AreEqual(6, manager.GetCommands().Count());
+
+            manager = new CommandManager(typeof(ExternalCommand).Assembly);
+            VerifyCommands(
+                manager.GetCommands(),
+                new("external", typeof(ExternalCommand)),
+                new("OtherExternalCommand", typeof(OtherExternalCommand)),
+                new("version", null)
+            );
+
+            manager = new CommandManager(new[] { typeof(ExternalCommand).Assembly, _commandAssembly });
+            VerifyCommands(
+                manager.GetCommands(),
+                new("AnotherSimpleCommand", typeof(AnotherSimpleCommand), false, "alias"),
+                new("AsyncCommand", typeof(AsyncCommand)),
+                new("custom", typeof(CustomParsingCommand), true),
+                new("external", typeof(ExternalCommand)),
+                new("HiddenCommand", typeof(HiddenCommand)),
+                new("OtherExternalCommand", typeof(OtherExternalCommand)),
+                new("test", typeof(TestCommand)),
+                new("version", null)
+            );
+        }
+
+        private record struct ExpectedCommand(string Name, Type Type, bool CustomParsing = false, params string[] Aliases);
+
+
         private static void VerifyCommand(CommandInfo command, string name, Type type, bool customParsing = false, string[] aliases = null)
         {
             Assert.AreEqual(name, command.Name);
@@ -342,11 +374,24 @@ namespace Ookii.CommandLine.Tests
             CollectionAssert.AreEqual(aliases ?? Array.Empty<string>(), command.Aliases.ToArray());
         }
 
+        private static void VerifyCommands(IEnumerable<CommandInfo> actual, params ExpectedCommand[] expected)
+        {
+            Assert.AreEqual(expected.Length, actual.Count());
+            var index = 0;
+            foreach (var command in actual)
+            {
+                var info = expected[index];
+                VerifyCommand(command, info.Name, info.Type, info.CustomParsing, info.Aliases);
+                ++index;
+            }
+        }
+
+
         public static CommandManager CreateManager(ProviderKind kind, CommandOptions options = null)
         {
             var manager = kind switch
             {
-                ProviderKind.Reflection => new CommandManager(_commandAssembly, options),
+                ProviderKind.Reflection => new CommandManager(options),
                 ProviderKind.Generated => new GeneratedManager(options),
                 _ => throw new InvalidOperationException()
             };

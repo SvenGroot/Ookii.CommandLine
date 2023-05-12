@@ -15,15 +15,18 @@ internal class ReflectionCommandProvider : CommandProvider
 {
     private readonly Assembly? _assembly;
     private readonly IEnumerable<Assembly>? _assemblies;
+    private readonly Assembly _callingAssembly;
 
-    public ReflectionCommandProvider(Assembly assembly)
+    public ReflectionCommandProvider(Assembly assembly, Assembly callingAssembly)
     {
         _assembly = assembly;
+        _callingAssembly = callingAssembly;
     }
 
-    public ReflectionCommandProvider(IEnumerable<Assembly> assemblies)
+    public ReflectionCommandProvider(IEnumerable<Assembly> assemblies, Assembly callingAssembly)
     {
         _assemblies = assemblies;
+        _callingAssembly = callingAssembly;
         if (_assemblies.Any(a => a == null))
         {
             throw new ArgumentNullException(nameof(assemblies));
@@ -47,6 +50,7 @@ internal class ReflectionCommandProvider : CommandProvider
             }
 
             return from type in types
+                   where type.Assembly == _callingAssembly || type.IsPublic
                    let info = CommandInfo.TryCreate(type, manager)
                    where info != null
                    select info;
