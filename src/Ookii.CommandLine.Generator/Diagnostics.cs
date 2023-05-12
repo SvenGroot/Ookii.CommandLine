@@ -6,37 +6,49 @@ using System.Text;
 
 namespace Ookii.CommandLine.Generator;
 
-// TODO: Help URIs.
 internal static class Diagnostics
 {
     private const string Category = "Ookii.CommandLine";
 
-    public static Diagnostic ArgumentsTypeNotReferenceType(INamedTypeSymbol symbol) => CreateDiagnostic(
+    public static Diagnostic TypeNotReferenceType(INamedTypeSymbol symbol, string attributeName) => CreateDiagnostic(
         "CL0001",
-        nameof(Resources.ArgumentsTypeNotReferenceTypeTitle),
-        nameof(Resources.ArgumentsTypeNotReferenceTypeMessageFormat),
+        nameof(Resources.TypeNotReferenceTypeTitle),
+        nameof(Resources.TypeNotReferenceTypeMessageFormat),
         DiagnosticSeverity.Error,
         symbol.Locations.FirstOrDefault(),
-        symbol.ToDisplayString());
+        symbol.ToDisplayString(),
+        attributeName);
 
-    public static Diagnostic ArgumentsClassNotPartial(INamedTypeSymbol symbol) => CreateDiagnostic(
+    public static Diagnostic ClassNotPartial(INamedTypeSymbol symbol, string attributeName) => CreateDiagnostic(
         "CL0002",
-        nameof(Resources.ArgumentsClassNotPartialTitle),
-        nameof(Resources.ArgumentsClassNotPartialMessageFormat),
+        nameof(Resources.ClassNotPartialTitle),
+        nameof(Resources.ClassNotPartialMessageFormat),
         DiagnosticSeverity.Error,
         symbol.Locations.FirstOrDefault(),
-        symbol.ToDisplayString());
+        symbol.ToDisplayString(),
+        attributeName);
 
-    public static Diagnostic ArgumentsClassIsGeneric(INamedTypeSymbol symbol) => CreateDiagnostic(
+    public static Diagnostic ClassIsGeneric(INamedTypeSymbol symbol, string attributeName) => CreateDiagnostic(
         "CL0003",
-        nameof(Resources.ArgumentsClassIsGenericTitle),
-        nameof(Resources.ArgumentsClassIsGenericMessageFormat),
+        nameof(Resources.ClassIsGenericTitle),
+        nameof(Resources.ClassIsGenericMessageFormat),
         DiagnosticSeverity.Error,
         symbol.Locations.FirstOrDefault(),
-        symbol.ToDisplayString());
+        symbol.ToDisplayString(),
+        attributeName);
+
+    public static Diagnostic ClassIsNested(INamedTypeSymbol symbol, string attributeName) => CreateDiagnostic(
+        "CL0004",
+        nameof(Resources.ClassIsNestedTitle),
+        nameof(Resources.ClassIsNestedMessageFormat),
+        DiagnosticSeverity.Error,
+        symbol.Locations.FirstOrDefault(),
+        symbol.ToDisplayString(),
+        attributeName);
+
 
     public static Diagnostic InvalidArrayRank(IPropertySymbol property) => CreateDiagnostic(
-        "CL0004",
+        "CL0005",
         nameof(Resources.InvalidArrayRankTitle),
         nameof(Resources.InvalidArrayRankMessageFormat),
         DiagnosticSeverity.Error,
@@ -45,15 +57,16 @@ internal static class Diagnostics
         property.Name);
 
     public static Diagnostic PropertyIsReadOnly(IPropertySymbol property) => CreateDiagnostic(
-        "CL0005",
+        "CL0006",
         nameof(Resources.PropertyIsReadOnlyTitle),
         nameof(Resources.PropertyIsReadOnlyMessageFormat),
         DiagnosticSeverity.Error,
         property.Locations.FirstOrDefault(),
-        property.ContainingType?.ToDisplayString(), property.Name);
+        property.ContainingType?.ToDisplayString(),
+        property.Name);
 
     public static Diagnostic NoConverter(ISymbol member, ITypeSymbol elementType) => CreateDiagnostic(
-        "CL0006",
+        "CL0007",
         nameof(Resources.NoConverterTitle),
         nameof(Resources.NoConverterMessageFormat),
         DiagnosticSeverity.Error,
@@ -63,7 +76,7 @@ internal static class Diagnostics
         member.Name);
 
     public static Diagnostic InvalidMethodSignature(ISymbol method) => CreateDiagnostic(
-        "CL0007",
+        "CL0008",
         nameof(Resources.InvalidMethodSignatureTitle),
         nameof(Resources.InvalidMethodSignatureMessageFormat),
         DiagnosticSeverity.Error,
@@ -71,21 +84,14 @@ internal static class Diagnostics
         method.ContainingType?.ToDisplayString(),
         method.Name);
 
-    public static Diagnostic ArgumentsClassIsNested(INamedTypeSymbol symbol) => CreateDiagnostic(
-        "CL0008",
-        nameof(Resources.ArgumentsClassIsNestedTitle),
-        nameof(Resources.ArgumentsClassIsNestedMessageFormat),
-        DiagnosticSeverity.Error,
-        symbol.Locations.FirstOrDefault(),
-        symbol.ToDisplayString());
-
     public static Diagnostic NonRequiredInitOnlyProperty(IPropertySymbol property) => CreateDiagnostic(
         "CL0009",
         nameof(Resources.NonRequiredInitOnlyPropertyTitle),
         nameof(Resources.NonRequiredInitOnlyPropertyMessageFormat),
         DiagnosticSeverity.Error,
         property.Locations.FirstOrDefault(),
-        property.ContainingType?.ToDisplayString(), property.Name);
+        property.ContainingType?.ToDisplayString(),
+        property.Name);
 
     public static Diagnostic GeneratedCustomParsingCommand(INamedTypeSymbol symbol) => CreateDiagnostic(
         "CL0010",
@@ -128,6 +134,14 @@ internal static class Diagnostics
         DiagnosticSeverity.Error,
         symbol.Locations.FirstOrDefault(),
         name);
+
+    public static Diagnostic ArgumentConverterStringNotSupported(ISymbol symbol) => CreateDiagnostic(
+        "CL0015",
+        nameof(Resources.ArgumentConverterStringNotSupportedTitle),
+        nameof(Resources.ArgumentConverterStringNotSupportedMessageFormat),
+        DiagnosticSeverity.Error,
+        symbol.Locations.FirstOrDefault(),
+        symbol.ToDisplayString());
 
     public static Diagnostic IgnoredAttribute(AttributeData attribute) => CreateDiagnostic(
         "CLW0001",

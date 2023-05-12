@@ -123,29 +123,29 @@
   <data name="AliasWithoutLongNameTitle" xml:space="preserve">
     <value>The AliasAttribute is ignored on an argument with no long name.</value>
   </data>
-  <data name="ArgumentsClassIsGenericMessageFormat" xml:space="preserve">
-    <value>The command line arguments class {0} may not be a generic class when the GeneratedParserAttribute is used.</value>
+  <data name="ArgumentConverterStringNotSupportedMessageFormat" xml:space="preserve">
+    <value>The command line argument defined by {0} uses the ArgumentConverterAttribute with a string argument, which is not supported by the GeneratedParserAttribute. Use a Type argument instead by using the typeof keyword.</value>
   </data>
-  <data name="ArgumentsClassIsGenericTitle" xml:space="preserve">
-    <value>The command line arguments class may not be a generic type.</value>
+  <data name="ArgumentConverterStringNotSupportedTitle" xml:space="preserve">
+    <value>The ArgumentConverterAttribute must use the typeof keyword.</value>
   </data>
-  <data name="ArgumentsClassIsNestedMessageFormat" xml:space="preserve">
-    <value>The command line arguments class {0} may not be nested in another type when the GeneratedParserAttribute is used.</value>
+  <data name="ClassIsGenericMessageFormat" xml:space="preserve">
+    <value>The class {0} may not be a generic class when the {1} attribute is used.</value>
   </data>
-  <data name="ArgumentsClassIsNestedTitle" xml:space="preserve">
-    <value>The command line arguments class may not be a nested type.</value>
+  <data name="ClassIsGenericTitle" xml:space="preserve">
+    <value>Th eclass may not be a generic type.</value>
   </data>
-  <data name="ArgumentsClassNotPartialMessageFormat" xml:space="preserve">
-    <value>The command line arguments class {0} must use the 'partial' modifier.</value>
+  <data name="ClassIsNestedMessageFormat" xml:space="preserve">
+    <value>The class {0} may not be nested in another type when the {1} attribute is used.</value>
   </data>
-  <data name="ArgumentsClassNotPartialTitle" xml:space="preserve">
-    <value>The command line arguments class must be a partial class.</value>
+  <data name="ClassIsNestedTitle" xml:space="preserve">
+    <value>The class may not be a nested type.</value>
   </data>
-  <data name="ArgumentsTypeNotReferenceTypeMessageFormat" xml:space="preserve">
-    <value>The command line arguments type {0} must be a reference type (class).</value>
+  <data name="ClassNotPartialMessageFormat" xml:space="preserve">
+    <value>The class {0} must use the 'partial' modifier when the {1} attribute is used.</value>
   </data>
-  <data name="ArgumentsTypeNotReferenceTypeTitle" xml:space="preserve">
-    <value>The command line arguments type must be a reference type.</value>
+  <data name="ClassNotPartialTitle" xml:space="preserve">
+    <value>The class must be a partial class.</value>
   </data>
   <data name="CommandAttributeWithoutInterfaceMessageFormat" xml:space="preserve">
     <value>The command line arguments class {0} has the CommandAttribute but does not implement the ICommand interface.</value>
@@ -260,6 +260,12 @@
   </data>
   <data name="ShortAliasWithoutShortNameTitle" xml:space="preserve">
     <value>The ShortAliasAttribute is ignored on an argument with no short name.</value>
+  </data>
+  <data name="TypeNotReferenceTypeMessageFormat" xml:space="preserve">
+    <value>The type {0} must be a reference type (class) when the {1} attribute is used.</value>
+  </data>
+  <data name="TypeNotReferenceTypeTitle" xml:space="preserve">
+    <value>The command line arguments type must be a reference type.</value>
   </data>
   <data name="UnknownAssemblyNameMessageFormat" xml:space="preserve">
     <value>An assembly matching the name '{0}' was not found.</value>

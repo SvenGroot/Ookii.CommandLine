@@ -71,28 +71,31 @@ public class ParserIncrementalGenerator : IIncrementalGenerator
                 continue;
             }
 
-            // TODO: Custom messages for provider types.
+            var attributeName = info.ClassKind == ClassKind.CommandManager
+                ? typeHelper.GeneratedCommandManagerAttribute!.Name
+                : typeHelper.GeneratedParserAttribute!.Name;
+
             if (!symbol.IsReferenceType)
             {
-                context.ReportDiagnostic(Diagnostics.ArgumentsTypeNotReferenceType(symbol));
+                context.ReportDiagnostic(Diagnostics.TypeNotReferenceType(symbol, attributeName));
                 continue;
             }
 
             if (!syntax.Modifiers.Any(m => m.IsKind(SyntaxKind.PartialKeyword)))
             {
-                context.ReportDiagnostic(Diagnostics.ArgumentsClassNotPartial(symbol));
+                context.ReportDiagnostic(Diagnostics.ClassNotPartial(symbol, attributeName));
                 continue;
             }
 
             if (symbol.IsGenericType)
             {
-                context.ReportDiagnostic(Diagnostics.ArgumentsClassIsGeneric(symbol));
+                context.ReportDiagnostic(Diagnostics.ClassIsGeneric(symbol, attributeName));
                 continue;
             }
 
             if (symbol.ContainingType != null)
             {
-                context.ReportDiagnostic(Diagnostics.ArgumentsClassIsNested(symbol));
+                context.ReportDiagnostic(Diagnostics.ClassIsNested(symbol, attributeName));
                 continue;
             }
 

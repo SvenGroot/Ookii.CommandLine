@@ -320,14 +320,14 @@ internal class ParserGenerator
                 valueType = rawValueType.WithNullableAnnotation(NullableAnnotation.NotAnnotated);
                 if (attributes.Converter == null)
                 {
-                    var keyConverter = DetermineConverter(keyType.GetUnderlyingType(), attributes.KeyConverter, keyType.IsNullableValueType());
+                    var keyConverter = DetermineConverter(member, keyType.GetUnderlyingType(), attributes.KeyConverter, keyType.IsNullableValueType());
                     if (keyConverter == null)
                     {
                         _context.ReportDiagnostic(Diagnostics.NoConverter(member, keyType.GetUnderlyingType()));
                         return;
                     }
 
-                    var valueConverter = DetermineConverter(valueType.GetUnderlyingType(), attributes.ValueConverter, valueType.IsNullableValueType());
+                    var valueConverter = DetermineConverter(member, valueType.GetUnderlyingType(), attributes.ValueConverter, valueType.IsNullableValueType());
                     if (valueConverter == null)
                     {
                         _context.ReportDiagnostic(Diagnostics.NoConverter(member, keyType.GetUnderlyingType()));
@@ -370,7 +370,7 @@ internal class ParserGenerator
         }
 
         var elementType = namedElementTypeWithNullable?.GetUnderlyingType() ?? elementTypeWithNullable;
-        converter ??= DetermineConverter(elementType, attributes.Converter, elementTypeWithNullable.IsNullableValueType());
+        converter ??= DetermineConverter(member, elementType, attributes.Converter, elementTypeWithNullable.IsNullableValueType());
         if (converter == null)
         {
             _context.ReportDiagnostic(Diagnostics.NoConverter(member, elementType));
@@ -582,9 +582,9 @@ internal class ParserGenerator
         return null;
     }
 
-    public string? DetermineConverter(ITypeSymbol elementType, AttributeData? converterAttribute, bool isNullableValueType)
+    public string? DetermineConverter(ISymbol member, ITypeSymbol elementType, AttributeData? converterAttribute, bool isNullableValueType)
     {
-        var converter = DetermineElementConverter(elementType, converterAttribute);
+        var converter = DetermineElementConverter(member, elementType, converterAttribute);
         if (converter != null && isNullableValueType)
         {
             converter = $"new Ookii.CommandLine.Conversion.NullableConverter({converter})";
@@ -593,15 +593,15 @@ internal class ParserGenerator
         return converter;
     }
 
-    public string? DetermineElementConverter(ITypeSymbol elementType, AttributeData? converterAttribute)
+    public string? DetermineElementConverter(ISymbol member, ITypeSymbol elementType, AttributeData? converterAttribute)
     {
         if (converterAttribute != null)
         {
             var argument = converterAttribute.ConstructorArguments[0];
             if (argument.Kind != TypedConstantKind.Type)
             {
-                // TODO: Either support this or emit error.
-                throw new NotSupportedException();
+                _context.ReportDiagnostic(Diagnostics.ArgumentConverterStringNotSupported(member));
+                return null;
             }
 
             var converterType = (INamedTypeSymbol)argument.Value!;

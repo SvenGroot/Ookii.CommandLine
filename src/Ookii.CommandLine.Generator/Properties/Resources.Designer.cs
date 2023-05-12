@@ -79,74 +79,74 @@ namespace Ookii.CommandLine.Generator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The command line arguments class {0} may not be a generic class when the GeneratedParserAttribute is used..
+        ///   Looks up a localized string similar to The command line argument defined by {0} uses the ArgumentConverterAttribute with a string argument, which is not supported by the GeneratedParserAttribute. Use a Type argument instead by using the typeof keyword..
         /// </summary>
-        internal static string ArgumentsClassIsGenericMessageFormat {
+        internal static string ArgumentConverterStringNotSupportedMessageFormat {
             get {
-                return ResourceManager.GetString("ArgumentsClassIsGenericMessageFormat", resourceCulture);
+                return ResourceManager.GetString("ArgumentConverterStringNotSupportedMessageFormat", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The command line arguments class may not be a generic type..
+        ///   Looks up a localized string similar to The ArgumentConverterAttribute must use the typeof keyword..
         /// </summary>
-        internal static string ArgumentsClassIsGenericTitle {
+        internal static string ArgumentConverterStringNotSupportedTitle {
             get {
-                return ResourceManager.GetString("ArgumentsClassIsGenericTitle", resourceCulture);
+                return ResourceManager.GetString("ArgumentConverterStringNotSupportedTitle", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The command line arguments class {0} may not be nested in another type when the GeneratedParserAttribute is used..
+        ///   Looks up a localized string similar to The class {0} may not be a generic class when the {1} attribute is used..
         /// </summary>
-        internal static string ArgumentsClassIsNestedMessageFormat {
+        internal static string ClassIsGenericMessageFormat {
             get {
-                return ResourceManager.GetString("ArgumentsClassIsNestedMessageFormat", resourceCulture);
+                return ResourceManager.GetString("ClassIsGenericMessageFormat", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The command line arguments class may not be a nested type..
+        ///   Looks up a localized string similar to Th eclass may not be a generic type..
         /// </summary>
-        internal static string ArgumentsClassIsNestedTitle {
+        internal static string ClassIsGenericTitle {
             get {
-                return ResourceManager.GetString("ArgumentsClassIsNestedTitle", resourceCulture);
+                return ResourceManager.GetString("ClassIsGenericTitle", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The command line arguments class {0} must use the &apos;partial&apos; modifier..
+        ///   Looks up a localized string similar to The class {0} may not be nested in another type when the {1} attribute is used..
         /// </summary>
-        internal static string ArgumentsClassNotPartialMessageFormat {
+        internal static string ClassIsNestedMessageFormat {
             get {
-                return ResourceManager.GetString("ArgumentsClassNotPartialMessageFormat", resourceCulture);
+                return ResourceManager.GetString("ClassIsNestedMessageFormat", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The command line arguments class must be a partial class..
+        ///   Looks up a localized string similar to The class may not be a nested type..
         /// </summary>
-        internal static string ArgumentsClassNotPartialTitle {
+        internal static string ClassIsNestedTitle {
             get {
-                return ResourceManager.GetString("ArgumentsClassNotPartialTitle", resourceCulture);
+                return ResourceManager.GetString("ClassIsNestedTitle", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The command line arguments type {0} must be a reference type (class)..
+        ///   Looks up a localized string similar to The class {0} must use the &apos;partial&apos; modifier when the {1} attribute is used..
         /// </summary>
-        internal static string ArgumentsTypeNotReferenceTypeMessageFormat {
+        internal static string ClassNotPartialMessageFormat {
             get {
-                return ResourceManager.GetString("ArgumentsTypeNotReferenceTypeMessageFormat", resourceCulture);
+                return ResourceManager.GetString("ClassNotPartialMessageFormat", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The command line arguments type must be a reference type..
+        ///   Looks up a localized string similar to The class must be a partial class..
         /// </summary>
-        internal static string ArgumentsTypeNotReferenceTypeTitle {
+        internal static string ClassNotPartialTitle {
             get {
-                return ResourceManager.GetString("ArgumentsTypeNotReferenceTypeTitle", resourceCulture);
+                return ResourceManager.GetString("ClassNotPartialTitle", resourceCulture);
             }
         }
         
@@ -489,6 +489,24 @@ namespace Ookii.CommandLine.Generator.Properties {
         internal static string ShortAliasWithoutShortNameTitle {
             get {
                 return ResourceManager.GetString("ShortAliasWithoutShortNameTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The type {0} must be a reference type (class) when the {1} attribute is used..
+        /// </summary>
+        internal static string TypeNotReferenceTypeMessageFormat {
+            get {
+                return ResourceManager.GetString("TypeNotReferenceTypeMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The command line arguments type must be a reference type..
+        /// </summary>
+        internal static string TypeNotReferenceTypeTitle {
+            get {
+                return ResourceManager.GetString("TypeNotReferenceTypeTitle", resourceCulture);
             }
         }
         
