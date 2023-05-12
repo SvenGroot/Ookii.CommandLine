@@ -42,7 +42,6 @@ internal class ConverterGenerator
 
     #endregion
 
-    // TODO: Customizable or random namespace?
     private const string DefaultGeneratedNamespace = "Ookii.CommandLine.Conversion.Generated";
     private const string ConverterSuffix = "Converter";
     private readonly INamedTypeSymbol? _readOnlySpanType;
@@ -180,7 +179,6 @@ internal class ConverterGenerator
 
     private static void CreateConverter(SourceBuilder builder, ITypeSymbol type, ConverterInfo info)
     {
-        // TODO: Handle exceptions similar to reflection versions.
         builder.AppendLine($"internal class {info.Name} : Ookii.CommandLine.Conversion.ArgumentConverter");
         builder.OpenBlock();
         string inputType = info.UseSpan ? "System.ReadOnlySpan<char>" : "string";

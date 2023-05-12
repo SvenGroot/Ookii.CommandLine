@@ -3,6 +3,7 @@ using Ookii.CommandLine.Validation;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -18,13 +19,17 @@ public class GeneratedArgument : CommandLineArgument
     private readonly Action<object, object?>? _setProperty;
     private readonly Func<object, object?>? _getProperty;
     private readonly Func<object?, CommandLineParser, bool>? _callMethod;
+    private readonly string _defaultValueDescription;
+    private readonly string? _defaultKeyDescription;
 
     private GeneratedArgument(ArgumentInfo info, Action<object, object?>? setProperty, Func<object, object?>? getProperty,
-        Func<object?, CommandLineParser, bool>? callMethod) : base(info)
+        Func<object?, CommandLineParser, bool>? callMethod, string defaultValueDescription, string? defaultKeyDescription) : base(info)
     {
         _setProperty = setProperty;
         _getProperty = getProperty;
         _callMethod = callMethod;
+        _defaultValueDescription = defaultValueDescription;
+        _defaultKeyDescription = defaultKeyDescription;
     }
 
     /// <summary>
@@ -41,6 +46,8 @@ public class GeneratedArgument : CommandLineArgument
     /// <param name="keyType"></param>
     /// <param name="valueType"></param>
     /// <param name="allowsNull"></param>
+    /// <param name="defaultValueDescription"></param>
+    /// <param name="defaultKeyDescription"></param>
     /// <param name="requiredProperty"></param>
     /// <param name="multiValueSeparatorAttribute"></param>
     /// <param name="descriptionAttribute"></param>
@@ -63,6 +70,8 @@ public class GeneratedArgument : CommandLineArgument
                                            ArgumentKind kind,
                                            ArgumentConverter converter,
                                            bool allowsNull,
+                                           string defaultValueDescription,
+                                           string? defaultKeyDescription = null,
                                            bool requiredProperty = false,
                                            Type? keyType = null,
                                            Type? valueType = null,
@@ -93,7 +102,7 @@ public class GeneratedArgument : CommandLineArgument
             info.ValueType = valueType;
         }
 
-        return new GeneratedArgument(info, setProperty, getProperty, callMethod);
+        return new GeneratedArgument(info, setProperty, getProperty, callMethod, defaultValueDescription, defaultKeyDescription);
     }
 
     /// <inheritdoc/>
@@ -130,5 +139,17 @@ public class GeneratedArgument : CommandLineArgument
         }
 
         _setProperty(target, value);
+    }
+
+    /// <inheritdoc/>
+    protected override string DetermineValueDescriptionForType(Type type)
+    {
+        Debug.Assert(type  == KeyType || type == ValueType || (ValueType == null && type == ElementType));
+        if (KeyType != null && type == KeyType)
+        {
+            return _defaultKeyDescription!;
+        }
+
+        return _defaultValueDescription;
     }
 }

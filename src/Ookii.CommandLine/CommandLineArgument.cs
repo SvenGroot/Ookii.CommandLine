@@ -597,7 +597,30 @@ public abstract class CommandLineArgument
     /// the type <c>T</c>; otherwise, the same value as the <see cref="ArgumentType"/>
     /// property.
     /// </value>
+    /// <remarks>
+    /// <para>
+    ///   For a dictionary argument, the element type is <see cref="KeyValuePair{TKey, TValue}"/>.
+    /// </para>
+    /// </remarks>
     public Type ElementType => _elementType;
+
+    /// <summary>
+    /// Gets the type of the keys of a dictionary argument.
+    /// </summary>
+    /// <value>
+    /// The type of the keys in the dictionary, or <see langword="null"/> if <see cref="IsDictionary"/>
+    /// is <see langword="false"/>.
+    /// </value>
+    public Type? KeyType => _keyType;
+
+    /// <summary>
+    /// Gets the type of the values of a dictionary argument.
+    /// </summary>
+    /// <value>
+    /// The type of the values in the dictionary, or <see langword="null"/> if
+    /// <see cref="IsDictionary"/> is <see langword="false"/>.
+    /// </value>
+    public Type? ValueType => _valueType;
 
     /// <summary>
     /// Gets the position of this argument.
@@ -1178,35 +1201,11 @@ public abstract class CommandLineArgument
     /// Determines the value description if one wasn't explicitly given.
     /// </summary>
     /// <param name="type">
-    /// The type to get the description for, or null to use the value of the <see cref="ElementType"/>
-    /// property.
+    /// The type to get the description for.
     /// </param>
     /// <returns>The value description.</returns>
-    /// <remarks>
-    /// <para>
-    ///   This method is responsible for applying the <see cref="ParseOptions.ValueDescriptionTransform"/>,
-    ///   if one is specified.
-    /// </para>
-    /// </remarks>
-    protected virtual string DetermineValueDescription(Type? type = null)
-    {
-        if (Kind == ArgumentKind.Dictionary && type == null)
-        {
-            var key = DetermineValueDescription(_keyType!.GetUnderlyingType());
-            var value = DetermineValueDescription(_valueType!.GetUnderlyingType());
-            return $"{key}{KeyValueSeparator}{value}";
-        }
-
-        var result = GetDefaultValueDescription(type);
-        if (result != null)
-        {
-            return result;
-        }
-
-        var typeName = GetFriendlyTypeName(type ?? ElementType);
-        return Parser.Options.ValueDescriptionTransform?.Apply(typeName) ?? typeName;
-    }
-
+    protected virtual string DetermineValueDescriptionForType(Type type) => GetFriendlyTypeName(type);
+    
     internal static ArgumentInfo CreateArgumentInfo(CommandLineParser parser,
                                                     Type argumentType,
                                                     bool allowsNull,
@@ -1250,6 +1249,25 @@ public abstract class CommandLineArgument
             IsHidden = attribute.IsHidden,
             Validators = validationAttributes ?? Enumerable.Empty<ArgumentValidationAttribute>(),
         };
+    }
+
+    private string DetermineValueDescription(Type? type = null)
+    {
+        var result = GetDefaultValueDescription(type);
+        if (result != null)
+        {
+            return result;
+        }
+
+        if (Kind == ArgumentKind.Dictionary && type == null)
+        {
+            var key = DetermineValueDescription(_keyType!.GetUnderlyingType());
+            var value = DetermineValueDescription(_valueType!.GetUnderlyingType());
+            return $"{key}{KeyValueSeparator}{value}";
+        }
+
+        var typeName = DetermineValueDescriptionForType(type ?? ElementType);
+        return Parser.Options.ValueDescriptionTransform?.Apply(typeName) ?? typeName;
     }
 
     private static string GetFriendlyTypeName(Type type)

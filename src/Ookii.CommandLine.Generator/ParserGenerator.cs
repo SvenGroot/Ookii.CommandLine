@@ -64,7 +64,6 @@ internal class ParserGenerator
         // DescriptionAttribute that gets the description from a resource.
         var attributes = new ArgumentsClassAttributes(_argumentsClass, _typeHelper, _context);
 
-        // TODO: Warn if AliasAttribute without CommandAttribute.
         var isCommand = false;
         if (attributes.Command != null)
         {
@@ -378,8 +377,6 @@ internal class ParserGenerator
             return;
         }
 
-        // TODO: Default value description. Can make DetermineValueDescription abstract and move
-        // to ReflectionArgument when done.
         // The leading commas are not a formatting I like but it does make things easier here.
         _builder.AppendLine($"yield return Ookii.CommandLine.Support.GeneratedArgument.Create(");
         _builder.IncreaseIndent();
@@ -392,14 +389,21 @@ internal class ParserGenerator
         _builder.AppendLine($", attribute: {attributes.CommandLineArgument.CreateInstantiation()}");
         _builder.AppendLine($", converter: {converter}");
         _builder.AppendLine($", allowsNull: {(allowsNull.ToCSharpString())}");
+        var valueDescriptionFormat = new SymbolDisplayFormat(genericsOptions: SymbolDisplayGenericsOptions.IncludeTypeParameters);
         if (keyType != null)
         {
             _builder.AppendLine($", keyType: typeof({keyType.ToDisplayString()})");
+            _builder.AppendLine($", defaultKeyDescription: \"{keyType.ToDisplayString(valueDescriptionFormat)}\"");
         }
 
         if (valueType != null)
         {
             _builder.AppendLine($", valueType: typeof({valueType.ToDisplayString()})");
+            _builder.AppendLine($", defaultValueDescription: \"{valueType.ToDisplayString(valueDescriptionFormat)}\"");
+        }
+        else
+        {
+            _builder.AppendLine($", defaultValueDescription: \"{elementType.ToDisplayString(valueDescriptionFormat)}\"");
         }
 
         AppendOptionalAttribute(attributes.MultiValueSeparator, "multiValueSeparatorAttribute");
