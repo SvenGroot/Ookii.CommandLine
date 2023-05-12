@@ -250,6 +250,33 @@ internal static class Diagnostics
         attribute.ApplicationSyntaxReference?.SyntaxTree.GetLocation(attribute.ApplicationSyntaxReference.Span),
         ns);
 
+    public static Diagnostic IgnoredAttributeForNonDictionary(ISymbol member, AttributeData attribute) => CreateDiagnostic(
+        "CLW0011",
+        nameof(Resources.IgnoredAttributeForNonDictionaryTitle),
+        nameof(Resources.IgnoredAttributeForNonDictionaryMessageFormat),
+        DiagnosticSeverity.Warning,
+        attribute.ApplicationSyntaxReference?.SyntaxTree.GetLocation(attribute.ApplicationSyntaxReference.Span),
+        attribute.AttributeClass?.Name,
+        member.ToDisplayString());
+
+    public static Diagnostic IgnoredAttributeForDictionaryWithConverter(ISymbol member, AttributeData attribute) => CreateDiagnostic(
+        "CLW0012",
+        nameof(Resources.IgnoredAttributeForDictionaryWithConverterTitle),
+        nameof(Resources.IgnoredAttributeForDictionaryWithConverterMessageFormat),
+        DiagnosticSeverity.Warning,
+        attribute.ApplicationSyntaxReference?.SyntaxTree.GetLocation(attribute.ApplicationSyntaxReference.Span),
+        attribute.AttributeClass?.Name,
+        member.ToDisplayString());
+
+    public static Diagnostic IgnoredAttributeForNonMultiValue(ISymbol member, AttributeData attribute) => CreateDiagnostic(
+        "CLW0013",
+        nameof(Resources.IgnoredAttributeForNonMultiValueTitle),
+        nameof(Resources.IgnoredAttributeForNonMultiValueMessageFormat),
+        DiagnosticSeverity.Warning,
+        attribute.ApplicationSyntaxReference?.SyntaxTree.GetLocation(attribute.ApplicationSyntaxReference.Span),
+        attribute.AttributeClass?.Name,
+        member.ToDisplayString());
+
     private static Diagnostic CreateDiagnostic(string id, string titleResource, string messageResource, DiagnosticSeverity severity, Location? location, params object?[]? messageArgs)
         => Diagnostic.Create(
             new DiagnosticDescriptor(

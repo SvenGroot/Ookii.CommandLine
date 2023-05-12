@@ -295,6 +295,7 @@ internal class ParserGenerator
         }
 
         var isMultiValue = false;
+        var isDictionary = false;
         var isRequired = argumentInfo.IsRequired;
         var kind = "Ookii.CommandLine.ArgumentKind.SingleValue";
         string? converter = null;
@@ -311,6 +312,7 @@ internal class ParserGenerator
                 Debug.Assert(multiValueElementType != null);
                 kind = "Ookii.CommandLine.ArgumentKind.Dictionary";
                 isMultiValue = true;
+                isDictionary = true;
                 elementTypeWithNullable = multiValueElementType!;
                 // KeyValuePair is guaranteed a named type.
                 namedElementTypeWithNullable = (INamedTypeSymbol)elementTypeWithNullable;
@@ -520,6 +522,14 @@ internal class ParserGenerator
         if (argumentInfo.IsHidden && argumentInfo.Position != null)
         {
             _context.ReportDiagnostic(Diagnostics.IsHiddenWithPositional(member));
+        }
+
+        CheckIgnoredDictionaryAttribute(member, isDictionary, attributes.Converter, attributes.KeyConverter);
+        CheckIgnoredDictionaryAttribute(member, isDictionary, attributes.Converter, attributes.ValueConverter);
+        CheckIgnoredDictionaryAttribute(member, isDictionary, attributes.Converter, attributes.KeyValueSeparator);
+        if (!isMultiValue && attributes.MultiValueSeparator != null)
+        {
+            _context.ReportDiagnostic(Diagnostics.IgnoredAttributeForNonMultiValue(member, attributes.MultiValueSeparator));
         }
     }
 
@@ -739,5 +749,22 @@ internal class ParserGenerator
         }
 
         return result;
+    }
+
+    private void CheckIgnoredDictionaryAttribute(ISymbol member, bool isDictionary, AttributeData? converter, AttributeData? attribute)
+    {
+        if (attribute == null)
+        { 
+            return; 
+        }
+
+        if (!isDictionary)
+        {
+            _context.ReportDiagnostic(Diagnostics.IgnoredAttributeForNonDictionary(member, attribute));
+        }
+        else if (converter != null)
+        {
+            _context.ReportDiagnostic(Diagnostics.IgnoredAttributeForDictionaryWithConverter(member, attribute));
+        }
     }
 }

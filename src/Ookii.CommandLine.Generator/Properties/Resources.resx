@@ -133,7 +133,7 @@
     <value>The class {0} may not be a generic class when the {1} attribute is used.</value>
   </data>
   <data name="ClassIsGenericTitle" xml:space="preserve">
-    <value>Th eclass may not be a generic type.</value>
+    <value>The class may not be a generic type.</value>
   </data>
   <data name="ClassIsNestedMessageFormat" xml:space="preserve">
     <value>The class {0} may not be nested in another type when the {1} attribute is used.</value>
@@ -176,6 +176,24 @@
   </data>
   <data name="GeneratedCustomParsingCommandTitle" xml:space="preserve">
     <value>The GeneratedParserAttribute cannot be used with a class that implements the ICommandWithCustomParsing interface.</value>
+  </data>
+  <data name="IgnoredAttributeForDictionaryWithConverterMessageFormat" xml:space="preserve">
+    <value>The {0} attribute is ignored for the dictionary argument defined by {1} that has the ArgumentConverterAttribute attribute.</value>
+  </data>
+  <data name="IgnoredAttributeForDictionaryWithConverterTitle" xml:space="preserve">
+    <value>The attribute is not used for a dictionary argument that has the ArgumentConverterAttribute attribute.</value>
+  </data>
+  <data name="IgnoredAttributeForNonDictionaryMessageFormat" xml:space="preserve">
+    <value>The {0} attribute is ignored for the non-dictionary argument defined by {1}.</value>
+  </data>
+  <data name="IgnoredAttributeForNonDictionaryTitle" xml:space="preserve">
+    <value>The attribute is not used for a non-dictionary argument.</value>
+  </data>
+  <data name="IgnoredAttributeForNonMultiValueMessageFormat" xml:space="preserve">
+    <value>The {0} attribute is ignored for the non-multi-value argument defined by {1}.</value>
+  </data>
+  <data name="IgnoredAttributeForNonMultiValueTitle" xml:space="preserve">
+    <value>The attribute is not used for a non-dictionary argument.</value>
   </data>
   <data name="InvalidArrayRankMessageFormat" xml:space="preserve">
     <value>The multi-value command line argument defined by {0}.{1} must have an array rank of one.</value>
@@ -260,6 +278,9 @@
   </data>
   <data name="ShortAliasWithoutShortNameTitle" xml:space="preserve">
     <value>The ShortAliasAttribute is ignored on an argument with no short name.</value>
+  </data>
+  <data name="String1" xml:space="preserve">
+    <value />
   </data>
   <data name="TypeNotReferenceTypeMessageFormat" xml:space="preserve">
     <value>The type {0} must be a reference type (class) when the {1} attribute is used.</value>

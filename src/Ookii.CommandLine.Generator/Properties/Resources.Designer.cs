@@ -106,7 +106,7 @@ namespace Ookii.CommandLine.Generator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Th eclass may not be a generic type..
+        ///   Looks up a localized string similar to The class may not be a generic type..
         /// </summary>
         internal static string ClassIsGenericTitle {
             get {
@@ -237,6 +237,60 @@ namespace Ookii.CommandLine.Generator.Properties {
         internal static string GeneratedCustomParsingCommandTitle {
             get {
                 return ResourceManager.GetString("GeneratedCustomParsingCommandTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The {0} attribute is ignored for the dictionary argument defined by {1} that has the ArgumentConverterAttribute attribute..
+        /// </summary>
+        internal static string IgnoredAttributeForDictionaryWithConverterMessageFormat {
+            get {
+                return ResourceManager.GetString("IgnoredAttributeForDictionaryWithConverterMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The attribute is not used for a dictionary argument that has the ArgumentConverterAttribute attribute..
+        /// </summary>
+        internal static string IgnoredAttributeForDictionaryWithConverterTitle {
+            get {
+                return ResourceManager.GetString("IgnoredAttributeForDictionaryWithConverterTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The {0} attribute is ignored for the non-dictionary argument defined by {1}..
+        /// </summary>
+        internal static string IgnoredAttributeForNonDictionaryMessageFormat {
+            get {
+                return ResourceManager.GetString("IgnoredAttributeForNonDictionaryMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The attribute is not used for a non-dictionary argument..
+        /// </summary>
+        internal static string IgnoredAttributeForNonDictionaryTitle {
+            get {
+                return ResourceManager.GetString("IgnoredAttributeForNonDictionaryTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The {0} attribute is ignored for the non-multi-value argument defined by {1}..
+        /// </summary>
+        internal static string IgnoredAttributeForNonMultiValueMessageFormat {
+            get {
+                return ResourceManager.GetString("IgnoredAttributeForNonMultiValueMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The attribute is not used for a non-dictionary argument..
+        /// </summary>
+        internal static string IgnoredAttributeForNonMultiValueTitle {
+            get {
+                return ResourceManager.GetString("IgnoredAttributeForNonMultiValueTitle", resourceCulture);
             }
         }
         
@@ -489,6 +543,15 @@ namespace Ookii.CommandLine.Generator.Properties {
         internal static string ShortAliasWithoutShortNameTitle {
             get {
                 return ResourceManager.GetString("ShortAliasWithoutShortNameTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string String1 {
+            get {
+                return ResourceManager.GetString("String1", resourceCulture);
             }
         }
         
