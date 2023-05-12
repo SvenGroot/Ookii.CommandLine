@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFrameworks>net7.0;net6.0;net48</TargetFrameworks>
@@ -8,6 +8,8 @@
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>ookii.snk</AssemblyOriginatorKeyFile>
     <DelaySign>false</DelaySign>
+    <!-- Explicit version so the tests don't need to be updated when the version number changes -->
+    <VersionPrefix>1.0.0</VersionPrefix>
   </PropertyGroup>
 
   <ItemGroup>

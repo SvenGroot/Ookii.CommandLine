@@ -113,6 +113,22 @@ internal static class Diagnostics
         symbol.ToDisplayString(),
         other);
 
+    public static Diagnostic InvalidAssemblyName(ISymbol symbol, string name) => CreateDiagnostic(
+        "CL0013",
+        nameof(Resources.InvalidAssemblyNameTitle),
+        nameof(Resources.InvalidAssemblyNameMessageFormat),
+        DiagnosticSeverity.Error,
+        symbol.Locations.FirstOrDefault(),
+        name);
+
+    public static Diagnostic UnknownAssemblyName(ISymbol symbol, string name) => CreateDiagnostic(
+        "CL0014",
+        nameof(Resources.UnknownAssemblyNameTitle),
+        nameof(Resources.UnknownAssemblyNameMessageFormat),
+        DiagnosticSeverity.Error,
+        symbol.Locations.FirstOrDefault(),
+        name);
+
     public static Diagnostic IgnoredAttribute(AttributeData attribute) => CreateDiagnostic(
         "CLW0001",
         nameof(Resources.UnknownAttributeTitle),

@@ -8,6 +8,14 @@ namespace Ookii.CommandLine.Tests;
 [GeneratedCommandManager]
 partial class GeneratedManager { }
 
+[GeneratedCommandManager(AssemblyNames = new[] { "Ookii.CommandLine.Tests.Commands" })]
+partial class GeneratedManagerWithExplicitAssembly { }
+
+// Also tests using identity instead of name.
+[GeneratedCommandManager(AssemblyNames = new[] { "Ookii.CommandLine.Tests", "Ookii.CommandLine.Tests.Commands, Version=1.0.0.0, Culture=neutral, PublicKeyToken=0c15020868fd6249" })]
+partial class GeneratedManagerWithMultipleAssemblies { }
+
+
 [GeneratedParser]
 [Command("test")]
 [Description("Test command description.")]

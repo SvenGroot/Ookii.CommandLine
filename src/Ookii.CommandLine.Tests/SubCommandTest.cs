@@ -330,14 +330,22 @@ namespace Ookii.CommandLine.Tests
         }
 
         [TestMethod]
-        public void TestExplicitAssembly()
+        [DynamicData(nameof(ProviderKinds), DynamicDataDisplayName = nameof(GetCustomDynamicDataDisplayName))]
+        public void TestExplicitAssembly(ProviderKind kind)
         {
-            // Using the calling assembly explicitly loads all the commands, including internal,
-            // same as the default constructor.
-            var manager = new CommandManager(_commandAssembly);
-            Assert.AreEqual(6, manager.GetCommands().Count());
+            if (kind == ProviderKind.Reflection)
+            {
+                // Using the calling assembly explicitly loads all the commands, including internal,
+                // same as the default constructor.
+                var mgr = new CommandManager(_commandAssembly);
+                Assert.AreEqual(6, mgr.GetCommands().Count());
+            }
 
-            manager = new CommandManager(typeof(ExternalCommand).Assembly);
+            // Explicitly specify the external assembly, which loads only public commands.
+            var manager = kind == ProviderKind.Reflection
+                ? new CommandManager(typeof(ExternalCommand).Assembly)
+                : new GeneratedManagerWithExplicitAssembly();
+
             VerifyCommands(
                 manager.GetCommands(),
                 new("external", typeof(ExternalCommand)),
@@ -345,7 +353,12 @@ namespace Ookii.CommandLine.Tests
                 new("version", null)
             );
 
-            manager = new CommandManager(new[] { typeof(ExternalCommand).Assembly, _commandAssembly });
+            // Public commands from external assembly plus public and internal commands from
+            // calling assembly.
+            manager = kind == ProviderKind.Reflection
+                ? new CommandManager(new[] { typeof(ExternalCommand).Assembly, _commandAssembly })
+                : new GeneratedManagerWithMultipleAssemblies();
+
             VerifyCommands(
                 manager.GetCommands(),
                 new("AnotherSimpleCommand", typeof(AnotherSimpleCommand), false, "alias"),

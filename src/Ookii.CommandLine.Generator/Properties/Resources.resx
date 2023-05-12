@@ -183,6 +183,12 @@
   <data name="InvalidArrayRankTitle" xml:space="preserve">
     <value>A multi-value command line argument defined by an array properties must have an array rank of one.</value>
   </data>
+  <data name="InvalidAssemblyNameMessageFormat" xml:space="preserve">
+    <value>The assembly name '{0}' is not valid.</value>
+  </data>
+  <data name="InvalidAssemblyNameTitle" xml:space="preserve">
+    <value>Invalid assembly name.</value>
+  </data>
   <data name="InvalidGeneratedConverterNamespaceMessageFormat" xml:space="preserve">
     <value>The value '{0}' is not a valid C# namespace name. The default namespace will be used instead.</value>
   </data>
@@ -254,6 +260,12 @@
   </data>
   <data name="ShortAliasWithoutShortNameTitle" xml:space="preserve">
     <value>The ShortAliasAttribute is ignored on an argument with no short name.</value>
+  </data>
+  <data name="UnknownAssemblyNameMessageFormat" xml:space="preserve">
+    <value>An assembly matching the name '{0}' was not found.</value>
+  </data>
+  <data name="UnknownAssemblyNameTitle" xml:space="preserve">
+    <value>Unknown assembly name.</value>
   </data>
   <data name="UnknownAttributeMessageFormat" xml:space="preserve">
     <value>The attribute {0} is unknown and will be ignored by the GeneratedParserAttribute.</value>

@@ -259,6 +259,24 @@ namespace Ookii.CommandLine.Generator.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The assembly name &apos;{0}&apos; is not valid..
+        /// </summary>
+        internal static string InvalidAssemblyNameMessageFormat {
+            get {
+                return ResourceManager.GetString("InvalidAssemblyNameMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid assembly name..
+        /// </summary>
+        internal static string InvalidAssemblyNameTitle {
+            get {
+                return ResourceManager.GetString("InvalidAssemblyNameTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The value &apos;{0}&apos; is not a valid C# namespace name. The default namespace will be used instead..
         /// </summary>
         internal static string InvalidGeneratedConverterNamespaceMessageFormat {
@@ -471,6 +489,24 @@ namespace Ookii.CommandLine.Generator.Properties {
         internal static string ShortAliasWithoutShortNameTitle {
             get {
                 return ResourceManager.GetString("ShortAliasWithoutShortNameTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to An assembly matching the name &apos;{0}&apos; was not found..
+        /// </summary>
+        internal static string UnknownAssemblyNameMessageFormat {
+            get {
+                return ResourceManager.GetString("UnknownAssemblyNameMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unknown assembly name..
+        /// </summary>
+        internal static string UnknownAssemblyNameTitle {
+            get {
+                return ResourceManager.GetString("UnknownAssemblyNameTitle", resourceCulture);
             }
         }
         

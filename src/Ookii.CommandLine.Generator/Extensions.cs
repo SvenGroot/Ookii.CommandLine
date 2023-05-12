@@ -174,7 +174,7 @@ internal static class Extensions
     }
 
     // Using a ref parameter with bool return allows me to chain these together.
-    public  static bool CheckType(this AttributeData data, ITypeSymbol? attributeType, ref List<AttributeData>? attributes)
+    public static bool CheckType(this AttributeData data, ITypeSymbol? attributeType, ref List<AttributeData>? attributes)
     {
         if (!(data.AttributeClass?.DerivesFrom(attributeType) ?? false))
         {
@@ -184,5 +184,31 @@ internal static class Extensions
         attributes ??= new();
         attributes.Add(data);
         return true;
+    }
+
+    public static TypedConstant? GetNamedArgument(this AttributeData data, string name)
+    {
+        foreach (var arg in data.NamedArguments)
+        {
+            if (arg.Key == name)
+            {
+                return arg.Value;
+            }
+        }
+
+        return null;
+    }
+
+    public static AttributeData? GetAttribute(this ISymbol symbol, ITypeSymbol type)
+    {
+        foreach (var attribute in symbol.GetAttributes())
+        {
+            if (type.SymbolEquals(attribute.AttributeClass))
+            {
+                return attribute;
+            }
+        }
+
+        return null;
     }
 }

@@ -12,7 +12,7 @@ internal readonly struct ArgumentsClassAttributes
     private readonly List<AttributeData>? _classValidators;
     private readonly List<AttributeData>? _aliases;
 
-    public ArgumentsClassAttributes(ITypeSymbol symbol, TypeHelper typeHelper, SourceProductionContext context)
+    public ArgumentsClassAttributes(ITypeSymbol symbol, TypeHelper typeHelper, SourceProductionContext? context)
     {
         // Exclude special types so we don't generate warnings for attributes on framework types.
         for (var current = symbol; current?.SpecialType == SpecialType.None; current = current.BaseType)
@@ -30,7 +30,10 @@ internal readonly struct ArgumentsClassAttributes
                     continue;
                 }
 
-                context.ReportDiagnostic(Diagnostics.IgnoredAttribute(attribute));
+                if (context is SourceProductionContext c)
+                {
+                    c.ReportDiagnostic(Diagnostics.IgnoredAttribute(attribute));
+                }
             }
         }
     }
