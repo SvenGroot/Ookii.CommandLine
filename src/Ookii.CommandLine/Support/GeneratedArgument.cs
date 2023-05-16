@@ -49,6 +49,7 @@ public class GeneratedArgument : CommandLineArgument
     /// <param name="defaultValueDescription"></param>
     /// <param name="defaultKeyDescription"></param>
     /// <param name="requiredProperty"></param>
+    /// <param name="alternateDefaultValue"></param>
     /// <param name="multiValueSeparatorAttribute"></param>
     /// <param name="descriptionAttribute"></param>
     /// <param name="valueDescriptionAttribute"></param>
@@ -73,6 +74,7 @@ public class GeneratedArgument : CommandLineArgument
                                            string defaultValueDescription,
                                            string? defaultKeyDescription = null,
                                            bool requiredProperty = false,
+                                           object? alternateDefaultValue = null,
                                            Type? keyType = null,
                                            Type? valueType = null,
                                            MultiValueSeparatorAttribute? multiValueSeparatorAttribute = null,
@@ -95,6 +97,7 @@ public class GeneratedArgument : CommandLineArgument
         info.ElementTypeWithNullable = elementTypeWithNullable;
         info.Converter = converter;
         info.Kind = kind;
+        info.DefaultValue ??= alternateDefaultValue;
         if (info.Kind == ArgumentKind.Dictionary)
         {
             info.KeyValueSeparator ??= KeyValuePairConverter.DefaultSeparator;

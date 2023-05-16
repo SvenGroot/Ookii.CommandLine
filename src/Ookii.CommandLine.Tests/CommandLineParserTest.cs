@@ -1144,6 +1144,16 @@ namespace Ookii.CommandLine.Tests
             });
         }
 
+        [TestMethod]
+        public void TestInitializerDefaultValues()
+        {
+            var parser = InitializerDefaultValueArguments.CreateParser();
+            Assert.AreEqual("foo\tbar\"", parser.GetArgument("Arg1").DefaultValue);
+            Assert.AreEqual(5.5f, parser.GetArgument("Arg2").DefaultValue);
+            // Arg3's default value can't be used because it's not a literal.
+            Assert.IsNull(parser.GetArgument("Arg3").DefaultValue);
+        }
+
         private class ExpectedArgument
         {
             public ExpectedArgument(string name, Type type, ArgumentKind kind = ArgumentKind.SingleValue)

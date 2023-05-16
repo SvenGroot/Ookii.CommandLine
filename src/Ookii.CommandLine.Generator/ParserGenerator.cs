@@ -1,5 +1,6 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Operations;
 using System;
 using System.Data;
@@ -449,6 +450,16 @@ internal class ParserGenerator
             {
                 _context.ReportDiagnostic(Diagnostics.IsRequiredWithRequiredProperty(member));
             }
+
+            // Check if we should use the initializer for a default value.
+            if (!isMultiValue && !property.IsRequired && !argumentInfo.IsRequired && argumentInfo.DefaultValue == null)
+            {
+                var alternateDefaultValue = GetInitializerValue(property);
+                if (alternateDefaultValue != null)
+                {
+                    _builder.AppendLine($", alternateDefaultValue: {alternateDefaultValue}");
+                }
+            }
         }
 
         if (methodInfo is MethodArgumentInfo info)
@@ -771,5 +782,12 @@ internal class ParserGenerator
         {
             _context.ReportDiagnostic(Diagnostics.IgnoredAttributeForDictionaryWithConverter(member, attribute));
         }
+    }
+
+    private string? GetInitializerValue(IPropertySymbol symbol)
+    {
+        var syntax = symbol.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax(_context.CancellationToken) as PropertyDeclarationSyntax;
+        var value = syntax?.Initializer?.Value as LiteralExpressionSyntax;
+        return value?.Token.ToFullString();
     }
 }

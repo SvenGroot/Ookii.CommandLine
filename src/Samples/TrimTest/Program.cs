@@ -33,7 +33,7 @@ partial class Arguments : ICommand
     [Description("Test argument")]
     [Alias("t")]
     [ValidateNotEmpty]
-    public string? Test { get; set; }
+    public string? Test { get; set; } = "Hello";
 
     [CommandLineArgument(Position = 1)]
     [ValueDescription("Stuff")]
@@ -45,7 +45,7 @@ partial class Arguments : ICommand
     public int Test3 { get; set; }
 
     [CommandLineArgument]
-    public int? Test4 { get; set; }
+    public int? Test4 { get; set; } = 5;
 
     [CommandLineArgument]
     public FileInfo[]? File { get; set; }

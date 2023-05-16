@@ -592,3 +592,16 @@ partial class DerivedArguments : BaseArguments
     [CommandLineArgument]
     public int DerivedArg { get; set; }
 }
+
+[GeneratedParser]
+partial class InitializerDefaultValueArguments
+{
+    [CommandLineArgument]
+    public string Arg1 { get; set; } = "foo\tbar\"";
+
+    [CommandLineArgument]
+    public float Arg2 { get; set; } = 5.5f;
+
+    [CommandLineArgument]
+    public int Arg3 { get; set; } = int.MaxValue;
+}
