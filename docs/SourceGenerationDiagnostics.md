@@ -181,7 +181,7 @@ Init accessors may only be used with required properties.
 
 A property that defines a command line argument may only use an `init` accessor if it also uses the
 `required` keyword. It's not sufficient to mark the argument required; you must use a required
-property (required properties requires .Net 7 or later).
+property (required properties are only supported on .Net 7 or later).
 
 For example, the following code triggers this error:
 
@@ -228,8 +228,6 @@ partial class Arguments : ICommandWithCustomParsing // ERROR: The command uses c
     {
         // Omitted
     }
-
-    public string Value { get; set; }
 
     public int Run()
     {
