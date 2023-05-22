@@ -127,8 +127,9 @@ Note that if no values are supplied, the property will not be set, so it can be 
 If the property has an initial non-null value, that value will be overwritten if the argument was
 supplied.
 
-The other option is to a read-only property of any type implementing [`ICollection<T>`][] (e.g. [`List<int>`][]). This requires that the property's value is not null, and items will be added
-to the list after parsing has completed.
+The other option is to a read-only property of any type implementing [`ICollection<T>`][] (e.g.
+[`List<int>`][]). This requires that the property's value is not null, and items will be added to
+the list after parsing has completed.
 
 ```csharp
 [CommandLineArgument]
@@ -138,7 +139,8 @@ public ICollection<string> AlsoMultiValue { get; } = new List<string>();
 It is possible to use [`List<string>`][] (or any other type implementing [`ICollection<T>`][]) as
 the type of the property itself, but, if using .Net 6.0 or later, [`CommandLineParser`][] can only
 determine the [nullability](Arguments.md#arguments-with-non-nullable-types) of the collection's
-elements if the property type is either an array or [`ICollection<T>`][] itself.
+elements if the property type is either an array or [`ICollection<T>`][] itself. This limitation
+does not apply if [source generation](SourceGeneration.md) is used.
 
 ### Dictionary arguments
 

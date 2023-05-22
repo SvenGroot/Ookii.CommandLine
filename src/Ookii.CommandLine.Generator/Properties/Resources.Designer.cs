@@ -565,7 +565,7 @@ namespace Ookii.CommandLine.Generator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The command line arguments type must be a reference type..
+        ///   Looks up a localized string similar to The command line arguments or command manager type must be a reference type..
         /// </summary>
         internal static string TypeNotReferenceTypeTitle {
             get {
