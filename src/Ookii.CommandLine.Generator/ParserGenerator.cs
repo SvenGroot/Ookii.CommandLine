@@ -520,6 +520,18 @@ internal class ParserGenerator
             });
         }
 
+        // Can't check if long/short name is actually used, or whether the '-' prefix is used for
+        // either style, since ParseOptions might change that. So, just warn either way.
+        if (!string.IsNullOrEmpty(argumentInfo.ArgumentName) && char.IsDigit(argumentInfo.ArgumentName![0]))
+        {
+            _context.ReportDiagnostic(Diagnostics.ArgumentStartsWithNumber(member, argumentInfo.ArgumentName));
+        }
+        else if (char.IsDigit(argumentInfo.ShortName))
+        {
+            _context.ReportDiagnostic(Diagnostics.ArgumentStartsWithNumber(member, argumentInfo.ShortName.ToString()));
+        }
+
+
         if (!argumentInfo.IsShort && attributes.ShortAliases != null)
         {
             _context.ReportDiagnostic(Diagnostics.ShortAliasWithoutShortName(attributes.ShortAliases.First(), member));

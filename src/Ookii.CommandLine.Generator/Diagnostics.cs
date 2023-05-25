@@ -277,6 +277,15 @@ internal static class Diagnostics
         attribute.AttributeClass?.Name,
         member.ToDisplayString());
 
+    public static Diagnostic ArgumentStartsWithNumber(ISymbol member, string name) => CreateDiagnostic(
+        "CLW0013",
+        nameof(Resources.ArgumentStartsWithNumberTitle),
+        nameof(Resources.ArgumentStartsWithNumberMessageFormat),
+        DiagnosticSeverity.Warning,
+        member.Locations.FirstOrDefault(),
+        name,
+        member.ToDisplayString());
+
     private static Diagnostic CreateDiagnostic(string id, string titleResource, string messageResource, DiagnosticSeverity severity, Location? location, params object?[]? messageArgs)
         => Diagnostic.Create(
             new DiagnosticDescriptor(

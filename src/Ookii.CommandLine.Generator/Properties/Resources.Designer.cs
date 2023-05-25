@@ -97,6 +97,24 @@ namespace Ookii.CommandLine.Generator.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The argument name &apos;{0}&apos; defined by &apos;{1}&apos; starts with a number, which cannot be used with the &apos;-&apos; argument prefix since it will be interpreted as a negative number..
+        /// </summary>
+        internal static string ArgumentStartsWithNumberMessageFormat {
+            get {
+                return ResourceManager.GetString("ArgumentStartsWithNumberMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Argument names starting with a number cannot be used with the &apos;-&apos; prefix..
+        /// </summary>
+        internal static string ArgumentStartsWithNumberTitle {
+            get {
+                return ResourceManager.GetString("ArgumentStartsWithNumberTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The class {0} may not be a generic class when the {1} attribute is used..
         /// </summary>
         internal static string ClassIsGenericMessageFormat {

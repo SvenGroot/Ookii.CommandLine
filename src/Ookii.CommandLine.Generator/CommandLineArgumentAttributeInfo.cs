@@ -8,6 +8,11 @@ internal class CommandLineArgumentAttributeInfo
 
     public CommandLineArgumentAttributeInfo(AttributeData data)
     {
+        if (data.ConstructorArguments.Length > 0)
+        {
+            ArgumentName = data.ConstructorArguments[0].Value as string;
+        }
+
         foreach (var named in data.NamedArguments)
         {
             switch (named.Key)
@@ -48,6 +53,8 @@ internal class CommandLineArgumentAttributeInfo
             }
         }
     }
+
+    public string? ArgumentName { get; }
 
     public bool IsRequired { get; }
 

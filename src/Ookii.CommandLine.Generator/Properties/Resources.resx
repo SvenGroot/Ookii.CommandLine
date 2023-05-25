@@ -129,6 +129,12 @@
   <data name="ArgumentConverterStringNotSupportedTitle" xml:space="preserve">
     <value>The ArgumentConverterAttribute must use the typeof keyword.</value>
   </data>
+  <data name="ArgumentStartsWithNumberMessageFormat" xml:space="preserve">
+    <value>The argument name '{0}' defined by '{1}' starts with a number, which cannot be used with the '-' argument prefix since it will be interpreted as a negative number.</value>
+  </data>
+  <data name="ArgumentStartsWithNumberTitle" xml:space="preserve">
+    <value>Argument names starting with a number cannot be used with the '-' prefix.</value>
+  </data>
   <data name="ClassIsGenericMessageFormat" xml:space="preserve">
     <value>The class {0} may not be a generic class when the {1} attribute is used.</value>
   </data>
