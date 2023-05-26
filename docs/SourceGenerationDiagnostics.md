@@ -335,6 +335,30 @@ partial class Arguments
 To fix this error, either use the constructor that takes a `Type` using the `typeof` keyword, or
 use a `CommandLineParser<T>` without using source generation.
 
+### OCL0031
+
+The argument does not have a long name or a short name. This happens when both the
+`CommandLineArgumentAttribute.IsLong` and `CommandLineArgumentAttribute.IsShort` properties are set
+to false. This means that when using [long/short mode](Arguments.md#longshort-mode), the argument
+would not be usable.
+
+This error will be triggered regardless of the parsing mode you actually use, since that can be
+changed at runtime by the `ParseOptions.Mode` property and is therefore not known at compile time.
+
+For example, the following code triggers this error:
+
+```csharp
+[GeneratedParser]
+[ParseOptions(Mode = ParsingMode.LongShort)]
+partial class Arguments
+{
+    // ERROR: No long or short name (IsShort is false by default).
+    [CommandLineAttribute(IsLong = false)]
+    [ArgumentConverter("MyNamespace.MyConverter")]
+    public CustomType? Argument { get; set; }
+}
+```
+
 ## Warnings
 
 ### OCL0016
@@ -646,3 +670,24 @@ This warning may be a false positive if you are using a different argument name 
 `ParseOptionAttribute.ArgumentNamePrefixes` or `ParseOptions.ArgumentNamePrefixes` property, or if
 you are using long/short mode and the name is a long name. In these cases, you should suppress or
 disable this warning.
+
+### OCL0032
+
+The `CommandLineArgumentAttribute.IsShort` property is ignored if an explicit short name is set
+using the `CommandLineArgumentAttribute.ShortName` property.
+
+If the `ShortName` property is set, it implies that `IsShort` is true, and manually setting it to
+false will have no effect.
+
+For example, the following code triggers this warning:
+
+```csharp
+[GeneratedParser]
+[ParseOptions(Mode = ParsingMode.LongShort)]
+partial class Arguments
+{
+    // WARNING: Argument has a short name so IsShort is ignored.
+    [CommandLineAttribute(ShortName = 'a', IsShort = false)]
+    public string? Argument { get; set; }
+}
+```
