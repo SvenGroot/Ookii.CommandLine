@@ -18,6 +18,7 @@ Using source generation has several benefits:
   [trimmed](https://learn.microsoft.com/dotnet/core/deploying/trimming/trimming-options). When
   source generation is not used, the way Ookii.CommandLine uses reflection prevents trimming
   entirely.
+- Specify [default values using property initializers](#default-values-using-property-initializers).
 - Improved performance. Benchmarks show that instantiating a `CommandLineParser<T>` using a
   generated parser is up to thirty times faster than using reflection. However, since we're still
   talking about microseconds, this is unlikely to matter that much to a typical application.
@@ -119,6 +120,40 @@ and `IParser<TSelf>` interfaces, which define these methods.
 Generating the `Parse()` methods is optional, and can be disabled using the
 `GeneratedParserAttribute.GenerateParseMethods` property. The `CreateParser()` method is always
 generated.
+
+### Default values using property initializers
+
+When using the source generation to create a command line parser, you can use property initializers
+to specify the default value of an argument, and still have that value be used in the usage help.
+
+```csharp
+[GeneratedParser]
+partial class Arguments
+{
+    [CommandLineArgument(DefaultValue = "foo")]
+    public string? Arg1 { get; set; }
+
+    [CommandLineArgument]
+    public string Arg2 { get; set; } = "foo";
+}
+```
+
+When using the reflection-based parser with the default constructors of the `CommandLineParser<T>`
+class, `Arg2` would have its value set to "foo" when omitted (since Ookii.CommandLine doesn't
+assign the property if the argument is not specifies), but that default value would not be included
+in the usage help, whereas `Arg1` does.
+
+With source generation, both `Arg1` and `Arg2` will have the default value of "foo" shown in the
+usage help, making the two forms identical. Additionally, `Arg2` could be marked non-nullable
+because it was initialized to a non-null value, something which isn't possible for `Arg1` without
+initializing the property to a value that will not be used.
+
+If both a property initializer and the `DefaultValue` property are both used, the `DefaultValue`
+property takes precedence.
+
+Note that this only works if the property initializer is a literal. If a different kind of value is
+used in the property initialized, such as a reference to a constant or a function call, the value
+will not be shown in the usage help.
 
 ## Generating a command manager
 
