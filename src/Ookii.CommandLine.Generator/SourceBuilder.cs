@@ -8,6 +8,7 @@ internal class SourceBuilder
     private readonly StringBuilder _builder = new();
     private int _indentLevel;
     private bool _startOfLine = true;
+    private bool _needArgumentSeparator;
 
     public SourceBuilder(INamespaceSymbol ns)
         : this(ns.IsGlobalNamespace ? null : ns.ToDisplayString())
@@ -44,6 +45,32 @@ internal class SourceBuilder
         WriteIndent();
         _builder.AppendLine(text);
         _startOfLine = true;
+    }
+
+    public void AppendArgument(string text)
+    {
+        if (_needArgumentSeparator)
+        {
+            AppendLine(",");
+        }
+
+        Append(text);
+        _needArgumentSeparator = true;
+    }
+
+    public void CloseArgumentList(bool withSemicolon = true)
+    {
+        if (withSemicolon)
+        {
+            AppendLine(");");
+        }
+        else
+        {
+            AppendLine(")");
+        }
+
+        --_indentLevel;
+        _needArgumentSeparator = false;
     }
 
     public void OpenBlock()

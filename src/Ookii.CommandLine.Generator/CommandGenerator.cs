@@ -171,38 +171,38 @@ internal class CommandGenerator
         }
 
         builder.IncreaseIndent();
-        builder.AppendLine("manager");
+        builder.AppendArgument("manager");
         if (!useCustomParsing)
         {
-            builder.AppendLine($", typeof({commandTypeName})");
+            builder.AppendArgument($"typeof({commandTypeName})");
         }
 
         var attributes = commandAttributes ?? new ArgumentsClassAttributes(commandType, _typeHelper, _context);
-        builder.AppendLine($", {attributes.Command!.CreateInstantiation()}");
+        builder.AppendArgument($"{attributes.Command!.CreateInstantiation()}");
         if (attributes.Description != null)
         {
-            builder.AppendLine($", descriptionAttribute: {attributes.Description.CreateInstantiation()}");
+            builder.AppendArgument($"descriptionAttribute: {attributes.Description.CreateInstantiation()}");
         }
 
         if (attributes.Aliases != null)
         {
-            builder.AppendLine($", aliasAttributes: new Ookii.CommandLine.AliasAttribute[] {{ {string.Join(", ", attributes.Aliases.Select(a => a.CreateInstantiation()))} }}");
+            builder.AppendArgument($"aliasAttributes: new Ookii.CommandLine.AliasAttribute[] {{ {string.Join(", ", attributes.Aliases.Select(a => a.CreateInstantiation()))} }}");
         }
 
         if (!useCustomParsing)
         {
             if (attributes.GeneratedParser != null)
             {
-                builder.AppendLine($", createParser: options => {commandTypeName}.CreateParser(options)");
+                builder.AppendArgument($"createParser: options => {commandTypeName}.CreateParser(options)");
             }
             else
             {
-                builder.AppendLine($", createParser: options => new CommandLineParser<{commandTypeName}>(options)");
+                builder.AppendArgument($"createParser: options => new CommandLineParser<{commandTypeName}>(options)");
             }
         }
 
-        builder.DecreaseIndent();
-        builder.AppendLine(");");
+        builder.CloseArgumentList();
+        builder.AppendLine();
     }
 
     private IEnumerable<(INamedTypeSymbol, ArgumentsClassAttributes?)>? GetCommands(string? assemblyName, ITypeSymbol manager)

@@ -144,13 +144,12 @@ internal class ParserGenerator
         _builder.IncreaseIndent();
         _builder.AppendLine(": base(");
         _builder.IncreaseIndent();
-        _builder.AppendLine($"typeof({_argumentsClass.Name})");
+        _builder.AppendArgument($"typeof({_argumentsClass.Name})");
         AppendOptionalAttribute(attributes.ParseOptions, "options");
         AppendOptionalAttribute(attributes.ClassValidators, "validators", "Ookii.CommandLine.Validation.ClassValidationAttribute");
         AppendOptionalAttribute(attributes.ApplicationFriendlyName, "friendlyName");
         AppendOptionalAttribute(attributes.Description, "description");
-        _builder.DecreaseIndent();
-        _builder.AppendLine(")");
+        _builder.CloseArgumentList(false);
         _builder.DecreaseIndent();
         _builder.AppendLine("{}");
         _builder.AppendLine();
@@ -383,30 +382,30 @@ internal class ParserGenerator
         // The leading commas are not a formatting I like but it does make things easier here.
         _builder.AppendLine($"yield return Ookii.CommandLine.Support.GeneratedArgument.Create(");
         _builder.IncreaseIndent();
-        _builder.AppendLine("parser");
-        _builder.AppendLine($", argumentType: typeof({argumentType.ToDisplayString()})");
-        _builder.AppendLine($", elementTypeWithNullable: typeof({elementTypeWithNullable.ToDisplayString()})");
-        _builder.AppendLine($", elementType: typeof({elementType.ToDisplayString()})");
-        _builder.AppendLine($", memberName: \"{member.Name}\"");
-        _builder.AppendLine($", kind: {kind}");
-        _builder.AppendLine($", attribute: {attributes.CommandLineArgument.CreateInstantiation()}");
-        _builder.AppendLine($", converter: {converter}");
-        _builder.AppendLine($", allowsNull: {(allowsNull.ToCSharpString())}");
+        _builder.AppendArgument("parser");
+        _builder.AppendArgument($"argumentType: typeof({argumentType.ToDisplayString()})");
+        _builder.AppendArgument($"elementTypeWithNullable: typeof({elementTypeWithNullable.ToDisplayString()})");
+        _builder.AppendArgument($"elementType: typeof({elementType.ToDisplayString()})");
+        _builder.AppendArgument($"memberName: \"{member.Name}\"");
+        _builder.AppendArgument($"kind: {kind}");
+        _builder.AppendArgument($"attribute: {attributes.CommandLineArgument.CreateInstantiation()}");
+        _builder.AppendArgument($"converter: {converter}");
+        _builder.AppendArgument($"allowsNull: {(allowsNull.ToCSharpString())}");
         var valueDescriptionFormat = new SymbolDisplayFormat(genericsOptions: SymbolDisplayGenericsOptions.IncludeTypeParameters);
         if (keyType != null)
         {
-            _builder.AppendLine($", keyType: typeof({keyType.ToDisplayString()})");
-            _builder.AppendLine($", defaultKeyDescription: \"{keyType.ToDisplayString(valueDescriptionFormat)}\"");
+            _builder.AppendArgument($"keyType: typeof({keyType.ToDisplayString()})");
+            _builder.AppendArgument($"defaultKeyDescription: \"{keyType.ToDisplayString(valueDescriptionFormat)}\"");
         }
 
         if (valueType != null)
         {
-            _builder.AppendLine($", valueType: typeof({valueType.ToDisplayString()})");
-            _builder.AppendLine($", defaultValueDescription: \"{valueType.ToDisplayString(valueDescriptionFormat)}\"");
+            _builder.AppendArgument($"valueType: typeof({valueType.ToDisplayString()})");
+            _builder.AppendArgument($"defaultValueDescription: \"{valueType.ToDisplayString(valueDescriptionFormat)}\"");
         }
         else
         {
-            _builder.AppendLine($", defaultValueDescription: \"{elementType.ToDisplayString(valueDescriptionFormat)}\"");
+            _builder.AppendArgument($"defaultValueDescription: \"{elementType.ToDisplayString(valueDescriptionFormat)}\"");
         }
 
         AppendOptionalAttribute(attributes.MultiValueSeparator, "multiValueSeparatorAttribute");
@@ -414,12 +413,12 @@ internal class ParserGenerator
         AppendOptionalAttribute(attributes.ValueDescription, "valueDescriptionAttribute");
         if (attributes.AllowDuplicateDictionaryKeys != null)
         {
-            _builder.AppendLine(", allowDuplicateDictionaryKeys: true");
+            _builder.AppendArgument("allowDuplicateDictionaryKeys: true");
         }
 
         if (attributes.KeyValueSeparator != null)
         {
-            _builder.AppendLine($", keyValueSeparatorAttribute: keyValueSeparatorAttribute{member.Name}");
+            _builder.AppendArgument($"keyValueSeparatorAttribute: keyValueSeparatorAttribute{member.Name}");
         }
 
         AppendOptionalAttribute(attributes.Aliases, "aliasAttributes", "Ookii.CommandLine.AliasAttribute");
@@ -429,11 +428,11 @@ internal class ParserGenerator
         {
             if (property.SetMethod != null && property.SetMethod.DeclaredAccessibility == Accessibility.Public && !property.SetMethod.IsInitOnly)
             {
-                _builder.AppendLine($", setProperty: (target, value) => (({_argumentsClass.ToDisplayString()})target).{member.Name} = ({originalArgumentType.ToDisplayString()})value{notNullAnnotation}");
+                _builder.AppendArgument($"setProperty: (target, value) => (({_argumentsClass.ToDisplayString()})target).{member.Name} = ({originalArgumentType.ToDisplayString()})value{notNullAnnotation}");
             }
 
-            _builder.AppendLine($", getProperty: (target) => (({_argumentsClass.ToDisplayString()})target).{member.Name}");
-            _builder.AppendLine($", requiredProperty: {property.IsRequired.ToCSharpString()}");
+            _builder.AppendArgument($"getProperty: (target) => (({_argumentsClass.ToDisplayString()})target).{member.Name}");
+            _builder.AppendArgument($"requiredProperty: {property.IsRequired.ToCSharpString()}");
             if (argumentInfo.DefaultValue != null)
             {
                 if (isMultiValue)
@@ -457,7 +456,7 @@ internal class ParserGenerator
                 var alternateDefaultValue = GetInitializerValue(property);
                 if (alternateDefaultValue != null)
                 {
-                    _builder.AppendLine($", alternateDefaultValue: {alternateDefaultValue}");
+                    _builder.AppendArgument($"alternateDefaultValue: {alternateDefaultValue}");
                 }
             }
         }
@@ -483,11 +482,11 @@ internal class ParserGenerator
 
             if (info.HasBooleanReturn)
             {
-                _builder.AppendLine($", callMethod: (value, parser) => {_argumentsClass.ToDisplayString()}.{member.Name}({arguments})");
+                _builder.AppendArgument($"callMethod: (value, parser) => {_argumentsClass.ToDisplayString()}.{member.Name}({arguments})");
             }
             else
             {
-                _builder.AppendLine($", callMethod: (value, parser) => {{ {_argumentsClass.ToDisplayString()}.{member.Name}({arguments}); return true; }}");
+                _builder.AppendArgument($"callMethod: (value, parser) => {{ {_argumentsClass.ToDisplayString()}.{member.Name}({arguments}); return true; }}");
             }
 
             if (argumentInfo.DefaultValue != null)
@@ -496,8 +495,8 @@ internal class ParserGenerator
             }
         }
 
-        _builder.DecreaseIndent();
-        _builder.AppendLine(");");
+        _builder.CloseArgumentList();
+        _builder.AppendLine();
         if (argumentInfo.Position is int position)
         {
             _positions ??= new();
@@ -727,7 +726,7 @@ internal class ParserGenerator
     {
         if (attribute != null)
         {
-            _builder.AppendLine($", {name}: {attribute.CreateInstantiation()}");
+            _builder.AppendArgument($"{name}: {attribute.CreateInstantiation()}");
         }
     }
 
@@ -735,7 +734,7 @@ internal class ParserGenerator
     {
         if (attributes != null)
         {
-            _builder.AppendLine($", {name}: new {typeName}[] {{ {string.Join(", ", attributes.Select(a => a.CreateInstantiation()))} }}");
+            _builder.AppendArgument($"{name}: new {typeName}[] {{ {string.Join(", ", attributes.Select(a => a.CreateInstantiation()))} }}");
         }
     }
 
