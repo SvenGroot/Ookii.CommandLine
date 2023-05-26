@@ -11,7 +11,7 @@ explanations of what they do and examples of their output.
 ## Contents
 
 - [What's new in Ookii.CommandLine](ChangeLog.md)
-- [Migrating from Ookii.CommandLine 2.x](Migrating.md)
+- [Migrating from Ookii.CommandLine 2.x / 3.x](Migrating.md)
 - [Tutorial: getting started with Ookii.CommandLine](Tutorial.md)
 - [Command line arguments in Ookii.CommandLine](Arguments.md)
   - [Defining command line arguments](DefiningArguments.md)

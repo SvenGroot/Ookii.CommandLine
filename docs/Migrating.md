@@ -1,6 +1,6 @@
-# Migrating from Ookii.CommandLine 2.x
+# Migrating from Ookii.CommandLine 2.x / 3.x
 
-Ookii.CommandLine 3.0 and later have a number of breaking changes from version 2.4 and earlier
+Ookii.CommandLine 4.0 and later have a number of breaking changes from version 3.x and earlier
 versions. This article explains what you need to know to migrate your code to the new version.
 
 Although there are quite a few changes, it's likely your application will not require many
@@ -12,7 +12,28 @@ As of version 3.0, .Net Framework 2.0 is no longer supported. You can still targ
 4.6.1 and later using the .Net Standard 2.0 assembly. If you need to support an older version of
 .Net, please continue to use [version 2.4](https://github.com/SvenGroot/ookii.commandline/releases/tag/v2.4).
 
-## Breaking API changes
+## Breaking API changes from version 3.0
+
+- The `CommandLineArgumentAttribute.ValueDescription` property has been replaced by the
+  `ValueDescriptionAttribute` attribute. This new attribute is not sealed, enabling derived
+  attributes e.g. to load a value description from localized resource.
+- Converting argument values from a string to their final type is no longer done using the
+  `TypeConverter` class, but instead using a custom `ArgumentConverter` class. Custom converters
+  must be specified using the `ArgumentConverterAttribute` instead of the `TypeConverterAttribute`.
+  - This change enables more flexibility, better performance by supporting conversions using
+    `ReadOnlySpan<char>`, and enables trimming your assembly when combined with
+    [source generation](SourceGeneration.md).
+- Constructor parameters can no longer be used to define command line arguments. Instead, all
+  arguments must be defined using properties. If you were using constructor parameters to avoid
+  setting a default value for a non-nullable reference type, you can use the `required` keyword
+  instead if using .Net 7.0 or later.
+- The `CommandManager`, when using an assembly that is not the calling assembly, will only use
+  public command classes, where before it would also use internal ones. This is to better respect
+  access modifiers, and to make sure generated and reflection-based command managers behave the
+  same.
+- The `CommandInfo` type is now a class instead of a structure.
+
+## Breaking API changes from version 2.4
 
 - It's strongly recommended to switch to the static [`CommandLineParser.Parse<T>()`][] method, if you
   were not already using it from version 2.4.
