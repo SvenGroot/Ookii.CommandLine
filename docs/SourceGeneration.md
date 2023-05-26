@@ -8,11 +8,11 @@ runtime using reflection.
 
 Using source generation has several benefits:
 
-- Get [errors and warnings](TODO) at compile time for argument rule violations (such as a required
-  positional argument after an optional positional argument), ignored options (such as setting a
-  default value for a required attribute), and other problems (such as using the same position
-  number more than once, method arguments with the wrong signature, or using the
-  `CommandLineArgumentAttribute` on a private or read-only property). These would normally be
+- Get [errors and warnings](SourceGenerationDiagnostics.md) at compile time for argument rule
+  violations (such as a required positional argument after an optional positional argument), ignored
+  options (such as setting a default value for a required attribute), and other problems (such as
+  using the same position number more than once, method arguments with the wrong signature, or using
+  the `CommandLineArgumentAttribute` on a private or read-only property). These would normally be
   silently ignored or cause a runtime exception, but now you can catch problems during compilation.
 - Allow your application to be
   [trimmed](https://learn.microsoft.com/dotnet/core/deploying/trimming/trimming-options). When
@@ -56,7 +56,7 @@ partial class Arguments
 The source generator will inspect the members and attributes of the class, and generates C# code
 that provides that information to a `CommandLineParser`, without needing to use reflection. While
 doing so, it checks whether your class violates any rules for defining arguments, and
-[emits warnings and errors](TODO) if it does.
+[emits warnings and errors](SourceGenerationDiagnostics.md) if it does.
 
 If any of the arguments has a type for which there is no built-in `ArgumentConverter` class, and
 the argument doesn't use the `ArgumentConverterAttribute`, the source generator will check whether

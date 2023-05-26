@@ -15,8 +15,8 @@ Without source generation, these mistakes would either lead to a runtime excepti
 catch any problems during compile time, which reduces the risk of bugs.
 
 Not all errors can be caught at compile time. For example, the source generator does not check for
-duplicate argument names, because the `ParseOptions.ArgumentNameTransform` property can modify the
-names, which makes this impossible to determine at compile time.
+duplicate argument names, because the `ParseOptions.ArgumentNameTransform` property and
+`ParseOptions.ArgumentNameComparison` properties can render the result of this check inaccurate.
 
 ## Errors
 
@@ -160,8 +160,8 @@ partial class Arguments
 A method argument must use a supported signature.
 
 When using a method to define an argument, only [specific signatures](DefiningArguments.md#using-methods)
-are allowed. This error indicates the method is not using one of the supported signatures, for
-example it has additional parameters, or is not static.
+are allowed. This error indicates the method is not using one of the supported signatures; for
+example, it has additional parameters.
 
 For example, the following code triggers this error:
 
@@ -169,9 +169,9 @@ For example, the following code triggers this error:
 [GeneratedParser]
 partial class Arguments
 {
-     // ERROR: the method must be static
+     // ERROR: the method has an unrecognized parameter
     [CommandLineAttribute]
-    public void Argument(string value);
+    public static void Argument(string value, int value2);
 }
 ```
 
@@ -320,6 +320,8 @@ The `ArgumentConverterAttribute` has two constructors, one that takes the `Type`
 and one that takes the name of a converter type as a string. The string constructor is not supported
 when using source generation.
 
+For example, the following code triggers this error:
+
 ```csharp
 [GeneratedParser]
 partial class Arguments
@@ -335,4 +337,312 @@ use a `CommandLineParser<T>` without using source generation.
 
 ## Warnings
 
-TODO
+### OCL0016
+
+Unknown attribute will be ignored.
+
+The arguments class itself, or one of the members defining an argument, has an attribute that is
+not used by Ookii.CommandLine.
+
+For example, the following code triggers this warning, because the current version of
+Ookii.CommandLine no longer uses the `TypeConverterAttribute`, having replaced it with the
+`ArgumentConverterAttribute`:
+
+```csharp
+[GeneratedParser]
+partial class Arguments
+{
+    [CommandLineAttribute]
+    [TypeConverter(typeof(MyNamespace.MyConverter)] // WARNING: TypeConverterAttribute is not used
+    public CustomType? Argument { get; set; }
+}
+```
+
+To fix this warning, remove the relevant attribute. If the attribute is present for some purpose
+other than Ookii.CommandLine, you should suppress or disable this warning.
+
+### OCL0017
+
+Methods that are not public and static will be ignored.
+
+If the `CommandLineArgumentAttribute` is used on a method that is not a `public static` method, no
+argument will be generated for this method.
+
+For example, the following code triggers this warning:
+
+```csharp
+[GeneratedParser]
+partial class Arguments
+{
+     // WARNING: the method must be public
+    [CommandLineAttribute]
+    private static void Argument(string value, int value2);
+}
+```
+
+### OCL0018
+
+Properties that are not public instance properties will be ignored.
+
+If the `CommandLineArgumentAttribute` is used on a property that is not a `public` property, or
+that is a `static` property, no argument will be generated for this property.
+
+For example, the following code triggers this warning:
+
+```csharp
+[GeneratedParser]
+partial class Arguments
+{
+     // WARNING: the property must be public
+    [CommandLineAttribute]
+    private string? Argument { get; set; }
+}
+```
+
+### OCL0019
+
+A command line arguments class has the `CommandAttribute` but does not implement the `ICommand`
+interface.
+
+Without the interface, the `CommandAttribute` is ignored and the class will not be treated as a
+command by a regular or generated `CommandManager`. Both the `CommandAttribute` and the `ICommand`
+interface are required for commands.
+
+For example, the following code triggers this warning:
+
+```csharp
+[GeneratedParser]
+[Command]
+partial class MyCommand // WARNING: The class doesn't implement ICommand
+{
+    [CommandLineAttribute]
+    public string? Argument { get; set; }
+}
+```
+
+The inverse, implementing `ICommand` without using the `CommandAttribute`, does not generate a
+warning as this is a common pattern for subcommand base classes.
+
+### OCL0020
+
+An argument that is required, multi-value, or a method argument, specifies a default value. The
+default value will not be used for these kinds of arguments.
+
+For a required argument, the default value is not used because not specifying an explicit value is
+an error. For a multi-value argument, the default value is never used and the collection will still
+be empty or null if no explicit value was given. The method for a method argument is only invoked
+if the argument is explicitly provided; it is never invoked with a default value.
+
+For example, the following code triggers this warning:
+
+```csharp
+[GeneratedParser]
+partial class Arguments
+{
+    // WARNING: Default value is unused on a required argument.
+    [CommandLineAttribute(DefaultValue = "foo")]
+    public required string Argument { get; set; }
+}
+```
+
+### OCL0021
+
+The `CommandLineArgumentAttribute.IsRequired` property is ignored for a property with the
+`required` keyword. If the `required` keyword is present, the argument is required, even if you
+set the `IsRequired` property to false explicitly.
+
+> The `required` keyword is only available in .Net 7.0 and later; the `IsRequired` property should
+> be used to create required arguments in older versions of .Net.
+
+For example, the following code triggers this warning:
+
+```csharp
+[GeneratedParser]
+partial class Arguments
+{
+    // WARNING: the argument will be required regardless of the value of IsRequired.
+    [CommandLineAttribute(IsRequired = false)]
+    public required string Argument { get; set; }
+}
+```
+
+### OCL0022
+
+The same position value is used for two or more arguments.
+
+While the actual position values do not matter--merely the order of the values do, so skipping
+numbers is fine--using the same number more than once can lead to unpredictable or unstable ordering
+of the arguments, which should be avoided.
+
+```csharp
+[GeneratedParser]
+partial class Arguments
+{
+    [CommandLineAttribute(Position = 0)]
+    public string? Argument1 { get; set; }
+
+    // WARNING: Argument2 has the same position as Argument1.
+    [CommandLineAttribute(Position = 0)]
+    public string? Argument2 { get; set; }
+}
+```
+
+### OCL0023
+
+The `ShortAliasAttribute` is ignored on an argument that does not have a short name. Set the
+`CommandLineArgumentAttribute.IsShort` property to true set an explicit short name using the
+`CommandLineArgumentAttribute.ShortName` property. Without a short name, any short aliases will not
+be used.
+
+Note that the `ShortAliasAttribute` is also ignored if `ParsingMode.LongShort` is not used, which is
+not checked by the source generator, because it can be changed at runtime using the
+`ParseOptions.Mode` property.
+
+For example, the following code triggers this warning:
+
+```csharp
+[GeneratedParser]
+[ParseOptions(Mode = ParsingMode.LongShort)]
+partial class Arguments
+{
+    // WARNING: The short alias is not used since the argument has no short name.
+    [CommandLineAttribute]
+    [ShortAlias('a')]
+    public string? Argument { get; set; }
+}
+```
+
+### OLC0024
+
+The `AliasAttribute` is ignored on an argument with no long name. An argument has no long name only
+if the `CommandLineArgumentAttribute.IsLong` property is set to false.
+
+Note that the `AliasAttribute` may still be used if `ParsingMode.LongShort` is not used, which is
+not checked by the source generator, because it can be changed at runtime using the
+`ParseOptions.Mode` property.
+
+For example, the following code triggers this warning:
+
+```csharp
+[GeneratedParser]
+[ParseOptions(Mode = ParsingMode.LongShort)]
+partial class Arguments
+{
+    // WARNING: The long alias is not used since the argument has no long name.
+    [CommandLineAttribute(IsLong = false, IsShort = true)]
+    [Alias("arg")]
+    public string? Argument { get; set; }
+}
+```
+
+### OCL0025
+
+The `CommandLineArgumentAttribute.IsHidden` property is ignored for positional arguments.
+
+Positional arguments cannot be hidden, because excluding them from the usage help would give
+incorrect positions for any additional positional arguments. A positional argument is therefore not
+hidden even if `IsHidden` is set to true.
+
+For example, the following code triggers this warning:
+
+```csharp
+[GeneratedParser]
+partial class Arguments
+{
+    // WARNING: The argument is not hidden because it's positional.
+    [CommandLineAttribute(Position = 0, IsHidden = true)]
+    public string? Argument { get; set; }
+}
+```
+
+### OCL0026
+
+The namespace specified in the `GeneratedConverterNamespaceAttribute` is not a valid C# namespace
+name, for example because one of the elements contains an unsupported character or starts with a
+digit.
+
+For example, the following code triggers this warning:
+
+```csharp
+[assembly: GeneratedConverterNamespace("MyApp.5Invalid")]
+```
+
+### OCL0027
+
+The `KeyConverterAttribute`, `ValueConverterAttribute`, `KeyValueSeparatorAttribute` and
+`AllowDuplicateDictionaryKeysAttribute` attributes are only used for dictionary arguments, and will
+be ignored if the argument is not a dictionary argument.
+
+For example, the following code triggers this warning:
+
+```csharp
+[GeneratedParser]
+partial class Arguments
+{
+    [CommandLineAttribute]
+    [AllowDuplicateDictionaryKeys] // WARNING: Ignored on non-dictionary arguments
+    public string? Argument { get; set; }
+}
+```
+
+### OCL0028
+
+The `KeyConverterAttribute`, `ValueConverterAttribute`,  and `KeyValueSeparatorAttribute` attributes
+are used by the default `KeyValuePairConverter` for dictionary arguments, and will be ignored if the
+argument uses the `ArgumentConverterAttribute` to specify a different converter.
+
+For example, the following code triggers this warning:
+
+```csharp
+[GeneratedParser]
+partial class Arguments
+{
+    [CommandLineAttribute]
+    [ArgumentConverter(typeof(CustomKeyValuePairConverter))]
+    [KeyValueSeparator(":")] // WARNING: Ignored on dictionary arguments with an explicit converter.
+    public Dictionary<string, int>? Argument { get; set; }
+}
+```
+
+### OCL0029
+
+The `MultiValueSeparatorAttribute` is only used for multi-value arguments (including dictionary
+arguments), and will be ignored if the argument is not a multi-value argument.
+
+For example, the following code triggers this warning:
+
+```csharp
+[GeneratedParser]
+partial class Arguments
+{
+    [CommandLineAttribute]
+    [MultiValueSeparator(",")] // WARNING: Ignored on non-multi-value arguments
+    public string? Argument { get; set; }
+}
+```
+
+### OCL0030
+
+An argument has an explicit name or short name starting with a number, which cannot be used with
+the '-' prefix.
+
+If the `CommandLineParser` sees a dash followed by a digit, it will always interpret this as a
+value, because it may be a negative number. It is never interpreted as an argument name, even if
+the rest of the argument is not a valid number.
+
+For example, the following code triggers this warning:
+
+```csharp
+[GeneratedParser]
+partial class Arguments
+{
+    // WARNING: Name starts with a number.
+    [CommandLineAttribute("1Arg")]
+    public string? Argument { get; set; }
+}
+```
+
+This warning may be a false positive if you are using a different argument name prefix with the
+`ParseOptionAttribute.ArgumentNamePrefixes` or `ParseOptions.ArgumentNamePrefixes` property, or if
+you are using long/short mode and the name is a long name. In these cases, you should suppress or
+disable this warning.

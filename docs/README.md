@@ -20,6 +20,7 @@ explanations of what they do and examples of their output.
   - [Argument validation and dependencies](Validation.md)
 - [Subcommands](Subcommands.md)
 - [Source generation](SourceGeneration.md)
+  - [Diagnostics](SourceGenerationDiagnostics.md)
 - [LineWrappingTextWriter and other utilities](Utilities.md)
 - [Code snippets](CodeSnippets.md)
 - [Class library documentation](https://www.ookii.org/Link/CommandLineDoc)
