@@ -237,11 +237,23 @@
   <data name="IsRequiredWithRequiredPropertyTitle" xml:space="preserve">
     <value>The CommandLineArgumentAttribute.IsRequired property is ignored for a required property.</value>
   </data>
+  <data name="IsShortIgnoredMessageFormat" xml:space="preserve">
+    <value>The argument defined by {0} has an explicit short name, so setting IsShort to false has no effect.</value>
+  </data>
+  <data name="IsShortIgnoredTitle" xml:space="preserve">
+    <value>IsShort is ignored if an explicit short name is set.</value>
+  </data>
   <data name="NoConverterMessageFormat" xml:space="preserve">
     <value>No command line argument converter exists for type {0} used by the argument defined by {1}.{2}, and none could be generated. Use the Ookii.CommandLine.Conversion.ArgumentConverterAttribute to specify a custom converter.</value>
   </data>
   <data name="NoConverterTitle" xml:space="preserve">
     <value>No command line argument converter exists for the argument's type.</value>
+  </data>
+  <data name="NoLongOrShortNameMessageFormat" xml:space="preserve">
+    <value>The argument defined by {0} has both IsLong and IsShort set to false, which means it has no name if long/short mode is used.</value>
+  </data>
+  <data name="NoLongOrShortNameTitle" xml:space="preserve">
+    <value>Argument has neither a long nor short name.</value>
   </data>
   <data name="NonPublicInstancePropertyMessageFormat" xml:space="preserve">
     <value>The property {0}.{1} will not create a command line argument because it is not a public instance property.</value>

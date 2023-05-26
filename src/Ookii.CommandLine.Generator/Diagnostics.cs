@@ -283,6 +283,22 @@ internal static class Diagnostics
         name,
         member.ToDisplayString());
 
+    public static Diagnostic NoLongOrShortName(ISymbol member, AttributeData attribute) => CreateDiagnostic(
+        "OCL0031",
+        nameof(Resources.NoLongOrShortNameTitle),
+        nameof(Resources.NoLongOrShortNameMessageFormat),
+        DiagnosticSeverity.Error,
+        attribute.GetLocation(),
+        member.ToDisplayString());
+
+    public static Diagnostic IsShortIgnored(ISymbol member, AttributeData attribute) => CreateDiagnostic(
+        "OCL0032",
+        nameof(Resources.IsShortIgnoredTitle),
+        nameof(Resources.IsShortIgnoredMessageFormat),
+        DiagnosticSeverity.Warning,
+        attribute.GetLocation(),
+        member.ToDisplayString());
+
     private static Diagnostic CreateDiagnostic(string id, string titleResource, string messageResource, DiagnosticSeverity severity, Location? location, params object?[]? messageArgs)
         => Diagnostic.Create(
             new DiagnosticDescriptor(

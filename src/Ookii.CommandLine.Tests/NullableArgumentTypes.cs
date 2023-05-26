@@ -8,7 +8,7 @@ using System.Globalization;
 namespace Ookii.CommandLine.Tests;
 
 // We deliberately have some properties and methods that cause warnings, so disable those.
-#pragma warning disable CLW0006
+#pragma warning disable OCL0021
 
 class NullReturningStringConverter : ArgumentConverter
 {

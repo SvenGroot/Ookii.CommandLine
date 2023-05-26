@@ -9,7 +9,7 @@ using System.IO;
 using System.Net;
 
 // We deliberately have some properties and methods that cause warnings, so disable those.
-#pragma warning disable CLW0002,CLW0003,CLW0005,CLW0008,CLW0009,CLW0013
+#pragma warning disable OCL0017,OCL0018,OCL0020,OCL0023,OCL0029
 
 namespace Ookii.CommandLine.Tests;
 

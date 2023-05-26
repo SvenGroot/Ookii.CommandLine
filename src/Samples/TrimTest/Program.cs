@@ -8,25 +8,24 @@ using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
 
-var manager = new TestManager();
-return manager.RunCommand() ?? 1;
+//var manager = new TestManager();
+//return manager.RunCommand() ?? 1;
 
-//var arguments = Arguments.Parse();
-//if (arguments != null)
-//{
-//    Console.WriteLine($"Hello, World! {arguments.Test}");
-//}
+var arguments = Arguments.Parse();
+if (arguments != null)
+{
+    Console.WriteLine($"Hello, World! {arguments.Test}");
+}
 
 
 [GeneratedCommandManager]
 partial class TestManager { }
 
 [GeneratedParser]
-[ParseOptions(CaseSensitive = true)]
+[ParseOptions(CaseSensitive = true, Mode = ParsingMode.LongShort)]
 [Description("This is a test")]
 [ApplicationFriendlyName("Trim Test")]
 [RequiresAny(nameof(Test), nameof(Test2))]
-[Command]
 partial class Arguments : ICommand
 {
     [CommandLineArgument(Position = 0)]

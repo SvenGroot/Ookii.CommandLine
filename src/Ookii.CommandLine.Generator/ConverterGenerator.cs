@@ -244,8 +244,7 @@ internal class ConverterGenerator
             return DefaultGeneratedNamespace;
         }
 
-        var ns = attribute.ConstructorArguments.FirstOrDefault().Value as string;
-        if (ns == null)
+        if (attribute.ConstructorArguments.FirstOrDefault().Value is not string ns)
         {
             return DefaultGeneratedNamespace;
         }

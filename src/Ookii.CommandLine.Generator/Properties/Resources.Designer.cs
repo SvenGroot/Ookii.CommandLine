@@ -421,6 +421,24 @@ namespace Ookii.CommandLine.Generator.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The argument defined by {0} has an explicit short name, so setting IsShort to false has no effect..
+        /// </summary>
+        internal static string IsShortIgnoredMessageFormat {
+            get {
+                return ResourceManager.GetString("IsShortIgnoredMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to IsShort is ignored if an explicit short name is set..
+        /// </summary>
+        internal static string IsShortIgnoredTitle {
+            get {
+                return ResourceManager.GetString("IsShortIgnoredTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to No command line argument converter exists for type {0} used by the argument defined by {1}.{2}, and none could be generated. Use the Ookii.CommandLine.Conversion.ArgumentConverterAttribute to specify a custom converter..
         /// </summary>
         internal static string NoConverterMessageFormat {
@@ -435,6 +453,24 @@ namespace Ookii.CommandLine.Generator.Properties {
         internal static string NoConverterTitle {
             get {
                 return ResourceManager.GetString("NoConverterTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The argument defined by {0} has both IsLong and IsShort set to false, which means it has no name if long/short mode is used..
+        /// </summary>
+        internal static string NoLongOrShortNameMessageFormat {
+            get {
+                return ResourceManager.GetString("NoLongOrShortNameMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Argument has neither a long nor short name..
+        /// </summary>
+        internal static string NoLongOrShortNameTitle {
+            get {
+                return ResourceManager.GetString("NoLongOrShortNameTitle", resourceCulture);
             }
         }
         

@@ -37,6 +37,7 @@ internal class CommandLineArgumentAttributeInfo
 
             case nameof(IsShort):
                 _isShort = (bool)named.Value.Value!;
+                ExplicitIsShort = _isShort;
                 break;
 
             case nameof(ShortName):
@@ -65,6 +66,8 @@ internal class CommandLineArgumentAttributeInfo
     public object? DefaultValue { get; }
 
     public bool IsShort => _isShort || ShortName != '\0';
+
+    public bool? ExplicitIsShort { get; }
 
     public char ShortName { get; }
 

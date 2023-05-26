@@ -26,7 +26,7 @@ namespace Ookii.CommandLine
     /// <para>
     ///   For example, if you use <c>-Sample Value1 Value2 Value3</c>, all three arguments after
     ///   <c>-Sample</c> are taken as values. In this case, it's not possible to supply any
-    ///   positional arguments until another named argument has beens supplied.
+    ///   positional arguments until another named argument has been supplied.
     /// </para>
     /// <para>
     ///   Using white-space separators will not work if the <see cref="CommandLineParser.AllowWhiteSpaceValueSeparator"/>

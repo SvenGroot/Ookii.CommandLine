@@ -164,7 +164,10 @@ internal class ParserGenerator
         {
             foreach (var member in current.GetMembers())
             {
-                GenerateArgument(member, ref requiredProperties);
+                if (!GenerateArgument(member, ref requiredProperties))
+                {
+                    return false;
+                }
             }
 
             current = current.BaseType;
@@ -219,23 +222,29 @@ internal class ParserGenerator
         return true;
     }
 
-    private void GenerateArgument(ISymbol member, ref List<(string, string, string)>? requiredProperties)
+    private bool GenerateArgument(ISymbol member, ref List<(string, string, string)>? requiredProperties)
     {
         // This shouldn't happen because of attribute targets, but check anyway.
         if (member.Kind is not (SymbolKind.Method or SymbolKind.Property))
         {
-            return;
+            return true;
         }
 
         var attributes = new ArgumentAttributes(member.GetAttributes(), _typeHelper, _context);
 
-        // Check if it is an attribute.
+        // Check if it is an argument.
         if (attributes.CommandLineArgument == null)
         {
-            return;
+            return true;
         }
 
         var argumentInfo = new CommandLineArgumentAttributeInfo(attributes.CommandLineArgument);
+        if (!argumentInfo.IsLong && !argumentInfo.IsShort)
+        {
+            _context.ReportDiagnostic(Diagnostics.NoLongOrShortName(member, attributes.CommandLineArgument));
+            return false;
+        }
+
         ITypeSymbol originalArgumentType;
         MethodArgumentInfo? methodInfo = null;
         var property = member as IPropertySymbol;
@@ -244,7 +253,7 @@ internal class ParserGenerator
             if (property.DeclaredAccessibility != Accessibility.Public || property.IsStatic)
             {
                 _context.ReportDiagnostic(Diagnostics.NonPublicInstanceProperty(property));
-                return;
+                return true;
             }
 
             originalArgumentType = property.Type;
@@ -254,14 +263,14 @@ internal class ParserGenerator
             if (method.DeclaredAccessibility != Accessibility.Public || !method.IsStatic)
             {
                 _context.ReportDiagnostic(Diagnostics.NonPublicStaticMethod(method));
-                return;
+                return true;
             }
 
             methodInfo = DetermineMethodArgumentInfo(method);
             if (methodInfo is not MethodArgumentInfo methodInfoValue)
             {
                 _context.ReportDiagnostic(Diagnostics.InvalidMethodSignature(method));
-                return;
+                return false;
             }
 
             originalArgumentType = methodInfoValue.ArgumentType;
@@ -269,7 +278,7 @@ internal class ParserGenerator
         else
         {
             // How did we get here? Already checked above.
-            return;
+            return true;
         }
 
         var argumentType = originalArgumentType.WithNullableAnnotation(NullableAnnotation.NotAnnotated);
@@ -304,7 +313,7 @@ internal class ParserGenerator
             var multiValueType = DetermineMultiValueType(property, argumentType);
             if (multiValueType is not var (collectionType, dictionaryType, multiValueElementType))
             {
-                return;
+                return false;
             }
 
             if (dictionaryType != null)
@@ -326,14 +335,14 @@ internal class ParserGenerator
                     if (keyConverter == null)
                     {
                         _context.ReportDiagnostic(Diagnostics.NoConverter(member, keyType.GetUnderlyingType()));
-                        return;
+                        return false;
                     }
 
                     var valueConverter = DetermineConverter(member, valueType.GetUnderlyingType(), attributes.ValueConverter, valueType.IsNullableValueType());
                     if (valueConverter == null)
                     {
                         _context.ReportDiagnostic(Diagnostics.NoConverter(member, keyType.GetUnderlyingType()));
-                        return;
+                        return false;
                     }
 
                     var separator = attributes.KeyValueSeparator == null 
@@ -356,7 +365,7 @@ internal class ParserGenerator
             if (property.SetMethod != null && property.SetMethod.IsInitOnly && !property.IsRequired)
             {
                 _context.ReportDiagnostic(Diagnostics.NonRequiredInitOnlyProperty(property));
-                return;
+                return false;
             }
 
             if (property.IsRequired)
@@ -376,7 +385,7 @@ internal class ParserGenerator
         if (converter == null)
         {
             _context.ReportDiagnostic(Diagnostics.NoConverter(member, elementType));
-            return;
+            return false;
         }
 
         // The leading commas are not a formatting I like but it does make things easier here.
@@ -558,6 +567,13 @@ internal class ParserGenerator
         {
             _context.ReportDiagnostic(Diagnostics.IgnoredAttributeForNonDictionary(member, attributes.AllowDuplicateDictionaryKeys));
         }
+
+        if (argumentInfo.ShortName != '\0' && argumentInfo.ExplicitIsShort == false)
+        {
+            _context.ReportDiagnostic(Diagnostics.IsShortIgnored(member, attributes.CommandLineArgument));
+        }
+
+        return true;
     }
 
     private (ITypeSymbol?, INamedTypeSymbol?, ITypeSymbol?)? DetermineMultiValueType(IPropertySymbol property, ITypeSymbol argumentType)
