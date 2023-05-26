@@ -605,3 +605,17 @@ partial class InitializerDefaultValueArguments
     [CommandLineArgument]
     public int Arg3 { get; set; } = int.MaxValue;
 }
+
+[GeneratedParser]
+partial class AutoPrefixAliasesArguments
+{
+    [CommandLineArgument(IsShort = true)]
+    public string Protocol { get; set; }
+
+    [CommandLineArgument]
+    public int Port { get; set; }
+
+    [CommandLineArgument(IsShort = true)]
+    [Alias("Prefix")]
+    public bool EnablePrefix { get; set; }
+}

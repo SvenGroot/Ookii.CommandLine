@@ -322,6 +322,42 @@ public class ParseOptions
     public bool? AutoVersionArgument { get; set; }
 
     /// <summary>
+    /// Gets or sets a value that indicates whether unique prefixes of an argument are automatically
+    /// used as aliases.
+    /// </summary>
+    /// <value>
+    ///   <see langword="true"/> to automatically use unique prefixes of an argument as aliases for
+    ///   that argument; <see langword="false"/> to not have automatic prefixes; otherwise,
+    ///   <see langword="null" /> to use the value from the <see cref="ParseOptionsAttribute.AutoPrefixAliases"/>
+    ///   property, or if the <see cref="ParseOptionsAttribute"/> attribute is not present,
+    ///   <see langword="true"/>.
+    /// </value>
+    /// <remarks>
+    /// <para>
+    ///   If this property is <see langword="true"/>, the <see cref="CommandLineParser"/> class
+    ///   will consider any prefix that uniquely identifies an argument by its name or one of its
+    ///   explicit aliases as an alias for that argument. For example, given two arguments "Port"
+    ///   and "Protocol", "Po" and "Port" would be an alias for "Port, and "Pr" an alias for
+    ///   "Protocol" (as well as "Pro", "Prot", "Proto", etc.). "P" would not be an alias because it
+    ///   doesn't uniquely identify a single argument.
+    /// </para>
+    /// <para>
+    ///   When using <see cref="ParsingMode.LongShort"/>, this only applies to long names. Explicit
+    ///   aliases set with the <see cref="AliasAttribute"/> take precedence over automatic aliases.
+    ///   Automatic prefix aliases are not shown in the usage help.
+    /// </para>
+    /// <para>
+    ///   This behavior is enabled unless explicitly disabled here or using the
+    ///   <see cref="ParseOptionsAttribute.AutoPrefixAliases"/> property.
+    /// </para>
+    /// <para>
+    ///   If not <see langword="null"/>, this property overrides the value of the
+    ///   <see cref="ParseOptionsAttribute.AutoPrefixAliases"/> property.
+    /// </para>
+    /// </remarks>
+    public bool? AutoPrefixAliases { get; set; }
+
+    /// <summary>
     /// Gets or sets the color applied to error messages.
     /// </summary>
     /// <value>
@@ -561,6 +597,7 @@ public class ParseOptions
         NameValueSeparator ??= attribute.NameValueSeparator;
         AutoHelpArgument ??= attribute.AutoHelpArgument;
         AutoVersionArgument ??= attribute.AutoVersionArgument;
+        AutoPrefixAliases ??= attribute.AutoPrefixAliases;
         ValueDescriptionTransform ??= attribute.ValueDescriptionTransform;
     }
 

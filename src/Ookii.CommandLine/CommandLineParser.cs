@@ -1622,7 +1622,15 @@ public class CommandLineParser
 
         if (argument == null && !_argumentsByName.TryGetValue(argumentName, out argument))
         {
-            throw StringProvider.CreateException(CommandLineArgumentErrorCategory.UnknownArgument, argumentName.ToString());
+            if (Options.AutoPrefixAliases ?? true)
+            {
+                argument = GetArgumentByNamePrefix(argumentName.Span);
+            }
+
+            if (argument == null)
+            {
+                throw StringProvider.CreateException(CommandLineArgumentErrorCategory.UnknownArgument, argumentName.ToString());
+            }
         }
 
         argument.SetUsedArgumentName(argumentName);
@@ -1660,6 +1668,45 @@ public class CommandLineParser
         // ParseArgumentValue returns true if parsing was canceled by the ArgumentParsed event handler
         // or the CancelParsing property.
         return ParseArgumentValue(argument, null, argumentValue) ? -1 : index;
+    }
+
+    private CommandLineArgument? GetArgumentByNamePrefix(ReadOnlySpan<char> prefix)
+    {
+        CommandLineArgument? foundArgument = null;
+        foreach (var argument in _arguments)
+        {
+            // Skip arguments without a long name.
+            if (Mode == ParsingMode.LongShort && !argument.HasLongName)
+            {
+                continue;
+            }
+
+            var matches = argument.ArgumentName.AsSpan().StartsWith(prefix, ArgumentNameComparison);
+            if (!matches && argument.Aliases != null)
+            {
+                foreach (var alias in argument.Aliases)
+                {
+                    if (alias.AsSpan().StartsWith(prefix, ArgumentNameComparison))
+                    {
+                        matches = true;
+                        break;
+                    }
+                }
+            }
+
+            if (matches)
+            {
+                if (foundArgument != null)
+                {
+                    // Prefix is not unique.
+                    return null;
+                }
+
+                foundArgument = argument;
+            }
+        }
+
+        return foundArgument;
     }
 
     private bool ParseShortArgument(ReadOnlySpan<char> name, ReadOnlyMemory<char>? value)

@@ -1154,6 +1154,36 @@ namespace Ookii.CommandLine.Tests
             Assert.IsNull(parser.GetArgument("Arg3").DefaultValue);
         }
 
+        [TestMethod]
+        [DynamicData(nameof(ProviderKinds), DynamicDataDisplayName = nameof(GetCustomDynamicDataDisplayName))]
+        public void TestAutoPrefixAliases(ProviderKind kind)
+        {
+            var parser = CreateParser<AutoPrefixAliasesArguments>(kind);
+
+            // Shortest possible prefixes
+            var result = parser.Parse(new[] { "-pro", "foo", "-Po", "5", "-e" });
+            Assert.IsNotNull(result);
+            Assert.AreEqual("foo", result.Protocol);
+            Assert.AreEqual(5, result.Port);
+            Assert.IsTrue(result.EnablePrefix);
+
+            // Ambiguous prefix
+            CheckThrows(() => parser.Parse(new[] { "-p", "foo" }), parser, CommandLineArgumentErrorCategory.UnknownArgument, "p");
+
+            // Ambiguous due to alias.
+            CheckThrows(() => parser.Parse(new[] { "-pr", "foo" }), parser, CommandLineArgumentErrorCategory.UnknownArgument, "pr");
+
+            // Prefix of an alias.
+            result = parser.Parse(new[] { "-pre" });
+            Assert.IsNotNull(result);
+            Assert.IsTrue(result.EnablePrefix);
+
+            // Disable auto prefix aliases.
+            var options = new ParseOptions() { AutoPrefixAliases = false };
+            parser = CreateParser<AutoPrefixAliasesArguments>(kind, options);
+            CheckThrows(() => parser.Parse(new[] { "-pro", "foo", "-Po", "5", "-e" }), parser, CommandLineArgumentErrorCategory.UnknownArgument, "pro");
+        }
+
         private class ExpectedArgument
         {
             public ExpectedArgument(string name, Type type, ArgumentKind kind = ArgumentKind.SingleValue)
