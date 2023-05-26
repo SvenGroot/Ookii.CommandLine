@@ -15,7 +15,7 @@ Without source generation, these mistakes would either lead to a runtime excepti
 catch any problems during compile time, which reduces the risk of bugs.
 
 Not all errors can be caught at compile time. For example, the source generator does not check for
-duplicate argument names, because the `ParseOptions.ArgumentNameTransform` property and
+duplicate argument names, because the `ParseOptions.ArgumentNameTransform` and
 `ParseOptions.ArgumentNameComparison` properties can render the result of this check inaccurate.
 
 ## Errors
