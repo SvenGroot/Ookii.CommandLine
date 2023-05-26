@@ -319,7 +319,7 @@ public class ParseOptions
     /// </remarks>
     /// <seealso cref="LocalizedStringProvider.AutomaticVersionName"/>
     /// <seealso cref="LocalizedStringProvider.AutomaticVersionDescription"/>
-    public bool? AutoVersionArgument { get; set; } = true;
+    public bool? AutoVersionArgument { get; set; }
 
     /// <summary>
     /// Gets or sets the color applied to error messages.
