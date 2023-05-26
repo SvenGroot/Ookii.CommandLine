@@ -20,7 +20,7 @@ names, which makes this impossible to determine at compile time.
 
 ## Errors
 
-### CL0001
+### OCL0001
 
 The command line arguments or command manager type must be a reference type.
 
@@ -38,7 +38,7 @@ partial struct Arguments // ERROR: The type must be a class.
 }
 ```
 
-### CL0002
+### OCL0002
 
 The command line arguments or command manager class must be partial.
 
@@ -56,7 +56,7 @@ class Arguments // ERROR: The class must be partial
 }
 ```
 
-### CL0003
+### OCL0003
 
 The command line arguments or command manager class must not have any generic type arguments.
 
@@ -74,7 +74,7 @@ partial class Arguments<T> // ERROR: The class must not be generic
 }
 ```
 
-### CL0004
+### OCL0004
 
 The command line arguments or command manager class must not be nested in another type.
 
@@ -95,7 +95,7 @@ class SomeClass
 }
 ```
 
-### CL0005
+### OCL0005
 
 A multi-value argument defined by a property with an array type must use an array rank of one.
 Arrays with different ranks are not supported.
@@ -112,7 +112,7 @@ partial class Arguments
 }
 ```
 
-### CL0006
+### OCL0006
 
 A command line argument property must have a public set accessor.
 
@@ -132,7 +132,7 @@ partial class Arguments
 }
 ```
 
-### CL0007
+### OCL0007
 
 No command line argument converter exists for the argument's type.
 
@@ -155,7 +155,7 @@ partial class Arguments
 }
 ```
 
-### CL0008
+### OCL0008
 
 A method argument must use a supported signature.
 
@@ -175,7 +175,7 @@ partial class Arguments
 }
 ```
 
-### CL0009
+### OCL0009
 
 Init accessors may only be used with required properties.
 
@@ -207,7 +207,7 @@ partial class Arguments
 }
 ```
 
-### CL0010
+### OCL0010
 
 The `GeneratedParserAttribute` cannot be used with a class that implements the
 `ICommandWithCustomParsing` interface.
@@ -236,7 +236,7 @@ partial class Arguments : ICommandWithCustomParsing // ERROR: The command uses c
 }
 ```
 
-### CL0011
+### OCL0011
 
 A positional multi-value argument must be the last positional argument.
 
@@ -258,7 +258,7 @@ partial class Arguments
 }
 ```
 
-### CL0012
+### OCL0012
 
 Required positional arguments must come before optional positional arguments.
 
@@ -279,7 +279,7 @@ partial class Arguments
 }
 ```
 
-### CL0013
+### OCL0013
 
 One of the assembly names specified in the `GeneratedCommandManagerAttribute.AssemblyNames` property
 is not valid. This error is used when you give the full assembly identify, but it cannot be parsed.
@@ -294,7 +294,7 @@ partial class MyCommandManager
 }
 ```
 
-### CL0014
+### OCL0014
 
 One of the assembly names specified in the `GeneratedCommandManagerAttribute.AssemblyNames` property
 could not be resolved. Make sure it's an assembly that is referenced by the current project.
@@ -312,7 +312,7 @@ partial class MyCommandManager
 }
 ```
 
-### CL0015
+### OCL0015
 
 The `ArgumentConverterAttribute` must use the `typeof` keyword.
 
