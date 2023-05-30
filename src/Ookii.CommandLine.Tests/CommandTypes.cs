@@ -50,9 +50,9 @@ public partial class AnotherSimpleCommand : ICommand
 [Description("Custom parsing command.")]
 partial class CustomParsingCommand : ICommandWithCustomParsing
 {
-    public void Parse(string[] args, int index, CommandOptions options)
+    public void Parse(ReadOnlyMemory<string> args, CommandManager manager)
     {
-        Value = args[index];
+        Value = args.Span[0];
     }
 
     public string Value { get; set; }

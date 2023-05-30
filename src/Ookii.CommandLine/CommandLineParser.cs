@@ -898,22 +898,15 @@ public class CommandLineParser
 
     /// <inheritdoc cref="Parse()" />
     /// <summary>
-    /// Parses the specified command line arguments, starting at the specified index.
+    /// Parses the specified command line arguments.
     /// </summary>
     /// <param name="args">The command line arguments.</param>
-    /// <param name="index">The index of the first argument to parse.</param>
-    /// <exception cref="ArgumentNullException">
-    ///   <paramref name="args"/> is <see langword="null"/>.
-    /// </exception>
-    /// <exception cref="ArgumentOutOfRangeException">
-    ///   <paramref name="index"/> does not fall within the bounds of <paramref name="args"/>.
-    /// </exception>
-    public object? Parse(string[] args, int index = 0)
+    public object? Parse(ReadOnlySpan<string> args)
     {
         try
         {
             HelpRequested = false;
-            return ParseCore(args, index);
+            return ParseCore(args);
         }
         catch (CommandLineArgumentException ex)
         {
@@ -921,6 +914,33 @@ public class CommandLineParser
             ParseResult = ParseResult.FromException(ex);
             throw;
         }
+    }
+
+    /// <inheritdoc cref="Parse()" />
+         /// <summary>
+         /// Parses the specified command line arguments, starting at the specified index.
+         /// </summary>
+         /// <param name="args">The command line arguments.</param>
+         /// <param name="index">The index of the first argument to parse.</param>
+         /// <exception cref="ArgumentNullException">
+         ///   <paramref name="args"/> is <see langword="null"/>.
+         /// </exception>
+         /// <exception cref="ArgumentOutOfRangeException">
+         ///   <paramref name="index"/> does not fall within the bounds of <paramref name="args"/>.
+         /// </exception>
+    public object? Parse(string[] args, int index = 0)
+    {
+        if (args == null)
+        {
+            throw new ArgumentNullException(nameof(index));
+        }
+
+        if (index < 0 || index > args.Length)
+        {
+            throw new ArgumentOutOfRangeException(nameof(index));
+        }
+
+        return Parse(args.AsSpan(index));
     }
 
     /// <summary>
@@ -970,6 +990,27 @@ public class CommandLineParser
     /// </exception>
     public object? ParseWithErrorHandling(string[] args, int index = 0)
     {
+        if (args == null)
+        {
+            throw new ArgumentNullException(nameof(index));
+        }
+
+        if (index < 0 || index > args.Length)
+        {
+            throw new ArgumentOutOfRangeException(nameof(index));
+        }
+
+        return ParseWithErrorHandling(args.AsSpan(index));
+    }
+
+    /// <inheritdoc cref="ParseWithErrorHandling()" />
+    /// <summary>
+    /// Parses the specified command line arguments, and displays error messages and usage help if
+    /// required.
+    /// </summary>
+    /// <param name="args">The command line arguments.</param>
+    public object? ParseWithErrorHandling(ReadOnlySpan<string> args)
+    {
         EventHandler<DuplicateArgumentEventArgs>? handler = null;
         if (_parseOptions.DuplicateArguments == ErrorMode.Warning)
         {
@@ -986,7 +1027,7 @@ public class CommandLineParser
         object? result = null;
         try
         {
-            result = Parse(args, index);
+            result = Parse(args);
         }
         catch (CommandLineArgumentException ex)
         {
@@ -1452,18 +1493,8 @@ public class CommandLineParser
         }
     }
 
-    private object? ParseCore(string[] args, int index)
+    private object? ParseCore(ReadOnlySpan<string> args)
     {
-        if (args == null)
-        {
-            throw new ArgumentNullException(nameof(index));
-        }
-
-        if (index < 0 || index > args.Length)
-        {
-            throw new ArgumentOutOfRangeException(nameof(index));
-        }
-
         // Reset all arguments to their default value.
         foreach (CommandLineArgument argument in _arguments)
         {
@@ -1473,7 +1504,7 @@ public class CommandLineParser
         HelpRequested = false;
         int positionalArgumentIndex = 0;
 
-        for (int x = index; x < args.Length; ++x)
+        for (int x = 0; x < args.Length; ++x)
         {
             string arg = args[x];
             var argumentNamePrefix = CheckArgumentNamePrefix(arg);
@@ -1601,7 +1632,7 @@ public class CommandLineParser
         return cancel;
     }
 
-    private int ParseNamedArgument(string[] args, int index, PrefixInfo prefix)
+    private int ParseNamedArgument(ReadOnlySpan<string> args, int index, PrefixInfo prefix)
     {
         var (argumentName, argumentValue) = args[index].AsMemory(prefix.Prefix.Length).SplitOnce(NameValueSeparator);
 

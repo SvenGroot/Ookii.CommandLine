@@ -18,22 +18,21 @@ internal abstract class ParentCommand : AsyncCommandBase, ICommandWithCustomPars
 {
     private IAsyncCommand? _childCommand;
 
-    public void Parse(string[] args, int index, CommandOptions options)
+    public void Parse(ReadOnlyMemory<string> args, CommandManager manager)
     {
         // Nested commands don't need to have a "version" command.
-        options.AutoVersionCommand = false;
+        manager.Options.AutoVersionCommand = false;
 
         // Select only the commands that have a ParentCommandAttribute specifying this command
         // as their parent.
-        options.CommandFilter =
+        manager.Options.CommandFilter =
             (command) => command.CommandType.GetCustomAttribute<ParentCommandAttribute>()?.ParentCommand == GetType();
 
-        var manager = new CommandManager(options);
         var info = CommandInfo.Create(GetType(), manager);
 
         // Use a custom UsageWriter to replace the application description with the
         // description of this command.
-        options.UsageWriter = new CustomUsageWriter(info)
+        manager.Options.UsageWriter = new CustomUsageWriter(info)
         {
             // Apply the same options as the parent command.
             IncludeApplicationDescriptionBeforeCommandList = true,
@@ -41,7 +40,7 @@ internal abstract class ParentCommand : AsyncCommandBase, ICommandWithCustomPars
         };
 
         // All commands in this sample are async, so this cast is safe.
-        _childCommand = (IAsyncCommand?)manager.CreateCommand(args, index);
+        _childCommand = (IAsyncCommand?)manager.CreateCommand(args);
     }
 
     public override async Task<int> RunAsync()

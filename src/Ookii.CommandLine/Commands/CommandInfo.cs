@@ -175,7 +175,7 @@ namespace Ookii.CommandLine.Commands
         {
             if (args == null)
             {
-                throw new ArgumentNullException(nameof(args));
+                throw new ArgumentNullException(nameof(index));
             }
 
             if (index < 0 || index > args.Length)
@@ -183,16 +183,35 @@ namespace Ookii.CommandLine.Commands
                 throw new ArgumentOutOfRangeException(nameof(index));
             }
 
+            return CreateInstanceWithResult(args.AsMemory(index));
+        }
+
+        /// <summary>
+        /// Creates an instance of the command type.
+        /// </summary>
+        /// <param name="args">The arguments to the command.</param>
+        /// <returns>
+        /// A tuple containing an instance of the <see cref="CommandType"/>, or <see langword="null"/> if an error
+        /// occurred or parsing was canceled, and the <see cref="ParseResult"/> of the operation.
+        /// </returns>
+        /// <remarks>
+        /// <para>
+        ///   The <see cref="ParseResult.Status"/> property of the returned <see cref="ParseResult"/>
+        ///   will be <see cref="ParseStatus.None"/> if the command used custom parsing.
+        /// </para>
+        /// </remarks>
+        public (ICommand?, ParseResult) CreateInstanceWithResult(ReadOnlyMemory<string> args)
+        {
             if (UseCustomArgumentParsing)
             {
                 var command = CreateInstanceWithCustomParsing();
-                command.Parse(args, index, _manager.Options);
+                command.Parse(args, _manager);
                 return (command, default);
             }
             else
             {
                 var parser = CreateParser();
-                var command = (ICommand?)parser.ParseWithErrorHandling(args, index);
+                var command = (ICommand?)parser.ParseWithErrorHandling(args.Span);
                 return (command, parser.ParseResult);
             }
         }

@@ -1,4 +1,6 @@
-﻿namespace Ookii.CommandLine.Commands
+﻿using System;
+
+namespace Ookii.CommandLine.Commands
 {
     /// <summary>
     /// Represents a subcommand that does its own argument parsing.
@@ -19,8 +21,7 @@
         /// Parses the arguments for the command.
         /// </summary>
         /// <param name="args">The arguments.</param>
-        /// <param name="index">The index of the first argument.</param>
-        /// <param name="options">The options to use for parsing and usage help.</param>
-        void Parse(string[] args, int index, CommandOptions options);
+        /// <param name="manager">The <see cref="CommandManager"/> that was used to create this command.</param>
+        void Parse(ReadOnlyMemory<string> args, CommandManager manager);
     }
 }

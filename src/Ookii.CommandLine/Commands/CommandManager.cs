@@ -301,17 +301,10 @@ public class CommandManager
     /// </summary>
     /// <param name="commandName">The name of the command.</param>
     /// <param name="args">The arguments to the command.</param>
-    /// <param name="index">The index in <paramref name="args"/> at which to start parsing the arguments.</param>
     /// <returns>
     ///   An instance a class implement the <see cref="ICommand"/> interface, or
     ///   <see langword="null"/> if the command was not found or an error occurred parsing the arguments.
     /// </returns>
-    /// <exception cref="ArgumentNullException">
-    ///   <paramref name="args"/> is <see langword="null"/>
-    /// </exception>
-    /// <exception cref="ArgumentOutOfRangeException">
-    ///   <paramref name="index"/> does not fall inside the bounds of <paramref name="args"/>.
-    /// </exception>
     /// <remarks>
     /// <para>
     ///   If the command could not be found, a list of possible commands is written using the
@@ -335,18 +328,8 @@ public class CommandManager
     ///   automatic version command, and not any other command name.
     /// </para>
     /// </remarks>
-    public ICommand? CreateCommand(string? commandName, string[] args, int index)
+    public ICommand? CreateCommand(string? commandName, ReadOnlyMemory<string> args)
     {
-        if (args == null)
-        {
-            throw new ArgumentNullException(nameof(args));
-        }
-
-        if (index < 0 || index > args.Length)
-        {
-            throw new ArgumentOutOfRangeException(nameof(index));
-        }
-
         ParseResult = default;
         var commandInfo = commandName == null
             ? null
@@ -361,7 +344,7 @@ public class CommandManager
         _options.UsageWriter.CommandName = info.Name;
         try
         {
-            var (command, result) = info.CreateInstanceWithResult(args, index);
+            var (command, result) = info.CreateInstanceWithResult(args);
             ParseResult = result;
             return command;
         }
@@ -369,6 +352,25 @@ public class CommandManager
         {
             _options.UsageWriter.CommandName = null;
         }
+    }
+
+    /// <inheritdoc cref="CreateCommand(string?, ReadOnlyMemory{string})"/>
+    /// <param name="commandName">The name of the command.</param>
+    /// <param name="args">The arguments to the command.</param>
+    /// <param name="index">The index in <paramref name="args"/> at which to start parsing the arguments.</param>
+    public ICommand? CreateCommand(string? commandName, string[] args, int index)
+    {
+        if (args == null)
+        {
+            throw new ArgumentNullException(nameof(index));
+        }
+
+        if (index < 0 || index > args.Length)
+        {
+            throw new ArgumentOutOfRangeException(nameof(index));
+        }
+
+        return CreateCommand(commandName, args.AsMemory(index));
     }
 
     /// <inheritdoc cref="CreateCommand(string?, string[], int)"/>
@@ -388,14 +390,25 @@ public class CommandManager
             throw new ArgumentOutOfRangeException(nameof(index));
         }
 
+        return CreateCommand(args.AsMemory(index));
+    }
+
+
+    /// <inheritdoc cref="CreateCommand(string?, ReadOnlyMemory{string})"/>
+    /// <summary>
+    /// Finds and instantiates the subcommand with the name from the first argument, or if that
+    /// fails, writes error and usage information.
+    /// </summary>
+    public ICommand? CreateCommand(ReadOnlyMemory<string> args)
+    {
         string? commandName = null;
-        if (index < args.Length)
+        if (args.Length != 0)
         {
-            commandName = args[index];
-            ++index;
+            commandName = args.Span[0];
+            args = args.Slice(1);
         }
 
-        return CreateCommand(commandName, args, index);
+        return CreateCommand(commandName, args);
     }
 
     /// <summary>
@@ -403,10 +416,10 @@ public class CommandManager
     /// using the first argument for the command name. If that fails, writes error and usage information.
     /// </summary>
     /// <returns>
-    /// <inheritdoc cref="CreateCommand(string?, string[], int)"/>
+    /// <inheritdoc cref="CreateCommand(string?, ReadOnlyMemory{string})"/>
     /// </returns>
     /// <remarks>
-    /// <inheritdoc cref="CreateCommand(string?, string[], int)"/>
+    /// <inheritdoc cref="CreateCommand(string?, ReadOnlyMemory{string})"/>
     /// </remarks>
     public ICommand? CreateCommand()
     {
