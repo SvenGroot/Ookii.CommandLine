@@ -307,6 +307,14 @@ internal static class Diagnostics
         member.Locations.FirstOrDefault(),
         member.ToDisplayString());
 
+    public static Diagnostic CommandWithoutDescription(ISymbol symbol) => CreateDiagnostic(
+        "OCL0034",
+        nameof(Resources.CommandWithoutDescriptionTitle),
+        nameof(Resources.CommandWithoutDescriptionMessageFormat),
+        DiagnosticSeverity.Warning,
+        symbol.Locations.FirstOrDefault(),
+        symbol.ToDisplayString());
+
     private static Diagnostic CreateDiagnostic(string id, string titleResource, string messageResource, DiagnosticSeverity severity, Location? location, params object?[]? messageArgs)
         => Diagnostic.Create(
             new DiagnosticDescriptor(

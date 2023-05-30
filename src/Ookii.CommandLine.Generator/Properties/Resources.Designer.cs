@@ -205,6 +205,24 @@ namespace Ookii.CommandLine.Generator.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The subcommand defined by {0} should have a description for the usage help. Use the System.ComponentModel.DescriptionAttribute attribute on the class to supply a description..
+        /// </summary>
+        internal static string CommandWithoutDescriptionMessageFormat {
+            get {
+                return ResourceManager.GetString("CommandWithoutDescriptionMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Subcommands should have a description..
+        /// </summary>
+        internal static string CommandWithoutDescriptionTitle {
+            get {
+                return ResourceManager.GetString("CommandWithoutDescriptionTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The default value is ignored if the argument is required, multi-value, or a method argument..
         /// </summary>
         internal static string DefaultValueIgnoredTitle {
@@ -615,15 +633,6 @@ namespace Ookii.CommandLine.Generator.Properties {
         internal static string ShortAliasWithoutShortNameTitle {
             get {
                 return ResourceManager.GetString("ShortAliasWithoutShortNameTitle", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to .
-        /// </summary>
-        internal static string String1 {
-            get {
-                return ResourceManager.GetString("String1", resourceCulture);
             }
         }
         

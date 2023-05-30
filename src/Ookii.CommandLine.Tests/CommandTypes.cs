@@ -3,7 +3,7 @@ using System;
 using System.ComponentModel;
 using System.Threading.Tasks;
 
-#pragma warning disable OCL0033
+#pragma warning disable OCL0033,OCL0034
 
 namespace Ookii.CommandLine.Tests;
 
@@ -16,7 +16,6 @@ partial class GeneratedManagerWithExplicitAssembly { }
 // Also tests using identity instead of name.
 [GeneratedCommandManager(AssemblyNames = new[] { "Ookii.CommandLine.Tests", "Ookii.CommandLine.Tests.Commands, Version=1.0.0.0, Culture=neutral, PublicKeyToken=0c15020868fd6249" })]
 partial class GeneratedManagerWithMultipleAssemblies { }
-
 
 [GeneratedParser]
 [Command("test")]

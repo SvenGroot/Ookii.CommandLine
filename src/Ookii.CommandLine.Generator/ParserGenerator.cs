@@ -117,6 +117,15 @@ internal class ParserGenerator
             return null;
         }
 
+        if (isCommand && attributes.Description == null)
+        {
+            var commandInfo = new CommandAttributeInfo(attributes.Command!);
+            if (!commandInfo.IsHidden)
+            {
+                _context.ReportDiagnostic(Diagnostics.CommandWithoutDescription(_argumentsClass));
+            }
+        }
+
         _builder.AppendLine($"public static Ookii.CommandLine.CommandLineParser<{_argumentsClass.Name}> CreateParser(Ookii.CommandLine.ParseOptions? options = null) => new(new GeneratedProvider(), options);");
         _builder.AppendLine();
         var nullableType = _argumentsClass.WithNullableAnnotation(NullableAnnotation.Annotated);

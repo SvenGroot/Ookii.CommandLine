@@ -720,7 +720,6 @@ To fix this, write a concise description explaining the argument's purpose and u
 [GeneratedParser]
 partial class Arguments
 {
-    /// WARNING: No DescriptionAttribute on this member.
     [CommandLineAttribute]
     [Description("A description of the argument.")]
     public string? Argument { get; set; }
@@ -729,3 +728,40 @@ partial class Arguments
 
 This warning will not be emitted for arguments that are hidden using the
 `CommandLineArgumentAttribute.IsHidden` property.
+
+### OCL0034
+
+Subcommands should have a description, set using the `DescriptionAttribute` attribute, for use in
+the usage help.
+
+For example, the following code triggers this warning:
+
+```csharp
+/// WARNING: No DescriptionAttribute on this subcommand class.
+[GeneratedParser]
+[Command]
+partial class MyCommand : ICommand
+{
+    [CommandLineAttribute]
+    [Description("A description of the argument.")]
+    public string? Argument { get; set; }
+}
+```
+
+To fix this, write a concise description explaining the command's purpose, and apply the
+`DescriptionAttribute` (or a derived attribute) to the class that defines the command.
+
+```csharp
+[GeneratedParser]
+[Description("A description of the command.")]
+[Command]
+partial class MyCommand : ICommand
+{
+    [CommandLineAttribute]
+    [Description("A description of the argument.")]
+    public string? Argument { get; set; }
+}
+```
+
+This warning will not be emitted for subcommands that are hidden using the
+`CommandAttribute.IsHidden` property.
