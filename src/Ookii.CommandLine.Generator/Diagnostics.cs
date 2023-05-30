@@ -299,6 +299,14 @@ internal static class Diagnostics
         attribute.GetLocation(),
         member.ToDisplayString());
 
+    public static Diagnostic ArgumentWithoutDescription(ISymbol member) => CreateDiagnostic(
+        "OCL0033",
+        nameof(Resources.ArgumentWithoutDescriptionTitle),
+        nameof(Resources.ArgumentWithoutDescriptionMessageFormat),
+        DiagnosticSeverity.Warning,
+        member.Locations.FirstOrDefault(),
+        member.ToDisplayString());
+
     private static Diagnostic CreateDiagnostic(string id, string titleResource, string messageResource, DiagnosticSeverity severity, Location? location, params object?[]? messageArgs)
         => Diagnostic.Create(
             new DiagnosticDescriptor(

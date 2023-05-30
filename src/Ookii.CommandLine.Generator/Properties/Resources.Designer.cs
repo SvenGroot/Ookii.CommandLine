@@ -115,6 +115,24 @@ namespace Ookii.CommandLine.Generator.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The argument defined by {0} should have a description for the usage help. Use the System.ComponentModel.DescriptionAttribute attribute on the member to supply a description..
+        /// </summary>
+        internal static string ArgumentWithoutDescriptionMessageFormat {
+            get {
+                return ResourceManager.GetString("ArgumentWithoutDescriptionMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Arguments should have a description..
+        /// </summary>
+        internal static string ArgumentWithoutDescriptionTitle {
+            get {
+                return ResourceManager.GetString("ArgumentWithoutDescriptionTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The class {0} may not be a generic class when the {1} attribute is used..
         /// </summary>
         internal static string ClassIsGenericMessageFormat {

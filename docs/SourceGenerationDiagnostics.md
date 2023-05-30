@@ -691,3 +691,41 @@ partial class Arguments
     public string? Argument { get; set; }
 }
 ```
+
+### OCL0033
+
+Arguments should have a description, set using the `DescriptionAttribute` attribute, for use in the
+usage help.
+
+Arguments without a description are not guaranteed to be listed in the description list of the
+usage help, and provide no additional information about their use when the user requests usage
+help (for example using the automatic `-Help` argument).
+
+For example, the following code triggers this warning:
+
+```csharp
+[GeneratedParser]
+partial class Arguments
+{
+    /// WARNING: No DescriptionAttribute on this member.
+    [CommandLineAttribute]
+    public string? Argument { get; set; }
+}
+```
+
+To fix this, write a concise description explaining the argument's purpose and usage, and apply the
+`DescriptionAttribute` (or a derived attribute) to the member that defines the argument.
+
+```csharp
+[GeneratedParser]
+partial class Arguments
+{
+    /// WARNING: No DescriptionAttribute on this member.
+    [CommandLineAttribute]
+    [Description("A description of the argument.")]
+    public string? Argument { get; set; }
+}
+```
+
+This warning will not be emitted for arguments that are hidden using the
+`CommandLineArgumentAttribute.IsHidden` property.

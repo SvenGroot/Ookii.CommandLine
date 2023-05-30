@@ -135,6 +135,12 @@
   <data name="ArgumentStartsWithNumberTitle" xml:space="preserve">
     <value>Argument names starting with a number cannot be used with the '-' prefix.</value>
   </data>
+  <data name="ArgumentWithoutDescriptionMessageFormat" xml:space="preserve">
+    <value>The argument defined by {0} should have a description for the usage help. Use the System.ComponentModel.DescriptionAttribute attribute on the member to supply a description.</value>
+  </data>
+  <data name="ArgumentWithoutDescriptionTitle" xml:space="preserve">
+    <value>Arguments should have a description.</value>
+  </data>
   <data name="ClassIsGenericMessageFormat" xml:space="preserve">
     <value>The class {0} may not be a generic class when the {1} attribute is used.</value>
   </data>

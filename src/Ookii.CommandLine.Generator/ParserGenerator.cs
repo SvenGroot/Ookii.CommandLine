@@ -550,9 +550,22 @@ internal class ParserGenerator
             _context.ReportDiagnostic(Diagnostics.AliasWithoutLongName(attributes.Aliases.First(), member));
         }
 
-        if (argumentInfo.IsHidden && argumentInfo.Position != null)
+        bool isHidden = false;
+        if (argumentInfo.IsHidden)
         {
-            _context.ReportDiagnostic(Diagnostics.IsHiddenWithPositional(member));
+            if (argumentInfo.Position != null)
+            {
+                _context.ReportDiagnostic(Diagnostics.IsHiddenWithPositional(member));
+            }
+            else
+            {
+                isHidden = true;
+            }
+        }
+
+        if (!isHidden && attributes.Description == null)
+        {
+            _context.ReportDiagnostic(Diagnostics.ArgumentWithoutDescription(member));
         }
 
         CheckIgnoredDictionaryAttribute(member, isDictionary, attributes.Converter, attributes.KeyConverter);

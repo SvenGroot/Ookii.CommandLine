@@ -8,6 +8,8 @@ using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
 
+#pragma warning disable OCL0033
+
 //var manager = new TestManager();
 //return manager.RunCommand() ?? 1;
 

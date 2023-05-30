@@ -3,6 +3,8 @@ using System;
 using System.ComponentModel;
 using System.Threading.Tasks;
 
+#pragma warning disable OCL0033
+
 namespace Ookii.CommandLine.Tests;
 
 [GeneratedCommandManager]
