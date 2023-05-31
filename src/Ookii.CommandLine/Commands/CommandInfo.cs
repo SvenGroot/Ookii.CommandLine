@@ -28,6 +28,7 @@ namespace Ookii.CommandLine.Commands
         /// </summary>
         /// <param name="commandType">The type that implements the subcommand.</param>
         /// <param name="attribute">The <see cref="CommandAttribute"/> for the subcommand type.</param>
+        /// <param name="parentCommandType">The <see cref="Type"/> of a command that is the parent of this command.</param>
         /// <param name="manager">
         ///   The <see cref="CommandManager"/> that is managing this command.
         /// </param>
@@ -37,12 +38,13 @@ namespace Ookii.CommandLine.Commands
         /// <exception cref="ArgumentException">
         ///   <paramref name="commandType"/> is not a command type.
         /// </exception>
-        protected CommandInfo(Type commandType, CommandAttribute attribute, CommandManager manager)
+        protected CommandInfo(Type commandType, CommandAttribute attribute, CommandManager manager, Type? parentCommandType)
         {
             _manager = manager ?? throw new ArgumentNullException(nameof(manager));
             _name = GetName(attribute, commandType, manager.Options);
             _commandType = commandType;
             _attribute = attribute;
+            ParentCommandType = parentCommandType;
         }
 
         internal CommandInfo(Type commandType, string name, CommandManager manager)
@@ -132,6 +134,8 @@ namespace Ookii.CommandLine.Commands
         /// </para>
         /// </remarks>
         public abstract IEnumerable<string> Aliases { get; }
+
+        public Type? ParentCommandType { get; }
 
         /// <summary>
         /// Creates an instance of the command type.

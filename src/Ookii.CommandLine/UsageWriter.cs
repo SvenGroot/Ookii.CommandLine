@@ -1572,7 +1572,7 @@ namespace Ookii.CommandLine
                 var name = ExecutableName;
                 if (CommandName != null)
                 {
-                    ExecutableName += " " + CommandName;
+                    name += " " + CommandName;
                 }
 
                 WriteLine(Resources.MoreInfoOnErrorFormat, name, arg.ArgumentNameWithPrefix);
@@ -1886,7 +1886,15 @@ namespace Ookii.CommandLine
         /// </para>
         /// </remarks>
         protected virtual void WriteCommandHelpInstruction(string argumentNamePrefix, string argumentName)
-            => WriteLine(Resources.CommandHelpInstructionFormat, ExecutableName, argumentNamePrefix, argumentName);
+        {
+            var name = ExecutableName;
+            if (CommandName != null)
+            {
+                name += " " + CommandName;
+            }
+
+            WriteLine(Resources.CommandHelpInstructionFormat, name, argumentNamePrefix, argumentName);
+        }
 
         #endregion
 

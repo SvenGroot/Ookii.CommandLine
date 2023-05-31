@@ -157,7 +157,7 @@ internal class CommandGenerator
         return builder.GetSource();
     }
 
-    private void GenerateCommand(SourceBuilder builder, INamedTypeSymbol commandType, ArgumentsClassAttributes? commandAttributes)
+    private bool GenerateCommand(SourceBuilder builder, INamedTypeSymbol commandType, ArgumentsClassAttributes? commandAttributes)
     {
         var useCustomParsing = commandType.ImplementsInterface(_typeHelper.ICommandWithCustomParsing);
         var commandTypeName = commandType.ToDisplayString();
@@ -201,8 +201,23 @@ internal class CommandGenerator
             }
         }
 
+        if (attributes.ParentCommand != null)
+        {
+            var argument = attributes.ParentCommand.ConstructorArguments[0];
+            if (argument.Kind != TypedConstantKind.Type)
+            {
+                _context.ReportDiagnostic(Diagnostics.ParentCommandStringNotSupported(attributes.ParentCommand, commandType));
+                return false;
+            }
+
+            var parentCommandType = (INamedTypeSymbol)argument.Value!;
+            builder.AppendArgument($"parentCommandType: typeof({parentCommandType})");
+        }
+
         builder.CloseArgumentList();
         builder.AppendLine();
+
+        return true;
     }
 
     private IEnumerable<(INamedTypeSymbol, ArgumentsClassAttributes?)>? GetCommands(string? assemblyName, ITypeSymbol manager)

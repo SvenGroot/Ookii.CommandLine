@@ -91,6 +91,8 @@ namespace Ookii.CommandLine.Commands
         /// </remarks>
         public Func<CommandInfo, bool>? CommandFilter { get; set; }
 
+        public Type? ParentCommand { get; set; }
+
         /// <summary>
         /// Gets or sets a value that indicates whether a version command should automatically be
         /// created.

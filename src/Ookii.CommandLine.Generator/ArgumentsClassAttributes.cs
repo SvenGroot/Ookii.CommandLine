@@ -9,6 +9,7 @@ internal readonly struct ArgumentsClassAttributes
     private readonly AttributeData? _applicationFriendlyName;
     private readonly AttributeData? _command;
     private readonly AttributeData? _generatedParser;
+    private readonly AttributeData? _parentCommand;
     private readonly List<AttributeData>? _classValidators;
     private readonly List<AttributeData>? _aliases;
 
@@ -24,6 +25,7 @@ internal readonly struct ArgumentsClassAttributes
                     attribute.CheckType(typeHelper.ApplicationFriendlyNameAttribute, ref _applicationFriendlyName) ||
                     attribute.CheckType(typeHelper.CommandAttribute, ref _command) ||
                     attribute.CheckType(typeHelper.ClassValidationAttribute, ref _classValidators) ||
+                    attribute.CheckType(typeHelper.ParentCommandAttribute, ref _parentCommand) ||
                     attribute.CheckType(typeHelper.AliasAttribute, ref _aliases) ||
                     attribute.CheckType(typeHelper.GeneratedParserAttribute, ref _generatedParser))
                 {
@@ -43,6 +45,7 @@ internal readonly struct ArgumentsClassAttributes
     public AttributeData? ApplicationFriendlyName => _applicationFriendlyName;
     public AttributeData? Command => _command;
     public AttributeData? GeneratedParser => _generatedParser;
+    public AttributeData? ParentCommand => _parentCommand;
     public List<AttributeData>? ClassValidators => _classValidators;
     public List<AttributeData>? Aliases => _aliases;
 }

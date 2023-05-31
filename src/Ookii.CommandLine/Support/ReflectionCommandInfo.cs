@@ -21,7 +21,7 @@ internal class ReflectionCommandInfo : CommandInfo
     private string? _description;
 
     public ReflectionCommandInfo(Type commandType, CommandAttribute? attribute, CommandManager manager)
-        : base(commandType, attribute ?? GetCommandAttributeOrThrow(commandType), manager)
+        : base(commandType, attribute ?? GetCommandAttributeOrThrow(commandType), manager, GetParentCommand(commandType))
     {
     }
 
@@ -87,5 +87,16 @@ internal class ReflectionCommandInfo : CommandInfo
     private string? GetCommandDescription()
     {
         return CommandType.GetCustomAttribute<DescriptionAttribute>()?.Description;
+    }
+
+    private static Type? GetParentCommand(Type commandType)
+    {
+        if (commandType == null)
+        {
+            throw new ArgumentNullException(nameof(commandType));
+        }
+
+        var attribute = commandType.GetCustomAttribute<ParentCommandAttribute>();
+        return attribute?.GetParentCommandType();
     }
 }

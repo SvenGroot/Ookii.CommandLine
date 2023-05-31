@@ -315,6 +315,14 @@ internal static class Diagnostics
         symbol.Locations.FirstOrDefault(),
         symbol.ToDisplayString());
 
+    public static Diagnostic ParentCommandStringNotSupported(AttributeData attribute, ISymbol symbol) => CreateDiagnostic(
+        "OCL0015",
+        nameof(Resources.ParentCommandStringNotSupportedTitle),
+        nameof(Resources.ParentCommandStringNotSupportedMessageFormat),
+        DiagnosticSeverity.Error,
+        attribute.GetLocation(),
+        symbol.ToDisplayString());
+
     private static Diagnostic CreateDiagnostic(string id, string titleResource, string messageResource, DiagnosticSeverity severity, Location? location, params object?[]? messageArgs)
         => Diagnostic.Create(
             new DiagnosticDescriptor(

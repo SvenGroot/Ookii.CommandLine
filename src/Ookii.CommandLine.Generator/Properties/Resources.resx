@@ -285,6 +285,12 @@
   <data name="NonRequiredInitOnlyPropertyTitle" xml:space="preserve">
     <value>Init accessors may only be used on required properties.</value>
   </data>
+  <data name="ParentCommandStringNotSupportedMessageFormat" xml:space="preserve">
+    <value>The subcommand defined by {0} uses the ParentCommandAttribute with a string argument, which is not supported by the GeneratedParserAttribute. Use a Type argument instead by using the typeof keyword.</value>
+  </data>
+  <data name="ParentCommandStringNotSupportedTitle" xml:space="preserve">
+    <value>The ParentCommandAttribute must use the typeof keyword.</value>
+  </data>
   <data name="PositionalArgumentAfterMultiValueMessageFormat" xml:space="preserve">
     <value>The positional argument defined by {0} comes after {1}, which is a multi-value argument and must come last.</value>
   </data>
@@ -308,6 +314,9 @@
   </data>
   <data name="ShortAliasWithoutShortNameTitle" xml:space="preserve">
     <value>The ShortAliasAttribute is ignored on an argument with no short name.</value>
+  </data>
+  <data name="String1" xml:space="preserve">
+    <value />
   </data>
   <data name="TypeNotReferenceTypeMessageFormat" xml:space="preserve">
     <value>The type {0} must be a reference type (class) when the {1} attribute is used.</value>

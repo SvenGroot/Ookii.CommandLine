@@ -87,4 +87,6 @@ internal class TypeHelper
 
     public INamedTypeSymbol? ICommandProvider => _compilation.GetTypeByMetadataName(NamespacePrefix + "Commands.ICommandProvider");
 
+    public INamedTypeSymbol? ParentCommandAttribute => _compilation.GetTypeByMetadataName(NamespacePrefix + "Commands.ParentCommandAttribute");
+
 }

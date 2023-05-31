@@ -114,3 +114,42 @@ public class NotACommand : ICommand
         throw new NotImplementedException();
     }
 }
+
+[Command(IsHidden = true)]
+class TestParentCommand : ParentCommand
+{
+}
+
+[GeneratedParser]
+[Command]
+[ParentCommand(typeof(TestParentCommand))]
+partial class TestChildCommand : ICommand
+{
+    [CommandLineArgument]
+    public int Value { get; set; }
+
+    public int Run() => Value;
+}
+
+[GeneratedParser]
+[Command]
+[ParentCommand(typeof(TestParentCommand))]
+partial class OtherTestChildCommand : ICommand
+{
+    public int Run() => throw new NotImplementedException();
+}
+
+[Command]
+[ParentCommand(typeof(TestParentCommand))]
+class NestedParentCommand : ParentCommand
+{
+}
+
+
+[GeneratedParser]
+[Command]
+[ParentCommand(typeof(NestedParentCommand))]
+partial class NestedParentChildCommand : ICommand
+{
+    public int Run() => throw new NotImplementedException();
+}

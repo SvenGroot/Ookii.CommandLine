@@ -228,10 +228,14 @@ public class CommandManager
     {
         var commands = GetCommandsUnsortedAndFiltered();
         if (_options.AutoVersionCommand &&
+            _options.ParentCommand == null &&
             !commands.Any(c => _options.CommandNameComparer.Compare(c.Name, Properties.Resources.AutomaticVersionCommandName) == 0))
         {
             var versionCommand = CommandInfo.GetAutomaticVersionCommand(this);
-            commands = commands.Append(versionCommand);
+            if (Options.CommandFilter?.Invoke(versionCommand) ?? true)
+            {
+                commands = commands.Append(versionCommand);
+            }
         }
 
         return commands.OrderBy(c => c.Name, _options.CommandNameComparer);
@@ -287,9 +291,14 @@ public class CommandManager
         }
 
         if (_options.AutoVersionCommand &&
+            _options.ParentCommand == null &&
             _options.CommandNameComparer.Compare(commandName, _options.AutoVersionCommandName()) == 0)
         {
-            return CommandInfo.GetAutomaticVersionCommand(this);
+            command = CommandInfo.GetAutomaticVersionCommand(this);
+            if (_options.CommandFilter?.Invoke(command) ?? true)
+            {
+                return command;
+            }
         }
 
         return null;
@@ -457,6 +466,45 @@ public class CommandManager
         return command?.Run();
     }
 
+    /// <summary>
+    /// Finds and instantiates the subcommand with the specified name, and if it succeeds,
+    /// runs it. If it fails, writes error and usage information.
+    /// </summary>
+    /// <param name="commandName">The name of the command.</param>
+    /// <param name="args">The arguments to the command.</param>
+    /// <returns>
+    ///   The value returned by <see cref="ICommand.Run"/>, or <see langword="null"/> if
+    ///   the command could not be created.
+    /// </returns>
+    /// <remarks>
+    /// <para>
+    ///   This function creates the command by invoking the <see cref="CreateCommand(string?, ReadOnlyMemory{string})"/>,
+    ///   method and then invokes the <see cref="ICommand.Run"/> method on the command.
+    /// </para>
+    /// </remarks>
+    public int? RunCommand(string? commandName, ReadOnlyMemory<string> args)
+    {
+        var command = CreateCommand(commandName, args);
+        return command?.Run();
+    }
+
+    /// <inheritdoc cref="RunCommand(string?, ReadOnlyMemory{string})"/>
+    /// <summary>
+    /// Finds and instantiates the subcommand with the name from the first argument, and if it
+    /// succeeds, runs it. If it fails, writes error and usage information.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    ///   This function creates the command by invoking the <see cref="CreateCommand(ReadOnlyMemory{string})"/>,
+    ///   method and then invokes the <see cref="ICommand.Run"/> method on the command.
+    /// </para>
+    /// </remarks>
+    public int? RunCommand(ReadOnlyMemory<string> args)
+    {
+        var command = CreateCommand(args);
+        return command?.Run();
+    }
+
     /// <inheritdoc cref="RunCommand(string?, string[], int)"/>
     /// <summary>
     /// Finds and instantiates the subcommand with the name from the first argument, and if it
@@ -494,6 +542,35 @@ public class CommandManager
         return RunCommand(Environment.GetCommandLineArgs(), 1);
     }
 
+    /// <inheritdoc cref="RunCommand(string?, ReadOnlyMemory{string})"/>
+    /// <summary>
+    /// Finds and instantiates the subcommand with the specified name, and if it succeeds,
+    /// runs it asynchronously. If it fails, writes error and usage information.
+    /// </summary>
+    /// <returns>
+    ///   A task representing the asynchronous run operation. The result is the value returned
+    ///   by <see cref="IAsyncCommand.RunAsync"/>, or <see langword="null"/> if the command
+    ///   could not be created.
+    /// </returns>
+    /// <remarks>
+    /// <para>
+    ///   This function creates the command by invoking the <see cref="CreateCommand(string?, ReadOnlyMemory{string})"/>,
+    ///   method. If the command implements the <see cref="IAsyncCommand"/> interface, it
+    ///   invokes the <see cref="IAsyncCommand.RunAsync"/> method; otherwise, it invokes the
+    ///   <see cref="ICommand.Run"/> method on the command.
+    /// </para>
+    /// </remarks>
+    public async Task<int?> RunCommandAsync(string? commandName, ReadOnlyMemory<string> args)
+    {
+        var command = CreateCommand(commandName, args);
+        if (command is IAsyncCommand asyncCommand)
+        {
+            return await asyncCommand.RunAsync();
+        }
+
+        return command?.Run();
+    }
+
     /// <inheritdoc cref="RunCommand(string?, string[], int)"/>
     /// <summary>
     /// Finds and instantiates the subcommand with the specified name, and if it succeeds,
@@ -515,6 +592,30 @@ public class CommandManager
     public async Task<int?> RunCommandAsync(string? commandName, string[] args, int index)
     {
         var command = CreateCommand(commandName, args, index);
+        if (command is IAsyncCommand asyncCommand)
+        {
+            return await asyncCommand.RunAsync();
+        }
+
+        return command?.Run();
+    }
+
+    /// <inheritdoc cref="RunCommandAsync(string?, ReadOnlyMemory{string})"/>
+    /// <summary>
+    /// Finds and instantiates the subcommand with the specified name, and if it succeeds,
+    /// runs it asynchronously. If it fails, writes error and usage information.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    ///   This function creates the command by invoking the <see cref="CreateCommand(ReadOnlyMemory{string})"/>,
+    ///   method. If the command implements the <see cref="IAsyncCommand"/> interface, it
+    ///   invokes the <see cref="IAsyncCommand.RunAsync"/> method; otherwise, it invokes the
+    ///   <see cref="ICommand.Run"/> method on the command.
+    /// </para>
+    /// </remarks>
+    public async Task<int?> RunCommandAsync(ReadOnlyMemory<string> args)
+    {
+        var command = CreateCommand(args);
         if (command is IAsyncCommand asyncCommand)
         {
             return await asyncCommand.RunAsync();
@@ -616,7 +717,7 @@ public class CommandManager
 
     private IEnumerable<CommandInfo> GetCommandsUnsortedAndFiltered()
     {
-        var commands = _provider.GetCommandsUnsorted(this);
+        var commands = _provider.GetCommandsUnsorted(this).Where(c => c.ParentCommandType == _options.ParentCommand);
         if (_options.CommandFilter != null)
         {
             commands = commands.Where(c => _options.CommandFilter(c));

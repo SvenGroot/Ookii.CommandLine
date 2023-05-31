@@ -13,8 +13,9 @@ public class GeneratedCommandInfoWithCustomParsing<T> : GeneratedCommandInfo
     public GeneratedCommandInfoWithCustomParsing(CommandManager manager,
                                                  CommandAttribute attribute,
                                                  DescriptionAttribute? descriptionAttribute = null,
-                                                 IEnumerable<AliasAttribute>? aliasAttributes = null)
-        : base(manager, typeof(T), attribute, descriptionAttribute, aliasAttributes)
+                                                 IEnumerable<AliasAttribute>? aliasAttributes = null,
+                                                 Type? parentCommandType = null)
+        : base(manager, typeof(T), attribute, descriptionAttribute, aliasAttributes, parentCommandType: parentCommandType)
     {
     }
 

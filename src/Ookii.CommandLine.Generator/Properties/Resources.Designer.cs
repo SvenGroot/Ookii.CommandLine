@@ -565,6 +565,24 @@ namespace Ookii.CommandLine.Generator.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The subcommand defined by {0} uses the ParentCommandAttribute with a string argument, which is not supported by the GeneratedParserAttribute. Use a Type argument instead by using the typeof keyword..
+        /// </summary>
+        internal static string ParentCommandStringNotSupportedMessageFormat {
+            get {
+                return ResourceManager.GetString("ParentCommandStringNotSupportedMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The ParentCommandAttribute must use the typeof keyword..
+        /// </summary>
+        internal static string ParentCommandStringNotSupportedTitle {
+            get {
+                return ResourceManager.GetString("ParentCommandStringNotSupportedTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The positional argument defined by {0} comes after {1}, which is a multi-value argument and must come last..
         /// </summary>
         internal static string PositionalArgumentAfterMultiValueMessageFormat {
@@ -633,6 +651,15 @@ namespace Ookii.CommandLine.Generator.Properties {
         internal static string ShortAliasWithoutShortNameTitle {
             get {
                 return ResourceManager.GetString("ShortAliasWithoutShortNameTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string String1 {
+            get {
+                return ResourceManager.GetString("String1", resourceCulture);
             }
         }
         

@@ -1318,7 +1318,7 @@ public class CommandLineParser
         return writer.MaximumLineLength is 0 or >= 30;
     }
 
-    private static void WriteError(ParseOptions options, string message, string color, bool blankLine = false)
+    internal static void WriteError(ParseOptions options, string message, string color, bool blankLine = false)
     {
         using var errorVtSupport = options.EnableErrorColor();
         try

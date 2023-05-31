@@ -24,13 +24,15 @@ public class GeneratedCommandInfo : CommandInfo
     /// <param name="descriptionAttribute"></param>
     /// <param name="aliasAttributes"></param>
     /// <param name="createParser"></param>
+    /// <param name="parentCommandType"></param>
     public GeneratedCommandInfo(CommandManager manager,
                                 Type commandType,
                                 CommandAttribute attribute,
                                 DescriptionAttribute? descriptionAttribute = null,
                                 IEnumerable<AliasAttribute>? aliasAttributes = null,
-                                Func<ParseOptions?, CommandLineParser>? createParser = null)
-        : base(commandType, attribute, manager)
+                                Func<ParseOptions?, CommandLineParser>? createParser = null,
+                                Type? parentCommandType = null)
+        : base(commandType, attribute, manager, parentCommandType)
     {
         _descriptionAttribute = descriptionAttribute;
         _aliases = aliasAttributes?.Select(a => a.Alias);
