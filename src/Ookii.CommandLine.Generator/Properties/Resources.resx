@@ -315,9 +315,6 @@
   <data name="ShortAliasWithoutShortNameTitle" xml:space="preserve">
     <value>The ShortAliasAttribute is ignored on an argument with no short name.</value>
   </data>
-  <data name="String1" xml:space="preserve">
-    <value />
-  </data>
   <data name="TypeNotReferenceTypeMessageFormat" xml:space="preserve">
     <value>The type {0} must be a reference type (class) when the {1} attribute is used.</value>
   </data>
@@ -331,7 +328,7 @@
     <value>Unknown assembly name.</value>
   </data>
   <data name="UnknownAttributeMessageFormat" xml:space="preserve">
-    <value>The attribute {0} is unknown and will be ignored by the GeneratedParserAttribute.</value>
+    <value>The attribute '{0}' on '{1}' is unknown and will be ignored by the GeneratedParserAttribute.</value>
   </data>
   <data name="UnknownAttributeTitle" xml:space="preserve">
     <value>Unknown attribute will be ignored.</value>

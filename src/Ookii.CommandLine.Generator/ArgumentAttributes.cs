@@ -17,9 +17,9 @@ internal class ArgumentAttributes
     private readonly List<AttributeData>? _shortAliases;
     private readonly List<AttributeData>? _validators;
 
-    public ArgumentAttributes(IEnumerable<AttributeData> attributes, TypeHelper typeHelper, SourceProductionContext context)
+    public ArgumentAttributes(ISymbol member, TypeHelper typeHelper, SourceProductionContext context)
     {
-        foreach (var attribute in attributes)
+        foreach (var attribute in member.GetAttributes())
         {
             if (attribute.CheckType(typeHelper.CommandLineArgumentAttribute, ref _commandLineArgumentAttribute) ||
                 attribute.CheckType(typeHelper.MultiValueSeparatorAttribute, ref _multiValueSeparator) ||
@@ -32,12 +32,14 @@ internal class ArgumentAttributes
                 attribute.CheckType(typeHelper.ValueConverterAttribute, ref _valueConverterAttribute) ||
                 attribute.CheckType(typeHelper.AliasAttribute, ref _aliases) ||
                 attribute.CheckType(typeHelper.ShortAliasAttribute, ref _shortAliases) ||
-                attribute.CheckType(typeHelper.ArgumentValidationAttribute, ref _validators))
+                attribute.CheckType(typeHelper.ArgumentValidationAttribute, ref _validators) ||
+                // Don't warn about attributes used by the compiler.
+                (attribute.AttributeClass?.ContainingNamespace.ToDisplayString().StartsWith("System.Runtime.CompilerServices") ?? false))
             {
                 continue;
             }
 
-            context.ReportDiagnostic(Diagnostics.IgnoredAttribute(attribute));
+            context.ReportDiagnostic(Diagnostics.IgnoredAttribute(member, attribute));
         }
     }
 

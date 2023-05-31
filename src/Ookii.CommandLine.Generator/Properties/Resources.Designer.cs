@@ -655,15 +655,6 @@ namespace Ookii.CommandLine.Generator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to .
-        /// </summary>
-        internal static string String1 {
-            get {
-                return ResourceManager.GetString("String1", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to The type {0} must be a reference type (class) when the {1} attribute is used..
         /// </summary>
         internal static string TypeNotReferenceTypeMessageFormat {
@@ -700,7 +691,7 @@ namespace Ookii.CommandLine.Generator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The attribute {0} is unknown and will be ignored by the GeneratedParserAttribute..
+        ///   Looks up a localized string similar to The attribute &apos;{0}&apos; on &apos;{1}&apos; is unknown and will be ignored by the GeneratedParserAttribute..
         /// </summary>
         internal static string UnknownAttributeMessageFormat {
             get {

@@ -27,14 +27,16 @@ internal readonly struct ArgumentsClassAttributes
                     attribute.CheckType(typeHelper.ClassValidationAttribute, ref _classValidators) ||
                     attribute.CheckType(typeHelper.ParentCommandAttribute, ref _parentCommand) ||
                     attribute.CheckType(typeHelper.AliasAttribute, ref _aliases) ||
-                    attribute.CheckType(typeHelper.GeneratedParserAttribute, ref _generatedParser))
+                    attribute.CheckType(typeHelper.GeneratedParserAttribute, ref _generatedParser) ||
+                    // Don't warn about attributes used by the compiler.
+                    (attribute.AttributeClass?.ContainingNamespace.ToDisplayString().StartsWith("System.Runtime.CompilerServices") ?? false))
                 {
                     continue;
                 }
 
                 if (context is SourceProductionContext c)
                 {
-                    c.ReportDiagnostic(Diagnostics.IgnoredAttribute(attribute));
+                    c.ReportDiagnostic(Diagnostics.IgnoredAttribute(current, attribute));
                 }
             }
         }

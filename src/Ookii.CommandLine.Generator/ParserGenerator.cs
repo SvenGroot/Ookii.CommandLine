@@ -239,7 +239,7 @@ internal class ParserGenerator
             return true;
         }
 
-        var attributes = new ArgumentAttributes(member.GetAttributes(), _typeHelper, _context);
+        var attributes = new ArgumentAttributes(member, _typeHelper, _context);
 
         // Check if it is an argument.
         if (attributes.CommandLineArgument == null)

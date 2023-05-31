@@ -140,13 +140,14 @@ internal static class Diagnostics
         attribute.GetLocation(),
         symbol.ToDisplayString());
 
-    public static Diagnostic IgnoredAttribute(AttributeData attribute) => CreateDiagnostic(
+    public static Diagnostic IgnoredAttribute(ISymbol symbol, AttributeData attribute) => CreateDiagnostic(
         "OCL0016",
         nameof(Resources.UnknownAttributeTitle),
         nameof(Resources.UnknownAttributeMessageFormat),
         DiagnosticSeverity.Warning,
         attribute.GetLocation(),
-        attribute.AttributeClass?.Name);
+        attribute.AttributeClass?.ToDisplayString(),
+        symbol.ToDisplayString());
 
     public static Diagnostic NonPublicStaticMethod(ISymbol method) => CreateDiagnostic(
         "OCL0017",

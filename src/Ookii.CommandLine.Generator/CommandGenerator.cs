@@ -177,7 +177,7 @@ internal class CommandGenerator
             builder.AppendArgument($"typeof({commandTypeName})");
         }
 
-        var attributes = commandAttributes ?? new ArgumentsClassAttributes(commandType, _typeHelper, _context);
+        var attributes = commandAttributes ?? new ArgumentsClassAttributes(commandType, _typeHelper, null);
         builder.AppendArgument($"{attributes.Command!.CreateInstantiation()}");
         if (attributes.Description != null)
         {
