@@ -220,6 +220,13 @@ public class CommandManager
     ///   predicate are not returned.
     /// </para>
     /// <para>
+    ///   If the <see cref="CommandOptions.ParentCommand"/> is <see langword="null"/>, only
+    ///   commands without a <see cref="ParentCommandAttribute"/> attribute are returned. If it is
+    ///   not <see langword="null"/>, only commands where the type specified using the
+    ///   <see cref="ParentCommandAttribute"/> attribute matches the value of the property are
+    ///   returned.
+    /// </para>
+    /// <para>
     ///   The automatic version command is added if the <see cref="CommandOptions.AutoVersionCommand"/>
     ///   property is <see langword="true"/> and there is no command with a conflicting name.
     /// </para>
@@ -267,6 +274,13 @@ public class CommandManager
     /// <para>
     ///   Commands that don't meet the criteria of the <see cref="CommandOptions.CommandFilter"/>
     ///   predicate are not returned.
+    /// </para>
+    /// <para>
+    ///   If the <see cref="CommandOptions.ParentCommand"/> is <see langword="null"/>, only
+    ///   commands without a <see cref="ParentCommandAttribute"/> attribute are returned. If it is
+    ///   not <see langword="null"/>, only commands where the type specified using the
+    ///   <see cref="ParentCommandAttribute"/> attribute matches the value of the property are
+    ///   returned.
     /// </para>
     /// <para>
     ///   The automatic version command is returned if the <see cref="CommandOptions.AutoVersionCommand"/>
@@ -330,6 +344,13 @@ public class CommandManager
     /// <para>
     ///   Commands that don't meet the criteria of the <see cref="CommandOptions.CommandFilter"/>
     ///   predicate are not returned.
+    /// </para>
+    /// <para>
+    ///   If the <see cref="CommandOptions.ParentCommand"/> is <see langword="null"/>, only
+    ///   commands without a <see cref="ParentCommandAttribute"/> attribute are returned. If it is
+    ///   not <see langword="null"/>, only commands where the type specified using the
+    ///   <see cref="ParentCommandAttribute"/> attribute matches the value of the property are
+    ///   returned.
     /// </para>
     /// <para>
     ///   The automatic version command is returned if the <see cref="CommandOptions.AutoVersionCommand"/>
@@ -459,6 +480,17 @@ public class CommandManager
     ///   This function creates the command by invoking the <see cref="CreateCommand(string?, string[], int)"/>,
     ///   method and then invokes the <see cref="ICommand.Run"/> method on the command.
     /// </para>
+    /// <para>
+    ///   Commands that don't meet the criteria of the <see cref="CommandOptions.CommandFilter"/>
+    ///   predicate are not included.
+    /// </para>
+    /// <para>
+    ///   If the <see cref="CommandOptions.ParentCommand"/> is <see langword="null"/>, only
+    ///   commands without a <see cref="ParentCommandAttribute"/> attribute are included. If it is
+    ///   not <see langword="null"/>, only commands where the type specified using the
+    ///   <see cref="ParentCommandAttribute"/> attribute matches the value of the property are
+    ///   included.
+    /// </para>
     /// </remarks>
     public int? RunCommand(string? commandName, string[] args, int index)
     {
@@ -481,6 +513,17 @@ public class CommandManager
     ///   This function creates the command by invoking the <see cref="CreateCommand(string?, ReadOnlyMemory{string})"/>,
     ///   method and then invokes the <see cref="ICommand.Run"/> method on the command.
     /// </para>
+    /// <para>
+    ///   Commands that don't meet the criteria of the <see cref="CommandOptions.CommandFilter"/>
+    ///   predicate are not included.
+    /// </para>
+    /// <para>
+    ///   If the <see cref="CommandOptions.ParentCommand"/> is <see langword="null"/>, only
+    ///   commands without a <see cref="ParentCommandAttribute"/> attribute are included. If it is
+    ///   not <see langword="null"/>, only commands where the type specified using the
+    ///   <see cref="ParentCommandAttribute"/> attribute matches the value of the property are
+    ///   included.
+    /// </para>
     /// </remarks>
     public int? RunCommand(string? commandName, ReadOnlyMemory<string> args)
     {
@@ -498,6 +541,17 @@ public class CommandManager
     ///   This function creates the command by invoking the <see cref="CreateCommand(ReadOnlyMemory{string})"/>,
     ///   method and then invokes the <see cref="ICommand.Run"/> method on the command.
     /// </para>
+    /// <para>
+    ///   Commands that don't meet the criteria of the <see cref="CommandOptions.CommandFilter"/>
+    ///   predicate are not included.
+    /// </para>
+    /// <para>
+    ///   If the <see cref="CommandOptions.ParentCommand"/> is <see langword="null"/>, only
+    ///   commands without a <see cref="ParentCommandAttribute"/> attribute are included. If it is
+    ///   not <see langword="null"/>, only commands where the type specified using the
+    ///   <see cref="ParentCommandAttribute"/> attribute matches the value of the property are
+    ///   included.
+    /// </para>
     /// </remarks>
     public int? RunCommand(ReadOnlyMemory<string> args)
     {
@@ -514,6 +568,17 @@ public class CommandManager
     /// <para>
     ///   This function creates the command by invoking the <see cref="CreateCommand(string[], int)"/>,
     ///   method and then invokes the <see cref="ICommand.Run"/> method on the command.
+    /// </para>
+    /// <para>
+    ///   Commands that don't meet the criteria of the <see cref="CommandOptions.CommandFilter"/>
+    ///   predicate are not included.
+    /// </para>
+    /// <para>
+    ///   If the <see cref="CommandOptions.ParentCommand"/> is <see langword="null"/>, only
+    ///   commands without a <see cref="ParentCommandAttribute"/> attribute are included. If it is
+    ///   not <see langword="null"/>, only commands where the type specified using the
+    ///   <see cref="ParentCommandAttribute"/> attribute matches the value of the property are
+    ///   included.
     /// </para>
     /// </remarks>
     public int? RunCommand(string[] args, int index = 0)
@@ -534,6 +599,17 @@ public class CommandManager
     /// <para>
     ///   This function creates the command by invoking the <see cref="CreateCommand()"/>,
     ///   method and then invokes the <see cref="ICommand.Run"/> method on the command.
+    /// </para>
+    /// <para>
+    ///   Commands that don't meet the criteria of the <see cref="CommandOptions.CommandFilter"/>
+    ///   predicate are not included.
+    /// </para>
+    /// <para>
+    ///   If the <see cref="CommandOptions.ParentCommand"/> is <see langword="null"/>, only
+    ///   commands without a <see cref="ParentCommandAttribute"/> attribute are included. If it is
+    ///   not <see langword="null"/>, only commands where the type specified using the
+    ///   <see cref="ParentCommandAttribute"/> attribute matches the value of the property are
+    ///   included.
     /// </para>
     /// </remarks>
     public int? RunCommand()
@@ -558,6 +634,17 @@ public class CommandManager
     ///   method. If the command implements the <see cref="IAsyncCommand"/> interface, it
     ///   invokes the <see cref="IAsyncCommand.RunAsync"/> method; otherwise, it invokes the
     ///   <see cref="ICommand.Run"/> method on the command.
+    /// </para>
+    /// <para>
+    ///   Commands that don't meet the criteria of the <see cref="CommandOptions.CommandFilter"/>
+    ///   predicate are not included.
+    /// </para>
+    /// <para>
+    ///   If the <see cref="CommandOptions.ParentCommand"/> is <see langword="null"/>, only
+    ///   commands without a <see cref="ParentCommandAttribute"/> attribute are included. If it is
+    ///   not <see langword="null"/>, only commands where the type specified using the
+    ///   <see cref="ParentCommandAttribute"/> attribute matches the value of the property are
+    ///   included.
     /// </para>
     /// </remarks>
     public async Task<int?> RunCommandAsync(string? commandName, ReadOnlyMemory<string> args)
@@ -588,6 +675,17 @@ public class CommandManager
     ///   invokes the <see cref="IAsyncCommand.RunAsync"/> method; otherwise, it invokes the
     ///   <see cref="ICommand.Run"/> method on the command.
     /// </para>
+    /// <para>
+    ///   Commands that don't meet the criteria of the <see cref="CommandOptions.CommandFilter"/>
+    ///   predicate are not included.
+    /// </para>
+    /// <para>
+    ///   If the <see cref="CommandOptions.ParentCommand"/> is <see langword="null"/>, only
+    ///   commands without a <see cref="ParentCommandAttribute"/> attribute are included. If it is
+    ///   not <see langword="null"/>, only commands where the type specified using the
+    ///   <see cref="ParentCommandAttribute"/> attribute matches the value of the property are
+    ///   included.
+    /// </para>
     /// </remarks>
     public async Task<int?> RunCommandAsync(string? commandName, string[] args, int index)
     {
@@ -612,6 +710,17 @@ public class CommandManager
     ///   invokes the <see cref="IAsyncCommand.RunAsync"/> method; otherwise, it invokes the
     ///   <see cref="ICommand.Run"/> method on the command.
     /// </para>
+    /// <para>
+    ///   Commands that don't meet the criteria of the <see cref="CommandOptions.CommandFilter"/>
+    ///   predicate are not included.
+    /// </para>
+    /// <para>
+    ///   If the <see cref="CommandOptions.ParentCommand"/> is <see langword="null"/>, only
+    ///   commands without a <see cref="ParentCommandAttribute"/> attribute are included. If it is
+    ///   not <see langword="null"/>, only commands where the type specified using the
+    ///   <see cref="ParentCommandAttribute"/> attribute matches the value of the property are
+    ///   included.
+    /// </para>
     /// </remarks>
     public async Task<int?> RunCommandAsync(ReadOnlyMemory<string> args)
     {
@@ -635,6 +744,17 @@ public class CommandManager
     ///   method. If the command implements the <see cref="IAsyncCommand"/> interface, it
     ///   invokes the <see cref="IAsyncCommand.RunAsync"/> method; otherwise, it invokes the
     ///   <see cref="ICommand.Run"/> method on the command.
+    /// </para>
+    /// <para>
+    ///   Commands that don't meet the criteria of the <see cref="CommandOptions.CommandFilter"/>
+    ///   predicate are not included.
+    /// </para>
+    /// <para>
+    ///   If the <see cref="CommandOptions.ParentCommand"/> is <see langword="null"/>, only
+    ///   commands without a <see cref="ParentCommandAttribute"/> attribute are included. If it is
+    ///   not <see langword="null"/>, only commands where the type specified using the
+    ///   <see cref="ParentCommandAttribute"/> attribute matches the value of the property are
+    ///   included.
     /// </para>
     /// </remarks>
     public async Task<int?> RunCommandAsync(string[] args, int index = 0)
@@ -661,6 +781,17 @@ public class CommandManager
     ///   invokes the <see cref="IAsyncCommand.RunAsync"/> method; otherwise, it invokes the
     ///   <see cref="ICommand.Run"/> method on the command.
     /// </para>
+    /// <para>
+    ///   Commands that don't meet the criteria of the <see cref="CommandOptions.CommandFilter"/>
+    ///   predicate are not included.
+    /// </para>
+    /// <para>
+    ///   If the <see cref="CommandOptions.ParentCommand"/> is <see langword="null"/>, only
+    ///   commands without a <see cref="ParentCommandAttribute"/> attribute are included. If it is
+    ///   not <see langword="null"/>, only commands where the type specified using the
+    ///   <see cref="ParentCommandAttribute"/> attribute matches the value of the property are
+    ///   included.
+    /// </para>
     /// </remarks>
     public async Task<int?> RunCommandAsync()
     {
@@ -678,12 +809,23 @@ public class CommandManager
     /// </summary>
     /// <remarks>
     /// <para>
-    ///   This method writes usage help for the application, including a list of all shell
-    ///   command names and their descriptions to <see cref="ParseOptions.UsageWriter"/>.
+    ///   This method writes usage help for the application, including a list of all
+    ///   subcommand names and their descriptions to <see cref="ParseOptions.UsageWriter"/>.
     /// </para>
     /// <para>
     ///   A command's name is retrieved from its <see cref="CommandAttribute"/> attribute,
     ///   and the description is retrieved from its <see cref="DescriptionAttribute"/> attribute.
+    /// </para>
+    /// <para>
+    ///   Commands that don't meet the criteria of the <see cref="CommandOptions.CommandFilter"/>
+    ///   predicate are not included.
+    /// </para>
+    /// <para>
+    ///   If the <see cref="CommandOptions.ParentCommand"/> is <see langword="null"/>, only
+    ///   commands without a <see cref="ParentCommandAttribute"/> attribute are included. If it is
+    ///   not <see langword="null"/>, only commands where the type specified using the
+    ///   <see cref="ParentCommandAttribute"/> attribute matches the value of the property are
+    ///   included.
     /// </para>
     /// </remarks>
     public void WriteUsage()
@@ -699,6 +841,17 @@ public class CommandManager
     /// <para>
     ///   A command's name is retrieved from its <see cref="CommandAttribute"/> attribute,
     ///   and the description is retrieved from its <see cref="DescriptionAttribute"/> attribute.
+    /// </para>
+    /// <para>
+    ///   Commands that don't meet the criteria of the <see cref="CommandOptions.CommandFilter"/>
+    ///   predicate are not included.
+    /// </para>
+    /// <para>
+    ///   If the <see cref="CommandOptions.ParentCommand"/> is <see langword="null"/>, only
+    ///   commands without a <see cref="ParentCommandAttribute"/> attribute are included. If it is
+    ///   not <see langword="null"/>, only commands where the type specified using the
+    ///   <see cref="ParentCommandAttribute"/> attribute matches the value of the property are
+    ///   included.
     /// </para>
     /// </remarks>
     public string GetUsage()

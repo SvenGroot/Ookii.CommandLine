@@ -135,6 +135,23 @@ namespace Ookii.CommandLine.Commands
         /// </remarks>
         public abstract IEnumerable<string> Aliases { get; }
 
+        /// <summary>
+        /// Gets the type of the command that is the parent of this command.
+        /// </summary>
+        /// <value>
+        /// The <see cref="Type"/> of the parent command, or <see langword="null"/> if this command
+        /// does not have a parent.
+        /// </value>
+        /// <remarks>
+        /// <para>
+        ///   Subcommands can specify their parent using the <see cref="ParentCommandAttribute"/>
+        ///   attribute.
+        /// </para>
+        /// <para>
+        ///   The <see cref="CommandManager"/> class will only use commands whose parent command
+        ///   type matches the value of the <see cref="CommandOptions.ParentCommand"/> property.
+        /// </para>
+        /// </remarks>
         public Type? ParentCommandType { get; }
 
         /// <summary>

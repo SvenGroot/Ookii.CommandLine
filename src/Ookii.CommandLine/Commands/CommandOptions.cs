@@ -91,6 +91,25 @@ namespace Ookii.CommandLine.Commands
         /// </remarks>
         public Func<CommandInfo, bool>? CommandFilter { get; set; }
 
+        /// <summary>
+        /// Gets or sets the parent command to filter commands by.
+        /// </summary>
+        /// <value>
+        /// The <see cref="Type"/> of a command whose children should be used by the <see cref="CommandManager"/>
+        /// class, or <see langword="null"/> to use commands without a parent.
+        /// </value>
+        /// <remarks>
+        /// <para>
+        ///   The <see cref="CommandManager"/> class will only consider commands whose parent, as
+        ///   set using the <see cref="ParentCommandAttribute"/> attribute, matches this type. If
+        ///   this property is <see langword="null"/>, only commands that do not have a the
+        ///   <see cref="ParentCommandAttribute"/> attribute are considered.
+        /// </para>
+        /// <para>
+        ///   All other commands are filtered out and will not be returned, created, or executed
+        ///   by the command manager.
+        /// </para>
+        /// </remarks>
         public Type? ParentCommand { get; set; }
 
         /// <summary>

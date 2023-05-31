@@ -25,6 +25,11 @@ namespace Ookii.CommandLine.Commands;
 ///   Often, the derived class can be empty; however, you can override the members of this class
 ///   to customize the behavior.
 /// </para>
+/// <para>
+///   The <see cref="ParentCommand"/> class is based on the <see cref="ICommandWithCustomParsing"/>
+///   attribute, so derived classes cannot define any arguments or use other functionality that
+///   depends on the <see cref="CommandLineParser"/> class.
+/// </para>
 /// </remarks>
 /// <threadsafety static="true" instance="false"/>
 public abstract class ParentCommand : ICommandWithCustomParsing, IAsyncCommand
