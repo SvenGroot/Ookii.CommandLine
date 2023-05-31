@@ -435,7 +435,7 @@ public partial class SubCommandTest
         Assert.AreEqual(_expectedNestedParentCommandUsage, writer.ToString());
 
         ((StringWriter)writer.BaseWriter).GetStringBuilder().Clear();
-        result = manager.RunCommand(new[] { "TestParentCommand", "NestedParentCommand", "NestedParentChildCommand", "-Help" });
+        result = manager.RunCommand(new[] { "TestParentCommand", "NestedParentCommand", "NestedParentChildCommand", "-Foo" });
         Assert.AreEqual(1, result);
         Assert.AreEqual(_expectedNestedChildCommandUsage, writer.ToString());
     }

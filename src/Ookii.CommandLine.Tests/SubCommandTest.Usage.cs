@@ -123,7 +123,9 @@ The following commands are available:
 Run 'test TestParentCommand NestedParentCommand <command> -Help' for more information about a command.
 ".ReplaceLineEndings();
 
-    public static readonly string _expectedNestedChildCommandUsage = @"Usage: test TestParentCommand NestedParentCommand NestedParentChildCommand [-Help]
+    public static readonly string _expectedNestedChildCommandUsage = @"Unknown argument name 'Foo'.
+
+Usage: test TestParentCommand NestedParentCommand NestedParentChildCommand [-Help]
 
     -Help [<Boolean>] (-?, -h)
         Displays this help message.
