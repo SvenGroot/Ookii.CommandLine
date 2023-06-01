@@ -8,7 +8,8 @@ namespace NestedCommands;
 // BaseCommand, it has a Path argument even though no arguments are defined here
 [Command("list")]
 [Description("Lists all students and courses.")]
-internal class ListCommand : BaseCommand
+[GeneratedParser]
+internal partial class ListCommand : BaseCommand
 {
     protected override Task<int> RunAsync(Database db)
     {

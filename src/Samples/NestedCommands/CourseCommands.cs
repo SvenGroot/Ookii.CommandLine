@@ -18,7 +18,8 @@ internal class CourseCommand : ParentCommand
 [Command("add")]
 [ParentCommand(typeof(CourseCommand))]
 [Description("Adds a course to the database.")]
-internal class AddCourseCommand : BaseCommand
+[GeneratedParser]
+internal partial class AddCourseCommand : BaseCommand
 {
     [CommandLineArgument(Position = 0, IsRequired = true)]
     [Description("The name of the course.")]
@@ -45,7 +46,8 @@ internal class AddCourseCommand : BaseCommand
 [Command("remove")]
 [ParentCommand(typeof(CourseCommand))]
 [Description("Removes a course from the database.")]
-internal class RemoveCourseCommand : BaseCommand
+[GeneratedParser]
+internal partial class RemoveCourseCommand : BaseCommand
 {
 
     [CommandLineArgument(Position = 0, IsRequired = true)]
