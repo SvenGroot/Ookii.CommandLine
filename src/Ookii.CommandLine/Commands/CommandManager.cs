@@ -863,10 +863,22 @@ public class CommandManager
     /// Gets the application description that will optionally be included in the usage help.
     /// </summary>
     /// <returns>
-    /// The value of the <see cref="AssemblyDescriptionAttribute"/> for the first assembly
-    /// used by this instance.
+    /// If the <see cref="CommandOptions.ParentCommand"/> property is not <see langword="null"/>,
+    /// and the command type referenced has the <see cref="DescriptionAttribute"/> attribute, the
+    /// description given in that attribute. Otherwise, the value of the
+    /// <see cref="AssemblyDescriptionAttribute"/> for the first assembly used by this instance.
     /// </returns>
-    public string? GetApplicationDescription() => _provider.GetApplicationDescription();
+    /// <seealso cref="UsageWriter.IncludeApplicationDescriptionBeforeCommandList"/>
+    public string? GetApplicationDescription()
+    {
+        var attribute = _options.ParentCommand?.GetCustomAttribute<DescriptionAttribute>();
+        if (attribute != null)
+        {
+            return attribute.Description;
+        }
+
+        return _provider.GetApplicationDescription();
+    }
 
     private IEnumerable<CommandInfo> GetCommandsUnsortedAndFiltered()
     {

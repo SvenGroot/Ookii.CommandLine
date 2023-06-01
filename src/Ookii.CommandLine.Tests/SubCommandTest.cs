@@ -421,6 +421,7 @@ public partial class SubCommandTest
             {
                 ExecutableName = _executableName,
                 IncludeCommandHelpInstruction = true,
+                IncludeApplicationDescriptionBeforeCommandList = true,
             }
         };
 

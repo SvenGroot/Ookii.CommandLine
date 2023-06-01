@@ -4,6 +4,7 @@ using Ookii.CommandLine.Terminal;
 using Ookii.CommandLine.Validation;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
@@ -564,6 +565,11 @@ namespace Ookii.CommandLine
         ///   The description to show is taken from the <see cref="AssemblyDescriptionAttribute"/>
         ///   of the first assembly passed to the <see cref="CommandManager"/> class. If the
         ///   assembly has no description, nothing is written.
+        /// </para>
+        /// <para>
+        ///   If the <see cref="CommandOptions.ParentCommand"/> property is not <see langword="null"/>,
+        ///   and the specified type has a <see cref="DescriptionAttribute"/>, that description is
+        ///   used instead.
         /// </para>
         /// </remarks>
         public bool IncludeApplicationDescriptionBeforeCommandList { get; set; }

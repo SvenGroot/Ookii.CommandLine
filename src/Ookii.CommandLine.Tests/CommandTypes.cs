@@ -116,6 +116,7 @@ public class NotACommand : ICommand
 }
 
 [Command(IsHidden = true)]
+[Description("Parent command description.")]
 class TestParentCommand : ParentCommand
 {
 }
@@ -141,6 +142,7 @@ partial class OtherTestChildCommand : ICommand
 
 [Command]
 [ParentCommand(typeof(TestParentCommand))]
+[Description("Other parent command description.")]
 class NestedParentCommand : ParentCommand
 {
 }

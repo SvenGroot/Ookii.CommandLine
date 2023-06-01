@@ -101,11 +101,14 @@ Usage: test AsyncCommand [[-Value] <Int32>] [-Help]
 
 ".ReplaceLineEndings();
 
-    public static readonly string _expectedParentCommandUsage = @"Usage: test TestParentCommand <command> [arguments]
+    public static readonly string _expectedParentCommandUsage = @"Parent command description.
+
+Usage: test TestParentCommand <command> [arguments]
 
 The following commands are available:
 
     NestedParentCommand
+        Other parent command description.
 
     OtherTestChildCommand
 
@@ -114,7 +117,9 @@ The following commands are available:
 Run 'test TestParentCommand <command> -Help' for more information about a command.
 ".ReplaceLineEndings();
 
-    public static readonly string _expectedNestedParentCommandUsage = @"Usage: test TestParentCommand NestedParentCommand <command> [arguments]
+    public static readonly string _expectedNestedParentCommandUsage = @"Other parent command description.
+
+Usage: test TestParentCommand NestedParentCommand <command> [arguments]
 
 The following commands are available:
 
