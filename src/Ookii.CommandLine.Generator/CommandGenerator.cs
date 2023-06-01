@@ -120,6 +120,7 @@ internal class CommandGenerator
         builder.OpenBlock();
 
         var generatedManagerAttribute = manager.GetAttribute(_typeHelper.GeneratedCommandManagerAttribute!)!;
+        var hasError = false;
         if (generatedManagerAttribute.GetNamedArgument("AssemblyNames") is TypedConstant assemblies)
         {
             foreach (var assembly in assemblies.Values)
@@ -127,12 +128,16 @@ internal class CommandGenerator
                 var commands = GetCommands(assembly.Value as string, manager);
                 if (commands == null)
                 {
-                    return null;
+                    hasError = true;
+                    continue;
                 }
 
                 foreach (var (command, attributes) in commands)
                 {
-                    GenerateCommand(builder, command, attributes);
+                    if (!GenerateCommand(builder, command, attributes))
+                    {
+                        hasError = true;
+                    }
                 }
             }
         }
@@ -140,7 +145,10 @@ internal class CommandGenerator
         {
             foreach (var (command, attributes) in _commands)
             {
-                GenerateCommand(builder, command, attributes);
+                if (!GenerateCommand(builder, command, attributes))
+                {
+                    hasError = true;
+                }
             }
         }
 
@@ -154,7 +162,7 @@ internal class CommandGenerator
         builder.OpenBlock();
         builder.CloseBlock(); // ctor
         builder.CloseBlock(); // manager class
-        return builder.GetSource();
+        return hasError ? null : builder.GetSource();
     }
 
     private bool GenerateCommand(SourceBuilder builder, INamedTypeSymbol commandType, ArgumentsClassAttributes? commandAttributes)

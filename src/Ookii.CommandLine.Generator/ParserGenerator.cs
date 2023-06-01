@@ -169,13 +169,14 @@ internal class ParserGenerator
 
         var current = _argumentsClass;
         List<(string, string, string)>? requiredProperties = null;
+        var hasError = false;
         while (current != null && current.SpecialType != SpecialType.System_Object)
         {
             foreach (var member in current.GetMembers())
             {
                 if (!GenerateArgument(member, ref requiredProperties))
                 {
-                    return false;
+                    hasError = true;
                 }
             }
 
@@ -228,7 +229,7 @@ internal class ParserGenerator
 
         _builder.CloseBlock(); // CreateInstance()
         _builder.CloseBlock(); // GeneratedProvider class
-        return true;
+        return !hasError;
     }
 
     private bool GenerateArgument(ISymbol member, ref List<(string, string, string)>? requiredProperties)
