@@ -4,9 +4,27 @@ using System;
 namespace Ookii.CommandLine;
 
 /// <summary>
-/// Indicates that the specified arguments type should use source generation.
-/// TODO: Better help.
+/// Indicates that the target arguments type should use source generation.
 /// </summary>
+/// <remarks>
+/// <para>
+///   When this attribute is applied to a class that defines command line arguments, source
+///   generation will be used to create a <see cref="CommandLineParser{T}"/> instance for those
+///   arguments, instead of the normal approach which uses run-time reflection.
+/// </para>
+/// <para>
+///   To use the generated parser, source generation will add several static methods to the target
+///   class: <c>CreateParser</c>, and three overloads of the <c>Parse</c> method. You must use
+///   these members, as using the <see cref="CommandLineParser{T}"/> class directly will throw
+///   an exception unless <see cref="ParseOptions.AllowReflectionWithGeneratedParser"/> is set to
+///   <see langword="true"/>.
+/// </para>
+/// <para>
+///   When using source generation with subcommands, you should also use a class with the <see cref="GeneratedCommandManagerAttribute"/>
+///   attribute to access the commands.
+/// </para>
+/// </remarks>
+/// <seealso href="https://github.com/SvenGroot/Ookii.CommandLine/blob/main/docs/SourceGeneration.md">Source generation</seealso>
 [AttributeUsage(AttributeTargets.Class)]
 public sealed class GeneratedParserAttribute : Attribute
 {

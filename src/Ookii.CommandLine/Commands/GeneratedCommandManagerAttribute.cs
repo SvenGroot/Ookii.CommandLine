@@ -4,12 +4,22 @@ using System.Collections.Generic;
 namespace Ookii.CommandLine.Commands;
 
 /// <summary>
-/// Indicates that the class with this attribute uses code generation to provide commands to a
-/// <see cref="CommandManager"/> class.
+/// Indicates that the target class is a command manager created using source generation.
 /// </summary>
 /// <remarks>
-/// TODO: Better docs.
+/// <para>
+///   When using this attribute, source generation is used to find and instantiate subcommand
+///   classes in the current assembly, or the assemblies specified using the <see cref="AssemblyNames"/> 
+///   property. The target class will be modified to inherit from the <see cref="CommandManager"/>
+///   class, and should be used instead of the <see cref="CommandManager"/> class to find, create,
+///   and run commands.
+/// </para>
+/// <para>
+///   To use source generation for the command line arguments of individual commands, use the
+///   <see cref="GeneratedParserAttribute"/> attribute on the command class.
+/// </para>
 /// </remarks>
+/// <seealso href="https://github.com/SvenGroot/Ookii.CommandLine/blob/main/docs/SourceGeneration.md">Source generation</seealso>
 [AttributeUsage(AttributeTargets.Class)]
 public sealed class GeneratedCommandManagerAttribute : Attribute
 {
