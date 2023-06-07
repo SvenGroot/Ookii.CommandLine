@@ -183,7 +183,7 @@ partial class CancelArguments
     [CommandLineArgument]
     public bool DoesNotCancel { get; set; }
 
-    [CommandLineArgument(CancelParsing = true)]
+    [CommandLineArgument(CancelParsing = CancelMode.Abort)]
     public bool DoesCancel { get; set; }
 }
 

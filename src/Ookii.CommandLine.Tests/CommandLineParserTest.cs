@@ -517,7 +517,7 @@ namespace Ookii.CommandLine.Tests
             {
                 if (e.Argument.ArgumentName == "DoesNotCancel")
                 {
-                    e.Cancel = true;
+                    e.CancelParsing = CancelMode.Abort;
                 }
             }
 
@@ -527,7 +527,7 @@ namespace Ookii.CommandLine.Tests
             Assert.AreEqual(ParseStatus.Canceled, parser.ParseResult.Status);
             Assert.IsNull(parser.ParseResult.LastException);
             Assert.AreEqual("DoesNotCancel", parser.ParseResult.ArgumentName);
-            Assert.IsTrue(parser.HelpRequested);
+            Assert.IsFalse(parser.HelpRequested);
             Assert.IsTrue(parser.GetArgument("Argument1").HasValue);
             Assert.AreEqual("foo", (string)parser.GetArgument("Argument1").Value);
             Assert.IsTrue(parser.GetArgument("DoesNotCancel").HasValue);
@@ -543,12 +543,15 @@ namespace Ookii.CommandLine.Tests
             {
                 if (e.Argument.ArgumentName == "DoesCancel")
                 {
-                    e.OverrideCancelParsing = true;
+                    Assert.AreEqual(CancelMode.Abort, e.CancelParsing);
+                    e.CancelParsing = CancelMode.None;
                 }
             }
 
             parser.ArgumentParsed += handler2;
             result = parser.Parse(new[] { "-Argument1", "foo", "-DoesCancel", "-Argument2", "bar" });
+            Assert.AreEqual(ParseStatus.Success, parser.ParseResult.Status);
+            Assert.IsNull(parser.ParseResult.ArgumentName);
             Assert.IsNotNull(result);
             Assert.IsFalse(parser.HelpRequested);
             Assert.IsFalse(result.DoesNotCancel);

@@ -243,43 +243,43 @@ public sealed class CommandLineArgumentAttribute : Attribute
     /// this argument is encountered.
     /// </summary>
     /// <value>
-    /// <see langword="true"/> if argument parsing should be canceled after this argument;
-    /// otherwise, <see langword="false"/>. The default value is <see langword="false" />.
+    /// One of the values of the <see cref="CancelMode"/> enumeration.
     /// </value>
     /// <remarks>
     /// <para>
-    ///   If this property is <see langword="true"/>, the <see cref="CommandLineParser"/> will
-    ///   stop parsing the command line arguments after seeing this argument, and return
-    ///   <see langword="null"/> from the <see cref="CommandLineParser.Parse(string[], int)"/> method
-    ///   or one of its overloads. Since no instance of the arguments type is returned, it's
-    ///   not possible to determine argument values, or which argument caused the cancellation,
-    ///   except by inspecting the <see cref="CommandLineParser.Arguments"/> property.
+    ///   If this property is not <see cref="CancelMode.None"/>, the <see cref="CommandLineParser"/>
+    ///   will stop parsing the command line arguments after seeing this argument. The result of
+    ///   the operation will be <see langword="null"/> if this property is <see cref="CancelMode.Abort"/>,
+    ///   or an instance of the arguments class with the results up to this point if this property
+    ///   is <see cref="CancelMode.Success"/>. In the latter case, the <see cref="ParseResult.RemainingArguments"/>
+    ///   property will contain all arguments that were not parsed.
     /// </para>
     /// <para>
-    ///   This property is most commonly useful to implement a "-Help" or "-?" style switch
-    ///   argument, where the presence of that argument causes usage help to be printed and
-    ///   the program to exit, regardless of whether the rest of the command line is valid
-    ///   or not.
+    ///   If <see cref="CancelMode.Success"/> is used, all required arguments must have a value at
+    ///   the point this argument is encountered, otherwise a <see cref="CommandLineArgumentException"/>
+    ///   is thrown.
+    /// </para>
+    /// <para>
+    ///   Use the <see cref="ParseResult.ArgumentName"/> property to determine which argument caused
+    ///   cancellation.
     /// </para>
     /// <para>
     ///   The <see cref="CommandLineParser{T}.ParseWithErrorHandling()"/> method and the
     ///   <see cref="CommandLineParser.Parse{T}(string[], ParseOptions?)"/> static helper method
-    ///   will print usage information if parsing was canceled through this method.
+    ///   will print usage information if parsing was canceled with <see cref="CancelMode.Abort"/>.
     /// </para>
     /// <para>
     ///   Canceling parsing in this way is identical to handling the <see cref="CommandLineParser.ArgumentParsed"/>
-    ///   event and setting <see cref="System.ComponentModel.CancelEventArgs.Cancel"/> to
-    ///   <see langword="true" />.
+    ///   event and setting <see cref="ArgumentParsedEventArgs.CancelParsing"/> property.
     /// </para>
     /// <para>
     ///   It's possible to prevent cancellation when an argument has this property set by
     ///   handling the <see cref="CommandLineParser.ArgumentParsed"/> event and setting the
-    ///   <see cref="ArgumentParsedEventArgs.OverrideCancelParsing"/> property to 
-    ///   <see langword="true"/>.
+    ///   <see cref="ArgumentParsedEventArgs.CancelParsing"/> property to <see cref="CancelMode.None"/>.
     /// </para>
     /// </remarks>
     /// <seealso cref="CommandLineArgument.CancelParsing"/>
-    public bool CancelParsing { get; set; }
+    public CancelMode CancelParsing { get; set; }
 
     /// <summary>
     /// Gets or sets a value that indicates whether the argument is hidden from the usage help.

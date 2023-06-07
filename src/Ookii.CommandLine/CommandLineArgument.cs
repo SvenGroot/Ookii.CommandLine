@@ -26,7 +26,7 @@ public abstract class CommandLineArgument
     private interface IValueHelper
     {
         object? Value { get; }
-        bool SetValue(CommandLineArgument argument, object? value);
+        CancelMode SetValue(CommandLineArgument argument, object? value);
         void ApplyValue(CommandLineArgument argument, object target);
     }
 
@@ -44,10 +44,10 @@ public abstract class CommandLineArgument
             argument.SetProperty(target, Value);
         }
 
-        public bool SetValue(CommandLineArgument argument, object? value)
+        public CancelMode SetValue(CommandLineArgument argument, object? value)
         {
             Value = value;
-            return true;
+            return CancelMode.None;
         }
     }
 
@@ -75,10 +75,10 @@ public abstract class CommandLineArgument
             }
         }
 
-        public bool SetValue(CommandLineArgument argument, object? value)
+        public CancelMode SetValue(CommandLineArgument argument, object? value)
         {
             _values.Add((T?)value);
-            return true;
+            return CancelMode.None;
         }
     }
 
@@ -116,7 +116,7 @@ public abstract class CommandLineArgument
             }
         }
 
-        public bool SetValue(CommandLineArgument argument, object? value)
+        public CancelMode SetValue(CommandLineArgument argument, object? value)
         {
             // ConvertToArgumentType is guaranteed to return non-null for dictionary arguments.
             var pair = (KeyValuePair<TKey?, TValue?>)value!;
@@ -144,7 +144,7 @@ public abstract class CommandLineArgument
                 throw argument._parser.StringProvider.CreateException(CommandLineArgumentErrorCategory.InvalidDictionaryValue, ex, argument, value.ToString());
             }
 
-            return true;
+            return CancelMode.None;
         }
     }
 
@@ -157,12 +157,13 @@ public abstract class CommandLineArgument
             throw new InvalidOperationException();
         }
 
-        public bool SetValue(CommandLineArgument argument, object? value)
+        public CancelMode SetValue(CommandLineArgument argument, object? value)
         {
             Value = value;
             try
             {
-                return argument.CallMethod(value);
+                // TODO: Support methods returning CancelMode.
+                return argument.CallMethod(value) ? CancelMode.None : CancelMode.Abort;
             }
             catch (TargetInvocationException ex)
             {
@@ -199,7 +200,7 @@ public abstract class CommandLineArgument
                 ElementType = typeof(bool),
                 Description = parser.StringProvider.AutomaticHelpDescription(),
                 MemberName = "AutomaticHelp",
-                CancelParsing = true,
+                CancelParsing = CancelMode.Abort,
                 Validators = Enumerable.Empty<ArgumentValidationAttribute>(),
                 Converter = Conversion.BooleanConverter.Instance,
             };
@@ -286,7 +287,7 @@ public abstract class CommandLineArgument
         public string? KeyValueSeparator { get; set; }
         public bool AllowDuplicateDictionaryKeys { get; set; }
         public bool AllowNull { get; set; }
-        public bool CancelParsing { get; set; }
+        public CancelMode CancelParsing { get; set; }
         public bool IsHidden { get; set; }
         public Type? KeyType { get; set; }
         public Type? ValueType { get; set; }
@@ -317,7 +318,7 @@ public abstract class CommandLineArgument
     private readonly bool _allowMultiValueWhiteSpaceSeparator;
     private readonly string? _keyValueSeparator;
     private readonly bool _allowNull;
-    private readonly bool _cancelParsing;
+    private readonly CancelMode _cancelParsing;
     private readonly bool _isHidden;
     private readonly IEnumerable<ArgumentValidationAttribute> _validators;
     private string? _valueDescription;
@@ -1006,46 +1007,15 @@ public abstract class CommandLineArgument
     /// argument is encountered.
     /// </summary>
     /// <value>
-    /// <see langword="true"/> if argument parsing should be canceled after this argument;
-    /// otherwise, <see langword="false"/>.
+    /// One of the values of the <see cref="CancelMode"/> enumeration.
     /// </value>
     /// <remarks>
     /// <para>
     ///   This value is determined using the <see cref="CommandLineArgumentAttribute.CancelParsing"/>
     ///   property.
     /// </para>
-    /// <para>
-    ///   If this property is <see langword="true"/>, the <see cref="CommandLineParser"/> will
-    ///   stop parsing the command line arguments after seeing this argument, and return
-    ///   <see langword="null"/> from the <see cref="CommandLineParser.Parse(string[], int)"/> method
-    ///   or one of its overloads. Since no instance of the arguments type is returned, it's
-    ///   not possible to determine argument values, or which argument caused the cancellation,
-    ///   except by inspecting the <see cref="CommandLineParser.Arguments"/> property.
-    /// </para>
-    /// <para>
-    ///   This property is most commonly useful to implement a "-Help" or "-?" style switch
-    ///   argument, where the presence of that argument causes usage help to be printed and
-    ///   the program to exit, regardless of whether the rest of the command line is valid
-    ///   or not.
-    /// </para>
-    /// <para>
-    ///   The <see cref="CommandLineParser{T}.ParseWithErrorHandling()"/> method and the
-    ///   <see cref="CommandLineParser.Parse{T}(string[], ParseOptions?)"/> static helper method
-    ///   will print usage information if parsing was canceled through this method.
-    /// </para>
-    /// <para>
-    ///   Canceling parsing in this way is identical to handling the <see cref="CommandLineParser.ArgumentParsed"/>
-    ///   event and setting <see cref="System.ComponentModel.CancelEventArgs.Cancel"/> to
-    ///   <see langword="true" />.
-    /// </para>
-    /// <para>
-    ///   It's possible to prevent cancellation when an argument has this property set by
-    ///   handling the <see cref="CommandLineParser.ArgumentParsed"/> event and setting the
-    ///   <see cref="ArgumentParsedEventArgs.OverrideCancelParsing"/> property to 
-    ///   <see langword="true"/>.
-    /// </para>
     /// </remarks>
-    public bool CancelParsing => _cancelParsing;
+    public CancelMode CancelParsing => _cancelParsing;
 
     /// <summary>
     /// Gets or sets a value that indicates whether the argument is hidden from the usage help.
@@ -1389,39 +1359,38 @@ public abstract class CommandLineArgument
         return false;
     }
 
-    internal bool SetValue(CultureInfo culture, bool hasValue, string? stringValue, ReadOnlySpan<char> spanValue)
+    internal CancelMode SetValue(CultureInfo culture, bool hasValue, string? stringValue, ReadOnlySpan<char> spanValue)
     {
         _valueHelper ??= CreateValueHelper();
 
-        bool continueParsing;
+        CancelMode cancelParsing;
         if (IsMultiValue && hasValue && MultiValueSeparator != null)
         {
-            continueParsing = true;
+            cancelParsing = CancelMode.None;
             spanValue.Split(MultiValueSeparator.AsSpan(), separateValue =>
             {
                 string? separateValueString = null;
                 PreValidate(ref separateValueString, separateValue);
                 var converted = ConvertToArgumentType(culture, true, separateValueString, separateValue);
-                continueParsing = _valueHelper.SetValue(this, converted);
-                if (!continueParsing)
+                cancelParsing = _valueHelper.SetValue(this, converted);
+                if (cancelParsing != CancelMode.Abort)
                 {
-                    return false;
+                    Validate(converted, ValidationMode.AfterConversion);
                 }
 
-                Validate(converted, ValidationMode.AfterConversion);
-                return true;
+                return cancelParsing == CancelMode.None;
             });
         }
         else
         {
             PreValidate(ref stringValue, spanValue);
             var converted = ConvertToArgumentType(culture, hasValue, stringValue, spanValue);
-            continueParsing = _valueHelper.SetValue(this, converted);
+            cancelParsing = _valueHelper.SetValue(this, converted);
             Validate(converted, ValidationMode.AfterConversion);
         }
 
         HasValue = true;
-        return continueParsing;
+        return cancelParsing;
     }
 
     internal static (CommandLineArgument, bool) CreateAutomaticHelp(CommandLineParser parser)
