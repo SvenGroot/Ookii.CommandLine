@@ -903,15 +903,20 @@ public class CommandLineParser
     /// <param name="args">The command line arguments.</param>
     public object? Parse(ReadOnlyMemory<string> args)
     {
+        int index = -1;
         try
         {
             HelpRequested = false;
-            return ParseCore(args);
+            return ParseCore(args, ref index);
         }
         catch (CommandLineArgumentException ex)
         {
             HelpRequested = true;
-            ParseResult = ParseResult.FromException(ex);
+            var remaining = index < args.Length
+                ? args.Slice(index + 1)
+                : default;
+
+            ParseResult = ParseResult.FromException(ex, remaining);
             throw;
         }
     }
@@ -1493,7 +1498,7 @@ public class CommandLineParser
         }
     }
 
-    private object? ParseCore(ReadOnlyMemory<string> args)
+    private object? ParseCore(ReadOnlyMemory<string> args, ref int x)
     {
         // Reset all arguments to their default value.
         foreach (CommandLineArgument argument in _arguments)
@@ -1506,7 +1511,6 @@ public class CommandLineParser
 
         var cancelParsing = CancelMode.None;
         CommandLineArgument? lastArgument = null;
-        int x;
         for (x = 0; x < args.Length; ++x)
         {
             string arg = args.Span[x];

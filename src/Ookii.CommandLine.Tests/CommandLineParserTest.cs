@@ -134,7 +134,8 @@ namespace Ookii.CommandLine.Tests
             var target = CreateParser<ThrowingArguments>(kind);
 
             // Only accepts one positional argument.
-            CheckThrows(() => target.Parse(new[] { "Foo", "Bar" }), target, CommandLineArgumentErrorCategory.TooManyArguments);
+            CheckThrows(() => target.Parse(new[] { "Foo", "Bar", "Baz" }), target, CommandLineArgumentErrorCategory.TooManyArguments);
+            Assert.IsTrue(new[] { "Bar", "Baz" }.AsSpan().SequenceEqual(target.ParseResult.RemainingArguments.Span));
         }
 
         [TestMethod]

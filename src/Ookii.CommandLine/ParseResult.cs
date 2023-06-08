@@ -79,12 +79,13 @@ namespace Ookii.CommandLine
         /// Creates a <see cref="ParseResult"/> instance that represents a parsing error.
         /// </summary>
         /// <param name="exception">The exception that occurred during parsing.</param>
+        /// <param name="remainingArguments">Any remaining arguments that were not parsed.</param>
         /// <returns>An instance of the <see cref="ParseResult"/> structure.</returns>
         /// <exception cref="ArgumentNullException">
         /// <paramref name="exception"/> is <see langword="null"/>.
         /// </exception>
-        public static ParseResult FromException(CommandLineArgumentException exception)
-            => new(ParseStatus.Error, exception ?? throw new ArgumentNullException(nameof(exception)), exception.ArgumentName);
+        public static ParseResult FromException(CommandLineArgumentException exception, ReadOnlyMemory<string> remainingArguments)
+            => new(ParseStatus.Error, exception ?? throw new ArgumentNullException(nameof(exception)), exception.ArgumentName, remainingArguments: remainingArguments);
 
         /// <summary>
         /// Creates a <see cref="ParseResult"/> instance that represents canceled parsing.
