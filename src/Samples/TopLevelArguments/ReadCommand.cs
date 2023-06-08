@@ -1,42 +1,16 @@
 ﻿using Ookii.CommandLine;
 using Ookii.CommandLine.Commands;
-using Ookii.CommandLine.Conversion;
-using System;
 using System.ComponentModel;
-using System.IO;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace SubcommandSample;
+namespace TopLevelArguments;
 
-// This is a sample subcommand that can be invoked by specifying "read" as the first argument
-// to the sample application.
-//
-// Subcommand argument parsing works just like a regular command line arguments class. After the
-// arguments have been parsed, the RunAsync method is invoked to execute the command.
-//
-// This is an asynchronous command. It uses the AsyncCommandBase class to get a default
-// implementation of Run, so we only need to worry about RunAsync, but we could also implement
-// IAsyncCommand ourselves.
-//
-// Check the Program.cs file to see how this command is invoked.
+// This command is identical to the read command of the Subcommand sample; see that for a more
+// detailed description.
+[GeneratedParser]
 [Command]
 [Description("Reads and displays data from a file using the specified encoding, wrapping the text to fit the console.")]
-class ReadCommand : AsyncCommandBase
+partial class ReadCommand : AsyncCommandBase
 {
-    // A required, positional argument to specify the file name.
-    [CommandLineArgument(Position = 0)]
-    [Description("The path of the file to read.")]
-    public required FileInfo Path { get; set; }
-
-    // An argument to specify the encoding.
-    // Because Encoding doesn't have a default ArgumentConverter, we use a custom one provided in
-    // this sample.
-    [CommandLineArgument]
-    [Description("The encoding to use to read the file. The default value is utf-8.")]
-    [ArgumentConverter(typeof(EncodingConverter))]
-    public Encoding Encoding { get; set; } = Encoding.UTF8;
-
     // Run the command after the arguments have been parsed.
     public override async Task<int> RunAsync()
     {
@@ -50,7 +24,7 @@ class ReadCommand : AsyncCommandBase
                 Options = FileOptions.Asynchronous
             };
 
-            using var reader = new StreamReader(Path.FullName, Encoding, true, options);
+            using var reader = new StreamReader(Program.Arguments!.Path.FullName, Program.Arguments.Encoding, true, options);
 
             // We use a LineWrappingTextWriter to neatly wrap console output
             using var writer = LineWrappingTextWriter.ForConsoleOut();

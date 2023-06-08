@@ -1,58 +1,30 @@
 ﻿using Ookii.CommandLine;
 using Ookii.CommandLine.Commands;
-using Ookii.CommandLine.Conversion;
 using Ookii.CommandLine.Validation;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.IO;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace SubcommandSample;
+namespace TopLevelArguments;
 
-// This is a sample subcommand that can be invoked by specifying "write" as the first argument
-// to the sample application.
-//
-// Subcommand argument parsing works just like a regular command line argument class. After the
-// arguments have been parsed, the Run method is invoked to execute the command.
-//
-// This is an asynchronous command. It uses the AsyncCommandBase class to get a default
-// implementation of Run, so we only need to worry about RunAsync, but we could also implement
-// IAsyncCommand ourselves.
-//
-// Check the Program.cs file to see how this command is invoked.
+// This command is identical to the write command of the Subcommand sample; see that for a more
+// detailed description.
+[GeneratedParser]
 [Command]
 [Description("Writes lines to a file, wrapping them to the specified width.")]
-class WriteCommand : AsyncCommandBase
+partial class WriteCommand : AsyncCommandBase
 {
-    // A required, positional argument to specify the file name.
-    [CommandLineArgument(Position = 0)]
-    [Description("The path of the file to write to.")]
-    public required FileInfo Path { get; set; }
-
     // Positional multi-value argument to specify the text to write
-    [CommandLineArgument(Position = 1)]
+    [CommandLineArgument(Position = 0)]
     [Description("The lines of text to write to the file; if no lines are specified, this application will read from standard input instead.")]
     public string[]? Lines { get; set; }
 
-    // An argument to specify the encoding.
-    // Because Encoding doesn't have a default ArgumentConverter, we use a custom one provided in
-    // this sample.
-    [CommandLineArgument]
-    [Description("The encoding to use to write the file. Default value: utf-8.")]
-    [ArgumentConverter(typeof(EncodingConverter))]
-    public Encoding Encoding { get; set; } = Encoding.UTF8;
-
     // An argument that specifies the maximum line length of the output.
-    [CommandLineArgument(DefaultValue = 79)]
+    [CommandLineArgument(DefaultValue = 79, IsShort = true)]
     [Description("The maximum length of the lines in the file, or 0 to have no limit.")]
-    [Alias("Length")]
     [ValidateRange(0, null)]
     public int MaximumLineLength { get; set; }
 
     // A switch argument that indicates it's okay to overwrite files.
-    [CommandLineArgument]
+    [CommandLineArgument(IsShort = true)]
     [Description("When this option is specified, the file will be overwritten if it already exists.")]
     public bool Overwrite { get; set; }
 
@@ -62,7 +34,7 @@ class WriteCommand : AsyncCommandBase
         try
         {
             // Check if we're allowed to overwrite the file.
-            if (!Overwrite && Path.Exists)
+            if (!Overwrite && Program.Arguments!.Path.Exists)
             {
                 // The Main method will return the exit status to the operating system. The numbers
                 // are made up for the sample, they don't mean anything. Usually, 0 means success,
@@ -79,7 +51,7 @@ class WriteCommand : AsyncCommandBase
                 Options = FileOptions.Asynchronous
             };
 
-            using var writer = new StreamWriter(Path.FullName, Encoding, options);
+            using var writer = new StreamWriter(Program.Arguments!.Path.FullName, Program.Arguments.Encoding, options);
 
             // We use a LineWrappingTextWriter to neatly white-space wrap the output.
             using var lineWriter = new LineWrappingTextWriter(writer, MaximumLineLength);
