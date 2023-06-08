@@ -18,12 +18,12 @@ public class GeneratedArgument : CommandLineArgument
 {
     private readonly Action<object, object?>? _setProperty;
     private readonly Func<object, object?>? _getProperty;
-    private readonly Func<object?, CommandLineParser, bool>? _callMethod;
+    private readonly Func<object?, CommandLineParser, CancelMode>? _callMethod;
     private readonly string _defaultValueDescription;
     private readonly string? _defaultKeyDescription;
 
     private GeneratedArgument(ArgumentInfo info, Action<object, object?>? setProperty, Func<object, object?>? getProperty,
-        Func<object?, CommandLineParser, bool>? callMethod, string defaultValueDescription, string? defaultKeyDescription) : base(info)
+        Func<object?, CommandLineParser, CancelMode>? callMethod, string defaultValueDescription, string? defaultKeyDescription) : base(info)
     {
         _setProperty = setProperty;
         _getProperty = getProperty;
@@ -87,7 +87,7 @@ public class GeneratedArgument : CommandLineArgument
                                            IEnumerable<ArgumentValidationAttribute>? validationAttributes = null,
                                            Action<object, object?>? setProperty = null,
                                            Func<object, object?>? getProperty = null,
-                                           Func<object?, CommandLineParser, bool>? callMethod = null)
+                                           Func<object?, CommandLineParser, CancelMode>? callMethod = null)
     {
         var info = CreateArgumentInfo(parser, argumentType, allowsNull, requiredProperty, memberName, attribute,
             multiValueSeparatorAttribute, descriptionAttribute, valueDescriptionAttribute, allowDuplicateDictionaryKeys,
@@ -112,7 +112,7 @@ public class GeneratedArgument : CommandLineArgument
     protected override bool CanSetProperty => _setProperty != null;
 
     /// <inheritdoc/>
-    protected override bool CallMethod(object? value)
+    protected override CancelMode CallMethod(object? value)
     {
         if (_callMethod == null)
         {

@@ -61,7 +61,7 @@ internal class ReflectionArgument : CommandLineArgument
         return _property.GetValue(target);
     }
 
-    protected override bool CallMethod(object? value)
+    protected override CancelMode CallMethod(object? value)
     {
         if (_method is not MethodArgumentInfo info)
         {
@@ -82,15 +82,12 @@ internal class ReflectionArgument : CommandLineArgument
             parameters[index] = Parser;
         }
 
-        var returnValue = info.Method.Invoke(null, parameters);
-        if (returnValue == null)
+        return info.Method.Invoke(null, parameters) switch
         {
-            return true;
-        }
-        else
-        {
-            return (bool)returnValue;
-        }
+            CancelMode mode => mode,
+            false => CancelMode.Abort,
+            _ => CancelMode.None
+        };
     }
 
     internal static CommandLineArgument Create(CommandLineParser parser, PropertyInfo property)
@@ -371,7 +368,7 @@ internal class ReflectionArgument : CommandLineArgument
     {
         var parameters = method.GetParameters();
         if (!method.IsStatic ||
-            method.ReturnType != typeof(bool) && method.ReturnType != typeof(void) ||
+            (method.ReturnType != typeof(bool) && method.ReturnType != typeof(void) && method.ReturnType != typeof(CancelMode)) ||
             parameters.Length > 2)
         {
             return null;

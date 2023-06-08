@@ -272,6 +272,27 @@ partial class MethodArguments
     }
 
     [CommandLineArgument]
+    public static CancelMode CancelModeAbort()
+    {
+        CalledMethodName = nameof(CancelModeAbort);
+        return CancelMode.Abort;
+    }
+
+    [CommandLineArgument]
+    public static CancelMode CancelModeSuccess()
+    {
+        CalledMethodName = nameof(CancelModeSuccess);
+        return CancelMode.Success;
+    }
+
+    [CommandLineArgument]
+    public static CancelMode CancelModeNone()
+    {
+        CalledMethodName = nameof(CancelModeNone);
+        return CancelMode.None;
+    }
+
+    [CommandLineArgument]
     public static bool CancelWithHelp(CommandLineParser parser)
     {
         CalledMethodName = nameof(CancelWithHelp);

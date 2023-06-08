@@ -14,12 +14,19 @@ namespace Ookii.CommandLine.Generator;
 
 internal class ParserGenerator
 {
+    private enum ReturnType
+    {
+        Void,
+        Boolean,
+        CancelMode
+    }
+
     private struct MethodArgumentInfo
     {
         public ITypeSymbol ArgumentType { get; set; }
         public bool HasValueParameter { get; set; }
         public bool HasParserParameter { get; set; }
-        public bool HasBooleanReturn { get; set; }
+        public ReturnType ReturnType { get; set; }
     }
 
     private struct PositionalArgumentInfo
@@ -499,15 +506,14 @@ internal class ParserGenerator
                 arguments = "parser";
             }
 
-            if (info.HasBooleanReturn)
+            var methodCall = info.ReturnType switch
             {
-                _builder.AppendArgument($"callMethod: (value, parser) => {_argumentsClass.ToDisplayString()}.{member.Name}({arguments})");
-            }
-            else
-            {
-                _builder.AppendArgument($"callMethod: (value, parser) => {{ {_argumentsClass.ToDisplayString()}.{member.Name}({arguments}); return true; }}");
-            }
+                ReturnType.CancelMode => $"callMethod: (value, parser) => {_argumentsClass.ToDisplayString()}.{member.Name}({arguments})",
+                ReturnType.Boolean => $"callMethod: (value, parser) => {_argumentsClass.ToDisplayString()}.{member.Name}({arguments}) ? Ookii.CommandLine.CancelMode.None : Ookii.CommandLine.CancelMode.Abort",
+                _ => $"callMethod: (value, parser) => {{ {_argumentsClass.ToDisplayString()}.{member.Name}({arguments}); return Ookii.CommandLine.CancelMode.None; }}"
+            };
 
+            _builder.AppendArgument(methodCall);
             if (argumentInfo.DefaultValue != null)
             {
                 _context.ReportDiagnostic(Diagnostics.DefaultValueWithMethod(member));
@@ -720,9 +726,13 @@ internal class ParserGenerator
         }
 
         var info = new MethodArgumentInfo();
-        if (method.ReturnType.SpecialType == SpecialType.System_Boolean)
+        if (method.ReturnType.SymbolEquals(_typeHelper.CancelMode))
         {
-            info.HasBooleanReturn = true;
+            info.ReturnType = ReturnType.CancelMode;
+        }
+        else if (method.ReturnType.SpecialType == SpecialType.System_Boolean)
+        {
+            info.ReturnType = ReturnType.Boolean;
         }
         else if (method.ReturnType.SpecialType != SpecialType.System_Void)
         {

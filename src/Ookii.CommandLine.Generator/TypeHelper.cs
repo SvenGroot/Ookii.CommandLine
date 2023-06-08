@@ -63,6 +63,8 @@ internal class TypeHelper
 
     public INamedTypeSymbol? ValueDescriptionAttribute => _compilation.GetTypeByMetadataName(NamespacePrefix + "ValueDescriptionAttribute");
 
+    public INamedTypeSymbol? CancelMode => _compilation.GetTypeByMetadataName(NamespacePrefix + "CancelMode");
+
     public INamedTypeSymbol? ArgumentValidationAttribute => _compilation.GetTypeByMetadataName(NamespacePrefix + "Validation.ArgumentValidationAttribute");
 
     public INamedTypeSymbol? ClassValidationAttribute => _compilation.GetTypeByMetadataName(NamespacePrefix + "Validation.ClassValidationAttribute");

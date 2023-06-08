@@ -4,6 +4,7 @@ using Ookii.CommandLine.Support;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Net;
@@ -739,46 +740,46 @@ namespace Ookii.CommandLine.Tests
             Assert.IsNull(parser.GetArgument("NotStatic"));
             Assert.IsNull(parser.GetArgument("NotPublic"));
 
-            Assert.IsNotNull(parser.Parse(new[] { "-NoCancel" }));
-            Assert.IsFalse(parser.HelpRequested);
+            CheckSuccess(parser, new[] { "-NoCancel" });
             Assert.AreEqual(nameof(MethodArguments.NoCancel), MethodArguments.CalledMethodName);
 
-            Assert.IsNull(parser.Parse(new[] { "-Cancel" }));
-            Assert.IsFalse(parser.HelpRequested);
+            CheckCanceled(parser, new[] { "-Cancel", "Foo" }, "Cancel", false, 1);
             Assert.AreEqual(nameof(MethodArguments.Cancel), MethodArguments.CalledMethodName);
 
-            Assert.IsNull(parser.Parse(new[] { "-CancelWithHelp" }));
-            Assert.IsTrue(parser.HelpRequested);
+            CheckCanceled(parser, new[] { "-CancelWithHelp" }, "CancelWithHelp", true, 0);
             Assert.AreEqual(nameof(MethodArguments.CancelWithHelp), MethodArguments.CalledMethodName);
 
-            Assert.IsNotNull(parser.Parse(new[] { "-CancelWithValue", "1" }));
-            Assert.IsFalse(parser.HelpRequested);
+            CheckSuccess(parser, new[] { "-CancelWithValue", "1" });
             Assert.AreEqual(nameof(MethodArguments.CancelWithValue), MethodArguments.CalledMethodName);
             Assert.AreEqual(1, MethodArguments.Value);
 
-            Assert.IsNull(parser.Parse(new[] { "-CancelWithValue", "-1" }));
-            Assert.IsFalse(parser.HelpRequested);
+            CheckCanceled(parser, new[] { "-CancelWithValue", "-1" }, "CancelWithValue", false);
             Assert.AreEqual(nameof(MethodArguments.CancelWithValue), MethodArguments.CalledMethodName);
             Assert.AreEqual(-1, MethodArguments.Value);
 
-            Assert.IsNotNull(parser.Parse(new[] { "-CancelWithValueAndHelp", "1" }));
-            Assert.IsFalse(parser.HelpRequested);
+            CheckSuccess(parser, new[] { "-CancelWithValueAndHelp", "1" });
             Assert.AreEqual(nameof(MethodArguments.CancelWithValueAndHelp), MethodArguments.CalledMethodName);
             Assert.AreEqual(1, MethodArguments.Value);
 
-            Assert.IsNull(parser.Parse(new[] { "-CancelWithValueAndHelp", "-1" }));
-            Assert.IsTrue(parser.HelpRequested);
+            CheckCanceled(parser, new[] { "-CancelWithValueAndHelp", "-1", "bar" }, "CancelWithValueAndHelp", true, 1);
             Assert.AreEqual(nameof(MethodArguments.CancelWithValueAndHelp), MethodArguments.CalledMethodName);
             Assert.AreEqual(-1, MethodArguments.Value);
 
-            Assert.IsNotNull(parser.Parse(new[] { "-NoReturn" }));
-            Assert.IsFalse(parser.HelpRequested);
+            CheckSuccess(parser, new[] { "-NoReturn" });
             Assert.AreEqual(nameof(MethodArguments.NoReturn), MethodArguments.CalledMethodName);
 
-            Assert.IsNotNull(parser.Parse(new[] { "42" }));
-            Assert.IsFalse(parser.HelpRequested);
+            CheckSuccess(parser, new[] { "42" });
             Assert.AreEqual(nameof(MethodArguments.Positional), MethodArguments.CalledMethodName);
             Assert.AreEqual(42, MethodArguments.Value);
+
+            CheckCanceled(parser, new[] { "-CancelModeAbort", "Foo" }, "CancelModeAbort", false, 1);
+            Assert.AreEqual(nameof(MethodArguments.CancelModeAbort), MethodArguments.CalledMethodName);
+
+            CheckSuccess(parser, new[] { "-CancelModeSuccess", "Foo" }, "CancelModeSuccess", 1);
+            Assert.AreEqual(nameof(MethodArguments.CancelModeSuccess), MethodArguments.CalledMethodName);
+
+            CheckSuccess(parser, new[] { "-CancelModeNone" });
+            Assert.AreEqual(nameof(MethodArguments.CancelModeNone), MethodArguments.CalledMethodName);
         }
 
         [TestMethod]
@@ -1347,10 +1348,6 @@ namespace Ookii.CommandLine.Tests
             }
         }
 
-        private static void CheckThrows(Action operation, CommandLineParser parser, CommandLineArgumentErrorCategory category, string argumentName = null, Type innerExceptionType = null)
-        {
-        }
-
         private static void CheckThrows(CommandLineParser parser, string[] arguments, CommandLineArgumentErrorCategory category, string argumentName = null, Type innerExceptionType = null, int remainingArgumentCount = 0)
         {
             try
@@ -1376,8 +1373,33 @@ namespace Ookii.CommandLine.Tests
                 }
 
                 var remaining = arguments.AsMemory(arguments.Length - remainingArgumentCount);
-                AssertSpanEqual(remaining.Span, parser.ParseResult.RemainingArguments.Span);
+                AssertMemoryEqual(remaining, parser.ParseResult.RemainingArguments);
             }
+        }
+
+        private static void CheckCanceled(CommandLineParser parser, string[] arguments, string argumentName, bool helpRequested, int remainingArgumentCount = 0)
+        {
+            Assert.IsNull(parser.Parse(arguments));
+            Assert.AreEqual(ParseStatus.Canceled, parser.ParseResult.Status);
+            Assert.AreEqual(argumentName, parser.ParseResult.ArgumentName);
+            Assert.AreEqual(helpRequested, parser.HelpRequested);
+            Assert.IsNull(parser.ParseResult.LastException);
+            var remaining = arguments.AsMemory(arguments.Length - remainingArgumentCount);
+            AssertMemoryEqual(remaining, parser.ParseResult.RemainingArguments);
+        }
+
+        private static T CheckSuccess<T>(CommandLineParser<T> parser, string[] arguments, string argumentName = null, int remainingArgumentCount = 0)
+            where T : class
+        {
+            var result = parser.Parse(arguments);
+            Assert.IsNotNull(result);
+            Assert.IsFalse(parser.HelpRequested);
+            Assert.AreEqual(ParseStatus.Success, parser.ParseResult.Status);
+            Assert.AreEqual(argumentName, parser.ParseResult.ArgumentName);
+            Assert.IsNull(parser.ParseResult.LastException);
+            var remaining = arguments.AsMemory(arguments.Length - remainingArgumentCount);
+            AssertMemoryEqual(remaining, parser.ParseResult.RemainingArguments);
+            return result;
         }
 
         internal static CommandLineParser<T> CreateParser<T>(ProviderKind kind, ParseOptions options = null)
@@ -1440,6 +1462,12 @@ namespace Ookii.CommandLine.Tests
             {
                 Assert.Fail($"Span not equal. Expected: {{ {string.Join(", ", expected.ToArray())} }}, Actual: {{ {string.Join(", ", actual.ToArray())} }}");
             }
+        }
+
+        public static void AssertMemoryEqual<T>(ReadOnlyMemory<T> expected, ReadOnlyMemory<T> actual)
+            where T : IEquatable<T>
+        {
+            AssertSpanEqual(expected.Span, actual.Span);
         }
     }
 }

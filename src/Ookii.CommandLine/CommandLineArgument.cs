@@ -162,8 +162,7 @@ public abstract class CommandLineArgument
             Value = value;
             try
             {
-                // TODO: Support methods returning CancelMode.
-                return argument.CallMethod(value) ? CancelMode.None : CancelMode.Abort;
+                return argument.CallMethod(value);
             }
             catch (TargetInvocationException ex)
             {
@@ -224,7 +223,7 @@ public abstract class CommandLineArgument
             return info;
         }
 
-        protected override bool CallMethod(object? value) => true;
+        protected override CancelMode CallMethod(object? value) => CancelMode.Abort;
         protected override object? GetProperty(object target) => throw new InvalidOperationException();
         protected override void SetProperty(object target, object? value) => throw new InvalidOperationException();
     }
@@ -256,7 +255,7 @@ public abstract class CommandLineArgument
             };
         }
 
-        protected override bool CallMethod(object? value) => AutomaticVersion(Parser);
+        protected override CancelMode CallMethod(object? value) => AutomaticVersion(Parser);
         protected override object? GetProperty(object target) => throw new InvalidOperationException();
         protected override void SetProperty(object target, object? value) => throw new InvalidOperationException();
     }
@@ -1165,7 +1164,7 @@ public abstract class CommandLineArgument
     /// <exception cref="InvalidOperationException">
     ///   This argument does not use a method.
     /// </exception>
-    protected abstract bool CallMethod(object? value);
+    protected abstract CancelMode CallMethod(object? value);
 
     /// <summary>
     /// Determines the value description if one wasn't explicitly given.
@@ -1562,12 +1561,12 @@ public abstract class CommandLineArgument
         });
     }
 
-    private static bool AutomaticVersion(CommandLineParser parser)
+    private static CancelMode AutomaticVersion(CommandLineParser parser)
     {
         ShowVersion(parser.StringProvider, parser.ArgumentsType.Assembly, parser.ApplicationFriendlyName);
 
         // Cancel parsing but do not show help.
-        return false;
+        return CancelMode.Abort;
     }
 
     internal static string DetermineArgumentName(string? explicitName, string memberName, NameTransform? transform)

@@ -22,14 +22,10 @@ namespace Ookii.CommandLine;
 ///   signatures:
 /// </para>
 /// <code>
-/// public static bool Method(ArgumentType value, CommandLineParser parser);
-/// public static bool Method(ArgumentType value);
-/// public static bool Method(CommandLineParser parser);
-/// public static bool Method();
-/// public static void Method(ArgumentType value, CommandLineParser parser);
-/// public static void Method(ArgumentType value);
-/// public static void Method(CommandLineParser parser);
-/// public static void Method();
+/// public static (void|bool|CancelMode) Method(ArgumentType value, CommandLineParser parser);
+/// public static (void|bool|CancelMode) Method(ArgumentType value);
+/// public static (void|bool|CancelMode) Method(CommandLineParser parser);
+/// public static (void|bool|CancelMode) Method();
 /// </code>
 /// <para>
 ///   In this case, the <c>ArgumentType</c> type determines the type of values the argument accepts. If there
@@ -38,17 +34,22 @@ namespace Ookii.CommandLine;
 /// </para>
 /// <para>
 ///   The method will be invoked as soon as the argument is parsed, before parsing the entire
-///   command line is complete. Return <see langword="false"/> to cancel parsing, in which case
-///   the remaining arguments will not be parsed and the <see cref="CommandLineParser.Parse(string[], int)"/>
-///   method returns <see langword="null"/>.
+///   command line is complete.
 /// </para>
 /// <para>
-///   Unlike using the <see cref="CancelParsing"/> or <see cref="CommandLineParser.ArgumentParsed"/>
-///   event, canceling parsing with the return value does not automatically print the usage
-///   help when using the <see cref="CommandLineParser{T}.ParseWithErrorHandling()"/> method, the
+///   The return type must be either <see cref="void"/>, <see cref="bool"/> or <see cref="CancelMode"/>.
+///   Using <see cref="void"/> is equivalent to returning <see cref="CancelMode.None"/>, and when
+///   using <see cref="bool"/>, returning <see langword="false"/> is equivalent to returning
+///   <see cref="CancelMode.Abort"/>.
+/// </para>
+/// <para>
+///   Unlike using the <see cref="CancelParsing"/> property event, canceling parsing with the return
+///   value does not automatically print the usage help when using the
+///   <see cref="CommandLineParser{T}.ParseWithErrorHandling()"/> method, the
 ///   <see cref="CommandLineParser.Parse{T}(string[], int, ParseOptions?)"/> method or the
 ///   <see cref="CommandManager"/> class. Instead, it must be requested using by setting the
-///   <see cref="CommandLineParser.HelpRequested"/> property to <see langword="true"/>.
+///   <see cref="CommandLineParser.HelpRequested"/> property to <see langword="true"/> in the
+///   target method.
 /// </para>
 /// </remarks>
 /// <threadsafety static="true" instance="false"/>
