@@ -881,7 +881,7 @@ namespace Ookii.CommandLine
             SetIndent(SyntaxIndent);
 
             WriteUsageSyntaxPrefix();
-            foreach (CommandLineArgument argument in Parser.Arguments)
+            foreach (CommandLineArgument argument in GetArgumentsInUsageOrder())
             {
                 if (argument.IsHidden)
                 {
@@ -905,9 +905,27 @@ namespace Ookii.CommandLine
                 }
             }
 
+            WriteUsageSyntaxSuffix();
             WriteLine(); // End syntax line
             WriteLine(); // Blank line
         }
+
+        /// <summary>
+        /// Gets the arguments in the order they will be shown in the usage syntax.
+        /// </summary>
+        /// <returns>A list of all arguments in usage order.</returns>
+        /// <remarks>
+        /// <para>
+        ///   This method is called by the base implementation of the <see cref="WriteParserUsageSyntax"/>
+        ///   method.
+        /// </para>
+        /// <para>
+        ///   The base implementation first returns positional arguments in the specified order,
+        ///   then required non-positional arguments in alphabetical order, then the remaining
+        ///   arguments in alphabetical order.
+        /// </para>
+        /// </remarks>
+        protected virtual IEnumerable<CommandLineArgument> GetArgumentsInUsageOrder() => Parser.Arguments;
 
         /// <summary>
         /// Write the prefix for the usage syntax, including the executable name and, for
@@ -940,6 +958,27 @@ namespace Ookii.CommandLine
             {
                 Write(' ');
                 Write(CommandName);
+            }
+        }
+
+        /// <summary>
+        /// Write the suffix for the usage syntax.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        ///   The base implementation does nothing for parser usage, and writes a string like
+        ///   " &lt;command&gt; [arguments]" for command manager usage.
+        /// </para>
+        /// <para>
+        ///   This method is called by the base implementation of the <see cref="WriteParserUsageSyntax"/>
+        ///   method and the <see cref="WriteCommandListUsageSyntax"/> method.
+        /// </para>
+        /// </remarks>
+        protected virtual void WriteUsageSyntaxSuffix()
+        {
+            if (OperationInProgress == Operation.CommandListUsage)
+            {
+                WriteLine(Resources.DefaultCommandUsageSuffix);
             }
         }
 
@@ -1166,7 +1205,7 @@ namespace Ookii.CommandLine
         /// </summary>
         /// <remarks>
         /// <para>
-        ///   The default implementation gets the list of arguments using the <see cref="GetFilteredAndSortedArguments"/>
+        ///   The default implementation gets the list of arguments using the <see cref="GetArgumentsInDescriptionOrder"/>
         ///   method, and calls the <see cref="WriteArgumentDescription(CommandLineArgument)"/> method for each one.
         /// </para>
         /// <para>
@@ -1191,7 +1230,7 @@ namespace Ookii.CommandLine
                 }
             }
 
-            var arguments = GetFilteredAndSortedArguments();
+            var arguments = GetArgumentsInDescriptionOrder();
             bool first = true;
             foreach (var argument in arguments)
             {
@@ -1595,7 +1634,7 @@ namespace Ookii.CommandLine
         ///   Arguments that are hidden are excluded from the list.
         /// </para>
         /// </remarks>
-        protected IEnumerable<CommandLineArgument> GetFilteredAndSortedArguments()
+        protected virtual IEnumerable<CommandLineArgument> GetArgumentsInDescriptionOrder()
         {
             var arguments = Parser.Arguments.Where(argument => !argument.IsHidden && ArgumentDescriptionListFilter switch
             {
@@ -1676,7 +1715,13 @@ namespace Ookii.CommandLine
                 var argumentName = transform.Apply(CommandManager.Options.StringProvider.AutomaticHelpName());
 
                 Writer.Indent = 0;
-                WriteCommandHelpInstruction(prefix, argumentName);
+                var name = ExecutableName;
+                if (CommandName != null)
+                {
+                    name += " " + CommandName;
+                }
+
+                WriteCommandHelpInstruction(name, prefix, argumentName);
             }
         }
 
@@ -1685,8 +1730,7 @@ namespace Ookii.CommandLine
         /// </summary>
         /// <remarks>
         /// <para>
-        ///   The base implementation calls <see cref="WriteUsageSyntaxPrefix"/>, and adds to it
-        ///   a string like " &lt;command&gt; [arguments]".
+        ///   The base implementation calls <see cref="WriteUsageSyntaxPrefix"/> and <see cref="WriteUsageSyntaxSuffix"/>.
         /// </para>
         /// <para>
         ///   This method is called by the base implementation of the <see cref="WriteCommandListUsageCore"/>
@@ -1696,7 +1740,7 @@ namespace Ookii.CommandLine
         protected virtual void WriteCommandListUsageSyntax()
         {
             WriteUsageSyntaxPrefix();
-            WriteLine(Resources.DefaultCommandUsageSuffix);
+            WriteUsageSyntaxSuffix();
             WriteLine();
         }
 
@@ -1877,6 +1921,7 @@ namespace Ookii.CommandLine
         /// <summary>
         /// Writes an instruction on how to get help on a command.
         /// </summary>
+        /// <param name="name">The application and command name.</param>
         /// <param name="argumentNamePrefix">The argument name prefix for a help argument.</param>
         /// <param name="argumentName">The automatic help argument name.</param>
         /// <remarks>
@@ -1891,14 +1936,8 @@ namespace Ookii.CommandLine
         ///   argument matching the automatic help argument's name.
         /// </para>
         /// </remarks>
-        protected virtual void WriteCommandHelpInstruction(string argumentNamePrefix, string argumentName)
+        protected virtual void WriteCommandHelpInstruction(string name, string argumentNamePrefix, string argumentName)
         {
-            var name = ExecutableName;
-            if (CommandName != null)
-            {
-                name += " " + CommandName;
-            }
-
             WriteLine(Resources.CommandHelpInstructionFormat, name, argumentNamePrefix, argumentName);
         }
 
