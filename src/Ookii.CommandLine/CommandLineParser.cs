@@ -912,11 +912,7 @@ public class CommandLineParser
         catch (CommandLineArgumentException ex)
         {
             HelpRequested = true;
-            var remaining = index < args.Length
-                ? args.Slice(index + 1)
-                : default;
-
-            ParseResult = ParseResult.FromException(ex, remaining);
+            ParseResult = ParseResult.FromException(ex, args.Slice(index));
             throw;
         }
     }
@@ -1542,8 +1538,6 @@ public class CommandLineParser
                     throw StringProvider.CreateException(CommandLineArgumentErrorCategory.TooManyArguments);
                 }
 
-                // ParseArgumentValue returns true if parsing was canceled by the ArgumentParsed event handler
-                // or the CancelParsing property.
                 lastArgument = _arguments[positionalArgumentIndex];
                 cancelParsing = ParseArgumentValue(lastArgument, arg, arg.AsMemory());
                 if (cancelParsing != CancelMode.None)

@@ -105,6 +105,9 @@ partial class ThrowingArguments
 {
     private int _throwingArgument;
 
+    [CommandLineArgument(Position = 0)]
+    public string Arg { get; set; }
+
     [CommandLineArgument]
     public int ThrowingArgument
     {

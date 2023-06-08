@@ -49,15 +49,28 @@ namespace Ookii.CommandLine
 
         /// <summary>
         /// Gets any arguments that were not parsed by the <see cref="CommandLineParser"/> if
-        /// parsing was canceled.
+        /// parsing was canceled or an error occurred.
         /// </summary>
         /// <value>
         /// A <see cref="ReadOnlyMemory{T}"/> instance with the remaining arguments, or an empty
-        /// collection if there were no remaining arguments, or parsing was not canceled.
+        /// collection if there were no remaining arguments.
         /// </value>
         /// <remarks>
         /// <para>
-        ///   This will always be an empty collection if parsing was not canceled. 
+        ///   If parsing succeeded without encountering an argument using <see cref="CancelMode.Success"/>,
+        ///   this collection will always be empty.
+        /// </para>
+        /// <para>
+        ///   If a <see cref="CommandLineArgumentException"/> exception was thrown, which arguments
+        ///   count as remaining depends on the type of error. For errors that occur during parsing,
+        ///   such as an unknown argument name, value conversion errors, validation errors,
+        ///   duplicate arguments, and others, the remaining arguments will be set to include the
+        ///   argument that threw the exception, and all arguments after it.
+        /// </para>
+        /// <para>
+        ///   For errors that occur after parsing is finished, such as validation errors from a
+        ///   validator that uses <see cref="Validation.ValidationMode.AfterParsing"/>, or an
+        ///   exception thrown by the target class, this collection will be empty.
         /// </para>
         /// </remarks>
         public ReadOnlyMemory<string> RemainingArguments { get; }
