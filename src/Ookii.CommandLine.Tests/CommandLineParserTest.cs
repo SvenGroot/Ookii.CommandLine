@@ -511,7 +511,7 @@ namespace Ookii.CommandLine.Tests
             Assert.IsTrue(parser.HelpRequested);
             Assert.AreEqual(ParseStatus.Canceled, parser.ParseResult.Status);
             Assert.IsNull(parser.ParseResult.LastException);
-            Assert.IsTrue(new[] { "-Argument2", "bar" }.AsSpan().SequenceEqual(parser.ParseResult.RemainingArguments.Span));
+            AssertSpanEqual(new[] { "-Argument2", "bar" }.AsSpan(), parser.ParseResult.RemainingArguments.Span);
             Assert.AreEqual("DoesCancel", parser.ParseResult.ArgumentName);
             Assert.IsTrue(parser.GetArgument("Argument1").HasValue);
             Assert.AreEqual("foo", (string)parser.GetArgument("Argument1").Value);
@@ -537,7 +537,7 @@ namespace Ookii.CommandLine.Tests
             Assert.AreEqual(ParseStatus.Canceled, parser.ParseResult.Status);
             Assert.IsNull(parser.ParseResult.LastException);
             Assert.AreEqual("DoesNotCancel", parser.ParseResult.ArgumentName);
-            Assert.IsTrue(new[] { "-Argument2", "bar" }.AsSpan().SequenceEqual(parser.ParseResult.RemainingArguments.Span));
+            AssertSpanEqual(new[] { "-Argument2", "bar" }.AsSpan(), parser.ParseResult.RemainingArguments.Span);
             Assert.IsFalse(parser.HelpRequested);
             Assert.IsTrue(parser.GetArgument("Argument1").HasValue);
             Assert.AreEqual("foo", (string)parser.GetArgument("Argument1").Value);
@@ -589,7 +589,7 @@ namespace Ookii.CommandLine.Tests
             var result = parser.Parse(new[] { "-Argument1", "foo", "-DoesCancelWithSuccess", "-Argument2", "bar" });
             Assert.AreEqual(ParseStatus.Success, parser.ParseResult.Status);
             Assert.AreEqual("DoesCancelWithSuccess", parser.ParseResult.ArgumentName);
-            Assert.IsTrue(new[] { "-Argument2", "bar" }.AsSpan().SequenceEqual(parser.ParseResult.RemainingArguments.Span));
+            AssertSpanEqual(new[] { "-Argument2", "bar" }.AsSpan(), parser.ParseResult.RemainingArguments.Span);
             Assert.IsNotNull(result);
             Assert.IsFalse(parser.HelpRequested);
             Assert.IsFalse(result.DoesNotCancel);
@@ -1349,9 +1349,13 @@ namespace Ookii.CommandLine.Tests
 
         private static void CheckThrows(Action operation, CommandLineParser parser, CommandLineArgumentErrorCategory category, string argumentName = null, Type innerExceptionType = null)
         {
+        }
+
+        private static void CheckThrows(CommandLineParser parser, string[] arguments, CommandLineArgumentErrorCategory category, string argumentName = null, Type innerExceptionType = null, int remainingArgumentCount = 0)
+        {
             try
             {
-                operation();
+                parser.Parse(arguments);
                 Assert.Fail("Expected CommandLineException was not thrown.");
             }
             catch (CommandLineArgumentException ex)
@@ -1370,16 +1374,11 @@ namespace Ookii.CommandLine.Tests
                 {
                     Assert.IsInstanceOfType(ex.InnerException, innerExceptionType);
                 }
+
+                var remaining = arguments.AsMemory(arguments.Length - remainingArgumentCount);
+                AssertSpanEqual(remaining.Span, parser.ParseResult.RemainingArguments.Span);
             }
         }
-
-        private static void CheckThrows(CommandLineParser parser, string[] arguments, CommandLineArgumentErrorCategory category, string argumentName = null, Type innerExceptionType = null, int remainingArgumentCount = 0)
-        {
-            CheckThrows(() => parser.Parse(arguments), parser, category, argumentName, innerExceptionType);
-            var remaining = arguments.AsMemory(arguments.Length - remainingArgumentCount);
-            AssertSpanEqual(remaining.Span, parser.ParseResult.RemainingArguments.Span);
-        }
-
 
         internal static CommandLineParser<T> CreateParser<T>(ProviderKind kind, ParseOptions options = null)
 #if NET7_0_OR_GREATER
