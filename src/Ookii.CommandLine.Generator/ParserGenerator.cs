@@ -141,11 +141,11 @@ internal class ParserGenerator
         {
             // We cannot rely on default interface implementations, because that makes the methods
             // uncallable without a generic type argument.
-            _builder.AppendLine($"public static {nullableType.ToDisplayString()} Parse(Ookii.CommandLine.ParseOptions? options = null) => CreateParser(options).ParseWithErrorHandling();");
+            _builder.AppendLine($"public static {nullableType.ToQualifiedName()} Parse(Ookii.CommandLine.ParseOptions? options = null) => CreateParser(options).ParseWithErrorHandling();");
             _builder.AppendLine();
-            _builder.AppendLine($"public static {nullableType.ToDisplayString()} Parse(string[] args, Ookii.CommandLine.ParseOptions? options = null) => CreateParser(options).ParseWithErrorHandling(args);");
+            _builder.AppendLine($"public static {nullableType.ToQualifiedName()} Parse(string[] args, Ookii.CommandLine.ParseOptions? options = null) => CreateParser(options).ParseWithErrorHandling(args);");
             _builder.AppendLine();
-            _builder.AppendLine($"public static {nullableType.ToDisplayString()} Parse(string[] args, int index, Ookii.CommandLine.ParseOptions? options = null) => CreateParser(options).ParseWithErrorHandling(args, index);");
+            _builder.AppendLine($"public static {nullableType.ToQualifiedName()} Parse(string[] args, int index, Ookii.CommandLine.ParseOptions? options = null) => CreateParser(options).ParseWithErrorHandling(args, index);");
             _builder.CloseBlock(); // class
         }
 
@@ -366,7 +366,7 @@ internal class ParserGenerator
                         ? "null"
                         : $"keyValueSeparatorAttribute{member.Name}.Separator";
 
-                    converter = $"new Ookii.CommandLine.Conversion.KeyValuePairConverter<{keyType.ToDisplayString()}, {rawValueType.ToDisplayString()}>({keyConverter}, {valueConverter}, {separator}, {allowsNull.ToCSharpString()})";
+                    converter = $"new Ookii.CommandLine.Conversion.KeyValuePairConverter<{keyType.ToQualifiedName()}, {rawValueType.ToQualifiedName()}>({keyConverter}, {valueConverter}, {separator}, {allowsNull.ToCSharpString()})";
                 }
             }
             else if (collectionType != null)
@@ -389,7 +389,7 @@ internal class ParserGenerator
             {
                 isRequired = true;
                 requiredProperties ??= new();
-                requiredProperties.Add((member.Name, property.Type.ToDisplayString(), notNullAnnotation));
+                requiredProperties.Add((member.Name, property.Type.ToQualifiedName(), notNullAnnotation));
             }
         }
         else
@@ -409,9 +409,9 @@ internal class ParserGenerator
         _builder.AppendLine($"yield return Ookii.CommandLine.Support.GeneratedArgument.Create(");
         _builder.IncreaseIndent();
         _builder.AppendArgument("parser");
-        _builder.AppendArgument($"argumentType: typeof({argumentType.ToDisplayString()})");
-        _builder.AppendArgument($"elementTypeWithNullable: typeof({elementTypeWithNullable.ToDisplayString()})");
-        _builder.AppendArgument($"elementType: typeof({elementType.ToDisplayString()})");
+        _builder.AppendArgument($"argumentType: typeof({argumentType.ToQualifiedName()})");
+        _builder.AppendArgument($"elementTypeWithNullable: typeof({elementTypeWithNullable.ToQualifiedName()})");
+        _builder.AppendArgument($"elementType: typeof({elementType.ToQualifiedName()})");
         _builder.AppendArgument($"memberName: \"{member.Name}\"");
         _builder.AppendArgument($"kind: {kind}");
         _builder.AppendArgument($"attribute: {attributes.CommandLineArgument.CreateInstantiation()}");
@@ -420,13 +420,13 @@ internal class ParserGenerator
         var valueDescriptionFormat = new SymbolDisplayFormat(genericsOptions: SymbolDisplayGenericsOptions.IncludeTypeParameters);
         if (keyType != null)
         {
-            _builder.AppendArgument($"keyType: typeof({keyType.ToDisplayString()})");
+            _builder.AppendArgument($"keyType: typeof({keyType.ToQualifiedName()})");
             _builder.AppendArgument($"defaultKeyDescription: \"{keyType.ToDisplayString(valueDescriptionFormat)}\"");
         }
 
         if (valueType != null)
         {
-            _builder.AppendArgument($"valueType: typeof({valueType.ToDisplayString()})");
+            _builder.AppendArgument($"valueType: typeof({valueType.ToQualifiedName()})");
             _builder.AppendArgument($"defaultValueDescription: \"{valueType.ToDisplayString(valueDescriptionFormat)}\"");
         }
         else
@@ -454,10 +454,10 @@ internal class ParserGenerator
         {
             if (property.SetMethod != null && property.SetMethod.DeclaredAccessibility == Accessibility.Public && !property.SetMethod.IsInitOnly)
             {
-                _builder.AppendArgument($"setProperty: (target, value) => (({_argumentsClass.ToDisplayString()})target).{member.Name} = ({originalArgumentType.ToDisplayString()})value{notNullAnnotation}");
+                _builder.AppendArgument($"setProperty: (target, value) => (({_argumentsClass.ToQualifiedName()})target).{member.Name} = ({originalArgumentType.ToQualifiedName()})value{notNullAnnotation}");
             }
 
-            _builder.AppendArgument($"getProperty: (target) => (({_argumentsClass.ToDisplayString()})target).{member.Name}");
+            _builder.AppendArgument($"getProperty: (target) => (({_argumentsClass.ToQualifiedName()})target).{member.Name}");
             _builder.AppendArgument($"requiredProperty: {property.IsRequired.ToCSharpString()}");
             if (argumentInfo.DefaultValue != null)
             {
@@ -494,11 +494,11 @@ internal class ParserGenerator
             {
                 if (info.HasParserParameter)
                 {
-                    arguments = $"({originalArgumentType.ToDisplayString()})value{notNullAnnotation}, parser";
+                    arguments = $"({originalArgumentType.ToQualifiedName()})value{notNullAnnotation}, parser";
                 }
                 else
                 {
-                    arguments = $"({originalArgumentType.ToDisplayString()})value{notNullAnnotation}";
+                    arguments = $"({originalArgumentType.ToQualifiedName()})value{notNullAnnotation}";
                 }    
             }
             else if (info.HasParserParameter)
@@ -508,9 +508,9 @@ internal class ParserGenerator
 
             var methodCall = info.ReturnType switch
             {
-                ReturnType.CancelMode => $"callMethod: (value, parser) => {_argumentsClass.ToDisplayString()}.{member.Name}({arguments})",
-                ReturnType.Boolean => $"callMethod: (value, parser) => {_argumentsClass.ToDisplayString()}.{member.Name}({arguments}) ? Ookii.CommandLine.CancelMode.None : Ookii.CommandLine.CancelMode.Abort",
-                _ => $"callMethod: (value, parser) => {{ {_argumentsClass.ToDisplayString()}.{member.Name}({arguments}); return Ookii.CommandLine.CancelMode.None; }}"
+                ReturnType.CancelMode => $"callMethod: (value, parser) => {_argumentsClass.ToQualifiedName()}.{member.Name}({arguments})",
+                ReturnType.Boolean => $"callMethod: (value, parser) => {_argumentsClass.ToQualifiedName()}.{member.Name}({arguments}) ? Ookii.CommandLine.CancelMode.None : Ookii.CommandLine.CancelMode.Abort",
+                _ => $"callMethod: (value, parser) => {{ {_argumentsClass.ToQualifiedName()}.{member.Name}({arguments}); return Ookii.CommandLine.CancelMode.None; }}"
             };
 
             _builder.AppendArgument(methodCall);
@@ -687,7 +687,7 @@ internal class ParserGenerator
             }
 
             var converterType = (INamedTypeSymbol)argument.Value!;
-            return $"new {converterType.ToDisplayString()}()";
+            return $"new {converterType.ToQualifiedName()}()";
         }
 
         if (elementType.SpecialType == SpecialType.System_String)
@@ -701,17 +701,17 @@ internal class ParserGenerator
 
         if (elementType.TypeKind == TypeKind.Enum)
         {
-            return $"new Ookii.CommandLine.Conversion.EnumConverter(typeof({elementType.ToDisplayString()}))";
+            return $"new Ookii.CommandLine.Conversion.EnumConverter(typeof({elementType.ToQualifiedName()}))";
         }
 
         if (elementType.ImplementsInterface(_typeHelper.ISpanParsable?.Construct(elementType)))
         {
-            return $"new Ookii.CommandLine.Conversion.SpanParsableConverter<{elementType.ToDisplayString()}>()";
+            return $"new Ookii.CommandLine.Conversion.SpanParsableConverter<{elementType.ToQualifiedName()}>()";
         }
 
         if (elementType.ImplementsInterface(_typeHelper.IParsable?.Construct(elementType)))
         {
-            return $"new Ookii.CommandLine.Conversion.ParsableConverter<{elementType.ToDisplayString()}>()";
+            return $"new Ookii.CommandLine.Conversion.ParsableConverter<{elementType.ToQualifiedName()}>()";
         }
 
         return _converterGenerator.GetConverter(elementType);

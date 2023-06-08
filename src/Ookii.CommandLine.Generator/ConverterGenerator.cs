@@ -67,7 +67,7 @@ internal class ConverterGenerator
                 return null;
             }
 
-            info.Name = GenerateName(type.ToDisplayString());
+            info.Name = GenerateName(type.ToQualifiedName());
             _converters.Add(type, info);
             converter = info;
         }
@@ -189,11 +189,11 @@ internal class ConverterGenerator
         builder.OpenBlock();
         if (info.ParseMethod)
         {
-            builder.AppendLine($"return {type.ToDisplayString()}.Parse(value{culture});");
+            builder.AppendLine($"return {type.ToQualifiedName()}.Parse(value{culture});");
         }
         else
         {
-            builder.AppendLine($"return new {type.ToDisplayString()}(value);");
+            builder.AppendLine($"return new {type.ToQualifiedName()}(value);");
         }
 
         builder.CloseBlock(); // try

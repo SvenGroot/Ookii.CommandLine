@@ -9,6 +9,14 @@ namespace Ookii.CommandLine.Generator;
 
 internal static class Extensions
 {
+    // This is the format used to emit type names in the output. It includes the global namespace
+    // so that this doesn't break if the class matches the namespace name.
+    private static readonly SymbolDisplayFormat QualifiedFormat = new(
+            globalNamespaceStyle: SymbolDisplayGlobalNamespaceStyle.Included,
+            typeQualificationStyle: SymbolDisplayTypeQualificationStyle.NameAndContainingTypesAndNamespaces,
+            genericsOptions: SymbolDisplayGenericsOptions.IncludeTypeParameters,
+            miscellaneousOptions: SymbolDisplayMiscellaneousOptions.UseSpecialTypes | SymbolDisplayMiscellaneousOptions.IncludeNullableReferenceTypeModifier | SymbolDisplayMiscellaneousOptions.EscapeKeywordIdentifiers);
+
     public static bool DerivesFrom(this ITypeSymbol symbol, ITypeSymbol? baseClass)
     {
         if (baseClass == null)
@@ -214,4 +222,9 @@ internal static class Extensions
 
     public static Location? GetLocation(this AttributeData attribute)
         => attribute.ApplicationSyntaxReference?.SyntaxTree.GetLocation(attribute.ApplicationSyntaxReference.Span);
+
+    public static string ToQualifiedName(this ITypeSymbol symbol)
+    {
+        return symbol.ToDisplayString(QualifiedFormat);
+    }
 }

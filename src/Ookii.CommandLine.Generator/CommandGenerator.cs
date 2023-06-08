@@ -81,7 +81,7 @@ internal class CommandGenerator
             var source = GenerateManager(manager);
             if (source != null)
             {
-                _context.AddSource(manager.ToDisplayString().ToIdentifier(".g.cs"), SourceText.From(source, Encoding.UTF8));
+                _context.AddSource(manager.ToQualifiedName().ToIdentifier(".g.cs"), SourceText.From(source, Encoding.UTF8));
             }
         }
     }
@@ -168,7 +168,7 @@ internal class CommandGenerator
     private bool GenerateCommand(SourceBuilder builder, INamedTypeSymbol commandType, ArgumentsClassAttributes? commandAttributes)
     {
         var useCustomParsing = commandType.ImplementsInterface(_typeHelper.ICommandWithCustomParsing);
-        var commandTypeName = commandType.ToDisplayString();
+        var commandTypeName = commandType.ToQualifiedName();
         if (useCustomParsing)
         {
             builder.AppendLine($"yield return new Ookii.CommandLine.Support.GeneratedCommandInfoWithCustomParsing<{commandTypeName}>(");
