@@ -9,11 +9,13 @@ namespace Ookii.CommandLine
     /// <seealso cref="CommandLineParser.ParseResult"/>
     public readonly struct ParseResult
     {
-        private ParseResult(ParseStatus status, CommandLineArgumentException? exception = null, string? argumentName = null)
+        private ParseResult(ParseStatus status, CommandLineArgumentException? exception = null, string? argumentName = null,
+            ReadOnlyMemory<string> remainingArguments = default)
         {
             Status = status;
             LastException = exception;
             ArgumentName = argumentName;
+            RemainingArguments = remainingArguments;
         }
 
         /// <summary>
@@ -46,12 +48,32 @@ namespace Ookii.CommandLine
         public string? ArgumentName { get; }
 
         /// <summary>
-        /// Gets a <see cref="ParseResult"/> instance that represents successful parsing.
+        /// Gets any arguments that were not parsed by the <see cref="CommandLineParser"/> if
+        /// parsing was canceled.
         /// </summary>
         /// <value>
-        /// An instance of the <see cref="ParseResult"/> structure.
+        /// A <see cref="ReadOnlyMemory{T}"/> instance with the remaining arguments, or an empty
+        /// collection if there were no remaining arguments, or parsing was not canceled.
         /// </value>
-        public static ParseResult Success => new(ParseStatus.Success);
+        /// <remarks>
+        /// <para>
+        ///   This will always be an empty collection if parsing was not canceled. 
+        /// </para>
+        /// </remarks>
+        public ReadOnlyMemory<string> RemainingArguments { get; }
+
+        /// <summary>
+        /// Gets a <see cref="ParseResult"/> instance that represents successful parsing.
+        /// </summary>
+        /// <param name="cancelArgumentName">
+        /// The name of the argument that canceled parsing using <see cref="CancelMode.Success"/>.
+        /// </param>
+        /// <param name="remainingArguments">Any remaining arguments that were not parsed.</param>
+        /// <returns>
+        /// An instance of the <see cref="ParseResult"/> structure.
+        /// </returns>
+        public static ParseResult FromSuccess(string? cancelArgumentName = null, ReadOnlyMemory<string> remainingArguments = default)
+            => new(ParseStatus.Success,argumentName: cancelArgumentName, remainingArguments: remainingArguments);
 
         /// <summary>
         /// Creates a <see cref="ParseResult"/> instance that represents a parsing error.
@@ -68,11 +90,12 @@ namespace Ookii.CommandLine
         /// Creates a <see cref="ParseResult"/> instance that represents canceled parsing.
         /// </summary>
         /// <param name="argumentName">The name of the argument that canceled parsing.</param>
+        /// <param name="remainingArguments">Any remaining arguments that were not parsed.</param>
         /// <returns>An instance of the <see cref="ParseResult"/> structure.</returns>
         /// <exception cref="ArgumentNullException">
         /// <paramref name="argumentName"/> is <see langword="null"/>.
         /// </exception>
-        public static ParseResult FromCanceled(string argumentName)
-            => new(ParseStatus.Canceled, null, argumentName ?? throw new ArgumentNullException(nameof(argumentName)));
+        public static ParseResult FromCanceled(string argumentName, ReadOnlyMemory<string> remainingArguments)
+            => new(ParseStatus.Canceled, null, argumentName ?? throw new ArgumentNullException(nameof(argumentName)), remainingArguments);
     }
 }

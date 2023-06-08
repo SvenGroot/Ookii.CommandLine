@@ -495,6 +495,9 @@ namespace Ookii.CommandLine.Tests
             Assert.IsFalse(result.DoesCancel);
             Assert.AreEqual("foo", result.Argument1);
             Assert.AreEqual("bar", result.Argument2);
+            Assert.AreEqual(ParseStatus.Success, parser.ParseResult.Status);
+            Assert.IsNull(parser.ParseResult.ArgumentName);
+            Assert.AreEqual(0, parser.ParseResult.RemainingArguments.Length);
 
             // Cancel if -DoesCancel specified.
             result = parser.Parse(new[] { "-Argument1", "foo", "-DoesCancel", "-Argument2", "bar" });
@@ -502,6 +505,7 @@ namespace Ookii.CommandLine.Tests
             Assert.IsTrue(parser.HelpRequested);
             Assert.AreEqual(ParseStatus.Canceled, parser.ParseResult.Status);
             Assert.IsNull(parser.ParseResult.LastException);
+            Assert.IsTrue(new[] { "-Argument2", "bar" }.AsSpan().SequenceEqual(parser.ParseResult.RemainingArguments.Span));
             Assert.AreEqual("DoesCancel", parser.ParseResult.ArgumentName);
             Assert.IsTrue(parser.GetArgument("Argument1").HasValue);
             Assert.AreEqual("foo", (string)parser.GetArgument("Argument1").Value);
@@ -527,6 +531,7 @@ namespace Ookii.CommandLine.Tests
             Assert.AreEqual(ParseStatus.Canceled, parser.ParseResult.Status);
             Assert.IsNull(parser.ParseResult.LastException);
             Assert.AreEqual("DoesNotCancel", parser.ParseResult.ArgumentName);
+            Assert.IsTrue(new[] { "-Argument2", "bar" }.AsSpan().SequenceEqual(parser.ParseResult.RemainingArguments.Span));
             Assert.IsFalse(parser.HelpRequested);
             Assert.IsTrue(parser.GetArgument("Argument1").HasValue);
             Assert.AreEqual("foo", (string)parser.GetArgument("Argument1").Value);
@@ -552,6 +557,7 @@ namespace Ookii.CommandLine.Tests
             result = parser.Parse(new[] { "-Argument1", "foo", "-DoesCancel", "-Argument2", "bar" });
             Assert.AreEqual(ParseStatus.Success, parser.ParseResult.Status);
             Assert.IsNull(parser.ParseResult.ArgumentName);
+            Assert.AreEqual(0, parser.ParseResult.RemainingArguments.Length);
             Assert.IsNotNull(result);
             Assert.IsFalse(parser.HelpRequested);
             Assert.IsFalse(result.DoesNotCancel);
@@ -564,8 +570,40 @@ namespace Ookii.CommandLine.Tests
             Assert.AreEqual(ParseStatus.Canceled, parser.ParseResult.Status);
             Assert.IsNull(parser.ParseResult.LastException);
             Assert.AreEqual("Help", parser.ParseResult.ArgumentName);
+            Assert.AreEqual(0, parser.ParseResult.RemainingArguments.Length);
             Assert.IsNull(result);
             Assert.IsTrue(parser.HelpRequested);
+        }
+
+        [TestMethod]
+        [DynamicData(nameof(ProviderKinds), DynamicDataDisplayName = nameof(GetCustomDynamicDataDisplayName))]
+        public void TestCancelParsingSuccess(ProviderKind kind)
+        {
+            var parser = CreateParser<CancelArguments>(kind);
+            var result = parser.Parse(new[] { "-Argument1", "foo", "-DoesCancelWithSuccess", "-Argument2", "bar" });
+            Assert.AreEqual(ParseStatus.Success, parser.ParseResult.Status);
+            Assert.AreEqual("DoesCancelWithSuccess", parser.ParseResult.ArgumentName);
+            Assert.IsTrue(new[] { "-Argument2", "bar" }.AsSpan().SequenceEqual(parser.ParseResult.RemainingArguments.Span));
+            Assert.IsNotNull(result);
+            Assert.IsFalse(parser.HelpRequested);
+            Assert.IsFalse(result.DoesNotCancel);
+            Assert.IsFalse(result.DoesCancel);
+            Assert.IsTrue(result.DoesCancelWithSuccess);
+            Assert.AreEqual("foo", result.Argument1);
+            Assert.IsNull(result.Argument2);
+
+            // No remaining arguments.
+            result = parser.Parse(new[] { "-Argument1", "foo", "-DoesCancelWithSuccess" });
+            Assert.AreEqual(ParseStatus.Success, parser.ParseResult.Status);
+            Assert.AreEqual("DoesCancelWithSuccess", parser.ParseResult.ArgumentName);
+            Assert.AreEqual(0, parser.ParseResult.RemainingArguments.Length);
+            Assert.IsNotNull(result);
+            Assert.IsFalse(parser.HelpRequested);
+            Assert.IsFalse(result.DoesNotCancel);
+            Assert.IsFalse(result.DoesCancel);
+            Assert.IsTrue(result.DoesCancelWithSuccess);
+            Assert.AreEqual("foo", result.Argument1);
+            Assert.IsNull(result.Argument2);
         }
 
         [TestMethod]
@@ -1257,6 +1295,7 @@ namespace Ookii.CommandLine.Tests
             Assert.AreEqual(ParseStatus.Success, target.ParseResult.Status);
             Assert.IsNull(target.ParseResult.LastException);
             Assert.IsNull(target.ParseResult.ArgumentName);
+            Assert.AreEqual(0, target.ParseResult.RemainingArguments.Length);
             Assert.IsFalse(target.HelpRequested);
             Assert.AreEqual(arg1, result.Arg1);
             Assert.AreEqual(arg2, result.Arg2);

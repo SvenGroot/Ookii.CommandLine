@@ -901,7 +901,7 @@ public class CommandLineParser
     /// Parses the specified command line arguments.
     /// </summary>
     /// <param name="args">The command line arguments.</param>
-    public object? Parse(ReadOnlySpan<string> args)
+    public object? Parse(ReadOnlyMemory<string> args)
     {
         try
         {
@@ -940,7 +940,7 @@ public class CommandLineParser
             throw new ArgumentOutOfRangeException(nameof(index));
         }
 
-        return Parse(args.AsSpan(index));
+        return Parse(args.AsMemory(index));
     }
 
     /// <summary>
@@ -1000,7 +1000,7 @@ public class CommandLineParser
             throw new ArgumentOutOfRangeException(nameof(index));
         }
 
-        return ParseWithErrorHandling(args.AsSpan(index));
+        return ParseWithErrorHandling(args.AsMemory(index));
     }
 
     /// <inheritdoc cref="ParseWithErrorHandling()" />
@@ -1009,7 +1009,7 @@ public class CommandLineParser
     /// required.
     /// </summary>
     /// <param name="args">The command line arguments.</param>
-    public object? ParseWithErrorHandling(ReadOnlySpan<string> args)
+    public object? ParseWithErrorHandling(ReadOnlyMemory<string> args)
     {
         EventHandler<DuplicateArgumentEventArgs>? handler = null;
         if (_parseOptions.DuplicateArguments == ErrorMode.Warning)
@@ -1493,7 +1493,7 @@ public class CommandLineParser
         }
     }
 
-    private object? ParseCore(ReadOnlySpan<string> args)
+    private object? ParseCore(ReadOnlyMemory<string> args)
     {
         // Reset all arguments to their default value.
         foreach (CommandLineArgument argument in _arguments)
@@ -1505,15 +1505,17 @@ public class CommandLineParser
         int positionalArgumentIndex = 0;
 
         var cancelParsing = CancelMode.None;
-        for (int x = 0; x < args.Length; ++x)
+        CommandLineArgument? lastArgument = null;
+        int x;
+        for (x = 0; x < args.Length; ++x)
         {
-            string arg = args[x];
+            string arg = args.Span[x];
             var argumentNamePrefix = CheckArgumentNamePrefix(arg);
             if (argumentNamePrefix != null)
             {
                 // If white space was the value separator, this function returns the index of argument containing the value for the named argument.
                 // It returns -1 if parsing was canceled by the ArgumentParsed event handler or the CancelParsing property.
-                (cancelParsing, x) = ParseNamedArgument(args, x, argumentNamePrefix.Value);
+                (cancelParsing, x, lastArgument) = ParseNamedArgument(args.Span, x, argumentNamePrefix.Value);
                 if (cancelParsing != CancelMode.None)
                 {
                     break;
@@ -1538,7 +1540,8 @@ public class CommandLineParser
 
                 // ParseArgumentValue returns true if parsing was canceled by the ArgumentParsed event handler
                 // or the CancelParsing property.
-                cancelParsing = ParseArgumentValue(_arguments[positionalArgumentIndex], arg, arg.AsMemory());
+                lastArgument = _arguments[positionalArgumentIndex];
+                cancelParsing = ParseArgumentValue(lastArgument, arg, arg.AsMemory());
                 if (cancelParsing != CancelMode.None)
                 {
                     break;
@@ -1548,6 +1551,7 @@ public class CommandLineParser
 
         if (cancelParsing == CancelMode.Abort)
         {
+            ParseResult = ParseResult.FromCanceled(lastArgument!.ArgumentName, args.Slice(x + 1));
             return null;
         }
 
@@ -1590,9 +1594,12 @@ public class CommandLineParser
             argument.ApplyPropertyValue(commandLineArguments);
         }
 
-        // Reset in case it was set by a method argument that didn't cancel parsing.
+        ParseResult = cancelParsing == CancelMode.None
+            ? ParseResult.FromSuccess()
+            : ParseResult.FromSuccess(lastArgument!.ArgumentName, args.Slice(x + 1));
+
+        // Reset to false in case it was set by a method argument that didn't cancel parsing.
         HelpRequested = false;
-        ParseResult = ParseResult.Success;
         return commandLineArguments;
     }
 
@@ -1637,14 +1644,12 @@ public class CommandLineParser
             {
                 HelpRequested = true;
             }
-
-            ParseResult = ParseResult.FromCanceled(argument.ArgumentName);
         }
 
         return e.CancelParsing;
     }
 
-    private (CancelMode, int) ParseNamedArgument(ReadOnlySpan<string> args, int index, PrefixInfo prefix)
+    private (CancelMode, int, CommandLineArgument?) ParseNamedArgument(ReadOnlySpan<string> args, int index, PrefixInfo prefix)
     {
         var (argumentName, argumentValue) = args[index].AsMemory(prefix.Prefix.Length).SplitOnce(NameValueSeparator);
 
@@ -1658,8 +1663,9 @@ public class CommandLineParser
             }
             else
             {
-                cancelParsing = ParseShortArgument(argumentName.Span, argumentValue);
-                return (cancelParsing, index);
+                CommandLineArgument? lastArgument;
+                (cancelParsing, lastArgument) = ParseShortArgument(argumentName.Span, argumentValue);
+                return (cancelParsing, index, lastArgument);
             }
         }
 
@@ -1692,7 +1698,7 @@ public class CommandLineParser
                 cancelParsing = ParseArgumentValue(argument, argumentValueString, argumentValueString.AsMemory());
                 if (cancelParsing != CancelMode.None)
                 {
-                    return (cancelParsing, index);
+                    return (cancelParsing, index, argument);
                 }
 
                 if (!argument.AllowMultiValueWhiteSpaceSeparator)
@@ -1703,14 +1709,14 @@ public class CommandLineParser
 
             if (argumentValueString != null)
             {
-                return (CancelMode.None, index);
+                return (CancelMode.None, index, argument);
             }
         }
 
         // ParseArgumentValue returns true if parsing was canceled by the ArgumentParsed event handler
         // or the CancelParsing property.
         cancelParsing = ParseArgumentValue(argument, null, argumentValue);
-        return (cancelParsing, index);
+        return (cancelParsing, index, argument);
     }
 
     private CommandLineArgument? GetArgumentByNamePrefix(ReadOnlySpan<char> prefix)
@@ -1752,11 +1758,12 @@ public class CommandLineParser
         return foundArgument;
     }
 
-    private CancelMode ParseShortArgument(ReadOnlySpan<char> name, ReadOnlyMemory<char>? value)
+    private (CancelMode, CommandLineArgument?) ParseShortArgument(ReadOnlySpan<char> name, ReadOnlyMemory<char>? value)
     {
+        CommandLineArgument? arg = null;
         foreach (var ch in name)
         {
-            var arg = GetShortArgumentOrThrow(ch);
+            arg = GetShortArgumentOrThrow(ch);
             if (!arg.IsSwitch)
             {
                 throw StringProvider.CreateException(CommandLineArgumentErrorCategory.CombinedShortNameNonSwitch, name.ToString());
@@ -1765,11 +1772,11 @@ public class CommandLineParser
             var cancelParsing = ParseArgumentValue(arg, null, value);
             if (cancelParsing != CancelMode.None)
             {
-                return cancelParsing;
+                return (cancelParsing, arg);
             }
         }
 
-        return CancelMode.None;
+        return (CancelMode.None, arg);
     }
 
     private CommandLineArgument GetShortArgumentOrThrow(char shortName)

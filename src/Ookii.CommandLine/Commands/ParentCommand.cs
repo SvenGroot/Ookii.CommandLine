@@ -95,7 +95,7 @@ public abstract class ParentCommand : ICommandWithCustomParsing, IAsyncCommand
 
             try
             {
-                _childCommand = (ICommand?)parser.Parse(args.Span);
+                _childCommand = (ICommand?)parser.Parse(args);
             }
             catch (CommandLineArgumentException)
             {

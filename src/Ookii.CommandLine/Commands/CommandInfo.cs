@@ -232,7 +232,7 @@ namespace Ookii.CommandLine.Commands
             else
             {
                 var parser = CreateParser();
-                var command = (ICommand?)parser.ParseWithErrorHandling(args.Span);
+                var command = (ICommand?)parser.ParseWithErrorHandling(args);
                 return (command, parser.ParseResult);
             }
         }

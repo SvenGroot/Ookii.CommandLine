@@ -185,6 +185,9 @@ partial class CancelArguments
 
     [CommandLineArgument(CancelParsing = CancelMode.Abort)]
     public bool DoesCancel { get; set; }
+
+    [CommandLineArgument(CancelParsing = CancelMode.Success)]
+    public bool DoesCancelWithSuccess { get; set; }
 }
 
 [GeneratedParser]
