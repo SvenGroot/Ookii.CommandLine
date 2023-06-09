@@ -514,6 +514,12 @@ public partial class SubCommandTest
         options.CommandFilter = c => c.Name != "version";
         Assert.IsNull(manager.GetCommand("version"));
         Assert.IsFalse(manager.GetCommands().Any(c => c.Name == "version"));
+
+        // Setting ParentCommand means there is no version command.
+        options.CommandFilter = null;
+        options.ParentCommand = typeof(ParentCommand);
+        Assert.IsNull(manager.GetCommand("version"));
+        Assert.IsFalse(manager.GetCommands().Any(c => c.Name == "version"));
     }
 
     private record struct ExpectedCommand(string Name, Type Type, bool CustomParsing = false, params string[] Aliases)

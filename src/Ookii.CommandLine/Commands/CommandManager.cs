@@ -326,6 +326,7 @@ public class CommandManager
                 return command;
             }
 
+            // Check for a prefix match, if requested.
             if (Options.AutoCommandPrefixAliases && !ambiguousMatch && command.MatchesPrefix(commandName))
             {
                 if (partialMatch == null)
