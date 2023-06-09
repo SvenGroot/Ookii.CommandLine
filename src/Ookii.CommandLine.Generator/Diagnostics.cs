@@ -140,6 +140,14 @@ internal static class Diagnostics
         attribute.GetLocation(),
         symbol.ToDisplayString());
 
+    public static Diagnostic ParentCommandStringNotSupported(AttributeData attribute, ISymbol symbol) => CreateDiagnostic(
+        "OCL0015", // Intentially the same as above.
+        nameof(Resources.ParentCommandStringNotSupportedTitle),
+        nameof(Resources.ParentCommandStringNotSupportedMessageFormat),
+        DiagnosticSeverity.Error,
+        attribute.GetLocation(),
+        symbol.ToDisplayString());
+
     public static Diagnostic IgnoredAttribute(ISymbol symbol, AttributeData attribute) => CreateDiagnostic(
         "OCL0016",
         nameof(Resources.UnknownAttributeTitle),
@@ -316,11 +324,20 @@ internal static class Diagnostics
         symbol.Locations.FirstOrDefault(),
         symbol.ToDisplayString());
 
-    public static Diagnostic ParentCommandStringNotSupported(AttributeData attribute, ISymbol symbol) => CreateDiagnostic(
-        "OCL0015",
-        nameof(Resources.ParentCommandStringNotSupportedTitle),
-        nameof(Resources.ParentCommandStringNotSupportedMessageFormat),
-        DiagnosticSeverity.Error,
+    public static Diagnostic IgnoredAttributeForNonCommand(ISymbol symbol, AttributeData attribute) => CreateDiagnostic(
+        "OCL0035",
+        nameof(Resources.IgnoredAttributeForNonCommandTitle),
+        nameof(Resources.IgnoredAttributeForNonCommandMessageFormat),
+        DiagnosticSeverity.Warning,
+        attribute.GetLocation(),
+        attribute.AttributeClass?.ToDisplayString(),
+        symbol.ToDisplayString());
+
+    public static Diagnostic IgnoredFriendlyNameAttribute(ISymbol symbol, AttributeData attribute) => CreateDiagnostic(
+        "OCL0036",
+        nameof(Resources.IgnoredFriendlyNameAttributeTitle),
+        nameof(Resources.IgnoredFriendlyNameAttributeMessageFormat),
+        DiagnosticSeverity.Warning,
         attribute.GetLocation(),
         symbol.ToDisplayString());
 

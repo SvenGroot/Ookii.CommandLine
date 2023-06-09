@@ -201,6 +201,12 @@
   <data name="IgnoredAttributeForDictionaryWithConverterTitle" xml:space="preserve">
     <value>The attribute is not used for a dictionary argument that has the ArgumentConverterAttribute attribute.</value>
   </data>
+  <data name="IgnoredAttributeForNonCommandMessageFormat" xml:space="preserve">
+    <value>The attribute '{0}' on '{1}' will be ignored because '{1}' is not a subcommand.</value>
+  </data>
+  <data name="IgnoredAttributeForNonCommandTitle" xml:space="preserve">
+    <value>The attribute is not used for command line arguments classes that are not commands.</value>
+  </data>
   <data name="IgnoredAttributeForNonDictionaryMessageFormat" xml:space="preserve">
     <value>The {0} attribute is ignored for the non-dictionary argument defined by {1}.</value>
   </data>
@@ -212,6 +218,12 @@
   </data>
   <data name="IgnoredAttributeForNonMultiValueTitle" xml:space="preserve">
     <value>The attribute is not used for a non-dictionary argument.</value>
+  </data>
+  <data name="IgnoredFriendlyNameAttributeMessageFormat" xml:space="preserve">
+    <value>The ApplicationFriendlyNameAttribute on '{0}' is ignored because '{0}' is a subcommand. Use '[assembly: ApplicationFriendlyName(...)]' instead.</value>
+  </data>
+  <data name="IgnoredFriendlyNameAttributeTitle" xml:space="preserve">
+    <value>The ApplicationFriendlyNameAttribute is ignored on a subcommand.</value>
   </data>
   <data name="InvalidArrayRankMessageFormat" xml:space="preserve">
     <value>The multi-value command line argument defined by {0}.{1} must have an array rank of one.</value>

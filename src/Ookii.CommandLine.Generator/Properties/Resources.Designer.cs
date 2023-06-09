@@ -313,6 +313,24 @@ namespace Ookii.CommandLine.Generator.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The attribute &apos;{0}&apos; on &apos;{1}&apos; will be ignored because &apos;{1}&apos; is not a subcommand..
+        /// </summary>
+        internal static string IgnoredAttributeForNonCommandMessageFormat {
+            get {
+                return ResourceManager.GetString("IgnoredAttributeForNonCommandMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The attribute is not used for command line arguments classes that are not commands..
+        /// </summary>
+        internal static string IgnoredAttributeForNonCommandTitle {
+            get {
+                return ResourceManager.GetString("IgnoredAttributeForNonCommandTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The {0} attribute is ignored for the non-dictionary argument defined by {1}..
         /// </summary>
         internal static string IgnoredAttributeForNonDictionaryMessageFormat {
@@ -345,6 +363,24 @@ namespace Ookii.CommandLine.Generator.Properties {
         internal static string IgnoredAttributeForNonMultiValueTitle {
             get {
                 return ResourceManager.GetString("IgnoredAttributeForNonMultiValueTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The ApplicationFriendlyNameAttribute on &apos;{0}&apos; is ignored because &apos;{0}&apos; is a subcommand. Use &apos;[assembly: ApplicationFriendlyName(...)]&apos; instead..
+        /// </summary>
+        internal static string IgnoredFriendlyNameAttributeMessageFormat {
+            get {
+                return ResourceManager.GetString("IgnoredFriendlyNameAttributeMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The ApplicationFriendlyNameAttribute is ignored on a subcommand..
+        /// </summary>
+        internal static string IgnoredFriendlyNameAttributeTitle {
+            get {
+                return ResourceManager.GetString("IgnoredFriendlyNameAttributeTitle", resourceCulture);
             }
         }
         

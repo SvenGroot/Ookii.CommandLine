@@ -314,11 +314,11 @@ partial class MyCommandManager
 
 ### OCL0015
 
-The `ArgumentConverterAttribute` must use the `typeof` keyword.
+The `ArgumentConverterAttribute` or `ParentCommandAttribute` must use the `typeof` keyword.
 
-The `ArgumentConverterAttribute` has two constructors, one that takes the `Type` of a converter,
-and one that takes the name of a converter type as a string. The string constructor is not supported
-when using source generation.
+The `ArgumentConverterAttribute` and `ParentCommandAttribute` have two constructors; one that takes
+the `Type` of a converter or parent command, and one that takes the name of a type as a string. The
+string constructor is not supported when using source generation.
 
 For example, the following code triggers this error:
 
@@ -333,7 +333,7 @@ partial class Arguments
 ```
 
 To fix this error, either use the constructor that takes a `Type` using the `typeof` keyword, or
-use a `CommandLineParser<T>` without using source generation.
+do not use source generation.
 
 ### OCL0031
 
@@ -707,7 +707,7 @@ For example, the following code triggers this warning:
 [GeneratedParser]
 partial class Arguments
 {
-    /// WARNING: No DescriptionAttribute on this member.
+    // WARNING: No DescriptionAttribute on this member.
     [CommandLineAttribute]
     public string? Argument { get; set; }
 }
@@ -737,7 +737,7 @@ the usage help.
 For example, the following code triggers this warning:
 
 ```csharp
-/// WARNING: No DescriptionAttribute on this subcommand class.
+// WARNING: No DescriptionAttribute on this subcommand class.
 [GeneratedParser]
 [Command]
 partial class MyCommand : ICommand
@@ -765,3 +765,50 @@ partial class MyCommand : ICommand
 
 This warning will not be emitted for subcommands that are hidden using the
 `CommandAttribute.IsHidden` property.
+
+### OCL0035
+
+The `ParentCommandAttribute` attribute is only used for subcommands, but was used on an arguments
+type that isn't a subcommand.
+
+For example, the following code triggers this warning:
+
+```csharp
+// WARNING: ParentCommandAttribute is ignored for non-commands.
+[GeneratedParser]
+[ParentCommand(typeof(SomeCommand))]
+partial class MyCommand
+{
+    [CommandLineAttribute]
+    [Description("A description of the argument.")]
+    public string? Argument { get; set; }
+}
+```
+
+### OCL0036
+
+The `ApplicationFriendlyNameAttribute` attribute was used on a subcommand. The
+`ApplicationFriendlyNameAttribute` is used by the automatic `-Version` argument, which is not
+created for subcommands, and the automatic `version` command only uses the
+`ApplicationFriendlyNameAttribute` when applied to the entry assembly for the application.
+
+For example, the following code triggers this warning:
+
+```csharp
+// WARNING: ApplicationFriendlyName is ignored for commands.
+[GeneratedParser]
+[ApplicationFriendlyName("My Application")]
+[Command]
+partial class MyCommand : ICommand
+{
+    [CommandLineAttribute]
+    [Description("A description of the argument.")]
+    public string? Argument { get; set; }
+}
+```
+
+Instead, the attribute should be applied to the assembly:
+
+```csharp
+[assembly: ApplicationFriendlyName("My Application")]
+```

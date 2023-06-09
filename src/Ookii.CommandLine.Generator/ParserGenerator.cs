@@ -124,12 +124,27 @@ internal class ParserGenerator
             return null;
         }
 
-        if (isCommand && attributes.Description == null)
+        if (isCommand)
         {
-            var commandInfo = new CommandAttributeInfo(attributes.Command!);
-            if (!commandInfo.IsHidden)
+            if (attributes.Description == null)
             {
-                _context.ReportDiagnostic(Diagnostics.CommandWithoutDescription(_argumentsClass));
+                var commandInfo = new CommandAttributeInfo(attributes.Command!);
+                if (!commandInfo.IsHidden)
+                {
+                    _context.ReportDiagnostic(Diagnostics.CommandWithoutDescription(_argumentsClass));
+                }
+            }
+
+            if (attributes.ApplicationFriendlyName != null)
+            {
+                _context.ReportDiagnostic(Diagnostics.IgnoredFriendlyNameAttribute(_argumentsClass, attributes.ApplicationFriendlyName));
+            }
+        }
+        else
+        {
+            if (attributes.ParentCommand != null)
+            {
+                _context.ReportDiagnostic(Diagnostics.IgnoredAttributeForNonCommand(_argumentsClass, attributes.ParentCommand));
             }
         }
 
