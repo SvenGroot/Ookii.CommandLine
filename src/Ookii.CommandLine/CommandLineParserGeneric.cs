@@ -111,6 +111,12 @@ namespace Ookii.CommandLine
             return (T?)base.Parse(args, index);
         }
 
+        /// <inheritdoc cref="CommandLineParser.Parse(ReadOnlyMemory{string})"/>
+        public new T? Parse(ReadOnlyMemory<string> args)
+        {
+            return (T?)base.Parse(args);
+        }
+
         /// <inheritdoc cref="CommandLineParser.ParseWithErrorHandling()"/>
         public new T? ParseWithErrorHandling()
         {
@@ -121,6 +127,12 @@ namespace Ookii.CommandLine
         public new T? ParseWithErrorHandling(string[] args, int index = 0)
         {
             return (T?)base.ParseWithErrorHandling(args, index);
+        }
+
+        /// <inheritdoc cref="CommandLineParser.ParseWithErrorHandling(ReadOnlyMemory{String})"/>
+        public new T? ParseWithErrorHandling(ReadOnlyMemory<string> args)
+        {
+            return (T?)base.ParseWithErrorHandling(args);
         }
     }
 }

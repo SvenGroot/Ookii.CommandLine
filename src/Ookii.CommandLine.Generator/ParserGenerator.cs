@@ -160,7 +160,7 @@ internal class ParserGenerator
             _builder.AppendLine();
             _builder.AppendLine($"public static {nullableType.ToQualifiedName()} Parse(string[] args, Ookii.CommandLine.ParseOptions? options = null) => CreateParser(options).ParseWithErrorHandling(args);");
             _builder.AppendLine();
-            _builder.AppendLine($"public static {nullableType.ToQualifiedName()} Parse(string[] args, int index, Ookii.CommandLine.ParseOptions? options = null) => CreateParser(options).ParseWithErrorHandling(args, index);");
+            _builder.AppendLine($"public static {nullableType.ToQualifiedName()} Parse(System.ReadOnlyMemory<string> args, Ookii.CommandLine.ParseOptions? options = null) => CreateParser(options).ParseWithErrorHandling(args);");
             _builder.CloseBlock(); // class
         }
 

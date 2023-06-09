@@ -60,7 +60,6 @@ public interface IParser<TSelf> : IParserProvider<TSelf>
     /// type <typeparamref name="TSelf"/>.
     /// </summary>
     /// <param name="args">The command line arguments.</param>
-    /// <param name="index">The index of the first argument to parse.</param>
     /// <param name="options">
     ///   The options that control parsing behavior and usage help formatting. If
     ///   <see langword="null" />, the default options are used.
@@ -71,7 +70,7 @@ public interface IParser<TSelf> : IParserProvider<TSelf>
     ///   property or a method argument that returned <see langword="false"/>.
     /// </returns>
     /// <seealso cref="CommandLineParser.Parse{T}(string[], ParseOptions?)"/>
-    public static abstract TSelf? Parse(string[] args, int index, ParseOptions? options = null);
+    public static abstract TSelf? Parse(ReadOnlyMemory<string> args, ParseOptions? options = null);
 }
 
 #endif
