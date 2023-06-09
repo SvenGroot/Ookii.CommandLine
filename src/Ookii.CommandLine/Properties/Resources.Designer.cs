@@ -394,6 +394,15 @@ namespace Ookii.CommandLine.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The specified TypeConverter cannot converter from a string..
+        /// </summary>
+        internal static string InvalidTypeConverter {
+            get {
+                return ResourceManager.GetString("InvalidTypeConverter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The &apos;minimum&apos; and &apos;maximum&apos; parameters cannot both be null..
         /// </summary>
         internal static string MinMaxBothNull {

@@ -51,7 +51,7 @@ namespace Ookii.CommandLine
         ///   <inheritdoc cref="CommandLineParser(Type, ParseOptions?)"/>
         /// </remarks>
 #if NET6_0_OR_GREATER
-        [RequiresUnreferencedCode("Trimming cannot be used when determining the default converter via reflection.")]
+        [RequiresUnreferencedCode("Trimming cannot be used when determining arguments via reflection. Use the GeneratedArgumentsParserAttribute instead.")]
 #endif
         public CommandLineParser(ParseOptions? options = null)
             : base(typeof(T), options)

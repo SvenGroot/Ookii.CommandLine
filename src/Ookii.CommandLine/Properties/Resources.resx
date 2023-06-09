@@ -405,4 +405,7 @@
   <data name="InvalidStringComparison" xml:space="preserve">
     <value>Invalid value for the StringComparison enumeration.</value>
   </data>
+  <data name="InvalidTypeConverter" xml:space="preserve">
+    <value>The specified TypeConverter cannot converter from a string.</value>
+  </data>
 </root>

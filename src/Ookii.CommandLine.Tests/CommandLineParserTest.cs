@@ -1295,6 +1295,8 @@ namespace Ookii.CommandLine.Tests
                 VerifyArgument(arg, expected[index]);
                 ++index;
             }
+
+            Assert.AreEqual(expected.Length, index);
         }
 
         private static void TestParse(CommandLineParser<TestArguments> target, string commandLine, string arg1 = null, int arg2 = 42, bool notSwitch = false, string arg3 = null, int arg4 = 47, float arg5 = 0.0f, string arg6 = null, bool arg7 = false, DayOfWeek[] arg8 = null, int? arg9 = null, bool[] arg10 = null, bool? arg11 = null, int[] arg12 = null, Dictionary<string, int> arg13 = null, Dictionary<string, int> arg14 = null, KeyValuePair<string, int>? arg15 = null)

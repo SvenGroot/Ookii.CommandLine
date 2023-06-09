@@ -23,6 +23,8 @@ As of version 3.0, .Net Framework 2.0 is no longer supported. You can still targ
   - This change enables more flexibility, better performance by supporting conversions using
     `ReadOnlySpan<char>`, and enables trimming your assembly when combined with
     [source generation](SourceGeneration.md).
+  - If you have existing conversions that depend on a `TypeConverter`, use the
+    `TypeConverterArgumentConverter<T>` as a convenient way to keep using that conversion.
 - Constructor parameters can no longer be used to define command line arguments. Instead, all
   arguments must be defined using properties. If you were using constructor parameters to avoid
   setting a default value for a non-nullable reference type, you can use the `required` keyword
@@ -31,10 +33,10 @@ As of version 3.0, .Net Framework 2.0 is no longer supported. You can still targ
   public command classes, where before it would also use internal ones. This is to better respect
   access modifiers, and to make sure generated and reflection-based command managers behave the
   same.
-- The `CommandInfo` type is now a class instead of a structure.
 - `ParseOptions.ArgumentNameComparer` and `CommandOptions.CommandNameComparer` have been replaced
   by `ArgumentNameComparison` and `CommandNameComparison` respectively, both now taking a
-  `StringComparison` value instead of a `IComparer<string>`.
+  `StringComparison` value instead of an `IComparer<string>`.
+- The `CommandInfo` type is now a class instead of a structure.
 
 ## Breaking API changes from version 2.4
 
@@ -79,7 +81,7 @@ As of version 3.0, .Net Framework 2.0 is no longer supported. You can still targ
 - The [`CommandLineArgument.ElementType`][] property now returns the underlying type for arguments
   using the [`Nullable<T>`][] type.
 
-## Breaking behavior changes
+## Breaking behavior changes from version 2.4
 
 - Argument type conversion now defaults to [`CultureInfo.InvariantCulture`][], instead of
   [`CurrentCulture`][]. This change was made to ensure a consistent parsing experience regardless of the
