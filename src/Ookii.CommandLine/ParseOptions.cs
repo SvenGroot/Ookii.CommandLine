@@ -337,7 +337,7 @@ public class ParseOptions
     ///   If this property is <see langword="true"/>, the <see cref="CommandLineParser"/> class
     ///   will consider any prefix that uniquely identifies an argument by its name or one of its
     ///   explicit aliases as an alias for that argument. For example, given two arguments "Port"
-    ///   and "Protocol", "Po" and "Port" would be an alias for "Port, and "Pr" an alias for
+    ///   and "Protocol", "Po" and "Por" would be an alias for "Port", and "Pr" an alias for
     ///   "Protocol" (as well as "Pro", "Prot", "Proto", etc.). "P" would not be an alias because it
     ///   doesn't uniquely identify a single argument.
     /// </para>

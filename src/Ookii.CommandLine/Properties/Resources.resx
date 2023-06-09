@@ -402,4 +402,7 @@
   <data name="ReflectionWithGeneratedParserFormat" xml:space="preserve">
     <value>The arguments type {0} has the GeneratedParserAttribute applied, but reflection is being used to create a parser for it. Use the generated {0}.CreateParser() or {0}.Parse() methods to use the generated parser. For subcommands, use the GeneratedCommandManagerAttribute.</value>
   </data>
+  <data name="InvalidStringComparison" xml:space="preserve">
+    <value>Invalid value for the StringComparison enumeration.</value>
+  </data>
 </root>

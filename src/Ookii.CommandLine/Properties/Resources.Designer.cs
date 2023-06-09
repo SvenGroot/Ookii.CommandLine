@@ -385,6 +385,15 @@ namespace Ookii.CommandLine.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Invalid value for the StringComparison enumeration..
+        /// </summary>
+        internal static string InvalidStringComparison {
+            get {
+                return ResourceManager.GetString("InvalidStringComparison", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The &apos;minimum&apos; and &apos;maximum&apos; parameters cannot both be null..
         /// </summary>
         internal static string MinMaxBothNull {

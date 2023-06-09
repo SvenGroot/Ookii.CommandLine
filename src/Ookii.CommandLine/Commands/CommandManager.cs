@@ -236,7 +236,7 @@ public class CommandManager
         var commands = GetCommandsUnsortedAndFiltered();
         if (_options.AutoVersionCommand &&
             _options.ParentCommand == null &&
-            !commands.Any(c => _options.CommandNameComparer.Compare(c.Name, Properties.Resources.AutomaticVersionCommandName) == 0))
+            !commands.Any(c => c.MatchesName(Properties.Resources.AutomaticVersionCommandName)))
         {
             var versionCommand = CommandInfo.GetAutomaticVersionCommand(this);
             if (Options.CommandFilter?.Invoke(versionCommand) ?? true)
@@ -245,7 +245,7 @@ public class CommandManager
             }
         }
 
-        return commands.OrderBy(c => c.Name, _options.CommandNameComparer);
+        return commands.OrderBy(c => c.Name, _options.CommandNameComparison.GetComparer());
     }
 
     /// <summary>
@@ -295,27 +295,42 @@ public class CommandManager
             throw new ArgumentNullException(nameof(commandName));
         }
 
-        var command = GetCommandsUnsortedAndFiltered()
-            .Where(c => c.MatchesName(commandName, Options.CommandNameComparer))
-            .FirstOrDefault();
-
-        if (command != null)
+        var commands = GetCommandsUnsortedAndFiltered();
+        if (_options.AutoVersionCommand && _options.ParentCommand == null)
         {
-            return command;
+            // We can unconditionally append this since it will not be checked if an earlier
+            // command matches.
+            // TODO: I don't think this logic is correct if there is a command with the same name
+            // and we match it by prefix only.
+            commands = commands.Append(CommandInfo.GetAutomaticVersionCommand(this));
         }
 
-        if (_options.AutoVersionCommand &&
-            _options.ParentCommand == null &&
-            _options.CommandNameComparer.Compare(commandName, _options.AutoVersionCommandName()) == 0)
+        CommandInfo? partialMatch = null;
+        var ambiguousMatch = false;
+        foreach (var command in commands)
         {
-            command = CommandInfo.GetAutomaticVersionCommand(this);
-            if (_options.CommandFilter?.Invoke(command) ?? true)
+            // Check for an exact match.
+            if (command.MatchesName(commandName))
             {
                 return command;
             }
+
+            if (Options.AutoCommandPrefixAliases && !ambiguousMatch && command.MatchesPrefix(commandName))
+            {
+                if (partialMatch == null)
+                {
+                    partialMatch = command;
+                }
+                else
+                {
+                    // The prefix is ambigious, so don't use it.
+                    partialMatch = null;
+                    ambiguousMatch = true;
+                }
+            }
         }
 
-        return null;
+        return partialMatch;
     }
 
     /// <summary>

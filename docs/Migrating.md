@@ -32,6 +32,9 @@ As of version 3.0, .Net Framework 2.0 is no longer supported. You can still targ
   access modifiers, and to make sure generated and reflection-based command managers behave the
   same.
 - The `CommandInfo` type is now a class instead of a structure.
+- `ParseOptions.ArgumentNameComparer` and `CommandOptions.CommandNameComparer` have been replaced
+  by `ArgumentNameComparison` and `CommandNameComparison` respectively, both now taking a
+  `StringComparison` value instead of a `IComparer<string>`.
 
 ## Breaking API changes from version 2.4
 

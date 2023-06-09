@@ -269,10 +269,6 @@ namespace Ookii.CommandLine.Commands
         /// Checks whether the command's name or aliases match the specified name.
         /// </summary>
         /// <param name="name">The name to check for.</param>
-        /// <param name="comparer">
-        /// The <see cref="IComparer{T}"/> to use for the comparisons, or <see langword="null"/>
-        /// to use the default comparison, which is <see cref="StringComparer.OrdinalIgnoreCase"/>.
-        /// </param>
         /// <returns>
         /// <see langword="true"/> if the <paramref name="name"/> matches the <see cref="Name"/>
         /// property or any of the items in the <see cref="Aliases"/> property.
@@ -280,20 +276,45 @@ namespace Ookii.CommandLine.Commands
         /// <exception cref="ArgumentNullException">
         /// <paramref name="name"/> is <see langword="null"/>.
         /// </exception>
-        public bool MatchesName(string name, IComparer<string>? comparer = null)
+        public bool MatchesName(string name)
         {
             if (name == null)
             {
                 throw new ArgumentNullException(nameof(name));
             }
 
-            comparer ??= StringComparer.OrdinalIgnoreCase;
-            if (comparer.Compare(name, _name) == 0)
+            if (string.Equals(name, _name, Manager.Options.CommandNameComparison))
             {
                 return true;
             }
 
-            return Aliases.Any(alias => comparer.Compare(name, alias) == 0);
+            return Aliases.Any(alias => string.Equals(name, alias, Manager.Options.CommandNameComparison));
+        }
+
+        /// <summary>
+        /// Checks whether the command's name or one of its aliases start with the specified prefix.
+        /// </summary>
+        /// <param name="prefix">The prefix to check for.</param>
+        /// <returns>
+        /// <see langword="true"/> if the <paramref name="prefix"/> is a prefix of the <see cref="Name"/>
+        /// property or any of the items in the <see cref="Aliases"/> property.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="prefix"/> is <see langword="null"/>.
+        /// </exception>
+        public bool MatchesPrefix(string prefix)
+        {
+            if (prefix == null)
+            {
+                throw new ArgumentNullException(nameof(prefix));
+            }
+
+            if (Name.StartsWith(prefix, Manager.Options.CommandNameComparison))
+            {
+                return true;
+            }
+
+            return Aliases.Any(alias => alias.StartsWith(prefix, Manager.Options.CommandNameComparison));
         }
 
         /// <summary>

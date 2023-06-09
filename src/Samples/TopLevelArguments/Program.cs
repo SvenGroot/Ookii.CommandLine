@@ -19,10 +19,10 @@ static class Program
         {
             // Use POSIX rules
             Mode = ParsingMode.LongShort,
-            ArgumentNameComparison = StringComparison.InvariantCultureIgnoreCase,
+            ArgumentNameComparison = StringComparison.InvariantCulture,
             ArgumentNameTransform = NameTransform.DashCase,
             ValueDescriptionTransform = NameTransform.DashCase,
-            CommandNameComparer = StringComparer.InvariantCultureIgnoreCase,
+            CommandNameComparison = StringComparison.InvariantCulture,
             CommandNameTransform = NameTransform.DashCase,
             // The top-level arguments will have a -Version argument, so no need for a version
             // command.

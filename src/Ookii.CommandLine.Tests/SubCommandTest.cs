@@ -61,7 +61,7 @@ public partial class SubCommandTest
         Assert.AreEqual("test", command.Name);
         Assert.AreEqual(typeof(TestCommand), command.CommandType);
 
-        var manager2 = new CommandManager(_commandAssembly, new CommandOptions() { CommandNameComparer = StringComparer.Ordinal });
+        var manager2 = new CommandManager(_commandAssembly, new CommandOptions() { CommandNameComparison = StringComparison.Ordinal, AutoCommandPrefixAliases = false });
         command = manager2.GetCommand("Test");
         Assert.IsNull(command);
 
@@ -384,7 +384,8 @@ public partial class SubCommandTest
     {
         var options = new CommandOptions
         {
-            ParentCommand = typeof(TestParentCommand)
+            ParentCommand = typeof(TestParentCommand),
+            AutoCommandPrefixAliases = false,
         };
 
         var manager = CreateManager(kind, options);
@@ -439,6 +440,24 @@ public partial class SubCommandTest
         result = manager.RunCommand(new[] { "TestParentCommand", "NestedParentCommand", "NestedParentChildCommand", "-Foo" });
         Assert.AreEqual(1, result);
         Assert.AreEqual(_expectedNestedChildCommandUsage, writer.ToString());
+    }
+
+    [TestMethod]
+    [DynamicData(nameof(ProviderKinds), DynamicDataDisplayName = nameof(GetCustomDynamicDataDisplayName))]
+    public void TestAutoPrefixAliases(ProviderKind kind)
+    {
+        var manager = CreateManager(kind);
+        
+        // Ambiguous between test and TestParentCommand.
+        Assert.IsNull(manager.GetCommand("tes"));
+
+        // Not ambiguous
+        Assert.AreEqual("TestParentCommand", manager.GetCommand("testp").Name);
+        Assert.AreEqual("version", manager.GetCommand("v").Name);
+
+        // Case sensitive, "tes" is no longer ambigous.
+        manager = CreateManager(kind, new CommandOptions() { CommandNameComparison = StringComparison.Ordinal });
+        Assert.AreEqual("test", manager.GetCommand("tes").Name);
     }
 
 

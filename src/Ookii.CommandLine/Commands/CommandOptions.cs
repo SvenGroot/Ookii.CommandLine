@@ -10,12 +10,13 @@ namespace Ookii.CommandLine.Commands
     public class CommandOptions : ParseOptions
     {
         /// <summary>
-        /// Gets or sets the <see cref="IEqualityComparer{T}"/> used to compare command names.
+        /// Gets or set the type of string comparison to use for argument names.
         /// </summary>
         /// <value>
-        /// The <see cref="IEqualityComparer{T}"/> used to compare command names. The default value is <see cref="StringComparer.OrdinalIgnoreCase"/>.
+        /// One of the values of the <see cref="StringComparison"/> enumeration. The default value
+        /// is <see cref="StringComparison.OrdinalIgnoreCase"/>.
         /// </value>
-        public IComparer<string> CommandNameComparer { get; set; } = StringComparer.OrdinalIgnoreCase;
+        public StringComparison CommandNameComparison { get; set; } = StringComparison.OrdinalIgnoreCase;
 
         /// <summary>
         /// Gets or sets a value that indicates how names are created for commands that don't have
@@ -129,6 +130,27 @@ namespace Ookii.CommandLine.Commands
         /// </para>
         /// </remarks>
         public bool AutoVersionCommand { get; set; } = true;
+
+        /// <summary>
+        /// Gets or sets a value that indicates whether unique prefixes of a command name are
+        /// automatically used as aliases.
+        /// </summary>
+        /// <value>
+        ///   <see langword="true"/> to automatically use unique prefixes of a command as aliases
+        ///   for that argument; otherwise <see langword="false"/>. The default value is
+        ///   <see langword="true"/>.
+        /// </value>
+        /// <remarks>
+        /// <para>
+        ///   If this property is <see langword="true"/>, the <see cref="CommandManager"/> class
+        ///   will consider any prefix that uniquely identifies a command by its name or one of its
+        ///   explicit aliases as an alias for that argument. For example, given two commands "read"
+        ///   and "record", "rea" would be an alias for "read", and "rec" an alias for
+        ///   "record" (as well as "reco" and "recor"). Both "r" and "re" would not be an alias
+        ///   because they don't uniquely identify a single command.
+        /// </para>
+        /// </remarks>
+        public bool AutoCommandPrefixAliases { get; set; } = true;
 
         internal string AutoVersionCommandName()
         {
