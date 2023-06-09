@@ -236,7 +236,7 @@ public class CommandManager
         var commands = GetCommandsUnsortedAndFiltered();
         if (_options.AutoVersionCommand &&
             _options.ParentCommand == null &&
-            !commands.Any(c => c.MatchesName(Properties.Resources.AutomaticVersionCommandName)))
+            !commands.Any(c => c.MatchesName(_options.StringProvider.AutomaticVersionCommandName())))
         {
             var versionCommand = CommandInfo.GetAutomaticVersionCommand(this);
             if (Options.CommandFilter?.Invoke(versionCommand) ?? true)
@@ -266,10 +266,18 @@ public class CommandManager
     ///   the same name, the first matching one will be returned.
     /// </para>
     /// <para>
+    ///   If the <see cref="CommandOptions.AutoCommandPrefixAliases"/> property is <see langword="true"/>,
+    ///   this function will also return a command whose name or alias starts with
+    ///   <paramref name="commandName"/>. In this case, the command will only be returned if there
+    ///   is exactly one matching command; if the prefix is ambiguous, <see langword="null"/> is
+    ///   returned.
+    /// </para>
+    /// <para>
     ///   A command's name is taken from the <see cref="CommandAttribute.CommandName"/> property. If
     ///   that property is <see langword="null"/>, the name is determined by taking the command
     ///   type's name, and applying the transformation specified by the <see cref="CommandOptions.CommandNameTransform"/>
-    ///   property.
+    ///   property. A command's aliases are specified using the <see cref="AliasAttribute"/>
+    ///   attribute.
     /// </para>
     /// <para>
     ///   Commands that don't meet the criteria of the <see cref="CommandOptions.CommandFilter"/>
@@ -296,13 +304,16 @@ public class CommandManager
         }
 
         var commands = GetCommandsUnsortedAndFiltered();
+        CommandInfo? versionCommand = null;
         if (_options.AutoVersionCommand && _options.ParentCommand == null)
         {
-            // We can unconditionally append this since it will not be checked if an earlier
-            // command matches.
-            // TODO: I don't think this logic is correct if there is a command with the same name
-            // and we match it by prefix only.
-            commands = commands.Append(CommandInfo.GetAutomaticVersionCommand(this));
+            // We can append this without checking for duplicates since it will not be checked if an
+            // earlier command matches.
+            versionCommand = CommandInfo.GetAutomaticVersionCommand(this);
+            if (_options.CommandFilter?.Invoke(versionCommand) ?? true)
+            {
+                commands = commands.Append(versionCommand);
+            }
         }
 
         CommandInfo? partialMatch = null;
@@ -321,9 +332,11 @@ public class CommandManager
                 {
                     partialMatch = command;
                 }
-                else
+                else if (command != versionCommand || !partialMatch.MatchesName(Options.StringProvider.AutomaticVersionCommandName()))
                 {
                     // The prefix is ambigious, so don't use it.
+                    // N.B. This doesn't apply if this is the automatic version command and the
+                    //      existing match would override the existence of that command.
                     partialMatch = null;
                     ambiguousMatch = true;
                 }

@@ -460,6 +460,61 @@ public partial class SubCommandTest
         Assert.AreEqual("test", manager.GetCommand("tes").Name);
     }
 
+    private class VersionCommandStringProvider : LocalizedStringProvider
+    {
+        public override string AutomaticVersionCommandName() => "AnotherSimpleCommand";
+    }
+
+    [TestMethod]
+    [DynamicData(nameof(ProviderKinds), DynamicDataDisplayName = nameof(GetCustomDynamicDataDisplayName))]
+    public void TestVersionCommandConflict(ProviderKind kind)
+    {
+        // Change the name of the version command so it matches one of the explicit commands.
+        var options = new CommandOptions()
+        {
+            StringProvider = new VersionCommandStringProvider(),
+        };
+
+        var manager = CreateManager(kind, options);
+
+        // There is no command named version.
+        Assert.IsNull(manager.GetCommand("version"));
+
+        // Name returns our command.
+        Assert.AreEqual(typeof(AnotherSimpleCommand), manager.GetCommand("AnotherSimpleCommand").CommandType);
+
+        // There is only one in the list of commands.
+        Assert.AreEqual(1, manager.GetCommands().Where(c => c.Name == "AnotherSimpleCommand").Count());
+
+        // Prefix is not ambiguous because the automatic command doesn't exist.
+        Assert.AreEqual(typeof(AnotherSimpleCommand), manager.GetCommand("Another").CommandType);
+
+        // If we filter out our command, the automatic one gets returned.
+        options.CommandFilter = c => c.CommandType != typeof(AnotherSimpleCommand);
+        Assert.AreEqual(typeof(AutomaticVersionCommand), manager.GetCommand("AnotherSimpleCommand").CommandType);
+        Assert.AreEqual(typeof(AutomaticVersionCommand), manager.GetCommands().Where(c => c.Name == "AnotherSimpleCommand").SingleOrDefault().CommandType);
+    }
+
+    [TestMethod]
+    [DynamicData(nameof(ProviderKinds), DynamicDataDisplayName = nameof(GetCustomDynamicDataDisplayName))]
+    public void TestNoVersionCommand(ProviderKind kind)
+    {
+        var options = new CommandOptions()
+        {
+            AutoVersionCommand = false,
+        };
+
+        var manager = CreateManager(kind, options);
+        Assert.IsNull(manager.GetCommand("version"));
+        Assert.IsFalse(manager.GetCommands().Any(c => c.Name == "version"));
+
+        // We can also filter it out.
+        options.AutoVersionCommand = true;
+        Assert.IsNotNull(manager.GetCommand("version"));
+        options.CommandFilter = c => c.Name != "version";
+        Assert.IsNull(manager.GetCommand("version"));
+        Assert.IsFalse(manager.GetCommands().Any(c => c.Name == "version"));
+    }
 
     private record struct ExpectedCommand(string Name, Type Type, bool CustomParsing = false, params string[] Aliases)
     {
