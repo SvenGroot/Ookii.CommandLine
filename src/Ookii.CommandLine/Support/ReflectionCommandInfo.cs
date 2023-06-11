@@ -49,16 +49,6 @@ internal class ReflectionCommandInfo : CommandInfo
             throw new InvalidOperationException(Properties.Resources.NoParserForCustomParsingCommand);
         }
 
-        if (Attribute.IsDefined(CommandType, typeof(GeneratedParserAttribute)))
-        {
-            var method = CommandType.GetMethod("CreateParser", BindingFlags.Public | BindingFlags.Static);
-            if (method != null)
-            {
-                var parameters = new object[] { Manager.Options };
-                return (CommandLineParser)(method.Invoke(null, parameters) ?? throw new InvalidOperationException("TODO"));
-            }
-        }
-
         return new CommandLineParser(CommandType, Manager.Options);
     }
 

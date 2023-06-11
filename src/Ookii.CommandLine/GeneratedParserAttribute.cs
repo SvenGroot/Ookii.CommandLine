@@ -14,10 +14,10 @@ namespace Ookii.CommandLine;
 /// </para>
 /// <para>
 ///   To use the generated parser, source generation will add several static methods to the target
-///   class: <c>CreateParser</c>, and three overloads of the <c>Parse</c> method. You must use
-///   these members, as using the <see cref="CommandLineParser{T}"/> class directly will throw
-///   an exception unless <see cref="ParseOptions.AllowReflectionWithGeneratedParser"/> is set to
-///   <see langword="true"/>.
+///   class: <c>CreateParser</c>, and three overloads of the <c>Parse</c> method. Using these
+///   members allows trimming your application without warnings, as they avoid the regular
+///   constructors of the <see cref="CommandLineParser"/> and <see cref="CommandLineParser{T}"/>
+///   class.
 /// </para>
 /// <para>
 ///   When using source generation with subcommands, you should also use a class with the <see cref="GeneratedCommandManagerAttribute"/>

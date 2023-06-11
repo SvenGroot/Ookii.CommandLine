@@ -21,9 +21,9 @@ public partial class SubCommandTest
     [ClassInitialize]
     public static void TestFixtureSetup(TestContext context)
     {
-        // Avoid exception when testing reflection on argument types that also have the
-        // GeneratedParseAttribute set.
-        ParseOptions.AllowReflectionWithGeneratedParserDefault = true;
+        // Get test coverage of reflection provider even on types that have the
+        // GeneratedParserAttribute.
+        ParseOptions.ForceReflectionDefault = true;
     }
 
     [TestMethod]

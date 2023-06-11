@@ -38,15 +38,6 @@ namespace Ookii.CommandLine
         ///   command line arguments type, because it violates one of the rules concerning argument
         ///   names or positions, or has an argument type that cannot be parsed.
         /// </exception>
-        /// <exception cref="InvalidOperationException">
-        ///   The type indicated by <typeparamref name="T"/> has the <see cref="GeneratedParserAttribute"/>
-        ///   attribute applied. Use the generated static <c>CreateParser()</c> or <c>Parse()</c>
-        ///   methods on the arguments type to access the generated parser. For subcommands, use a
-        ///   command provider with the <see cref="GeneratedCommandManagerAttribute"/> attribute to
-        ///   create a <see cref="CommandManager"/> that will use generated parsers for subcommands. Set
-        ///   the <see cref="ParseOptions.AllowReflectionWithGeneratedParser"/> property to
-        ///   <see langword="true"/> to disable this exception.
-        /// </exception>
         /// <remarks>
         ///   <inheritdoc cref="CommandLineParser(Type, ParseOptions?)"/>
         /// </remarks>
@@ -60,7 +51,7 @@ namespace Ookii.CommandLine
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CommandLineParser"/> class using the
-        /// specified options.
+        /// specified argument provider and options.
         /// </summary>
         /// <param name="provider">
         ///   <inheritdoc cref="CommandLineParser(ArgumentProvider, ParseOptions?)"/>
@@ -76,16 +67,6 @@ namespace Ookii.CommandLine
         /// <exception cref="ArgumentException">
         ///   The <see cref="ArgumentProvider.ArgumentsType"/> property for the <paramref name="provider"/>
         ///   if a different type than <typeparamref name="T"/>.
-        /// </exception>
-        /// <exception cref="InvalidOperationException">
-        ///   The provider uses <see cref="ProviderKind.Reflection"/>, but the type indicated by the
-        ///   <typeparamref name="T"/> property has the <see cref="GeneratedParserAttribute"/>
-        ///   attribute applied. Use the generated static <c>CreateParser()</c> or <c>Parse()</c>
-        ///   methods on the arguments type to access the generated parser. For subcommands, use a
-        ///   command provider with the <see cref="GeneratedCommandManagerAttribute"/> attribute to
-        ///   create a <see cref="CommandManager"/> that will use generated parsers for subcommands. Set
-        ///   the <see cref="ParseOptions.AllowReflectionWithGeneratedParser"/> property to
-        ///   <see langword="true"/> to disable this exception.
         /// </exception>
         /// <remarks>
         ///   <inheritdoc cref="CommandLineParser(ArgumentProvider, ParseOptions?)"/>

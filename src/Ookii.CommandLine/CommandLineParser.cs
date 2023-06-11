@@ -286,22 +286,12 @@ public class CommandLineParser
     ///   because it violates one of the rules concerning argument names or positions, or has an argument type that cannot
     ///   be parsed.
     /// </exception>
-    /// <exception cref="InvalidOperationException">
-    ///   The type indicated by <paramref name="argumentsType"/> has the <see cref="GeneratedParserAttribute"/>
-    ///   attribute applied. Use the generated static <c>CreateParser()</c> or <c>Parse()</c>
-    ///   methods on the arguments type to access the generated parser. For subcommands, use a
-    ///   command provider with the <see cref="GeneratedCommandManagerAttribute"/> attribute to
-    ///   create a <see cref="CommandManager"/> that will use generated parsers for subcommands. Set
-    ///   the <see cref="ParseOptions.AllowReflectionWithGeneratedParser"/> property to
-    ///   <see langword="true"/> to disable this exception.
-    /// </exception>
     /// <remarks>
     /// <para>
     ///   This constructor uses reflection to determine the arguments defined by the type indicated
-    ///   by <paramref name="argumentsType"/> at runtime. To determine the arguments at compile
-    ///   time instead, apply the <see cref="GeneratedParserAttribute"/> to the arguments type
-    ///   and use the generated static <c>CreateParser()</c> or <c>Parse()</c> methods on that type
-    ///   instead.
+    ///   by <paramref name="argumentsType"/> at runtime, unless the type has the
+    ///   <see cref="GeneratedParserAttribute"/> applied. In that case, you can also use the
+    ///   generated static <c>CreateParser()</c> or <c>Parse()</c> methods on that type instead.
     /// </para>
     /// <para>
     ///   If the <paramref name="options"/> parameter is not <see langword="null"/>, the
@@ -318,7 +308,7 @@ public class CommandLineParser
     [RequiresUnreferencedCode("Trimming cannot be used when determining arguments via reflection. Use the GeneratedArgumentsParserAttribute instead.")]
 #endif
     public CommandLineParser(Type argumentsType, ParseOptions? options = null)
-        : this(new ReflectionArgumentProvider(argumentsType ?? throw new ArgumentNullException(nameof(argumentsType))), options)
+        : this(GetArgumentProvider(argumentsType ?? throw new ArgumentNullException(nameof(argumentsType)), options), options)
     {
     }
 
@@ -342,16 +332,6 @@ public class CommandLineParser
     ///   positions, or has an argument type that cannot
     ///   be parsed.
     /// </exception>
-    /// <exception cref="InvalidOperationException">
-    ///   The provider uses <see cref="ProviderKind.Reflection"/>, but the type indicated by the
-    ///   <see cref="ArgumentProvider.ArgumentsType"/> property has the <see cref="GeneratedParserAttribute"/>
-    ///   attribute applied. Use the generated static <c>CreateParser()</c> or <c>Parse()</c>
-    ///   methods on the arguments type to access the generated parser. For subcommands, use a
-    ///   command provider with the <see cref="GeneratedCommandManagerAttribute"/> attribute to
-    ///   create a <see cref="CommandManager"/> that will use generated parsers for subcommands. Set
-    ///   the <see cref="ParseOptions.AllowReflectionWithGeneratedParser"/> property to
-    ///   <see langword="true"/> to disable this exception.
-    /// </exception>
     /// <remarks>
     /// <para>
     ///   If the <paramref name="options"/> parameter is not <see langword="null"/>, the
@@ -368,14 +348,6 @@ public class CommandLineParser
     {
         _provider = provider ?? throw new ArgumentNullException(nameof(provider));
         _parseOptions = options ?? new();
-        if (provider.Kind == ProviderKind.Reflection &&
-            !_parseOptions.AllowReflectionWithGeneratedParser &&
-            Attribute.IsDefined(provider.ArgumentsType, typeof(GeneratedParserAttribute)))
-        {
-            throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture,
-                Properties.Resources.ReflectionWithGeneratedParserFormat, provider.ArgumentsType.FullName));
-        }
-
         var optionsAttribute = _provider.OptionsAttribute;
         if (optionsAttribute != null)
         {
@@ -918,17 +890,17 @@ public class CommandLineParser
     }
 
     /// <inheritdoc cref="Parse()" />
-         /// <summary>
-         /// Parses the specified command line arguments, starting at the specified index.
-         /// </summary>
-         /// <param name="args">The command line arguments.</param>
-         /// <param name="index">The index of the first argument to parse.</param>
-         /// <exception cref="ArgumentNullException">
-         ///   <paramref name="args"/> is <see langword="null"/>.
-         /// </exception>
-         /// <exception cref="ArgumentOutOfRangeException">
-         ///   <paramref name="index"/> does not fall within the bounds of <paramref name="args"/>.
-         /// </exception>
+    /// <summary>
+    /// Parses the specified command line arguments, starting at the specified index.
+    /// </summary>
+    /// <param name="args">The command line arguments.</param>
+    /// <param name="index">The index of the first argument to parse.</param>
+    /// <exception cref="ArgumentNullException">
+    ///   <paramref name="args"/> is <see langword="null"/>.
+    /// </exception>
+    /// <exception cref="ArgumentOutOfRangeException">
+    ///   <paramref name="index"/> does not fall within the bounds of <paramref name="args"/>.
+    /// </exception>
     public object? Parse(string[] args, int index = 0)
     {
         if (args == null)
@@ -1068,15 +1040,6 @@ public class CommandLineParser
     /// <exception cref="CommandLineArgumentException">
     ///   <inheritdoc cref="Parse()"/>
     /// </exception>
-    /// <exception cref="InvalidOperationException">
-    ///   The type indicated by <typeparamref name="T"/> has the <see cref="GeneratedParserAttribute"/>
-    ///   attribute applied. Use the generated static <c>CreateParser()</c> or <c>Parse()</c>
-    ///   methods on the arguments type to access the generated parser. For subcommands, use a
-    ///   command provider with the <see cref="GeneratedCommandManagerAttribute"/> attribute to
-    ///   create a <see cref="CommandManager"/> that will use generated parsers for subcommands. Set
-    ///   the <see cref="ParseOptions.AllowReflectionWithGeneratedParser"/> property to
-    ///   <see langword="true"/> to disable this exception.
-    /// </exception>
     /// <exception cref="NotSupportedException">
     ///   The <see cref="CommandLineParser"/> cannot use <typeparamref name="T"/> as the command
     ///   line arguments type, because it violates one of the rules concerning argument names or
@@ -1108,11 +1071,10 @@ public class CommandLineParser
     ///   method.
     /// </para>
     /// <para>
-    ///   This method uses reflection to determine the arguments defined by the type indicated
-    ///   by <typeparamref name="T"/> at runtime. To determine the arguments at compile
-    ///   time instead, apply the <see cref="GeneratedParserAttribute"/> to the arguments type
-    ///   and use the generated static <c>CreateParser()</c> or <c>Parse()</c> methods on that type
-    ///   instead.
+    ///   This method uses reflection to determine the arguments defined by the type <typeparamref name="T"/>
+    ///   at runtime, unless the type has the <see cref="GeneratedParserAttribute"/> applied. In
+    ///   that case, you can also use the generated static <c>CreateParser()</c> or <c>Parse()</c>
+    ///   methods on that type instead.
     /// </para>
     /// </remarks>
 #if NET6_0_OR_GREATER
@@ -1804,5 +1766,24 @@ public class CommandLineParser
         }
 
         return null;
+    }
+
+#if NET6_0_OR_GREATER
+    [RequiresUnreferencedCode("Trimming cannot be used when determining arguments via reflection. Use the GeneratedArgumentsParserAttribute instead.")]
+#endif
+    private static ArgumentProvider GetArgumentProvider(Type type, ParseOptions? options)
+    {
+        // Try to use the generated provider if it exists.
+        var forceReflection = options?.ForceReflection ?? ParseOptions.ForceReflectionDefault;
+        if (!forceReflection && Attribute.IsDefined(type, typeof(GeneratedParserAttribute)))
+        {
+            var providerType = type.GetNestedType("OokiiCommandLineArgumentProvider", BindingFlags.NonPublic);
+            if (providerType != null && typeof(ArgumentProvider).IsAssignableFrom(providerType))
+            {
+                return (ArgumentProvider)Activator.CreateInstance(providerType)!;
+            }
+        }
+
+        return new ReflectionArgumentProvider(type);
     }
 }

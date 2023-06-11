@@ -148,7 +148,7 @@ internal class ParserGenerator
             }
         }
 
-        _builder.AppendLine($"public static Ookii.CommandLine.CommandLineParser<{_argumentsClass.Name}> CreateParser(Ookii.CommandLine.ParseOptions? options = null) => new(new GeneratedProvider(), options);");
+        _builder.AppendLine($"public static Ookii.CommandLine.CommandLineParser<{_argumentsClass.Name}> CreateParser(Ookii.CommandLine.ParseOptions? options = null) => new(new OokiiCommandLineArgumentProvider(), options);");
         _builder.AppendLine();
         var nullableType = _argumentsClass.WithNullableAnnotation(NullableAnnotation.Annotated);
 
@@ -169,9 +169,9 @@ internal class ParserGenerator
 
     private bool GenerateProvider(ArgumentsClassAttributes attributes, bool isCommand)
     {
-        _builder.AppendLine("private class GeneratedProvider : Ookii.CommandLine.Support.GeneratedArgumentProvider");
+        _builder.AppendLine("private class OokiiCommandLineArgumentProvider : Ookii.CommandLine.Support.GeneratedArgumentProvider");
         _builder.OpenBlock();
-        _builder.AppendLine("public GeneratedProvider()");
+        _builder.AppendLine("public OokiiCommandLineArgumentProvider()");
         _builder.IncreaseIndent();
         _builder.AppendLine(": base(");
         _builder.IncreaseIndent();
@@ -250,7 +250,7 @@ internal class ParserGenerator
         }
 
         _builder.CloseBlock(); // CreateInstance()
-        _builder.CloseBlock(); // GeneratedProvider class
+        _builder.CloseBlock(); // OokiiCommandLineArgumentProvider class
         return !hasError;
     }
 

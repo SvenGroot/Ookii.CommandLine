@@ -519,36 +519,28 @@ public class ParseOptions
 
     /// <summary>
     /// Gets or sets a value that indicates whether the <see cref="CommandLineParser"/> class
-    /// will allow the use of reflection with an arguments class that also has the
-    /// <see cref="GeneratedParserAttribute"/> attribute.
+    /// will use reflection even if the command line arguments type has the
+    /// <see cref="GeneratedParserAttribute"/>.
     /// </summary>
     /// <value>
-    /// <see langword="true"/> to allow the use of reflection when the arguments class has the
+    /// <see langword="true"/> to force the use of reflection when the arguments class has the
     /// <see cref="GeneratedParserAttribute"/> attribute; otherwise, <see langword="false"/>. The
     /// default value is <see langword="false"/>.
     /// </value>
     /// <remarks>
     /// <para>
-    ///   When this property is <see langword="false"/> (the default), the <see cref="CommandLineParser(Type, ParseOptions?)"/>
-    ///   constructor, the <see cref="CommandLineParser{T}.CommandLineParser(ParseOptions?)"/>
-    ///   constructor, and the static <see cref="CommandLineParser.Parse{T}(ParseOptions?)"/> methods
-    ///   will throw an exception if they are used with an arguments type that has the
-    ///   <see cref="GeneratedParserAttribute"/> applied. This is done to avoid the situation
-    ///   where the user wanted to use a generated parser, but is accidentally using reflection
-    ///   instead.
-    /// </para>
-    /// <para>
-    ///   If you need to support using arguments classes that may have the <see cref="GeneratedParserAttribute"/>
-    ///   attribute, for example when using commands from an external assembly that you don't
-    ///   control, set this property to <see langword="true"/> to avoid the exception. Note that
-    ///   you will not get the performance benefits of the generated code in this case.
+    ///   This property only applies when you manually construct an instance of the
+    ///   <see cref="CommandLineParser"/> or <see cref="CommandLineParser{T}"/> class, or use one
+    ///   of the static <see cref="CommandLineParser.Parse{T}(ParseOptions?)"/> methods. If you use
+    ///   the generated static <c>CreateParser</c> and <c>Parse</c> methods on the command line
+    ///   arguments type, the generated parser is used regardless of the value of this property.
     /// </para>
     /// </remarks>
-    public bool AllowReflectionWithGeneratedParser { get; set; } = AllowReflectionWithGeneratedParserDefault;
+    public bool ForceReflection { get; set; } = ForceReflectionDefault;
 
     // Used by the tests so we can get coverage of the default options path while not causing
     // exceptions.
-    internal static bool AllowReflectionWithGeneratedParserDefault { get; set; }
+    internal static bool ForceReflectionDefault { get; set; }
 
     /// <summary>
     /// Gets or sets the <see cref="UsageWriter"/> to use to create usage help.
