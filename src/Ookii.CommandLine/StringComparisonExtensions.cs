@@ -21,4 +21,7 @@ internal static class StringComparisonExtensions
         return StringComparer.FromComparison(comparison);
 #endif
     }
+
+    public static bool IsCaseSensitive(this StringComparison comparison)
+        => comparison is StringComparison.Ordinal or StringComparison.InvariantCulture or StringComparison.CurrentCulture;
 }

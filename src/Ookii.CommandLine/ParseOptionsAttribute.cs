@@ -45,6 +45,64 @@ public class ParseOptionsAttribute : Attribute
     public ParsingMode Mode { get; set; }
 
     /// <summary>
+    /// Gets or sets a value that indicates whether the options follow POSIX conventions.
+    /// </summary>
+    /// <value>
+    /// <see langword="true"/> if the options follow POSIX conventions; otherwise,
+    /// <see langword="false"/>.
+    /// </value>
+    /// <remarks>
+    /// <para>
+    ///   This property is provided as a convenient way to set a number of related properties that
+    ///   together indicate the parser is using POSIX conventions. POSIX conventions in this case
+    ///   means that parsing uses long/short mode, argument names are case sensitive, and argument
+    ///   names and value descriptions use dash case (e.g. "argument-name").
+    /// </para>
+    /// <para>
+    ///   Setting this property to <see langword="true"/> is equivalent to setting the
+    ///   <see cref="Mode"/> property to <see cref="ParsingMode.LongShort"/>, the
+    ///   <see cref="CaseSensitive"/> property to <see langword="true"/>,
+    ///   the <see cref="ArgumentNameTransform"/> property to <see cref="NameTransform.DashCase"/>,
+    ///   and the <see cref="ValueDescriptionTransform"/> property to <see cref="NameTransform.DashCase"/>.
+    /// </para>
+    /// <para>
+    ///   This property will only return <see langword="true"/> if the above properties are the
+    ///   indicated values. It will return <see langword="false"/> for any other combination of
+    ///   values, not just the ones indicated below.
+    /// </para>
+    /// <para>
+    ///   Setting this property to <see langword="false"/> is equivalent to setting the
+    ///   <see cref="Mode"/> property to <see cref="ParsingMode.Default"/>, the
+    ///   <see cref="CaseSensitive"/> property to <see langword="false"/>,
+    ///   the <see cref="ArgumentNameTransform"/> property to <see cref="NameTransform.None"/>,
+    ///   and the <see cref="ValueDescriptionTransform"/> property to <see cref="NameTransform.None"/>.
+    /// </para>
+    /// </remarks>
+    /// <seealso cref="ParseOptions.IsPosix"/>
+    public virtual bool IsPosix
+    {
+        get => Mode == ParsingMode.LongShort && CaseSensitive && ArgumentNameTransform == NameTransform.DashCase &&
+            ValueDescriptionTransform == NameTransform.DashCase;
+        set
+        {
+            if (value)
+            {
+                Mode = ParsingMode.LongShort;
+                CaseSensitive = true;
+                ArgumentNameTransform = NameTransform.DashCase;
+                ValueDescriptionTransform = NameTransform.DashCase;
+            }
+            else
+            {
+                Mode = ParsingMode.Default;
+                CaseSensitive = false;
+                ArgumentNameTransform = NameTransform.None;
+                ValueDescriptionTransform = NameTransform.None;
+            }
+        }
+    }
+
+    /// <summary>
     /// Gets or sets a value that indicates how names are created for arguments that don't have
     /// an explicit name.
     /// </summary>

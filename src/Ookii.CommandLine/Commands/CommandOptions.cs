@@ -10,6 +10,66 @@ namespace Ookii.CommandLine.Commands
     public class CommandOptions : ParseOptions
     {
         /// <summary>
+        /// Gets or sets a value that indicates whether the options follow POSIX conventions.
+        /// </summary>
+        /// <value>
+        /// <see langword="true"/> if the options follow POSIX conventions; otherwise,
+        /// <see langword="false"/>.
+        /// </value>
+        /// <remarks>
+        /// <para>
+        ///   This property is provided as a convenient way to set a number of related properties
+        ///   that together indicate the parser is using POSIX conventions. POSIX conventions in
+        ///   this case means that parsing uses long/short mode, argument and command names are case
+        ///   sensitive, and argument names, command names and value descriptions use dash case
+        ///   (e.g. "argument-name").
+        /// </para>
+        /// <para>
+        ///   Setting this property to <see langword="true"/> is equivalent to setting the
+        ///   <see cref="ParseOptions.Mode"/> property to <see cref="ParsingMode.LongShort"/>, the
+        ///   <see cref="ParseOptions.ArgumentNameComparison"/> property to <see cref="StringComparison.InvariantCulture"/>,
+        ///   the <see cref="ParseOptions.ArgumentNameTransform"/> property to <see cref="NameTransform.DashCase"/>,
+        ///   the <see cref="ParseOptions.ValueDescriptionTransform"/> property to <see cref="NameTransform.DashCase"/>,
+        ///   the <see cref="CommandNameComparison"/> property to <see cref="StringComparison.InvariantCulture"/>,
+        ///   and the <see cref="CommandNameTransform"/> property to <see cref="NameTransform.DashCase"/>.
+        /// </para>
+        /// <para>
+        ///   This property will only return <see langword="true"/> if the above properties are the
+        ///   indicated values, except that <see cref="ParseOptions.ArgumentNameComparison"/> and
+        ///   <see cref="CommandNameComparison"/> can be any case-sensitive comparison. It will
+        ///   return <see langword="false"/> for any other combination of values, not just the ones
+        ///   indicated below.
+        /// </para>
+        /// <para>
+        ///   Setting this property to <see langword="false"/> is equivalent to setting the
+        ///   <see cref="ParseOptions.Mode"/> property to <see cref="ParsingMode.Default"/>, the
+        ///   <see cref="ParseOptions.ArgumentNameComparison"/> property to <see cref="StringComparison.OrdinalIgnoreCase"/>,
+        ///   the <see cref="ParseOptions.ArgumentNameTransform"/> property to <see cref="NameTransform.None"/>,
+        ///   the <see cref="ParseOptions.ValueDescriptionTransform"/> property to <see cref="NameTransform.None"/>,
+        ///   the <see cref="CommandNameComparison"/> property to <see cref="StringComparison.OrdinalIgnoreCase"/>,
+        ///   and the <see cref="CommandNameTransform"/> property to <see cref="NameTransform.None"/>.
+        /// </para>
+        /// </remarks>
+        public override bool IsPosix
+        { 
+            get => base.IsPosix && CommandNameComparison.IsCaseSensitive() && CommandNameTransform == NameTransform.DashCase;
+            set
+            {
+                base.IsPosix = value;
+                if (value)
+                {
+                    CommandNameComparison = StringComparison.InvariantCulture;
+                    CommandNameTransform = NameTransform.DashCase;
+                }
+                else
+                {
+                    CommandNameComparison = StringComparison.OrdinalIgnoreCase;
+                    CommandNameTransform = NameTransform.None;
+                }
+            }
+        }
+
+        /// <summary>
         /// Gets or set the type of string comparison to use for argument names.
         /// </summary>
         /// <value>
