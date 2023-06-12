@@ -313,6 +313,15 @@ namespace Ookii.CommandLine.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to You must specify at least one name/value separator..
+        /// </summary>
+        internal static string EmptyNameValueSeparators {
+            get {
+                return ResourceManager.GetString("EmptyNameValueSeparators", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The provided ArgumentProvider is not for the type &apos;{0}&apos;..
         /// </summary>
         internal static string IncorrectProviderTypeFormat {

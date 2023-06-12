@@ -200,22 +200,12 @@ public class CommandLineParser
     private readonly PrefixInfo[] _sortedPrefixes;
     private readonly string[] _argumentNamePrefixes;
     private readonly string? _longArgumentNamePrefix;
+    private readonly char[] _nameValueSeparators;
 
     private ReadOnlyCollection<CommandLineArgument>? _argumentsReadOnlyWrapper;
     private ReadOnlyCollection<string>? _argumentNamePrefixesReadOnlyWrapper;
+    private ReadOnlyCollection<char>? _nameValueSeparatorsReadOnlyWrapper;
     private List<CommandLineArgument>? _requiredPropertyArguments;
-
-    /// <summary>
-    /// Gets the default character used to separate the name and the value of an argument.
-    /// </summary>
-    /// <value>
-    /// The default character used to separate the name and the value of an argument, which is ':'.
-    /// </value>
-    /// <remarks>
-    /// This constant is used as the default value of the <see cref="NameValueSeparator"/> property.
-    /// </remarks>
-    /// <seealso cref="AllowWhiteSpaceValueSeparator"/>
-    public const char DefaultNameValueSeparator = ':';
 
     /// <summary>
     /// Gets the default prefix used for long argument names if <see cref="Mode"/> is
@@ -358,6 +348,7 @@ public class CommandLineParser
         var comparison = _parseOptions.ArgumentNameComparisonOrDefault;
         ArgumentNameComparison = comparison;
         _argumentNamePrefixes = DetermineArgumentNamePrefixes(_parseOptions);
+        _nameValueSeparators = DetermineNameValueSeparators(_parseOptions);
         var prefixInfos = _argumentNamePrefixes.Select(p => new PrefixInfo { Prefix = p, Short = true });
         if (_mode == ParsingMode.LongShort)
         {
@@ -485,11 +476,11 @@ public class CommandLineParser
     /// <remarks>
     /// <para>
     ///   If you change the value of the <see cref="ParseOptions.Culture"/>, <see cref="ParseOptions.DuplicateArguments"/>,
-    ///   <see cref="ParseOptions.AllowWhiteSpaceValueSeparator"/>, <see cref="ParseOptions.NameValueSeparator"/>,
-    ///   <see cref="StringProvider"/> or <see cref="UsageWriter"/> property, this will affect
-    ///   the behavior of this instance. The other properties of the <see cref="ParseOptions"/>
-    ///   class are only used when the <see cref="CommandLineParser"/> class in constructed, so
-    ///   changing them afterwards will have no effect.
+    ///   <see cref="ParseOptions.AllowWhiteSpaceValueSeparator"/>, <see cref="StringProvider"/> or
+    ///   <see cref="UsageWriter"/> property, this will affect the behavior of this instance. The
+    ///   other properties of the <see cref="ParseOptions"/> class are only used when the
+    ///   <see cref="CommandLineParser"/> class in constructed, so changing them afterwards will
+    ///   have no effect.
     /// </para>
     /// </remarks>
     public ParseOptions Options => _parseOptions;
@@ -542,29 +533,29 @@ public class CommandLineParser
     /// argument from its name.
     /// </summary>
     /// <value>
-    ///   <see langword="true"/> if names and values can be in separate arguments; <see langword="false"/> if the character
-    ///   specified in the <see cref="NameValueSeparator"/> property must be used. The default
+    ///   <see langword="true"/> if names and values can be in separate arguments; <see langword="false"/> if the characters
+    ///   specified in the <see cref="NameValueSeparators"/> property must be used. The default
     ///   value is <see langword="true"/>.
     /// </value>
     /// <remarks>
     /// <para>
     ///   If the <see cref="AllowWhiteSpaceValueSeparator"/> property is <see langword="true"/>,
-    ///   the value of an argument can be separated from its name either by using the character
-    ///   specified in the <see cref="NameValueSeparator"/> property or by using white space (i.e.
+    ///   the value of an argument can be separated from its name either by using the characters
+    ///   specified in the <see cref="NameValueSeparators"/> property or by using white space (i.e.
     ///   by having a second argument that has the value). Given a named argument named "Sample",
     ///   the command lines <c>-Sample:value</c> and <c>-Sample value</c>
     ///   are both valid and will assign the value "value" to the argument.
     /// </para>
     /// <para>
-    ///   If the <see cref="AllowWhiteSpaceValueSeparator"/> property is <see langword="false"/>, only the character
-    ///   specified in the <see cref="NameValueSeparator"/> property is allowed to separate the value from the name.
+    ///   If the <see cref="AllowWhiteSpaceValueSeparator"/> property is <see langword="false"/>, only the characters
+    ///   specified in the <see cref="NameValueSeparators"/> property are allowed to separate the value from the name.
     ///   The command line <c>-Sample:value</c> still assigns the value "value" to the argument, but for the command line "-Sample value" the argument 
     ///   is considered not to have a value (which is only valid if <see cref="CommandLineArgument.IsSwitch"/> is <see langword="true"/>), and
     ///   "value" is considered to be the value for the next positional argument.
     /// </para>
     /// <para>
     ///   For switch arguments (the <see cref="CommandLineArgument.IsSwitch"/> property is <see langword="true"/>),
-    ///   only the character specified in the <see cref="NameValueSeparator"/> property is allowed
+    ///   only the characters specified in the <see cref="NameValueSeparators"/> property are allowed
     ///   to specify an explicit value regardless of the value of the <see cref="AllowWhiteSpaceValueSeparator"/>
     ///   property. Given a switch argument named "Switch"  the command line <c>-Switch false</c>
     ///   is interpreted to mean that the value of "Switch" is <see langword="true"/> and the value of the
@@ -581,38 +572,20 @@ public class CommandLineParser
     public bool AllowWhiteSpaceValueSeparator => _parseOptions.AllowWhiteSpaceValueSeparatorOrDefault;
 
     /// <summary>
-    /// Gets or sets the character used to separate the name and the value of an argument.
+    /// Gets the characters used to separate the name and the value of an argument.
     /// </summary>
     /// <value>
-    ///   The character used to separate the name and the value of an argument. The default value is the
-    ///   <see cref="DefaultNameValueSeparator"/> constant, a colon (:).
+    ///   The characters used to separate the name and the value of an argument.
     /// </value>
     /// <remarks>
-    /// <para>
-    ///   This character is used to separate the name and the value if both are provided as
-    ///   a single argument to the application, e.g. <c>-sample:value</c> if the default value is used.
-    /// </para>
-    /// <note>
-    ///   The character chosen here cannot be used in the name of any parameter. Therefore,
-    ///   it's usually best to choose a non-alphanumeric value such as the colon or equals sign.
-    ///   The character can appear in argument values (e.g. <c>-sample:foo:bar</c> is fine, in which
-    ///   case the value is "foo:bar").
-    /// </note>
-    /// <note>
-    ///   Do not pick a whitespace character as the separator. Doing this only works if the
-    ///   whitespace character is part of the argument token, which usually means it needs to be
-    ///   quoted or escaped when invoking your application. Instead, use the
-    ///   <see cref="AllowWhiteSpaceValueSeparator"/> property to control whether whitespace
-    ///   is allowed as a separator.
-    /// </note>
     /// <para>
     ///   Use the <see cref="ParseOptions"/> or <see cref="ParseOptionsAttribute "/> class to
     ///   change this value.
     /// </para>
     /// </remarks>
-    /// <seealso cref="ParseOptionsAttribute.NameValueSeparator"/>
-    /// <seealso cref="ParseOptions.NameValueSeparator"/>
-    public char NameValueSeparator => _parseOptions.NameValueSeparatorOrDefault;
+    /// <seealso cref="ParseOptionsAttribute.NameValueSeparators"/>
+    /// <seealso cref="ParseOptions.NameValueSeparators"/>
+    public ReadOnlyCollection<char> NameValueSeparators => _nameValueSeparatorsReadOnlyWrapper ??= new(_nameValueSeparators);
 
     /// <summary>
     /// Gets or sets a value that indicates whether usage help should be displayed if the <see cref="Parse(string[], int)"/>
@@ -1259,6 +1232,19 @@ public class CommandLineParser
     }
 
     /// <summary>
+    /// Gets the default character used to separate the name and the value of an argument.
+    /// </summary>
+    /// <returns>
+    /// The default characters used to separate the name and the value of an argument, which are
+    /// ':' and '='.
+    /// </returns>
+    /// <remarks>
+    /// The return value of this method is used as the default value of the <see cref="NameValueSeparators"/> property.
+    /// </remarks>
+    /// <seealso cref="AllowWhiteSpaceValueSeparator"/>
+    public static char[] GetDefaultNameValueSeparators() => new[] { ':', '=' };
+
+    /// <summary>
     /// Raises the <see cref="ArgumentParsed"/> event.
     /// </summary>
     /// <param name="e">The data for the event.</param>
@@ -1337,6 +1323,24 @@ public class CommandLineParser
         }
     }
 
+    private static char[] DetermineNameValueSeparators(ParseOptions options)
+    {
+        if (options.NameValueSeparators == null)
+        {
+            return GetDefaultNameValueSeparators();
+        }
+        else
+        {
+            var result = options.NameValueSeparators.ToArray();
+            if (result.Length == 0)
+            {
+                throw new ArgumentException(Properties.Resources.EmptyNameValueSeparators, nameof(options));
+            }
+
+            return result;
+        }
+    }
+
     private int DetermineMemberArguments()
     {
         int additionalPositionalArgumentCount = 0;
@@ -1381,7 +1385,7 @@ public class CommandLineParser
 
     private void AddNamedArgument(CommandLineArgument argument)
     {
-        if (argument.ArgumentName.Contains(NameValueSeparator))
+        if (_nameValueSeparators.Any(separator => argument.ArgumentName.Contains(separator)))
         {
             throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.ArgumentNameContainsSeparatorFormat, argument.ArgumentName));
         }
@@ -1611,7 +1615,7 @@ public class CommandLineParser
 
     private (CancelMode, int, CommandLineArgument?) ParseNamedArgument(ReadOnlySpan<string> args, int index, PrefixInfo prefix)
     {
-        var (argumentName, argumentValue) = args[index].AsMemory(prefix.Prefix.Length).SplitOnce(NameValueSeparator);
+        var (argumentName, argumentValue) = args[index].AsMemory(prefix.Prefix.Length).SplitFirstOfAny(_nameValueSeparators);
 
         CancelMode cancelParsing;
         CommandLineArgument? argument = null;

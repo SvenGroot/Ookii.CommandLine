@@ -408,4 +408,7 @@
   <data name="InvalidTypeConverter" xml:space="preserve">
     <value>The specified TypeConverter cannot converter from a string.</value>
   </data>
+  <data name="EmptyNameValueSeparators" xml:space="preserve">
+    <value>You must specify at least one name/value separator.</value>
+  </data>
 </root>

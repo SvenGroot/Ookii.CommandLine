@@ -333,7 +333,7 @@ public class ParseOptions
     /// </summary>
     /// <value>
     ///   <see langword="true"/> if white space is allowed to separate an argument name and its
-    ///   value; <see langword="false"/> if only the <see cref="NameValueSeparator"/> is allowed,
+    ///   value; <see langword="false"/> if only the <see cref="NameValueSeparators"/> are allowed,
     ///   or <see langword="null" /> to use the value from the <see cref="ParseOptionsAttribute.AllowWhiteSpaceValueSeparator"/>
     ///   property, or if the <see cref="ParseOptionsAttribute"/> is not present, the default
     ///   option which is <see langword="true"/>. The default value is <see langword="null"/>.
@@ -358,18 +358,19 @@ public class ParseOptions
     public bool AllowWhiteSpaceValueSeparatorOrDefault => AllowWhiteSpaceValueSeparator ?? true;
 
     /// <summary>
-    /// Gets or sets the character used to separate the name and the value of an argument.
+    /// Gets or sets the characters used to separate the name and the value of an argument.
     /// </summary>
     /// <value>
     ///   The character used to separate the name and the value of an argument, or <see langword="null"/>
     ///   to use the value from the <see cref="ParseOptionsAttribute"/> attribute, or if that
-    ///   is not present, the <see cref="CommandLineParser.DefaultNameValueSeparator"/>
-    ///   constant, a colon (:). The default value is <see langword="null"/>.
+    ///   is not present, the values returned by the <see cref="CommandLineParser.GetDefaultNameValueSeparators"/>
+    ///   method, which are a colon (:) and an equals sign (=). The default value is <see langword="null"/>.
     /// </value>
     /// <remarks>
     /// <para>
-    ///   This character is used to separate the name and the value if both are provided as
-    ///   a single argument to the application, e.g. <c>-sample:value</c> if the default value is used.
+    ///   These characters are used to separate the name and the value if both are provided as
+    ///   a single argument to the application, e.g. <c>-sample:value</c> or <c>-sample=value</c>
+    ///   if the default value is used.
     /// </para>
     /// <note>
     ///   The character chosen here cannot be used in the name of any parameter. Therefore,
@@ -386,20 +387,20 @@ public class ParseOptions
     /// </note>
     /// <para>
     ///   If not <see langword="null"/>, this property overrides the value of the
-    ///   <see cref="ParseOptionsAttribute.NameValueSeparator"/> property.
+    ///   <see cref="ParseOptionsAttribute.NameValueSeparators"/> property.
     /// </para>
     /// </remarks>
-    public char? NameValueSeparator { get; set; }
+    public IEnumerable<char>? NameValueSeparators { get; set; }
 
     /// <summary>
-    /// Gets the character used to separate the name and the value of an argument.
+    /// Gets the characters used to separate the name and the value of an argument.
     /// </summary>
     /// <value>
-    /// The value of the <see cref="NameValueSeparator"/> property, or the value of the
-    /// <see cref="CommandLineParser.DefaultNameValueSeparator"/> constant if that property is
+    /// The value of the <see cref="NameValueSeparators"/> property, or the return value of the
+    /// <see cref="CommandLineParser.GetDefaultNameValueSeparators"/> method if that property is
     /// <see langword="null"/>.
     /// </value>
-    public char NameValueSeparatorOrDefault => NameValueSeparator ?? CommandLineParser.DefaultNameValueSeparator;
+    public IEnumerable<char> NameValueSeparatorsOrDefault => NameValueSeparators ?? CommandLineParser.GetDefaultNameValueSeparators();
 
     /// <summary>
     /// Gets or sets a value that indicates a help argument will be automatically added.
@@ -772,7 +773,7 @@ public class ParseOptions
         ArgumentNameComparison ??= attribute.GetStringComparison();
         DuplicateArguments ??= attribute.DuplicateArguments;
         AllowWhiteSpaceValueSeparator ??= attribute.AllowWhiteSpaceValueSeparator;
-        NameValueSeparator ??= attribute.NameValueSeparator;
+        NameValueSeparators ??= attribute.NameValueSeparators;
         AutoHelpArgument ??= attribute.AutoHelpArgument;
         AutoVersionArgument ??= attribute.AutoVersionArgument;
         AutoPrefixAliases ??= attribute.AutoPrefixAliases;

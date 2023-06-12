@@ -22,7 +22,7 @@ public class ParseOptionsAttributeTest
         Assert.IsFalse(options.IsPosix);
         Assert.IsNull(options.LongArgumentNamePrefix);
         Assert.AreEqual(ParsingMode.Default, options.Mode);
-        Assert.AreEqual(':', options.NameValueSeparator);
+        Assert.IsNull(options.NameValueSeparators);
         Assert.AreEqual(NameTransform.None, options.ValueDescriptionTransform);
     }
 

@@ -10,6 +10,12 @@ namespace Ookii.CommandLine
             return value.SplitAt(index, 1);
         }
 
+        public static (ReadOnlyMemory<char>, ReadOnlyMemory<char>?) SplitFirstOfAny(this ReadOnlyMemory<char> value, ReadOnlySpan<char> separators)
+        {
+            var index = value.Span.IndexOfAny(separators);
+            return value.SplitAt(index, 1);
+        }
+
         public static StringSpanTuple SplitOnce(this ReadOnlySpan<char> value, ReadOnlySpan<char> separator, out bool hasSeparator)
         {
             var index = value.IndexOf(separator);

@@ -217,26 +217,43 @@ public partial class CommandLineParserTest
     public void ParseTestNameValueSeparator(ProviderKind kind)
     {
         var target = CreateParser<SimpleArguments>(kind);
-        Assert.AreEqual(CommandLineParser.DefaultNameValueSeparator, target.NameValueSeparator);
-        SimpleArguments args = target.Parse(new[] { "-Argument1:test", "-Argument2:foo:bar" });
+        CollectionAssert.AreEquivalent(new[] { ':', '=' }, target.NameValueSeparators);
+        var args = CheckSuccess(target, new[] { "-Argument1:test", "-Argument2:foo:bar" });
         Assert.IsNotNull(args);
         Assert.AreEqual("test", args.Argument1);
         Assert.AreEqual("foo:bar", args.Argument2);
+        args = CheckSuccess(target, new[] { "-Argument1=test", "-Argument2=foo:bar" });
+        Assert.AreEqual("test", args.Argument1);
+        Assert.AreEqual("foo:bar", args.Argument2);
+        args = CheckSuccess(target, new[] { "-Argument2:foo=bar" });
+        Assert.AreEqual("foo=bar", args.Argument2);
+
         CheckThrows(target,
-            new[] { "-Argument1=test" },
+            new[] { "-Argument1>test" },
             CommandLineArgumentErrorCategory.UnknownArgument,
-            "Argument1=test",
+            "Argument1>test",
             remainingArgumentCount: 1);
 
-        target.Options.NameValueSeparator = '=';
-        args = target.Parse(new[] { "-Argument1=test", "-Argument2=foo=bar" });
+        var options = new ParseOptions()
+        {
+            NameValueSeparators = new[] { '>' },
+        };
+
+        target = CreateParser<SimpleArguments>(kind, options);
+        args = target.Parse(new[] { "-Argument1>test", "-Argument2>foo>bar" });
         Assert.IsNotNull(args);
         Assert.AreEqual("test", args.Argument1);
-        Assert.AreEqual("foo=bar", args.Argument2);
+        Assert.AreEqual("foo>bar", args.Argument2);
         CheckThrows(target,
             new[] { "-Argument1:test" },
             CommandLineArgumentErrorCategory.UnknownArgument,
             "Argument1:test",
+            remainingArgumentCount: 1);
+
+        CheckThrows(target,
+            new[] { "-Argument1=test" },
+            CommandLineArgumentErrorCategory.UnknownArgument,
+            "Argument1=test",
             remainingArgumentCount: 1);
     }
 
@@ -635,7 +652,7 @@ public partial class CommandLineParserTest
         var parser = CreateParser<ParseOptionsArguments>(kind);
         Assert.IsFalse(parser.AllowWhiteSpaceValueSeparator);
         Assert.IsTrue(parser.AllowDuplicateArguments);
-        Assert.AreEqual('=', parser.NameValueSeparator);
+        CollectionAssert.AreEquivalent(new[] { '=' }, parser.NameValueSeparators);
         Assert.AreEqual(ParsingMode.LongShort, parser.Mode);
         CollectionAssert.AreEqual(new[] { "--", "-" }, parser.ArgumentNamePrefixes);
         Assert.AreEqual("---", parser.LongArgumentNamePrefix);
@@ -652,7 +669,7 @@ public partial class CommandLineParserTest
             ArgumentNameComparison = StringComparison.OrdinalIgnoreCase,
             AllowWhiteSpaceValueSeparator = true,
             DuplicateArguments = ErrorMode.Error,
-            NameValueSeparator = ';',
+            NameValueSeparators = new[] { ';' },
             ArgumentNamePrefixes = new[] { "+" },
             AutoHelpArgument = true,
         };
@@ -660,7 +677,7 @@ public partial class CommandLineParserTest
         parser = CreateParser<ParseOptionsArguments>(kind, options);
         Assert.IsTrue(parser.AllowWhiteSpaceValueSeparator);
         Assert.IsFalse(parser.AllowDuplicateArguments);
-        Assert.AreEqual(';', parser.NameValueSeparator);
+        CollectionAssert.AreEquivalent(new[] { ';' }, parser.NameValueSeparators);
         Assert.AreEqual(ParsingMode.Default, parser.Mode);
         CollectionAssert.AreEqual(new[] { "+" }, parser.ArgumentNamePrefixes);
         Assert.IsNull(parser.LongArgumentNamePrefix);

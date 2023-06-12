@@ -35,7 +35,7 @@ public class ParseOptionsTest
         Assert.IsFalse(options.IsPosix);
         Assert.IsNull(options.LongArgumentNamePrefix);
         Assert.IsNull(options.Mode);
-        Assert.IsNull(options.NameValueSeparator);
+        Assert.IsNull(options.NameValueSeparators);
         Assert.AreEqual(UsageHelpRequest.Full, options.ShowUsageOnError);
         Assert.IsNotNull(options.StringProvider);
         Assert.IsNotNull(options.UsageWriter);
@@ -54,7 +54,7 @@ public class ParseOptionsTest
         Assert.AreEqual(ErrorMode.Error, options.DuplicateArgumentsOrDefault);
         Assert.AreEqual("--", options.LongArgumentNamePrefixOrDefault);
         Assert.AreEqual(ParsingMode.Default, options.ModeOrDefault);
-        Assert.AreEqual(':', options.NameValueSeparatorOrDefault);
+        CollectionAssert.AreEqual(new[] { ':', '=' }, options.NameValueSeparatorsOrDefault.ToArray());
         Assert.AreEqual(NameTransform.None, options.ValueDescriptionTransformOrDefault);
     }
 
@@ -110,7 +110,7 @@ public class ParseOptionsTest
         Assert.IsFalse(options.IsPosix);
         Assert.IsNull(options.LongArgumentNamePrefix);
         Assert.AreEqual(ParsingMode.Default, options.Mode);
-        Assert.AreEqual(':', options.NameValueSeparator);
+        Assert.IsNull(options.NameValueSeparators);
         Assert.AreEqual(NameTransform.None, options.ValueDescriptionTransform);
 
         options = new ParseOptions();

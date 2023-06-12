@@ -202,7 +202,7 @@ partial class CancelArguments
     ArgumentNamePrefixes = new[] { "--", "-" },
     LongArgumentNamePrefix = "---",
     CaseSensitive = true,
-    NameValueSeparator = '=',
+    NameValueSeparators = new[] { '=' },
     AutoHelpArgument = false)]
 partial class ParseOptionsArguments
 {

@@ -364,8 +364,8 @@ namespace Ookii.CommandLine
         public string ArgumentDescriptionColor { get; set; } = TextFormat.ForegroundGreen;
 
         /// <summary>
-        /// Gets or sets a value indicating whether white space, rather than the value of the
-        /// <see cref="CommandLineParser.NameValueSeparator"/> property, is used to separate
+        /// Gets or sets a value indicating whether white space, rather than the first item of the
+        /// <see cref="CommandLineParser.NameValueSeparators"/> property, is used to separate
         /// arguments and their values in the command line syntax.
         /// </summary>
         /// <value>
@@ -1031,7 +1031,7 @@ namespace Ookii.CommandLine
 
             char? separator = argument.Parser.AllowWhiteSpaceValueSeparator && UseWhiteSpaceValueSeparator
                 ? null
-                : argument.Parser.NameValueSeparator;
+                : argument.Parser.NameValueSeparators[0];
 
             if (argument.Position == null)
             {

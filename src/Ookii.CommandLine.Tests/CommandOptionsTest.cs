@@ -36,7 +36,7 @@ public class CommandOptionsTest
         Assert.IsFalse(options.IsPosix);
         Assert.IsNull(options.LongArgumentNamePrefix);
         Assert.IsNull(options.Mode);
-        Assert.IsNull(options.NameValueSeparator);
+        Assert.IsNull(options.NameValueSeparators);
         Assert.AreEqual(UsageHelpRequest.Full, options.ShowUsageOnError);
         Assert.IsNotNull(options.StringProvider);
         Assert.IsNotNull(options.UsageWriter);

@@ -230,8 +230,8 @@ public class ParseOptionsAttribute : Attribute
     /// </summary>
     /// <value>
     ///   <see langword="true"/> if white space is allowed to separate an argument name and its
-    ///   value; <see langword="false"/> if only the value from <see cref="NameValueSeparator"/>
-    ///   is allowed. The default value is <see langword="true"/>.
+    ///   value; <see langword="false"/> if only the values from <see cref="NameValueSeparators"/>
+    ///   are allowed. The default value is <see langword="true"/>.
     /// </value>
     /// <remarks>
     /// <para>
@@ -246,13 +246,15 @@ public class ParseOptionsAttribute : Attribute
     /// Gets or sets the character used to separate the name and the value of an argument.
     /// </summary>
     /// <value>
-    ///   The character used to separate the name and the value of an argument. The default value is the
-    ///   <see cref="CommandLineParser.DefaultNameValueSeparator"/> constant, a colon (:).
+    ///   The characters used to separate the name and the value of an argument, or <see langword="null"/>
+    ///   to use the default value from the <see cref="CommandLineParser.GetDefaultNameValueSeparators"/>
+    ///   method, which is a colon ':' and an equals sign '='. The default value is <see langword="null"/>.
     /// </value>
     /// <remarks>
     /// <para>
-    ///   This character is used to separate the name and the value if both are provided as
-    ///   a single argument to the application, e.g. <c>-sample:value</c> if the default value is used.
+    ///   These characters are used to separate the name and the value if both are provided as
+    ///   a single argument to the application, e.g. <c>-sample:value</c> or <c>-sample=value</c>
+    ///   if the default value is used.
     /// </para>
     /// <note>
     ///   The character chosen here cannot be used in the name of any parameter. Therefore,
@@ -261,19 +263,19 @@ public class ParseOptionsAttribute : Attribute
     ///   case the value is "foo:bar").
     /// </note>
     /// <note>
-    ///   Do not pick a whitespace character as the separator. Doing this only works if the
+    ///   Do not pick a white-space character as the separator. Doing this only works if the
     ///   whitespace character is part of the argument, which usually means it needs to be
     ///   quoted or escaped when invoking your application. Instead, use the
-    ///   <see cref="AllowWhiteSpaceValueSeparator"/> property to control whether whitespace
+    ///   <see cref="AllowWhiteSpaceValueSeparator"/> property to control whether white space
     ///   is allowed as a separator.
     /// </note>
     /// <para>
-    ///   This value can be overridden by the <see cref="ParseOptions.NameValueSeparator"/>
+    ///   This value can be overridden by the <see cref="ParseOptions.NameValueSeparators"/>
     ///   property.
     /// </para>
     /// </remarks>
-    /// <seealso cref="CommandLineParser.NameValueSeparator"/>
-    public char NameValueSeparator { get; set; } = CommandLineParser.DefaultNameValueSeparator;
+    /// <seealso cref="CommandLineParser.NameValueSeparators"/>
+    public char[]? NameValueSeparators { get; set; }
 
     /// <summary>
     /// Gets or sets a value that indicates a help argument will be automatically added.
