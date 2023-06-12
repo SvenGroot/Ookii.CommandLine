@@ -83,7 +83,7 @@ public abstract class ParentCommand : ICommandWithCustomParsing, IAsyncCommand
 
             var parser = info.CreateParser();
             EventHandler<DuplicateArgumentEventArgs>? handler = null;
-            if (parser.Options.DuplicateArguments == ErrorMode.Warning)
+            if (parser.Options.DuplicateArgumentsOrDefault == ErrorMode.Warning)
             {
                 handler = (sender, e) =>
                 {

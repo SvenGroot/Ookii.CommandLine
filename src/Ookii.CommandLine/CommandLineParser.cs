@@ -354,14 +354,14 @@ public class CommandLineParser
             _parseOptions.Merge(optionsAttribute);
         }
 
-        _mode = _parseOptions.Mode ?? default;
-        var comparison = _parseOptions.ArgumentNameComparison ?? StringComparison.OrdinalIgnoreCase;
+        _mode = _parseOptions.ModeOrDefault;
+        var comparison = _parseOptions.ArgumentNameComparisonOrDefault;
         ArgumentNameComparison = comparison;
         _argumentNamePrefixes = DetermineArgumentNamePrefixes(_parseOptions);
         var prefixInfos = _argumentNamePrefixes.Select(p => new PrefixInfo { Prefix = p, Short = true });
         if (_mode == ParsingMode.LongShort)
         {
-            _longArgumentNamePrefix = _parseOptions.LongArgumentNamePrefix ?? DefaultLongArgumentNamePrefix;
+            _longArgumentNamePrefix = _parseOptions.LongArgumentNamePrefixOrDefault;
             if (string.IsNullOrWhiteSpace(_longArgumentNamePrefix))
             {
                 throw new ArgumentException(Properties.Resources.EmptyArgumentNamePrefix, nameof(options));
@@ -507,7 +507,7 @@ public class CommandLineParser
     /// </para>
     /// </remarks>
     /// <seealso cref="ParseOptions.Culture"/>
-    public CultureInfo Culture => _parseOptions.Culture ?? CultureInfo.InvariantCulture;
+    public CultureInfo Culture => _parseOptions.CultureOrDefault;
 
     /// <summary>
     /// Gets a value indicating whether duplicate arguments are allowed.
@@ -535,7 +535,7 @@ public class CommandLineParser
     /// </remarks>
     /// <see cref="ParseOptionsAttribute.DuplicateArguments"/>
     /// <see cref="ParseOptions.DuplicateArguments"/>
-    public bool AllowDuplicateArguments => (_parseOptions.DuplicateArguments ?? default) != ErrorMode.Error;
+    public bool AllowDuplicateArguments => _parseOptions.DuplicateArgumentsOrDefault != ErrorMode.Error;
 
     /// <summary>
     /// Gets value indicating whether the value of an argument may be in a separate
@@ -578,7 +578,7 @@ public class CommandLineParser
     /// </remarks>
     /// <seealso cref="ParseOptionsAttribute.AllowWhiteSpaceValueSeparator"/>
     /// <seealso cref="ParseOptions.AllowWhiteSpaceValueSeparator"/>
-    public bool AllowWhiteSpaceValueSeparator => _parseOptions.AllowWhiteSpaceValueSeparator ?? true;
+    public bool AllowWhiteSpaceValueSeparator => _parseOptions.AllowWhiteSpaceValueSeparatorOrDefault;
 
     /// <summary>
     /// Gets or sets the character used to separate the name and the value of an argument.
@@ -612,7 +612,7 @@ public class CommandLineParser
     /// </remarks>
     /// <seealso cref="ParseOptionsAttribute.NameValueSeparator"/>
     /// <seealso cref="ParseOptions.NameValueSeparator"/>
-    public char NameValueSeparator => _parseOptions.NameValueSeparator ?? DefaultNameValueSeparator;
+    public char NameValueSeparator => _parseOptions.NameValueSeparatorOrDefault;
 
     /// <summary>
     /// Gets or sets a value that indicates whether usage help should be displayed if the <see cref="Parse(string[], int)"/>
@@ -985,7 +985,7 @@ public class CommandLineParser
     public object? ParseWithErrorHandling(ReadOnlyMemory<string> args)
     {
         EventHandler<DuplicateArgumentEventArgs>? handler = null;
-        if (_parseOptions.DuplicateArguments == ErrorMode.Warning)
+        if (_parseOptions.DuplicateArgumentsOrDefault == ErrorMode.Warning)
         {
             handler = (sender, e) =>
             {
@@ -1354,7 +1354,7 @@ public class CommandLineParser
 
     private void DetermineAutomaticArguments()
     {
-        bool autoHelp = Options.AutoHelpArgument ?? true;
+        bool autoHelp = Options.AutoHelpArgumentOrDefault;
         if (autoHelp)
         {
             var (argument, created) = CommandLineArgument.CreateAutomaticHelp(this);
@@ -1367,7 +1367,7 @@ public class CommandLineParser
             HelpArgument = argument;
         }
 
-        bool autoVersion = Options.AutoVersionArgument ?? true;
+        bool autoVersion = Options.AutoVersionArgumentOrDefault;
         if (autoVersion && !_provider.IsCommand)
         {
             var argument = CommandLineArgument.CreateAutomaticVersion(this);
@@ -1631,7 +1631,7 @@ public class CommandLineParser
 
         if (argument == null && !_argumentsByName.TryGetValue(argumentName, out argument))
         {
-            if (Options.AutoPrefixAliases ?? true)
+            if (Options.AutoPrefixAliasesOrDefault)
             {
                 argument = GetArgumentByNamePrefix(argumentName.Span);
             }

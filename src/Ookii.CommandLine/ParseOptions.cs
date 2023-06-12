@@ -36,6 +36,16 @@ public class ParseOptions
     public CultureInfo? Culture { get; set; }
 
     /// <summary>
+    /// Gets the culture used to convert command line argument values from their string
+    /// representation to the argument type.
+    /// </summary>
+    /// <value>
+    /// The value of the <see cref="Culture"/> property, or <see cref="CultureInfo.InvariantCulture"/>
+    /// if that property is <see langword="null"/>.
+    /// </value>
+    public CultureInfo CultureOrDefault => Culture ?? CultureInfo.InvariantCulture;
+
+    /// <summary>
     /// Gets or sets a value that indicates the command line argument parsing rules to use.
     /// </summary>
     /// <value>
@@ -52,6 +62,15 @@ public class ParseOptions
     /// </remarks>
     /// <seealso cref="CommandLineParser.Mode"/>
     public ParsingMode? Mode { get; set; }
+
+    /// <summary>
+    /// Gets a value that indicates the command line argument parsing rules to use.
+    /// </summary>
+    /// <value>
+    /// The value of the <see cref="Mode"/> property, or <see cref="ParsingMode.Default"/>
+    /// if that property is <see langword="null"/>.
+    /// </value>
+    public ParsingMode ModeOrDefault => Mode ?? ParsingMode.Default;
 
     /// <summary>
     /// Gets or sets a value that indicates whether the options follow POSIX conventions.
@@ -92,7 +111,7 @@ public class ParseOptions
     /// <seealso cref="ParseOptionsAttribute.IsPosix"/>
     public virtual bool IsPosix
     {
-        get => Mode == ParsingMode.LongShort && (ArgumentNameComparison?.IsCaseSensitive() ?? false) &&
+        get => Mode == ParsingMode.LongShort && ArgumentNameComparisonOrDefault.IsCaseSensitive() &&
             ArgumentNameTransform == NameTransform.DashCase && ValueDescriptionTransform == NameTransform.DashCase;
         set
         {
@@ -144,6 +163,16 @@ public class ParseOptions
     public NameTransform? ArgumentNameTransform { get; set; }
 
     /// <summary>
+    /// Gets a value that indicates how names are created for arguments that don't have an explicit
+    /// name.
+    /// </summary>
+    /// <value>
+    /// The value of the <see cref="ArgumentNameTransform"/> property, or <see cref="NameTransform.None"/>
+    /// if that property is <see langword="null"/>.
+    /// </value>
+    public NameTransform ArgumentNameTransformOrDefault => ArgumentNameTransform ?? NameTransform.None;
+
+    /// <summary>
     /// Gets or sets the argument name prefixes to use when parsing the arguments.
     /// </summary>
     /// <value>
@@ -167,6 +196,16 @@ public class ParseOptions
     /// <seealso cref="CommandLineParser.ArgumentNamePrefixes"/>
 
     public IEnumerable<string>? ArgumentNamePrefixes { get; set; }
+
+    /// <summary>
+    /// Gets the argument name prefixes to use when parsing the arguments.
+    /// </summary>
+    /// <value>
+    /// The value of the <see cref="ArgumentNamePrefixes"/> property, or the return value of the
+    /// <see cref="CommandLineParser.GetDefaultArgumentNamePrefixes()"/> method if that property
+    /// is <see langword="null"/>
+    /// </value>
+    public IEnumerable<string> ArgumentNamePrefixesOrDefault => ArgumentNamePrefixes ?? CommandLineParser.GetDefaultArgumentNamePrefixes();
 
     /// <summary>
     /// Gets or sets the argument name prefix to use for long argument names.
@@ -196,6 +235,16 @@ public class ParseOptions
     public string? LongArgumentNamePrefix { get; set; }
 
     /// <summary>
+    /// Gets the argument name prefix to use for long argument names.
+    /// </summary>
+    /// <value>
+    /// The value of the <see cref="ArgumentNamePrefixes"/> property, or the value of the
+    /// <see cref="CommandLineParser.DefaultLongArgumentNamePrefix"/> constant if that property
+    /// is <see langword="null"/>
+    /// </value>
+    public string LongArgumentNamePrefixOrDefault => LongArgumentNamePrefix ?? CommandLineParser.DefaultLongArgumentNamePrefix;
+
+    /// <summary>
     /// Gets or set the type of string comparison to use for argument names.
     /// </summary>
     /// <value>
@@ -214,6 +263,16 @@ public class ParseOptions
     /// </remarks>
     /// <seealso cref="CommandLineParser.ArgumentNameComparison"/>
     public StringComparison? ArgumentNameComparison { get; set; }
+
+    /// <summary>
+    /// Gets the type of string comparison to use for argument names.
+    /// </summary>
+    /// <value>
+    /// The value of the <see cref="ArgumentNameComparison"/> property, or <see cref="StringComparison.OrdinalIgnoreCase"/>
+    /// if that property is <see langword="null"/>.
+    /// </value>
+    public StringComparison ArgumentNameComparisonOrDefault => ArgumentNameComparison ?? StringComparison.OrdinalIgnoreCase;
+
 
     /// <summary>
     /// Gets or sets the <see cref="TextWriter"/> used to print error information if argument
@@ -261,6 +320,15 @@ public class ParseOptions
     public ErrorMode? DuplicateArguments { get; set; }
 
     /// <summary>
+    /// Gets a value indicating whether duplicate arguments are allowed.
+    /// </summary>
+    /// <value>
+    /// The value of the <see cref="DuplicateArguments"/> property, or <see cref="ErrorMode.Error"/>
+    /// if that property is <see langword="null"/>.
+    /// </value>
+    public ErrorMode DuplicateArgumentsOrDefault => DuplicateArguments ?? ErrorMode.Error;
+
+    /// <summary>
     /// Gets or sets a value indicating whether the value of arguments may be separated from the name by white space.
     /// </summary>
     /// <value>
@@ -278,6 +346,16 @@ public class ParseOptions
     /// </remarks>
     /// <seealso cref="CommandLineParser.AllowWhiteSpaceValueSeparator"/>
     public bool? AllowWhiteSpaceValueSeparator { get; set; }
+
+    /// <summary>
+    /// Gets a value indicating whether the value of arguments may be separated from the name by
+    /// white space.
+    /// </summary>
+    /// <value>
+    /// The value of the <see cref="AllowWhiteSpaceValueSeparator"/> property, or <see langword="true"/>
+    /// if that property is <see langword="null"/>.
+    /// </value>
+    public bool AllowWhiteSpaceValueSeparatorOrDefault => AllowWhiteSpaceValueSeparator ?? true;
 
     /// <summary>
     /// Gets or sets the character used to separate the name and the value of an argument.
@@ -312,6 +390,16 @@ public class ParseOptions
     /// </para>
     /// </remarks>
     public char? NameValueSeparator { get; set; }
+
+    /// <summary>
+    /// Gets the character used to separate the name and the value of an argument.
+    /// </summary>
+    /// <value>
+    /// The value of the <see cref="NameValueSeparator"/> property, or the value of the
+    /// <see cref="CommandLineParser.DefaultNameValueSeparator"/> constant if that property is
+    /// <see langword="null"/>.
+    /// </value>
+    public char NameValueSeparatorOrDefault => NameValueSeparator ?? CommandLineParser.DefaultNameValueSeparator;
 
     /// <summary>
     /// Gets or sets a value that indicates a help argument will be automatically added.
@@ -349,6 +437,15 @@ public class ParseOptions
     public bool? AutoHelpArgument { get; set; }
 
     /// <summary>
+    /// Gets a value that indicates a help argument will be automatically added.
+    /// </summary>
+    /// <value>
+    /// The value of the <see cref="AutoHelpArgument"/> property, or <see langword="true"/>
+    /// if that property is <see langword="null"/>.
+    /// </value>
+    public bool AutoHelpArgumentOrDefault => AutoHelpArgument ?? true;
+
+    /// <summary>
     /// Gets or sets a value that indicates a version argument will be automatically added.
     /// </summary>
     /// <value>
@@ -380,6 +477,16 @@ public class ParseOptions
     /// <seealso cref="LocalizedStringProvider.AutomaticVersionName"/>
     /// <seealso cref="LocalizedStringProvider.AutomaticVersionDescription"/>
     public bool? AutoVersionArgument { get; set; }
+
+    /// <summary>
+    /// Gets a value that indicates a version argument will be automatically added.
+    /// </summary>
+    /// <value>
+    /// The value of the <see cref="AutoVersionArgument"/> property, or <see langword="true"/>
+    /// if that property is <see langword="null"/>.
+    /// </value>
+    public bool AutoVersionArgumentOrDefault => AutoVersionArgument ?? true;
+
 
     /// <summary>
     /// Gets or sets a value that indicates whether unique prefixes of an argument are automatically
@@ -416,6 +523,16 @@ public class ParseOptions
     /// </para>
     /// </remarks>
     public bool? AutoPrefixAliases { get; set; }
+
+    /// <summary>
+    /// Gets a value that indicates whether unique prefixes of an argument are automatically used as
+    /// aliases.
+    /// </summary>
+    /// <value>
+    /// The value of the <see cref="AutoPrefixAliases"/> property, or <see langword="true"/>
+    /// if that property is <see langword="null"/>.
+    /// </value>
+    public bool AutoPrefixAliasesOrDefault => AutoPrefixAliases ?? true;
 
     /// <summary>
     /// Gets or sets the color applied to error messages.
@@ -576,6 +693,15 @@ public class ParseOptions
     /// </para>
     /// </remarks>
     public NameTransform? ValueDescriptionTransform { get; set; }
+
+    /// <summary>
+    /// Gets a value that indicates how value descriptions derived from type names are transformed.
+    /// </summary>
+    /// <value>
+    /// The value of the <see cref="ValueDescriptionTransform"/> property, or <see cref="NameTransform.None"/>
+    /// if that property is <see langword="null"/>.
+    /// </value>
+    public NameTransform ValueDescriptionTransformOrDefault => ValueDescriptionTransform ?? NameTransform.None;
 
     /// <summary>
     /// Gets or sets a value that indicates whether the <see cref="CommandLineParser"/> class

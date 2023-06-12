@@ -1700,10 +1700,10 @@ namespace Ookii.CommandLine
             if (IncludeCommandHelpInstruction)
             {
                 var prefix = CommandManager.Options.Mode == ParsingMode.LongShort
-                    ? (CommandManager.Options.LongArgumentNamePrefix ?? CommandLineParser.DefaultLongArgumentNamePrefix)
+                    ? (CommandManager.Options.LongArgumentNamePrefixOrDefault)
                     : (CommandManager.Options.ArgumentNamePrefixes?.FirstOrDefault() ?? CommandLineParser.GetDefaultArgumentNamePrefixes()[0]);
 
-                var transform = CommandManager.Options.ArgumentNameTransform ?? NameTransform.None;
+                var transform = CommandManager.Options.ArgumentNameTransformOrDefault;
                 var argumentName = transform.Apply(CommandManager.Options.StringProvider.AutomaticHelpName());
 
                 Writer.Indent = 0;

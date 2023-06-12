@@ -1190,7 +1190,7 @@ public abstract class CommandLineArgument
                                                     IEnumerable<ShortAliasAttribute>? shortAliasAttributes,
                                                     IEnumerable<ArgumentValidationAttribute>? validationAttributes)
     {
-        var argumentName = DetermineArgumentName(attribute.ArgumentName, memberName, parser.Options.ArgumentNameTransform);
+        var argumentName = DetermineArgumentName(attribute.ArgumentName, memberName, parser.Options.ArgumentNameTransformOrDefault);
         return new ArgumentInfo()
         {
             Parser = parser,
@@ -1236,7 +1236,7 @@ public abstract class CommandLineArgument
         }
 
         var typeName = DetermineValueDescriptionForType(type ?? ElementType);
-        return Parser.Options.ValueDescriptionTransform?.Apply(typeName) ?? typeName;
+        return Parser.Options.ValueDescriptionTransformOrDefault.Apply(typeName);
     }
 
     private static string GetFriendlyTypeName(Type type)
@@ -1399,7 +1399,7 @@ public abstract class CommandLineArgument
             throw new ArgumentNullException(nameof(parser));
         }
 
-        var argumentName = DetermineArgumentName(null, parser.StringProvider.AutomaticHelpName(), parser.Options.ArgumentNameTransform);
+        var argumentName = DetermineArgumentName(null, parser.StringProvider.AutomaticHelpName(), parser.Options.ArgumentNameTransformOrDefault);
         var shortName = parser.StringProvider.AutomaticHelpShortName();
         var shortAlias = char.ToLowerInvariant(argumentName[0]);
         var existingArg = parser.GetArgument(argumentName) ??
@@ -1422,7 +1422,7 @@ public abstract class CommandLineArgument
             throw new ArgumentNullException(nameof(parser));
         }
 
-        var argumentName = DetermineArgumentName(null, parser.StringProvider.AutomaticVersionName(), parser.Options.ArgumentNameTransform);
+        var argumentName = DetermineArgumentName(null, parser.StringProvider.AutomaticVersionName(), parser.Options.ArgumentNameTransformOrDefault);
         if (parser.GetArgument(argumentName) != null)
         {
             return null;
@@ -1569,14 +1569,14 @@ public abstract class CommandLineArgument
         return CancelMode.Abort;
     }
 
-    internal static string DetermineArgumentName(string? explicitName, string memberName, NameTransform? transform)
+    internal static string DetermineArgumentName(string? explicitName, string memberName, NameTransform transform)
     {
         if (explicitName != null)
         {
             return explicitName;
         }
 
-        return transform?.Apply(memberName) ?? memberName;
+        return transform.Apply(memberName);
     }
 
     private string? GetDefaultValueDescription(Type? type)

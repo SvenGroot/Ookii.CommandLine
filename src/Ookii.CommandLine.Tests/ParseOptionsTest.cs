@@ -42,6 +42,20 @@ public class ParseOptionsTest
         Assert.IsNull(options.UseErrorColor);
         Assert.IsNull(options.ValueDescriptionTransform);
         Assert.AreEqual(TextFormat.ForegroundYellow, options.WarningColor);
+
+        // Defaults
+        Assert.IsTrue(options.AllowWhiteSpaceValueSeparatorOrDefault);
+        CollectionAssert.AreEqual(CommandLineParser.GetDefaultArgumentNamePrefixes(), options.ArgumentNamePrefixesOrDefault.ToArray());
+        Assert.AreEqual(NameTransform.None, options.ArgumentNameTransformOrDefault);
+        Assert.IsTrue(options.AutoHelpArgumentOrDefault);
+        Assert.IsTrue(options.AutoPrefixAliasesOrDefault);
+        Assert.IsTrue(options.AutoVersionArgumentOrDefault);
+        Assert.AreEqual(StringComparison.OrdinalIgnoreCase, options.ArgumentNameComparisonOrDefault);
+        Assert.AreEqual(ErrorMode.Error, options.DuplicateArgumentsOrDefault);
+        Assert.AreEqual("--", options.LongArgumentNamePrefixOrDefault);
+        Assert.AreEqual(ParsingMode.Default, options.ModeOrDefault);
+        Assert.AreEqual(':', options.NameValueSeparatorOrDefault);
+        Assert.AreEqual(NameTransform.None, options.ValueDescriptionTransformOrDefault);
     }
 
     [TestMethod]
