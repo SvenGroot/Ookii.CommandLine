@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Ookii.CommandLine.Terminal;
 using System;
+using System.Linq;
 
 namespace Ookii.CommandLine.Tests;
 
@@ -76,5 +77,52 @@ public class ParseOptionsTest
         };
 
         Assert.IsTrue(options.IsPosix);
+    }
+
+    [TestMethod]
+    public void TestMerge()
+    {
+        var options = new ParseOptions();
+        var attribute = new ParseOptionsAttribute();
+        options.Merge(attribute);
+        Assert.IsTrue(options.AllowWhiteSpaceValueSeparator);
+        Assert.IsNull(options.ArgumentNamePrefixes);
+        Assert.AreEqual(NameTransform.None, options.ArgumentNameTransform);
+        Assert.IsTrue(options.AutoHelpArgument);
+        Assert.IsTrue(options.AutoPrefixAliases);
+        Assert.IsTrue(options.AutoVersionArgument);
+        Assert.AreEqual(StringComparison.OrdinalIgnoreCase, options.ArgumentNameComparison);
+        Assert.AreEqual(ErrorMode.Error, options.DuplicateArguments);
+        Assert.IsFalse(options.IsPosix);
+        Assert.IsNull(options.LongArgumentNamePrefix);
+        Assert.AreEqual(ParsingMode.Default, options.Mode);
+        Assert.AreEqual(':', options.NameValueSeparator);
+        Assert.AreEqual(NameTransform.None, options.ValueDescriptionTransform);
+
+        options = new ParseOptions();
+        attribute = new ParseOptionsAttribute()
+        {
+            CaseSensitive = true,
+            ArgumentNamePrefixes = new[] { "+", "++" },
+            LongArgumentNamePrefix = "+++",
+        };
+
+        options.Merge(attribute);
+        Assert.AreEqual(StringComparison.InvariantCulture, options.ArgumentNameComparison);
+        CollectionAssert.AreEqual(new[] { "+", "++" }, options.ArgumentNamePrefixes.ToArray());
+        Assert.AreEqual("+++", options.LongArgumentNamePrefix);
+
+        options = new ParseOptions();
+        attribute = new ParseOptionsAttribute()
+        {
+            IsPosix = true,
+        };
+
+        options.Merge(attribute);
+        Assert.IsTrue(options.IsPosix);
+        Assert.AreEqual(ParsingMode.LongShort, options.Mode);
+        Assert.AreEqual(StringComparison.InvariantCulture, options.ArgumentNameComparison);
+        Assert.AreEqual(NameTransform.DashCase, options.ArgumentNameTransform);
+        Assert.AreEqual(NameTransform.DashCase, options.ValueDescriptionTransform);
     }
 }
