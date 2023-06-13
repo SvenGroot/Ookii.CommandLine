@@ -3,6 +3,7 @@
 using Ookii.CommandLine.Terminal;
 using System;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Ookii.CommandLine
@@ -11,10 +12,10 @@ namespace Ookii.CommandLine
     internal static partial class StringSpanExtensions
     {
 
-        public static async Task WriteToAsync(this ReadOnlyMemory<char> self, TextWriter writer)
+        public static async Task WriteToAsync(this ReadOnlyMemory<char> self, TextWriter writer, CancellationToken cancellationToken)
         {
 #if NETSTANDARD2_1_OR_GREATER || NET6_0_OR_GREATER
-            await writer.WriteAsync(self);
+            await writer.WriteAsync(self, cancellationToken);
 #else
             await writer.WriteAsync(self.ToString());
 #endif

@@ -3,38 +3,47 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 
-namespace Ookii.CommandLine
+namespace Ookii.CommandLine;
+
+internal partial class RingBuffer
 {
-    internal partial class RingBuffer
+    public async Task WriteToAsync(TextWriter writer, int length, CancellationToken cancellationToken)
     {
-        public async Task WriteToAsync(TextWriter writer, int length)
+        if (length > Size)
         {
-            if (length > Size)
-            {
-                throw new ArgumentOutOfRangeException(nameof(length));
-            }
-
-            var remaining = _buffer.Length - _bufferStart;
-            if (remaining < length)
-            {
-                await writer.WriteAsync(_buffer, _bufferStart, remaining);
-                remaining = length - remaining;
-                await writer.WriteAsync(_buffer, 0, remaining);
-                _bufferStart = remaining;
-            }
-            else
-            {
-                await writer.WriteAsync(_buffer, _bufferStart, length);
-                _bufferStart += length;
-                Debug.Assert(_bufferStart <= _buffer.Length);
-            }
-
-            if (_bufferEnd != null && _bufferStart == _bufferEnd.Value)
-            {
-                _bufferEnd = null;
-            }
+            throw new ArgumentOutOfRangeException(nameof(length));
         }
+
+        var remaining = _buffer.Length - _bufferStart;
+        if (remaining < length)
+        {
+            await WriteAsyncHelper(writer, _buffer, _bufferStart, remaining, cancellationToken);
+            remaining = length - remaining;
+            await WriteAsyncHelper(writer, _buffer, 0, remaining, cancellationToken);
+            _bufferStart = remaining;
+        }
+        else
+        {
+            await WriteAsyncHelper(writer, _buffer, _bufferStart, length, cancellationToken);
+            _bufferStart += length;
+            Debug.Assert(_bufferStart <= _buffer.Length);
+        }
+
+        if (_bufferEnd != null && _bufferStart == _bufferEnd.Value)
+        {
+            _bufferEnd = null;
+        }
+    }
+
+    private async Task WriteAsyncHelper(TextWriter writer, char[] buffer, int index, int length, CancellationToken cancellationToken)
+    {
+#if NETSTANDARD2_1_OR_GREATER || NET6_0_OR_GREATER
+        await writer.WriteAsync(buffer.AsMemory(index, length), cancellationToken);
+#else
+        await writer.WriteAsync(buffer, index, length);
+#endif
     }
 }

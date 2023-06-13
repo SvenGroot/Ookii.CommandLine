@@ -657,8 +657,7 @@ namespace Ookii.CommandLine
                 return Task.FromCanceled(cancellationToken);
             }
 
-            // TODO: Use cancellation token if possible.
-            _asyncWriteTask = WriteCoreAsync(buffer);
+            _asyncWriteTask = WriteCoreAsync(buffer, cancellationToken);
             return _asyncWriteTask;
         }
 
@@ -715,6 +714,7 @@ namespace Ookii.CommandLine
         /// Insert an additional new line if the line buffer is not empty. This has no effect if
         /// the line buffer is empty or the <see cref="MaximumLineLength"/> property is zero.
         /// </param>
+        /// <param name="cancellationToken">A token that can be used to cancel the operation.</param>
         /// <returns>A task that represents the asynchronous flush operation.</returns>
         /// <remarks>
         /// <para>
@@ -736,9 +736,9 @@ namespace Ookii.CommandLine
         ///   <paramref name="insertNewLine"/> set to <see langword="true"/>.
         /// </para>
         /// </remarks>
-        public Task FlushAsync(bool insertNewLine)
+        public Task FlushAsync(bool insertNewLine, CancellationToken cancellationToken = default)
         {
-            var task = FlushCoreAsync(insertNewLine);
+            var task = FlushCoreAsync(insertNewLine, cancellationToken);
             _asyncWriteTask = task;
             return task;
         }
@@ -763,6 +763,7 @@ namespace Ookii.CommandLine
         /// <summary>
         /// Restarts writing on the beginning of the line, without indenting that line.
         /// </summary>
+        /// <param name="cancellationToken">A token that can be used to cancel the operation.</param>
         /// <returns>
         ///   A task that represents the asynchronous reset operation.
         /// </returns>
@@ -778,9 +779,9 @@ namespace Ookii.CommandLine
         ///   the output position is simply reset to the beginning of the line without writing anything to the base writer.
         /// </para>
         /// </remarks>
-        public Task ResetIndentAsync()
+        public Task ResetIndentAsync(CancellationToken cancellationToken = default)
         {
-            var task = ResetIndentCoreAsync();
+            var task = ResetIndentCoreAsync(cancellationToken);
             _asyncWriteTask = task;
             return task;
         }
@@ -843,6 +844,8 @@ namespace Ookii.CommandLine
         private partial void FlushCore(bool insertNewLine);
 
         private partial void ResetIndentCore();
+
+        private static partial void WriteBlankLine(TextWriter writer);
 
         private static int GetLineLengthForConsole()
         {

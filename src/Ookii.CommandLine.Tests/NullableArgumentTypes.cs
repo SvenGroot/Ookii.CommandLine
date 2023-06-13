@@ -43,6 +43,22 @@ class NullReturningIntConverter : ArgumentConverter
 [GeneratedParser]
 partial class NullableArguments
 {
+    [CommandLineArgument("constructorNullable", Position = 0)]
+    [ArgumentConverter(typeof(NullReturningStringConverter))]
+    public string? ConstructorNullable { get; set; }
+
+    [CommandLineArgument("constructorNonNullable", Position = 1)]
+    [ArgumentConverter(typeof(NullReturningStringConverter))]
+    public string ConstructorNonNullable { get; set; } = default!;
+
+    [CommandLineArgument("constructorValueType", Position = 2)]
+    [ArgumentConverter(typeof(NullReturningIntConverter))]
+    public int ConstructorValueType { get; set; }
+
+    [CommandLineArgument("constructorNullableValueType", Position = 3)]
+    [ArgumentConverter(typeof(NullReturningIntConverter))]
+    public int? ConstructorNullableValueType { get; set; }
+
     [CommandLineArgument]
     [ArgumentConverter(typeof(NullReturningStringConverter))]
     public string? Nullable { get; set; } = "NotNullDefaultValue";
