@@ -6,6 +6,12 @@ namespace Ookii.CommandLine.Conversion;
 /// <summary>
 /// A converter for arguments with enumeration values.
 /// </summary>
+/// <remarks>
+/// <para>
+///   If conversion fails, this converter will provide an error message that includes all the
+///   allowed values for the enumeration.
+/// </para>
+/// </remarks>
 /// <threadsafety static="true" instance="true"/>
 public class EnumConverter : ArgumentConverter
 {

@@ -63,8 +63,10 @@ namespace Ookii.CommandLine.Validation
         /// </value>
         /// <remarks>
         /// <para>
-        ///   This error message is only used if the validation fails, which only the case for
-        ///   undefined numerical values. Strings that don't match the name don't use this error.
+        ///   This property is only used if the validation fails, which only the case for
+        ///   undefined numerical values. Other strings that don't match the name of one of the
+        ///   defined constants use the error message from the converter, which in the case of
+        ///   the <see cref="EnumConverter"/> always shows the possible values.
         /// </para>
         /// </remarks>
         public bool IncludeValuesInErrorMessage { get; set; }
