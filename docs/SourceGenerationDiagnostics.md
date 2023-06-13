@@ -858,7 +858,7 @@ Instead, the attribute should be applied to the assembly:
 [assembly: ApplicationFriendlyName("My Application")]
 ```
 
-### OCL0038
+### OCL0039
 
 The initial value of a property will not be included in the usage help, because it uses an
 expression type that is not supported by the source generator. Supported expression types are

@@ -375,6 +375,6 @@ internal static class Diagnostics
                 Category,
                 severity,
                 isEnabledByDefault: true,
-                helpLinkUri: $"https://www.ookii.org/Link/CommandLineGeneratorError#{id}"),
+                helpLinkUri: $"https://www.ookii.org/Link/CommandLineGeneratorError#{id.ToLowerInvariant()}"),
             location, messageArgs);
 }
