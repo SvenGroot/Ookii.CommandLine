@@ -175,7 +175,7 @@ namespace Ookii.CommandLine.Validation
         /// </para>
         /// </remarks>
         public virtual bool IsSpanValid(CommandLineArgument argument, ReadOnlySpan<char> value)
-            => throw new NotImplementedException();
+            => throw new NotImplementedException(Properties.Resources.IsSpanValidNotImplemented);
 
         /// <summary>
         /// Gets the error message to display if validation failed.

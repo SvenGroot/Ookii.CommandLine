@@ -414,4 +414,16 @@
   <data name="AutoPositionNotSupportedFormat" xml:space="preserve">
     <value>The member '{0}' uses CommandLineArgumentAttribute.IsPositional without setting an explicit Position, which is only supported when the GeneratedParserAttribute is used.</value>
   </data>
+  <data name="InvalidMethodAccess" xml:space="preserve">
+    <value>Cannot call the method for this argument.</value>
+  </data>
+  <data name="InvalidPropertyAccess" xml:space="preserve">
+    <value>Cannot get or set the property for this argument.</value>
+  </data>
+  <data name="IsSpanValidNotImplemented" xml:space="preserve">
+    <value>The IsSpanValid method must be overridden if CanValidateSpan is set to true.</value>
+  </data>
+  <data name="NullPropertyValue" xml:space="preserve">
+    <value>A read-only property for a multi-value or dictionary argument returned null.</value>
+  </data>
 </root>

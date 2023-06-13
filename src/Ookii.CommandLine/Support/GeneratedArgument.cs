@@ -124,7 +124,7 @@ public class GeneratedArgument : CommandLineArgument
     {
         if (_callMethod == null)
         {
-            throw new InvalidOperationException();
+            throw new InvalidOperationException(Properties.Resources.InvalidMethodAccess);
         }
 
         return _callMethod(value, this.Parser);
@@ -135,7 +135,7 @@ public class GeneratedArgument : CommandLineArgument
     {
         if (_getProperty == null)
         {
-            throw new InvalidOperationException();
+            throw new InvalidOperationException(Properties.Resources.InvalidPropertyAccess);
         }
 
         return _getProperty(target);
@@ -146,7 +146,7 @@ public class GeneratedArgument : CommandLineArgument
     {
         if (_setProperty == null)
         {
-            throw new InvalidOperationException();
+            throw new InvalidOperationException(Properties.Resources.InvalidPropertyAccess);
         }
 
         _setProperty(target, value);

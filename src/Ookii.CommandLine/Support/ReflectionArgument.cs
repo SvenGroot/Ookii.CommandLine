@@ -45,7 +45,7 @@ internal class ReflectionArgument : CommandLineArgument
     {
         if (_property == null)
         {
-            throw new InvalidOperationException();
+            throw new InvalidOperationException(Properties.Resources.InvalidPropertyAccess);
         }
 
         _property.SetValue(target, value);
@@ -55,7 +55,7 @@ internal class ReflectionArgument : CommandLineArgument
     {
         if (_property == null)
         {
-            throw new InvalidOperationException();
+            throw new InvalidOperationException(Properties.Resources.InvalidPropertyAccess);
         }
 
         return _property.GetValue(target);
@@ -65,7 +65,7 @@ internal class ReflectionArgument : CommandLineArgument
     {
         if (_method is not MethodArgumentInfo info)
         {
-            throw new InvalidOperationException();
+            throw new InvalidOperationException(Properties.Resources.InvalidMethodAccess);
         }
 
         int parameterCount = (info.HasValueParameter ? 1 : 0) + (info.HasParserParameter ? 1 : 0);

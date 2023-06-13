@@ -376,6 +376,15 @@ namespace Ookii.CommandLine.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cannot call the method for this argument..
+        /// </summary>
+        internal static string InvalidMethodAccess {
+            get {
+                return ResourceManager.GetString("InvalidMethodAccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The method &apos;{0}&apos; has an unsupported signature..
         /// </summary>
         internal static string InvalidMethodSignatureFormat {
@@ -390,6 +399,15 @@ namespace Ookii.CommandLine.Properties {
         internal static string InvalidOptionalArgumentOrder {
             get {
                 return ResourceManager.GetString("InvalidOptionalArgumentOrder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot get or set the property for this argument..
+        /// </summary>
+        internal static string InvalidPropertyAccess {
+            get {
+                return ResourceManager.GetString("InvalidPropertyAccess", resourceCulture);
             }
         }
         
@@ -417,6 +435,15 @@ namespace Ookii.CommandLine.Properties {
         internal static string InvalidTypeConverter {
             get {
                 return ResourceManager.GetString("InvalidTypeConverter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The IsSpanValid method must be overridden if CanValidateSpan is set to true..
+        /// </summary>
+        internal static string IsSpanValidNotImplemented {
+            get {
+                return ResourceManager.GetString("IsSpanValidNotImplemented", resourceCulture);
             }
         }
         
@@ -543,6 +570,15 @@ namespace Ookii.CommandLine.Properties {
         internal static string NullArgumentValueFormat {
             get {
                 return ResourceManager.GetString("NullArgumentValueFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A read-only property for a multi-value or dictionary argument returned null..
+        /// </summary>
+        internal static string NullPropertyValue {
+            get {
+                return ResourceManager.GetString("NullPropertyValue", resourceCulture);
             }
         }
         

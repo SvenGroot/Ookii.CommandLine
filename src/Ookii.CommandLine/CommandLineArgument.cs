@@ -67,7 +67,9 @@ public abstract class CommandLineArgument
                 return;
             }
 
-            var list = (ICollection<T?>?)argument.GetProperty(target) ?? throw new InvalidOperationException();
+            var list = (ICollection<T?>?)argument.GetProperty(target)
+                ?? throw new InvalidOperationException(Properties.Resources.NullPropertyValue);
+
             list.Clear();
             foreach (var value in _values)
             {
@@ -107,7 +109,7 @@ public abstract class CommandLineArgument
             }
 
             var dictionary = (IDictionary<TKey, TValue?>?)argument.GetProperty(target)
-                ?? throw new InvalidOperationException();
+                ?? throw new InvalidOperationException(Properties.Resources.NullPropertyValue);
 
             dictionary.Clear();
             foreach (var pair in _dictionary)
@@ -154,7 +156,7 @@ public abstract class CommandLineArgument
 
         public void ApplyValue(CommandLineArgument argument, object target)
         {
-            throw new InvalidOperationException();
+            throw new InvalidOperationException(Properties.Resources.InvalidPropertyAccess);
         }
 
         public CancelMode SetValue(CommandLineArgument argument, object? value)
@@ -224,8 +226,12 @@ public abstract class CommandLineArgument
         }
 
         protected override CancelMode CallMethod(object? value) => CancelMode.Abort;
-        protected override object? GetProperty(object target) => throw new InvalidOperationException();
-        protected override void SetProperty(object target, object? value) => throw new InvalidOperationException();
+
+        protected override object? GetProperty(object target)
+            => throw new InvalidOperationException(Properties.Resources.InvalidPropertyAccess);
+
+        protected override void SetProperty(object target, object? value)
+            => throw new InvalidOperationException(Properties.Resources.InvalidPropertyAccess);
     }
 
     private class VersionArgument : CommandLineArgument
@@ -256,8 +262,13 @@ public abstract class CommandLineArgument
         }
 
         protected override CancelMode CallMethod(object? value) => AutomaticVersion(Parser);
-        protected override object? GetProperty(object target) => throw new InvalidOperationException();
-        protected override void SetProperty(object target, object? value) => throw new InvalidOperationException();
+
+        protected override object? GetProperty(object target)
+            => throw new InvalidOperationException(Properties.Resources.InvalidPropertyAccess);
+
+        protected override void SetProperty(object target, object? value)
+            => throw new InvalidOperationException(Properties.Resources.InvalidPropertyAccess);
+
     }
 
     internal struct ArgumentInfo
