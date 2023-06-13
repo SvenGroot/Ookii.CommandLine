@@ -73,7 +73,7 @@ public class KeyValuePairConverter<TKey, TValue> : ArgumentConverter
     /// Initializes a new instance of the <see cref="KeyValuePairConverter{TKey, TValue}"/> class.
     /// </summary>
 #if NET6_0_OR_GREATER
-    [RequiresUnreferencedCode("Trimming cannot be used when determining converter types via reflection.")]
+    [RequiresUnreferencedCode("Key and value converters cannot be statically determined.")]
 #endif
     public KeyValuePairConverter()
         : this(typeof(TKey).GetStringConverter(null), typeof(TValue).GetStringConverter(null), null, true)

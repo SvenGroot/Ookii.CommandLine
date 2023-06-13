@@ -89,7 +89,7 @@ namespace Ookii.CommandLine
         }
 
 #if NET6_0_OR_GREATER
-        [RequiresUnreferencedCode("Trimming cannot be used when determining the default converter via reflection.")]
+        [RequiresUnreferencedCode("Argument information cannot be statically determined using reflection. Consider using the GeneratedParserAttribute.", Url = CommandLineParser.UnreferencedCodeHelpUrl)]
 #endif
         public static ArgumentConverter GetStringConverter(this Type type, Type? converterType)
         {

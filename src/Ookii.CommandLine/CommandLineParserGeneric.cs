@@ -42,7 +42,7 @@ namespace Ookii.CommandLine
         ///   <inheritdoc cref="CommandLineParser(Type, ParseOptions?)"/>
         /// </remarks>
 #if NET6_0_OR_GREATER
-        [RequiresUnreferencedCode("Trimming cannot be used when determining arguments via reflection. Use the GeneratedArgumentsParserAttribute instead.")]
+        [RequiresUnreferencedCode("Argument information cannot be statically determined using reflection. Consider using the GeneratedParserAttribute.", Url = UnreferencedCodeHelpUrl)]
 #endif
         public CommandLineParser(ParseOptions? options = null)
             : base(typeof(T), options)

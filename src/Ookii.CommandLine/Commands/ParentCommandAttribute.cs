@@ -67,7 +67,7 @@ public sealed class ParentCommandAttribute : Attribute
     public string ParentCommandTypeName { get; }
 
 #if NET6_0_OR_GREATER
-    [RequiresUnreferencedCode("Trimming cannot be used when determining commands via reflection. Use the GeneratedCommandManagerAttribute instead.")]
+    [RequiresUnreferencedCode("Command information cannot be statically determined using reflection. Consider using the GeneratedParserAttribute and GeneratedCommandManagerAttribute.", Url = CommandLineParser.UnreferencedCodeHelpUrl)]
 #endif
     internal Type GetParentCommandType() => Type.GetType(ParentCommandTypeName, true)!;
 }

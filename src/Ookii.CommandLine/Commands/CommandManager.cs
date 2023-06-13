@@ -73,7 +73,7 @@ public class CommandManager
     /// </note>
     /// </remarks>
 #if NET6_0_OR_GREATER
-    [RequiresUnreferencedCode("Trimming is not possible when determining commands using reflection. Use the GeneratedCommandManagerAttribute instead.")]
+    [RequiresUnreferencedCode("Command information cannot be statically determined using reflection. Consider using the GeneratedParserAttribute and GeneratedCommandManagerAttribute.", Url = CommandLineParser.UnreferencedCodeHelpUrl)]
 #endif
     public CommandManager(CommandOptions? options = null)
         : this(new ReflectionCommandProvider(Assembly.GetCallingAssembly(), Assembly.GetCallingAssembly()), options)
@@ -123,7 +123,7 @@ public class CommandManager
     /// </note>
     /// </remarks>
 #if NET6_0_OR_GREATER
-    [RequiresUnreferencedCode("Trimming is not possible when determining commands using reflection. Use the GeneratedCommandManagerAttribute instead.")]
+    [RequiresUnreferencedCode("Command information cannot be statically determined using reflection. Consider using the GeneratedParserAttribute and GeneratedCommandManagerAttribute.", Url = CommandLineParser.UnreferencedCodeHelpUrl)]
 #endif
     public CommandManager(Assembly assembly, CommandOptions? options = null)
         : this(new ReflectionCommandProvider(assembly ?? throw new ArgumentNullException(nameof(assembly)), Assembly.GetCallingAssembly()), options)
@@ -155,7 +155,7 @@ public class CommandManager
     /// </note>
     /// </remarks>
 #if NET6_0_OR_GREATER
-    [RequiresUnreferencedCode("Trimming is not possible when determining commands using reflection. Use the GeneratedCommandManagerAttribute instead.")]
+    [RequiresUnreferencedCode("Command information cannot be statically determined using reflection. Consider using the GeneratedParserAttribute and GeneratedCommandManagerAttribute.", Url = CommandLineParser.UnreferencedCodeHelpUrl)]
 #endif
     public CommandManager(IEnumerable<Assembly> assemblies, CommandOptions? options = null)
         : this(new ReflectionCommandProvider(assemblies ?? throw new ArgumentNullException(nameof(assemblies)), Assembly.GetCallingAssembly()), options)

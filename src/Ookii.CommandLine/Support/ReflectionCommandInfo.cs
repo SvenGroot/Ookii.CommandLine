@@ -14,7 +14,7 @@ namespace Ookii.CommandLine.Support;
 
 
 #if NET6_0_OR_GREATER
-[RequiresUnreferencedCode("Trimming is not possible when determining commands using reflection. Use the GeneratedCommandManagerAttribute instead.")]
+[RequiresUnreferencedCode("Command information cannot be statically determined using reflection. Consider using the GeneratedParserAttribute and GeneratedCommandManagerAttribute.", Url = CommandLineParser.UnreferencedCodeHelpUrl)]
 #endif
 internal class ReflectionCommandInfo : CommandInfo
 {

@@ -259,6 +259,8 @@ public class CommandLineParser
     /// </remarks>
     public event EventHandler<DuplicateArgumentEventArgs>? DuplicateArgument;
 
+    internal const string UnreferencedCodeHelpUrl = "https://www.ookii.org/Link/CommandLineSourceGeneration";
+
     /// <summary>
     /// Initializes a new instance of the <see cref="CommandLineParser"/> class using the
     /// specified arguments type and options.
@@ -295,7 +297,7 @@ public class CommandLineParser
     /// </para>
     /// </remarks>
 #if NET6_0_OR_GREATER
-    [RequiresUnreferencedCode("Trimming cannot be used when determining arguments via reflection. Use the GeneratedArgumentsParserAttribute instead.")]
+    [RequiresUnreferencedCode("Argument information cannot be statically determined using reflection. Consider using the GeneratedParserAttribute.", Url = UnreferencedCodeHelpUrl)]
 #endif
     public CommandLineParser(Type argumentsType, ParseOptions? options = null)
         : this(GetArgumentProvider(argumentsType ?? throw new ArgumentNullException(nameof(argumentsType)), options), options)
@@ -1052,7 +1054,7 @@ public class CommandLineParser
     /// </para>
     /// </remarks>
 #if NET6_0_OR_GREATER
-    [RequiresUnreferencedCode("Trimming cannot be used when determining arguments via reflection. Use the GeneratedArgumentsParserAttribute instead.")]
+    [RequiresUnreferencedCode("Argument information cannot be statically determined using reflection. Consider using the GeneratedParserAttribute.", Url = UnreferencedCodeHelpUrl)]
 #endif
     public static T? Parse<T>(ParseOptions? options = null)
         where T : class
@@ -1094,7 +1096,7 @@ public class CommandLineParser
     ///   <inheritdoc cref="Parse{T}(ParseOptions?)"/>
     /// </remarks>
 #if NET6_0_OR_GREATER
-    [RequiresUnreferencedCode("Trimming cannot be used when determining arguments via reflection. Use the GeneratedArgumentsParserAttribute instead.")]
+    [RequiresUnreferencedCode("Argument information cannot be statically determined using reflection. Consider using the GeneratedParserAttribute.", Url = UnreferencedCodeHelpUrl)]
 #endif
     public static T? Parse<T>(string[] args, int index, ParseOptions? options = null)
         where T : class
@@ -1132,7 +1134,7 @@ public class CommandLineParser
     ///   <inheritdoc cref="Parse{T}(ParseOptions?)"/>
     /// </remarks>
 #if NET6_0_OR_GREATER
-    [RequiresUnreferencedCode("Trimming cannot be used when determining arguments via reflection. Use the GeneratedArgumentsParserAttribute instead.")]
+    [RequiresUnreferencedCode("Argument information cannot be statically determined using reflection. Consider using the GeneratedParserAttribute.", Url = UnreferencedCodeHelpUrl)]
 #endif
     public static T? Parse<T>(string[] args, ParseOptions? options = null)
         where T : class
@@ -1774,7 +1776,7 @@ public class CommandLineParser
     }
 
 #if NET6_0_OR_GREATER
-    [RequiresUnreferencedCode("Trimming cannot be used when determining arguments via reflection. Use the GeneratedArgumentsParserAttribute instead.")]
+    [RequiresUnreferencedCode("Argument information cannot be statically determined using reflection. Consider using the GeneratedParserAttribute.", Url = UnreferencedCodeHelpUrl)]
 #endif
     private static ArgumentProvider GetArgumentProvider(Type type, ParseOptions? options)
     {
