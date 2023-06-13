@@ -30,11 +30,11 @@ public class EnumConverter : ArgumentConverter
         }
         catch (ArgumentException ex)
         {
-            throw new FormatException(ex.Message, ex);
+            throw CreateException(value, ex, argument);
         }
         catch (OverflowException ex)
         {
-            throw new FormatException(ex.Message, ex);
+            throw CreateException(value, ex, argument);
         }
     }
 
@@ -48,12 +48,18 @@ public class EnumConverter : ArgumentConverter
         }
         catch (ArgumentException ex)
         {
-            throw new FormatException(ex.Message, ex);
+            throw CreateException(value.ToString(), ex, argument);
         }
         catch (OverflowException ex)
         {
-            throw new FormatException(ex.Message, ex);
+            throw CreateException(value.ToString(), ex, argument);
         }
     }
 #endif
+
+    private Exception CreateException(string value, Exception inner, CommandLineArgument argument)
+    {
+        var message = argument.Parser.StringProvider.ValidateEnumValueFailed(argument.ArgumentName, _enumType, value, true);
+        return new CommandLineArgumentException(message, argument.ArgumentName, CommandLineArgumentErrorCategory.ArgumentValueConversion, inner);
+    }
 }

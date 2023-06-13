@@ -997,12 +997,12 @@ public partial class CommandLineParserTest
         CollectionAssert.AreEqual(new[] { "foo", "bar", "baz", "ban" }, result.Arg4);
 
         // Enum validator
-        CheckThrows(parser, new[] { "-Day", "foo" }, CommandLineArgumentErrorCategory.ArgumentValueConversion, "Day", typeof(FormatException), remainingArgumentCount: 2);
+        CheckThrows(parser, new[] { "-Day", "foo" }, CommandLineArgumentErrorCategory.ArgumentValueConversion, "Day", typeof(ArgumentException), remainingArgumentCount: 2);
         CheckThrows(parser, new[] { "-Day", "9" }, CommandLineArgumentErrorCategory.ValidationFailed, "Day", remainingArgumentCount: 2);
-        CheckThrows(parser, new[] { "-Day", "" }, CommandLineArgumentErrorCategory.ArgumentValueConversion, "Day", typeof(FormatException), remainingArgumentCount: 2);
+        CheckThrows(parser, new[] { "-Day", "" }, CommandLineArgumentErrorCategory.ArgumentValueConversion, "Day", typeof(ArgumentException), remainingArgumentCount: 2);
         result = parser.Parse(new[] { "-Day", "1" });
         Assert.AreEqual(DayOfWeek.Monday, result.Day);
-        CheckThrows(parser, new[] { "-Day2", "foo" }, CommandLineArgumentErrorCategory.ArgumentValueConversion, "Day2", typeof(FormatException), remainingArgumentCount: 2);
+        CheckThrows(parser, new[] { "-Day2", "foo" }, CommandLineArgumentErrorCategory.ArgumentValueConversion, "Day2", typeof(ArgumentException), remainingArgumentCount: 2);
         CheckThrows(parser, new[] { "-Day2", "9" }, CommandLineArgumentErrorCategory.ValidationFailed, "Day2", remainingArgumentCount: 2);
         result = parser.Parse(new[] { "-Day2", "1" });
         Assert.AreEqual(DayOfWeek.Monday, result.Day2);
