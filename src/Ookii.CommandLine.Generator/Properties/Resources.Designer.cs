@@ -511,6 +511,24 @@ namespace Ookii.CommandLine.Generator.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The arguments class &apos;{0}&apos; contains positional arguments using an explicit Position value, and ones using IsPositional for member-based ordering, which is not allowed. Note that this may include arguments defined by a base class..
+        /// </summary>
+        internal static string MixedImplicitExplicitPositionsMessageFormat {
+            get {
+                return ResourceManager.GetString("MixedImplicitExplicitPositionsMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Positional arguments with an explicit position value and those with a position inferred from the member order cannot be mixed..
+        /// </summary>
+        internal static string MixedImplicitExplicitPositionsTitle {
+            get {
+                return ResourceManager.GetString("MixedImplicitExplicitPositionsTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to No command line argument converter exists for type {0} used by the argument defined by {1}.{2}, and none could be generated. Use the Ookii.CommandLine.Conversion.ArgumentConverterAttribute to specify a custom converter..
         /// </summary>
         internal static string NoConverterMessageFormat {

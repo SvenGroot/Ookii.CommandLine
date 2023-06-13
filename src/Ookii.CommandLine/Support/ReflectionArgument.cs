@@ -130,6 +130,11 @@ internal class ReflectionArgument : CommandLineArgument
         var attribute = member.GetCustomAttribute<CommandLineArgumentAttribute>()
             ?? throw new ArgumentException(Properties.Resources.MissingArgumentAttribute, nameof(method));
 
+        if (attribute.IsPositional && attribute.Position < 0)
+        {
+            throw new NotSupportedException(Properties.Resources.AutoPositionNotSupportedFormat);
+        }
+
         var multiValueSeparatorAttribute = member.GetCustomAttribute<MultiValueSeparatorAttribute>();
         var descriptionAttribute = member.GetCustomAttribute<DescriptionAttribute>();
         var valueDescriptionAttribute = member.GetCustomAttribute<ValueDescriptionAttribute>();

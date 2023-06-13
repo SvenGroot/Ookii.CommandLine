@@ -160,6 +160,15 @@ namespace Ookii.CommandLine.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The member &apos;{0}&apos; uses CommandLineArgumentAttribute.IsPositional without setting an explicit Position, which is only supported when the GeneratedParserAttribute is used..
+        /// </summary>
+        internal static string AutoPositionNotSupportedFormat {
+            get {
+                return ResourceManager.GetString("AutoPositionNotSupportedFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The arguments are not valid..
         /// </summary>
         internal static string ClassValidationFailed {
@@ -376,7 +385,7 @@ namespace Ookii.CommandLine.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The command line constructor cannot have non-optional arguments after an optional argument..
+        ///   Looks up a localized string similar to The command line arguments class cannot have non-optional arguments after an optional argument..
         /// </summary>
         internal static string InvalidOptionalArgumentOrder {
             get {

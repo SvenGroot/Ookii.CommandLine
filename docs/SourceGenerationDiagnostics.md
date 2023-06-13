@@ -349,13 +349,11 @@ For example, the following code triggers this error:
 
 ```csharp
 [GeneratedParser]
-[ParseOptions(Mode = ParsingMode.LongShort)]
 partial class Arguments
 {
     // ERROR: No long or short name (IsShort is false by default).
     [CommandLineAttribute(IsLong = false)]
-    [ArgumentConverter("MyNamespace.MyConverter")]
-    public CustomType? Argument { get; set; }
+    public string? Argument { get; set; }
 }
 ```
 
@@ -378,6 +376,33 @@ version by default.
 If you cannot change the language version, remove the `GeneratedParserAttribute` or
 `CommandManagerAttribute` and use the `CommandLineParser<T>` class, `CommandLineParser.Parse<T>()`
 methods, or `CommandManager` class directly to use reflection instead of source generation.
+
+### OCL0038
+
+Positional arguments using an explicit position with the `CommandLineArgumentAttribute.Position`
+property, and those using a position derived from their member ordering using the
+`CommandLineArgumentAttribute.IsPositional` property cannot be mixed. Note that this includes any
+arguments defined in a base class.
+
+For example, the following code triggers this error:
+
+```csharp
+// ERROR: Argument1 uses automatic positioning, and Argument2 uses an explicit position.
+[GeneratedParser]
+partial class Arguments
+{
+    [CommandLineAttribute(IsPositional = true)]
+    public string? Argument1 { get; set; }
+
+    [CommandLineAttribute(Position = 0)]
+    public string? Argument2 { get; set; }
+}
+```
+
+Please switch all arguments to use either explicit or automatic positions.
+
+Note that using `CommandLineArgumentAttribute.IsPositional` without an explicit position does not
+work without the `GeneratedParserAttribute`.
 
 ## Warnings
 

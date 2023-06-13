@@ -46,6 +46,7 @@ public class GeneratedArgument : CommandLineArgument
     /// <param name="keyType"></param>
     /// <param name="valueType"></param>
     /// <param name="allowsNull"></param>
+    /// <param name="position"></param>
     /// <param name="defaultValueDescription"></param>
     /// <param name="defaultKeyDescription"></param>
     /// <param name="requiredProperty"></param>
@@ -72,6 +73,7 @@ public class GeneratedArgument : CommandLineArgument
                                            ArgumentConverter converter,
                                            bool allowsNull,
                                            string defaultValueDescription,
+                                           int? position = null,
                                            string? defaultKeyDescription = null,
                                            bool requiredProperty = false,
                                            object? alternateDefaultValue = null,
@@ -89,6 +91,12 @@ public class GeneratedArgument : CommandLineArgument
                                            Func<object, object?>? getProperty = null,
                                            Func<object?, CommandLineParser, CancelMode>? callMethod = null)
     {
+        if (position is int pos)
+        {
+            Debug.Assert(attribute.IsPositional && attribute.Position < 0);
+            attribute.Position = pos;
+        }
+
         var info = CreateArgumentInfo(parser, argumentType, allowsNull, requiredProperty, memberName, attribute,
             multiValueSeparatorAttribute, descriptionAttribute, valueDescriptionAttribute, allowDuplicateDictionaryKeys,
             keyValueSeparatorAttribute, aliasAttributes, shortAliasAttributes, validationAttributes);

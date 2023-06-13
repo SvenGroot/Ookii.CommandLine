@@ -358,6 +358,14 @@ internal static class Diagnostics
         location,
         symbol.ToDisplayString());
 
+    public static Diagnostic MixedImplicitExplicitPositions(ISymbol symbol) => CreateDiagnostic(
+        "OCL0039",
+        nameof(Resources.MixedImplicitExplicitPositionsTitle),
+        nameof(Resources.MixedImplicitExplicitPositionsMessageFormat),
+        DiagnosticSeverity.Error,
+        symbol.Locations.FirstOrDefault(),
+        symbol.ToDisplayString());
+
     private static Diagnostic CreateDiagnostic(string id, string titleResource, string messageResource, DiagnosticSeverity severity, Location? location, params object?[]? messageArgs)
         => Diagnostic.Create(
             new DiagnosticDescriptor(

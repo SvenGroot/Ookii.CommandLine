@@ -1291,6 +1291,32 @@ public partial class CommandLineParserTest
         Assert.AreEqual("Ookii.CommandLine.Tests.Commands", parser.ApplicationFriendlyName);
     }
 
+    [TestMethod]
+    public void TestAutoPosition()
+    {
+        var parser = AutoPositionArguments.CreateParser();
+        VerifyArguments(parser.Arguments, new[]
+        {
+            new ExpectedArgument("BaseArg1", typeof(string), ArgumentKind.SingleValue) { Position = 0, IsRequired = true },
+            new ExpectedArgument("BaseArg2", typeof(int), ArgumentKind.SingleValue) { Position = 1 },
+            new ExpectedArgument("Arg1", typeof(string), ArgumentKind.SingleValue) { Position = 2 },
+            new ExpectedArgument("Arg2", typeof(int), ArgumentKind.SingleValue) { Position = 3 },
+            new ExpectedArgument("Arg3", typeof(int), ArgumentKind.SingleValue),
+            new ExpectedArgument("BaseArg3", typeof(int), ArgumentKind.SingleValue),
+            new ExpectedArgument("Help", typeof(bool), ArgumentKind.Method) { MemberName = "AutomaticHelp", Description = "Displays this help message.", IsSwitch = true, Aliases = new[] { "?", "h" } },
+            new ExpectedArgument("Version", typeof(bool), ArgumentKind.Method) { MemberName = "AutomaticVersion", Description = "Displays version information.", IsSwitch = true },
+        });
+
+        try
+        {
+            parser = new CommandLineParser<AutoPositionArguments>();
+            Debug.Fail("Expected exception not thrown.");
+        }
+        catch (NotSupportedException)
+        {
+        }
+    }
+
     private class ExpectedArgument
     {
         public ExpectedArgument(string name, Type type, ArgumentKind kind = ArgumentKind.SingleValue)

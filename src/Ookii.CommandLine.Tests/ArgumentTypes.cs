@@ -672,3 +672,28 @@ partial class AutoPrefixAliasesArguments
     [Alias("Prefix")]
     public bool EnablePrefix { get; set; }
 }
+
+class AutoPositionArgumentsBase
+{
+    [CommandLineArgument(IsPositional = true, IsRequired = true)]
+    public string BaseArg1 { get; set; }
+
+    [CommandLineArgument(IsPositional = true)]
+    public int BaseArg2 { get; set; }
+
+    [CommandLineArgument]
+    public int BaseArg3 { get; set; }
+}
+
+[GeneratedParser]
+partial class AutoPositionArguments : AutoPositionArgumentsBase
+{
+    [CommandLineArgument(IsPositional = true)]
+    public string Arg1 { get; set; }
+
+    [CommandLineArgument(IsPositional = true)]
+    public int Arg2 { get; set; }
+
+    [CommandLineArgument]
+    public int Arg3 { get; set; }
+}

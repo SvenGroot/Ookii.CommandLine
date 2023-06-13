@@ -157,7 +157,7 @@
     <value>Multi-dimensional arrays are not supported for command line arguments.</value>
   </data>
   <data name="InvalidOptionalArgumentOrder" xml:space="preserve">
-    <value>The command line constructor cannot have non-optional arguments after an optional argument.</value>
+    <value>The command line arguments class cannot have non-optional arguments after an optional argument.</value>
   </data>
   <data name="MissingArgumentAttribute" xml:space="preserve">
     <value>The specified property or method is not a command line argument.</value>
@@ -410,5 +410,8 @@
   </data>
   <data name="EmptyNameValueSeparators" xml:space="preserve">
     <value>You must specify at least one name/value separator.</value>
+  </data>
+  <data name="AutoPositionNotSupportedFormat" xml:space="preserve">
+    <value>The member '{0}' uses CommandLineArgumentAttribute.IsPositional without setting an explicit Position, which is only supported when the GeneratedParserAttribute is used.</value>
   </data>
 </root>

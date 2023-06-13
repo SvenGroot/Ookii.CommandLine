@@ -267,6 +267,12 @@
   <data name="IsShortIgnoredTitle" xml:space="preserve">
     <value>IsShort is ignored if an explicit short name is set.</value>
   </data>
+  <data name="MixedImplicitExplicitPositionsMessageFormat" xml:space="preserve">
+    <value>The arguments class '{0}' contains positional arguments using an explicit Position value, and ones using IsPositional for member-based ordering, which is not allowed. Note that this may include arguments defined by a base class.</value>
+  </data>
+  <data name="MixedImplicitExplicitPositionsTitle" xml:space="preserve">
+    <value>Positional arguments with an explicit position value and those with a position inferred from the member order cannot be mixed.</value>
+  </data>
   <data name="NoConverterMessageFormat" xml:space="preserve">
     <value>No command line argument converter exists for type {0} used by the argument defined by {1}.{2}, and none could be generated. Use the Ookii.CommandLine.Conversion.ArgumentConverterAttribute to specify a custom converter.</value>
   </data>

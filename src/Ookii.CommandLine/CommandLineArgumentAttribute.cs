@@ -60,6 +60,7 @@ public sealed class CommandLineArgumentAttribute : Attribute
 {
     private readonly string? _argumentName;
     private bool _short;
+    private bool _isPositional;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="CommandLineArgumentAttribute"/> class using the specified argument name.
@@ -205,9 +206,13 @@ public sealed class CommandLineArgumentAttribute : Attribute
     ///   more than once.
     /// </para>
     /// <para>
-    ///   If you have arguments defined by the type's constructor parameters, positional arguments defined by properties will
-    ///   always come after them; for example, if you have two constructor parameter arguments and one property positional argument with
-    ///   position 0, then that argument will actually be the third positional argument.
+    ///   When using the <see cref="GeneratedParserAttribute"/>, you can also set the <see cref="IsPositional"/>
+    ///   property to <see langword="true"/> without setting the <see cref="Position"/> property
+    ///   to order the positional arguments using the order of the members that define them.
+    /// </para>
+    /// <para>
+    ///   If you set the <see cref="Position"/> property to a non-negative value, it is not
+    ///   necessary to set the <see cref="IsPositional"/> property.
     /// </para>
     /// <para>
     ///   The <see cref="CommandLineArgument.Position"/> property will be set to reflect the actual position of the argument,
@@ -216,6 +221,37 @@ public sealed class CommandLineArgumentAttribute : Attribute
     /// </remarks>
     /// <seealso cref="CommandLineArgument.Position"/>
     public int Position { get; set; } = -1;
+
+    /// <summary>
+    /// Gets or sets a value that indicates that an argument is positional.
+    /// </summary>
+    /// <value>
+    /// <see langword="true"/> if the argument is positional; otherwise, <see langword="false"/>.
+    /// </value>
+    /// <remarks>
+    /// <para>
+    ///   If the <see cref="Position"/> property is set to a non-negative value, this property
+    ///   always returns <see langword="true"/>.
+    /// </para>
+    /// <para>
+    ///   When using the <see cref="GeneratedParserAttribute"/> attribute, you can set the
+    ///   <see cref="IsPositional"/> property to <see langword="true"/> without setting the
+    ///   <see cref="Position"/> property, to order positional arguments using the order of the
+    ///   members that define them.
+    /// </para>
+    /// <para>
+    ///   Doing this is not supported without the <see cref="GeneratedParserAttribute"/>, because
+    ///   reflection is not guaranteed to return class members in any particular order. The
+    ///   <see cref="CommandLineParser"/> class will throw an exception if the <see cref="IsPositional"/>
+    ///   property is <see langword="true"/> without a non-negative <see cref="Position"/> property
+    ///   value if reflection is used.
+    /// </para>
+    /// </remarks>
+    public bool IsPositional
+    {
+        get => _isPositional || Position >= 0;
+        set => _isPositional = value;
+    }
 
     /// <summary>
     /// Gets or sets the default value to be assigned to the property if the argument is not supplied on the command line.

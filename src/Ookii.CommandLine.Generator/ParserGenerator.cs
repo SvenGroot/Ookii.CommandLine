@@ -45,6 +45,8 @@ internal class ParserGenerator
     private readonly ConverterGenerator _converterGenerator;
     private readonly CommandGenerator _commandGenerator;
     private readonly LanguageVersion _languageVersion;
+    private bool _hasImplicitPositions;
+    private int _nextImplicitPosition;
     private Dictionary<int, string>? _positions;
     private List<PositionalArgumentInfo>? _positionalArguments;
 
@@ -197,20 +199,28 @@ internal class ParserGenerator
         _builder.AppendLine("public override System.Collections.Generic.IEnumerable<Ookii.CommandLine.CommandLineArgument> GetArguments(Ookii.CommandLine.CommandLineParser parser)");
         _builder.OpenBlock();
 
-        var current = _argumentsClass;
         List<(string, string, string)>? requiredProperties = null;
         var hasError = false;
-        while (current != null && current.SpecialType != SpecialType.System_Object)
+
+        // Build a stack with the base types because we have to consider them first to get the
+        // correct order for auto positional arguments.
+        var argumentTypes = new Stack<INamedTypeSymbol>();
+        for (var current = _argumentsClass;
+             current != null && current.SpecialType == SpecialType.None;
+             current = current.BaseType)
         {
-            foreach (var member in current.GetMembers())
+            argumentTypes.Push(current);
+        }
+
+        foreach (var type in argumentTypes)
+        {
+            foreach (var member in type.GetMembers())
             {
                 if (!GenerateArgument(member, ref requiredProperties))
                 {
                     hasError = true;
                 }
             }
-
-            current = current.BaseType;
         }
 
         if (!VerifyPositionalArgumentRules())
@@ -543,10 +553,14 @@ internal class ParserGenerator
             }
         }
 
-        _builder.CloseArgumentList();
-        _builder.AppendLine();
         if (argumentInfo.Position is int position)
         {
+            if (_hasImplicitPositions)
+            {
+                _context.ReportDiagnostic(Diagnostics.MixedImplicitExplicitPositions(_argumentsClass));
+                return false;
+            }
+
             _positions ??= new();
             if (_positions.TryGetValue(position, out string name))
             {
@@ -566,6 +580,21 @@ internal class ParserGenerator
                 IsMultiValue = isMultiValue
             });
         }
+        else if (argumentInfo.IsPositional)
+        {
+            if (_positions != null)
+            {
+                _context.ReportDiagnostic(Diagnostics.MixedImplicitExplicitPositions(_argumentsClass));
+                return false;
+            }
+
+            _hasImplicitPositions = true;
+            _builder.AppendArgument($"position: {_nextImplicitPosition}");
+            ++_nextImplicitPosition;
+        }
+
+        _builder.CloseArgumentList();
+        _builder.AppendLine();
 
         // Can't check if long/short name is actually used, or whether the '-' prefix is used for
         // either style, since ParseOptions might change that. So, just warn either way.

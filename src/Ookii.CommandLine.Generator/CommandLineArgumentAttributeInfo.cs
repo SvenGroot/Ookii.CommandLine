@@ -5,6 +5,7 @@ namespace Ookii.CommandLine.Generator;
 internal class CommandLineArgumentAttributeInfo
 {
     private readonly bool _isShort;
+    private readonly bool _isPositional;
 
     public CommandLineArgumentAttributeInfo(AttributeData data)
     {
@@ -35,6 +36,10 @@ internal class CommandLineArgumentAttributeInfo
 
                 break;
 
+            case nameof(IsPositional):
+                _isPositional = (bool)named.Value.Value!;
+                break;
+
             case nameof(IsShort):
                 _isShort = (bool)named.Value.Value!;
                 ExplicitIsShort = _isShort;
@@ -62,6 +67,8 @@ internal class CommandLineArgumentAttributeInfo
     public bool HasIsRequired { get; }
 
     public int? Position { get; }
+
+    public bool IsPositional => _isPositional || Position != null;
 
     public object? DefaultValue { get; }
 
