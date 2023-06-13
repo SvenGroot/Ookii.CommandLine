@@ -7,7 +7,7 @@ Ookii.CommandLine has two ways by which it can determine which arguments are ava
   the only method available before version 4.0, and is still used if the `GeneratedParserAttribute`
   is not present.
 - Source generation will perform the same inspection at compile time, generating C# code that will
-  provide the required information to the `CommandLineParser` without runtime overhead. This is
+  provide the required information to the `CommandLineParser` with less runtime overhead. This is
   used as of version 4.0 when the `GeneratedParserAttribute` is present.
 
 The same also applies to [subcommands](Subcommands.md). The `CommandManager` class uses runtime
@@ -16,41 +16,36 @@ with the `GeneratedCommandManagerAttribute` to do that same work at compile time
 
 Using source generation has several benefits:
 
-- Get [errors and warnings](SourceGenerationDiagnostics.md) at compile time for argument rule
-  violations (such as a required positional argument after an optional positional argument), ignored
-  options (such as setting a default value for a required attribute), and other problems (such as
-  using the same position number more than once, method arguments with the wrong signature, or using
-  the `CommandLineArgumentAttribute` on a private or read-only property). These would normally be
-  silently ignored or cause a runtime exception, but now you can catch problems during compilation.
-- Allow your application to be
-  [trimmed](https://learn.microsoft.com/dotnet/core/deploying/trimming/trimming-options). When
-  source generation is not used, the way Ookii.CommandLine uses reflection prevents trimming
-  entirely.
+- Get [errors and warnings](SourceGenerationDiagnostics.md) at compile time for many common mistakes,
+  which would cause a runtime exception or be silently ignored when using reflection.
+- Use [automatic ordering](#automatic-ordering-of-positional-arguments) for positional arguments.
 - Specify [default values using property initializers](#default-values-using-property-initializers).
+- Allow your application to be
+  [trimmed](https://learn.microsoft.com/dotnet/core/deploying/trimming/trimming-options). It's not
+  possible to statically determine what types are needed to determine arguments using reflection,
+  so trimming is not possible at all with reflection.
 - Improved performance; benchmarks show that instantiating a `CommandLineParser<T>` using a
   generated parser is up to thirty times faster than using reflection.
 
 A few restrictions apply to projects that use Ookii.CommandLine's source generation:
 
-- The project must a C# project (other languages are not supported), using C# version 8 or later.
-- The project must be built using a recent version of the .Net SDK (TODO: Exact version).
+- The project must be a C# project (other languages are not supported), using C# version 8 or later.
+  Other languages or older C# versions are not supported.
+- The project must be built using using the .Net 6.0 SDK or a later version.
   - You can still target older runtimes supported by Ookii.CommandLine, down to .Net Framework 4.6,
-    but you must build the project using an SDK that supports the source generator, and set the
-    appropriate language version using the `<LangVersion>` property in your project file.
-- If you use the `ArgumentConverterAttribute`, you must use the constructor that takes a `Type`
-  instance. The constructor that takes a string is not supported.
-- The arguments or command manager class may not be nested in another type.
-- The arguments or command manager class may not have generic type parameters.
+    but you must build the project using the .Net 6.0 SDK or newer.
+- If you use the `ArgumentConverterAttribute` or `ParentCommandAttribute`, you must use the
+  constructor that takes a `Type` instance. The constructor that takes a string is not supported.
+- The generated arguments or command manager class may not be nested in another type.
+- The generated arguments or command manager class may not have generic type parameters.
 
-Generally, it's recommended to use source generation unless you cannot meet these requirements, or
-you have another reason why you cannot use it.
+Generally, it's recommended to use source generation unless you cannot meet these requirements.
 
 ## Generating a parser
 
-Normally, the `CommandLineParser` class uses runtime reflection to determine the command line
-arguments defined by an arguments class. To use source generation instead, use the
-`GeneratedParserAttribute` attribute on your arguments class. You must also mark the class as
-`partial`, because the source generator will add additional members to your class.
+To use source generation to determine the command line arguments defined by a class, apply the
+`GeneratedParserAttribute` attribute to that class. You must also mark the class as `partial`,
+because the source generator will add additional members to your class.
 
 ```csharp
 [GeneratedParser]
@@ -61,7 +56,7 @@ partial class Arguments
 }
 ```
 
-The source generator will inspect the members and attributes of the class, and generates C# code
+The source generator will inspect the members and attributes of the class, and generate C# code
 that provides that information to a `CommandLineParser`, without needing to use reflection. While
 doing so, it checks whether your class violates any rules for defining arguments, and
 [emits warnings and errors](SourceGenerationDiagnostics.md) if it does.
@@ -69,32 +64,27 @@ doing so, it checks whether your class violates any rules for defining arguments
 If any of the arguments has a type for which there is no built-in `ArgumentConverter` class, and
 the argument doesn't use the `ArgumentConverterAttribute`, the source generator will check whether
 the type supports any of the standard methods of [argument value conversion](Arguments.md#argument-value-conversion),
-and if it does, it will generate an `ArgumentConverter` implementation for that type (without
-source generation, conversion for these types would normally also use reflection), and uses it
+and if it does, it will generate an `ArgumentConverter` implementation for that type, and uses it
 for the argument.
 
-Generated `ArgumentConverter` classes are internal to your project, and placed in the `Ookii.CommandLine.Conversion.Generated`
-namespace. The namespace can be customized using the `GeneratedConverterNamespaceAttribute`
-attribute.
+Generated `ArgumentConverter` classes are internal to your project, and placed in the
+`Ookii.CommandLine.Conversion.Generated` namespace. The namespace can be customized using the
+`GeneratedConverterNamespaceAttribute` attribute.
 
-You can view any of the generated files using Visual Studio by looking under Dependencies,
-Analyzers, Ookii.CommandLine.Generator in the Solution Explorer, or by setting the
-`<EmitCompilerGeneratedFiles>` property to true in your project file, in which case the generated
-files will be placed under the `obj` folder of your project.
+If you use Visual Studio, you can view the generated files by looking under Dependencies,
+Analyzers, Ookii.CommandLine.Generator in the Solution Explorer.
+
+You can also set the `<EmitCompilerGeneratedFiles>` property to true in your project file, in which
+case the generated files will be placed under the `obj` folder of your project.
 
 ### Using a generated parser
 
-When using the `GeneratedParserAttribute`, you must *not* use the regular `CommandLineParser` or
-`CommandLineParser<T>` constructor, or the static `CommandLineParser.Parse<T>()` methods. These will
-still use reflection, even if a generated parser is available for a class.
+You can use the regular `CommandLineParser<T>` or `CommandLineParser` constructors, or the static
+`CommandLineParser.Parse<T>()` methods, which will automatically use the generated argument
+information if it is available.
 
-> By default, these constructors and methods will throw an exception if you try to use them with a
-> class that has the `GeneratedParserAttribute`, to prevent accidentally using reflection when it
-> was not intended. If for some reason you need to use reflection on a class that has that
-> attribute, you can set the `ParseOptions.AllowReflectionWithGeneratedParser` property to `true`.
-
-Instead, you should use one of the methods that the source generator will add to your arguments
-class (where `Arguments` is the name of your class):
+For convenience, the source generator also adds the following methods to your arguments class (where
+`Arguments` is the name of your class):
 
 ```csharp
 public static CommandLineParser<Arguments> CreateParser(ParseOptions? options = null);
@@ -103,11 +93,15 @@ public static Arguments? Parse(ParseOptions? options = null);
 
 public static Arguments? Parse(string[] args, ParseOptions? options = null);
 
-public static Arguments? Parse(string[] args, int index, ParseOptions? options = null);
+public static Arguments? Parse(ReadOnlyMemory<string> args, ParseOptions? options = null);
 ```
 
 Use the `CreateParser()` method as an alternative to the `CommandLineParser<T>` constructor, and the
 `Parse()` methods as an alternative to the static `CommandLineParser.Parse<T>()` methods.
+
+Generally, it's recommended to use these generated methods. If you want to trim your application,
+you must use them, since the regular `CommandLineParser` constructor will still use reflection to
+determine if generated argument information is present, and therefore still prohibits trimming.
 
 So, if you had the following code before using source generation:
 
@@ -121,17 +115,64 @@ You would replace it with the following:
 var arguments = Arguments.Parse();
 ```
 
-If your project targets .Net 7 or later, the generated class will implement the `IParserProvider<TSelf>`
-and `IParser<TSelf>` interfaces, which define these methods.
+Everything else remains the same.
+
+If your project targets .Net 7.0 or later, the generated class will implement the
+`IParserProvider<TSelf>` and `IParser<TSelf>` interfaces, which define the generated methods.
 
 Generating the `Parse()` methods is optional, and can be disabled using the
 `GeneratedParserAttribute.GenerateParseMethods` property. The `CreateParser()` method is always
 generated.
 
+### Automatic ordering of positional arguments
+
+When using the `GeneratedParserAttribute`, you do not have to specify explicit positions for
+positional arguments. Instead, you can use the `CommandLineArgumentAttribute.IsPositional`
+property to indicate which arguments are positional, and the order will be determined by the order
+of the members that define the arguments.
+
+That means instead of this:
+
+```csharp
+class Arguments
+{
+    [CommandLineArgument(Position = 0)]
+    public string? SomeArgument { get; set; }
+
+    [CommandLineArgument(Position = 1)]
+    public int OtherArgument { get; set; }
+}
+```
+
+You can now do this:
+
+```csharp
+class Arguments
+{
+    [CommandLineArgument(IsPositional = true)]
+    public string? SomeArgument { get; set; }
+
+    [CommandLineArgument(IsPositional = true)]
+    public int OtherArgument { get; set; }
+}
+```
+
+This means you no longer have to be careful about ordering when adding new arguments, and don't
+have to worry about accidentally using the same position more than once.
+
+If your class derives from a base class that defines positional arguments, those will come before
+the arguments of the derived class.
+
+If you use automatic ordering, all positional arguments must use it. Mixing explicit positions and
+automatic positions is not allowed.
+
+Using automatic ordering is not possible with reflection, because reflection does not guarantee it
+will return the members of the class in any particular order.
+
 ### Default values using property initializers
 
-When using the source generation to create a command line parser, you can use property initializers
-to specify the default value of an argument, and still have that value be used in the usage help.
+When using the source generation, you can use property initializers to specify the default value of
+an argument, and still have that value be used in the usage help.
 
 ```csharp
 [GeneratedParser]
@@ -145,41 +186,51 @@ partial class Arguments
 }
 ```
 
-When using the reflection-based parser with the default constructors of the `CommandLineParser<T>`
-class, `Arg2` would have its value set to "foo" when omitted (since Ookii.CommandLine doesn't
-assign the property if the argument is not specifies), but that default value would not be included
-in the usage help, whereas `Arg1` does.
+When using a reflection-based parser, `Arg2` would have its value set to "foo" when omitted (since
+Ookii.CommandLine doesn't assign the property if the argument is not specifies), but that default
+value would not be included in the usage help, whereas the default value of `Arg1` will be.
 
-With source generation, both `Arg1` and `Arg2` will have the default value of "foo" shown in the
-usage help, making the two forms identical. Additionally, `Arg2` could be marked non-nullable
-because it was initialized to a non-null value, something which isn't possible for `Arg1` without
-initializing the property to a value that will not be used.
+With the `GeneratedParserAttribute`, both `Arg1` and `Arg2` will have the default value of "foo"
+shown in the usage help, making the two forms identical. Additionally, `Arg2` could be marked
+non-nullable because it was initialized to a non-null value, something which isn't possible for
+`Arg1` without initializing the property to a value that will not be used.
 
 If both a property initializer and the `DefaultValue` property are both used, the `DefaultValue`
 property takes precedence.
 
-Note that this only works if the property initializer is a literal. If a different kind of value is
-used in the property initialized, such as a reference to a constant or a function call, the value
-will not be shown in the usage help.
+This only works if the property initializer is a literal, enumeration value, reference to a constant,
+or a null-forgiving expression with any of those expression types.
+
+For example, `5`, `"value"`, `DayOfWeek.Tuesday`, `int.MaxValue` and `default!` are all supported
+expressions for property initializers.
+
+If a different kind of expression is used in the property initializer, such as a function call or
+`new` expression, the value will not be shown in the usage help.
 
 ## Generating a command manager
 
-Just like the `CommandLineParser` class, the `CommandManager` class normally uses reflection to
-locate all command classes in the assembly or assemblies you specify. Instead, you can create a
-class with the `GeneratedCommandManagerAttribute` which can perform this same job at compile time.
+You can apply the `GeneratedParserAttribute` to a command, and generate the parser for that command
+at compile time. This will work with the `CommandManager` class without further changes to your
+code.
 
-To create a generated command manager, define a partial class with the
-`GeneratedCommandManagerAttribute`:
+The `GeneratedParserAttribute` works the same for command classes as it does for any other arguments
+class, with one exception: the static `Parse()` methods are not generated by default for command
+classes. You must explicitly set the `GeneratedParserAttribute.GenerateParseMethods` to `true` if
+you want them to be generated.
+
+However, the `CommandManager` class still uses reflection to determine what commands are available
+in the assembly or assemblies you specify. To determine the available commands at compile time, you
+must define a partial class with the `GeneratedCommandManagerAttribute`:
 
 ```csharp
 [GeneratedCommandManager]
-partial class MyCommandManager
+partial class GeneratedManager
 {
 }
 ```
 
 The source generator will find all command classes in your project, and generate C# code to provide
-those arguments to the `CommandManager` without needing reflection.
+those command to the generated command manager without needing reflection.
 
 If you need to load commands from a different assembly, or multiple assemblies, you can use the
 `GeneratedCommandManagerAttribute.AssemblyNames` property. This property can use either just the
@@ -188,13 +239,14 @@ token.
 
 ```csharp
 [GeneratedCommandManager(AssemblyNames = new[] { "MyCommandAssembly" })]
-partial class MyCommandManager
+partial class GeneratedManager
 {
 }
 ```
 
-If you wish to use commands from an assembly that is dynamically loaded during runtime, you must
-continue using reflection.
+Any assemblies specified in this list must be directly referenced by your application. If you wish
+to use commands from an assembly that is dynamically loaded during runtime, you must continue to use
+reflection.
 
 ### Using a generated command manager
 
@@ -202,10 +254,11 @@ The source generator will add `CommandManager` as a base class to your class, an
 following constructor to the class:
 
 ```csharp
-public MyCommandManager(CommandOptions? options = null)
+public GeneratedManager(CommandOptions? options = null)
 ```
 
-Instead of instantiation the `CommandManager` class, you use your generated class instead.
+This means a class with the `GeneratedCommandManagerAttribute` can be used as a drop-in replacement
+of the regular `CommandManager` class.
 
 If you had the following code before using source generation:
 
@@ -217,38 +270,9 @@ return manager.RunCommand() ?? 1;
 You would replace it with the following:
 
 ```csharp
-var manager = new MyCommandManager();
+var manager = new GeneratedManager();
 return manager.RunCommand() ?? 1;
 ```
-
-### Commands with generated parsers
-
-You can apply the `GeneratedParserAttribute` to a command class, and a generated command manager
-will use the generated parser for that command.
-
-```csharp
-[Command]
-[GeneratedParser]
-partial class MyCommand : ICommand
-{
-    [CommandLineArgument]
-    public string? SomeArgument { get; set; }
-
-    public int Run()
-    {
-        /* ... */
-    }
-}
-```
-
-Note that if you create a normal `CommandManager` instance which uses reflection, it will always use
-reflection to create a parser for its commands, even if the command has the
-`GeneratedParserAttribute`.
-
-The `GeneratedParserAttribute` works the same for command classes as it does for any other arguments
-class, with one exception: the static `Parse()` methods are not generated by default for command
-classes. You must explicitly set the `GeneratedParserAttribute.GenerateParseMethods` to `true` if
-you want them to be generated.
 
 Next, we will take a look at several [utility classes](Utilities.md) provided, and used, by
 Ookii.CommandLine.
