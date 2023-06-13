@@ -30,7 +30,6 @@ public class ParserIncrementalGenerator : IIncrementalGenerator
             .Where(static c => c != null);
 
         var compilationAndClasses = context.CompilationProvider.Combine(classDeclarations.Collect());
-
         context.RegisterSourceOutput(compilationAndClasses, static (spc, source) => Execute(source.Left, source.Right!, spc));
     }
 
@@ -49,6 +48,7 @@ public class ParserIncrementalGenerator : IIncrementalGenerator
             var info = cls!.Value;
             var syntax = info.Syntax;
             context.CancellationToken.ThrowIfCancellationRequested();
+            var languageVersion = (info.Syntax.SyntaxTree.Options as CSharpParseOptions)?.LanguageVersion ?? LanguageVersion.CSharp1;
             var semanticModel = compilation.GetSemanticModel(syntax.SyntaxTree);
             if (semanticModel.GetDeclaredSymbol(syntax, context.CancellationToken) is not INamedTypeSymbol symbol)
             {
@@ -74,6 +74,12 @@ public class ParserIncrementalGenerator : IIncrementalGenerator
             var attributeName = info.ClassKind == ClassKind.CommandManager
                 ? typeHelper.GeneratedCommandManagerAttribute!.Name
                 : typeHelper.GeneratedParserAttribute!.Name;
+
+            if (languageVersion < LanguageVersion.CSharp8)
+            {
+                context.ReportDiagnostic(Diagnostics.UnsupportedLanguageVersion(symbol, attributeName));
+                continue;
+            }
 
             if (!symbol.IsReferenceType)
             {
@@ -105,7 +111,9 @@ public class ParserIncrementalGenerator : IIncrementalGenerator
                 continue;
             }
 
-            var source = ParserGenerator.Generate(context, symbol, typeHelper, converterGenerator, commandGenerator);
+            var source = ParserGenerator.Generate(context, symbol, typeHelper, converterGenerator, commandGenerator,
+                languageVersion);
+
             if (source != null)
             {
                 context.AddSource(symbol.ToDisplayString().ToIdentifier(".g.cs"), SourceText.From(source, Encoding.UTF8));

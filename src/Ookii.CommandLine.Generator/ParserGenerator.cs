@@ -44,10 +44,12 @@ internal class ParserGenerator
     private readonly SourceBuilder _builder;
     private readonly ConverterGenerator _converterGenerator;
     private readonly CommandGenerator _commandGenerator;
+    private readonly LanguageVersion _languageVersion;
     private Dictionary<int, string>? _positions;
     private List<PositionalArgumentInfo>? _positionalArguments;
 
-    public ParserGenerator(SourceProductionContext context, INamedTypeSymbol argumentsClass, TypeHelper typeHelper, ConverterGenerator converterGenerator, CommandGenerator commandGenerator)
+    public ParserGenerator(SourceProductionContext context, INamedTypeSymbol argumentsClass, TypeHelper typeHelper,
+        ConverterGenerator converterGenerator, CommandGenerator commandGenerator, LanguageVersion languageVersion)
     {
         _typeHelper = typeHelper;
         _compilation = typeHelper.Compilation;
@@ -56,11 +58,15 @@ internal class ParserGenerator
         _builder = new(argumentsClass.ContainingNamespace);
         _converterGenerator = converterGenerator;
         _commandGenerator = commandGenerator;
+        _languageVersion = languageVersion; 
     }
 
-    public static string? Generate(SourceProductionContext context, INamedTypeSymbol argumentsClass, TypeHelper typeHelper, ConverterGenerator converterGenerator, CommandGenerator commandGenerator)
+    public static string? Generate(SourceProductionContext context, INamedTypeSymbol argumentsClass, TypeHelper typeHelper,
+        ConverterGenerator converterGenerator, CommandGenerator commandGenerator, LanguageVersion languageVersion)
     {
-        var generator = new ParserGenerator(context, argumentsClass, typeHelper, converterGenerator, commandGenerator);
+        var generator = new ParserGenerator(context, argumentsClass, typeHelper, converterGenerator, commandGenerator,
+            languageVersion);
+
         return generator.Generate();
     }
 
@@ -106,7 +112,9 @@ internal class ParserGenerator
         }
 
         _builder.AppendLine($"partial class {_argumentsClass.Name}");
-        if (_typeHelper.IParser != null)
+        // Static interface methods require not just .Net 7 but also C# 11.
+        // There is no defined constant for C# 11 because the generator is built for .Net 6.0.
+        if (_typeHelper.IParser != null && _languageVersion >= (LanguageVersion)1100)
         {
             if (generateParseMethods)
             {
@@ -148,7 +156,7 @@ internal class ParserGenerator
             }
         }
 
-        _builder.AppendLine($"public static Ookii.CommandLine.CommandLineParser<{_argumentsClass.Name}> CreateParser(Ookii.CommandLine.ParseOptions? options = null) => new(new OokiiCommandLineArgumentProvider(), options);");
+        _builder.AppendLine($"public static Ookii.CommandLine.CommandLineParser<{_argumentsClass.ToQualifiedName()}> CreateParser(Ookii.CommandLine.ParseOptions? options = null) => new Ookii.CommandLine.CommandLineParser<{_argumentsClass.ToQualifiedName()}>(new OokiiCommandLineArgumentProvider(), options);");
         _builder.AppendLine();
         var nullableType = _argumentsClass.WithNullableAnnotation(NullableAnnotation.Annotated);
 

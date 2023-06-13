@@ -345,4 +345,10 @@
   <data name="UnknownAttributeTitle" xml:space="preserve">
     <value>Unknown attribute will be ignored.</value>
   </data>
+  <data name="UnsupportedLanguageVersionMessageFormat" xml:space="preserve">
+    <value>The type '{0}' uses the '{1}' attribute, which requires at least C# 8.0.</value>
+  </data>
+  <data name="UnsupportedLanguageVersionTitle" xml:space="preserve">
+    <value>Ookii.CommandLine source generation requires at least C# 8.0.</value>
+  </data>
 </root>

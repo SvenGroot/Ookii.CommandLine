@@ -341,6 +341,15 @@ internal static class Diagnostics
         attribute.GetLocation(),
         symbol.ToDisplayString());
 
+    public static Diagnostic UnsupportedLanguageVersion(ISymbol symbol, string attributeName) => CreateDiagnostic(
+        "OCL0037",
+        nameof(Resources.UnsupportedLanguageVersionTitle),
+        nameof(Resources.UnsupportedLanguageVersionMessageFormat),
+        DiagnosticSeverity.Error,
+        symbol.Locations.FirstOrDefault(),
+        symbol.ToDisplayString(),
+        attributeName);
+
     private static Diagnostic CreateDiagnostic(string id, string titleResource, string messageResource, DiagnosticSeverity severity, Location? location, params object?[]? messageArgs)
         => Diagnostic.Create(
             new DiagnosticDescriptor(

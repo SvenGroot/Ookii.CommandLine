@@ -743,5 +743,23 @@ namespace Ookii.CommandLine.Generator.Properties {
                 return ResourceManager.GetString("UnknownAttributeTitle", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The type &apos;{0}&apos; uses the &apos;{1}&apos; attribute, which requires at least C# 8.0..
+        /// </summary>
+        internal static string UnsupportedLanguageVersionMessageFormat {
+            get {
+                return ResourceManager.GetString("UnsupportedLanguageVersionMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ookii.CommandLine source generation requires at least C# 8.0..
+        /// </summary>
+        internal static string UnsupportedLanguageVersionTitle {
+            get {
+                return ResourceManager.GetString("UnsupportedLanguageVersionTitle", resourceCulture);
+            }
+        }
     }
 }
