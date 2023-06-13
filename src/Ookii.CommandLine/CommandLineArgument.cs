@@ -1440,7 +1440,6 @@ public abstract class CommandLineArgument
     {
         // Do nothing for method-based values, or for required properties if the provider is not
         // using reflection.
-        // TODO: Handle new style constructor parameters.
         if (Kind == ArgumentKind.Method || (IsRequiredProperty && _parser.ProviderKind != ProviderKind.Reflection))
         {
             return;

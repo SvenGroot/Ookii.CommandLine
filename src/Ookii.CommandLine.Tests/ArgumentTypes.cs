@@ -516,30 +516,6 @@ partial class InjectionArguments
     public int Arg { get; set; }
 }
 
-// TODO: Test with new ctor argument style.
-//class InjectionMixedArguments
-//{
-//    private readonly CommandLineParser _parser;
-//    private readonly int _arg1;
-//    private readonly int _arg2;
-
-//    public InjectionMixedArguments(int arg1, CommandLineParser parser, int arg2)
-//    {
-//        _arg1 = arg1;
-//        _parser = parser;
-//        _arg2 = arg2;
-//    }
-
-//    public CommandLineParser Parser => _parser;
-
-//    public int Arg1 => _arg1;
-
-//    public int Arg2 => _arg2;
-
-//    [CommandLineArgument]
-//    public int Arg3 { get; set; }
-//}
-
 struct StructWithParseCulture
 {
     public int Value { get; set; }

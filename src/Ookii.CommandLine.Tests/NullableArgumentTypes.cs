@@ -43,35 +43,6 @@ class NullReturningIntConverter : ArgumentConverter
 [GeneratedParser]
 partial class NullableArguments
 {
-    // TODO: Put back with new ctor approach.
-    //public TestArguments(
-    //    [ArgumentConverter(typeof(NullReturningStringConverter))] string? constructorNullable,
-    //    [ArgumentConverter(typeof(NullReturningStringConverter))] string constructorNonNullable,
-    //    [ArgumentConverter(typeof(NullReturningIntConverter))] int constructorValueType,
-    //    [ArgumentConverter(typeof(NullReturningIntConverter))] int? constructorNullableValueType)
-    //{
-    //    ConstructorNullable = constructorNullable;
-    //    ConstructorNonNullable = constructorNonNullable;
-    //    ConstructorValueType = constructorValueType;
-    //    ConstructorNullableValueType = constructorNullableValueType;
-    //}
-
-    [CommandLineArgument("constructorNullable", Position = 0)]
-    [ArgumentConverter(typeof(NullReturningStringConverter))]
-    public string? ConstructorNullable { get; set; }
-
-    [CommandLineArgument("constructorNonNullable", Position = 1)]
-    [ArgumentConverter(typeof(NullReturningStringConverter))]
-    public string ConstructorNonNullable { get; set; } = default!;
-
-    [CommandLineArgument("constructorValueType", Position = 2)]
-    [ArgumentConverter(typeof(NullReturningIntConverter))]
-    public int ConstructorValueType { get; set; }
-
-    [CommandLineArgument("constructorNullableValueType", Position = 3)]
-    [ArgumentConverter(typeof(NullReturningIntConverter))]
-    public int? ConstructorNullableValueType { get; set; }
-
     [CommandLineArgument]
     [ArgumentConverter(typeof(NullReturningStringConverter))]
     public string? Nullable { get; set; } = "NotNullDefaultValue";

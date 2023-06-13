@@ -60,21 +60,6 @@ public class CommandLineParserNullableTest
 
     [TestMethod]
     [DynamicData(nameof(ProviderKinds), DynamicDataDisplayName = nameof(GetCustomDynamicDataDisplayName))]
-    public void TestNonNullableConstructor(ProviderKind kind)
-    {
-        // TODO: Update for new ctor arguments style.
-        var parser = CommandLineParserTest.CreateParser<NullableArguments>(kind);
-        ExpectNullException(parser, "constructorNonNullable", "foo", "(null)", "4", "5");
-        ExpectNullException(parser, "constructorValueType", "foo", "bar", "(null)", "5");
-        var result = ExpectSuccess(parser, "(null)", "bar", "4", "(null)");
-        Assert.IsNull(result.ConstructorNullable);
-        Assert.AreEqual("bar", result.ConstructorNonNullable);
-        Assert.AreEqual(4, result.ConstructorValueType);
-        Assert.IsNull(result.ConstructorNullableValueType);
-    }
-
-    [TestMethod]
-    [DynamicData(nameof(ProviderKinds), DynamicDataDisplayName = nameof(GetCustomDynamicDataDisplayName))]
     public void TestNonNullableProperties(ProviderKind kind)
     {
         var parser = CommandLineParserTest.CreateParser<NullableArguments>(kind);
