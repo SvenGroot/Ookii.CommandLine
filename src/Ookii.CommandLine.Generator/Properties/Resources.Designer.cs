@@ -745,6 +745,24 @@ namespace Ookii.CommandLine.Generator.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The initial value of the property &apos;{0}&apos; will not be included in the usage help because it is not a literal expression, enum value, or constant. Consider changing the initializer, or use CommandLineArgumentAttribute.DefaultValue as an alternative..
+        /// </summary>
+        internal static string UnsupportedInitializerSyntaxMessageFormat {
+            get {
+                return ResourceManager.GetString("UnsupportedInitializerSyntaxMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The property&apos;s initial value uses an unsupported expression..
+        /// </summary>
+        internal static string UnsupportedInitializerSyntaxTitle {
+            get {
+                return ResourceManager.GetString("UnsupportedInitializerSyntaxTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The type &apos;{0}&apos; uses the &apos;{1}&apos; attribute, which requires at least C# 8.0..
         /// </summary>
         internal static string UnsupportedLanguageVersionMessageFormat {

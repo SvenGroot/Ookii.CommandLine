@@ -1234,8 +1234,16 @@ public partial class CommandLineParserTest
         var parser = InitializerDefaultValueArguments.CreateParser();
         Assert.AreEqual("foo\tbar\"", parser.GetArgument("Arg1").DefaultValue);
         Assert.AreEqual(5.5f, parser.GetArgument("Arg2").DefaultValue);
-        // Arg3's default value can't be used because it's not a literal.
-        Assert.IsNull(parser.GetArgument("Arg3").DefaultValue);
+        Assert.AreEqual(int.MaxValue, parser.GetArgument("Arg3").DefaultValue);
+        Assert.AreEqual(DayOfWeek.Tuesday, parser.GetArgument("Arg4").DefaultValue);
+        Assert.AreEqual(47, parser.GetArgument("Arg5").DefaultValue);
+        // Does not use a supported expression type.
+        Assert.IsNull(parser.GetArgument("Arg6").DefaultValue);
+        Assert.AreEqual(0, parser.GetArgument("Arg7").DefaultValue);
+        // Null because set to "default".
+        Assert.IsNull(parser.GetArgument("Arg8").DefaultValue);
+        // Null because explicit null.
+        Assert.IsNull(parser.GetArgument("Arg9").DefaultValue);
     }
 
     [TestMethod]

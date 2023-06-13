@@ -345,6 +345,12 @@
   <data name="UnknownAttributeTitle" xml:space="preserve">
     <value>Unknown attribute will be ignored.</value>
   </data>
+  <data name="UnsupportedInitializerSyntaxMessageFormat" xml:space="preserve">
+    <value>The initial value of the property '{0}' will not be included in the usage help because it is not a literal expression, enum value, or constant. Consider changing the initializer, or use CommandLineArgumentAttribute.DefaultValue as an alternative.</value>
+  </data>
+  <data name="UnsupportedInitializerSyntaxTitle" xml:space="preserve">
+    <value>The property's initial value uses an unsupported expression.</value>
+  </data>
   <data name="UnsupportedLanguageVersionMessageFormat" xml:space="preserve">
     <value>The type '{0}' uses the '{1}' attribute, which requires at least C# 8.0.</value>
   </data>

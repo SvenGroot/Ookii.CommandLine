@@ -832,3 +832,47 @@ Instead, the attribute should be applied to the assembly:
 ```csharp
 [assembly: ApplicationFriendlyName("My Application")]
 ```
+
+### OCL0038
+
+The initial value of a property will not be included in the usage help, because it uses an
+expression type that is not supported by the source generator. Supported expression types are
+literals, enumeration values, constants, and null-forgiving expressions containing any of those
+expression types.
+
+For example, `5`, `"value"`, `DayOfWeek.Tuesday`, `int.MaxValue` and `default!` are all supported
+expressions for property initializers.
+
+Any other type of expression, such as a method invocation or constructing a new object, is not
+supported and will not be included in the usage help.
+
+For example, the following code triggers this warning:
+
+```csharp
+// WARNING: ApplicationFriendlyName is ignored for commands.
+[GeneratedParser]
+partial class Arguments
+{
+    // WARNING: Method call for property initializer is not supported for the usage help.
+    [CommandLineAttribute]
+    public string? Argument { get; set; } = GetDefaultValue();
+
+    private static int GetDefaultValue()
+    {
+        // omitted.
+    }
+}
+```
+
+This will not affect the actual value of the argument, since the property will not be set by the
+`CommandLineParser` if the `CommandLineArgumentAttribute.DefaultValue` property is null. Therefore,
+you can safely suppress this warning and include the relevant explanation of the default value in
+the property's description manually, if desired.
+
+To avoid this warning, use one of the supported expression types, or use the
+`CommandLineArgumentAttribute.DefaultValue` property. This warning will not be emitted if the
+`CommandLineArgumentAttribute.DefaultValue` property is not null, regardless of the initializer.
+
+Note that default values set by property initializers are only shown in the usage help if the
+`GeneratedParserAttribute` is used. When reflection is used, only
+`CommandLineArgumentAttribute.DefaultValue` is supported.

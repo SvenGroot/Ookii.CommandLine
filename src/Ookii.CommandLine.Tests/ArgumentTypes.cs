@@ -9,7 +9,7 @@ using System.IO;
 using System.Net;
 
 // We deliberately have some properties and methods that cause warnings, so disable those.
-#pragma warning disable OCL0017,OCL0018,OCL0020,OCL0023,OCL0029,OCL0033
+#pragma warning disable OCL0017,OCL0018,OCL0020,OCL0023,OCL0029,OCL0033,OCL0038
 
 namespace Ookii.CommandLine.Tests;
 
@@ -632,6 +632,31 @@ partial class InitializerDefaultValueArguments
 
     [CommandLineArgument]
     public int Arg3 { get; set; } = int.MaxValue;
+
+    [CommandLineArgument]
+    public DayOfWeek Arg4 { get; set; } = DayOfWeek.Tuesday;
+
+    [CommandLineArgument]
+    public int Arg5 { get; set; } = Value;
+
+    [CommandLineArgument]
+    public int Arg6 { get; set; } = GetValue();
+
+    [CommandLineArgument]
+    public int Arg7 { get; set; } = default;
+
+#nullable enable
+    [CommandLineArgument]
+    public string? Arg8 { get; set; } = default!;
+
+    [CommandLineArgument]
+    public string? Arg9 { get; set; } = null!;
+#nullable disable
+
+    private const int Value = 47;
+
+    public static int GetValue() => 42;
+
 }
 
 [GeneratedParser]

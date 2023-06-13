@@ -350,6 +350,14 @@ internal static class Diagnostics
         symbol.ToDisplayString(),
         attributeName);
 
+    public static Diagnostic UnsupportedInitializerSyntax(ISymbol symbol, Location location) => CreateDiagnostic(
+        "OCL0038",
+        nameof(Resources.UnsupportedInitializerSyntaxTitle),
+        nameof(Resources.UnsupportedInitializerSyntaxMessageFormat),
+        DiagnosticSeverity.Warning,
+        location,
+        symbol.ToDisplayString());
+
     private static Diagnostic CreateDiagnostic(string id, string titleResource, string messageResource, DiagnosticSeverity severity, Location? location, params object?[]? messageArgs)
         => Diagnostic.Create(
             new DiagnosticDescriptor(

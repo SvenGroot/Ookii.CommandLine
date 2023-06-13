@@ -15,6 +15,7 @@ internal static class Extensions
             globalNamespaceStyle: SymbolDisplayGlobalNamespaceStyle.Included,
             typeQualificationStyle: SymbolDisplayTypeQualificationStyle.NameAndContainingTypesAndNamespaces,
             genericsOptions: SymbolDisplayGenericsOptions.IncludeTypeParameters,
+            memberOptions: SymbolDisplayMemberOptions.IncludeContainingType,
             miscellaneousOptions: SymbolDisplayMiscellaneousOptions.UseSpecialTypes | SymbolDisplayMiscellaneousOptions.IncludeNullableReferenceTypeModifier | SymbolDisplayMiscellaneousOptions.EscapeKeywordIdentifiers);
 
     public static bool DerivesFrom(this ITypeSymbol symbol, ITypeSymbol? baseClass)
@@ -223,7 +224,7 @@ internal static class Extensions
     public static Location? GetLocation(this AttributeData attribute)
         => attribute.ApplicationSyntaxReference?.SyntaxTree.GetLocation(attribute.ApplicationSyntaxReference.Span);
 
-    public static string ToQualifiedName(this ITypeSymbol symbol)
+    public static string ToQualifiedName(this ISymbol symbol)
     {
         return symbol.ToDisplayString(QualifiedFormat);
     }

@@ -870,7 +870,42 @@ internal class ParserGenerator
     private string? GetInitializerValue(IPropertySymbol symbol)
     {
         var syntax = symbol.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax(_context.CancellationToken) as PropertyDeclarationSyntax;
-        var value = syntax?.Initializer?.Value as LiteralExpressionSyntax;
-        return value?.Token.ToFullString();
+        if (syntax?.Initializer == null)
+        {
+            return null;
+        }
+
+        var expression = syntax.Initializer.Value;
+        if (expression is PostfixUnaryExpressionSyntax postfixUnaryExpression) 
+        { 
+            if (postfixUnaryExpression.Kind() == SyntaxKind.SuppressNullableWarningExpression)
+            {
+                expression = postfixUnaryExpression.Operand;
+            }
+        }
+
+        var expressionString = expression switch
+        {
+            // We have to include the type in a default expression because it's going to be
+            // assigned to an object so just "default" would always be null.
+            LiteralExpressionSyntax value => value.IsKind(SyntaxKind.DefaultLiteralExpression) ? $"default({symbol.Type.ToQualifiedName()})" : value?.Token.ToFullString(),
+            MemberAccessExpressionSyntax memberAccessExpression => GetSymbolExpressionString(memberAccessExpression),
+            IdentifierNameSyntax identifierName => GetSymbolExpressionString(identifierName),
+            _ => null,
+        };
+
+        if (expressionString == null)
+        {
+            _context.ReportDiagnostic(Diagnostics.UnsupportedInitializerSyntax(symbol, syntax.Initializer.GetLocation()));
+        }
+
+        return expressionString;
+    }
+
+    private string? GetSymbolExpressionString(ExpressionSyntax syntax)
+    {
+        var model = _compilation.GetSemanticModel(syntax.SyntaxTree);
+        var symbol = model.GetSymbolInfo(syntax);
+        return symbol.Symbol?.ToQualifiedName();
     }
 }
