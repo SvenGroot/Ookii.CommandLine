@@ -3,6 +3,7 @@
   <PropertyGroup>
     <TargetFrameworks>net7.0;net6.0;net48</TargetFrameworks>
     <Nullable>disable</Nullable>
+    <AssemblyTitle>Ookii.CommandLine Unit Tests</AssemblyTitle>
     <Description>Tests for Ookii.CommandLine.</Description>
     <IsPackable>false</IsPackable>
     <LangVersion>11.0</LangVersion>

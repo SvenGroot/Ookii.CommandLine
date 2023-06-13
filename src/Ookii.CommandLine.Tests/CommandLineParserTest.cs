@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Sven Groot (Ookii.org)
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Ookii.CommandLine.Support;
+using Ookii.CommandLine.Tests.Commands;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -40,7 +41,7 @@ public partial class CommandLineParserTest
         CollectionAssert.AreEqual(CommandLineParser.GetDefaultArgumentNamePrefixes(), target.ArgumentNamePrefixes);
         Assert.IsNull(target.LongArgumentNamePrefix);
         Assert.AreEqual(argumentsType, target.ArgumentsType);
-        Assert.AreEqual(Assembly.GetExecutingAssembly().GetName().Name, target.ApplicationFriendlyName);
+        Assert.AreEqual("Ookii.CommandLine Unit Tests", target.ApplicationFriendlyName);
         Assert.AreEqual(string.Empty, target.Description);
         Assert.AreEqual(2, target.Arguments.Count);
         using var args = target.Arguments.GetEnumerator();
@@ -1265,6 +1266,21 @@ public partial class CommandLineParserTest
         var options = new ParseOptions() { AutoPrefixAliases = false };
         parser = CreateParser<AutoPrefixAliasesArguments>(kind, options);
         CheckThrows(parser, new[] { "-pro", "foo", "-Po", "5", "-e" }, CommandLineArgumentErrorCategory.UnknownArgument, "pro", remainingArgumentCount: 5);
+    }
+
+    [TestMethod]
+    [DynamicData(nameof(ProviderKinds), DynamicDataDisplayName = nameof(GetCustomDynamicDataDisplayName))]
+    public void TestApplicationFriendlyName(ProviderKind kind)
+    {
+        CommandLineParser parser = CreateParser<TestArguments>(kind);
+        Assert.AreEqual("Friendly name", parser.ApplicationFriendlyName);
+
+        // Default to assembly title if no friendly name.
+        parser = CreateParser<SimpleArguments>(kind);
+        Assert.AreEqual("Ookii.CommandLine Unit Tests", parser.ApplicationFriendlyName);
+
+        parser = CreateParser<ExternalCommand>(kind);
+        Assert.AreEqual("Ookii.CommandLine.Tests.Commands", parser.ApplicationFriendlyName);
     }
 
     private class ExpectedArgument

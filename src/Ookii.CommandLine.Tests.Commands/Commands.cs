@@ -3,8 +3,11 @@ using Ookii.CommandLine.Commands;
 
 namespace Ookii.CommandLine.Tests.Commands;
 
+#pragma warning disable OCL0034 // Subcommands should have a description.
+
 [Command("external")]
-public class ExternalCommand : ICommand
+[GeneratedParser]
+public partial class ExternalCommand : ICommand
 {
     public int Run() => throw new NotImplementedException();
 }

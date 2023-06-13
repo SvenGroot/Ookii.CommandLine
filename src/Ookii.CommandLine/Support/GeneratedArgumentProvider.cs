@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -50,7 +51,9 @@ public abstract class GeneratedArgumentProvider : ArgumentProvider
 
     /// <inheritdoc/>
     public override string ApplicationFriendlyName
-        => _friendlyNameAttribute?.Name ?? ArgumentsType.Assembly.GetName().Name ?? string.Empty;
+        => _friendlyNameAttribute?.Name ?? ArgumentsType.Assembly.GetCustomAttribute<ApplicationFriendlyNameAttribute>()?.Name
+            ?? ArgumentsType.Assembly.GetCustomAttribute<AssemblyTitleAttribute>()?.Title ?? ArgumentsType.Assembly.GetName().Name
+            ?? string.Empty;
 
     /// <inheritdoc/>
     public override string Description => _descriptionAttribute?.Description ?? string.Empty;

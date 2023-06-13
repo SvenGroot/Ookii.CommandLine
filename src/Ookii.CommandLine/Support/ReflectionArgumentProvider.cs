@@ -30,7 +30,8 @@ internal class ReflectionArgumentProvider : ArgumentProvider
             var attribute = ArgumentsType.GetCustomAttribute<ApplicationFriendlyNameAttribute>() ??
                 ArgumentsType.Assembly.GetCustomAttribute<ApplicationFriendlyNameAttribute>();
 
-            return attribute?.Name ?? ArgumentsType.Assembly.GetName().Name ?? string.Empty;
+            return attribute?.Name ?? ArgumentsType.Assembly.GetCustomAttribute<AssemblyTitleAttribute>()?.Title ??
+                ArgumentsType.Assembly.GetName().Name ?? string.Empty;
         }
     }
 

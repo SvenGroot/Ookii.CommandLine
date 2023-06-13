@@ -443,7 +443,8 @@ public class CommandLineParser
     /// <para>
     ///   The friendly name is determined by checking for the <see cref="ApplicationFriendlyNameAttribute"/>
     ///   attribute first on the arguments type, then on the arguments type's assembly. If
-    ///   neither exists, the arguments type's assembly's name is used.
+    ///   neither exists, the <see cref="AssemblyTitleAttribute"/> is used. If that is not present
+    ///   either, the assembly's name is used.
     /// </para>
     /// <para>
     ///   This name is only used in the output of the automatically created "-Version"
