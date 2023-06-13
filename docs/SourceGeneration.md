@@ -1,10 +1,18 @@
 # Source generation
 
-Ookii.CommandLine includes a source generator that can be used to generate a `CommandLineParser<T>`
-for an arguments type, or a `CommandManager` for the commands in an assembly, at compile time. The
-source generator will generate C# code that creates those classes using information about your
-arguments or command types available during compilation, rather than determining that information at
-runtime using reflection.
+Ookii.CommandLine has two ways by which it can determine which arguments are available.
+
+- Reflection will inspect the members of the arguments type at runtime, check for the
+  `CommandLineParserAttribute`, and provide that information to the `CommandLineParser`. This was
+  the only method available before version 4.0, and is still used if the `GeneratedParserAttribute`
+  is not present.
+- Source generation will perform the same inspection at compile time, generating C# code that will
+  provide the required information to the `CommandLineParser` without runtime overhead. This is
+  used as of version 4.0 when the `GeneratedParserAttribute` is present.
+
+The same also applies to [subcommands](Subcommands.md). The `CommandManager` class uses runtime
+reflection by default to discover the subcommands in an assembly, and source generation is available
+with the `GeneratedCommandManagerAttribute` to do that same work at compile time.
 
 Using source generation has several benefits:
 
@@ -19,11 +27,10 @@ Using source generation has several benefits:
   source generation is not used, the way Ookii.CommandLine uses reflection prevents trimming
   entirely.
 - Specify [default values using property initializers](#default-values-using-property-initializers).
-- Improved performance. Benchmarks show that instantiating a `CommandLineParser<T>` using a
-  generated parser is up to thirty times faster than using reflection. However, since we're still
-  talking about microseconds, this is unlikely to matter that much to a typical application.
+- Improved performance; benchmarks show that instantiating a `CommandLineParser<T>` using a
+  generated parser is up to thirty times faster than using reflection.
 
-A few restrictions apply to projects that use Ookii.ComandLine's source generation:
+A few restrictions apply to projects that use Ookii.CommandLine's source generation:
 
 - The project must a C# project (other languages are not supported), using C# version 8 or later.
 - The project must be built using a recent version of the .Net SDK (TODO: Exact version).
