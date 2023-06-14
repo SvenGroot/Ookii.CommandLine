@@ -43,8 +43,7 @@ public partial class CommandLineParserTest
         Assert.AreEqual(argumentsType, target.ArgumentsType);
         Assert.AreEqual("Ookii.CommandLine Unit Tests", target.ApplicationFriendlyName);
         Assert.AreEqual(string.Empty, target.Description);
-        Assert.AreEqual(2, target.Arguments.Count);
-        using var args = target.Arguments.GetEnumerator();
+        Assert.AreEqual(2, target.Arguments.Length);
         VerifyArguments(target.Arguments, new[]
         {
             new ExpectedArgument("Help", typeof(bool), ArgumentKind.Method) { MemberName = "AutomaticHelp", Description = "Displays this help message.", IsSwitch = true, Aliases = new[] { "?", "h" } },
@@ -67,7 +66,7 @@ public partial class CommandLineParserTest
         Assert.AreEqual(argumentsType, target.ArgumentsType);
         Assert.AreEqual("Friendly name", target.ApplicationFriendlyName);
         Assert.AreEqual("Test arguments description.", target.Description);
-        Assert.AreEqual(18, target.Arguments.Count);
+        Assert.AreEqual(18, target.Arguments.Length);
         VerifyArguments(target.Arguments, new[]
         {
             new ExpectedArgument("arg1", typeof(string)) { MemberName = "Arg1", Position = 0, IsRequired = true, Description = "Arg1 description." },
@@ -1211,7 +1210,7 @@ public partial class CommandLineParserTest
     {
         var parser = CreateParser<DerivedArguments>(kind);
         Assert.AreEqual("Base class attribute.", parser.Description);
-        Assert.AreEqual(4, parser.Arguments.Count);
+        Assert.AreEqual(4, parser.Arguments.Length);
         VerifyArguments(parser.Arguments, new[]
         {
             new ExpectedArgument("BaseArg", typeof(string), ArgumentKind.SingleValue),

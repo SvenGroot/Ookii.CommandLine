@@ -45,11 +45,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="System.Collections.Immutable" Version="7.0.0" Condition="'$(TargetFramework)'=='netstandard2.0' Or '$(TargetFramework)'=='netstandard2.1'" />
     <PackageReference Include="System.Memory" Version="4.5.5" Condition="'$(TargetFramework)'=='netstandard2.0'" />
   </ItemGroup>
 
   <ItemGroup>
-    <InternalsVisibleTo Include="Ookii.CommandLine.Tests, PublicKey=00240000048000009400000006020000002400005253413100040000010001007fe1af257fa87a9a6602636ac8ea1afaebcb1b755b73cf31deb0c7c91b2604ad50570535f3e9e6e43525725daad5cd9cb09382331957108e70a320426d5db111674d2538d3f33c84bb72b16fd7ad43f00c17abf72a9d8ad18bc57f213e1aa3d891d44a184a9707f45ec0a435846544f80144c0df25debf40eb50d50f9e7d4fb0"/>
+    <InternalsVisibleTo Include="Ookii.CommandLine.Tests, PublicKey=00240000048000009400000006020000002400005253413100040000010001007fe1af257fa87a9a6602636ac8ea1afaebcb1b755b73cf31deb0c7c91b2604ad50570535f3e9e6e43525725daad5cd9cb09382331957108e70a320426d5db111674d2538d3f33c84bb72b16fd7ad43f00c17abf72a9d8ad18bc57f213e1aa3d891d44a184a9707f45ec0a435846544f80144c0df25debf40eb50d50f9e7d4fb0" />
   </ItemGroup>
 
   <ItemGroup>

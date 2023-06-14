@@ -4,6 +4,7 @@ using Ookii.CommandLine.Support;
 using Ookii.CommandLine.Validation;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -190,7 +191,7 @@ public class CommandLineParser
     #endregion
 
     private readonly ArgumentProvider _provider;
-    private readonly List<CommandLineArgument> _arguments = new();
+    private readonly ImmutableArray<CommandLineArgument> _arguments;
     private readonly SortedDictionary<ReadOnlyMemory<char>, CommandLineArgument> _argumentsByName;
     private readonly SortedDictionary<char, CommandLineArgument>? _argumentsByShortName;
     private readonly int _positionalArgumentCount;
@@ -198,13 +199,10 @@ public class CommandLineParser
     private readonly ParseOptions _parseOptions;
     private readonly ParsingMode _mode;
     private readonly PrefixInfo[] _sortedPrefixes;
-    private readonly string[] _argumentNamePrefixes;
+    private readonly ImmutableArray<string> _argumentNamePrefixes;
     private readonly string? _longArgumentNamePrefix;
-    private readonly char[] _nameValueSeparators;
+    private readonly ImmutableArray<char> _nameValueSeparators;
 
-    private ReadOnlyCollection<CommandLineArgument>? _argumentsReadOnlyWrapper;
-    private ReadOnlyCollection<string>? _argumentNamePrefixesReadOnlyWrapper;
-    private ReadOnlyCollection<char>? _nameValueSeparatorsReadOnlyWrapper;
     private List<CommandLineArgument>? _requiredPropertyArguments;
 
     /// <summary>
@@ -368,11 +366,20 @@ public class CommandLineParser
         _sortedPrefixes = prefixInfos.OrderByDescending(info => info.Prefix.Length).ToArray();
         _argumentsByName = new(new MemoryComparer(comparison));
 
-        _positionalArgumentCount = DetermineMemberArguments();
-        DetermineAutomaticArguments();
+        var builder = ImmutableArray.CreateBuilder<CommandLineArgument>();
+        _positionalArgumentCount = DetermineMemberArguments(builder);
+        DetermineAutomaticArguments(builder);
         // Sort the member arguments in usage order (positional first, then required
         // non-positional arguments, then the rest by name.
-        _arguments.Sort(new CommandLineArgumentComparer(comparison));
+        builder.Sort(new CommandLineArgumentComparer(comparison));
+        if (builder.Count == builder.Capacity)
+        {
+            _arguments = builder.MoveToImmutable();
+        }
+        else
+        {
+            _arguments = builder.ToImmutable();
+        }
 
         VerifyPositionalArgumentRules();
     }
@@ -406,8 +413,7 @@ public class CommandLineParser
     /// </remarks>
     /// <seealso cref="ParseOptionsAttribute.ArgumentNamePrefixes"/>
     /// <seealso cref="ParseOptions.ArgumentNamePrefixes"/>
-    public ReadOnlyCollection<string> ArgumentNamePrefixes =>
-        _argumentNamePrefixesReadOnlyWrapper ??= new(_argumentNamePrefixes);
+    public ImmutableArray<string> ArgumentNamePrefixes => _argumentNamePrefixes;
 
     /// <summary>
     /// Gets the prefix to use for long argument names.
@@ -588,7 +594,7 @@ public class CommandLineParser
     /// </remarks>
     /// <seealso cref="ParseOptionsAttribute.NameValueSeparators"/>
     /// <seealso cref="ParseOptions.NameValueSeparators"/>
-    public ReadOnlyCollection<char> NameValueSeparators => _nameValueSeparatorsReadOnlyWrapper ??= new(_nameValueSeparators);
+    public ImmutableArray<char> NameValueSeparators => _nameValueSeparators;
 
     /// <summary>
     /// Gets or sets a value that indicates whether usage help should be displayed if the <see cref="Parse(string[], int)"/>
@@ -670,7 +676,7 @@ public class CommandLineParser
     ///   and default value. Their current value can also be retrieved this way, in addition to using the arguments type directly.
     /// </para>
     /// </remarks>
-    public ReadOnlyCollection<CommandLineArgument> Arguments => _argumentsReadOnlyWrapper ??= _arguments.AsReadOnly();
+    public ImmutableArray<CommandLineArgument> Arguments => _arguments;
 
     /// <summary>
     /// Gets the automatic help argument or an argument with the same name, if there is one.
@@ -1227,11 +1233,11 @@ public class CommandLineParser
     /// <seealso cref="ArgumentNamePrefixes"/>
     /// <seealso cref="ParseOptionsAttribute.ArgumentNamePrefixes"/>
     /// <seealso cref="ParseOptions.ArgumentNamePrefixes"/>
-    public static string[] GetDefaultArgumentNamePrefixes()
+    public static ImmutableArray<string> GetDefaultArgumentNamePrefixes()
     {
         return RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
-            ? new[] { "-", "/" }
-            : new[] { "-" };
+            ? ImmutableArray.Create("-", "/")
+            : ImmutableArray.Create("-");
     }
 
     /// <summary>
@@ -1245,7 +1251,7 @@ public class CommandLineParser
     /// The return value of this method is used as the default value of the <see cref="NameValueSeparators"/> property.
     /// </remarks>
     /// <seealso cref="AllowWhiteSpaceValueSeparator"/>
-    public static char[] GetDefaultNameValueSeparators() => new[] { ':', '=' };
+    public static ImmutableArray<char> GetDefaultNameValueSeparators() => ImmutableArray.Create(':', '=');
 
     /// <summary>
     /// Raises the <see cref="ArgumentParsed"/> event.
@@ -1303,7 +1309,7 @@ public class CommandLineParser
         }
     }
 
-    private static string[] DetermineArgumentNamePrefixes(ParseOptions options)
+    private static ImmutableArray<string> DetermineArgumentNamePrefixes(ParseOptions options)
     {
         if (options.ArgumentNamePrefixes == null)
         {
@@ -1311,7 +1317,7 @@ public class CommandLineParser
         }
         else
         {
-            var result = options.ArgumentNamePrefixes.ToArray();
+            var result = options.ArgumentNamePrefixes.ToImmutableArray();
             if (result.Length == 0)
             {
                 throw new ArgumentException(Properties.Resources.EmptyArgumentNamePrefixes, nameof(options));
@@ -1326,7 +1332,7 @@ public class CommandLineParser
         }
     }
 
-    private static char[] DetermineNameValueSeparators(ParseOptions options)
+    private static ImmutableArray<char> DetermineNameValueSeparators(ParseOptions options)
     {
         if (options.NameValueSeparators == null)
         {
@@ -1334,7 +1340,7 @@ public class CommandLineParser
         }
         else
         {
-            var result = options.NameValueSeparators.ToArray();
+            var result = options.NameValueSeparators.ToImmutableArray();
             if (result.Length == 0)
             {
                 throw new ArgumentException(Properties.Resources.EmptyNameValueSeparators, nameof(options));
@@ -1344,12 +1350,12 @@ public class CommandLineParser
         }
     }
 
-    private int DetermineMemberArguments()
+    private int DetermineMemberArguments(ImmutableArray<CommandLineArgument>.Builder builder)
     {
         int additionalPositionalArgumentCount = 0;
         foreach (var argument in _provider.GetArguments(this))
         {
-            AddNamedArgument(argument);
+            AddNamedArgument(argument, builder);
             if (argument.Position != null)
             {
                 ++additionalPositionalArgumentCount;
@@ -1359,7 +1365,7 @@ public class CommandLineParser
         return additionalPositionalArgumentCount;
     }
 
-    private void DetermineAutomaticArguments()
+    private void DetermineAutomaticArguments(ImmutableArray<CommandLineArgument>.Builder builder)
     {
         bool autoHelp = Options.AutoHelpArgumentOrDefault;
         if (autoHelp)
@@ -1368,7 +1374,7 @@ public class CommandLineParser
 
             if (created)
             {
-                AddNamedArgument(argument);
+                AddNamedArgument(argument, builder);
             }
 
             HelpArgument = argument;
@@ -1381,12 +1387,12 @@ public class CommandLineParser
 
             if (argument != null)
             {
-                AddNamedArgument(argument);
+                AddNamedArgument(argument, builder);
             }
         }
     }
 
-    private void AddNamedArgument(CommandLineArgument argument)
+    private void AddNamedArgument(CommandLineArgument argument, ImmutableArray<CommandLineArgument>.Builder builder)
     {
         if (_nameValueSeparators.Any(separator => argument.ArgumentName.Contains(separator)))
         {
@@ -1427,7 +1433,7 @@ public class CommandLineParser
             _requiredPropertyArguments.Add(argument);
         }
 
-        _arguments.Add(argument);
+        builder.Add(argument);
     }
 
     private void VerifyPositionalArgumentRules()
@@ -1618,7 +1624,7 @@ public class CommandLineParser
 
     private (CancelMode, int, CommandLineArgument?) ParseNamedArgument(ReadOnlySpan<string> args, int index, PrefixInfo prefix)
     {
-        var (argumentName, argumentValue) = args[index].AsMemory(prefix.Prefix.Length).SplitFirstOfAny(_nameValueSeparators);
+        var (argumentName, argumentValue) = args[index].AsMemory(prefix.Prefix.Length).SplitFirstOfAny(_nameValueSeparators.AsSpan());
 
         CancelMode cancelParsing;
         CommandLineArgument? argument = null;
