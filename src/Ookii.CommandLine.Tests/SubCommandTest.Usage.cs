@@ -70,6 +70,22 @@ The following commands are available:
 Run 'test <command> -Help' for more information about a command.
 ".ReplaceLineEndings();
 
+    public static readonly string _expectedUsageAutoInstruction = @"Usage: test <command> [arguments]
+
+The following commands are available:
+
+    AnotherSimpleCommand, alias
+
+    test
+        Test command description.
+
+    version
+        Displays version information.
+
+Run 'test <command> -Help' for more information about a command.
+".ReplaceLineEndings();
+
+
     public static readonly string _expectedUsageWithDescription = @"Tests for Ookii.CommandLine.
 
 Usage: test <command> [arguments]

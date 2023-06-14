@@ -211,6 +211,28 @@ public partial class SubCommandTest
 
     [TestMethod]
     [DynamicData(nameof(ProviderKinds), DynamicDataDisplayName = nameof(GetCustomDynamicDataDisplayName))]
+    public void TestWriteUsageAutoInstruction(ProviderKind kind)
+    {
+        using var writer = LineWrappingTextWriter.ForStringWriter(0);
+        var options = new CommandOptions()
+        {
+            Error = writer,
+            // Filter out commands that prevent the instruction being shown.
+            CommandFilter = c => !c.UseCustomArgumentParsing,
+            UsageWriter = new UsageWriter(writer)
+            {
+                ExecutableName = _executableName,
+                IncludeCommandHelpInstruction = true,
+            }
+        };
+
+        var manager = CreateManager(kind, options);
+        manager.WriteUsage();
+        Assert.AreEqual(_expectedUsageAutoInstruction, writer.BaseWriter.ToString());
+    }
+
+    [TestMethod]
+    [DynamicData(nameof(ProviderKinds), DynamicDataDisplayName = nameof(GetCustomDynamicDataDisplayName))]
     public void TestWriteUsageApplicationDescription(ProviderKind kind)
     {
         using var writer = LineWrappingTextWriter.ForStringWriter(0);
