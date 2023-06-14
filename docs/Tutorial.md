@@ -2,7 +2,7 @@
 
 This tutorial will show you the basics of how to use Ookii.CommandLine. It will show you how to
 create an application that parses the command line and shows usage help, how to customize some of
-the options—including the new long/short mode—and how to use subcommands.
+the options—including the POSIX-like long/short mode—and how to use subcommands.
 
 Refer to the [documentation](README.md) for more detailed information.
 
@@ -12,7 +12,7 @@ Create a directory called "tutorial" for the project, and run the following comm
 directory:
 
 ```text
-dotnet new console --framework net6.0
+dotnet new console --framework net7.0
 ```
 
 Next, we will add a reference to Ookii.CommandLine's NuGet package:
@@ -26,70 +26,77 @@ dotnet add package Ookii.CommandLine
 Add a file to your project called Arguments.cs, and insert the following code:
 
 ```csharp
+using System.ComponentModel;
 using Ookii.CommandLine;
 
 namespace Tutorial;
 
-class Arguments
+[GeneratedParser]
+[Description("Reads a file and displays the contents on the command line.")]
+partial class Arguments
 {
-    [CommandLineArgument(Position = 0, IsRequired = true)]
-    public string? Path { get; set; }
+    [CommandLineArgument(IsPositional = true)]
+    [Description("The path of the file to read.")]
+    public required string Path { get; set; }
 }
+```
+
+If you are targeting a .Net version before .Net 7.0, the `required` keyword is not available. In
+that case, use the following code instead:
+
+```csharp
+[CommandLineArgument(IsPositional = true, IsRequired = true)]
+[Description("The path of the file to read.")]
+public string? Path { get; set; }
 ```
 
 In Ookii.CommandLine, you define arguments by making a class that holds them, and adding properties
 to that class. Every public property that has the [`CommandLineArgumentAttribute`][] defines an argument.
 
-The code above defines a single argument called "Path", indicates it's the first positional argument,
+The code above defines a single argument called "Path", indicates it's the a positional argument,
 and makes it required.
 
 > You can use the [`CommandLineArgumentAttribute`][] to specify a custom name for your argument. If you
 > don't, the property name is used.
 
+The class above uses the `GeneratedParserAttribute`, which is not required, but is recommended
+unless you are using an SDK older than .Net 6.0, or a language other than C# ([find out more](SourceGeneration.md)).
+
 Now replace the contents of Program.cs with the following:
 
 ```csharp
-using Ookii.CommandLine;
+using Tutorial;
 
-namespace Tutorial;
-
-static class Program
+var arguments = Arguments.Parse();
+if (arguments == null)
 {
-    public static int Main()
-    {
-        var args = CommandLineParser.Parse<Arguments>();
-        if (args == null)
-        {
-            return 1;
-        }
-
-        ReadFile(args);
-        return 0;
-    }
-
-    private static void ReadFile(Arguments args)
-    {
-        foreach (var line in File.ReadLines(args.Path!))
-        {
-            Console.WriteLine(line);
-        }
-    }
+    return 1;
 }
+
+foreach (var line in File.ReadLines(arguments.Path))
+{
+    Console.WriteLine(line);
+}
+
+return 0;
 ```
 
 This code parses the arguments we defined, returns an error code if it was unsuccessful, and writes
 the contents of the file specified by the path argument to the console.
 
-The important part is the call to `CommandLineParser.Parse<Arguments>()`. This static method will
-parse your arguments, handle and print any errors, and print usage help if required.
+The important part is the call to `Arguments.Parse()`. This static method was created by the
+`GeneratedParserAttribute`, and will parse your arguments, handle and print any errors, and print
+usage help if required.
 
-But wait, we didn't pass any arguments to this method? Actually, the [`Parse<T>()`][Parse<T>()_1]
-method will call [`Environment.GetCommandLineArgs()`][] to get the arguments. There are also
-overloads that take an explicit `string[]` array with the arguments, if you want to pass them
-manually.
+> If you cannot use the `GeneratedParserAttribute`, call `CommandLineParser.Parse<Arguments>()`
+> instead.
+
+But wait, we didn't pass any arguments to this method? Actually, the method will call
+[`Environment.GetCommandLineArgs()`][] to get the arguments. There are also overloads that take an
+explicit `string[]` array with the arguments, if you want to pass them manually.
 
 So, let's run our application. Build the application using `dotnet build`, and then, from the
-`bin/Debug/net6.0` directory, run the following:
+`bin/Debug/net7.0` directory, run the following:
 
 ```text
 ./tutorial ../../../tutorial.csproj
@@ -102,13 +109,13 @@ Which will give print the contents of the tutorial.csproj file:
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net7.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Ookii.CommandLine" Version="3.0.0" />
+    <PackageReference Include="Ookii.CommandLine" Version="4.0.0" />
   </ItemGroup>
 
 </Project>
@@ -126,7 +133,12 @@ This gives the following output:
 ```text
 The required argument 'Path' was not supplied.
 
+Reads a file and displays the contents on the command line.
+
 Usage: tutorial [-Path] <String> [-Help] [-Version]
+
+    -Path <String>
+        The path of the file to read.
 
     -Help [<Boolean>] (-?, -h)
         Displays this help message.
@@ -138,13 +150,13 @@ Usage: tutorial [-Path] <String> [-Help] [-Version]
 > The actual usage help uses color if your console supports it. See [here](images/color.png) for
 > an example.
 
-As you can see, the [`Parse<T>()`][Parse<T>()_1] method lets us know what's wrong (we didn't supply
-the required argument), and shows the usage help.
+As you can see, the generated `Parse()` method lets us know what's wrong (we didn't supply the
+required argument), and shows the usage help.
 
-The usage syntax (the line starting with "Usage:") includes the `-Path` argument we defined.
-However, the list of argument descriptions below it does not. That's because our argument doesn't
-have a description, and only arguments with descriptions are shown in that list by default. We'll
-add some descriptions [below](#expanding-the-usage-help).
+This usage help includes the description we applied to the class (this is the application
+description), and the `-Path` argument using the [`DescriptionAttribute`][]. This is how you can
+provide detailed information about your arguments to your users. It's strongly recommended to
+always add a description to your arguments.
 
 You can also see that there are two more arguments that we didn't define: `-Help` and `-Version`.
 These arguments are automatically added by Ookii.CommandLine. So, what do they do?
@@ -163,14 +175,14 @@ tutorial 1.0.0
 
 By default, it shows the assembly's name and informational version. It'll also show the assembly's
 copyright information, if there is any (there's not in this case). You can also use the
-[`ApplicationFriendlyNameAttribute`][] attribute to specify a custom name instead of the assembly name.
+`AssemblyTitleAttribute` or [`ApplicationFriendlyNameAttribute`][] attribute to specify a custom
+name instead of the assembly name.
 
 > If you define an argument called "Help" or "Version", the automatic arguments won't be added.
 > Also, you can disable the automatic arguments using the [`ParseOptionsAttribute`][] attribute.
 
-Note that in the usage syntax, your positional "Path" argument still has its name shown as `-Path`.
-That's because every argument, even positional ones, can still be supplied by name. So if you run
-this:
+Note that the positional "Path" argument still has its name shown as `-Path`. That's because every
+argument, even positional ones, can still be supplied by name. So if you run this:
 
 ```text
 ./tutorial -path ../../../tutorial.csproj
@@ -178,8 +190,8 @@ this:
 
 The output is the same as above.
 
-> Argument names are case insensitive by default, so even though I used `-path` instead of `-Path`
-> above, it still worked.
+> Argument names are case insensitive by default, so `-path` will work instead of `-Path`, as does
+> `-PATH` or any other capitalization.
 
 ## Arguments with other types
 
@@ -200,18 +212,21 @@ And then add the following properties to the `Arguments` class:
 
 ```csharp
 [CommandLineArgument]
+[Description("The maximum number of lines to output.")]
+[ValueDescription("Number")]
 [ValidateRange(1, null)]
-[Alias("Max")]
+[Alias("Lines")]
 public int? MaxLines { get; set; }
 
 [CommandLineArgument]
+[Description("Use black text on a white background.")]
 public bool Inverted { get; set; }
 ```
 
 This defines two new arguments. The first, `-MaxLines`, uses `int?` as its type, so it will only
 accept integer numbers, and be null if not supplied. This argument is not positional (you must use
 the name), and it's optional. We've also added a validator to ensure the value is positive, and
-since `-MaxLines` might be a bit verbose, we've given it an alias `-Max`, which can be used as an
+since `-MaxLines` might be a bit verbose, we've given it an alias `-Lines`, which can be used as an
 alternative name to supply the argument.
 
 > An argument can have any number of aliases; just repeat the [`AliasAttribute`][] attribute.
@@ -219,39 +234,46 @@ alternative name to supply the argument.
 The second argument, `-Inverted`, is a boolean, which means it's a switch argument. Switch arguments
 don't need values, you either supply them or you don't.
 
-Now, let's update `ReadFile` to use the new arguments:
+Now, let's update Program.cs to use the new arguments:
 
 ```csharp
-private static void ReadFile(Arguments args)
+using Tutorial;
+
+var arguments = Arguments.Parse();
+if (arguments == null)
 {
-    if (args.Inverted)
-    {
-        Console.BackgroundColor = ConsoleColor.White;
-        Console.ForegroundColor = ConsoleColor.Black;
-    }
-
-    var lines = File.ReadLines(args.Path!);
-    if (args.MaxLines is int maxLines)
-    {
-        lines = lines.Take(maxLines);
-    }
-
-    foreach (var line in lines)
-    {
-        Console.WriteLine(line);
-    }
-
-    if (args.Inverted)
-    {
-        Console.ResetColor();
-    }
+    return 1;
 }
+
+if (arguments.Inverted)
+{
+    Console.BackgroundColor = ConsoleColor.White;
+    Console.ForegroundColor = ConsoleColor.Black;
+}
+
+var lines = File.ReadLines(arguments.Path);
+if (arguments.MaxLines is int maxLines)
+{
+    lines = lines.Take(maxLines);
+}
+
+foreach (var line in lines)
+{
+    Console.WriteLine(line);
+}
+
+if (arguments.Inverted)
+{
+    Console.ResetColor();
+}
+
+return 0;
 ```
 
 Now we can run the application like this:
 
 ```text
-./tutorial ../../../tutorial.csproj -max 5 -inverted
+./tutorial ../../../tutorial.csproj -lines 5 -inverted
 ```
 
 And it'll only show the first five lines of the file, using black-on-white text.
@@ -259,97 +281,21 @@ And it'll only show the first five lines of the file, using black-on-white text.
 If you supply a value that's not a valid integer for `-MaxLines`, or a value that's less than 1,
 you'll once again get an error message and the usage help.
 
-Above, we used a nullable value type ([`Nullable<int>`][], or `int?`) so we could tell whether the
-argument was supplied. Instead, we could also set a default value. This can be done in two ways: the
-first is using the [`DefaultValue`][DefaultValue_1] property:
+What do you think will happen if we run this command?
 
-```csharp
-[CommandLineArgument(DefaultValue = 10)]
-[ValidateRange(1, null)]
-[Alias("Max")]
-public int MaxLines { get; set; }
+```text
+./tutorial ../../../tutorial.csproj -m 5 -i
 ```
 
-> If your argument's type doesn't have literals, you can also use a string to specify the default
-> value, and the value will be converted when used. For example, `[CommandLineArgument(DefaultValue = "10")]`
-> is equivalent to the above.
+If you tried it, you can see that it worked. By default, Ookii.CommandLine will treat any unique
+prefix of a command line argument's name or aliases as an alias for that command. So, `-m` is
+automatically an alias for `-MaxLines`. As is `-ma`, and `-max`, etc. And `-l` is as well, as it's
+a prefix of the alias `-Lines`.
 
-Alternatively, you can just initialize the property, since Ookii.CommandLine won't set the property
-if the argument is not supplied and the default value is null:
+> This only works if the prefix matches exactly one argument. And if you don't like this behavior,
+> is can be disabled using the `ParseOptionsAttribute.AutoPrefixAliases` property.
 
-```csharp
-[CommandLineArgument]
-public int MaxLines { get; set; } = 10;
-```
-
-The advantage of the former approach is that the default value will be included in the usage help.
-The latter allows you to use non-constant values, and can sometimes be required if the type of an
-argument is a non-nullable reference type (you can also use both, in which case the [`DefaultValue`][DefaultValue_1]
-property will overwrite the initial value).
-
-While we're talking about non-nullable reference types, consider the following alternative for the
-`-Path` argument:
-
-```csharp
-[CommandLineArgument(Position = 0, IsRequired = true)]
-public string Path { get; set; } = string.Empty;
-```
-
-An automatic property with a non-nullable type must be initialized with a non-null value, or the
-code won't compile. Even though we know the property will be set by the [`CommandLineParser`][],
-because the argument is required, this is still required because the C# compiler can't know that
-(and the compiler is right in case you create an instance manually without using the
-[`CommandLineParser`][]). So we must initialize the property, even if that value won't be used.
-
-The advantage of doing this would be that we can remove the `!` from the value's usage in
-`ReadFile`, at the cost of an unnecessary initialization. As a bonus, for .Net 6.0 and later only,
-the [`CommandLineParser`][] will make sure that arguments with non-nullable types can't be set to
-null, even if the [`TypeConverter`][] for the property's type returns null (it will treat that as an
-error).
-
-## Expanding the usage help
-
-We saw before that our custom arguments were included in the usage syntax, but didn't have any
-descriptions. Typically, you'll want to add descriptions to your arguments, so your users can tell
-what they do. This is done using the [`System.ComponentModel.DescriptionAttribute`][] attribute.
-
-Let's add some for our arguments:
-
-```csharp
-using Ookii.CommandLine;
-using Ookii.CommandLine.Validation;
-using System.ComponentModel;
-
-namespace Tutorial;
-
-[Description("Reads a file and displays the contents on the command line.")]
-class Arguments
-{
-    [CommandLineArgument(Position = 0, IsRequired = true)]
-    [Description("The path of the file to read.")]
-    public string? Path { get; set; }
-
-    [CommandLineArgument(ValueDescription = "Number")]
-    [Description("The maximum number of lines to output.")]
-    [ValidateRange(1, null)]
-    [Alias("Max")]
-    public int? MaxLines { get; set; }
-
-    [CommandLineArgument]
-    [Description("Use black text on a white background.")]
-    public bool Inverted { get; set; }
-}
-```
-
-I've also added a description to the class itself. That description is shown before the usage syntax
-as part of the usage help. Use it to provide a description for your application as a whole.
-
-The `MaxLines` property now also sets its *value description*. The value description is a short,
-typically one-word description of the type of values the argument accepts, which is shown in angle
-brackets in the usage help. It defaults to the type name, but "Int32" might not be very meaningful
-to people who aren't programmers, so we've changed it to "Number" instead.
-
-Now, let's run the application using `./tutorial -help`:
+Let's take a look at the usage help for our updated application, by running `./tutorial -help`:
 
 ```text
 Reads a file and displays the contents on the command line.
@@ -365,22 +311,55 @@ Usage: tutorial [-Path] <String> [-Help] [-Inverted] [-MaxLines <Number>] [-Vers
     -Inverted [<Boolean>]
         Use black text on a white background.
 
-    -MaxLines <Number> (-Max)
+    -MaxLines <Number> (-Lines)
         The maximum number of lines to output. Must be at least 1.
 
     -Version [<Boolean>]
         Displays version information.
 ```
 
-Now our usage help looks a lot better! All the arguments are present in the description list. Also
-note how the [`ValidateRangeAttribute`][] validator we used automatically added its condition to the
-description of `-MaxLines` (this can be disabled either globally or on a per-validator basis if you
-want). Things like the default value, if an argument has one, are added in a similar fashion.
+There's a few interesting things here. The `MaxLines` property has the `ValueDescriptionAttribute`
+applied, and we can see that the value, "Number", is used inside the angle brackets after
+`-MaxLines`. This is the *value description*, which is a short, typically one-word description of
+the type of values the argument accepts. It defaults to the type name, but "Int32" might not be very
+meaningful to people who aren't programmers, so we've changed it to "Number" instead.
+
+You can also see that the [`ValidateRangeAttribute`][] doesn't just validate its condition, it also
+adds that condition to the description of the argument (this can be disabled either globally or on
+a per-validator basis if you want). So you don't have to worry about keeping the description and
+the actual requirements in sync.
 
 The `-MaxLines` argument also has its alias listed, just like the `-Help` argument.
 
 > Don't like the way the usage help looks? It can be fully customized! Check out the
 > [custom usage sample](../src/Samples/CustomUsage) for an example of that.
+
+## Default values
+
+Above, we used a nullable value type ([`Nullable<int>`][], or `int?`) so we could tell whether the
+argument was supplied. Instead, we could also set a default value. This can easily be done by
+initializing the property with that value:
+
+```csharp
+[CommandLineArgument]
+[ValidateRange(1, null)]
+[Alias("Lines")]
+public int MaxLines { get; set; } = 10;
+```
+
+> Instead of initializing the property, you can also use the
+> [`CommandLineArgumentAttribute.DefaultValue`][] property, which can be useful if e.g. you're not using
+> an automatic property (so you can't have a direct initializer like that). And, this method accepts
+> not just the argument's actual type, but also any string that can be converted to it. For example,
+> both `[CommandLineArgument(DefaultValue = 10)]` and `[CommandLineArgument(DefaultValue = "10")]`
+> are equivalent to the above. Handy if your argument's type doesn't have literals.
+
+This default value would be shown in the usage help as well, similar to the validator:
+
+```text
+    -MaxLines <Number> (-Lines)
+        The maximum number of lines to output. Must be at least 1. Default value: 10.
+```
 
 ## Long/short mode and other customizations
 
@@ -1001,6 +980,7 @@ following resources:
 [`AsyncCommandBase`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_Commands_AsyncCommandBase.htm
 [`CaseSensitive`]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_ParseOptionsAttribute_CaseSensitive.htm
 [`CommandAttribute`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_Commands_CommandAttribute.htm
+[`CommandLineArgumentAttribute.DefaultValue`]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_DefaultValue.htm
 [`CommandLineArgumentAttribute.IsLong`]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_IsLong.htm
 [`CommandLineArgumentAttribute.ShortName`]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_ShortName.htm
 [`CommandLineArgumentAttribute`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_CommandLineArgumentAttribute.htm
@@ -1031,13 +1011,10 @@ following resources:
 [`StringComparer.InvariantCulture`]: https://learn.microsoft.com/dotnet/api/system.stringcomparer.invariantculture
 [`StringComparer.Ordinal`]: https://learn.microsoft.com/dotnet/api/system.stringcomparer.ordinal
 [`StringComparer.OrdinalIgnoreCase`]: https://learn.microsoft.com/dotnet/api/system.stringcomparer.ordinalignorecase
-[`System.ComponentModel.DescriptionAttribute`]: https://learn.microsoft.com/dotnet/api/system.componentmodel.descriptionattribute
 [`Take()`]: https://learn.microsoft.com/dotnet/api/system.linq.enumerable.take
-[`TypeConverter`]: https://learn.microsoft.com/dotnet/api/system.componentmodel.typeconverter
 [`Uri`]: https://learn.microsoft.com/dotnet/api/system.uri
 [`ValidateRangeAttribute`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_Validation_ValidateRangeAttribute.htm
 [ArgumentNameComparer_1]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_ParseOptions_ArgumentNameComparer.htm
-[DefaultValue_1]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_DefaultValue.htm
 [Mode_2]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_ParseOptionsAttribute_Mode.htm
 [Parse<T>()_1]: https://www.ookii.org/docs/commandline-3.1/html/M_Ookii_CommandLine_CommandLineParser_Parse__1.htm
 [Run()_0]: https://www.ookii.org/docs/commandline-3.1/html/M_Ookii_CommandLine_Commands_AsyncCommandBase_Run.htm

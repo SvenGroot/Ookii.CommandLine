@@ -1,14 +1,16 @@
 # Ookii.CommandLine [![NuGet](https://img.shields.io/nuget/v/Ookii.CommandLine)](https://www.nuget.org/packages/Ookii.CommandLine/)
 
-Ookii.CommandLine is a powerful and flexible command line argument parsing library for .Net
-applications.
+Ookii.CommandLine is a powerful, flexible and highly customizable command line argument parsing
+library for .Net applications.
 
 - Easily define arguments by creating a class with properties.
 - Create applications with multiple subcommands.
 - Generate fully customizable usage help.
 - Supports PowerShell-like and POSIX-like parsing rules.
+- Trim-friendly
 
-Ookii.CommandLine is provided in versions for [.Net Standard 2.0, .Net Standard 2.1, and .Net 6.0 and later](#requirements).
+Ookii.CommandLine is [provided in versions](#requirements) for .Net Standard 2.0, .Net Standard 2.1,
+.Net 6.0, and .Net 7.0 and later.
 
 Ookii.CommandLine can be added to your project using [NuGet](https://nuget.org/packages/Ookii.CommandLine).
 [Code snippets](docs/CodeSnippets.md) for Visual Studio are available on the
@@ -20,35 +22,36 @@ A [C++ version](https://github.com/SvenGroot/Ookii.CommandLine.Cpp) is also avai
 
 Ookii.CommandLine is a library that lets you parse the command line arguments for your application
 into a set of strongly-typed, named values. You can easily define the accepted arguments, and then
-parse the command line supplied to your application for those arguments. In addition, you can
-generate usage help that can be displayed to the user.
+parse the supplied arguments for those values. In addition, you can generate usage help that can be
+displayed to the user.
 
 Ookii.CommandLine can be used with any kind of .Net application, whether console or GUI. Some
-functions, such as creating usage help, are primarily designed for console applications, but even
-those can be easily adapted for use with other styles of applications.
+functionality, such as creating usage help, are primarily designed for console applications, but
+even those can be easily adapted for use with other styles of applications.
 
 Two styles of [command line parsing rules](docs/Arguments.md) are supported: the default mode uses
 rules similar to those used by PowerShell, and the alternative [long/short mode](docs/Arguments.md#longshort-mode)
 uses a style influenced by POSIX conventions, where arguments have separate long and short names
 with different prefixes. Many aspects of the parsing rules are configurable.
 
-To determine which arguments are accepted, you create a class, with constructor parameters and
-properties that define the arguments. Attributes are used to specify names, create required or
-positional arguments, and to specify descriptions for use in the generated usage help.
+To determine which arguments are accepted, you create a class, with properties and methods that
+define the arguments. Attributes are used to specify names, create required or positional arguments,
+and to specify descriptions for use in the generated usage help.
 
 For example, the following class defines four arguments: a required positional argument, an optional
 positional argument, a named-only argument, and a switch argument (sometimes also called a flag):
 
 ```csharp
-class MyArguments
+[GeneratedParser]
+partial class MyArguments
 {
-    [CommandLineArgument(Position = 0, IsRequired = true)]
+    [CommandLineArgument(IsPositional = true)]
     [Description("A required positional argument.")]
-    public string? Required { get; set; }
+    public required string Required { get; set; }
 
-    [CommandLineArgument(Position = 1)]
+    [CommandLineArgument(IsPositional = true)]
     [Description("An optional positional argument.")]
-    public int Optional { get; set; }
+    public required int Optional { get; set; } = 42;
 
     [CommandLineArgument]
     [Description("An argument that can only be supplied by name.")]
@@ -62,11 +65,16 @@ class MyArguments
 
 Each argument has a different type that determines the kinds of values it can accept.
 
+> If you are using an older version of .Net where the `required` keyword is not available, you can
+> use `[CommandLineArgument(IsRequired = true)]` to create a required argument instead.
+
 To parse these arguments, all you have to do is add the following line to your `Main` method:
 
 ```csharp
-var arguments = CommandLineParser.Parse<MyArguments>();
+var arguments = MyArguments.Parse();
 ```
+
+The `Parse()` method is added to the class through [source generation](docs/SourceGeneration.md).
 
 This code will take the arguments from `Environment.GetCommandLineArgs()` (you can also manually
 pass a `string[]` array if you want), will handle and print errors to the console, and will print
@@ -83,7 +91,7 @@ Usage: MyApplication [-Required] <String> [[-Optional] <Int32>] [-Help] [-Named 
         A required positional argument.
 
     -Optional <Int32>
-        An optional positional argument.
+        An optional positional argument with a default value. Default value: 42.
 
     -Help [<Boolean>] (-?, -h)
         Displays this help message.
@@ -98,10 +106,9 @@ Usage: MyApplication [-Required] <String> [[-Optional] <Int32>] [-Help] [-Named 
         Displays version information.
 ```
 
-The [usage help](docs/UsageHelp.md) includes the descriptions given for the arguments.
-
-See the [documentation for the samples](src/Samples) for more examples of usage help generated by
-Ookii.CommandLine. The usage help format can also be [fully customized](src/Samples/CustomUsage).
+The [usage help](docs/UsageHelp.md) includes the descriptions given for the arguments, as well as
+things like default values and aliases. The usage help format can also be
+[fully customized](src/Samples/CustomUsage).
 
 The application also has two arguments that weren't in the class, `-Help` and `-Version`, which are
 automatically added by default.
@@ -126,22 +133,26 @@ It can be used with applications supporting one of the following:
 
 - .Net Standard 2.0
 - .Net Standard 2.1
-- .Net 6.0 and later
+- .Net 6.0
+- .Net 7.0 and later
 
 As of version 3.0, .Net Framework 2.0 is no longer supported. You can still target .Net Framework
 4.6.1 and later using the .Net Standard 2.0 assembly. If you need to support an older version of
 .Net, please continue to use [version 2.4](https://github.com/SvenGroot/ookii.commandline/releases/tag/v2.4).
 
-The .Net Standard 2.1 and .Net 6.0 version utilize `ReadOnlySpan<char>` for improved performance of
-the [`LineWrappingTextWriter`](docs/Utilities.md) class.
+The .Net Standard 2.1 and .Net 6.0 and 7.0 versions utilize the framework `ReadOnlySpan<T>` and
+`ReadOnlyMemory<T>` types without a dependency on the System.Memory package.
 
-The .Net 6.0 version has additional support for [nullable reference types](docs/Arguments.md#arguments-with-non-nullable-types).
+The .Net 6.0 version has additional support for [nullable reference types](docs/Arguments.md#arguments-with-non-nullable-types),
+and is annotated to allow [trimming](https://learn.microsoft.com/dotnet/core/deploying/trimming/trimming-options)
+
+The .Net 7.0 version has additional support for `ISpanParsable<TSelf>` and `IParsable<TSelf>`.
 
 ## Building and testing
 
 To build Ookii.CommandLine, make sure you have the following installed:
 
-- [Microsoft .Net 6.0 SDK](https://dotnet.microsoft.com/download)
+- [Microsoft .Net 7.0 SDK](https://dotnet.microsoft.com/download) or later
 - [Microsoft PowerShell 6 or later](https://github.com/PowerShell/PowerShell)
 
 PowerShell is used to generate some source files during the build. Besides installing it normally,
@@ -151,8 +162,8 @@ To build the library, tests and samples, simply use the `dotnet build` command i
 directory. You can run the unit tests using `dotnet test`. The tests should pass on all platforms
 (Windows and Linux have been tested).
 
-The tests are built and run for both .Net 6.0 and .Net Framework 4.8. Running the .Net Framework
-tests on a non-Windows platform may require the use of [Mono](https://www.mono-project.com/).
+The tests are built and run for .Net 7.0, .Net 6.0, and .Net Framework 4.8. Running the .Net
+Framework tests on a non-Windows platform may require the use of [Mono](https://www.mono-project.com/).
 
 Ookii.CommandLine uses a strongly-typed resources file, which will not update correctly unless the
 `Resources.resx` file is edited with [Microsoft Visual Studio](https://visualstudio.microsoft.com/).
@@ -169,11 +180,11 @@ Nowadays, System.CommandLine offers an official Microsoft solution for command l
 then, should you use Ookii.CommandLine?
 
 Ookii.CommandLine has a very different design. It uses a declarative approach to defining command
-line arguments, using properties and attributes, which I personally prefer as it reduces the amount
-of code you typically need to write.
+line arguments, using properties and attributes, which I personally prefer to the fluent API used
+by System.CommandLine, as it reduces the amount of code you typically need to write.
 
-Additionally, Ookii.CommandLine supports a more PowerShell-like syntax, as well as the POSIX-like
-syntax that System.CommandLine uses.
+Additionally, Ookii.CommandLine is highly configurable, and supports a more PowerShell-like syntax,
+as well as the POSIX-like syntax that System.CommandLine uses.
 
 In the end, it comes down to personal preference. You should use whichever one suits your needs and
 coding style best.
