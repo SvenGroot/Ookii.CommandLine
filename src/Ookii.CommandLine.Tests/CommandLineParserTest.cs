@@ -4,6 +4,7 @@ using Ookii.CommandLine.Support;
 using Ookii.CommandLine.Tests.Commands;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Globalization;
@@ -1356,8 +1357,8 @@ public partial class CommandLineParserTest
         Assert.IsFalse(argument.AllowMultiValueWhiteSpaceSeparator);
         Assert.IsNull(argument.Value);
         Assert.IsFalse(argument.HasValue);
-        CollectionAssert.AreEqual(expected.Aliases, argument.Aliases);
-        CollectionAssert.AreEqual(expected.ShortAliases, argument.ShortAliases);
+        CollectionAssert.AreEqual(expected.Aliases ?? Array.Empty<string>(), argument.Aliases);
+        CollectionAssert.AreEqual(expected.ShortAliases ?? Array.Empty<char>(), argument.ShortAliases);
     }
 
     private static void VerifyArguments(IEnumerable<CommandLineArgument> arguments, ExpectedArgument[] expected)

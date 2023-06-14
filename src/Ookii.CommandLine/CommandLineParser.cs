@@ -1402,24 +1402,18 @@ public class CommandLineParser
         if (argument.HasLongName)
         {
             _argumentsByName.Add(argument.ArgumentName.AsMemory(), argument);
-            if (argument.Aliases != null)
+            foreach (string alias in argument.Aliases)
             {
-                foreach (string alias in argument.Aliases)
-                {
-                    _argumentsByName.Add(alias.AsMemory(), argument);
-                }
+                _argumentsByName.Add(alias.AsMemory(), argument);
             }
         }
 
         if (_argumentsByShortName != null && argument.HasShortName)
         {
             _argumentsByShortName.Add(argument.ShortName, argument);
-            if (argument.ShortAliases != null)
+            foreach (var alias in argument.ShortAliases)
             {
-                foreach (var alias in argument.ShortAliases)
-                {
-                    _argumentsByShortName.Add(alias, argument);
-                }
+                _argumentsByShortName.Add(alias, argument);
             }
         }
 
@@ -1704,7 +1698,7 @@ public class CommandLineParser
             }
 
             var matches = argument.ArgumentName.AsSpan().StartsWith(prefix, ArgumentNameComparison);
-            if (!matches && argument.Aliases != null)
+            if (!matches)
             {
                 foreach (var alias in argument.Aliases)
                 {

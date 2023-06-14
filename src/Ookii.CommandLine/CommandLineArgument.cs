@@ -4,6 +4,7 @@ using Ookii.CommandLine.Support;
 using Ookii.CommandLine.Validation;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -311,8 +312,8 @@ public abstract class CommandLineArgument
     private readonly string _argumentName;
     private readonly bool _hasLongName = true;
     private readonly char _shortName;
-    private readonly ReadOnlyCollection<string>? _aliases;
-    private readonly ReadOnlyCollection<char>? _shortAliases;
+    private readonly ImmutableArray<string> _aliases = ImmutableArray<string>.Empty;
+    private readonly ImmutableArray<char> _shortAliases = ImmutableArray<char>.Empty;
     private readonly Type _argumentType;
     private readonly Type _elementType;
     private readonly Type _elementTypeWithNullable;
@@ -369,12 +370,12 @@ public abstract class CommandLineArgument
 
         if (HasLongName && info.Aliases != null)
         {
-            _aliases = new(info.Aliases.ToArray());
+            _aliases = info.Aliases.ToImmutableArray();
         }
 
         if (HasShortName && info.ShortAliases != null)
         {
-            _shortAliases = new(info.ShortAliases.ToArray());
+            _shortAliases = info.ShortAliases.ToImmutableArray();
         }
 
         _argumentType = info.ArgumentType;
@@ -570,7 +571,7 @@ public abstract class CommandLineArgument
     /// </para>
     /// </remarks>
     /// <seealso cref="AliasAttribute"/>
-    public ReadOnlyCollection<string>? Aliases => _aliases;
+    public ImmutableArray<string> Aliases => _aliases;
 
     /// <summary>
     /// Gets the alternative short names for this command line argument.
@@ -586,7 +587,7 @@ public abstract class CommandLineArgument
     /// </para>
     /// </remarks>
     /// <seealso cref="ShortAliasAttribute"/>
-    public ReadOnlyCollection<char>? ShortAliases => _shortAliases;
+    public ImmutableArray<char> ShortAliases => _shortAliases;
 
     /// <summary>
     /// Gets the type of the argument's value.
@@ -1349,8 +1350,7 @@ public abstract class CommandLineArgument
             return true;
         }
 
-        if (writer.IncludeAliasInDescription &&
-            ((Aliases != null && Aliases.Count > 0) || (ShortAliases != null && ShortAliases.Count > 0)))
+        if (writer.IncludeAliasInDescription && (Aliases.Length > 0 || ShortAliases.Length > 0))
         {
             return true;
         }
