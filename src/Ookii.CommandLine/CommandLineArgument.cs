@@ -1619,9 +1619,8 @@ public abstract class CommandLineArgument
             {
                 if (stringValue == null)
                 {
-                    if (validator.CanValidateSpan)
+                    if (validator.ValidateSpan(this, spanValue))
                     {
-                        validator.ValidateSpan(this, spanValue);
                         continue;
                     }
                     else

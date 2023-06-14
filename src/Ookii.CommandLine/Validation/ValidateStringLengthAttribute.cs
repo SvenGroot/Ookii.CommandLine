@@ -26,7 +26,6 @@ namespace Ookii.CommandLine.Validation
         {
             _minimum = minimum;
             _maximum = maximum;
-            CanValidateSpan = true;
         }
 
         /// <summary>
@@ -70,7 +69,7 @@ namespace Ookii.CommandLine.Validation
         }
 
         /// <inheritdoc cref="IsValid(CommandLineArgument, object?)"/>
-        public override bool IsSpanValid(CommandLineArgument argument, ReadOnlySpan<char> value)
+        public override bool? IsSpanValid(CommandLineArgument argument, ReadOnlySpan<char> value)
         {
             var length = value.Length;
             return length >= _minimum && length <= _maximum;

@@ -39,9 +39,6 @@ namespace Ookii.CommandLine.Validation
         {
             _pattern = pattern;
             _options = options;
-#if NET7_0_OR_GREATER
-            CanValidateSpan = true;
-#endif
         }
 
         /// <summary>
@@ -112,7 +109,7 @@ namespace Ookii.CommandLine.Validation
         /// <returns>
         ///   <see langword="true"/> if the value is valid; otherwise, <see langword="false"/>.
         /// </returns>
-        public override bool IsSpanValid(CommandLineArgument argument, ReadOnlySpan<char> value)
+        public override bool? IsSpanValid(CommandLineArgument argument, ReadOnlySpan<char> value)
             => Pattern.IsMatch(value);
 
 #endif

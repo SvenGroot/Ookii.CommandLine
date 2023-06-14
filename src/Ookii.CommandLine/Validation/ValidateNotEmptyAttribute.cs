@@ -20,14 +20,6 @@ namespace Ookii.CommandLine.Validation
     public class ValidateNotEmptyAttribute : ArgumentValidationWithHelpAttribute
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="ValidateNotEmptyAttribute"/> class.
-        /// </summary>
-        public ValidateNotEmptyAttribute()
-        {
-            CanValidateSpan = true;
-        }
-
-        /// <summary>
         /// Gets a value that indicates when validation will run.
         /// </summary>
         /// <value>
@@ -51,7 +43,7 @@ namespace Ookii.CommandLine.Validation
         }
 
         /// <inheritdoc cref="IsValid(CommandLineArgument, object?)"/>
-        public override bool IsSpanValid(CommandLineArgument argument, ReadOnlySpan<char> value)
+        public override bool? IsSpanValid(CommandLineArgument argument, ReadOnlySpan<char> value)
             => !value.IsEmpty;
 
         /// <summary>

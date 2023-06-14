@@ -48,16 +48,6 @@ namespace Ookii.CommandLine.Validation
         public virtual CommandLineArgumentErrorCategory ErrorCategory => CommandLineArgumentErrorCategory.ValidationFailed;
 
         /// <summary>
-        /// Gets a value that indicates whether this instance can validate a <see cref="ReadOnlySpan{T}"/>
-        /// when using <see cref="ValidationMode.BeforeConversion"/>.
-        /// </summary>
-        /// <value>
-        /// <see langword="true"/> if the validator implements <see cref="IsSpanValid"/>, otherwise,
-        /// <see langword="false"/>. The default value is <see langword="false"/>.
-        /// </value>
-        public bool CanValidateSpan { get; protected set; }
-
-        /// <summary>
         /// Validates the argument value, and throws an exception if validation failed.
         /// </summary>
         /// <param name="argument">The argument being validated.</param>
@@ -90,10 +80,14 @@ namespace Ookii.CommandLine.Validation
         ///   The argument value. If not <see langword="null"/>, this must be an instance of
         ///   <see cref="CommandLineArgument.ArgumentType"/>.
         /// </param>
+        /// <returns>
+        ///   <see langword="true"/> if validation was performed and successful; <see langword="false"/>
+        ///   if this validator doesn't support validating spans and the <see cref="IsValid"/>
+        ///   method should be used instead.
+        /// </returns>
         /// <remarks>
         /// <para>
         ///   The <see cref="CommandLineParser"/> class will only call this method if the
-        ///   <see cref="CanValidateSpan"/> property is <see langword="true"/>, and the
         ///   <see cref="Mode"/> property is <see cref="ValidationMode.BeforeConversion"/>.
         /// </para>
         /// </remarks>
@@ -101,17 +95,20 @@ namespace Ookii.CommandLine.Validation
         ///   The <paramref name="value"/> parameter is not a valid value. The <see cref="CommandLineArgumentException.Category"/>
         ///   property will be the value of the <see cref="ErrorCategory"/> property.
         /// </exception>
-        public void ValidateSpan(CommandLineArgument argument, ReadOnlySpan<char> value)
+        public bool ValidateSpan(CommandLineArgument argument, ReadOnlySpan<char> value)
         {
             if (argument == null)
             {
                 throw new ArgumentNullException(nameof(argument));
             }
 
-            if (!IsSpanValid(argument, value))
+            var result = IsSpanValid(argument, value);
+            if (result == false)
             {
                 throw new CommandLineArgumentException(GetErrorMessage(argument, value.ToString()), argument.ArgumentName, ErrorCategory);
             }
+
+            return result != null;
         }
 
 
@@ -160,12 +157,13 @@ namespace Ookii.CommandLine.Validation
         ///   The raw string argument value provided by the user on the command line.
         /// </param>
         /// <returns>
-        ///   <see langword="true"/> if the value is valid; otherwise, <see langword="false"/>.
+        ///   <see langword="null"/> if this validator doesn't support validating spans, and the
+        ///   regular <see cref="IsValid"/> method should be called instead; <see langword="true"/>
+        ///   if the value is valid; otherwise, <see langword="false"/>.
         /// </returns>
         /// <remarks>
         /// <para>
         ///   The <see cref="CommandLineParser"/> class will only call this method if the
-        ///   <see cref="CanValidateSpan"/> property is <see langword="true"/>, and the
         ///   <see cref="Mode"/> property is <see cref="ValidationMode.BeforeConversion"/>.
         /// </para>
         /// <para>
@@ -173,9 +171,11 @@ namespace Ookii.CommandLine.Validation
         ///   property unless you want to get the collection type for a multi-value or dictionary
         ///   argument.
         /// </para>
+        /// <para>
+        ///   The base class implementation returns <see langword="null"/>.
+        /// </para>
         /// </remarks>
-        public virtual bool IsSpanValid(CommandLineArgument argument, ReadOnlySpan<char> value)
-            => throw new NotImplementedException(Properties.Resources.IsSpanValidNotImplemented);
+        public virtual bool? IsSpanValid(CommandLineArgument argument, ReadOnlySpan<char> value) => null;
 
         /// <summary>
         /// Gets the error message to display if validation failed.
