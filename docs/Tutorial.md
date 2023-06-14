@@ -11,13 +11,13 @@ Refer to the [documentation](README.md) for more detailed information.
 Create a directory called "tutorial" for the project, and run the following command in that
 directory:
 
-```text
+```bash
 dotnet new console --framework net7.0
 ```
 
 Next, we will add a reference to Ookii.CommandLine's NuGet package:
 
-```text
+```bash
 dotnet add package Ookii.CommandLine
 ```
 
@@ -26,8 +26,8 @@ dotnet add package Ookii.CommandLine
 Add a file to your project called Arguments.cs, and insert the following code:
 
 ```csharp
-using System.ComponentModel;
 using Ookii.CommandLine;
+using System.ComponentModel;
 
 namespace Tutorial;
 
@@ -88,8 +88,8 @@ The important part is the call to `Arguments.Parse()`. This static method was cr
 `GeneratedParserAttribute`, and will parse your arguments, handle and print any errors, and print
 usage help if required.
 
-> If you cannot use the `GeneratedParserAttribute`, call `CommandLineParser.Parse<Arguments>()`
-> instead.
+> If you cannot use the `GeneratedParserAttribute`, call
+> [`CommandLineParser.Parse<Arguments>()`][Parse<T>()_1] instead.
 
 But wait, we didn't pass any arguments to this method? Actually, the method will call
 [`Environment.GetCommandLineArgs()`][] to get the arguments. There are also overloads that take an
@@ -98,7 +98,7 @@ explicit `string[]` array with the arguments, if you want to pass them manually.
 So, let's run our application. Build the application using `dotnet build`, and then, from the
 `bin/Debug/net7.0` directory, run the following:
 
-```text
+```bash
 ./tutorial ../../../tutorial.csproj
 ```
 
@@ -124,7 +124,7 @@ Which will give print the contents of the tutorial.csproj file:
 So far, so good. But what happens if we invoke the application without arguments? After all, we
 made the `-Path` argument required. To try this, run the following command:
 
-```text
+```bash
 ./tutorial
 ```
 
@@ -133,6 +133,23 @@ This gives the following output:
 ```text
 The required argument 'Path' was not supplied.
 
+Usage: tutorial [-Path] <String> [-Help] [-Version]
+
+Run 'tutorial -Help' for more information.
+```
+
+As you can see, the generated `Parse()` method lets us know what's wrong (we didn't supply the
+required argument), and shows some basic help, with an instruction on how to get more help.
+
+Let's follow that instruction:
+
+```bash
+./tutorial -Help
+```
+
+Now we get this output:
+
+```text
 Reads a file and displays the contents on the command line.
 
 Usage: tutorial [-Path] <String> [-Help] [-Version]
@@ -150,8 +167,8 @@ Usage: tutorial [-Path] <String> [-Help] [-Version]
 > The actual usage help uses color if your console supports it. See [here](images/color.png) for
 > an example.
 
-As you can see, the generated `Parse()` method lets us know what's wrong (we didn't supply the
-required argument), and shows the usage help.
+The generated `Parse()` method also took care of handling that `-Help` argument, and showed the
+usage help.
 
 This usage help includes the description we applied to the class (this is the application
 description), and the `-Path` argument using the [`DescriptionAttribute`][]. This is how you can
@@ -159,12 +176,11 @@ provide detailed information about your arguments to your users. It's strongly r
 always add a description to your arguments.
 
 You can also see that there are two more arguments that we didn't define: `-Help` and `-Version`.
-These arguments are automatically added by Ookii.CommandLine. So, what do they do?
+These arguments are automatically added by Ookii.CommandLine.
 
-If you use the `-Help` argument (`./tutorial -Help`), it shows the same message as before. The only
-difference is that there's no error message, even if you omitted the `-Path` argument. And even if
-you do supply a path together with `-Help`, it still shows the help and exits, it doesn't run the
-application. Basically, the presence of `-Help` will override anything else.
+We've already seen what `-Help` does: it shows the usage help. Even if you supply other arguments
+along with `-Help`, it will still show the help and exit; it doesn't run the application. Basically,
+the presence of `-Help` will override anything else.
 
 The `-Version` argument shows version information about your application:
 
@@ -178,8 +194,9 @@ copyright information, if there is any (there's not in this case). You can also 
 `AssemblyTitleAttribute` or [`ApplicationFriendlyNameAttribute`][] attribute to specify a custom
 name instead of the assembly name.
 
-> If you define an argument called "Help" or "Version", the automatic arguments won't be added.
-> Also, you can disable the automatic arguments using the [`ParseOptionsAttribute`][] attribute.
+> If you define your own argument called "Help" or "Version", the automatic arguments won't be added.
+> Also, you can disable the automatic arguments using the [`ParseOptionsAttribute`][] attribute or
+> [`ParseOptions`][] class.
 
 Note that the positional "Path" argument still has its name shown as `-Path`. That's because every
 argument, even positional ones, can still be supplied by name. So if you run this:
@@ -278,22 +295,48 @@ Now we can run the application like this:
 
 And it'll only show the first five lines of the file, using black-on-white text.
 
-If you supply a value that's not a valid integer for `-MaxLines`, or a value that's less than 1,
-you'll once again get an error message and the usage help.
+If you supply a value for `-MaxLines` that's not a valid integer, it shows an error message again:
 
-What do you think will happen if we run this command?
+```bash
+./tutorial ../../../tutorial.csproj -lines hello
+```
+
+```text
+The value 'hello' provided for argument 'MaxLines' could not be interpreted as a 'Number'.
+
+Usage: tutorial [-Path] <String> [-Help] [-Inverted] [-MaxLines <Number>] [-Version]
+
+Run 'tutorial -Help' for more information.
+```
+
+And because of the `ValidateRangeAttribute`, we can't specify a value less than 1 either.
+
+```bash
+./tutorial ../../../tutorial.csproj -lines 0
+```
+
+```text
+The argument 'MaxLines' must be at least 1.
+
+Usage: tutorial [-Path] <String> [-Help] [-Inverted] [-MaxLines <Number>] [-Version]
+
+Run 'tutorial -Help' for more information.
+```
+
+Now, what do you think will happen if we run this command?
 
 ```text
 ./tutorial ../../../tutorial.csproj -m 5 -i
 ```
 
-If you tried it, you can see that it worked. By default, Ookii.CommandLine will treat any unique
-prefix of a command line argument's name or aliases as an alias for that command. So, `-m` is
-automatically an alias for `-MaxLines`. As is `-ma`, and `-max`, etc. And `-l` is as well, as it's
-a prefix of the alias `-Lines`.
+You might expect that to fail, as there are no arguments named `-m` or `-i`. However, if you tried
+it, you can see that it worked. By default, Ookii.CommandLine will treat any unique prefix of a
+command line argument's name or aliases as an alias for that argument. So, `-m` is automatically an
+alias for `-MaxLines`. As is `-ma`, and `-max`, etc. And `-l` is as well, as it's a prefix of the
+alias `-Lines`.
 
 > This only works if the prefix matches exactly one argument. And if you don't like this behavior,
-> is can be disabled using the `ParseOptionsAttribute.AutoPrefixAliases` property.
+> it can be disabled using the `ParseOptionsAttribute.AutoPrefixAliases` property.
 
 Let's take a look at the usage help for our updated application, by running `./tutorial -help`:
 
@@ -324,6 +367,9 @@ applied, and we can see that the value, "Number", is used inside the angle brack
 the type of values the argument accepts. It defaults to the type name, but "Int32" might not be very
 meaningful to people who aren't programmers, so we've changed it to "Number" instead.
 
+You may have noticed above that the value description was also used in the error message when we
+provided an invalid value.
+
 You can also see that the [`ValidateRangeAttribute`][] doesn't just validate its condition, it also
 adds that condition to the description of the argument (this can be disabled either globally or on
 a per-validator basis if you want). So you don't have to worry about keeping the description and
@@ -348,10 +394,10 @@ public int MaxLines { get; set; } = 10;
 ```
 
 > Instead of initializing the property, you can also use the
-> [`CommandLineArgumentAttribute.DefaultValue`][] property, which can be useful if e.g. you're not using
-> an automatic property (so you can't have a direct initializer like that). And, this method accepts
-> not just the argument's actual type, but also any string that can be converted to it. For example,
-> both `[CommandLineArgument(DefaultValue = 10)]` and `[CommandLineArgument(DefaultValue = "10")]`
+> [`CommandLineArgumentAttribute.DefaultValue`][] property, which can be useful if e.g. you're not
+> using an automatic property (so you can't have a direct initializer like that). And, that property
+> accepts not just the argument's actual type, but also any string that can be converted to it. For
+> example, both `[CommandLineArgument(DefaultValue = 10)]` and `[CommandLineArgument(DefaultValue = "10")]`
 > are equivalent to the above. Handy if your argument's type doesn't have literals.
 
 This default value would be shown in the usage help as well, similar to the validator:
@@ -361,33 +407,39 @@ This default value would be shown in the usage help as well, similar to the vali
         The maximum number of lines to output. Must be at least 1. Default value: 10.
 ```
 
-## Long/short mode and other customizations
+## POSIX conventions and other options
 
 Ookii.CommandLine offers many options to customize the way it parses the command line. For example,
 you can disable the use of white space as a separator between argument names and values, and specify
-a custom separator. You can specify custom argument name prefixes, instead of `-` which is the
+custom separators. You can specify custom argument name prefixes, instead of `-` which is the
 default (on Windows only, `/` is also accepted by default). You can make the argument names case
 sensitive. And there's more.
 
-Most of these options can be specified using the [`ParseOptionsAttribute`][], which you can apply to
-your class. Let's apply some options:
+One thing you may want to do is use POSIX-like conventions, instead of the default PowerShell-like
+parsing behavior. With POSIX conventions, arguments have separate long and short, one-character
+names, which use different prefixes (typically `--` for long names and `-` for short). Argument
+names are typically lowercase, with dashes between words, and are case sensitive. These are the same
+conventions followed by tools such as `dotnet` or `git`, and many others. For a cross-platform
+application, you may prefer these conventions over the default, but it's up to you of course.
+
+A convenient way to change these options is to use the [`ParseOptionsAttribute`][], which you can
+apply to your class. Let's use it to enable POSIX mode:
 
 ```csharp
+[GeneratedParser]
 [Description("Reads a file and displays the contents on the command line.")]
-[ParseOptions(Mode = ParsingMode.LongShort,
-    CaseSensitive = true,
-    ArgumentNameTransform = NameTransform.DashCase,
-    ValueDescriptionTransform = NameTransform.DashCase)]
-class Arguments
+[ParseOptions(IsPosix = true)]
+partial class Arguments
 {
-    [CommandLineArgument(Position = 0, IsRequired = true)]
+    [CommandLineArgument(IsPositional = true)]
     [Description("The path of the file to read.")]
-    public string? Path { get; set; }
+    public required string Path { get; set; }
 
-    [CommandLineArgument(IsShort = true, ValueDescription = "number")]
+    [CommandLineArgument(IsShort = true)]
     [Description("The maximum number of lines to output.")]
+    [ValueDescription("number")]
     [ValidateRange(1, null)]
-    [Alias("max")]
+    [Alias("lines")]
     public int? MaxLines { get; set; }
 
     [CommandLineArgument(IsShort = true)]
@@ -396,19 +448,24 @@ class Arguments
 }
 ```
 
+The `ParseOptionsAttribute.IsPosix` property is actually a shorthand way to set several related
+properties. The above attribute is identical to this:
+
+```csharp
+[ParseOptions(Mode = ParsingMode.LongShort,
+    CaseSensitive = true,
+    ArgumentNameTransform = NameTransform.DashCase,
+    ValueDescriptionTransform = NameTransform.DashCase)]
+```
+
 We've done a few things here: we've turned on an alternative set of parsing rules by setting the
 [`Mode`][Mode_2] property to [`ParsingMode.LongShort`][], we've made argument names case sensitive,
 and we've applied a name transformation to both argument names and value descriptions, which will
 make them lower case with dashes between words (e.g. "max-lines").
 
-These options combined make the application's parsing behavior very similar to common POSIX
-conventions; the same conventions followed by tools such as `dotnet` or `git`, and many others. For
-a cross-platform application, you may prefer these conventions over the default, but it's up to you
-of course.
-
-Long/short mode is the key to this behavior. It allows every argument to have two separate names:
-a long name, using the `--` prefix by default, and a single-character short name using the `-`
-prefix (and `/` on Windows).
+Long/short mode is the key to getting POSIX-like behavior. It allows every argument to have two
+separate names: a long name, using the `--` prefix by default, and a single-character short name
+using the `-` prefix (and `/` on Windows).
 
 When using long/short mode, all arguments have long names by default, but you'll need to indicate
 which arguments have short names. We've done that here with the `MaxLines` and `Inverted`
@@ -444,8 +501,8 @@ Usage: tutorial [--path] <string> [--help] [--inverted] [--max-lines <number>] [
     -i, --inverted [<boolean>]
             Use black text on a white background.
 
-    -m, --max-lines <number> (--max)
-            The maximum number of lines to output.
+    -m, --max-lines <number> (--lines)
+            The maximum number of lines to output. Must be at least 1.
 
         --version [<boolean>]
             Displays version information.
@@ -456,14 +513,9 @@ can see the result of the name transformation on all the arguments and value des
 the automatic `--help` and `--version` arguments, which are now also lower case.
 
 In addition to the [`ParseOptionsAttribute`][] attribute, you can also use the [`ParseOptions`][]
-class to specify these and many other options, including where to write errors and help, and
-customization options for the usage help. You can pass an instance of the [`ParseOptions`][] class
-to the [`Parse<T>()`][Parse<T>()_1] method.
-
-For the options that are available on both the [`ParseOptionsAttribute`][] attribute and the
-[`ParseOptions`][] class, you can choose which method to use based on your personal preference. If
-you specify the same option in both the [`ParseOptionsAttribute`][] attribute and the
-[`ParseOptions`][] class, the [`ParseOptions`][] class takes precedence.
+class to specify these and many other options. [`ParseOptions`][] can also be used to customize
+where to write errors and help, and to customize the usage help. You can pass an instance of the
+[`ParseOptions`][] class to the generated `Parse()` method.
 
 ## Using subcommands
 
