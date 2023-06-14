@@ -638,7 +638,7 @@ public class ParseOptions
     /// </summary>
     /// <value>
     /// One of the values of the <see cref="UsageHelpRequest"/> enumeration. The default value
-    /// is <see cref="UsageHelpRequest.Full"/>.
+    /// is <see cref="UsageHelpRequest.SyntaxOnly"/>.
     /// </value>
     /// <remarks>
     /// <para>

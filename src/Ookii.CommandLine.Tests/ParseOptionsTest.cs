@@ -36,7 +36,7 @@ public class ParseOptionsTest
         Assert.IsNull(options.LongArgumentNamePrefix);
         Assert.IsNull(options.Mode);
         Assert.IsNull(options.NameValueSeparators);
-        Assert.AreEqual(UsageHelpRequest.Full, options.ShowUsageOnError);
+        Assert.AreEqual(UsageHelpRequest.SyntaxOnly, options.ShowUsageOnError);
         Assert.IsNotNull(options.StringProvider);
         Assert.IsNotNull(options.UsageWriter);
         Assert.IsNull(options.UseErrorColor);

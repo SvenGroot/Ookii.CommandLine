@@ -7,14 +7,14 @@
     public enum UsageHelpRequest
     {
         /// <summary>
-        /// Full usage help is shown, including the argument descriptions.
-        /// </summary>
-        Full,
-        /// <summary>
         /// Only the usage syntax is shown; the argument descriptions are not. In addition, the
         /// <see cref="UsageWriter.WriteMoreInfoMessage"/> message is shown.
         /// </summary>
         SyntaxOnly,
+        /// <summary>
+        /// Full usage help is shown, including the argument descriptions.
+        /// </summary>
+        Full,
         /// <summary>
         /// No usage help is shown. Instead, the <see cref="UsageWriter.WriteMoreInfoMessage"/>
         /// message is shown.

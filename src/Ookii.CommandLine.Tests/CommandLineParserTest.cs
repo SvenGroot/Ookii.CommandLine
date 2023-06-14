@@ -471,6 +471,7 @@ public partial class CommandLineParserTest
         {
             ArgumentNamePrefixes = new[] { "/", "-" },
             Error = error,
+            ShowUsageOnError = UsageHelpRequest.Full,
             UsageWriter = new UsageWriter(lineWriter)
             {
                 ExecutableName = _executableName,

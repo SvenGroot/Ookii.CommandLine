@@ -418,6 +418,7 @@ public partial class SubCommandTest
         var options = new CommandOptions()
         {
             Error = writer,
+            ShowUsageOnError = UsageHelpRequest.Full,
             UsageWriter = new UsageWriter(writer)
             {
                 ExecutableName = _executableName,
