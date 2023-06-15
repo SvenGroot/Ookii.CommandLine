@@ -836,7 +836,7 @@ file, optionally appending to the file.
 
 Let's build and run our application again, without arguments:
 
-```text
+```bash
 ./tutorial
 ```
 
