@@ -33,36 +33,54 @@ public class GeneratedArgument : CommandLineArgument
     }
 
     /// <summary>
-    /// This class is for internal use by the source generator, and should not be used in your code.
+    /// Creates a <see cref="GeneratedArgument"/> instance.
     /// </summary>
-    /// <param name="parser"></param>
-    /// <param name="argumentType"></param>
-    /// <param name="memberName"></param>
-    /// <param name="attribute"></param>
-    /// <param name="kind"></param>
-    /// <param name="converter"></param>
-    /// <param name="elementType"></param>
-    /// <param name="elementTypeWithNullable"></param>
-    /// <param name="keyType"></param>
-    /// <param name="valueType"></param>
-    /// <param name="allowsNull"></param>
-    /// <param name="position"></param>
-    /// <param name="defaultValueDescription"></param>
-    /// <param name="defaultKeyDescription"></param>
-    /// <param name="requiredProperty"></param>
-    /// <param name="alternateDefaultValue"></param>
-    /// <param name="multiValueSeparatorAttribute"></param>
-    /// <param name="descriptionAttribute"></param>
-    /// <param name="valueDescriptionAttribute"></param>
-    /// <param name="allowDuplicateDictionaryKeys"></param>
-    /// <param name="keyValueSeparatorAttribute"></param>
-    /// <param name="aliasAttributes"></param>
-    /// <param name="shortAliasAttributes"></param>
-    /// <param name="validationAttributes"></param>
-    /// <param name="setProperty"></param>
-    /// <param name="getProperty"></param>
-    /// <param name="callMethod"></param>
-    /// <returns></returns>
+    /// <param name="parser">The <see cref="CommandLineParser"/> this argument belongs to.</param>
+    /// <param name="argumentType">The type of the argument.</param>
+    /// <param name="elementTypeWithNullable">The element type including <see cref="Nullable{T}"/>.</param>
+    /// <param name="elementType">The element type excluding <see cref="Nullable{T}"/>.</param>
+    /// <param name="memberName">The name of the property or method.</param>
+    /// <param name="attribute">The <see cref="CommandLineArgumentAttribute"/>.</param>
+    /// <param name="kind">The kind of argument.</param>
+    /// <param name="converter">The <see cref="ArgumentConverter"/> for the argument's type.</param>
+    /// <param name="allowsNull">Indicates if <see langword="null"/> values are allowed.</param>
+    /// <param name="defaultValueDescription">
+    /// The value description to use if the <see cref="ValueDescriptionAttribute"/> attribute is
+    /// not present. For dictionary arguments, this is the value description for the value of the
+    /// key/value pair.
+    /// </param>
+    /// <param name="position">The position for positional arguments that use automatic positioning.</param>
+    /// <param name="defaultKeyDescription">
+    /// The value description to use for the key of a dictionary argument if the
+    /// <see cref="ValueDescriptionAttribute"/> attribute is not present.
+    /// </param>
+    /// <param name="requiredProperty">
+    /// Indicates if the argument used a C# 11 <c>required</c> property.
+    /// </param>
+    /// <param name="alternateDefaultValue">
+    /// Default value to use if the <see cref="CommandLineArgumentAttribute.DefaultValue"/> property
+    /// is not set.
+    /// </param>
+    /// <param name="keyType">The type of the key of a dictionary argument.</param>
+    /// <param name="valueType">The type of the value of a dictionary argument.</param>
+    /// <param name="multiValueSeparatorAttribute">The <see cref="MultiValueSeparatorAttribute"/>.</param>
+    /// <param name="descriptionAttribute">The <see cref="DescriptionAttribute"/>.</param>
+    /// <param name="valueDescriptionAttribute">The <see cref="ValueDescriptionAttribute"/>.</param>
+    /// <param name="allowDuplicateDictionaryKeys">The <see cref="AllowDuplicateDictionaryKeysAttribute"/>.</param>
+    /// <param name="keyValueSeparatorAttribute">The <see cref="KeyValueSeparatorAttribute"/>.</param>
+    /// <param name="aliasAttributes">A collection of <see cref="AliasAttribute"/> values.</param>
+    /// <param name="shortAliasAttributes">A collection of <see cref="ShortAliasAttribute"/> values.</param>
+    /// <param name="validationAttributes">A collection of <see cref="ArgumentValidationAttribute"/> values.</param>
+    /// <param name="setProperty">
+    /// A delegate that sets the value of the property that defined the argument.
+    /// </param>
+    /// <param name="getProperty">
+    /// A delegate that gets the value of the property that defined the argument.
+    /// </param>
+    /// <param name="callMethod">
+    /// A delegate that calls the method that defined the argument.
+    /// </param>
+    /// <returns>A <see cref="GeneratedArgument"/> instance.</returns>
     public static GeneratedArgument Create(CommandLineParser parser,
                                            Type argumentType,
                                            Type elementTypeWithNullable,

@@ -27,19 +27,24 @@
       <NamespaceSummaryItem name="Ookii.CommandLine" isDocumented="True">&lt;para&gt;
   Provides functionality for defining and parsing command line arguments, and for generating usage help.
 &lt;/para&gt;</NamespaceSummaryItem>
-      <NamespaceSummaryItem name="Ookii.CommandLine.Commands" isDocumented="True">&lt;para&gt;
+<NamespaceSummaryItem name="Ookii.CommandLine.Commands" isDocumented="True">&lt;para&gt;
   Provides functionality for creating applications with multiple subcommands, each with their own arguments.
 &lt;/para&gt;</NamespaceSummaryItem>
-      <NamespaceSummaryItem name="Ookii.CommandLine.Terminal" isDocumented="True">&lt;para&gt;
+<NamespaceSummaryItem name="Ookii.CommandLine.Terminal" isDocumented="True">&lt;para&gt;
   Provides helpers for supporting virtual terminal sequences and color output.
 &lt;/para&gt;</NamespaceSummaryItem>
-      <NamespaceSummaryItem name="Ookii.CommandLine.Validation" isDocumented="True">&lt;para&gt;
+<NamespaceSummaryItem name="Ookii.CommandLine.Validation" isDocumented="True">&lt;para&gt;
   Provides attributes used to validate the value of arguments, and the relation between arguments.
 &lt;/para&gt;</NamespaceSummaryItem>
-    </NamespaceSummaries>
+<NamespaceSummaryItem name="Ookii.CommandLine.Conversion" isDocumented="True">&lt;para&gt;
+  Provides functionality for converting strings to the actual type of the argument.
+&lt;/para&gt;</NamespaceSummaryItem>
+<NamespaceSummaryItem name="Ookii.CommandLine.Support" isDocumented="True">&lt;para&gt;
+  Provides types to support source generation. Types in this namespace should not be used directly in your code.
+&lt;/para&gt;</NamespaceSummaryItem></NamespaceSummaries>
     <CopyrightHref>https://github.com/SvenGroot/Ookii.CommandLine</CopyrightHref>
     <CopyrightText>Copyright &amp;#169%3b Sven Groot %28Ookii.org%29</CopyrightText>
-    <HelpTitle>Ookii.CommandLine 3.1 documentation</HelpTitle>
+    <HelpTitle>Ookii.CommandLine 4.0 documentation</HelpTitle>
     <NamingMethod>MemberName</NamingMethod>
     <PresentationStyle>Default2022</PresentationStyle>
     <SyntaxFilters>C#, Visual Basic, Visual Basic Usage, Managed C++</SyntaxFilters>

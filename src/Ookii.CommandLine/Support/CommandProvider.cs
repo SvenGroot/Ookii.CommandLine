@@ -30,8 +30,8 @@ public abstract class CommandProvider
     public abstract IEnumerable<CommandInfo> GetCommandsUnsorted(CommandManager manager);
 
     /// <summary>
-    /// Gets the application description
+    /// Gets the application description.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>The application description, or <see langword="null"/> if there is none.</returns>
     public abstract string? GetApplicationDescription();
 }

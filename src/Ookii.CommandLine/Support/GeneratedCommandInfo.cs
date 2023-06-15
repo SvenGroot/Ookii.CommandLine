@@ -16,15 +16,15 @@ public class GeneratedCommandInfo : CommandInfo
     private readonly Func<ParseOptions?, CommandLineParser>? _createParser;
 
     /// <summary>
-    /// This class is for internal use by the source generator, and should not be used in your code.
+    /// Initializes a new instance of the <see cref="GeneratedCommandInfo"/> class.
     /// </summary>
-    /// <param name="manager"></param>
-    /// <param name="commandType"></param>
-    /// <param name="attribute"></param>
-    /// <param name="descriptionAttribute"></param>
-    /// <param name="aliasAttributes"></param>
-    /// <param name="createParser"></param>
-    /// <param name="parentCommandType"></param>
+    /// <param name="manager">The command manager.</param>
+    /// <param name="commandType">The type of the command.</param>
+    /// <param name="attribute">The <see cref="CommandAttribute"/>.</param>
+    /// <param name="descriptionAttribute">The <see cref="DescriptionAttribute"/>.</param>
+    /// <param name="aliasAttributes">A collection of <see cref="AliasAttribute"/> values.</param>
+    /// <param name="createParser">A delegate that creates a command line parser for the command when invoked.</param>
+    /// <param name="parentCommandType">The type of the parent command.</param>
     public GeneratedCommandInfo(CommandManager manager,
                                 Type commandType,
                                 CommandAttribute attribute,
