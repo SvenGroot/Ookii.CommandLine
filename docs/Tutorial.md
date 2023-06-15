@@ -59,7 +59,7 @@ and makes it required.
 > You can use the [`CommandLineArgumentAttribute`][] to specify a custom name for your argument. If you
 > don't, the property name is used.
 
-The class above uses the `GeneratedParserAttribute`, which is not required, but is recommended
+The class above uses the [`GeneratedParserAttribute`][], which is not required, but is recommended
 unless you are using an SDK older than .Net 6.0, or a language other than C# ([find out more](SourceGeneration.md)).
 
 Now replace the contents of Program.cs with the following:
@@ -85,10 +85,10 @@ This code parses the arguments we defined, returns an error code if it was unsuc
 the contents of the file specified by the path argument to the console.
 
 The important part is the call to `Arguments.Parse()`. This static method was created by the
-`GeneratedParserAttribute`, and will parse your arguments, handle and print any errors, and print
+[`GeneratedParserAttribute`][], and will parse your arguments, handle and print any errors, and print
 usage help if required.
 
-> If you cannot use the `GeneratedParserAttribute`, call
+> If you cannot use the [`GeneratedParserAttribute`][], call
 > [`CommandLineParser.Parse<Arguments>()`][Parse<T>()_1] instead.
 
 But wait, we didn't pass any arguments to this method? Actually, the method will call
@@ -191,7 +191,7 @@ tutorial 1.0.0
 
 By default, it shows the assembly's name and informational version. It'll also show the assembly's
 copyright information, if there is any (there's not in this case). You can also use the
-`AssemblyTitleAttribute` or [`ApplicationFriendlyNameAttribute`][] attribute to specify a custom
+[`AssemblyTitleAttribute`][] or [`ApplicationFriendlyNameAttribute`][] attribute to specify a custom
 name instead of the assembly name.
 
 > If you define your own argument called "Help" or "Version", the automatic arguments won't be added.
@@ -309,7 +309,7 @@ Usage: tutorial [-Path] <String> [-Help] [-Inverted] [-MaxLines <Number>] [-Vers
 Run 'tutorial -Help' for more information.
 ```
 
-And because of the `ValidateRangeAttribute`, we can't specify a value less than 1 either.
+And because of the [`ValidateRangeAttribute`][], we can't specify a value less than 1 either.
 
 ```bash
 ./tutorial ../../../tutorial.csproj -lines 0
@@ -336,7 +336,7 @@ alias for `-MaxLines`. As is `-ma`, and `-max`, etc. And `-l` is as well, as it'
 alias `-Lines`.
 
 > This only works if the prefix matches exactly one argument. And if you don't like this behavior,
-> it can be disabled using the `ParseOptionsAttribute.AutoPrefixAliases` property.
+> it can be disabled using the [`ParseOptionsAttribute.AutoPrefixAliases`][] property.
 
 Let's take a look at the usage help for our updated application, by running `./tutorial -help`:
 
@@ -361,7 +361,7 @@ Usage: tutorial [-Path] <String> [-Help] [-Inverted] [-MaxLines <Number>] [-Vers
         Displays version information.
 ```
 
-There's a few interesting things here. The `MaxLines` property has the `ValueDescriptionAttribute`
+There's a few interesting things here. The `MaxLines` property has the [`ValueDescriptionAttribute`][]
 applied, and we can see that the value, "Number", is used inside the angle brackets after
 `-MaxLines`. This is the *value description*, which is a short, typically one-word description of
 the type of values the argument accepts. It defaults to the type name, but "Int32" might not be very
@@ -448,7 +448,7 @@ partial class Arguments
 }
 ```
 
-The `ParseOptionsAttribute.IsPosix` property is actually a shorthand way to set several related
+The [`ParseOptionsAttribute.IsPosix`][] property is actually a shorthand way to set several related
 properties. The above attribute is identical to this:
 
 ```csharp
@@ -596,7 +596,7 @@ command's return value from `Main()`.
 
 And that's it: we've now defined a command. However, we still need to change the application to
 use commands instead of just parsing arguments from a single class. To do this, we'll use the
-`CommandManager` class.
+[`CommandManager`][] class.
 
 First, we'll add a file named GeneratedManager.cs, with these contents:
 
@@ -611,12 +611,12 @@ partial class GeneratedManager
 }
 ```
 
-The `GeneratedCommandManagerAttribute` is similar to the `GeneratedParserAttribute`, except it turns
-the target class into a command manager. The `GeneratedCommandManagerAttribute` will make your class
-derive from `CommandManager`, and generates code to find and instantiate the commands in this
+The [`GeneratedCommandManagerAttribute`][] is similar to the [`GeneratedParserAttribute`][], except it turns
+the target class into a command manager. The [`GeneratedCommandManagerAttribute`][] will make your class
+derive from [`CommandManager`][], and generates code to find and instantiate the commands in this
 assembly.
 
-> You can also use `CommandManager` directly, without a generated class, in which case reflection
+> You can also use [`CommandManager`][] directly, without a generated class, in which case reflection
 > is used to find the commands. Do this if you can't use [source generation](SourceGeneration.md).
 
 Now replace the code in Program.cs with the following.
@@ -641,7 +641,7 @@ command (even if currently we have only one command). The [`CommandOptions`][] c
 the [`ParseOptions`][] class, so it can be used to specify all the same options, in addition to
 some that are specific to commands.
 
-Actually, for [`CommandOptions`][] the meaning of `IsPosix` is slightly different. It sets the same
+Actually, for [`CommandOptions`][] the meaning of [`IsPosix`][IsPosix_0] is slightly different. It sets the same
 options as before, but also sets two additional ones. It's actually equivalent to the following:
 
 ```csharp
@@ -660,7 +660,7 @@ So in addition to enabling what it did before, it also made command names case s
 case insensitive by default, just like argument names) and transforms their names to lowercase
 separated by dashes as well.
 
-> Note that [`ParseOptions`][], and by extension [`CommandOptions`][], use a `StringComparison`
+> Note that [`ParseOptions`][], and by extension [`CommandOptions`][], use a [`StringComparison`][]
 > value instead of just a [`CaseSensitive`][] property.
 
 The [`RunCommand()`][] method will take the arguments from [`Environment.GetCommandLineArgs()`][]
@@ -696,7 +696,7 @@ description of the command.
 
 But why is the command called `read`, and not `read-command`, if it's based on the class name
 `ReadCommand`? If you use a name transformation for command names, it will strip the suffix
-"Command" from the name by default. Use the `CommandOptions.StripCommandNameSuffix` property to
+"Command" from the name by default. Use the [`CommandOptions.StripCommandNameSuffix`][] property to
 customize that behavior.
 
 There is a second command, `version`, which is automatically added unless there already is a command
@@ -973,42 +973,51 @@ following resources:
 - [Class library documentation](https://www.ookii.org/Link/CommandLineDoc)
 - [Sample applications](../src/Samples)
 
-[`AliasAttribute`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_AliasAttribute.htm
-[`ApplicationFriendlyNameAttribute`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_ApplicationFriendlyNameAttribute.htm
-[`AsyncCommandBase.Run()`]: https://www.ookii.org/docs/commandline-3.1/html/M_Ookii_CommandLine_Commands_AsyncCommandBase_Run.htm
-[`AsyncCommandBase`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_Commands_AsyncCommandBase.htm
-[`CaseSensitive`]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_ParseOptionsAttribute_CaseSensitive.htm
-[`CommandAttribute`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_Commands_CommandAttribute.htm
-[`CommandLineArgumentAttribute.DefaultValue`]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_DefaultValue.htm
-[`CommandLineArgumentAttribute.IsLong`]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_IsLong.htm
-[`CommandLineArgumentAttribute.ShortName`]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_ShortName.htm
-[`CommandLineArgumentAttribute`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_CommandLineArgumentAttribute.htm
-[`CommandLineParser`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_CommandLineParser.htm
-[`CommandManager.RunCommandAsync()`]: https://www.ookii.org/docs/commandline-3.1/html/Overload_Ookii_CommandLine_Commands_CommandManager_RunCommandAsync.htm
-[`CommandManager`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_Commands_CommandManager.htm
-[`CommandOptions`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_Commands_CommandOptions.htm
-[`CreateCommand()`]: https://www.ookii.org/docs/commandline-3.1/html/Overload_Ookii_CommandLine_Commands_CommandManager_CreateCommand.htm
+[`AliasAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_AliasAttribute.htm
+[`ApplicationFriendlyNameAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_ApplicationFriendlyNameAttribute.htm
+[`AssemblyTitleAttribute`]: https://learn.microsoft.com/dotnet/api/system.reflection.assemblytitleattribute
+[`AsyncCommandBase.Run()`]: https://www.ookii.org/docs/commandline-4.0/html/M_Ookii_CommandLine_Commands_AsyncCommandBase_Run.htm
+[`AsyncCommandBase`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Commands_AsyncCommandBase.htm
+[`CaseSensitive`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_ParseOptionsAttribute_CaseSensitive.htm
+[`CommandAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Commands_CommandAttribute.htm
+[`CommandLineArgumentAttribute.DefaultValue`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_DefaultValue.htm
+[`CommandLineArgumentAttribute.IsLong`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_IsLong.htm
+[`CommandLineArgumentAttribute.ShortName`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_ShortName.htm
+[`CommandLineArgumentAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_CommandLineArgumentAttribute.htm
+[`CommandLineParser`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_CommandLineParser.htm
+[`CommandManager.RunCommandAsync()`]: https://www.ookii.org/docs/commandline-4.0/html/Overload_Ookii_CommandLine_Commands_CommandManager_RunCommandAsync.htm
+[`CommandManager`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Commands_CommandManager.htm
+[`CommandOptions.StripCommandNameSuffix`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_Commands_CommandOptions_StripCommandNameSuffix.htm
+[`CommandOptions`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Commands_CommandOptions.htm
+[`CreateCommand()`]: https://www.ookii.org/docs/commandline-4.0/html/Overload_Ookii_CommandLine_Commands_CommandManager_CreateCommand.htm
 [`DescriptionAttribute`]: https://learn.microsoft.com/dotnet/api/system.componentmodel.descriptionattribute
 [`Environment.GetCommandLineArgs()`]: https://learn.microsoft.com/dotnet/api/system.environment.getcommandlineargs
 [`File.ReadLinesAsync()`]: https://learn.microsoft.com/dotnet/api/system.io.file.readlinesasync
 [`FileInfo`]: https://learn.microsoft.com/dotnet/api/system.io.fileinfo
-[`GetCommand()`]: https://www.ookii.org/docs/commandline-3.1/html/M_Ookii_CommandLine_Commands_CommandManager_GetCommand.htm
-[`IAsyncCommand`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_Commands_IAsyncCommand.htm
+[`GeneratedCommandManagerAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Commands_GeneratedCommandManagerAttribute.htm
+[`GeneratedParserAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_GeneratedParserAttribute.htm
+[`GetCommand()`]: https://www.ookii.org/docs/commandline-4.0/html/M_Ookii_CommandLine_Commands_CommandManager_GetCommand.htm
+[`IAsyncCommand`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Commands_IAsyncCommand.htm
 [`IAsyncEnumerable<T>`]: https://learn.microsoft.com/dotnet/api/system.collections.generic.iasyncenumerable-1
-[`ICommand.Run()`]: https://www.ookii.org/docs/commandline-3.1/html/M_Ookii_CommandLine_Commands_ICommand_Run.htm
-[`ICommand`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_Commands_ICommand.htm
-[`IncludeApplicationDescriptionBeforeCommandList`]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_UsageWriter_IncludeApplicationDescriptionBeforeCommandList.htm
+[`ICommand.Run()`]: https://www.ookii.org/docs/commandline-4.0/html/M_Ookii_CommandLine_Commands_ICommand_Run.htm
+[`ICommand`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Commands_ICommand.htm
+[`IncludeApplicationDescriptionBeforeCommandList`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_UsageWriter_IncludeApplicationDescriptionBeforeCommandList.htm
 [`Nullable<int>`]: https://learn.microsoft.com/dotnet/api/system.nullable-1
-[`ParseOptions`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_ParseOptions.htm
-[`ParseOptionsAttribute`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_ParseOptionsAttribute.htm
-[`ParsingMode.LongShort`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_ParsingMode.htm
-[`RunCommand()`]: https://www.ookii.org/docs/commandline-3.1/html/Overload_Ookii_CommandLine_Commands_CommandManager_RunCommand.htm
-[`RunCommandAsync()`]: https://www.ookii.org/docs/commandline-3.1/html/Overload_Ookii_CommandLine_Commands_CommandManager_RunCommandAsync.htm
+[`ParseOptions`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_ParseOptions.htm
+[`ParseOptionsAttribute.AutoPrefixAliases`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_ParseOptionsAttribute_AutoPrefixAliases.htm
+[`ParseOptionsAttribute.IsPosix`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_ParseOptionsAttribute_IsPosix.htm
+[`ParseOptionsAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_ParseOptionsAttribute.htm
+[`ParsingMode.LongShort`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_ParsingMode.htm
+[`RunCommand()`]: https://www.ookii.org/docs/commandline-4.0/html/Overload_Ookii_CommandLine_Commands_CommandManager_RunCommand.htm
+[`RunCommandAsync()`]: https://www.ookii.org/docs/commandline-4.0/html/Overload_Ookii_CommandLine_Commands_CommandManager_RunCommandAsync.htm
+[`StringComparison`]: https://learn.microsoft.com/dotnet/api/system.stringcomparison
 [`Take()`]: https://learn.microsoft.com/dotnet/api/system.linq.enumerable.take
 [`Uri`]: https://learn.microsoft.com/dotnet/api/system.uri
-[`ValidateRangeAttribute`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_Validation_ValidateRangeAttribute.htm
-[Mode_2]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_ParseOptionsAttribute_Mode.htm
-[Parse<T>()_1]: https://www.ookii.org/docs/commandline-3.1/html/M_Ookii_CommandLine_CommandLineParser_Parse__1.htm
-[Run()_0]: https://www.ookii.org/docs/commandline-3.1/html/M_Ookii_CommandLine_Commands_AsyncCommandBase_Run.htm
-[Run()_1]: https://www.ookii.org/docs/commandline-3.1/html/M_Ookii_CommandLine_Commands_ICommand_Run.htm
-[RunAsync()_1]: https://www.ookii.org/docs/commandline-3.1/html/M_Ookii_CommandLine_Commands_IAsyncCommand_RunAsync.htm
+[`ValidateRangeAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Validation_ValidateRangeAttribute.htm
+[`ValueDescriptionAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_ValueDescriptionAttribute.htm
+[IsPosix_0]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_Commands_CommandOptions_IsPosix.htm
+[Mode_2]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_ParseOptionsAttribute_Mode.htm
+[Parse<T>()_1]: https://www.ookii.org/docs/commandline-4.0/html/M_Ookii_CommandLine_CommandLineParser_Parse__1.htm
+[Run()_0]: https://www.ookii.org/docs/commandline-4.0/html/M_Ookii_CommandLine_Commands_AsyncCommandBase_Run.htm
+[Run()_1]: https://www.ookii.org/docs/commandline-4.0/html/M_Ookii_CommandLine_Commands_ICommand_Run.htm
+[RunAsync()_1]: https://www.ookii.org/docs/commandline-4.0/html/M_Ookii_CommandLine_Commands_IAsyncCommand_RunAsync.htm
