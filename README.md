@@ -146,7 +146,8 @@ The .Net Standard 2.1 and .Net 6.0 and 7.0 versions utilize the framework `ReadO
 The .Net 6.0 version has additional support for [nullable reference types](docs/Arguments.md#arguments-with-non-nullable-types),
 and is annotated to allow [trimming](https://learn.microsoft.com/dotnet/core/deploying/trimming/trimming-options)
 
-The .Net 7.0 version has additional support for `ISpanParsable<TSelf>` and `IParsable<TSelf>`.
+The .Net 7.0 version has additional support for `required` properties, and can utilize
+`ISpanParsable<TSelf>` and `IParsable<TSelf>` for argument conversion.
 
 ## Building and testing
 
