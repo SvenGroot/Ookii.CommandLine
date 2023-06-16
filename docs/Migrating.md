@@ -20,15 +20,10 @@ As of version 3.0, .Net Framework 2.0 is no longer supported. You can still targ
 - Converting argument values from a string to their final type is no longer done using the
   `TypeConverter` class, but instead using a custom `ArgumentConverter` class. Custom converters
   must be specified using the `ArgumentConverterAttribute` instead of the `TypeConverterAttribute`.
-  - This change enables more flexibility, better performance by supporting conversions using
-    `ReadOnlySpan<char>`, and enables trimming your assembly when combined with
-    [source generation](SourceGeneration.md).
   - If you have existing conversions that depend on a `TypeConverter`, use the
     `TypeConverterArgumentConverter<T>` as a convenient way to keep using that conversion.
 - Constructor parameters can no longer be used to define command line arguments. Instead, all
-  arguments must be defined using properties. If you were using constructor parameters to avoid
-  setting a default value for a non-nullable reference type, you can use the `required` keyword
-  instead if using .Net 7.0 or later.
+  arguments must be defined using properties.
 - The `CommandManager`, when using an assembly that is not the calling assembly, will only use
   public command classes, where before it would also use internal ones. This is to better respect
   access modifiers, and to make sure generated and reflection-based command managers behave the
@@ -37,6 +32,22 @@ As of version 3.0, .Net Framework 2.0 is no longer supported. You can still targ
   by `ArgumentNameComparison` and `CommandNameComparison` respectively, both now taking a
   `StringComparison` value instead of an `IComparer<string>`.
 - The `CommandInfo` type is now a class instead of a structure.
+- The `ICommandWithCustomParseOptions.Parse()` method signature has changed to use a
+  `ReadOnlyMemory<string>` structure for the arguments and to receive a reference to the calling
+  `CommandManager` instance.
+- The `CommandLineArgumentAttribute.CancelParsing` property now takes a `CancelMode` enumeration
+  rather than a boolean.
+- The `ArgumentParsedEventArgs` class was changed to use the `CancelMode` enumeration.
+- The `ParseOptionsAttribute.NameValueSeparator` property was replaced with
+  `ParseOptionsAttribute.NameValueSeparators`.
+- The `ParseOptions.NameValueSeparator` property was replaced with
+  `ParseOptions.NameValueSeparators`.
+- Properties that previously returned a `ReadOnlyCollection<T>` now return an `ImmutableArray<T>`.
+
+## Breaking behavior changes from version 3.0
+
+- By default, both `:` and `=` are accepted as argument name/value separators.
+- The default value of `ParseOptions.ShowUsageOnError` has changed.
 
 ## Breaking API changes from version 2.4
 
