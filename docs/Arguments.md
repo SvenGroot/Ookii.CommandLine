@@ -251,7 +251,7 @@ converter will be used for conversion instead of any of the default methods.
 
 Previous versions of Ookii.CommandLine used .Net's [`TypeConverter`][] class. Starting with
 Ookii.CommandLine 4.0, this is no longer the case, and the [`ArgumentConverter`][] class is used
-instead. [See here](DefiningArguments.md#using-a-typeconverter) for more information on how to
+instead. [See here](DefiningArguments.md#custom-type-conversion) for more information on how to
 upgrade code that relied on a [`TypeConverter`][].
 
 ### Enumeration conversion
