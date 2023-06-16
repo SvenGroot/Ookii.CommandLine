@@ -23,6 +23,12 @@ As of version 3.0, .Net Framework 2.0 is no longer supported. You can still targ
   [`TypeConverterAttribute`][].
   - If you have existing conversions that depend on a [`TypeConverter`][], use the
     [`TypeConverterArgumentConverter<T>`][] as a convenient way to keep using that conversion.
+  - The [`KeyValuePairConverter<TKey, TValue>`][] class has moved into the
+    `Ookii.CommandLine.Conversion` namespace.
+  - The [`KeyValueSeparatorAttribute`][] has moved into the `Ookii.CommandLine.Conversion`
+    namespace.
+  - The `KeyTypeConverterAttribute` and `ValueTypeConverterAttribute` were renamed to
+    [`KeyConverterAttribute`][] and [`ValueConverterAttribute`][] respectively
 - Constructor parameters can no longer be used to define command line arguments. Instead, all
   arguments must be defined using properties.
 - The [`CommandManager`][], when using an assembly that is not the calling assembly, will only use
@@ -137,6 +143,9 @@ As of version 3.0, .Net Framework 2.0 is no longer supported. You can still targ
 [`ICommandWithCustomParsing`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Commands_ICommandWithCustomParsing.htm
 [`IComparer<string>`]: https://learn.microsoft.com/dotnet/api/system.collections.generic.icomparer-1
 [`ImmutableArray<T>`]: https://learn.microsoft.com/dotnet/api/system.collections.immutable.immutablearray-1
+[`KeyConverterAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Conversion_KeyConverterAttribute.htm
+[`KeyValuePairConverter<TKey, TValue>`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Conversion_KeyValuePairConverter_2.htm
+[`KeyValueSeparatorAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Conversion_KeyValueSeparatorAttribute.htm
 [`LineWrappingTextWriter`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_LineWrappingTextWriter.htm
 [`Nullable<T>`]: https://learn.microsoft.com/dotnet/api/system.nullable-1
 [`Ookii.CommandLine.Commands`]: https://www.ookii.org/docs/commandline-4.0/html/N_Ookii_CommandLine_Commands.htm
@@ -152,6 +161,7 @@ As of version 3.0, .Net Framework 2.0 is no longer supported. You can still targ
 [`TypeConverterAttribute`]: https://learn.microsoft.com/dotnet/api/system.componentmodel.typeconverterattribute
 [`UsageWriter`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_UsageWriter.htm
 [`ValueDescriptionAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_ValueDescriptionAttribute.htm
+[`ValueConverterAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Conversion_ValueConverterAttribute.htm
 [ArgumentNameComparison_1]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_ParseOptions_ArgumentNameComparison.htm
 [CommandLineParser.Parse()_2]: https://www.ookii.org/docs/commandline-4.0/html/Overload_Ookii_CommandLine_CommandLineParser_Parse.htm
 [Parse()_5]: https://www.ookii.org/docs/commandline-4.0/html/Overload_Ookii_CommandLine_CommandLineParser_1_Parse.htm
