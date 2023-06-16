@@ -19,6 +19,11 @@ namespace Ookii.CommandLine;
 ///   constructor directly; these classes do not support this interface unless it is manually
 ///   implemented.
 /// </para>
+/// <para>
+///   When using a version of .Net where static interface methods are not supported, the
+///   <see cref="GeneratedParserAttribute"/> will still generate the same method defined by this
+///   interface, just without having it implement the interface.
+/// </para>
 /// </remarks>
 public interface IParserProvider<TSelf>
     where TSelf : class, IParserProvider<TSelf>

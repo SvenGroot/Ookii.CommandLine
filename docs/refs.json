@@ -84,6 +84,10 @@
   "CommandOptions.StripCommandNameSuffix": "P_Ookii_CommandLine_Commands_CommandOptions_StripCommandNameSuffix",
   "Console.WindowWidth": "#system.console.windowwidth",
   "CreateCommand()": "Overload_Ookii_CommandLine_Commands_CommandManager_CreateCommand",
+  "CreateParser()": [
+    "M_Ookii_CommandLine_Commands_CommandInfo_CreateParser",
+    "M_Ookii_CommandLine_IParserProvider_1_CreateParser"
+  ],
   "CultureInfo": "#system.globalization.cultureinfo",
   "CultureInfo.InvariantCulture": "#system.globalization.cultureinfo.invariantculture",
   "CurrentCulture": "#system.globalization.cultureinfo.currentculture",
@@ -209,7 +213,8 @@
     "M_Ookii_CommandLine_CommandLineParser_Parse",
     "M_Ookii_CommandLine_Commands_ICommandWithCustomParsing_Parse",
     "Overload_Ookii_CommandLine_CommandLineParser_1_Parse",
-    "Overload_Ookii_CommandLine_CommandLineParser_Parse"
+    "Overload_Ookii_CommandLine_CommandLineParser_Parse",
+    "Overload_Ookii_CommandLine_IParser_1_Parse"
   ],
   "Parse<T>()": [
     "Overload_Ookii_CommandLine_CommandLineParser_Parse",
@@ -238,7 +243,9 @@
   "ParseResult.LastException": "P_Ookii_CommandLine_ParseResult_LastException",
   "ParseResult.RemainingArguments": "P_Ookii_CommandLine_ParseResult_RemainingArguments",
   "ParseResult.Status": "P_Ookii_CommandLine_ParseResult_Status",
+  "ParseStatus.Canceled": "T_Ookii_CommandLine_ParseStatus",
   "ParseStatus.Error": "T_Ookii_CommandLine_ParseStatus",
+  "ParseStatus.Success": "T_Ookii_CommandLine_ParseStatus",
   "ParseWithErrorHandling()": [
     "M_Ookii_CommandLine_CommandLineParser_1_ParseWithErrorHandling_1",
     "M_Ookii_CommandLine_CommandLineParser_1_ParseWithErrorHandling",

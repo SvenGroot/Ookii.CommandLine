@@ -19,6 +19,11 @@ namespace Ookii.CommandLine;
 ///   method, or create the parser directly by using the <see cref="CommandLineParser{T}.CommandLineParser(Ookii.CommandLine.ParseOptions?)"/>
 ///   constructor; these classes do not support this interface unless it is manually implemented.
 /// </para>
+/// <para>
+///   When using a version of .Net where static interface methods are not supported, the
+///   <see cref="GeneratedParserAttribute"/> will still generate the same methods defined by this
+///   interface, just without having them implement the interface.
+/// </para>
 /// </remarks>
 public interface IParser<TSelf> : IParserProvider<TSelf>
     where TSelf : class, IParser<TSelf>
