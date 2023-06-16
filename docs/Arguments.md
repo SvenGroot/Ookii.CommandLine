@@ -65,6 +65,15 @@ By default, Ookii.CommandLine accepts [any prefix](DefiningArguments.md#automati
 that uniquely identifies a single argument as an alias for that argument, without having to
 explicitly define those aliases.
 
+For example, if you have two arguments named `-File` and `-Folder`, you can refer to the first
+argument with `-Fi` and `-Fil` (also case insensitive by default). For the second one, `-Fo`,
+`-Fol`, `-Fold` and `-Folde`. However, `-F` is not an automatic prefix alias, because it could refer
+to either argument.
+
+When using long/short mode, automatic prefix aliases apply to arguments' long names. An argument
+named `--argument` can automatically be used with the prefix alias `--a` (assuming it is unique),
+but the short name `-a` will only exist if it was explicitly created.
+
 ## Positional arguments
 
 An argument can be _positional_, which means in addition to being supplied by name, it can also be
@@ -240,16 +249,10 @@ It is possible to override the default conversion by specifying a custom type co
 `ArgumentConverterAttribute`. When this attribute is applied to an argument, the specified type
 converter will be used for conversion instead of any of the default methods.
 
-### Using TypeConverters
-
 Previous versions of Ookii.CommandLine used .Net's `TypeConverter` class. Starting with
 Ookii.CommandLine 4.0, this is no longer the case, and the `ArgumentConverter` class is used
-instead.
-
-To help with transitioning code that relied on `TypeConverter`, you can use the
-`TypeConverterArgumentConverter<T>` class to use a type's default argument converter (for example
-`[ArgumentConverter(typeof(TypeConverterArgumentConverter<SomeType>))])`), or the
-`TypeConverterArgumentConverter` class as a base class to adapt a custom `TypeConverter`.
+instead. [See here](DefiningArguments.md#using-a-typeconverter) for more information on how to
+upgrade code that relied on a `TypeConverter`.
 
 ### Enumeration type conversion
 
@@ -258,8 +261,8 @@ insensitive conversion, and allows both the names and underlying value of the en
 used. This means that e.g. for the [`DayOfWeek`][] enumeration, "Monday", "monday", and "1" can all
 be used to indicate [`DayOfWeek.Monday`][].
 
-In the case of a numeric value, the converter does not check if the resulting value is valid for
-the enumeration type, so again for [`DayOfWeek`][], a value of "9" would be converted to `(DayOfWeek)9`
+In the case of a numeric value, the converter does not check if the resulting value is valid for the
+enumeration type, so again for [`DayOfWeek`][], a value of "9" would be converted to `(DayOfWeek)9`
 even though there is no such value in the enumeration.
 
 To ensure the result is constrained to only the defined values of the enumeration, use the
@@ -285,19 +288,22 @@ the use of numeric values entirely.
 
 For multi-value and dictionary arguments, the converter must be for the element type (e.g. if the
 argument is a multi-value argument of type `int[]`, the type converter must be able to convert to
-`int`). For a dictionary argument the element type is [`KeyValuePair<TKey, TValue>`][], and the type
+`int`).
+
+For a dictionary argument the element type is [`KeyValuePair<TKey, TValue>`][], and the type
 converter is responsible for parsing the key and value from the argument value.
 
-Ookii.CommandLine provides the [`KeyValuePairConverter<TKey, TValue>`][] class that is used by default
-for dictionary arguments. You can override this using the [`TypeConverterAttribute`][] as usual, but
+Ookii.CommandLine provides the `KeyValuePairConverter<TKey, TValue>` class that is used by default
+for dictionary arguments. You can override this using the `ArgumentConverterAttribute` as usual, but
 if you only want to customize the parsing of the key and value types, you can use the
-[`KeyTypeConverterAttribute`][] and the [`ValueTypeConverterAttribute`][] attributes respectively.
-The [`KeyValuePairConverter<TKey, TValue>`][] will use those attributes to locate a custom converter.
-You can also customize the key/value separator used by this converter using the
-[`KeyValueSeparatorAttribute`][] attribute.
+`KeyConverterAttribute` and the `ValueConverterAttribute` attributes respectively.
 
-If you do specify the [`TypeConverterAttribute`][] for a dictionary argument, the
-[`KeyTypeConverterAttribute`][], [`ValueTypeConverterAttribute`][], and [`KeyValueSeparatorAttribute`][]
+The `KeyValuePairConverter<TKey, TValue>` will use those attributes to determine which converter to
+use instead of the default for the key and value types. You can also customize the key/value
+separator used by this converter using the [`KeyValueSeparatorAttribute`][] attribute.
+
+If you do specify the `ArgumentConverterAttribute` for a dictionary argument, the
+`KeyConverterAttribute`, `ValueConverterAttribute`, and [`KeyValueSeparatorAttribute`][]
 attributes will be ignored.
 
 ### Conversion culture
@@ -308,8 +314,8 @@ interpreted; for example, some cultures might use a period as the decimal separa
 use a comma.
 
 To ensure a consistent parsing experience for all users regardless of their machine's regional
-format settings, Ookii.CommandLine defaults to using [`CultureInfo.InvariantCulture`][]. You can change
-this using the [`ParseOptions.Culture`][] property, but be very careful if you do.
+format settings, Ookii.CommandLine defaults to using [`CultureInfo.InvariantCulture`][]. You can
+change this using the [`ParseOptions.Culture`][] property, but be very careful if you do.
 
 ## Arguments with non-nullable types
 
@@ -320,39 +326,42 @@ nullable reference or value type (e.g. `string?` or `int?`), nothing changes. Bu
 not nullable (e.g. `string` (in a context with NRT support) or `int`), [`CommandLineParser`][] will
 ensure that the value will not be null.
 
-Assigning a null value to an argument only happens if the [`TypeConverter`][] for that argument returns
-`null` as the result of the conversion. If this happens and the argument is not nullable, a
-[`CommandLineArgumentException`][] is thrown with the category set to [`NullArgumentValue`][NullArgumentValue_0].
+Assigning a null value to an argument only happens if the `ArgumentConverter` for that argument
+returns null as the result of the conversion. If this happens and the argument is not nullable, a
+[`CommandLineArgumentException`][] is thrown with the category set to
+[`NullArgumentValue`][NullArgumentValue_0].
 
 Null-checking for non-nullable reference types is only available in .Net 6.0 and later. If you are
 using the .Net Standard versions of Ookii.CommandLine, this check is only done for value types.
 
 For multi-value arguments, the nullability check applies to the type of the elements (e.g.
 `string?[]` for an array), and for dictionary arguments, it applies to the value (e.g.
-`Dictionary<string, string?>`); the key may never be null for a dictionary argument.
+`Dictionary<string, string?>`); the key may never be nullable for a dictionary argument.
 
 See also the [`CommandLineArgument.AllowNull`][] property.
 
 ## Long/short mode
 
-POSIX and GNU conventions specify that options use a dash (`-`) followed by a single characters, and
-define the concept of long options, which use `--` followed by an a multi-character name. This style
-is used by many tools like `dotnet`, `git`, and many others, and may be preferred if you are writing
-a cross-platform application.
+The default behavior of Ookii.CommandLine is similar to how PowerShell parses arguments. However,
+many command line tools like `dotnet`, `git`, and many others use POSIX or GNU conventions. This is
+especially common for Linux or cross-platform applications.
+
+POSIX and GNU conventions specify that options use a dash (`-`) followed by a single character, and
+define the concept of long options, which use `--` followed by an a multi-character name.
 
 Ookii.CommandLine calls this style of parsing "long/short mode," and offers it as an alternative
-mode to augment the default parsing rules. In this mode, an argument can have the regular long name
-and an additional single-character short name, each with its own argument name prefix. By default,
-the prefix `--` is used for long names, and `-` (and `/` on Windows) for short names.
+mode to the default parsing rules. In this mode, an argument can have a long name, which takes the
+place of the regular argument name, and an additional single-character short name. By default,
+Ookii.CommandLine follows the convention of using the prefix `--` for long names, and `-` (and `/`
+on Windows only) for short names.
 
 POSIX conventions also specify the use of lower case argument names, with dashes separating words
 ("dash-case"), which you can easily achieve using [name transformation](DefiningArguments.md#name-transformation),
-and case-sensitive argument names, which can be enabled with the
-[`ParseOptionsAttribute.CaseSensitive`][] property or the [`ParseOptions.ArgumentNameComparer`][]
-property.
+and case-sensitive argument names. For information on how to set these options,
+[see here](DefiningArguments.md#longshort-mode).
 
-For example, an argument named `--path` could have a short name `-p`. It could then be supplied
-using either name:
+When using long/short mode, an argument named `--path` could have a short name `-p`. It could then
+be supplied using either name:
 
 ```text
 --path value
@@ -366,7 +375,8 @@ Or:
 
 Note that you must use the correct prefix: using `-path` or `--p` will not work.
 
-An argument can have either a short name or a long name, or both.
+An argument can have either a short name or a long name, or both. The short name doesn't have to
+use the first letter of the long name; it can be anything.
 
 Arguments in this mode can still have aliases. You can set separate long and short aliases, which
 follow the same rules as the long and short names.
@@ -386,8 +396,8 @@ This is equivalent to:
 
 This only works for switch arguments, and does not apply to long names.
 
-Besides these differences, long/short mode follows the same rules and conventions as the default
-mode outlined above, with all the same options.
+Besides these differences, long/short mode follows the same rules and conventions outlined above,
+with all the same options.
 
 ## More information
 
@@ -406,24 +416,15 @@ Next, let's take a look at how to [define arguments](DefiningArguments.md).
 [`FileInfo`]: https://learn.microsoft.com/dotnet/api/system.io.fileinfo
 [`FlagsAttribute`]: https://learn.microsoft.com/dotnet/api/system.flagsattribute
 [`Int32`]: https://learn.microsoft.com/dotnet/api/system.int32
-[`KeyTypeConverterAttribute`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_KeyTypeConverterAttribute.htm
 [`KeyValuePair<TKey, TValue>`]: https://learn.microsoft.com/dotnet/api/system.collections.generic.keyvaluepair-2
-[`KeyValuePairConverter<TKey, TValue>`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_KeyValuePairConverter_2.htm
 [`KeyValueSeparatorAttribute`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_KeyValueSeparatorAttribute.htm
 [`MultiValueSeparatorAttribute`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_MultiValueSeparatorAttribute.htm
 [`ParseOptions.AllowWhiteSpaceValueSeparator`]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_ParseOptions_AllowWhiteSpaceValueSeparator.htm
-[`ParseOptions.ArgumentNameComparer`]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_ParseOptions_ArgumentNameComparer.htm
 [`ParseOptions.Culture`]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_ParseOptions_Culture.htm
-[`ParseOptions.NameValueSeparator`]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_ParseOptions_NameValueSeparator.htm
 [`ParseOptions`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_ParseOptions.htm
 [`ParseOptionsAttribute.AllowWhiteSpaceValueSeparator`]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_ParseOptionsAttribute_AllowWhiteSpaceValueSeparator.htm
 [`ParseOptionsAttribute.CaseSensitive`]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_ParseOptionsAttribute_CaseSensitive.htm
-[`ParseOptionsAttribute.NameValueSeparator`]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_ParseOptionsAttribute_NameValueSeparator.htm
 [`ParseOptionsAttribute`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_ParseOptionsAttribute.htm
 [`String`]: https://learn.microsoft.com/dotnet/api/system.string
-[`System.ComponentModel.TypeConverterAttribute`]: https://learn.microsoft.com/dotnet/api/system.componentmodel.typeconverterattribute
-[`TypeConverter`]: https://learn.microsoft.com/dotnet/api/system.componentmodel.typeconverter
-[`TypeConverterAttribute`]: https://learn.microsoft.com/dotnet/api/system.componentmodel.typeconverterattribute
 [`Uri`]: https://learn.microsoft.com/dotnet/api/system.uri
-[`ValueTypeConverterAttribute`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_ValueTypeConverterAttribute.htm
 [NullArgumentValue_0]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_CommandLineArgumentErrorCategory.htm

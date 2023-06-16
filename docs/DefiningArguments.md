@@ -257,6 +257,28 @@ The type specified must be derived from the [`TypeConverter`][] class.
 To make it easy to implement custom type converters to/from a string, Ookii.CommandLine provides
 the [`TypeConverterBase<T>`][] type.
 
+#### Using a TypeConverter
+
+Previous versions of Ookii.CommandLine used .Net's `TypeConverter` class. Starting with
+Ookii.CommandLine 4.0, this is no longer the case, and the `ArgumentConverter` class is used
+instead.
+
+To help with transitioning code that relied on `TypeConverter`, you can use the
+`TypeConverterArgumentConverter<T>` class to use a type's default argument converter.
+
+```csharp
+[CommandLineArgument]
+[ArgumentConverter(typeof(TypeConverterArgumentConverter<SomeType>))]
+public SomeType Argument { get; set; }
+```
+
+This will use `TypeDescriptor.GetTypeConverter()` function to get the default `TypeConverter` for
+the type. Note that using that function will make it impossible to trim your application; this is
+the main reason `TypeConverter` is no longer used.
+
+If you were using a custom `TypeConverter`, you can use the `TypeConverterArgumentConverter` class
+as a base class to adapt it.
+
 ### Arguments that cancel parsing
 
 You can indicate that argument parsing should stop and immediately print usage help when an argument
