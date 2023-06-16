@@ -516,6 +516,10 @@ When using [long/short mode](Arguments.md#longshort-mode), the [`AliasAttribute`
 aliases, and will be ignored if the argument doesn't have a long name. Use the [`ShortAliasAttribute`][]
 to specify short aliases. These will be ignored if the argument doesn't have a short name.
 
+## Automatic prefix aliases
+
+TODO
+
 ## Name transformation
 
 If your desired argument naming convention doesn't match your .Net naming convention, you can use

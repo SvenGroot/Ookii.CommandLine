@@ -23,6 +23,8 @@ please check the [migration guide](Migrating.md).
   - This enables conversion using [`ReadOnlySpan<char>`][] for better performance, makes it easier to
     implement new converters, provides better error messages for enumeration conversion, and enables
     the use of trimming (when source generation is used).
+- Automatically accept [any unique prefix](DefiningArguments.md#automatic-prefix-aliases) of an
+  argument name as an alias.
 - Use the `required` keyword in C# 11 and .Net 7.0 to create required arguments.
 - Support for using properties with `init` accessors (only if they are `required`).
 - Value descriptions are now specified using the [`ValueDescriptionAttribute`][] attribute. This

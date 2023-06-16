@@ -28,25 +28,31 @@ prompt, and typically take the following form:
 
 The argument name is preceded by the _argument name prefix_. This prefix is configurable, but
 defaults to accepting a dash (`-`) and a forward slash (`/`) on Windows, and only a dash (`-`) on
-other platforms such as Linux or MacOS.
+other platforms such as Linux or MacOS. In long/short mode, this may be the long argument name
+prefix, which is `--` by default.
 
 Argument names are case insensitive by default, though this can be customized using the
-[`ParseOptionsAttribute.CaseSensitive`][] property or the [`ParseOptions.ArgumentNameComparer`][]
+[`ParseOptionsAttribute.CaseSensitive`][] property or the `ParseOptions.ArgumentNameComparison`
 property.
 
-The argument's value follow the name, separated by either white space (as a separate argument token),
-or by the argument name/value separator, which is a colon (`:`) by default. The following is
-identical to the previous example:
+The argument's value follows the name, separated by either white space (as a separate argument
+token), or by the argument name/value separator; by default, both a colon (`:`) and an equals sign
+(`=`) are accepted. The following three example are identical:
 
 ```text
+-ArgumentName value
 -ArgumentName:value
+-ArgumentName=value
 ```
 
 Whether white-space is allowed to separate the name and value is configured using the
 [`ParseOptionsAttribute.AllowWhiteSpaceValueSeparator`][] or
-[`ParseOptions.AllowWhiteSpaceValueSeparator`][] property, and the argument name/value separator can
-be customized using the [`ParseOptionsAttribute.NameValueSeparator`][] or
-[`ParseOptions.NameValueSeparator`][] property.
+[`ParseOptions.AllowWhiteSpaceValueSeparator`][] property, and the argument name/value separator(s)
+can be customized using the `ParseOptionsAttribute.NameValueSeparators` or
+`ParseOptions.NameValueSeparators` property.
+
+The name/value separator cannot occur in the argument name; however, it can still be used in
+argument values. For example, `-ArgumentName:foo:bar` will give `-ArgumentName` the value `foo:bar`.
 
 Not all arguments require values; those that do not are called [_switch arguments_](#switch-arguments)
 and have a value determined by their presence or absence on the command line.
@@ -55,34 +61,56 @@ An argument can have one or more aliases: alternative names that can also be use
 argument. For example, an argument named `-Verbose` might use the alias `-v` as a shorter to type
 alternative.
 
+By default, Ookii.CommandLine accepts [any prefix](DefiningArguments.md#automatic-prefix-aliases)
+that uniquely identifies a single argument as an alias for that argument, without having to
+explicitly define those aliases.
+
 ## Positional arguments
 
 An argument can be _positional_, which means in addition to being supplied by name, it can also be
-supplied without the name, using the position of the value. Which argument the value belongs to
+supplied without the name, using the ordering of the values. Which argument the value belongs to
 is determined by its position relative to other positional arguments.
 
 If an argument value is encountered without being preceded by a name, it is matched to the
-next positional argument without a value. For example, take the following command line arguments:
+next positional argument without a value. For example, take an application that has three arguments:
+`-Positional1`, `-Positional2` and `-Positional3` are positional, in that order, and `-NamedOnly` is
+non-positional.
+
+Now, consider the following invocation:
 
 ```text
-value1 –ArgumentName value2 value3
+value1 -NamedOnly value2 value3
 ```
 
-In this case, value1 is not preceded by a name; therefore, it is matched to the first positional
-argument. Value2 follows a name, so it is matched to the argument with the name `-ArgumentName`.
-Finally, value3 is matched to the second positional argument.
+In this case, "value1" is not preceded by a name; therefore, it is matched to `-Positional1`
+argument. The value "value2" follows a name, so it is matched to the argument with the name
+`-NamedOnly`. Finally, "value3" is matched to the second positional argument, which is
+`-Positional2`.
 
 A positional argument can still be supplied by name. If a positional argument is supplied by name,
-it cannot also be specified by position; in the previous example, if the argument named
-`-ArgumentName` was the second positional argument, then value3 becomes the value for the third
-positional argument, because the value for `-ArgumentName` was already specified by name. If
-`-ArgumentName` is the first positional argument, this would cause an error (unless duplicate
-arguments are allowed in the options), because it already had a value set by `value`.
+it cannot also be specified by position. Take the following example:
+
+```text
+value1 -Positional2 value2 value3
+```
+
+In this case, "value1" is still matched to `-Positional1`. The value for `-Positional2` is now
+given by name, and is "value2". The value "value3" is for the next positional argument, but since
+`-Positional2` already has a value, it will be assigned to `-Positional3` instead.
+
+The following example would cause an error:
+
+```text
+value1 -Positional1 value2
+```
+
+This is because `-Positional1` is assigned to twice; first by position, and then by name. Duplicate
+arguments cause an error by default, though this can be changed.
 
 ## Required arguments
 
-A command line argument that is required must be supplied on all invocations of the application. If a
-required argument is not supplied, this is considered an error and parsing will fail.
+A command line argument that is required must be supplied on all invocations of the application. If
+a required argument is not supplied, this is considered an error and parsing will fail.
 
 Any argument can be made required. Usually, it is recommended for any required argument to also be a
 positional argument, but this is not mandatory.
@@ -107,12 +135,9 @@ A switch argument’s value can be specified explicitly, as in the following exa
 -Switch:false
 ```
 
-You must use the name/value separator (a colon by default) to specify an explicit value for a switch
-argument; you cannot use white space. If the command line contains `-Switch false`, then `false` is
-the value of the next positional argument, not the value for `-Switch`.
-
-If you use a nullable Boolean type (`bool?`) as the type of the argument, it will be `null` if
-not supplied, `true` if supplied, and `false` only if explicitly set to false using `-Switch:false`.
+You must use the name/value separator (a colon or equals sign by default) to specify an explicit
+value for a switch argument; you cannot use white space. If the command line contains `-Switch false`,
+then `false` is the value of the next positional argument, not the value for `-Switch`.
 
 ## Arguments with multiple values
 
@@ -128,15 +153,16 @@ In this case, if `-ArgumentName` is a multi-value argument, the value of the arg
 holding all three values.
 
 It’s possible to specify a separator for multi-value arguments using the
-[`MultiValueSeparatorAttribute`][] attribute. This makes it possible to specify multiple values for the
-argument while the argument itself is specified only once. For example, if the separator is set to a
-comma, you can specify the values as follows:
+[`MultiValueSeparatorAttribute`][] attribute. This makes it possible to specify multiple values for
+the argument while the argument itself is specified only once. For example, if the separator is set
+to a comma, you can specify the values as follows:
 
 ```text
 -ArgumentName value1,value2,value3
 ```
 
-In this case, the value of the argument named `-ArgumentName` will be a list with the three values "value1", "value2" and "value3".
+In this case, the value of the argument named `-ArgumentName` will be a list with the three values
+"value1", "value2" and "value3".
 
 **Note:** if you specify a separator for a multi-value argument, it is _not_ possible to have an
 argument value containing the separator. There is no way to escape the separator. Therefore, make
@@ -161,9 +187,8 @@ positional argument values will be considered values for the multi-value argumen
 If a multi-value argument is required, it means it must have at least one value. You cannot set a
 default value for an optional multi-value argument.
 
-If the type of the argument is a list of Boolean values (e.g. `bool[]`), it will act as a
-multi-value argument and a switch. A value of true (or the explicit value if one is given) gets
-added to the list for every time that the argument is supplied.
+An argument can be both multi-value and a switch. A value of true (or the explicit value if one is
+given) gets added to the list for every time that the argument is supplied.
 
 If an argument is not a multi-value argument, it is an error to supply it more than once, unless
 duplicate arguments are allowed in the [`ParseOptions`][] or [`ParseOptionsAttribute`][], in which
@@ -185,7 +210,8 @@ In this case, the value of the argument named `-ArgumentName` will be a dictiona
 If you specify the same key more than once, an exception will be thrown, unless the
 [`AllowDuplicateDictionaryKeysAttribute`][] attribute is specified for the argument.
 
-The default key/value separator (which is `=`) can be overridden using the [`KeyValueSeparatorAttribute`][] attribute.
+The default key/value separator (which is `=`) can be overridden using the
+[`KeyValueSeparatorAttribute`][] attribute.
 
 ## Argument value conversion
 
@@ -197,27 +223,40 @@ type.
 Ookii.CommandLine will try to convert the argument using the following options, in order of
 preference:
 
-1. If the argument has the [`TypeConverterAttribute`][] applied, the specified custom
-   [`TypeConverter`][].
-2. The argument type's default [`TypeConverter`][], if it can convert from a string.
-3. A `public static Parse(String, ICultureInfo)` method.
-4. A `public static Parse(String)` method.
-5. A public constructor that takes a single string argument.
+1. If the argument has the `ArgumentConverterAttribute` applied, the specified custom
+   `ArgumentConverter`.
+2. For .Net 7 and later:
+   1. An implementation of the `ISpanParsable<TSelf>` interface.
+   2. An implementation of the `IParsable<TSelf>` interface.
+3. A `public static Parse(string, ICultureInfo)` method.
+4. A `public static Parse(string)` method.
+5. A public constructor that takes a single `string` argument.
 
 This will cover the majority of types you'd want to use for arguments without having to write any
 conversion code. If you write your own custom type, you can use it for arguments as long as it meets
-one of the above criteria (a [`TypeConverter`][] is preferred).
+one of the above criteria.
 
 It is possible to override the default conversion by specifying a custom type converter using the
-[`System.ComponentModel.TypeConverterAttribute`][]. When this attribute is applied to an argument,
-the specified type converter will be used for conversion instead of any of the default methods.
+`ArgumentConverterAttribute`. When this attribute is applied to an argument, the specified type
+converter will be used for conversion instead of any of the default methods.
+
+### Using TypeConverters
+
+Previous versions of Ookii.CommandLine used .Net's `TypeConverter` class. Starting with
+Ookii.CommandLine 4.0, this is no longer the case, and the `ArgumentConverter` class is used
+instead.
+
+To help with transitioning code that relied on `TypeConverter`, you can use the
+`TypeConverterArgumentConverter<T>` class to use a type's default argument converter (for example
+`[ArgumentConverter(typeof(TypeConverterArgumentConverter<SomeType>))])`), or the
+`TypeConverterArgumentConverter` class as a base class to adapt a custom `TypeConverter`.
 
 ### Enumeration type conversion
 
-The default [`TypeConverter`][] for enumeration types uses case insensitive conversion, and allows
-both the names and underlying value of the enumeration to be used. This means that e.g. for the
-[`DayOfWeek`][] enumeration, "Monday", "monday", and "1" can all be used to indicate
-[`DayOfWeek.Monday`][].
+The `EnumConverter` used for enumeration types relies on the `Enum.Parse()` method. It uses case
+insensitive conversion, and allows both the names and underlying value of the enumeration to be
+used. This means that e.g. for the [`DayOfWeek`][] enumeration, "Monday", "monday", and "1" can all
+be used to indicate [`DayOfWeek.Monday`][].
 
 In the case of a numeric value, the converter does not check if the resulting value is valid for
 the enumeration type, so again for [`DayOfWeek`][], a value of "9" would be converted to `(DayOfWeek)9`
