@@ -104,6 +104,8 @@
     "P_Ookii_CommandLine_LineWrappingTextWriter_Encoding",
     "#system.text.encoding"
   ],
+  "Enum.Parse()": "#system.enum.parse",
+  "EnumConverter": "T_Ookii_CommandLine_Conversion_EnumConverter",
   "Environment.GetCommandLineArgs()": "#system.environment.getcommandlineargs",
   "Error": "P_Ookii_CommandLine_ParseOptions_Error",
   "ErrorCategory": "P_Ookii_CommandLine_Validation_ArgumentValidationAttribute_ErrorCategory",
@@ -145,13 +147,17 @@
   "Indent": "P_Ookii_CommandLine_LineWrappingTextWriter_Indent",
   "Int32": "#system.int32",
   "Inverted": null,
+  "IParsable<TSelf>": "#system.iparsable-1",
+  "ISpanParsable<TSelf>": "#system.ispanparsable-1",
   "IsPosix": [
     "P_Ookii_CommandLine_Commands_CommandOptions_IsPosix",
     "P_Ookii_CommandLine_ParseOptions_IsPosix",
     "P_Ookii_CommandLine_ParseOptionsAttribute_IsPosix"
   ],
   "IsValid()": "M_Ookii_CommandLine_Validation_ArgumentValidationAttribute_IsValid",
+  "KeyConverterAttribute": "T_Ookii_CommandLine_Conversion_KeyConverterAttribute",
   "KeyValuePair<TKey, TValue>": "#system.collections.generic.keyvaluepair-2",
+  "KeyValuePairConverter<TKey, TValue>": "T_Ookii_CommandLine_Conversion_KeyValuePairConverter_2",
   "LineWrappingTextWriter": "T_Ookii_CommandLine_LineWrappingTextWriter",
   "LineWrappingTextWriter.ForConsoleError()": "M_Ookii_CommandLine_LineWrappingTextWriter_ForConsoleError",
   "LineWrappingTextWriter.ForConsoleOut()": "M_Ookii_CommandLine_LineWrappingTextWriter_ForConsoleOut",
@@ -203,6 +209,7 @@
   ],
   "ParseOptions": "T_Ookii_CommandLine_ParseOptions",
   "ParseOptions.AllowWhiteSpaceValueSeparator": "P_Ookii_CommandLine_ParseOptions_AllowWhiteSpaceValueSeparator",
+  "ParseOptions.ArgumentNameComparison": "P_Ookii_CommandLine_ParseOptions_ArgumentNameComparison",
   "ParseOptions.ArgumentNameTransform": "P_Ookii_CommandLine_ParseOptions_ArgumentNameTransform",
   "ParseOptions.AutoVersionArgument": "P_Ookii_CommandLine_ParseOptions_AutoVersionArgument",
   "ParseOptions.Culture": "P_Ookii_CommandLine_ParseOptions_Culture",
@@ -291,6 +298,7 @@
     "M_Ookii_CommandLine_LocalizedStringProvider_ValidationFailed",
     "T_Ookii_CommandLine_CommandLineArgumentErrorCategory"
   ],
+  "ValueConverterAttribute": "T_Ookii_CommandLine_Conversion_ValueConverterAttribute",
   "ValueDescriptionAttribute": "T_Ookii_CommandLine_ValueDescriptionAttribute",
   "VirtualTerminal": "T_Ookii_CommandLine_Terminal_VirtualTerminal",
   "Wrapping": "P_Ookii_CommandLine_LineWrappingTextWriter_Wrapping",

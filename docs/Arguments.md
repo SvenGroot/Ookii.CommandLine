@@ -32,7 +32,7 @@ other platforms such as Linux or MacOS. In long/short mode, this may be the long
 prefix, which is `--` by default.
 
 Argument names are case insensitive by default, though this can be customized using the
-[`ParseOptionsAttribute.CaseSensitive`][] property or the `ParseOptions.ArgumentNameComparison`
+[`ParseOptionsAttribute.CaseSensitive`][] property or the [`ParseOptions.ArgumentNameComparison`][]
 property.
 
 The argument's value follows the name, separated by either white space (as a separate argument
@@ -48,8 +48,8 @@ token), or by the argument name/value separator; by default, both a colon (`:`) 
 Whether white-space is allowed to separate the name and value is configured using the
 [`ParseOptionsAttribute.AllowWhiteSpaceValueSeparator`][] or
 [`ParseOptions.AllowWhiteSpaceValueSeparator`][] property, and the argument name/value separator(s)
-can be customized using the `ParseOptionsAttribute.NameValueSeparators` or
-`ParseOptions.NameValueSeparators` property.
+can be customized using the [`ParseOptionsAttribute.NameValueSeparators`][] or
+[`ParseOptions.NameValueSeparators`][] property.
 
 The name/value separator cannot occur in the argument name; however, it can still be used in
 argument values. For example, `-ArgumentName:foo:bar` will give `-ArgumentName` the value `foo:bar`.
@@ -232,11 +232,11 @@ type.
 Ookii.CommandLine will try to convert the argument using the following options, in order of
 preference:
 
-1. If the argument has the `ArgumentConverterAttribute` applied, the specified custom
-   `ArgumentConverter`.
+1. If the argument has the [`ArgumentConverterAttribute`][] applied, the specified custom
+   [`ArgumentConverter`][].
 2. For .Net 7 and later:
-   1. An implementation of the `ISpanParsable<TSelf>` interface.
-   2. An implementation of the `IParsable<TSelf>` interface.
+   1. An implementation of the [`ISpanParsable<TSelf>`][] interface.
+   2. An implementation of the [`IParsable<TSelf>`][] interface.
 3. A `public static Parse(string, ICultureInfo)` method.
 4. A `public static Parse(string)` method.
 5. A public constructor that takes a single `string` argument.
@@ -245,18 +245,18 @@ This will cover the majority of types you'd want to use for arguments without ha
 conversion code. If you write your own custom type, you can use it for arguments as long as it meets
 one of the above criteria.
 
-It is possible to override the default conversion by specifying a custom type converter using the
-`ArgumentConverterAttribute`. When this attribute is applied to an argument, the specified type
+It is possible to override the default conversion by specifying a custom converter using the
+[`ArgumentConverterAttribute`][]. When this attribute is applied to an argument, the specified type
 converter will be used for conversion instead of any of the default methods.
 
-Previous versions of Ookii.CommandLine used .Net's `TypeConverter` class. Starting with
-Ookii.CommandLine 4.0, this is no longer the case, and the `ArgumentConverter` class is used
+Previous versions of Ookii.CommandLine used .Net's [`TypeConverter`][] class. Starting with
+Ookii.CommandLine 4.0, this is no longer the case, and the [`ArgumentConverter`][] class is used
 instead. [See here](DefiningArguments.md#using-a-typeconverter) for more information on how to
-upgrade code that relied on a `TypeConverter`.
+upgrade code that relied on a [`TypeConverter`][].
 
-### Enumeration type conversion
+### Enumeration conversion
 
-The `EnumConverter` used for enumeration types relies on the `Enum.Parse()` method. It uses case
+The [`EnumConverter`][] used for enumeration types relies on the [`Enum.Parse()`][] method. It uses case
 insensitive conversion, and allows both the names and underlying value of the enumeration to be
 used. This means that e.g. for the [`DayOfWeek`][] enumeration, "Monday", "monday", and "1" can all
 be used to indicate [`DayOfWeek.Monday`][].
@@ -287,23 +287,23 @@ the use of numeric values entirely.
 ### Multi-value and dictionary value conversion
 
 For multi-value and dictionary arguments, the converter must be for the element type (e.g. if the
-argument is a multi-value argument of type `int[]`, the type converter must be able to convert to
+argument is a multi-value argument of type `int[]`, the argument converter must be able to convert to
 `int`).
 
 For a dictionary argument the element type is [`KeyValuePair<TKey, TValue>`][], and the type
 converter is responsible for parsing the key and value from the argument value.
 
-Ookii.CommandLine provides the `KeyValuePairConverter<TKey, TValue>` class that is used by default
-for dictionary arguments. You can override this using the `ArgumentConverterAttribute` as usual, but
+Ookii.CommandLine provides the [`KeyValuePairConverter<TKey, TValue>`][] class that is used by default
+for dictionary arguments. You can override this using the [`ArgumentConverterAttribute`][] as usual, but
 if you only want to customize the parsing of the key and value types, you can use the
-`KeyConverterAttribute` and the `ValueConverterAttribute` attributes respectively.
+[`KeyConverterAttribute`][] and the [`ValueConverterAttribute`][] attributes respectively.
 
-The `KeyValuePairConverter<TKey, TValue>` will use those attributes to determine which converter to
+The [`KeyValuePairConverter<TKey, TValue>`][] will use those attributes to determine which converter to
 use instead of the default for the key and value types. You can also customize the key/value
 separator used by this converter using the [`KeyValueSeparatorAttribute`][] attribute.
 
-If you do specify the `ArgumentConverterAttribute` for a dictionary argument, the
-`KeyConverterAttribute`, `ValueConverterAttribute`, and [`KeyValueSeparatorAttribute`][]
+If you do specify the [`ArgumentConverterAttribute`][] for a dictionary argument, the
+[`KeyConverterAttribute`][], [`ValueConverterAttribute`][], and [`KeyValueSeparatorAttribute`][]
 attributes will be ignored.
 
 ### Conversion culture
@@ -326,7 +326,7 @@ nullable reference or value type (e.g. `string?` or `int?`), nothing changes. Bu
 not nullable (e.g. `string` (in a context with NRT support) or `int`), [`CommandLineParser`][] will
 ensure that the value will not be null.
 
-Assigning a null value to an argument only happens if the `ArgumentConverter` for that argument
+Assigning a null value to an argument only happens if the [`ArgumentConverter`][] for that argument
 returns null as the result of the conversion. If this happens and the argument is not nullable, a
 [`CommandLineArgumentException`][] is thrown with the category set to
 [`NullArgumentValue`][NullArgumentValue_0].
@@ -404,6 +404,8 @@ with all the same options.
 Next, let's take a look at how to [define arguments](DefiningArguments.md).
 
 [`AllowDuplicateDictionaryKeysAttribute`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_AllowDuplicateDictionaryKeysAttribute.htm
+[`ArgumentConverter`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Conversion_ArgumentConverter.htm
+[`ArgumentConverterAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Conversion_ArgumentConverterAttribute.htm
 [`CommandLineArgument.AllowNull`]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_CommandLineArgument_AllowNull.htm
 [`CommandLineArgumentException`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_CommandLineArgumentException.htm
 [`CommandLineParser`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_CommandLineParser.htm
@@ -413,18 +415,29 @@ Next, let's take a look at how to [define arguments](DefiningArguments.md).
 [`DayOfWeek.Monday`]: https://learn.microsoft.com/dotnet/api/system.dayofweek
 [`DayOfWeek.Wednesday`]: https://learn.microsoft.com/dotnet/api/system.dayofweek
 [`DayOfWeek`]: https://learn.microsoft.com/dotnet/api/system.dayofweek
+[`Enum.Parse()`]: https://learn.microsoft.com/dotnet/api/system.enum.parse
+[`EnumConverter`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Conversion_EnumConverter.htm
 [`FileInfo`]: https://learn.microsoft.com/dotnet/api/system.io.fileinfo
 [`FlagsAttribute`]: https://learn.microsoft.com/dotnet/api/system.flagsattribute
 [`Int32`]: https://learn.microsoft.com/dotnet/api/system.int32
+[`IParsable<TSelf>`]: https://learn.microsoft.com/dotnet/api/system.iparsable-1
+[`ISpanParsable<TSelf>`]: https://learn.microsoft.com/dotnet/api/system.ispanparsable-1
+[`KeyConverterAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Conversion_KeyConverterAttribute.htm
 [`KeyValuePair<TKey, TValue>`]: https://learn.microsoft.com/dotnet/api/system.collections.generic.keyvaluepair-2
+[`KeyValuePairConverter<TKey, TValue>`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Conversion_KeyValuePairConverter_2.htm
 [`KeyValueSeparatorAttribute`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_KeyValueSeparatorAttribute.htm
 [`MultiValueSeparatorAttribute`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_MultiValueSeparatorAttribute.htm
 [`ParseOptions.AllowWhiteSpaceValueSeparator`]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_ParseOptions_AllowWhiteSpaceValueSeparator.htm
+[`ParseOptions.ArgumentNameComparison`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_ParseOptions_ArgumentNameComparison.htm
 [`ParseOptions.Culture`]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_ParseOptions_Culture.htm
+[`ParseOptions.NameValueSeparators`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_ParseOptions_NameValueSeparators.htm
 [`ParseOptions`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_ParseOptions.htm
 [`ParseOptionsAttribute.AllowWhiteSpaceValueSeparator`]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_ParseOptionsAttribute_AllowWhiteSpaceValueSeparator.htm
 [`ParseOptionsAttribute.CaseSensitive`]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_ParseOptionsAttribute_CaseSensitive.htm
+[`ParseOptionsAttribute.NameValueSeparators`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_ParseOptionsAttribute_NameValueSeparators.htm
 [`ParseOptionsAttribute`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_ParseOptionsAttribute.htm
 [`String`]: https://learn.microsoft.com/dotnet/api/system.string
+[`TypeConverter`]: https://learn.microsoft.com/dotnet/api/system.componentmodel.typeconverter
 [`Uri`]: https://learn.microsoft.com/dotnet/api/system.uri
+[`ValueConverterAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Conversion_ValueConverterAttribute.htm
 [NullArgumentValue_0]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_CommandLineArgumentErrorCategory.htm
