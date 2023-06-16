@@ -6,41 +6,42 @@
 please check the [migration guide](Migrating.md).
 
 - Add support for [source generation](SourceGeneration.md).
-  - Use the `GeneratedParserAttribute` to determine command line arguments at compile time.
+  - Use the [`GeneratedParserAttribute`][] to determine command line arguments at compile time.
     - Get errors and warnings for many mistakes.
     - Automatically determine the order of positional arguments.
     - Use property initializers to set default values that are used in the usage help.
     - Allow your application to be trimmed.
     - Improved performance.
-  - Use the `GeneratedCommandManagerAttribute` to determine subcommands at compile time.
+  - Use the [`GeneratedCommandManagerAttribute`][] to determine subcommands at compile time.
     - Allow an application with subcommands to be trimmed.
     - Improved performance.
   - Using source generation is recommended unless you are not able to meet the requirements.
 - Constructor parameters can no longer be used to define command line arguments.
-- Converting strings to argument types is now done using Ookii.CommandLine's own `ArgumentConverter`
+- Converting strings to argument types is now done using Ookii.CommandLine's own [`ArgumentConverter`][]
   class.
-  - This enables conversion using `ReadOnlySpan<char>` for better performance, makes it easier to
+  - See the [migration guide](Migrating.md) for more information.
+  - This enables conversion using [`ReadOnlySpan<char>`][] for better performance, makes it easier to
     implement new converters, provides better error messages for enumeration conversion, and enables
     the use of trimming (when source generation is used).
 - Use the `required` keyword in C# 11 and .Net 7.0 to create required arguments.
 - Support for using properties with `init` accessors (only if they are `required`).
-- Value descriptions are now specified using the `ValueDescriptionAttribute` attribute. This
+- Value descriptions are now specified using the [`ValueDescriptionAttribute`][] attribute. This
   attribute is not sealed to allow derived classes that implement localization.
 - Conveniently set several related options to enable POSIX-like conventions using the
-  `ParseOptions.IsPosix`, `CommandOptions.IsPosix` or `ParseOptionsAttribute.IsPosix` property.
+  [`ParseOptions.IsPosix`][], [`CommandOptions.IsPosix`][] or [`ParseOptionsAttribute.IsPosix`][] property.
 - Support for multiple argument name/value separators, with the default now accepting both `:` and
   `=`.
 - You can now [cancel parsing](DefiningArguments.md#arguments-that-cancel-parsing) and still return
   success.
 - The remaining unparsed arguments, if parsing was canceled or encountered an error, are available
-  through the `CommandLineParser.ParseResult` property.
+  through the [`CommandLineParser.ParseResult`][] property.
 - By default, only usage syntax is shown if a parsing error occurs; the help argument must be used
   to get full help.
-- Argument validators used before conversion can implement validation on `ReadOnlySpan<char>` for
+- Argument validators used before conversion can implement validation on [`ReadOnlySpan<char>`][] for
   better performance.
 - Built-in support for [nested subcommands](Subcommands.md#nested-subcommands).
-- The automatic version argument and command will use the `AssemblyTitleAttribute` if the
-  `ApplicationFriendlyNameAttribute` was not used.
+- The automatic version argument and command will use the [`AssemblyTitleAttribute`][] if the
+  [`ApplicationFriendlyNameAttribute`][] was not used.
 - Various bug fixes and minor improvements.
 
 ## Ookii.CommandLine 3.1.1
@@ -206,25 +207,35 @@ and usage.
 Upgrading an existing project that is using Ookii.CommandLine 1.0 to Ookii.CommandLine 2.0 or newer
 may require substantial code changes and may change how command lines are parsed.
 
-[`CommandLineParser`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_CommandLineParser.htm
-[`CommandLineParser<T>`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_CommandLineParser_1.htm
+[`ApplicationFriendlyNameAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_ApplicationFriendlyNameAttribute.htm
+[`ArgumentConverter`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Conversion_ArgumentConverter.htm
+[`AssemblyTitleAttribute`]: https://learn.microsoft.com/dotnet/api/system.reflection.assemblytitleattribute
+[`CommandLineParser.ParseResult`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_CommandLineParser_ParseResult.htm
+[`CommandLineParser`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_CommandLineParser.htm
+[`CommandLineParser<T>.ParseWithErrorHandling()`]: https://www.ookii.org/docs/commandline-4.0/html/M_Ookii_CommandLine_CommandLineParser_1_ParseWithErrorHandling.htm
+[`CommandLineParser<T>`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_CommandLineParser_1.htm
+[`CommandManager.ParseResult`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_Commands_CommandManager_ParseResult.htm
+[`CommandOptions.IsPosix`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_Commands_CommandOptions_IsPosix.htm
 [`CultureInfo.InvariantCulture`]: https://learn.microsoft.com/dotnet/api/system.globalization.cultureinfo.invariantculture
 [`Environment.GetCommandLineArgs()`]: https://learn.microsoft.com/dotnet/api/system.environment.getcommandlineargs
-[`ParseOptions`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_ParseOptions.htm
-[`ParseOptionsAttribute`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_ParseOptionsAttribute.htm
-[`TypeConverter`]: https://learn.microsoft.com/dotnet/api/system.componentmodel.typeconverter
-[Parse()_6]: https://www.ookii.org/docs/commandline-3.1/html/M_Ookii_CommandLine_CommandLineParser_Parse.htm
-[Parse<T>()_1]: https://www.ookii.org/docs/commandline-3.1/html/M_Ookii_CommandLine_CommandLineParser_Parse__1.htm
-[UsageWriter_1]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_UsageWriter.htm
-[`CommandLineParser.ParseResult`]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_CommandLineParser_ParseResult.htm
-[`CommandLineParser<T>.ParseWithErrorHandling()`]: https://www.ookii.org/docs/commandline-3.1/html/M_Ookii_CommandLine_CommandLineParser_1_ParseWithErrorHandling.htm
-[`CommandManager.ParseResult`]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_Commands_CommandManager_ParseResult.htm
-[`LineWrappingTextWriter.ToString()`]: https://www.ookii.org/docs/commandline-3.1/html/M_Ookii_CommandLine_LineWrappingTextWriter_ToString.htm
-[`LineWrappingTextWriter`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_LineWrappingTextWriter.htm
-[`ResetIndentAsync()`]: https://www.ookii.org/docs/commandline-3.1/html/M_Ookii_CommandLine_LineWrappingTextWriter_ResetIndentAsync.htm
+[`GeneratedCommandManagerAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Commands_GeneratedCommandManagerAttribute.htm
+[`GeneratedParserAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_GeneratedParserAttribute.htm
+[`LineWrappingTextWriter.ToString()`]: https://www.ookii.org/docs/commandline-4.0/html/M_Ookii_CommandLine_LineWrappingTextWriter_ToString.htm
+[`LineWrappingTextWriter`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_LineWrappingTextWriter.htm
+[`ParseOptions.IsPosix`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_ParseOptions_IsPosix.htm
+[`ParseOptions`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_ParseOptions.htm
+[`ParseOptionsAttribute.IsPosix`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_ParseOptionsAttribute_IsPosix.htm
+[`ParseOptionsAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_ParseOptionsAttribute.htm
+[`ReadOnlySpan<char>`]: https://learn.microsoft.com/dotnet/api/system.readonlyspan-1
+[`ResetIndentAsync()`]: https://www.ookii.org/docs/commandline-4.0/html/M_Ookii_CommandLine_LineWrappingTextWriter_ResetIndentAsync.htm
 [`StringWriter`]: https://learn.microsoft.com/dotnet/api/system.io.stringwriter
-[`Wrapping`]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_LineWrappingTextWriter_Wrapping.htm
-[Flush()_0]: https://www.ookii.org/docs/commandline-3.1/html/M_Ookii_CommandLine_LineWrappingTextWriter_Flush_1.htm
-[ParseWithErrorHandling()_1]: https://www.ookii.org/docs/commandline-3.1/html/M_Ookii_CommandLine_CommandLineParser_1_ParseWithErrorHandling.htm
-[WriteAsync()_4]: https://www.ookii.org/docs/commandline-3.1/html/Overload_Ookii_CommandLine_LineWrappingTextWriter_WriteAsync.htm
-[WriteLineAsync()_5]: https://www.ookii.org/docs/commandline-3.1/html/Overload_Ookii_CommandLine_LineWrappingTextWriter_WriteLineAsync.htm
+[`TypeConverter`]: https://learn.microsoft.com/dotnet/api/system.componentmodel.typeconverter
+[`ValueDescriptionAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_ValueDescriptionAttribute.htm
+[`Wrapping`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_LineWrappingTextWriter_Wrapping.htm
+[Flush()_0]: https://www.ookii.org/docs/commandline-4.0/html/M_Ookii_CommandLine_LineWrappingTextWriter_Flush_1.htm
+[Parse()_6]: https://www.ookii.org/docs/commandline-4.0/html/M_Ookii_CommandLine_CommandLineParser_Parse.htm
+[Parse<T>()_1]: https://www.ookii.org/docs/commandline-4.0/html/M_Ookii_CommandLine_CommandLineParser_Parse__1.htm
+[ParseWithErrorHandling()_1]: https://www.ookii.org/docs/commandline-4.0/html/M_Ookii_CommandLine_CommandLineParser_1_ParseWithErrorHandling.htm
+[UsageWriter_1]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_UsageWriter.htm
+[WriteAsync()_4]: https://www.ookii.org/docs/commandline-4.0/html/Overload_Ookii_CommandLine_LineWrappingTextWriter_WriteAsync.htm
+[WriteLineAsync()_5]: https://www.ookii.org/docs/commandline-4.0/html/Overload_Ookii_CommandLine_LineWrappingTextWriter_WriteLineAsync.htm
