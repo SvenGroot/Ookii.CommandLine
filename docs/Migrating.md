@@ -15,39 +15,41 @@ As of version 3.0, .Net Framework 2.0 is no longer supported. You can still targ
 ## Breaking API changes from version 3.0
 
 - The `CommandLineArgumentAttribute.ValueDescription` property has been replaced by the
-  `ValueDescriptionAttribute` attribute. This new attribute is not sealed, enabling derived
+  [`ValueDescriptionAttribute`][] attribute. This new attribute is not sealed, enabling derived
   attributes e.g. to load a value description from localized resource.
 - Converting argument values from a string to their final type is no longer done using the
-  `TypeConverter` class, but instead using a custom `ArgumentConverter` class. Custom converters
-  must be specified using the `ArgumentConverterAttribute` instead of the `TypeConverterAttribute`.
-  - If you have existing conversions that depend on a `TypeConverter`, use the
-    `TypeConverterArgumentConverter<T>` as a convenient way to keep using that conversion.
+  [`TypeConverter`][] class, but instead using a custom [`ArgumentConverter`][] class. Custom
+  converters must be specified using the [`ArgumentConverterAttribute`][] instead of the
+  [`TypeConverterAttribute`][].
+  - If you have existing conversions that depend on a [`TypeConverter`][], use the
+    [`TypeConverterArgumentConverter<T>`][] as a convenient way to keep using that conversion.
 - Constructor parameters can no longer be used to define command line arguments. Instead, all
   arguments must be defined using properties.
-- The `CommandManager`, when using an assembly that is not the calling assembly, will only use
+- The [`CommandManager`][], when using an assembly that is not the calling assembly, will only use
   public command classes, where before it would also use internal ones. This is to better respect
   access modifiers, and to make sure generated and reflection-based command managers behave the
   same.
-- `ParseOptions.ArgumentNameComparer` and `CommandOptions.CommandNameComparer` have been replaced
-  by `ArgumentNameComparison` and `CommandNameComparison` respectively, both now taking a
-  `StringComparison` value instead of an `IComparer<string>`.
-- The `CommandInfo` type is now a class instead of a structure.
-- The `ICommandWithCustomParseOptions.Parse()` method signature has changed to use a
-  `ReadOnlyMemory<string>` structure for the arguments and to receive a reference to the calling
-  `CommandManager` instance.
-- The `CommandLineArgumentAttribute.CancelParsing` property now takes a `CancelMode` enumeration
-  rather than a boolean.
-- The `ArgumentParsedEventArgs` class was changed to use the `CancelMode` enumeration.
+- `ParseOptions.ArgumentNameComparer` and `CommandOptions.CommandNameComparer` have been replaced by
+  [`ArgumentNameComparison`][ArgumentNameComparison_1] and [`CommandNameComparison`][] respectively,
+  both now taking a [`StringComparison`][] value instead of an [`IComparer<string>`][].
+- The [`CommandInfo`][] type is now a class instead of a structure.
+- The [`ICommandWithCustomParsing.Parse()`][] method signature has changed to use a
+  [`ReadOnlyMemory<string>`][] structure for the arguments and to receive a reference to the calling
+  [`CommandManager`][] instance.
+- The [`CommandLineArgumentAttribute.CancelParsing`][] property now takes a [`CancelMode`][]
+  enumeration rather than a boolean.
+- The [`ArgumentParsedEventArgs`][] class was changed to use the [`CancelMode`][] enumeration.
 - The `ParseOptionsAttribute.NameValueSeparator` property was replaced with
-  `ParseOptionsAttribute.NameValueSeparators`.
+  [`ParseOptionsAttribute.NameValueSeparators`][].
 - The `ParseOptions.NameValueSeparator` property was replaced with
-  `ParseOptions.NameValueSeparators`.
-- Properties that previously returned a `ReadOnlyCollection<T>` now return an `ImmutableArray<T>`.
+  [`ParseOptions.NameValueSeparators`][].
+- Properties that previously returned a [`ReadOnlyCollection<T>`][] now return an
+  [`ImmutableArray<T>`][].
 
 ## Breaking behavior changes from version 3.0
 
 - By default, both `:` and `=` are accepted as argument name/value separators.
-- The default value of `ParseOptions.ShowUsageOnError` has changed.
+- The default value of [`ParseOptions.ShowUsageOnError`][] has changed.
 
 ## Breaking API changes from version 2.4
 
@@ -108,29 +110,49 @@ As of version 3.0, .Net Framework 2.0 is no longer supported. You can still targ
 - The [`LineWrappingTextWriter`][] class does not count virtual terminal sequences as part of the
   line length by default.
 
-[`AsyncCommandBase`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_Commands_AsyncCommandBase.htm
-[`CommandAttribute`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_Commands_CommandAttribute.htm
-[`CommandLineArgument.ElementType`]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_CommandLineArgument_ElementType.htm
-[`CommandLineParser.HelpRequested`]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_CommandLineParser_HelpRequested.htm
-[`CommandLineParser.Parse<T>()`]: https://www.ookii.org/docs/commandline-3.1/html/M_Ookii_CommandLine_CommandLineParser_Parse__1.htm
-[`CommandLineParser.WriteUsage()`]: https://www.ookii.org/docs/commandline-3.1/html/M_Ookii_CommandLine_CommandLineParser_WriteUsage.htm
-[`CommandLineParser`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_CommandLineParser.htm
-[`CommandLineParser<T>`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_CommandLineParser_1.htm
-[`CommandManager.RunCommandAsync()`]: https://www.ookii.org/docs/commandline-3.1/html/Overload_Ookii_CommandLine_Commands_CommandManager_RunCommandAsync.htm
-[`CommandManager`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_Commands_CommandManager.htm
-[`CommandOptions`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_Commands_CommandOptions.htm
+[`ArgumentConverter`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Conversion_ArgumentConverter.htm
+[`ArgumentConverterAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Conversion_ArgumentConverterAttribute.htm
+[`ArgumentParsedEventArgs`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_ArgumentParsedEventArgs.htm
+[`AsyncCommandBase`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Commands_AsyncCommandBase.htm
+[`CancelMode`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_CancelMode.htm
+[`CommandAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Commands_CommandAttribute.htm
+[`CommandInfo`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Commands_CommandInfo.htm
+[`CommandLineArgument.ElementType`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_CommandLineArgument_ElementType.htm
+[`CommandLineArgumentAttribute.CancelParsing`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_CancelParsing.htm
+[`CommandLineParser.HelpRequested`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_CommandLineParser_HelpRequested.htm
+[`CommandLineParser.Parse<T>()`]: https://www.ookii.org/docs/commandline-4.0/html/M_Ookii_CommandLine_CommandLineParser_Parse__1.htm
+[`CommandLineParser.WriteUsage()`]: https://www.ookii.org/docs/commandline-4.0/html/M_Ookii_CommandLine_CommandLineParser_WriteUsage.htm
+[`CommandLineParser`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_CommandLineParser.htm
+[`CommandLineParser<T>`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_CommandLineParser_1.htm
+[`CommandManager.RunCommandAsync()`]: https://www.ookii.org/docs/commandline-4.0/html/Overload_Ookii_CommandLine_Commands_CommandManager_RunCommandAsync.htm
+[`CommandManager`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Commands_CommandManager.htm
+[`CommandNameComparison`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_Commands_CommandOptions_CommandNameComparison.htm
+[`CommandOptions`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Commands_CommandOptions.htm
 [`CultureInfo.InvariantCulture`]: https://learn.microsoft.com/dotnet/api/system.globalization.cultureinfo.invariantculture
 [`CurrentCulture`]: https://learn.microsoft.com/dotnet/api/system.globalization.cultureinfo.currentculture
-[`IAsyncCommand`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_Commands_IAsyncCommand.htm
-[`ICommand.Run()`]: https://www.ookii.org/docs/commandline-3.1/html/M_Ookii_CommandLine_Commands_ICommand_Run.htm
-[`ICommand`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_Commands_ICommand.htm
-[`ICommandWithCustomParsing.Parse()`]: https://www.ookii.org/docs/commandline-3.1/html/M_Ookii_CommandLine_Commands_ICommandWithCustomParsing_Parse.htm
-[`ICommandWithCustomParsing`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_Commands_ICommandWithCustomParsing.htm
-[`LineWrappingTextWriter`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_LineWrappingTextWriter.htm
+[`IAsyncCommand`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Commands_IAsyncCommand.htm
+[`ICommand.Run()`]: https://www.ookii.org/docs/commandline-4.0/html/M_Ookii_CommandLine_Commands_ICommand_Run.htm
+[`ICommand`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Commands_ICommand.htm
+[`ICommandWithCustomParsing.Parse()`]: https://www.ookii.org/docs/commandline-4.0/html/M_Ookii_CommandLine_Commands_ICommandWithCustomParsing_Parse.htm
+[`ICommandWithCustomParsing`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Commands_ICommandWithCustomParsing.htm
+[`IComparer<string>`]: https://learn.microsoft.com/dotnet/api/system.collections.generic.icomparer-1
+[`ImmutableArray<T>`]: https://learn.microsoft.com/dotnet/api/system.collections.immutable.immutablearray-1
+[`LineWrappingTextWriter`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_LineWrappingTextWriter.htm
 [`Nullable<T>`]: https://learn.microsoft.com/dotnet/api/system.nullable-1
-[`Ookii.CommandLine.Commands`]: https://www.ookii.org/docs/commandline-3.1/html/N_Ookii_CommandLine_Commands.htm
-[`ParseOptions`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_ParseOptions.htm
-[`UsageWriter`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_UsageWriter.htm
-[CommandLineParser.Parse()_2]: https://www.ookii.org/docs/commandline-3.1/html/Overload_Ookii_CommandLine_CommandLineParser_Parse.htm
-[Parse()_5]: https://www.ookii.org/docs/commandline-3.1/html/Overload_Ookii_CommandLine_CommandLineParser_1_Parse.htm
-[Parse()_6]: https://www.ookii.org/docs/commandline-3.1/html/Overload_Ookii_CommandLine_CommandLineParser_Parse.htm
+[`Ookii.CommandLine.Commands`]: https://www.ookii.org/docs/commandline-4.0/html/N_Ookii_CommandLine_Commands.htm
+[`ParseOptions.NameValueSeparators`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_ParseOptions_NameValueSeparators.htm
+[`ParseOptions.ShowUsageOnError`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_ParseOptions_ShowUsageOnError.htm
+[`ParseOptions`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_ParseOptions.htm
+[`ParseOptionsAttribute.NameValueSeparators`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_ParseOptionsAttribute_NameValueSeparators.htm
+[`ReadOnlyCollection<T>`]: https://learn.microsoft.com/dotnet/api/system.collections.objectmodel.readonlycollection-1
+[`ReadOnlyMemory<string>`]: https://learn.microsoft.com/dotnet/api/system.readonlymemory-1
+[`StringComparison`]: https://learn.microsoft.com/dotnet/api/system.stringcomparison
+[`TypeConverter`]: https://learn.microsoft.com/dotnet/api/system.componentmodel.typeconverter
+[`TypeConverterArgumentConverter<T>`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Conversion_TypeConverterArgumentConverter_1.htm
+[`TypeConverterAttribute`]: https://learn.microsoft.com/dotnet/api/system.componentmodel.typeconverterattribute
+[`UsageWriter`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_UsageWriter.htm
+[`ValueDescriptionAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_ValueDescriptionAttribute.htm
+[ArgumentNameComparison_1]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_ParseOptions_ArgumentNameComparison.htm
+[CommandLineParser.Parse()_2]: https://www.ookii.org/docs/commandline-4.0/html/Overload_Ookii_CommandLine_CommandLineParser_Parse.htm
+[Parse()_5]: https://www.ookii.org/docs/commandline-4.0/html/Overload_Ookii_CommandLine_CommandLineParser_1_Parse.htm
+[Parse()_6]: https://www.ookii.org/docs/commandline-4.0/html/Overload_Ookii_CommandLine_CommandLineParser_Parse.htm
