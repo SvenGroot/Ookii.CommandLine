@@ -3,18 +3,19 @@
 When you have [defined the command line arguments](DefiningArguments.md), you can parse the command
 line to determine their values. There are two basic ways to do this, described below.
 
-## Using the static helper method
+## Using the static helper methods
 
-The easiest way to parse the arguments is using the static [`CommandLineParser.Parse<T>()`][] helper
-methods. These methods take care of parsing the arguments, handling errors, and printing usage help
-if necessary.
+The easiest way to parse the arguments is using the static `Parse()` methods that is generated for
+your arguments class when using [source generation](SourceGeneration.md) with the
+`GeneratedParserAttribute`. These methods take care of parsing the arguments, handling errors, and
+printing usage help if necessary.
 
 A basic usage sample for the [`CommandLineParser`][] class is as follows:
 
 ```csharp
 public static int Main()
 {
-    var arguments = CommandLineParser.Parse<MyArguments>();
+    var arguments = MyArguments.Parse();
     if (arguments == null)
     {
         return 1; // Or a suitable error code.
@@ -27,11 +28,13 @@ public static int Main()
 This overload takes the arguments from the [`Environment.GetCommandLineArgs()`][] method, so there is
 no need to pass them manually (though you can if desired), and the default [`ParseOptions`][].
 
-If argument parsing is successful, the [`CommandLineParser`][] will create a new instance of the class
-defining the arguments, passing the values parsed from the command line to the constructor
-parameters (if any). It will then set the value of each property to the value of the corresponding
-argument. This is not done in any particular order, so do not write code that makes assumptions
-about this. Finally, it will return the instance.
+If you cannot use source generation, you can call one of the [`CommandLineParser.Parse<T>()`][]
+methods, which work the same way as the generated method.
+
+If argument parsing is successful, the [`CommandLineParser`][] will create a new instance of the
+class defining the arguments. It will then set the value of each property to the value of the
+corresponding argument. This is not done in any particular order, so do not write code that makes
+assumptions about this. Finally, it will return the instance.
 
 Argument parsing can fail for a number of reason, including:
 
@@ -43,24 +46,25 @@ Argument parsing can fail for a number of reason, including:
 - Argument value conversion failed for one of the arguments.
 - An argument failed [validation](Validation.md).
 
-See the [`CommandLineArgumentErrorCategory`][] enumeration for more information. In addition, parsing
-could have been canceled by an argument using the [`CommandLineArgumentAttribute.CancelParsing`][]
-property, a method argument, or the automatic `-Help` and `-Version` arguments.
+See the [`CommandLineArgumentErrorCategory`][] enumeration for more information. In addition,
+parsing could have been canceled by an argument using the
+[`CommandLineArgumentAttribute.CancelParsing`][] property with `CancelMode.Abort`, a method
+argument, or the automatic `-Help` and `-Version` arguments.
 
-If argument parsing does fail or was canceled, the static [`Parse<T>()`][Parse<T>()_1] method
-returns null. The method has already printed error and usage information, and there's nothing you
-need to do except exit your application.
+If argument parsing does fail or was canceled, the generated `Parse()` method (as well as the static
+[`CommandLineParser.Parse<T>()`][] method) returns null. The method has already printed error and
+usage information, and there's nothing you need to do except exit your application.
 
-The static [`Parse<T>()`][Parse<T>()_1] will not throw an exception, unless the arguments type
+The generated `Parse()` methods and the static [`Parse<T>()`][Parse<T>()_1] method will never throw
+a `CommandLineArgumentArgumentException`. They can throw other exceptions if the arguments type
 violates one of the rules for valid arguments (such as defining an optional positional argument
 after a required one). An exception from this method typically indicates a mistake in your arguments
-class.
+class. When using source generation, these kinds of errors are typically caught at compile time.
 
 You can customize various aspects of the parsing behavior using either the
 [`ParseOptionsAttribute`][], applied to your arguments class, or a [`ParseOptions`][] instance
-passed to the [`Parse<T>()`][Parse<T>()_1] method. The latter can be used to set a few options not
-available with the [`ParseOptionsAttribute`][], including options to customize the usage help and
-error messages.
+passed to the `Parse()` method. The latter can be used to set a few options not available with the
+[`ParseOptionsAttribute`][], including options to customize the usage help and error messages.
 
 The [`ParseOptions`][] class can even be used to redirect where errors and help are written.
 
@@ -69,7 +73,7 @@ using var writer = LineWrappingTextWriter.ForStringWriter();
 var options = new ParseOptions()
 {
     Error = writer,
-    Mode = ParsingMode.LongShort,
+    IsPosix = true,
     DuplicateArguments = ErrorMode.Warning,
     UsageWriter = new UsageWriter(writer);
 };
@@ -83,11 +87,6 @@ if (arguments == null)
 }
 ```
 
-In the vast majority of cases, [`ParseOptionsAttribute`][] and [`ParseOptions`][] should be sufficient to
-customize the parsing behavior to your liking. If you need access to the [`CommandLineParser`][] instance
-after parsing finished, you can use [injection](DefiningArguments.md#commandlineparser-injection),
-so it should rarely be necessary to use the manual parsing method.
-
 ### Custom error messages
 
 If you wish to customize the error messages shown to the user if parsing fails, for example to
@@ -96,7 +95,8 @@ the source for all error messages, as well as a number of other strings used by 
 
 Create a class that derives from the [`LocalizedStringProvider`][] class and override its members to
 customize any strings you wish to change. You can specify a custom string provider using the
-[`ParseOptions.StringProvider`][] class.
+[`ParseOptions.StringProvider`][] class. Localizing some strings used in the usage help may also
+require you to create a custom `UsageWriter`.
 
 Alternatively, if you need more error information, you can use the manual parsing method below, and
 use the [`CommandLineArgumentException.Category`][] property to determine the cause of the exception
@@ -114,18 +114,23 @@ In this case, you can manually create an instance of the [`CommandLineParser<T>`
 the instance [`ParseWithErrorHandling()`][ParseWithErrorHandling()_1] or [`Parse()`][Parse()_5] method.
 
 > The [`CommandLineParser<T>`][] class is a helper class that derives from [`CommandLineParser`][]
-> and provides strongly-typed [`Parse()`][Parse()_5] and [`ParseWithErrorHandling()`][ParseWithErrorHandling()_1] methods.
+> and provides strongly-typed [`Parse()`][Parse()_5] and
+> [`ParseWithErrorHandling()`][ParseWithErrorHandling()_1] methods.
 
-Using [`ParseWithErrorHandling()`][ParseWithErrorHandling()_1] is the easiest in this case, because it will still handle
-printing error messages and usage help, the same as the static [`Parse<T>()`][Parse<T>()_1] method. If you want
-more information about the error that occurred, you can access the [`CommandLineParser.ParseResult`][]
-property after parsing.
+If you are using source generation, you can call the generated `CreateParser()` method that is added
+to your class to get a `CommandLineParser<T>` instance. Otherwise, simply use
+`new CommandLineParser<MyArguments>()`.
+
+Using [`ParseWithErrorHandling()`][ParseWithErrorHandling()_1] is the easiest in this case, because
+it will still handle printing error messages and usage help, the same as the generated `Parse()`
+method and static [`Parse<T>()`][Parse<T>()_1] methods. If you want more information about the error
+that occurred, you can access the [`CommandLineParser.ParseResult`][] property after parsing.
 
 For example, you can use this approach if you want to return a success status when parsing was
 canceled, but not when a parsing error occurred:
 
 ```csharp
-var parser = new CommandLineParser<MyArguments>();
+var parser = MyArguments.CreateParser();
 var arguments = parser.ParseWithErrorHandling();
 if (arguments == null)
 {
@@ -133,9 +138,15 @@ if (arguments == null)
 }
 ```
 
+The status will be set to `ParseStatus.Canceled` if parsing was canceled with `CancelMode.Abort`.
+
 You can also use the [`ParseResult.ArgumentName`][] property to determine which argument canceled
-parsing in this case. If an error occurred, the status will be [`ParseStatus.Error`][] and you can use
-the [`ParseResult.LastException`][] property to access the actual error that occurred.
+parsing in this case. If an error occurred, the status will be [`ParseStatus.Error`][] and you can
+use the [`ParseResult.LastException`][] property to access the actual error that occurred.
+
+If parsing was canceled using `CancelMode.Success`, the status will be `ParseStatus.Success`, but
+`ParseResult.ArgumentName` will be non-null and set to the argument that canceled parsing. Use the
+`ParseResult.RemainingArguments` property to get any arguments that were not parsed.
 
 For the most fine grained control, you can use the [`CommandLineParser<T>.Parse()`][] method, which
 lets you handle errors manually.
@@ -165,7 +176,7 @@ Here is a basic sample of manual parsing and error handling using the [`Parse()`
 ```csharp
 static int Main()
 {
-    var parser = new CommandLineParser<MyArguments>();
+    var parser = MyArguments.CreateParser();
     try
     {
         var arguments = parser.Parse();
@@ -190,9 +201,10 @@ static int Main()
 
 If you wish to customize the behavior, that can still be done using the [`ParseOptionsAttribute`][]
 attribute and the [`ParseOptions`][] class (which you can pass to the [`CommandLineParser<T>`][]
-constructor). Some properties of the [`ParseOptions`][] class (like [`Error`][]) are not used with
-the [`Parse()`][Parse()_5]  methods, as they apply to the [`ParseWithErrorHandling()`][ParseWithErrorHandling()_1] and the static
-[`Parse<T>()`][Parse<T>()_1] methods only.
+constructor or the generated `CreateParser()` method). Some properties of the [`ParseOptions`][]
+class (like [`Error`][]) are not used with the [`Parse()`][Parse()_5]  methods, as they apply to the
+[`ParseWithErrorHandling()`][ParseWithErrorHandling()_1] and the static [`Parse<T>()`][Parse<T>()_1]
+methods only.
 
 Next, we'll take a look at [generating usage help](UsageHelp.md).
 
