@@ -26,7 +26,11 @@
   "AssemblyTitleAttribute": "#system.reflection.assemblytitleattribute",
   "AsyncCommandBase": "T_Ookii_CommandLine_Commands_AsyncCommandBase",
   "AsyncCommandBase.Run()": "M_Ookii_CommandLine_Commands_AsyncCommandBase_Run",
+  "Bar": null,
   "CancelMode": "T_Ookii_CommandLine_CancelMode",
+  "CancelMode.Abort": "T_Ookii_CommandLine_CancelMode",
+  "CancelMode.None": "T_Ookii_CommandLine_CancelMode",
+  "CancelMode.Success": "T_Ookii_CommandLine_CancelMode",
   "CancelParsing": [
     "P_Ookii_CommandLine_CommandLineArgument_CancelParsing",
     "P_Ookii_CommandLine_CommandLineArgumentAttribute_CancelParsing"
@@ -43,6 +47,7 @@
   "CommandLineArgumentAttribute.DefaultValue": "P_Ookii_CommandLine_CommandLineArgumentAttribute_DefaultValue",
   "CommandLineArgumentAttribute.IsHidden": "P_Ookii_CommandLine_CommandLineArgumentAttribute_IsHidden",
   "CommandLineArgumentAttribute.IsLong": "P_Ookii_CommandLine_CommandLineArgumentAttribute_IsLong",
+  "CommandLineArgumentAttribute.IsPositional": "P_Ookii_CommandLine_CommandLineArgumentAttribute_IsPositional",
   "CommandLineArgumentAttribute.IsRequired": "P_Ookii_CommandLine_CommandLineArgumentAttribute_IsRequired",
   "CommandLineArgumentAttribute.IsShort": "P_Ookii_CommandLine_CommandLineArgumentAttribute_IsShort",
   "CommandLineArgumentAttribute.Position": "P_Ookii_CommandLine_CommandLineArgumentAttribute_Position",
@@ -111,12 +116,14 @@
   "ErrorCategory": "P_Ookii_CommandLine_Validation_ArgumentValidationAttribute_ErrorCategory",
   "File.ReadLinesAsync()": "#system.io.file.readlinesasync",
   "FileInfo": "#system.io.fileinfo",
+  "FileName": null,
   "FlagsAttribute": "#system.flagsattribute",
   "Flush()": [
     "M_Ookii_CommandLine_LineWrappingTextWriter_Flush_1",
     "M_Ookii_CommandLine_LineWrappingTextWriter_Flush",
     "Overload_Ookii_CommandLine_LineWrappingTextWriter_Flush"
   ],
+  "Foo": null,
   "GeneratedCommandManagerAttribute": "T_Ookii_CommandLine_Commands_GeneratedCommandManagerAttribute",
   "GeneratedParserAttribute": "T_Ookii_CommandLine_GeneratedParserAttribute",
   "GetArgument": "M_Ookii_CommandLine_CommandLineParser_GetArgument",
@@ -149,6 +156,7 @@
   "Inverted": null,
   "IParsable<TSelf>": "#system.iparsable-1",
   "ISpanParsable<TSelf>": "#system.ispanparsable-1",
+  "IsPositional": "P_Ookii_CommandLine_CommandLineArgumentAttribute_IsPositional",
   "IsPosix": [
     "P_Ookii_CommandLine_Commands_CommandOptions_IsPosix",
     "P_Ookii_CommandLine_ParseOptions_IsPosix",
@@ -211,6 +219,7 @@
   "ParseOptions.AllowWhiteSpaceValueSeparator": "P_Ookii_CommandLine_ParseOptions_AllowWhiteSpaceValueSeparator",
   "ParseOptions.ArgumentNameComparison": "P_Ookii_CommandLine_ParseOptions_ArgumentNameComparison",
   "ParseOptions.ArgumentNameTransform": "P_Ookii_CommandLine_ParseOptions_ArgumentNameTransform",
+  "ParseOptions.AutoPrefixAliases": "P_Ookii_CommandLine_ParseOptions_AutoPrefixAliases",
   "ParseOptions.AutoVersionArgument": "P_Ookii_CommandLine_ParseOptions_AutoVersionArgument",
   "ParseOptions.Culture": "P_Ookii_CommandLine_ParseOptions_Culture",
   "ParseOptions.DefaultValueDescriptions": "P_Ookii_CommandLine_ParseOptions_DefaultValueDescriptions",
@@ -227,6 +236,7 @@
   "ParseOptionsAttribute.NameValueSeparators": "P_Ookii_CommandLine_ParseOptionsAttribute_NameValueSeparators",
   "ParseResult.ArgumentName": "P_Ookii_CommandLine_ParseResult_ArgumentName",
   "ParseResult.LastException": "P_Ookii_CommandLine_ParseResult_LastException",
+  "ParseResult.RemainingArguments": "P_Ookii_CommandLine_ParseResult_RemainingArguments",
   "ParseResult.Status": "P_Ookii_CommandLine_ParseResult_Status",
   "ParseStatus.Error": "T_Ookii_CommandLine_ParseStatus",
   "ParseWithErrorHandling()": [
@@ -238,6 +248,10 @@
     "Overload_Ookii_CommandLine_CommandLineParser_ParseWithErrorHandling"
   ],
   "ParsingMode.LongShort": "T_Ookii_CommandLine_ParsingMode",
+  "Position": [
+    "P_Ookii_CommandLine_CommandLineArgument_Position",
+    "P_Ookii_CommandLine_CommandLineArgumentAttribute_Position"
+  ],
   "ProhibitsAttribute": "T_Ookii_CommandLine_Validation_ProhibitsAttribute",
   "ReadCommand": null,
   "ReadOnlyCollection<T>": "#system.collections.objectmodel.readonlycollection-1",
@@ -260,6 +274,7 @@
   "RunCommandAsync()": "Overload_Ookii_CommandLine_Commands_CommandManager_RunCommandAsync",
   "SetConsoleMode": "https://learn.microsoft.com/windows/console/setconsolemode",
   "ShortAliasAttribute": "T_Ookii_CommandLine_ShortAliasAttribute",
+  "SomeName": null,
   "SortedDictionary<string, int>": "#system.collections.generic.sorteddictionary-2",
   "StreamReader": "#system.io.streamreader",
   "String": "#system.string",
@@ -272,8 +287,10 @@
   "TextWriter": "#system.io.textwriter",
   "ToString()": "#system.object.tostring",
   "TypeConverter": "#system.componentmodel.typeconverter",
+  "TypeConverterArgumentConverter": "T_Ookii_CommandLine_Conversion_TypeConverterArgumentConverter",
   "TypeConverterArgumentConverter<T>": "T_Ookii_CommandLine_Conversion_TypeConverterArgumentConverter_1",
   "TypeConverterAttribute": "#system.componentmodel.typeconverterattribute",
+  "TypeDescriptor.GetConverter()": "#system.componentmodel.typedescriptor.getconverter",
   "Uri": "#system.uri",
   "UsageHelpRequest.SyntaxOnly": "T_Ookii_CommandLine_UsageHelpRequest",
   "UsageWriter": "T_Ookii_CommandLine_UsageWriter",
