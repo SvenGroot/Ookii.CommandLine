@@ -6,10 +6,11 @@ range.
 
 While it's possible to do this kind of validation after the arguments have been parsed, or to write
 custom property setters that perform the validation, Ookii.CommandLine also provides validation
-attributes. The advantage of this is that you can reuse common validation rules, if you use the
-static [`CommandLineParser.Parse<T>()`][] or [`CommandLineParser<T>.ParseWithErrorHandling()`][] method
-it will handle printing validation error messages, and validators can also add a help message to the
-argument descriptions in the [usage help](UsageHelp.md).
+attributes. The advantage of this is that you can reuse common validation rules, if you use one of
+the generated [`Parse()`][Parse()_7], static [`CommandLineParser.Parse<T>()`][] or
+[`CommandLineParser<T>.ParseWithErrorHandling()`][] methods it will handle printing validation error
+messages, and validators can also add a help message to the argument descriptions in the [usage
+help](UsageHelp.md).
 
 ## Built-in validators
 
@@ -24,7 +25,7 @@ are discussed [below](#argument-dependencies-and-restrictions)):
 Validator                            | Description                                                                                                                                                                                                                                                                                                                                              | Applied
 -------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------
 [`ValidateCountAttribute`][]         | Validates that the number of items for a multi-value argument is in the specified range.                                                                                                                                                                                                                                                                 | After parsing.
-[`ValidateEnumValueAttribute`][]     | Validates that the value is one of the defined values for an enumeration. The default [`TypeConverter`][] for an enumeration allows conversion from the underlying value, even if that value is not a defined value for the enumeration. This validator prevents that. See also [enumeration type conversion](Arguments.md#enumeration-type-conversion). | After conversion.
+[`ValidateEnumValueAttribute`][]     | Validates that the value is one of the defined values for an enumeration. The default [`TypeConverter`][] for an enumeration allows conversion from the underlying value, even if that value is not a defined value for the enumeration. This validator prevents that. See also [enumeration type conversion](Arguments.md#enumeration-conversion).      | After conversion.
 [`ValidateNotEmptyAttribute`][]      | Validates that the value of an argument is not an empty string.                                                                                                                                                                                                                                                                                          | Before conversion.
 [`ValidateNotNullAttribute`][]       | Validates that the value of an argument is not null. This is only useful if the [`TypeConverter`][] for an argument can return null (for example, the [`NullableConverter`][] can). It's not necessary to use this validator on non-nullable value types, or if using .Net 6.0 or later, on non-nullable reference types.                                | After conversion.
 [`ValidateNotWhiteSpaceAttribute`][] | Validates that the value of an argument is not an empty string or a string containing only white-space characters.                                                                                                                                                                                                                                       | Before conversion.
@@ -35,7 +36,7 @@ Validator                            | Description                              
 Note that there is no `ValidateSetAttribute`, or an equivalent way to make sure that an argument is
 one of a predefined set of values, because you're encouraged to use an enumeration type for this
 instead, in combination with the [`ValidateEnumValueAttribute`][] if desired. You can of course use
-the [`ValidatePatternAttribute`][] for this purpose as well.
+the [`ValidatePatternAttribute`][] for this purpose as well, or you can create a custom validator.
 
 The [`ValidateRangeAttribute`][], [`ValidateCountAttribute`][] and
 [`ValidateStringLengthAttribute`][] all allow the use of open-ended ranges, without either a lower
@@ -142,8 +143,9 @@ For example, you might have an application that can read data from a file, or fr
 specified IP address and port. You could express these arguments as follows:
 
 ```csharp
+[GeneratedParser]
 [RequiresAny(nameof(Path), nameof(Ip))]
-internal class ProgramArguments
+partial class ProgramArguments
 {
     [CommandLineArgument(Position = 0)]
     [Description("The path to use.")]
@@ -244,42 +246,56 @@ class ValidateFutureDateAttribute : ValidateRangeAttribute
 }
 ```
 
+### Validation using ReadOnlySpan\<char>
+
+If an argument is provided using the name/value separator (e.g. `-Argument:value`), the
+[`CommandLineParser`][] class will try to avoid allocating a new string for the value as long as the
+argument converter and any pre-conversion validators support using a [`ReadOnlySpan<char>`][]. For
+this reason, it's strongly recommended that you implement the
+[`ArgumentValidationAttribute.IsSpanValid`][] method for a custom pre-conversion validator. This
+does not apply to validators that don't use [`ValidationMode.BeforeConversion`][].
+
 Now that you know (almost) everything there is to know about arguments, let's move on to
 [subcommands](Subcommands.md).
 
-[`ArgumentValidationAttribute`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_Validation_ArgumentValidationAttribute.htm
-[`ArgumentValidationWithHelpAttribute`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_Validation_ArgumentValidationWithHelpAttribute.htm
-[`Category`]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_CommandLineArgumentException_Category.htm
-[`ClassValidationAttribute`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_Validation_ClassValidationAttribute.htm
-[`CommandLineArgumentErrorCategory.ValidationFailed`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_CommandLineArgumentErrorCategory.htm
-[`CommandLineArgumentException`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_CommandLineArgumentException.htm
-[`CommandLineParser.Parse<T>()`]: https://www.ookii.org/docs/commandline-3.1/html/M_Ookii_CommandLine_CommandLineParser_Parse__1.htm
+[`ArgumentValidationAttribute.IsSpanValid`]: https://www.ookii.org/docs/commandline-4.0/html/M_Ookii_CommandLine_Validation_ArgumentValidationAttribute_IsSpanValid.htm
+[`ArgumentValidationAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Validation_ArgumentValidationAttribute.htm
+[`ArgumentValidationWithHelpAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Validation_ArgumentValidationWithHelpAttribute.htm
+[`Category`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_CommandLineArgumentException_Category.htm
+[`ClassValidationAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Validation_ClassValidationAttribute.htm
+[`CommandLineArgumentErrorCategory.ValidationFailed`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_CommandLineArgumentErrorCategory.htm
+[`CommandLineArgumentException`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_CommandLineArgumentException.htm
+[`CommandLineParser.Parse<T>()`]: https://www.ookii.org/docs/commandline-4.0/html/M_Ookii_CommandLine_CommandLineParser_Parse__1.htm
+[`CommandLineParser`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_CommandLineParser.htm
+[`CommandLineParser<T>.ParseWithErrorHandling()`]: https://www.ookii.org/docs/commandline-4.0/html/M_Ookii_CommandLine_CommandLineParser_1_ParseWithErrorHandling.htm
 [`DateOnly`]: https://learn.microsoft.com/dotnet/api/system.dateonly
-[`ErrorCategory`]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_Validation_ArgumentValidationAttribute_ErrorCategory.htm
-[`GetErrorMessage()`]: https://www.ookii.org/docs/commandline-3.1/html/M_Ookii_CommandLine_Validation_ArgumentValidationAttribute_GetErrorMessage.htm
-[`GetUsageHelp()`]: https://www.ookii.org/docs/commandline-3.1/html/M_Ookii_CommandLine_Validation_ArgumentValidationAttribute_GetUsageHelp.htm
-[`GetUsageHelpCore()`]: https://www.ookii.org/docs/commandline-3.1/html/M_Ookii_CommandLine_Validation_ArgumentValidationWithHelpAttribute_GetUsageHelpCore.htm
+[`ErrorCategory`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_Validation_ArgumentValidationAttribute_ErrorCategory.htm
+[`GetErrorMessage()`]: https://www.ookii.org/docs/commandline-4.0/html/M_Ookii_CommandLine_Validation_ArgumentValidationAttribute_GetErrorMessage.htm
+[`GetUsageHelp()`]: https://www.ookii.org/docs/commandline-4.0/html/M_Ookii_CommandLine_Validation_ArgumentValidationAttribute_GetUsageHelp.htm
+[`GetUsageHelpCore()`]: https://www.ookii.org/docs/commandline-4.0/html/M_Ookii_CommandLine_Validation_ArgumentValidationWithHelpAttribute_GetUsageHelpCore.htm
 [`IComparable<T>`]: https://learn.microsoft.com/dotnet/api/system.icomparable-1
-[`IsValid()`]: https://www.ookii.org/docs/commandline-3.1/html/M_Ookii_CommandLine_Validation_ArgumentValidationAttribute_IsValid.htm
-[`LocalizedStringProvider`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_LocalizedStringProvider.htm
+[`IsValid()`]: https://www.ookii.org/docs/commandline-4.0/html/M_Ookii_CommandLine_Validation_ArgumentValidationAttribute_IsValid.htm
+[`LocalizedStringProvider`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_LocalizedStringProvider.htm
 [`NullableConverter`]: https://learn.microsoft.com/dotnet/api/system.componentmodel.nullableconverter
-[`Ookii.CommandLine.Validation`]: https://www.ookii.org/docs/commandline-3.1/html/N_Ookii_CommandLine_Validation.htm
-[`ProhibitsAttribute`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_Validation_ProhibitsAttribute.htm
-[`RequiresAnyAttribute`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_Validation_RequiresAnyAttribute.htm
-[`RequiresAttribute`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_Validation_RequiresAttribute.htm
+[`Ookii.CommandLine.Validation`]: https://www.ookii.org/docs/commandline-4.0/html/N_Ookii_CommandLine_Validation.htm
+[`ProhibitsAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Validation_ProhibitsAttribute.htm
+[`ReadOnlySpan<char>`]: https://learn.microsoft.com/dotnet/api/system.readonlyspan-1
+[`RequiresAnyAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Validation_RequiresAnyAttribute.htm
+[`RequiresAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Validation_RequiresAttribute.htm
 [`TypeConverter`]: https://learn.microsoft.com/dotnet/api/system.componentmodel.typeconverter
-[`UsageWriter.IncludeValidatorsInDescription`]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_UsageWriter_IncludeValidatorsInDescription.htm
-[`ValidateCountAttribute`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_Validation_ValidateCountAttribute.htm
-[`ValidateEnumValueAttribute.IncludeValuesInErrorMessage`]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_Validation_ValidateEnumValueAttribute_IncludeValuesInErrorMessage.htm
-[`ValidateEnumValueAttribute`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_Validation_ValidateEnumValueAttribute.htm
-[`ValidateNotEmptyAttribute`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_Validation_ValidateNotEmptyAttribute.htm
-[`ValidateNotNullAttribute`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_Validation_ValidateNotNullAttribute.htm
-[`ValidateNotWhiteSpaceAttribute`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_Validation_ValidateNotWhiteSpaceAttribute.htm
-[`ValidatePatternAttribute.ErrorMessage`]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_Validation_ValidatePatternAttribute_ErrorMessage.htm
-[`ValidatePatternAttribute`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_Validation_ValidatePatternAttribute.htm
-[`ValidateRangeAttribute`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_Validation_ValidateRangeAttribute.htm
-[`ValidateStringLengthAttribute`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_Validation_ValidateStringLengthAttribute.htm
-[IncludeInUsageHelp_0]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_Validation_ArgumentValidationWithHelpAttribute_IncludeInUsageHelp.htm
-[Mode_3]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_Validation_ArgumentValidationAttribute_Mode.htm
-[ValidationFailed_1]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_CommandLineArgumentErrorCategory.htm
-[`CommandLineParser<T>.ParseWithErrorHandling()`]: https://www.ookii.org/docs/commandline-3.1/html/M_Ookii_CommandLine_CommandLineParser_1_ParseWithErrorHandling.htm
+[`UsageWriter.IncludeValidatorsInDescription`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_UsageWriter_IncludeValidatorsInDescription.htm
+[`ValidateCountAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Validation_ValidateCountAttribute.htm
+[`ValidateEnumValueAttribute.IncludeValuesInErrorMessage`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_Validation_ValidateEnumValueAttribute_IncludeValuesInErrorMessage.htm
+[`ValidateEnumValueAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Validation_ValidateEnumValueAttribute.htm
+[`ValidateNotEmptyAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Validation_ValidateNotEmptyAttribute.htm
+[`ValidateNotNullAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Validation_ValidateNotNullAttribute.htm
+[`ValidateNotWhiteSpaceAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Validation_ValidateNotWhiteSpaceAttribute.htm
+[`ValidatePatternAttribute.ErrorMessage`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_Validation_ValidatePatternAttribute_ErrorMessage.htm
+[`ValidatePatternAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Validation_ValidatePatternAttribute.htm
+[`ValidateRangeAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Validation_ValidateRangeAttribute.htm
+[`ValidateStringLengthAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Validation_ValidateStringLengthAttribute.htm
+[`ValidationMode.BeforeConversion`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Validation_ValidationMode.htm
+[IncludeInUsageHelp_0]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_Validation_ArgumentValidationWithHelpAttribute_IncludeInUsageHelp.htm
+[Mode_3]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_Validation_ArgumentValidationAttribute_Mode.htm
+[Parse()_7]: https://www.ookii.org/docs/commandline-4.0/html/Overload_Ookii_CommandLine_IParser_1_Parse.htm
+[ValidationFailed_1]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_CommandLineArgumentErrorCategory.htm

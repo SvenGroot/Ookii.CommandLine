@@ -22,6 +22,7 @@
   "Arguments.Parse()": null,
   "ArgumentType": "P_Ookii_CommandLine_CommandLineArgument_ArgumentType",
   "ArgumentValidationAttribute": "T_Ookii_CommandLine_Validation_ArgumentValidationAttribute",
+  "ArgumentValidationAttribute.IsSpanValid": "M_Ookii_CommandLine_Validation_ArgumentValidationAttribute_IsSpanValid",
   "ArgumentValidationWithHelpAttribute": "T_Ookii_CommandLine_Validation_ArgumentValidationWithHelpAttribute",
   "AssemblyTitleAttribute": "#system.reflection.assemblytitleattribute",
   "AsyncCommandBase": "T_Ookii_CommandLine_Commands_AsyncCommandBase",
@@ -322,6 +323,7 @@
     "M_Ookii_CommandLine_LocalizedStringProvider_ValidationFailed",
     "T_Ookii_CommandLine_CommandLineArgumentErrorCategory"
   ],
+  "ValidationMode.BeforeConversion": "T_Ookii_CommandLine_Validation_ValidationMode",
   "ValueConverterAttribute": "T_Ookii_CommandLine_Conversion_ValueConverterAttribute",
   "ValueDescriptionAttribute": "T_Ookii_CommandLine_ValueDescriptionAttribute",
   "VirtualTerminal": "T_Ookii_CommandLine_Terminal_VirtualTerminal",

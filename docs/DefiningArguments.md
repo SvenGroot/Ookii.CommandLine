@@ -319,6 +319,10 @@ public int Argument { get; set; }
 
 The type specified must be derived from the [`ArgumentConverter`][] class.
 
+To create a custom converter, create a class that derives from the [`ArgumentConverter`][] class.
+Argument conversion can use either a [`ReadOnlySpan<char>`][] or a [`String`][], and it's recommended to
+support the [`ReadOnlySpan<char>`][] method to avoid unnecessary string allocations.
+
 Previous versions of Ookii.CommandLine used .Net's [`TypeConverter`][] class. Starting with
 Ookii.CommandLine 4.0, this is no longer the case, and the [`ArgumentConverter`][] class is used
 instead.
@@ -638,6 +642,7 @@ Next, we'll take a look at how to [parse the arguments we've defined](ParsingArg
 [`ParseOptionsAttribute.AutoPrefixAliases`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_ParseOptionsAttribute_AutoPrefixAliases.htm
 [`ParseOptionsAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_ParseOptionsAttribute.htm
 [`ParseResult.RemainingArguments`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_ParseResult_RemainingArguments.htm
+[`ReadOnlySpan<char>`]: https://learn.microsoft.com/dotnet/api/system.readonlyspan-1
 [`ShortAliasAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_ShortAliasAttribute.htm
 [`String`]: https://learn.microsoft.com/dotnet/api/system.string
 [`System.ComponentModel.DescriptionAttribute`]: https://learn.microsoft.com/dotnet/api/system.componentmodel.descriptionattribute
