@@ -6,6 +6,8 @@
   "AliasAttribute": "T_Ookii_CommandLine_AliasAttribute",
   "AllowDuplicateDictionaryKeysAttribute": "T_Ookii_CommandLine_AllowDuplicateDictionaryKeysAttribute",
   "ApplicationFriendlyNameAttribute": "T_Ookii_CommandLine_ApplicationFriendlyNameAttribute",
+  "Arg1": null,
+  "Arg2": null,
   "ArgumentConverter": "T_Ookii_CommandLine_Conversion_ArgumentConverter",
   "ArgumentConverterAttribute": "T_Ookii_CommandLine_Conversion_ArgumentConverterAttribute",
   "ArgumentNameComparison": [
@@ -99,6 +101,7 @@
   "DateTime": "#system.datetime",
   "DayOfWeek": "#system.dayofweek",
   "DayOfWeek.Monday": "#system.dayofweek",
+  "DayOfWeek.Tuesday": "#system.dayofweek",
   "DayOfWeek.Wednesday": "#system.dayofweek",
   "DefaultValue": [
     "P_Ookii_CommandLine_CommandLineArgument_DefaultValue",
@@ -134,7 +137,10 @@
   ],
   "Foo": null,
   "GeneratedCommandManagerAttribute": "T_Ookii_CommandLine_Commands_GeneratedCommandManagerAttribute",
+  "GeneratedCommandManagerAttribute.AssemblyNames": "P_Ookii_CommandLine_Commands_GeneratedCommandManagerAttribute_AssemblyNames",
+  "GeneratedConverterNamespaceAttribute": "T_Ookii_CommandLine_Conversion_GeneratedConverterNamespaceAttribute",
   "GeneratedParserAttribute": "T_Ookii_CommandLine_GeneratedParserAttribute",
+  "GeneratedParserAttribute.GenerateParseMethods": "P_Ookii_CommandLine_GeneratedParserAttribute_GenerateParseMethods",
   "GetArgument": "M_Ookii_CommandLine_CommandLineParser_GetArgument",
   "GetCommand()": "M_Ookii_CommandLine_Commands_CommandManager_GetCommand",
   "GetErrorMessage()": "M_Ookii_CommandLine_Validation_ArgumentValidationAttribute_GetErrorMessage",
@@ -164,6 +170,8 @@
   "Int32": "#system.int32",
   "Inverted": null,
   "IParsable<TSelf>": "#system.iparsable-1",
+  "IParser<TSelf>": "T_Ookii_CommandLine_IParser_1",
+  "IParserProvider<TSelf>": "T_Ookii_CommandLine_IParserProvider_1",
   "ISpanParsable<TSelf>": "#system.ispanparsable-1",
   "IsPositional": "P_Ookii_CommandLine_CommandLineArgumentAttribute_IsPositional",
   "IsPosix": [
@@ -211,6 +219,7 @@
     "M_Ookii_CommandLine_LocalizedStringProvider_NullArgumentValue"
   ],
   "Ookii.CommandLine.Commands": "N_Ookii_CommandLine_Commands",
+  "Ookii.CommandLine.Conversion.Generated": null,
   "Ookii.CommandLine.Terminal": "N_Ookii_CommandLine_Terminal",
   "Ookii.CommandLine.Validation": "N_Ookii_CommandLine_Validation",
   "ParentCommand": "T_Ookii_CommandLine_Commands_ParentCommand",
@@ -306,6 +315,7 @@
   "TextFormat": "T_Ookii_CommandLine_Terminal_TextFormat",
   "TextWriter": "#system.io.textwriter",
   "ToString()": "#system.object.tostring",
+  "Type": "#system.type",
   "TypeConverter": "#system.componentmodel.typeconverter",
   "TypeConverterArgumentConverter": "T_Ookii_CommandLine_Conversion_TypeConverterArgumentConverter",
   "TypeConverterArgumentConverter<T>": "T_Ookii_CommandLine_Conversion_TypeConverterArgumentConverter_1",
