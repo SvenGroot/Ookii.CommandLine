@@ -23,7 +23,7 @@ partial class GeneratedManagerWithMultipleAssemblies { }
 public partial class TestCommand : ICommand
 {
     [CommandLineArgument]
-    public string Argument { get; set; }
+    public string? Argument { get; set; }
 
     public int Run()
     {
@@ -55,7 +55,7 @@ partial class CustomParsingCommand : ICommandWithCustomParsing
         Value = args.Span[0];
     }
 
-    public string Value { get; set; }
+    public string? Value { get; set; }
 
     public int Run()
     {

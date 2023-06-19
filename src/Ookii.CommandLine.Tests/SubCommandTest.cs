@@ -103,25 +103,25 @@ public partial class SubCommandTest
         };
 
         var manager = CreateManager(kind, options);
-        TestCommand command = (TestCommand)manager.CreateCommand("test", new[] { "-Argument", "Foo" }, 0);
+        var command = (TestCommand?)manager.CreateCommand("test", new[] { "-Argument", "Foo" }, 0);
         Assert.IsNotNull(command);
         Assert.AreEqual(ParseStatus.Success, manager.ParseResult.Status);
         Assert.AreEqual("Foo", command.Argument);
         Assert.AreEqual("", writer.BaseWriter.ToString());
 
-        command = (TestCommand)manager.CreateCommand(new[] { "test", "-Argument", "Bar" });
+        command = (TestCommand?)manager.CreateCommand(new[] { "test", "-Argument", "Bar" });
         Assert.IsNotNull(command);
         Assert.AreEqual(ParseStatus.Success, manager.ParseResult.Status);
         Assert.AreEqual("Bar", command.Argument);
         Assert.AreEqual("", writer.BaseWriter.ToString());
 
-        var command2 = (AnotherSimpleCommand)manager.CreateCommand("anothersimplecommand", new[] { "skip", "-Value", "42" }, 1);
+        var command2 = (AnotherSimpleCommand?)manager.CreateCommand("anothersimplecommand", new[] { "skip", "-Value", "42" }, 1);
         Assert.IsNotNull(command2);
         Assert.AreEqual(ParseStatus.Success, manager.ParseResult.Status);
         Assert.AreEqual(42, command2.Value);
         Assert.AreEqual("", writer.BaseWriter.ToString());
 
-        CustomParsingCommand command3 = (CustomParsingCommand)manager.CreateCommand(new[] { "custom", "hello" });
+        var command3 = (CustomParsingCommand?)manager.CreateCommand(new[] { "custom", "hello" });
         Assert.IsNotNull(command3);
         // None because of custom parsing.
         Assert.AreEqual(ParseStatus.None, manager.ParseResult.Status);
@@ -143,7 +143,7 @@ public partial class SubCommandTest
         versionCommand = manager.CreateCommand(new[] { "test", "-Foo" });
         Assert.IsNull(versionCommand);
         Assert.AreEqual(ParseStatus.Error, manager.ParseResult.Status);
-        Assert.AreEqual(CommandLineArgumentErrorCategory.UnknownArgument, manager.ParseResult.LastException.Category);
+        Assert.AreEqual(CommandLineArgumentErrorCategory.UnknownArgument, manager.ParseResult.LastException!.Category);
         Assert.AreEqual(manager.ParseResult.ArgumentName, manager.ParseResult.LastException.ArgumentName);
         Assert.AreNotEqual("", writer.BaseWriter.ToString());
 
@@ -473,12 +473,12 @@ public partial class SubCommandTest
         Assert.IsNull(manager.GetCommand("tes"));
 
         // Not ambiguous
-        Assert.AreEqual("TestParentCommand", manager.GetCommand("testp").Name);
-        Assert.AreEqual("version", manager.GetCommand("v").Name);
+        Assert.AreEqual("TestParentCommand", manager.GetCommand("testp")!.Name);
+        Assert.AreEqual("version", manager.GetCommand("v")!.Name);
 
         // Case sensitive, "tes" is no longer ambigous.
         manager = CreateManager(kind, new CommandOptions() { CommandNameComparison = StringComparison.Ordinal });
-        Assert.AreEqual("test", manager.GetCommand("tes").Name);
+        Assert.AreEqual("test", manager.GetCommand("tes")!.Name);
     }
 
     private class VersionCommandStringProvider : LocalizedStringProvider
@@ -502,18 +502,18 @@ public partial class SubCommandTest
         Assert.IsNull(manager.GetCommand("version"));
 
         // Name returns our command.
-        Assert.AreEqual(typeof(AnotherSimpleCommand), manager.GetCommand("AnotherSimpleCommand").CommandType);
+        Assert.AreEqual(typeof(AnotherSimpleCommand), manager.GetCommand("AnotherSimpleCommand")!.CommandType);
 
         // There is only one in the list of commands.
         Assert.AreEqual(1, manager.GetCommands().Where(c => c.Name == "AnotherSimpleCommand").Count());
 
         // Prefix is not ambiguous because the automatic command doesn't exist.
-        Assert.AreEqual(typeof(AnotherSimpleCommand), manager.GetCommand("Another").CommandType);
+        Assert.AreEqual(typeof(AnotherSimpleCommand), manager.GetCommand("Another")!.CommandType);
 
         // If we filter out our command, the automatic one gets returned.
         options.CommandFilter = c => c.CommandType != typeof(AnotherSimpleCommand);
-        Assert.AreEqual(typeof(AutomaticVersionCommand), manager.GetCommand("AnotherSimpleCommand").CommandType);
-        Assert.AreEqual(typeof(AutomaticVersionCommand), manager.GetCommands().Where(c => c.Name == "AnotherSimpleCommand").SingleOrDefault().CommandType);
+        Assert.AreEqual(typeof(AutomaticVersionCommand), manager.GetCommand("AnotherSimpleCommand")!.CommandType);
+        Assert.AreEqual(typeof(AutomaticVersionCommand), manager.GetCommands().Where(c => c.Name == "AnotherSimpleCommand").Single().CommandType);
     }
 
     [TestMethod]
@@ -543,13 +543,13 @@ public partial class SubCommandTest
         Assert.IsFalse(manager.GetCommands().Any(c => c.Name == "version"));
     }
 
-    private record struct ExpectedCommand(string Name, Type Type, bool CustomParsing = false, params string[] Aliases)
+    private record struct ExpectedCommand(string Name, Type? Type, bool CustomParsing = false, params string[]? Aliases)
     {
         public Type ParentCommand { get; set; }
     }
 
 
-    private static void VerifyCommand(CommandInfo command, string name, Type type, bool customParsing = false, string[] aliases = null)
+    private static void VerifyCommand(CommandInfo command, string name, Type? type, bool customParsing = false, string[]? aliases = null)
     {
         Assert.AreEqual(name, command.Name);
         if (type != null)
@@ -575,7 +575,7 @@ public partial class SubCommandTest
     }
 
 
-    public static CommandManager CreateManager(ProviderKind kind, CommandOptions options = null)
+    public static CommandManager CreateManager(ProviderKind kind, CommandOptions? options = null)
     {
         var manager = kind switch
         {

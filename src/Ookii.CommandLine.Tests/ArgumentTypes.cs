@@ -8,6 +8,11 @@ using System.Globalization;
 using System.IO;
 using System.Net;
 
+// Nullability is disabled for this file because there are some differences for both reflection and
+// source generation in how nullable and non-nullable contexts are handled and both need to be
+// tested.
+#nullable disable
+
 // We deliberately have some properties and methods that cause warnings, so disable those.
 #pragma warning disable OCL0017,OCL0018,OCL0020,OCL0023,OCL0029,OCL0033,OCL0038
 

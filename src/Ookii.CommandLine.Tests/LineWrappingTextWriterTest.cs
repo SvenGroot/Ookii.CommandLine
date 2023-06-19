@@ -200,7 +200,7 @@ public partial class LineWrappingTextWriterTest
     [ExpectedException(typeof(ArgumentNullException))]
     public void ConstructorTestBaseWriterNull()
     {
-        new LineWrappingTextWriter(null, 0, false);
+        new LineWrappingTextWriter(null!, 0, false);
     }
 
     [TestMethod()]
@@ -497,7 +497,7 @@ public partial class LineWrappingTextWriterTest
         }
 
         writer.Flush();
-        return writer.ToString();
+        return writer.ToString()!;
     }
 
     private static async Task<string> WriteStringAsync(string value, int maxLength, int segmentSize, int indent = 0)
@@ -516,7 +516,7 @@ public partial class LineWrappingTextWriterTest
         }
 
         await writer.FlushAsync();
-        return writer.ToString();
+        return writer.ToString()!;
     }
 
 
@@ -530,7 +530,7 @@ public partial class LineWrappingTextWriterTest
         }
 
         writer.Flush();
-        return writer.BaseWriter.ToString();
+        return writer.BaseWriter.ToString()!;
     }
 
     private static string WriteChars(char[] value, int maxLength, int indent = 0)
@@ -543,6 +543,6 @@ public partial class LineWrappingTextWriterTest
         }
 
         writer.Flush();
-        return writer.BaseWriter.ToString();
+        return writer.BaseWriter.ToString()!;
     }
 }

@@ -123,7 +123,7 @@ public class ParseOptionsTest
 
         options.Merge(attribute);
         Assert.AreEqual(StringComparison.InvariantCulture, options.ArgumentNameComparison);
-        CollectionAssert.AreEqual(new[] { "+", "++" }, options.ArgumentNamePrefixes.ToArray());
+        CollectionAssert.AreEqual(new[] { "+", "++" }, options.ArgumentNamePrefixes!.ToArray());
         Assert.AreEqual("+++", options.LongArgumentNamePrefix);
 
         options = new ParseOptions();
