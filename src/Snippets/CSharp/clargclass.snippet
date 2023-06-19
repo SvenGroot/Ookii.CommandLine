@@ -46,18 +46,14 @@
           <Namespace>System.ComponentModel</Namespace>
         </Import>
       </Imports>
-      <Code Language="csharp"><![CDATA[[Description("$Description$")]
-class $Name$
+      <Code Language="csharp"><![CDATA[
+[GeneratedParser]
+[Description("$Description$")]
+partial class $Name$
 {
-    // [CommandLineArgument(Position = 0, IsRequired = true)]
+    // [CommandLineArgument(IsPositional = true)]
     // [Description("Argument description.")]
-    // public string SampleArgument { get; set; }
-
-    public static $Name$? Parse()
-    {
-        // Parse the arguments from Environment.GetCommandLineArgs().
-        return CommandLineParser.Parse<$Name$>();
-    }
+    // public required string SampleArgument { get; set; }
 }]]></Code>
     </Snippet>
   </CodeSnippet>

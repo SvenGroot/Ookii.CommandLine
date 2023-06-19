@@ -5,15 +5,15 @@
       <SnippetTypes>
         <SnippetType>Expansion</SnippetType>
       </SnippetTypes>
-      <Title>clargpos</Title>
+      <Title>clargreq</Title>
       <Author>Sven Groot (Ookii.org)</Author>
       <Description>
-        Snippet for creating a positional command line argument for use with Ookii.CommandLine.
+        Snippet for creating a required positional command line argument for use with Ookii.CommandLine.
       </Description>
       <HelpUrl>
         https://github.com/SvenGroot/ookii.commandline
       </HelpUrl>
-      <Shortcut>clargpos</Shortcut>
+      <Shortcut>clargreq</Shortcut>
     </Header>
     <Snippet>
       <Declarations>
@@ -55,7 +55,7 @@
       </Imports>
       <Code Language="csharp"><![CDATA[[CommandLineArgument(IsPositional = true)]
 [Description("$Description$")]
-public $Type$ $Name$ { get; set; }]]></Code>
+public required $Type$ $Name$ { get; set; }]]></Code>
     </Snippet>
   </CodeSnippet>
 </CodeSnippets>
