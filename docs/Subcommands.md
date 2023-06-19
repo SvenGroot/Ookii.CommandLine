@@ -126,7 +126,7 @@ prefixes `r` and `re` are not automatic aliases, because they are ambiguous betw
 commands.
 
 Automatic prefix aliases for command names can be disabled using the
-`CommandOptions.AutoCommandPrefixAliases` property.
+[`CommandOptions.AutoCommandPrefixAliases`][] property.
 
 ### Asynchronous commands
 
@@ -214,7 +214,7 @@ add their own additional arguments.
 
 The `DatabaseCommand` class is not considered a subcommand by the [`CommandManager`][], because it
 does not have the [`CommandAttribute`][] attribute, and because it is abstract. It also does not
-need the `GeneratedParserAttribute`, because the attribute on the derived classes will process the
+need the [`GeneratedParserAttribute`][], because the attribute on the derived classes will process the
 base class arguments.
 
 Some applications also have options that don't belong to any specific command, but can instead be
@@ -223,9 +223,9 @@ argument as the command name, but it is possible to build an application where t
 
 To do so, you need to define an arguments class (not a subcommand) that defines the top-level
 arguments, one of which (typically the last positional argument) is the command name. That argument
-should set the `CommandLineArgumentAttribute.CancelParsing` property to `CancelMode.Success`. After
+should set the [`CommandLineArgumentAttribute.CancelParsing`][] property to [`CancelMode.Success`][]. After
 parsing the arguments for this class, you can then invoke the [`CommandManager`][] using the command
-name from that argument, and the remaining arguments from the `ParseResult.RemainingArguments`
+name from that argument, and the remaining arguments from the [`ParseResult.RemainingArguments`][]
 property.
 
 An example of how to do this can be found in the [top-level arguments sample](../src/Samples/TopLevelArguments).
@@ -364,13 +364,13 @@ application's configuration.
 
 ### Using source generation with subcommands
 
-While the `GeneratedParserAttribute` can be applied to commands, and the generated parser will be
+While the [`GeneratedParserAttribute`][] can be applied to commands, and the generated parser will be
 used by the [`CommandManager`][] class, the [`CommandManager`][] class still uses reflection to
 find the subcommand classes in the specified assemblies.
 
 To use [source generation](SourceGeneration.md#generating-a-command-manager) to find the commands at
 compile time and provide that information to a generated command manager, you must define a class as
-follows, using the `GeneratedCommandManagerAttribute`:
+follows, using the [`GeneratedCommandManagerAttribute`][]:
 
 ```csharp
 [GeneratedCommandManager]
@@ -391,7 +391,7 @@ public static async Task<int> Main()
 ```
 
 In this case, if you want to use commands from other assemblies, you must specify them using the
-`GeneratedCommandManagerAttribute`, and they can only come from assemblies that are directly
+[`GeneratedCommandManagerAttribute`][], and they can only come from assemblies that are directly
 referenced from your application, not dynamically loaded ones.
 
 ### Subcommand options
@@ -426,7 +426,7 @@ public static int Main()
 ```
 
 This code makes command names case sensitive by using the invariant string comparer (the default is
-`StringComparison.OrdinalIgnoreCase`, which is case insensitive), enables a name transformation,
+[`StringComparison.OrdinalIgnoreCase`][], which is case insensitive), enables a name transformation,
 and also sets some [usage help options](#subcommand-usage-help).
 
 ### Custom error handling
@@ -587,7 +587,7 @@ is enabled, none of the commands use custom parsing, and all commands use the sa
 argument name transformation, and argument name prefixes.
 
 You can force or disable the inclusion of the command help instruction by using the
-`UsageWriter.IncludeCommandHelpInstruction` property.
+[`UsageWriter.IncludeCommandHelpInstruction`][] property.
 
 Other properties let you configure indentation and colors, among others.
 
@@ -614,14 +614,14 @@ description of the command can be customized using the [`LocalizedStringProvider
 
 ## Nested subcommands
 
-Ookii.CommandLine supports nested subcommands through the `ParentCommandAttribute`, the
-`ParentCommand` class, and the `CommandOptions.ParentCommand` property. The [`CommandManager`][]
-will only return commands whose `ParentCommandAttribute` matches the type specified in the
-`CommandOptions.ParentCommand` property. By default, this property is null, so commands that do not
+Ookii.CommandLine supports nested subcommands through the [`ParentCommandAttribute`][], the
+[`ParentCommand`][] class, and the [`CommandOptions.ParentCommand`][] property. The [`CommandManager`][]
+will only return commands whose [`ParentCommandAttribute`][] matches the type specified in the
+[`CommandOptions.ParentCommand`][] property. By default, this property is null, so commands that do not
 have a parent command will be returned.
 
 To create a command that can have nested commands, the easiest way is to create a class that derives
-from the `ParentCommand` class.
+from the [`ParentCommand`][] class.
 
 ```csharp
 [Command]
@@ -631,13 +631,13 @@ class MyParentCommand : ParentCommand
 }
 ```
 
-> `ParentCommand` uses `ICommandWithCustomParsing`, so it cannot use the `GeneratedParserAttribute`.
+> [`ParentCommand`][] uses [`ICommandWithCustomParsing`][], so it cannot use the [`GeneratedParserAttribute`][].
 
-Typically, this class can be empty, although `ParentCommand` provides several protected methods you
+Typically, this class can be empty, although [`ParentCommand`][] provides several protected methods you
 can override to customize the behavior.
 
 To define a command that is nested under `MyParentCommand`, you need to use the
-`ParentCommandAttribute`.
+[`ParentCommandAttribute`][].
 
 ```csharp
 [GeneratedParser]
@@ -649,7 +649,7 @@ partial class ChildCommand : ICommand
 }
 ```
 
-When run, `MyParentCommand` will modify the `CommandOptions.ParentCommand` property and use the
+When run, `MyParentCommand` will modify the [`CommandOptions.ParentCommand`][] property and use the
 [`CommandManager`][] again to find and execute the nested commands.
 
 Note that the automatic version command has no parent and will therefore only exist at the top
@@ -661,47 +661,58 @@ functionality.
 The next page will discuss Ookii.CommandLine's [source generation](SourceGeneration.md) in more
 detail.
 
-[`AliasAttribute`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_AliasAttribute.htm
-[`ApplicationFriendlyNameAttribute`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_ApplicationFriendlyNameAttribute.htm
-[`AsyncCommandBase`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_Commands_AsyncCommandBase.htm
-[`CommandAttribute`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_Commands_CommandAttribute.htm
-[`CommandLineParser.Parse<T>()`]: https://www.ookii.org/docs/commandline-3.1/html/M_Ookii_CommandLine_CommandLineParser_Parse__1.htm
-[`CommandLineParser`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_CommandLineParser.htm
-[`CommandManager.GetCommand()`]: https://www.ookii.org/docs/commandline-3.1/html/M_Ookii_CommandLine_Commands_CommandManager_GetCommand.htm
-[`CommandManager.RunCommandAsync()`]: https://www.ookii.org/docs/commandline-3.1/html/Overload_Ookii_CommandLine_Commands_CommandManager_RunCommandAsync.htm
-[`CommandManager`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_Commands_CommandManager.htm
-[`CommandNameTransform`]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_Commands_CommandOptions_CommandNameTransform.htm
-[`CommandOptions.AutoVersionCommand`]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_Commands_CommandOptions_AutoVersionCommand.htm
-[`CommandOptions.CommandFilter`]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_Commands_CommandOptions_CommandFilter.htm
-[`CommandOptions.CommandNameTransform`]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_Commands_CommandOptions_CommandNameTransform.htm
-[`CommandOptions.StripCommandNameSuffix`]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_Commands_CommandOptions_StripCommandNameSuffix.htm
-[`CommandOptions`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_Commands_CommandOptions.htm
-[`CreateCommand()`]: https://www.ookii.org/docs/commandline-3.1/html/Overload_Ookii_CommandLine_Commands_CommandManager_CreateCommand.htm
+[`AliasAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_AliasAttribute.htm
+[`ApplicationFriendlyNameAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_ApplicationFriendlyNameAttribute.htm
+[`AsyncCommandBase`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Commands_AsyncCommandBase.htm
+[`CancelMode.Success`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_CancelMode.htm
+[`CommandAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Commands_CommandAttribute.htm
+[`CommandLineArgumentAttribute.CancelParsing`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_CancelParsing.htm
+[`CommandLineParser.Parse<T>()`]: https://www.ookii.org/docs/commandline-4.0/html/M_Ookii_CommandLine_CommandLineParser_Parse__1.htm
+[`CommandLineParser`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_CommandLineParser.htm
+[`CommandManager.GetCommand()`]: https://www.ookii.org/docs/commandline-4.0/html/M_Ookii_CommandLine_Commands_CommandManager_GetCommand.htm
+[`CommandManager.ParseResult`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_Commands_CommandManager_ParseResult.htm
+[`CommandManager.RunCommandAsync()`]: https://www.ookii.org/docs/commandline-4.0/html/Overload_Ookii_CommandLine_Commands_CommandManager_RunCommandAsync.htm
+[`CommandManager`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Commands_CommandManager.htm
+[`CommandNameTransform`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_Commands_CommandOptions_CommandNameTransform.htm
+[`CommandOptions.AutoCommandPrefixAliases`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_Commands_CommandOptions_AutoCommandPrefixAliases.htm
+[`CommandOptions.AutoVersionCommand`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_Commands_CommandOptions_AutoVersionCommand.htm
+[`CommandOptions.CommandFilter`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_Commands_CommandOptions_CommandFilter.htm
+[`CommandOptions.CommandNameTransform`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_Commands_CommandOptions_CommandNameTransform.htm
+[`CommandOptions.ParentCommand`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_Commands_CommandOptions_ParentCommand.htm
+[`CommandOptions.StripCommandNameSuffix`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_Commands_CommandOptions_StripCommandNameSuffix.htm
+[`CommandOptions`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Commands_CommandOptions.htm
+[`CreateCommand()`]: https://www.ookii.org/docs/commandline-4.0/html/Overload_Ookii_CommandLine_Commands_CommandManager_CreateCommand.htm
 [`DescriptionAttribute`]: https://learn.microsoft.com/dotnet/api/system.componentmodel.descriptionattribute
 [`Environment.GetCommandLineArgs()`]: https://learn.microsoft.com/dotnet/api/system.environment.getcommandlineargs
-[`IAsyncCommand.RunAsync()`]: https://www.ookii.org/docs/commandline-3.1/html/M_Ookii_CommandLine_Commands_IAsyncCommand_RunAsync.htm
-[`IAsyncCommand`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_Commands_IAsyncCommand.htm
-[`ICommand.Run()`]: https://www.ookii.org/docs/commandline-3.1/html/M_Ookii_CommandLine_Commands_ICommand_Run.htm
-[`ICommand`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_Commands_ICommand.htm
-[`ICommandWithCustomParsing.Parse()`]: https://www.ookii.org/docs/commandline-3.1/html/M_Ookii_CommandLine_Commands_ICommandWithCustomParsing_Parse.htm
-[`ICommandWithCustomParsing`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_Commands_ICommandWithCustomParsing.htm
-[`IncludeApplicationDescriptionBeforeCommandList`]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_UsageWriter_IncludeApplicationDescriptionBeforeCommandList.htm
-[`LocalizedStringProvider`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_LocalizedStringProvider.htm
-[`NameTransform.DashCase`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_NameTransform.htm
-[`NameTransform.None`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_NameTransform.htm
-[`Ookii.CommandLine.Commands`]: https://www.ookii.org/docs/commandline-3.1/html/N_Ookii_CommandLine_Commands.htm
-[`ParseOptions.AutoVersionArgument`]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_ParseOptions_AutoVersionArgument.htm
-[`ParseOptions`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_ParseOptions.htm
-[`ParseOptionsAttribute`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_ParseOptionsAttribute.htm
-[`RunCommand()`]: https://www.ookii.org/docs/commandline-3.1/html/Overload_Ookii_CommandLine_Commands_CommandManager_RunCommand.htm
-[`RunCommand`]: https://www.ookii.org/docs/commandline-3.1/html/Overload_Ookii_CommandLine_Commands_CommandManager_RunCommand.htm
-[`RunCommandAsync()`]: https://www.ookii.org/docs/commandline-3.1/html/Overload_Ookii_CommandLine_Commands_CommandManager_RunCommandAsync.htm
-[`StripCommandNameSuffix`]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_Commands_CommandOptions_StripCommandNameSuffix.htm
-[`UsageWriter`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_UsageWriter.htm
-[`WriteCommandDescription()`]: https://www.ookii.org/docs/commandline-3.1/html/M_Ookii_CommandLine_UsageWriter_WriteCommandDescription.htm
-[`WriteCommandHelpInstruction()`]: https://www.ookii.org/docs/commandline-3.1/html/M_Ookii_CommandLine_UsageWriter_WriteCommandHelpInstruction.htm
-[`WriteCommandListUsageCore()`]: https://www.ookii.org/docs/commandline-3.1/html/M_Ookii_CommandLine_UsageWriter_WriteCommandListUsageCore.htm
-[`WriteCommandListUsageSyntax()`]: https://www.ookii.org/docs/commandline-3.1/html/M_Ookii_CommandLine_UsageWriter_WriteCommandListUsageSyntax.htm
-[RunAsync()_0]: https://www.ookii.org/docs/commandline-3.1/html/M_Ookii_CommandLine_Commands_AsyncCommandBase_RunAsync.htm
-[`CommandManager.ParseResult`]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_Commands_CommandManager_ParseResult.htm
-[`ParseResult.Status`]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_ParseResult_Status.htm
+[`GeneratedCommandManagerAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Commands_GeneratedCommandManagerAttribute.htm
+[`GeneratedParserAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_GeneratedParserAttribute.htm
+[`IAsyncCommand.RunAsync()`]: https://www.ookii.org/docs/commandline-4.0/html/M_Ookii_CommandLine_Commands_IAsyncCommand_RunAsync.htm
+[`IAsyncCommand`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Commands_IAsyncCommand.htm
+[`ICommand.Run()`]: https://www.ookii.org/docs/commandline-4.0/html/M_Ookii_CommandLine_Commands_ICommand_Run.htm
+[`ICommand`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Commands_ICommand.htm
+[`ICommandWithCustomParsing.Parse()`]: https://www.ookii.org/docs/commandline-4.0/html/M_Ookii_CommandLine_Commands_ICommandWithCustomParsing_Parse.htm
+[`ICommandWithCustomParsing`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Commands_ICommandWithCustomParsing.htm
+[`IncludeApplicationDescriptionBeforeCommandList`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_UsageWriter_IncludeApplicationDescriptionBeforeCommandList.htm
+[`LocalizedStringProvider`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_LocalizedStringProvider.htm
+[`NameTransform.DashCase`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_NameTransform.htm
+[`NameTransform.None`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_NameTransform.htm
+[`Ookii.CommandLine.Commands`]: https://www.ookii.org/docs/commandline-4.0/html/N_Ookii_CommandLine_Commands.htm
+[`ParentCommand`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Commands_ParentCommand.htm
+[`ParentCommandAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Commands_ParentCommandAttribute.htm
+[`ParseOptions.AutoVersionArgument`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_ParseOptions_AutoVersionArgument.htm
+[`ParseOptions`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_ParseOptions.htm
+[`ParseOptionsAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_ParseOptionsAttribute.htm
+[`ParseResult.RemainingArguments`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_ParseResult_RemainingArguments.htm
+[`ParseResult.Status`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_ParseResult_Status.htm
+[`RunCommand()`]: https://www.ookii.org/docs/commandline-4.0/html/Overload_Ookii_CommandLine_Commands_CommandManager_RunCommand.htm
+[`RunCommand`]: https://www.ookii.org/docs/commandline-4.0/html/Overload_Ookii_CommandLine_Commands_CommandManager_RunCommand.htm
+[`RunCommandAsync()`]: https://www.ookii.org/docs/commandline-4.0/html/Overload_Ookii_CommandLine_Commands_CommandManager_RunCommandAsync.htm
+[`StringComparison.OrdinalIgnoreCase`]: https://learn.microsoft.com/dotnet/api/system.stringcomparison
+[`StripCommandNameSuffix`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_Commands_CommandOptions_StripCommandNameSuffix.htm
+[`UsageWriter.IncludeCommandHelpInstruction`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_UsageWriter_IncludeCommandHelpInstruction.htm
+[`UsageWriter`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_UsageWriter.htm
+[`WriteCommandDescription()`]: https://www.ookii.org/docs/commandline-4.0/html/M_Ookii_CommandLine_UsageWriter_WriteCommandDescription.htm
+[`WriteCommandHelpInstruction()`]: https://www.ookii.org/docs/commandline-4.0/html/M_Ookii_CommandLine_UsageWriter_WriteCommandHelpInstruction.htm
+[`WriteCommandListUsageCore()`]: https://www.ookii.org/docs/commandline-4.0/html/M_Ookii_CommandLine_UsageWriter_WriteCommandListUsageCore.htm
+[`WriteCommandListUsageSyntax()`]: https://www.ookii.org/docs/commandline-4.0/html/M_Ookii_CommandLine_UsageWriter_WriteCommandListUsageSyntax.htm
+[RunAsync()_0]: https://www.ookii.org/docs/commandline-4.0/html/M_Ookii_CommandLine_Commands_AsyncCommandBase_RunAsync.htm
