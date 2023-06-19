@@ -1,6 +1,4 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Ookii.CommandLine.Terminal;
-using System;
 
 namespace Ookii.CommandLine.Tests;
 

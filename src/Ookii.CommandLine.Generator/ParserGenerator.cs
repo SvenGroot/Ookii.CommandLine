@@ -1,14 +1,7 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.CodeAnalysis.Operations;
-using System;
-using System.Data;
 using System.Diagnostics;
-using System.Globalization;
-using System.Reflection;
-using System.Text;
-using System.Xml.Linq;
 
 namespace Ookii.CommandLine.Generator;
 
@@ -60,7 +53,7 @@ internal class ParserGenerator
         _builder = new(argumentsClass.ContainingNamespace);
         _converterGenerator = converterGenerator;
         _commandGenerator = commandGenerator;
-        _languageVersion = languageVersion; 
+        _languageVersion = languageVersion;
     }
 
     public static string? Generate(SourceProductionContext context, INamedTypeSymbol argumentsClass, TypeHelper typeHelper,
@@ -395,7 +388,7 @@ internal class ParserGenerator
                         return false;
                     }
 
-                    var separator = attributes.KeyValueSeparator == null 
+                    var separator = attributes.KeyValueSeparator == null
                         ? "null"
                         : $"keyValueSeparatorAttribute{member.Name}.Separator";
 
@@ -532,7 +525,7 @@ internal class ParserGenerator
                 else
                 {
                     arguments = $"({originalArgumentType.ToQualifiedName()})value{notNullAnnotation}";
-                }    
+                }
             }
             else if (info.HasParserParameter)
             {
@@ -851,7 +844,7 @@ internal class ParserGenerator
         string? multiValueArgument = null;
         string? optionalArgument = null;
         var result = true;
-        foreach (var argument in  _positionalArguments) 
+        foreach (var argument in _positionalArguments)
         {
             if (multiValueArgument != null)
             {
@@ -882,8 +875,8 @@ internal class ParserGenerator
     private void CheckIgnoredDictionaryAttribute(ISymbol member, bool isDictionary, AttributeData? converter, AttributeData? attribute)
     {
         if (attribute == null)
-        { 
-            return; 
+        {
+            return;
         }
 
         if (!isDictionary)
@@ -905,8 +898,8 @@ internal class ParserGenerator
         }
 
         var expression = syntax.Initializer.Value;
-        if (expression is PostfixUnaryExpressionSyntax postfixUnaryExpression) 
-        { 
+        if (expression is PostfixUnaryExpressionSyntax postfixUnaryExpression)
+        {
             if (postfixUnaryExpression.Kind() == SyntaxKind.SuppressNullableWarningExpression)
             {
                 expression = postfixUnaryExpression.Operand;

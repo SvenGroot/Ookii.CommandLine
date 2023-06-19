@@ -1,10 +1,8 @@
-﻿// Copyright (c) Sven Groot (Ookii.org)
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Ookii.CommandLine.Support;
 using Ookii.CommandLine.Tests.Commands;
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Globalization;
@@ -1533,7 +1531,7 @@ public partial class CommandLineParserTest
         };
 
     public static void AssertSpanEqual<T>(ReadOnlySpan<T> expected, ReadOnlySpan<T> actual)
-        where T: IEquatable<T>
+        where T : IEquatable<T>
     {
         if (!expected.SequenceEqual(actual))
         {

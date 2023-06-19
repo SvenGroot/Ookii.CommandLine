@@ -1,10 +1,10 @@
-﻿namespace Ookii.CommandLine.Tests
-{
-    partial class CommandLineParserTest
-    {
-        private const string _executableName = "test";
+﻿namespace Ookii.CommandLine.Tests;
 
-        private static readonly string _expectedDefaultUsage = @"Test arguments description.
+partial class CommandLineParserTest
+{
+    private const string _executableName = "test";
+
+    private static readonly string _expectedDefaultUsage = @"Test arguments description.
 
 Usage: test [/arg1] <String> [[/other] <Number>] [[/notSwitch] <Boolean>] [[/Arg5] <Single>] [[/other2] <Number>] [[/Arg8] <DayOfWeek>...] /Arg6 <String> [/Arg10...] [/Arg11] [/Arg12 <Int32>...] [/Arg13 <String=Int32>...] [/Arg14 <String=Int32>...] [/Arg15 <KeyValuePair<String, Int32>>] [/Arg3 <String>] [/Arg7] [/Arg9 <Int32>] [/Help] [/Version]
 
@@ -43,7 +43,7 @@ Usage: test [/arg1] <String> [[/other] <Number>] [[/notSwitch] <Boolean>] [[/Arg
 
 ".ReplaceLineEndings();
 
-        private static readonly string _expectedLongShortUsage = @"Usage: test [[--foo] <Int32>] [[--bar] <Int32>] [[--Arg2] <Int32>] [--Arg1 <Int32>] [--Help] [--Switch1] [--Switch2] [-u] [--Version]
+    private static readonly string _expectedLongShortUsage = @"Usage: test [[--foo] <Int32>] [[--bar] <Int32>] [[--Arg2] <Int32>] [--Arg1 <Int32>] [--Help] [--Switch1] [--Switch2] [-u] [--Version]
 
     -f, --foo <Int32>
             Foo description. Default value: 0.
@@ -74,7 +74,7 @@ Usage: test [/arg1] <String> [[/other] <Number>] [[/notSwitch] <Boolean>] [[/Arg
 
 ".ReplaceLineEndings();
 
-        private static readonly string _expectedLongShortUsageShortNameSyntax = @"Usage: test [[-f] <Int32>] [[--bar] <Int32>] [[-a] <Int32>] [--Arg1 <Int32>] [-?] [-S] [-k] [-u] [--Version]
+    private static readonly string _expectedLongShortUsageShortNameSyntax = @"Usage: test [[-f] <Int32>] [[--bar] <Int32>] [[-a] <Int32>] [--Arg1 <Int32>] [-?] [-S] [-k] [-u] [--Version]
 
     -f, --foo <Int32>
             Foo description. Default value: 0.
@@ -105,7 +105,7 @@ Usage: test [/arg1] <String> [[/other] <Number>] [[/notSwitch] <Boolean>] [[/Arg
 
 ".ReplaceLineEndings();
 
-        private static readonly string _expectedLongShortUsageAbbreviated = @"Usage: test [[--foo] <Int32>] [[--bar] <Int32>] [[--Arg2] <Int32>] [arguments]
+    private static readonly string _expectedLongShortUsageAbbreviated = @"Usage: test [[--foo] <Int32>] [[--bar] <Int32>] [[--Arg2] <Int32>] [arguments]
 
     -f, --foo <Int32>
             Foo description. Default value: 0.
@@ -136,7 +136,7 @@ Usage: test [/arg1] <String> [[/other] <Number>] [[/notSwitch] <Boolean>] [[/Arg
 
 ".ReplaceLineEndings();
 
-        private static readonly string _expectedUsageDescriptionOnly = @"Test arguments description.
+    private static readonly string _expectedUsageDescriptionOnly = @"Test arguments description.
 
 Usage: test [-arg1] <String> [[-other] <Number>] [[-notSwitch] <Boolean>] [[-Arg5] <Single>] [[-other2] <Number>] [[-Arg8] <DayOfWeek>...] -Arg6 <String> [-Arg10...] [-Arg11] [-Arg12 <Int32>...] [-Arg13 <String=Int32>...] [-Arg14 <String=Int32>...] [-Arg15 <KeyValuePair<String, Int32>>] [-Arg3 <String>] [-Arg7] [-Arg9 <Int32>] [-Help] [-Version]
 
@@ -163,7 +163,7 @@ Usage: test [-arg1] <String> [[-other] <Number>] [[-notSwitch] <Boolean>] [[-Arg
 
 ".ReplaceLineEndings();
 
-        private static readonly string _expectedUsageAll = @"Test arguments description.
+    private static readonly string _expectedUsageAll = @"Test arguments description.
 
 Usage: test [-arg1] <String> [[-other] <Number>] [[-notSwitch] <Boolean>] [[-Arg5] <Single>] [[-other2] <Number>] [[-Arg8] <DayOfWeek>...] -Arg6 <String> [-Arg10...] [-Arg11] [-Arg12 <Int32>...] [-Arg13 <String=Int32>...] [-Arg14 <String=Int32>...] [-Arg15 <KeyValuePair<String, Int32>>] [-Arg3 <String>] [-Arg7] [-Arg9 <Int32>] [-Help] [-Version]
 
@@ -223,15 +223,15 @@ Usage: test [-arg1] <String> [[-other] <Number>] [[-notSwitch] <Boolean>] [[-Arg
 
 ".ReplaceLineEndings();
 
-        private static readonly string _expectedUsageNone = @"Test arguments description.
+    private static readonly string _expectedUsageNone = @"Test arguments description.
 
 Usage: test [-arg1] <String> [[-other] <Number>] [[-notSwitch] <Boolean>] [[-Arg5] <Single>] [[-other2] <Number>] [[-Arg8] <DayOfWeek>...] -Arg6 <String> [-Arg10...] [-Arg11] [-Arg12 <Int32>...] [-Arg13 <String=Int32>...] [-Arg14 <String=Int32>...] [-Arg15 <KeyValuePair<String, Int32>>] [-Arg3 <String>] [-Arg7] [-Arg9 <Int32>] [-Help] [-Version]
 
 ".ReplaceLineEndings();
 
-        // Raw strings would be nice here so including the escape character directly wouldn't be
-        // necessary but that requires C# 11.
-        private static readonly string _expectedUsageColor = @"Test arguments description.
+    // Raw strings would be nice here so including the escape character directly wouldn't be
+    // necessary but that requires C# 11.
+    private static readonly string _expectedUsageColor = @"Test arguments description.
 
 [36mUsage:[0m test [/arg1] <String> [[/other] <Number>] [[/notSwitch] <Boolean>] [[/Arg5] <Single>] [[/other2] <Number>] [[/Arg8] <DayOfWeek>...] /Arg6 <String> [/Arg10...] [/Arg11] [/Arg12 <Int32>...] [/Arg13 <String=Int32>...] [/Arg14 <String=Int32>...] [/Arg15 <KeyValuePair<String, Int32>>] [/Arg3 <String>] [/Arg7] [/Arg9 <Int32>] [/Help] [/Version]
 
@@ -270,7 +270,7 @@ Usage: test [-arg1] <String> [[-other] <Number>] [[-notSwitch] <Boolean>] [[-Arg
 
 ".ReplaceLineEndings();
 
-        private static readonly string _expectedLongShortUsageColor = @"[36mUsage:[0m test [[--foo] <Int32>] [[--bar] <Int32>] [[--Arg2] <Int32>] [--Arg1 <Int32>] [--Help] [--Switch1] [--Switch2] [-u] [--Version]
+    private static readonly string _expectedLongShortUsageColor = @"[36mUsage:[0m test [[--foo] <Int32>] [[--bar] <Int32>] [[--Arg2] <Int32>] [--Arg1 <Int32>] [--Help] [--Switch1] [--Switch2] [-u] [--Version]
 
     [32m-f, --foo <Int32>[0m
             Foo description. Default value: 0.
@@ -301,7 +301,7 @@ Usage: test [-arg1] <String> [[-other] <Number>] [[-notSwitch] <Boolean>] [[-Arg
 
 ".ReplaceLineEndings();
 
-        private static readonly string _expectedUsageHidden = @"Usage: test [-Foo <Int32>] [-Help] [-Version]
+    private static readonly string _expectedUsageHidden = @"Usage: test [-Foo <Int32>] [-Help] [-Version]
 
     -Foo <Int32>
 
@@ -314,7 +314,7 @@ Usage: test [-arg1] <String> [[-other] <Number>] [[-notSwitch] <Boolean>] [[-Arg
 
 ".ReplaceLineEndings();
 
-        private static readonly string _expectedUsageValidators = @"Usage: test [[-arg2] <String>] [-Arg1 <Int32>] [-Arg3 <Int32>] [-Arg4 <String>...] [-Day <DayOfWeek>] [-Day2 <DayOfWeek>] [-Help] [-NotNull <Int32>] [-Version]
+    private static readonly string _expectedUsageValidators = @"Usage: test [[-arg2] <String>] [-Arg1 <Int32>] [-Arg3 <Int32>] [-Arg4 <String>...] [-Day <DayOfWeek>] [-Day2 <DayOfWeek>] [-Help] [-NotNull <Int32>] [-Version]
 
     -arg2 <String>
         Arg2 description. Must not be empty.
@@ -345,7 +345,7 @@ Usage: test [-arg1] <String> [[-other] <Number>] [[-notSwitch] <Boolean>] [[-Arg
 
 ".ReplaceLineEndings();
 
-        private static readonly string _expectedUsageDependencies = @"Usage: test [-Address <IPAddress>] [-Help] [-Path <FileInfo>] [-Port <Int16>] [-Protocol <Int32>] [-Throughput <Int32>] [-Version]
+    private static readonly string _expectedUsageDependencies = @"Usage: test [-Address <IPAddress>] [-Help] [-Path <FileInfo>] [-Port <Int16>] [-Protocol <Int32>] [-Throughput <Int32>] [-Version]
 
 You must use at least one of: -Address, -Path.
 
@@ -372,7 +372,7 @@ You must use at least one of: -Address, -Path.
 
 ".ReplaceLineEndings();
 
-        private static readonly string _expectedUsageDependenciesDisabled = @"Usage: test [-Address <IPAddress>] [-Help] [-Path <FileInfo>] [-Port <Int16>] [-Protocol <Int32>] [-Throughput <Int32>] [-Version]
+    private static readonly string _expectedUsageDependenciesDisabled = @"Usage: test [-Address <IPAddress>] [-Help] [-Path <FileInfo>] [-Port <Int16>] [-Protocol <Int32>] [-Throughput <Int32>] [-Version]
 
     -Address <IPAddress>
         The address.
@@ -397,7 +397,7 @@ You must use at least one of: -Address, -Path.
 
 ".ReplaceLineEndings();
 
-        private static readonly string _expectedUsageAlphabeticalLongName = @"Usage: test [[--foo] <Int32>] [[--bar] <Int32>] [[--Arg2] <Int32>] [--Arg1 <Int32>] [--Help] [--Switch1] [--Switch2] [-u] [--Version]
+    private static readonly string _expectedUsageAlphabeticalLongName = @"Usage: test [[--foo] <Int32>] [[--bar] <Int32>] [[--Arg2] <Int32>] [--Arg1 <Int32>] [--Help] [--Switch1] [--Switch2] [-u] [--Version]
 
         --Arg1 <Int32>
             Arg1 description.
@@ -428,7 +428,7 @@ You must use at least one of: -Address, -Path.
 
 ".ReplaceLineEndings();
 
-        private static readonly string _expectedUsageAlphabeticalLongNameDescending = @"Usage: test [[--foo] <Int32>] [[--bar] <Int32>] [[--Arg2] <Int32>] [--Arg1 <Int32>] [--Help] [--Switch1] [--Switch2] [-u] [--Version]
+    private static readonly string _expectedUsageAlphabeticalLongNameDescending = @"Usage: test [[--foo] <Int32>] [[--bar] <Int32>] [[--Arg2] <Int32>] [--Arg1 <Int32>] [--Help] [--Switch1] [--Switch2] [-u] [--Version]
 
         --Version [<Boolean>]
             Displays version information.
@@ -459,7 +459,7 @@ You must use at least one of: -Address, -Path.
 
 ".ReplaceLineEndings();
 
-        private static readonly string _expectedUsageAlphabeticalShortName = @"Usage: test [[--foo] <Int32>] [[--bar] <Int32>] [[--Arg2] <Int32>] [--Arg1 <Int32>] [--Help] [--Switch1] [--Switch2] [-u] [--Version]
+    private static readonly string _expectedUsageAlphabeticalShortName = @"Usage: test [[--foo] <Int32>] [[--bar] <Int32>] [[--Arg2] <Int32>] [--Arg1 <Int32>] [--Help] [--Switch1] [--Switch2] [-u] [--Version]
 
     -?, --Help [<Boolean>] (-h)
             Displays this help message.
@@ -490,7 +490,7 @@ You must use at least one of: -Address, -Path.
 
 ".ReplaceLineEndings();
 
-        private static readonly string _expectedUsageAlphabeticalShortNameDescending = @"Usage: test [[--foo] <Int32>] [[--bar] <Int32>] [[--Arg2] <Int32>] [--Arg1 <Int32>] [--Help] [--Switch1] [--Switch2] [-u] [--Version]
+    private static readonly string _expectedUsageAlphabeticalShortNameDescending = @"Usage: test [[--foo] <Int32>] [[--bar] <Int32>] [[--Arg2] <Int32>] [--Arg1 <Int32>] [--Help] [--Switch1] [--Switch2] [-u] [--Version]
 
         --Version [<Boolean>]
             Displays version information.
@@ -521,7 +521,7 @@ You must use at least one of: -Address, -Path.
 
 ".ReplaceLineEndings();
 
-        private static readonly string _expectedUsageAlphabetical = @"Usage: test [[-foo] <Int32>] [[-bar] <Int32>] [[-Arg2] <Int32>] [-Arg1 <Int32>] [-Help] [-Switch1] [-Switch2] [-Switch3] [-Version]
+    private static readonly string _expectedUsageAlphabetical = @"Usage: test [[-foo] <Int32>] [[-bar] <Int32>] [[-Arg2] <Int32>] [-Arg1 <Int32>] [-Help] [-Switch1] [-Switch2] [-Switch3] [-Version]
 
     -Arg1 <Int32>
         Arg1 description.
@@ -552,7 +552,7 @@ You must use at least one of: -Address, -Path.
 
 ".ReplaceLineEndings();
 
-        private static readonly string _expectedUsageAlphabeticalDescending = @"Usage: test [[-foo] <Int32>] [[-bar] <Int32>] [[-Arg2] <Int32>] [-Arg1 <Int32>] [-Help] [-Switch1] [-Switch2] [-Switch3] [-Version]
+    private static readonly string _expectedUsageAlphabeticalDescending = @"Usage: test [[-foo] <Int32>] [[-bar] <Int32>] [[-Arg2] <Int32>] [-Arg1 <Int32>] [-Help] [-Switch1] [-Switch2] [-Switch3] [-Version]
 
     -Version [<Boolean>]
         Displays version information.
@@ -583,15 +583,15 @@ You must use at least one of: -Address, -Path.
 
 ".ReplaceLineEndings();
 
-        private static readonly string _expectedUsageSyntaxOnly = @"Usage: test [/arg1] <String> [[/other] <Number>] [[/notSwitch] <Boolean>] [[/Arg5] <Single>] [[/other2] <Number>] [[/Arg8] <DayOfWeek>...] /Arg6 <String> [/Arg10...] [/Arg11] [/Arg12 <Int32>...] [/Arg13 <String=Int32>...] [/Arg14 <String=Int32>...] [/Arg15 <KeyValuePair<String, Int32>>] [/Arg3 <String>] [/Arg7] [/Arg9 <Int32>] [/Help] [/Version]
+    private static readonly string _expectedUsageSyntaxOnly = @"Usage: test [/arg1] <String> [[/other] <Number>] [[/notSwitch] <Boolean>] [[/Arg5] <Single>] [[/other2] <Number>] [[/Arg8] <DayOfWeek>...] /Arg6 <String> [/Arg10...] [/Arg11] [/Arg12 <Int32>...] [/Arg13 <String=Int32>...] [/Arg14 <String=Int32>...] [/Arg15 <KeyValuePair<String, Int32>>] [/Arg3 <String>] [/Arg7] [/Arg9 <Int32>] [/Help] [/Version]
 
 Run 'test /Help' for more information.
 ".ReplaceLineEndings();
 
-        private static readonly string _expectedUsageMessageOnly = @"Run 'test /Help' for more information.
+    private static readonly string _expectedUsageMessageOnly = @"Run 'test /Help' for more information.
 ".ReplaceLineEndings();
 
-        private static readonly string _expectedUsageSeparator = @"Test arguments description.
+    private static readonly string _expectedUsageSeparator = @"Test arguments description.
 
 Usage: test [/arg1:]<String> [[/other:]<Number>] [[/notSwitch:]<Boolean>] [[/Arg5:]<Single>] [[/other2:]<Number>] [[/Arg8:]<DayOfWeek>...] /Arg6:<String> [/Arg10...] [/Arg11] [/Arg12:<Int32>...] [/Arg13:<String=Int32>...] [/Arg14:<String=Int32>...] [/Arg15:<KeyValuePair<String, Int32>>] [/Arg3:<String>] [/Arg7] [/Arg9:<Int32>] [/Help] [/Version]
 
@@ -630,7 +630,7 @@ Usage: test [/arg1:]<String> [[/other:]<Number>] [[/notSwitch:]<Boolean>] [[/Arg
 
 ".ReplaceLineEndings();
 
-        private static readonly string _expectedCustomIndentUsage = @"Test arguments description.
+    private static readonly string _expectedCustomIndentUsage = @"Test arguments description.
 
 Usage: test [-arg1] <String> [[-other] <Number>] [[-notSwitch] <Boolean>] [[-Arg5] <Single>] [[-other2] <Number>] [[-Arg8] <DayOfWeek>...] -Arg6 <String> [-Arg10...] [-Arg11] [-Arg12 <Int32>...] [-Arg13 <String=Int32>...] [-Arg14 <String=Int32>...] [-Arg15 <KeyValuePair<String, Int32>>] [-Arg3 <String>] [-Arg7] [-Arg9 <Int32>] [-Help] [-Version]
 
@@ -668,5 +668,4 @@ Usage: test [-arg1] <String> [[-other] <Number>] [[-notSwitch] <Boolean>] [[-Arg
     Displays version information.
 
 ".ReplaceLineEndings();
-    }
 }

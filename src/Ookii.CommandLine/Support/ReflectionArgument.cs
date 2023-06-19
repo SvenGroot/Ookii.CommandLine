@@ -1,14 +1,12 @@
-﻿using System.Collections.Generic;
-using System.Globalization;
-using System;
-using System.Reflection;
-using System.ComponentModel;
-using Ookii.CommandLine.Conversion;
-using System.Diagnostics;
-using System.Text;
+﻿using Ookii.CommandLine.Conversion;
 using Ookii.CommandLine.Validation;
-using System.Threading;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 
 namespace Ookii.CommandLine.Support;

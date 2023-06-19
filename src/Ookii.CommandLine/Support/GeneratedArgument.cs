@@ -4,10 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Ookii.CommandLine.Support;
 
@@ -173,7 +169,7 @@ public class GeneratedArgument : CommandLineArgument
     /// <inheritdoc/>
     protected override string DetermineValueDescriptionForType(Type type)
     {
-        Debug.Assert(type  == KeyType || type == ValueType || (ValueType == null && type == ElementType));
+        Debug.Assert(type == KeyType || type == ValueType || (ValueType == null && type == ElementType));
         if (KeyType != null && type == KeyType)
         {
             return _defaultKeyDescription!;

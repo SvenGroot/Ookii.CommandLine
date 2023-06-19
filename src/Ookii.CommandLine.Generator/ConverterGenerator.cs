@@ -1,7 +1,5 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
-using System.Text;
-using System.Xml.Linq;
 
 namespace Ookii.CommandLine.Generator;
 
@@ -252,7 +250,7 @@ internal class ConverterGenerator
         var elements = ns.Split('.');
         foreach (var element in elements)
         {
-            if (!SyntaxFacts.IsValidIdentifier(element)) 
+            if (!SyntaxFacts.IsValidIdentifier(element))
             {
                 context.ReportDiagnostic(Diagnostics.InvalidGeneratedConverterNamespace(ns, attribute));
                 return DefaultGeneratedNamespace;

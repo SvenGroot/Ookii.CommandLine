@@ -1,11 +1,9 @@
-﻿// Copyright (c) Sven Groot (Ookii.org)
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Ookii.CommandLine.Commands;
 using Ookii.CommandLine.Support;
 using Ookii.CommandLine.Tests.Commands;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -470,7 +468,7 @@ public partial class SubCommandTest
     public void TestAutoPrefixAliases(ProviderKind kind)
     {
         var manager = CreateManager(kind);
-        
+
         // Ambiguous between test and TestParentCommand.
         Assert.IsNull(manager.GetCommand("tes"));
 

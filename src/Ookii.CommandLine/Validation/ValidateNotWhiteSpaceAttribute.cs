@@ -1,74 +1,73 @@
 ﻿using System;
 
-namespace Ookii.CommandLine.Validation
+namespace Ookii.CommandLine.Validation;
+
+
+/// <summary>
+/// Validates that the value of an argument is not an empty string, or a string containing only
+/// white-space characters.
+/// </summary>
+/// <remarks>
+/// <note>
+///   If the argument's type is not <see cref="string"/>, this validator uses the raw string
+///   value provided by the user, before type conversion takes place.
+/// </note>
+/// <para>
+///   If the argument is optional, validation is only performed if the argument is specified,
+///   so the value may still be <see langword="null"/> if the argument is not supplied, if that
+///   is the default value.
+/// </para>
+/// </remarks>
+/// <threadsafety static="true" instance="true"/>
+public class ValidateNotWhiteSpaceAttribute : ArgumentValidationWithHelpAttribute
 {
+    /// <summary>
+    /// Gets a value that indicates when validation will run.
+    /// </summary>
+    /// <value>
+    /// <see cref="ValidationMode.BeforeConversion"/>.
+    /// </value>
+    public override ValidationMode Mode => ValidationMode.BeforeConversion;
 
     /// <summary>
-    /// Validates that the value of an argument is not an empty string, or a string containing only
-    /// white-space characters.
+    /// Determines if the argument's value is not null or only white-space characters.
     /// </summary>
-    /// <remarks>
-    /// <note>
-    ///   If the argument's type is not <see cref="string"/>, this validator uses the raw string
-    ///   value provided by the user, before type conversion takes place.
-    /// </note>
-    /// <para>
-    ///   If the argument is optional, validation is only performed if the argument is specified,
-    ///   so the value may still be <see langword="null"/> if the argument is not supplied, if that
-    ///   is the default value.
-    /// </para>
-    /// </remarks>
-    /// <threadsafety static="true" instance="true"/>
-    public class ValidateNotWhiteSpaceAttribute : ArgumentValidationWithHelpAttribute
+    /// <param name="argument">The argument being validated.</param>
+    /// <param name="value">
+    ///   The raw string argument value.
+    /// </param>
+    /// <returns>
+    ///   <see langword="true"/> if the value is valid; otherwise, <see langword="false"/>.
+    /// </returns>
+    public override bool IsValid(CommandLineArgument argument, object? value)
     {
-        /// <summary>
-        /// Gets a value that indicates when validation will run.
-        /// </summary>
-        /// <value>
-        /// <see cref="ValidationMode.BeforeConversion"/>.
-        /// </value>
-        public override ValidationMode Mode => ValidationMode.BeforeConversion;
-
-        /// <summary>
-        /// Determines if the argument's value is not null or only white-space characters.
-        /// </summary>
-        /// <param name="argument">The argument being validated.</param>
-        /// <param name="value">
-        ///   The raw string argument value.
-        /// </param>
-        /// <returns>
-        ///   <see langword="true"/> if the value is valid; otherwise, <see langword="false"/>.
-        /// </returns>
-        public override bool IsValid(CommandLineArgument argument, object? value)
-        {
-            return !string.IsNullOrWhiteSpace(value as string);
-        }
-
-        /// <inheritdoc cref="IsValid(CommandLineArgument, object?)"/>
-        public override bool? IsSpanValid(CommandLineArgument argument, ReadOnlySpan<char> value)
-            => !value.IsWhiteSpace();
-
-        /// <summary>
-        /// Gets the error message to display if validation failed.
-        /// </summary>
-        /// <param name="argument">The argument that was validated.</param>
-        /// <param name="value">Not used.</param>
-        /// <returns>The error message.</returns>
-        public override string GetErrorMessage(CommandLineArgument argument, object? value)
-        {
-            if (value == null)
-            {
-                return argument.Parser.StringProvider.NullArgumentValue(argument.ArgumentName);
-            }
-            else
-            {
-                return argument.Parser.StringProvider.ValidateNotWhiteSpaceFailed(argument.ArgumentName);
-            }
-        }
-
-        /// <inheritdoc/>
-        protected override string GetUsageHelpCore(CommandLineArgument argument)
-            => argument.Parser.StringProvider.ValidateNotWhiteSpaceUsageHelp();
-
+        return !string.IsNullOrWhiteSpace(value as string);
     }
+
+    /// <inheritdoc cref="IsValid(CommandLineArgument, object?)"/>
+    public override bool? IsSpanValid(CommandLineArgument argument, ReadOnlySpan<char> value)
+        => !value.IsWhiteSpace();
+
+    /// <summary>
+    /// Gets the error message to display if validation failed.
+    /// </summary>
+    /// <param name="argument">The argument that was validated.</param>
+    /// <param name="value">Not used.</param>
+    /// <returns>The error message.</returns>
+    public override string GetErrorMessage(CommandLineArgument argument, object? value)
+    {
+        if (value == null)
+        {
+            return argument.Parser.StringProvider.NullArgumentValue(argument.ArgumentName);
+        }
+        else
+        {
+            return argument.Parser.StringProvider.ValidateNotWhiteSpaceFailed(argument.ArgumentName);
+        }
+    }
+
+    /// <inheritdoc/>
+    protected override string GetUsageHelpCore(CommandLineArgument argument)
+        => argument.Parser.StringProvider.ValidateNotWhiteSpaceUsageHelp();
+
 }

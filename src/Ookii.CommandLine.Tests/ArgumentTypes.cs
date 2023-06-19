@@ -155,7 +155,7 @@ partial class MultiValueSeparatorArguments
     public string[] Separator { get; set; }
 }
 
-[GeneratedParser]   
+[GeneratedParser]
 partial class SimpleArguments
 {
     [CommandLineArgument]

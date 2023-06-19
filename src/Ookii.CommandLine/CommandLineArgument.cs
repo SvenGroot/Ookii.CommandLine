@@ -1,11 +1,9 @@
-﻿// Copyright (c) Sven Groot (Ookii.org)
-using Ookii.CommandLine.Conversion;
+﻿using Ookii.CommandLine.Conversion;
 using Ookii.CommandLine.Support;
 using Ookii.CommandLine.Validation;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
@@ -182,7 +180,7 @@ public abstract class CommandLineArgument
     {
         public HelpArgument(CommandLineParser parser, string argumentName, char shortName, char shortAlias)
             : base(CreateInfo(parser, argumentName, shortName, shortAlias))
-        { 
+        {
         }
 
         protected override bool CanSetProperty => false;
@@ -1186,7 +1184,7 @@ public abstract class CommandLineArgument
     /// </param>
     /// <returns>The value description.</returns>
     protected virtual string DetermineValueDescriptionForType(Type type) => GetFriendlyTypeName(type);
-    
+
     internal static ArgumentInfo CreateArgumentInfo(CommandLineParser parser,
                                                     Type argumentType,
                                                     bool allowsNull,
@@ -1591,7 +1589,7 @@ public abstract class CommandLineArgument
 
     private string? GetDefaultValueDescription(Type? type)
     {
-        if (Parser.Options.DefaultValueDescriptions == null || 
+        if (Parser.Options.DefaultValueDescriptions == null ||
             !Parser.Options.DefaultValueDescriptions.TryGetValue(type ?? ElementType, out string? value))
         {
             return null;

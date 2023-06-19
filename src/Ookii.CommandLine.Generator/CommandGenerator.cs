@@ -1,6 +1,5 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
-using System.Diagnostics;
 using System.Text;
 
 namespace Ookii.CommandLine.Generator;
@@ -256,7 +255,7 @@ internal class CommandGenerator
         }
 
         IAssemblySymbol? foundAssembly = null;
-        foreach (var reference in  _typeHelper.Compilation.References)
+        foreach (var reference in _typeHelper.Compilation.References)
         {
             if (_typeHelper.Compilation.GetAssemblyOrModuleSymbol(reference) is IAssemblySymbol assembly)
             {

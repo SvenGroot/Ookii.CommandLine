@@ -1,6 +1,5 @@
 ﻿using Ookii.CommandLine.Commands;
 using System;
-using System.ComponentModel;
 
 namespace Ookii.CommandLine;
 

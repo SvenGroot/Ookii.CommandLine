@@ -2224,7 +2224,7 @@ public class UsageWriter
                 first = false;
             }
 
-            if ((!globalMode && requiredMode != options.Mode) || 
+            if ((!globalMode && requiredMode != options.Mode) ||
                 (!globalNameTransform && requiredNameTransform != options.ArgumentNameTransform) ||
                 (!globalPrefixes && options.ArgumentNamePrefixes != null) ||
                 (actualMode == ParsingMode.LongShort && !globalLongPrefix && options.LongArgumentNamePrefix != null))

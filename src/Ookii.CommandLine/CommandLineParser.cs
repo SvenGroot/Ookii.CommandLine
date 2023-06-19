@@ -1,13 +1,10 @@
-﻿// Copyright (c) Sven Groot (Ookii.org)
-using Ookii.CommandLine.Commands;
+﻿using Ookii.CommandLine.Commands;
 using Ookii.CommandLine.Support;
 using Ookii.CommandLine.Validation;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;

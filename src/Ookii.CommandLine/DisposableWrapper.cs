@@ -1,60 +1,58 @@
-﻿// Copyright (c) Sven Groot (Ookii.org)
-using System;
+﻿using System;
 
-namespace Ookii.CommandLine
+namespace Ookii.CommandLine;
+
+internal static class DisposableWrapper
 {
-    internal static class DisposableWrapper
+    public static DisposableWrapper<T> Create<T>(T? obj, Func<T> createIfNull)
+        where T : IDisposable
     {
-        public static DisposableWrapper<T> Create<T>(T? obj, Func<T> createIfNull)
-            where T : IDisposable
+        return new DisposableWrapper<T>(obj, createIfNull);
+    }
+}
+
+/// <summary>
+/// Helper to either use an existing instance (and not dispose it), or create an instance
+/// and dispose it.
+/// </summary>
+/// <typeparam name="T"></typeparam>
+internal class DisposableWrapper<T> : IDisposable
+    where T : IDisposable
+{
+    private readonly T _inner;
+    private bool _needDispose;
+
+    public DisposableWrapper(T? inner, Func<T> createIfNull)
+    {
+        if (inner == null)
         {
-            return new DisposableWrapper<T>(obj, createIfNull);
+            _inner = createIfNull();
+            _needDispose = true;
+        }
+        else
+        {
+            _inner = inner;
         }
     }
 
-    /// <summary>
-    /// Helper to either use an existing instance (and not dispose it), or create an instance
-    /// and dispose it.
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    internal class DisposableWrapper<T> : IDisposable
-        where T : IDisposable
+    public T Inner => _inner;
+
+    protected virtual void Dispose(bool disposing)
     {
-        private readonly T _inner;
-        private bool _needDispose;
-
-        public DisposableWrapper(T? inner, Func<T> createIfNull)
+        if (_needDispose)
         {
-            if (inner == null)
+            if (disposing)
             {
-                _inner = createIfNull();
-                _needDispose = true;
+                _inner.Dispose();
             }
-            else
-            {
-                _inner = inner;
-            }
+
+            _needDispose = false;
         }
+    }
 
-        public T Inner => _inner;
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (_needDispose)
-            {
-                if (disposing)
-                {
-                    _inner.Dispose();
-                }
-
-                _needDispose = false;
-            }
-        }
-
-        public void Dispose()
-        {
-            Dispose(disposing: true);
-            GC.SuppressFinalize(this);
-        }
+    public void Dispose()
+    {
+        Dispose(disposing: true);
+        GC.SuppressFinalize(this);
     }
 }

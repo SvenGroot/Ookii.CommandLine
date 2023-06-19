@@ -1,7 +1,6 @@
 ﻿using Ookii.CommandLine.Validation;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 
 namespace Ookii.CommandLine.Support;
@@ -104,7 +103,7 @@ public abstract class ArgumentProvider
         }
 
         foreach (var validator in _validators)
-        { 
+        {
             validator.Validate(parser);
         }
     }
