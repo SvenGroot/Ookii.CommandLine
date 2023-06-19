@@ -2,16 +2,23 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net6.0</TargetFramework>
-    <ImplicitUsings>disable</ImplicitUsings>
+    <TargetFramework>net7.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <Description>Command line parsing sample for Ookii.CommandLine</Description>
     <Copyright>Copyright (c) Sven Groot (Ookii.org)
 This is sample code, so you can use it freely.</Copyright>
   </PropertyGroup>
 
+  <!--
+    These two project references are for the library and the source generator. When using NuGet
+    instead, the <PackageReference> for Ookii.CommandLine will replace both of these.
+  -->
   <ItemGroup>
     <ProjectReference Include="..\..\Ookii.CommandLine\Ookii.CommandLine.csproj" />
+    <ProjectReference Include="..\..\Ookii.CommandLine.Generator\Ookii.CommandLine.Generator.csproj"
+                      OutputItemType="Analyzer"
+                      ReferenceOutputAssembly="false" />
   </ItemGroup>
 
 </Project>

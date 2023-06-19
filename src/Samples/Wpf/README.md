@@ -5,9 +5,10 @@ interface. It uses the same arguments as the [parser sample](../Parser).
 
 Running this sample requires Microsoft Windows.
 
-This sample does not use the static [`CommandLineParser.Parse<T>()`][] method, but instead handles
-errors manually so it can show a dialog with the error message and a help button, and show the
-usage help only if that button was clicked, or the `-Help` argument was used.
+This sample does not use the generated static [`Parse()`][Parse()_7] method, but instead uses the generated
+[`CreateParser()`][CreateParser()_1] method, and handles errors manually so it can show a dialog with the error message
+and a help button, and show the usage help only if that button was clicked, or the `-Help` argument
+was used.
 
 To use as much of the built-in usage help generation as possible, this sample uses a class derived
 from the [`UsageWriter`][] class (see [HtmlUsageWriter.cs](HtmlUsageWriter.cs)) that wraps the
@@ -20,8 +21,8 @@ The sample uses a simple CSS stylesheet to format the usage help; you can make t
 like, of course.
 
 This is by no means the only way. Since all the information needed to generate usage help is
-available in the [`CommandLineParser<T>`][] class, you could for example use a custom XAML page to show
-the usage help.
+available in the [`CommandLineParser<T>`][] class, you could for example use a custom XAML page to
+show the usage help.
 
 This sample also defines a custom `-Version` argument; the automatic one that gets added by
 Ookii.CommandLine writes to the console, so it isn't useful here. This manual implementation shows
@@ -32,6 +33,7 @@ A similar approach would work for Windows Forms, or any other GUI framework.
 This application is very basic; it's just a sample, and I don't do a lot of GUI work nowadays. It's
 just intended to show how the [`UsageWriter`][] can be adapted to work in the context of a GUI app.
 
-[`CommandLineParser.Parse<T>()`]: https://www.ookii.org/docs/commandline-3.1/html/M_Ookii_CommandLine_CommandLineParser_Parse__1.htm
-[`CommandLineParser<T>`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_CommandLineParser_1.htm
-[`UsageWriter`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_UsageWriter.htm
+[`CommandLineParser<T>`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_CommandLineParser_1.htm
+[`UsageWriter`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_UsageWriter.htm
+[CreateParser()_1]: https://www.ookii.org/docs/commandline-4.0/html/M_Ookii_CommandLine_IParserProvider_1_CreateParser.htm
+[Parse()_7]: https://www.ookii.org/docs/commandline-4.0/html/Overload_Ookii_CommandLine_IParser_1_Parse.htm

@@ -1,7 +1,7 @@
 # Custom usage sample
 
 This sample shows the flexibility of Ookii.CommandLine's usage help generation. It uses a custom
-[`UsageWriter`][], along with a custom `LocalizedStringProvider`, to completely transform the way
+[`UsageWriter`][], along with a custom [`LocalizedStringProvider`][], to completely transform the way
 the usage help looks.
 
 This sample also uses long/short parsing mode, but everything in it is applicable to default mode as
@@ -50,4 +50,5 @@ If you compare this with the usage output of the [parser sample](../Parser), whi
 output format, you can see just how much you can change by simply overriding some methods on the
 [`UsageWriter`][] class.
 
-[`UsageWriter`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_UsageWriter.htm
+[`LocalizedStringProvider`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_LocalizedStringProvider.htm
+[`UsageWriter`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_UsageWriter.htm

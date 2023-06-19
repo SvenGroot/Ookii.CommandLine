@@ -1,6 +1,5 @@
 ﻿using Ookii.CommandLine;
 using Ookii.CommandLine.Validation;
-using System;
 using System.ComponentModel;
 
 namespace ParserSample;
@@ -13,9 +12,15 @@ namespace ParserSample;
 //
 // We add a friendly name for the application, used by the "-Version" argument, and a description
 // used when displaying usage help.
+//
+// The GeneratedParserAttribute indicates this class uses source generation, building the parser at
+// compile time instead of during runtime. This gives us improved performance, some additional
+// features, and compile-time errors and warnings. Arguments classes that use the
+// GeneratedParserAttribute must be partial.
+[GeneratedParser]
 [ApplicationFriendlyName("Ookii.CommandLine Sample")]
 [Description("Sample command line application. The application parses the command line and prints the results, but otherwise does nothing and none of the arguments are actually used for anything.")]
-class ProgramArguments
+partial class ProgramArguments
 {
     // This property defines a required positional argument called "-Source".
     //
@@ -31,26 +36,34 @@ class ProgramArguments
     // fails.
     //
     // We add a description that will be shown when displaying usage help.
-    [CommandLineArgument(Position = 0, IsRequired = true)]
+    [CommandLineArgument(IsPositional = true)]
     [Description("The source data.")]
-    public string? Source { get; set; }
+    public required string Source { get; set; }
+
+    // If not using .Net 7 and C# 11 or later, the required keyword is not available. In that case,
+    // use the following to create a required argument:
+    // [CommandLineArgument(IsRequired = true, IsPositional = true)]
+    // [Description("The source data.")]
+    // public string? Source { get; set; }
+
 
     // This property defines a required positional argument called "-Destination".
-    [CommandLineArgument(Position = 1, IsRequired = true)]
+    [CommandLineArgument(IsPositional = true)]
     [Description("The destination data.")]
-    public string? Destination { get; set; }
+    public required string Destination { get; set; }
 
-    // This property defines a optional positional argument called "-OperationIndex". If the argument
-    // is not supplied, this property will be set to the default value 1.
+    // This property defines a optional positional argument called "-OperationIndex". If the
+    // argument is not supplied, this property will be set to the default value 1. This default
+    // value will also be shown in the usage help.
     //
     // The argument's type is "int", so only valid integer values will be accepted. Anything else
     // will cause an error.
     //
     // For types other than string, Ookii.CommandLine can use any type with a public static Parse
     // method (preferably ISpanParsable<T> in .Net 7), or with a constructor that takes a string.
-    [CommandLineArgument(Position = 2, DefaultValue = 1)]
+    [CommandLineArgument(IsPositional = true)]
     [Description("The operation's index.")]
-    public int OperationIndex { get; set; }
+    public int OperationIndex { get; set; } = 1;
 
     // This property defines an argument named "-Date". This argument is not positional, so it can
     // only be supplied by name, for example as "-Date 1969-07-20".
@@ -59,7 +72,7 @@ class ProgramArguments
     // supplied, rather than having to choose a default value. Since there is no default value, the
     // CommandLineParser won't set this property at all if the argument is not supplied.
     //
-    // The type conversion from string to DateTime is culture sensitive. The CommandLineParser
+    // The conversion from string to DateTime is culture sensitive. The CommandLineParser
     // defaults to CultureInfo.InvariantCulture to ensure a consistent experience regardless of the
     // user's culture, though you can change that if you want.
     [CommandLineArgument]
@@ -93,6 +106,11 @@ class ProgramArguments
     //
     // This argument has an alias, so it can also be specified using "-v" instead of its regular
     // name. An argument can have multiple aliases by specifying the Alias attribute more than once.
+    //
+    // Any unique prefix of an argument name or alias is also an alias, unless
+    // ParseOptions.AutoPrefixAliases is set to false. The prefix "v", however, is not unique, since
+    // it could be for either "-Verbose" or "-Version", so it won't work unless specifically added
+    // as an alias. However, e.g. "-Verb" will work as an alias automatically.
     [CommandLineArgument]
     [Description("Print verbose information; this is an example of a switch argument.")]
     [Alias("v")]
@@ -126,35 +144,4 @@ class ProgramArguments
     [Description("This is an argument using an enumeration type.")]
     [ValidateEnumValue]
     public DayOfWeek? Day { get; set; }
-
-    // Using a static creation function for a command line arguments class is not required, but it's
-    // a convenient way to place all command-line related functionality in one file. To parse the
-    // arguments (eg. from the Main method) you only need to call this function.
-    public static ProgramArguments? Parse()
-    {
-        // Many aspects of the parsing behavior and usage help generation can be customized using
-        // the ParseOptions. You can also use the ParseOptionsAttribute for some of them (see the
-        // LongShort sample for an example of that).
-        var options = new ParseOptions()
-        {
-            // If you have a lot of arguments, showing full help if there's a parsing error can make
-            // the error message hard to spot. We set it to show syntax only here, and require the
-            // use of the "-Help" argument for full help.
-            ShowUsageOnError = UsageHelpRequest.SyntaxOnly,
-            // By default, repeating an argument more than once (except for multi-value arguments),
-            // causes an error. By changing this option, we set it to show a warning instead, and
-            // use the last value supplied.
-            DuplicateArguments = ErrorMode.Warning,
-        }; 
-
-        // The static Parse method parses the arguments, handles errors, and shows usage help if
-        // necessary (using a LineWrappingTextWriter to neatly white-space wrap console output).
-        // 
-        // It takes the arguments from Environment.GetCommandLineArgs(), but also has an overload
-        // that takes a string[] array, if you prefer.
-        //
-        // If you want more control over parsing and error handling, you can create an instance of
-        // the CommandLineParser<T> class. See docs/ParsingArguments.md for an example of that.
-        return CommandLineParser.Parse<ProgramArguments>(options);
-    }
 }

@@ -1,9 +1,21 @@
-﻿// Ookii.CommandLine is easy to use with top-level statements too.
-using CustomUsage;
+﻿using CustomUsage;
 using Ookii.CommandLine;
 
-// Parse the arguments. See ProgramArguments.cs for the definitions.
-var arguments = ProgramArguments.Parse();
+// Not all options can be set with the ParseOptionsAttribute.
+var options = new ParseOptions()
+{
+    // Set the value description of all int arguments to "number", instead of doing it
+    // separately on each argument.
+    DefaultValueDescriptions = new Dictionary<Type, string>()
+    {
+        { typeof(int), "number" }
+    },
+    // Use our own string provider and usage writer for the custom usage strings.
+    StringProvider = new CustomStringProvider(),
+    UsageWriter = new CustomUsageWriter(),
+};
+
+var arguments = ProgramArguments.Parse(options);
 
 // No need to do anything when the value is null; Parse() already printed errors and
 // usage to the console. We return a non-zero value to indicate failure.

@@ -10,26 +10,23 @@ namespace CustomUsage;
 // This sample sets the mode, case sensitivity and name transform to use POSIX conventions.
 //
 // See the Parse() method below to see how the usage customization is applied.
+[GeneratedParser]
 [ApplicationFriendlyName("Ookii.CommandLine Long/Short Mode Sample")]
 [Description("Sample command line application with highly customized usage help. The application parses the command line and prints the results, but otherwise does nothing and none of the arguments are actually used for anything.")]
-[ParseOptions(Mode = ParsingMode.LongShort,
-    ArgumentNameTransform = NameTransform.DashCase,
-    ValueDescriptionTransform = NameTransform.DashCase,
-    CaseSensitive = true,
-    DuplicateArguments = ErrorMode.Warning)]
-class ProgramArguments
+[ParseOptions(IsPosix = true, DuplicateArguments = ErrorMode.Warning)]
+partial class ProgramArguments
 {
-    [CommandLineArgument(Position = 0, IsRequired = true, IsShort = true)]
+    [CommandLineArgument(IsPositional = true, IsShort = true)]
     [Description("The source data.")]
-    public string? Source { get; set; }
+    public required string Source { get; set; }
 
-    [CommandLineArgument(Position = 1, IsRequired = true, IsShort = true)]
+    [CommandLineArgument(IsPositional = true, IsShort = true)]
     [Description("The destination data.")]
-    public string? Destination { get; set; }
+    public required string Destination { get; set; }
 
-    [CommandLineArgument(DefaultValue = 1)]
+    [CommandLineArgument(IsPositional = true)]
     [Description("The operation's index.")]
-    public int OperationIndex { get; set; }
+    public int OperationIndex { get; set; } = 1;
 
     [CommandLineArgument(ShortName = 'D')]
     [Description("Provides a date to the application.")]
@@ -57,23 +54,4 @@ class ProgramArguments
     [Description("This is an example of a multi-value argument, which can be repeated multiple times to set more than one value.")]
     [MultiValueSeparator]
     public string[]? Values { get; set; }
-
-    public static ProgramArguments? Parse()
-    {
-        // Not all options can be set with the ParseOptionsAttribute.
-        var options = new ParseOptions()
-        {
-            // Set the value description of all int arguments to "number", instead of doing it
-            // separately on each argument.
-            DefaultValueDescriptions = new Dictionary<Type, string>()
-            {
-                { typeof(int), "number" }
-            },
-            // Use our own string provider and usage writer for the custom usage strings.
-            StringProvider = new CustomStringProvider(),
-            UsageWriter = new CustomUsageWriter(),
-        };
-
-        return CommandLineParser.Parse<ProgramArguments>(options);
-    }
 }
