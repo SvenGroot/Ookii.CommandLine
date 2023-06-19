@@ -4,10 +4,17 @@ This sample is a simple demonstration of subcommands. The sample application def
 `read`, and `write`, which can be used to read or write a file, respectively.
 
 The sample shows how to use both synchronous and asynchronous commands, and also contains an example
-of a custom [`TypeConverter`][], used for the [`Encoding`][Encoding_1] class.
+of a custom [`ArgumentConverter`][], used for the [`Encoding`][Encoding_1] class.
 
 For detailed information, check the source of the [`ReadCommand`](ReadCommand.cs) class, the
 [`WriteCommand`](WriteCommand.cs) class, and the [`Main()`](Program.cs) method to see it works.
+
+This application uses [source generation](../../../docs/SourceGeneration.md) for both the commands,
+and for the [`CommandManager`][] to find all commands and arguments at compile time. This enables
+the application to be safely trimmed. A publish profile for Visual Studio that trims the application
+is included so you can try this out, or you can run `dotnet publish --self-contained` in the
+project's folder. This also works for applications without subcommands, even though this is the only
+sample that demonstrates this.
 
 When invoked without arguments, a subcommand application prints the list of commands.
 
@@ -32,7 +39,7 @@ Run 'Subcommand <command> -Help' for more information about a command.
 ```
 
 Like the usage help format for arguments, the command list format can also be customized using the
-`UsageWriter` class. If the console is capable, the command list also uses color.
+[`UsageWriter`][] class. If the console is capable, the command list also uses color.
 
 If we run `./Subcommand write -Help`, we get the following:
 
@@ -72,11 +79,13 @@ there is an automatic `version` command, which has the same function. We can see
 `./Subcommand version`:
 
 ```text
-Ookii.CommandLine Subcommand Sample 3.0.0
+Ookii.CommandLine Subcommand Sample 4.0.0
 Copyright (c) Sven Groot (Ookii.org)
 This is sample code, so you can use it freely.
 ```
 
-[`CommandLineParser`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_CommandLineParser.htm
-[`TypeConverter`]: https://learn.microsoft.com/dotnet/api/system.componentmodel.typeconverter
+[`ArgumentConverter`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Conversion_ArgumentConverter.htm
+[`CommandLineParser`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_CommandLineParser.htm
+[`CommandManager`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Commands_CommandManager.htm
+[`UsageWriter`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_UsageWriter.htm
 [Encoding_1]: https://learn.microsoft.com/dotnet/api/system.text.encoding

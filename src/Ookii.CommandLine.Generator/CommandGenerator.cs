@@ -204,7 +204,7 @@ internal class CommandGenerator
             }
             else
             {
-                builder.AppendArgument($"createParser: options => new CommandLineParser<{commandTypeName}>(options)");
+                builder.AppendArgument($"createParser: options => new Ookii.CommandLine.CommandLineParser<{commandTypeName}>(options)");
             }
         }
 

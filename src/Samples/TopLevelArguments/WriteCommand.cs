@@ -13,15 +13,15 @@ namespace TopLevelArguments;
 partial class WriteCommand : AsyncCommandBase
 {
     // Positional multi-value argument to specify the text to write
-    [CommandLineArgument(Position = 0)]
+    [CommandLineArgument(IsPositional = true)]
     [Description("The lines of text to write to the file; if no lines are specified, this application will read from standard input instead.")]
     public string[]? Lines { get; set; }
 
     // An argument that specifies the maximum line length of the output.
-    [CommandLineArgument(DefaultValue = 79, IsShort = true)]
+    [CommandLineArgument(IsShort = true)]
     [Description("The maximum length of the lines in the file, or 0 to have no limit.")]
     [ValidateRange(0, null)]
-    public int MaximumLineLength { get; set; }
+    public int MaximumLineLength { get; set; } = 79;
 
     // A switch argument that indicates it's okay to overwrite files.
     [CommandLineArgument(IsShort = true)]

@@ -1,12 +1,11 @@
 ﻿using Ookii.CommandLine;
 using Ookii.CommandLine.Conversion;
-using System;
 using System.Globalization;
 using System.Text;
 
 namespace TopLevelArguments;
 
-// A ArgumentConverter for the Encoding class, using the utility base class provided by
+// An ArgumentConverter for the Encoding class, using the utility base class provided by
 // Ookii.CommandLine.
 internal class EncodingConverter : ArgumentConverter
 {

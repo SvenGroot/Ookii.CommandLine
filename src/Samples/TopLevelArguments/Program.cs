@@ -17,31 +17,19 @@ static class Program
         // output. CommandOptions inherits from ParseOptions so it supports all the same options.
         var commandOptions = new CommandOptions()
         {
-            // Use POSIX rules
-            Mode = ParsingMode.LongShort,
-            ArgumentNameComparison = StringComparison.InvariantCulture,
-            ArgumentNameTransform = NameTransform.DashCase,
-            ValueDescriptionTransform = NameTransform.DashCase,
-            CommandNameComparison = StringComparison.InvariantCulture,
-            CommandNameTransform = NameTransform.DashCase,
+            IsPosix = true,
             // The top-level arguments will have a -Version argument, so no need for a version
             // command.
             AutoVersionCommand = false,
             UsageWriter = commandUsageWriter,
         };
 
-        // Create a CommandManager for the commands in the current assembly.
-        //
-        // In addition to our commands, it will also have an automatic "version" command (this can
-        // be disabled with the options).
         var manager = new GeneratedManager(commandOptions);
+
+        // Use different options for the top-level arguments.
         var parseOptions = new ParseOptions()
         {
-            // Use POSIX rules
-            Mode = ParsingMode.LongShort,
-            ArgumentNameComparison = StringComparison.InvariantCultureIgnoreCase,
-            ArgumentNameTransform = NameTransform.DashCase,
-            ValueDescriptionTransform = NameTransform.DashCase,
+            IsPosix = true,
             // Modified usage format to list commands as well as top-level usage.
             UsageWriter = new TopLevelUsageWriter(manager)
         };

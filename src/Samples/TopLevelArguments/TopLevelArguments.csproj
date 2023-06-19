@@ -21,4 +21,5 @@ This is sample code, so you can use it freely.</Copyright>
                       OutputItemType="Analyzer"
                       ReferenceOutputAssembly="false" />
   </ItemGroup>
+
 </Project>

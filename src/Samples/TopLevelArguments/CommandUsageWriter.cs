@@ -10,11 +10,6 @@ class CommandUsageWriter : UsageWriter
     // for that.
     public bool IncludeCommandUsageSyntax { get; set; }
 
-    public CommandUsageWriter()
-    {
-        IncludeCommandHelpInstruction = true;
-    }
-
     // Indicate there are global arguments in the command usage syntax.
     protected override void WriteUsageSyntaxPrefix()
     {

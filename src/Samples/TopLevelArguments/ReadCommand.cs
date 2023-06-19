@@ -16,22 +16,11 @@ partial class ReadCommand : AsyncCommandBase
     {
         try
         {
-            var options = new FileStreamOptions()
-            {
-                Access = FileAccess.Read,
-                Mode = FileMode.Open,
-                Share = FileShare.ReadWrite | FileShare.Delete,
-                Options = FileOptions.Asynchronous
-            };
-
-            using var reader = new StreamReader(Program.Arguments!.Path.FullName, Program.Arguments.Encoding, true, options);
-
             // We use a LineWrappingTextWriter to neatly wrap console output
             using var writer = LineWrappingTextWriter.ForConsoleOut();
 
             // Write the contents of the file to the console.
-            string? line;
-            while ((line = await reader.ReadLineAsync()) != null)
+            await foreach(var line in File.ReadLinesAsync(Program.Arguments!.Path.FullName, Program.Arguments.Encoding))
             {
                 await writer.WriteLineAsync(line);
             }

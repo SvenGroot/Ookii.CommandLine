@@ -11,9 +11,9 @@ namespace NestedCommands;
 internal abstract class BaseCommand : AsyncCommandBase
 {
     // The path argument can be used by any command that inherits from this class.
-    [CommandLineArgument(DefaultValue = "data.json")]
+    [CommandLineArgument]
     [Description("The json file holding the data.")]
-    public string Path { get; set; } = string.Empty;
+    public string Path { get; set; } = "data.json";
 
     // Implement the task's RunAsync method to load the database and handle some errors.
     public override async Task<int> RunAsync()

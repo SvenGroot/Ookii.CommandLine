@@ -1,11 +1,8 @@
 ﻿using Ookii.CommandLine;
 using Ookii.CommandLine.Commands;
 using Ookii.CommandLine.Conversion;
-using System;
 using System.ComponentModel;
-using System.IO;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace SubcommandSample;
 
@@ -20,19 +17,22 @@ namespace SubcommandSample;
 // IAsyncCommand ourselves.
 //
 // Check the Program.cs file to see how this command is invoked.
+[GeneratedParser]
 [Command]
 [Description("Reads and displays data from a file using the specified encoding, wrapping the text to fit the console.")]
-class ReadCommand : AsyncCommandBase
+partial class ReadCommand : AsyncCommandBase
 {
     // A required, positional argument to specify the file name.
-    [CommandLineArgument(Position = 0)]
+    [CommandLineArgument(IsPositional = true)]
     [Description("The path of the file to read.")]
     public required FileInfo Path { get; set; }
 
     // An argument to specify the encoding.
     // Because Encoding doesn't have a default ArgumentConverter, we use a custom one provided in
     // this sample.
-    [CommandLineArgument]
+    // Encoding's ToString() implementation just gives the class name, so don't include the default
+    // value in the usage help; we'll write it ourself instead.
+    [CommandLineArgument(IncludeDefaultInUsageHelp = false)]
     [Description("The encoding to use to read the file. The default value is utf-8.")]
     [ArgumentConverter(typeof(EncodingConverter))]
     public Encoding Encoding { get; set; } = Encoding.UTF8;
@@ -42,22 +42,11 @@ class ReadCommand : AsyncCommandBase
     {
         try
         {
-            var options = new FileStreamOptions()
-            {
-                Access = FileAccess.Read,
-                Mode = FileMode.Open,
-                Share = FileShare.ReadWrite | FileShare.Delete,
-                Options = FileOptions.Asynchronous
-            };
-
-            using var reader = new StreamReader(Path.FullName, Encoding, true, options);
-
             // We use a LineWrappingTextWriter to neatly wrap console output
             using var writer = LineWrappingTextWriter.ForConsoleOut();
 
             // Write the contents of the file to the console.
-            string? line;
-            while ((line = await reader.ReadLineAsync()) != null)
+            await foreach (var line in File.ReadLinesAsync(Path.FullName, Encoding))
             {
                 await writer.WriteLineAsync(line);
             }
