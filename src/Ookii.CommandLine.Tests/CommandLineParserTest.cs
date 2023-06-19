@@ -71,7 +71,7 @@ public partial class CommandLineParserTest
             new ExpectedArgument("arg1", typeof(string)) { MemberName = "Arg1", Position = 0, IsRequired = true, Description = "Arg1 description." },
             new ExpectedArgument("other", typeof(int)) { MemberName = "Arg2", Position = 1, DefaultValue = 42, Description = "Arg2 description.", ValueDescription = "Number" },
             new ExpectedArgument("notSwitch", typeof(bool)) { MemberName = "NotSwitch", Position = 2, DefaultValue = false },
-            new ExpectedArgument("Arg5", typeof(float)) { Position = 3, Description = "Arg5 description." },
+            new ExpectedArgument("Arg5", typeof(float)) { Position = 3, Description = "Arg5 description.", DefaultValue = 1.0f },
             new ExpectedArgument("other2", typeof(int)) { MemberName = "Arg4", Position = 4, DefaultValue = 47, Description = "Arg4 description.", ValueDescription = "Number" },
             new ExpectedArgument("Arg8", typeof(DayOfWeek[]), ArgumentKind.MultiValue) { ElementType = typeof(DayOfWeek), Position = 5 },
             new ExpectedArgument("Arg6", typeof(string)) { Position = null, IsRequired = true, Description = "Arg6 description.", Aliases = new[] { "Alias1", "Alias2" } },
@@ -1373,7 +1373,7 @@ public partial class CommandLineParserTest
         Assert.AreEqual(expected.Length, index);
     }
 
-    private static void TestParse(CommandLineParser<TestArguments> target, string commandLine, string? arg1 = null, int arg2 = 42, bool notSwitch = false, string? arg3 = null, int arg4 = 47, float arg5 = 0.0f, string? arg6 = null, bool arg7 = false, DayOfWeek[]? arg8 = null, int? arg9 = null, bool[]? arg10 = null, bool? arg11 = null, int[]? arg12 = null, Dictionary<string, int>? arg13 = null, Dictionary<string, int>? arg14 = null, KeyValuePair<string, int>? arg15 = null)
+    private static void TestParse(CommandLineParser<TestArguments> target, string commandLine, string? arg1 = null, int arg2 = 42, bool notSwitch = false, string? arg3 = null, int arg4 = 47, float arg5 = 1.0f, string? arg6 = null, bool arg7 = false, DayOfWeek[]? arg8 = null, int? arg9 = null, bool[]? arg10 = null, bool? arg11 = null, int[]? arg12 = null, Dictionary<string, int>? arg13 = null, Dictionary<string, int>? arg14 = null, KeyValuePair<string, int>? arg15 = null)
     {
         string[] args = commandLine.Split(' '); // not using quoted arguments in the tests, so this is fine.
         var result = target.Parse(args);

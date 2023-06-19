@@ -37,13 +37,15 @@ please check the [migration guide](Migrating.md).
   success.
 - The remaining unparsed arguments, if parsing was canceled or encountered an error, are available
   through the [`CommandLineParser.ParseResult`][] property.
-- By default, only usage syntax is shown if a parsing error occurs; the help argument must be used
-  to get full help.
 - Argument validators used before conversion can implement validation on [`ReadOnlySpan<char>`][] for
   better performance.
 - Built-in support for [nested subcommands](Subcommands.md#nested-subcommands).
 - The automatic version argument and command will use the [`AssemblyTitleAttribute`][] if the
   [`ApplicationFriendlyNameAttribute`][] was not used.
+- By default, only usage syntax is shown if a parsing error occurs; the help argument must be used
+  to get full help.
+- Exclude the default value from the usage help on a per argument basis with the
+  [`CommandLineArgumentAttribute.IncludeDefaultInUsageHelp`][] property.
 - Various bug fixes and minor improvements.
 
 ## Ookii.CommandLine 3.1.1
@@ -212,6 +214,7 @@ may require substantial code changes and may change how command lines are parsed
 [`ApplicationFriendlyNameAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_ApplicationFriendlyNameAttribute.htm
 [`ArgumentConverter`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Conversion_ArgumentConverter.htm
 [`AssemblyTitleAttribute`]: https://learn.microsoft.com/dotnet/api/system.reflection.assemblytitleattribute
+[`CommandLineArgumentAttribute.IncludeDefaultInUsageHelp`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_IncludeDefaultInUsageHelp.htm
 [`CommandLineParser.ParseResult`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_CommandLineParser_ParseResult.htm
 [`CommandLineParser`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_CommandLineParser.htm
 [`CommandLineParser<T>.ParseWithErrorHandling()`]: https://www.ookii.org/docs/commandline-4.0/html/M_Ookii_CommandLine_CommandLineParser_1_ParseWithErrorHandling.htm

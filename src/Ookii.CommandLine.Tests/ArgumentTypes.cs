@@ -54,7 +54,8 @@ partial class TestArguments
     public int Arg4 { get; set; }
 
     // Short/long name stuff should be ignored if not using LongShort mode.
-    [CommandLineArgument(Position = 4, ShortName = 'a', IsLong = false), Description("Arg5 description.")]
+    [CommandLineArgument(Position = 4, ShortName = 'a', IsLong = false, DefaultValue = 1.0f, IncludeDefaultInUsageHelp = false)]
+    [Description("Arg5 description.")]
     public float Arg5 { get; set; }
 
     [Alias("Alias1")]

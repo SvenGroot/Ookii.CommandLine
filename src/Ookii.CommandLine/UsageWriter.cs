@@ -1404,7 +1404,7 @@ public class UsageWriter
             WriteArgumentValidators(argument);
         }
 
-        if (IncludeDefaultValueInDescription && argument.DefaultValue != null)
+        if (IncludeDefaultValueInDescription && argument.IncludeDefaultInUsageHelp && argument.DefaultValue != null)
         {
             WriteDefaultValue(argument.DefaultValue);
         }

@@ -289,6 +289,7 @@ public abstract class CommandLineArgument
         public bool IsRequired { get; set; }
         public bool IsRequiredProperty { get; set; }
         public object? DefaultValue { get; set; }
+        public bool IncludeDefaultValueInHelp { get; set; }
         public string? Description { get; set; }
         public string? ValueDescription { get; set; }
         public string? MultiValueSeparator { get; set; }
@@ -393,6 +394,7 @@ public abstract class CommandLineArgument
         Position = info.Position;
         _converter = info.Converter;
         _defaultValue = ConvertToArgumentTypeInvariant(info.DefaultValue);
+        IncludeDefaultInUsageHelp = info.IncludeDefaultValueInHelp;
         _valueDescription = info.ValueDescription;
         _allowDuplicateDictionaryKeys = info.AllowDuplicateDictionaryKeys;
         _allowMultiValueWhiteSpaceSeparator = IsMultiValue && !IsSwitch && info.AllowMultiValueWhiteSpaceSeparator;
@@ -703,6 +705,27 @@ public abstract class CommandLineArgument
     {
         get { return _defaultValue; }
     }
+
+    /// <summary>
+    /// Gets a value that indicates whether the default value should be included in the argument's
+    /// description in the usage help.
+    /// </summary>
+    /// <value>
+    /// <see langword="true"/> if the default value should be shown in the usage help; otherwise,
+    /// <see langword="false"/>.
+    /// </value>
+    /// <remarks>
+    /// <para>
+    ///   This value is set by the <see cref="CommandLineArgumentAttribute.IncludeDefaultInUsageHelp"/>
+    ///   property.
+    /// </para>
+    /// <para>
+    ///   The default value will only be shown if the <see cref="DefaultValue"/> property is not
+    ///   <see langword="null"/>, and if both this property and the <see cref="UsageWriter.IncludeDefaultValueInDescription"/>
+    ///   property are <see langword="true"/>.
+    /// </para>
+    /// </remarks>
+    public bool IncludeDefaultInUsageHelp { get; }
 
     /// <summary>
     /// Gets the description of the argument.
@@ -1220,6 +1243,7 @@ public abstract class CommandLineArgument
             Aliases = GetAliases(aliasAttributes, argumentName),
             ShortAliases = GetShortAliases(shortAliasAttributes, argumentName),
             DefaultValue = attribute.DefaultValue,
+            IncludeDefaultValueInHelp = attribute.IncludeDefaultInUsageHelp,
             IsRequired = attribute.IsRequired || requiredProperty,
             IsRequiredProperty = requiredProperty,
             MemberName = memberName,
@@ -1353,7 +1377,7 @@ public abstract class CommandLineArgument
             return true;
         }
 
-        if (writer.IncludeDefaultValueInDescription && DefaultValue != null)
+        if (writer.IncludeDefaultValueInDescription && IncludeDefaultInUsageHelp && DefaultValue != null)
         {
             return true;
         }
