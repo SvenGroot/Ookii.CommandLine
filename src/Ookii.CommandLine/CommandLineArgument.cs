@@ -412,10 +412,10 @@ public abstract class CommandLineArgument
     public CommandLineParser Parser => _parser;
 
     /// <summary>
-    /// Gets the name of the property, method, or constructor parameter that defined this command line argument.
+    /// Gets the name of the property or method that defined this command line argument.
     /// </summary>
     /// <value>
-    /// The name of the property, method, or constructor parameter that defined this command line argument.
+    /// The name of the property or method that defined this command line argument.
     /// </value>
     public string MemberName
     {
@@ -642,12 +642,13 @@ public abstract class CommandLineArgument
     /// </value>
     /// <remarks>
     /// <para>
-    ///   A positional argument is created either using a constructor parameter on the command line arguments type,
-    ///   or by using the <see cref="CommandLineArgumentAttribute.Position"/> property.
+    ///   A positional argument is created  by using the <see cref="CommandLineArgumentAttribute.Position"/>
+    ///   or <see cref="CommandLineArgumentAttribute.IsPositional"/> property.
     /// </para>
     /// <para>
-    ///   The <see cref="Position"/> property reflects the actual position of the positional argument. For positional
-    ///   arguments created from properties this doesn't need to match the original value of the <see cref="CommandLineArgumentAttribute.Position"/> property.
+    ///   The <see cref="Position"/> property reflects the actual position of the positional argument.
+    ///   This doesn't need to match the original value of the <see cref="CommandLineArgumentAttribute.Position"/>
+    ///   property.
     /// </para>
     /// </remarks>
     public int? Position { get; internal set; }
@@ -656,13 +657,14 @@ public abstract class CommandLineArgument
     /// Gets a value that indicates whether the argument is required.
     /// </summary>
     /// <value>
-    ///   <see langword="true"/> if the argument's value must be specified on the command line; <see langword="false"/> if the argument may be omitted.
+    ///   <see langword="true"/> if the argument's value must be specified on the command line;
+    ///   <see langword="false"/> if the argument may be omitted.
     /// </value>
     /// <remarks>
     /// <para>
-    ///   An argument defined by a constructor parameter is required if the parameter does not
-    ///   have a default value. An argument defined by a property or method is required if its
-    ///   <see cref="CommandLineArgumentAttribute.IsRequired"/> property is <see langword="true"/>.
+    ///   An argument is required if its <see cref="CommandLineArgumentAttribute.IsRequired"/>,
+    ///   property is <see langword="true"/>, or if it was defined by an property with the
+    ///   <c>required</c> keyword available in C# 11 and later.
     /// </para>
     /// </remarks>
     public bool IsRequired
@@ -693,12 +695,12 @@ public abstract class CommandLineArgument
     /// </value>
     /// <remarks>
     /// <para>
-    ///   The default value of an argument defined by a constructor parameter is specified by
-    ///   the default value of that parameter. For an argument defined by a property, the default
-    ///   value is set by the <see cref="CommandLineArgumentAttribute.DefaultValue"/> property.
+    ///   The default value is set by the <see cref="CommandLineArgumentAttribute.DefaultValue"/>
+    ///   property, or when the <see cref="GeneratedParserAttribute"/> is used it can also be
+    ///   specified using a property initializer.
     /// </para>
     /// <para>
-    ///   This value is only used if <see cref="IsRequired"/> is <see langword="false"/>.
+    ///   This value is only used if the <see cref="IsRequired"/> property is <see langword="false"/>.
     /// </para>
     /// </remarks>
     public object? DefaultValue
@@ -739,7 +741,7 @@ public abstract class CommandLineArgument
     /// </para>
     /// <para>
     ///   To set the description of an argument, apply the <see cref="System.ComponentModel.DescriptionAttribute"/>
-    ///   attribute to the constructor parameter, property, or method that defines the argument.
+    ///   attribute to the property or method that defines the argument.
     /// </para>
     /// </remarks>
     public string Description
@@ -1029,7 +1031,7 @@ public abstract class CommandLineArgument
     ///   value types other than <see cref="Nullable{T}"/>. Only on .Net 6.0 and later will the property be
     ///   <see langword="false"/> for non-nullable reference types. Although nullable reference types are available
     ///   on .Net Core 3.x, only .Net 6.0 and later will get this behavior due to the necessary runtime support to
-    ///   determine nullability of a property or constructor argument.
+    ///   determine nullability of a property or method parameter.
     /// </para>
     /// </remarks>
     public bool AllowNull => _allowNull;
@@ -1098,10 +1100,10 @@ public abstract class CommandLineArgument
     ///   Conversion is done by one of several methods. First, if a <see
     ///   cref="ArgumentConverterAttribute"/> was present on the property, or method that
     ///   defined the argument, the specified <see cref="ArgumentConverter"/> is used.
-    ///   Otherwise, the type must implement <see cref="ISpanParsable{TSelf}"/>, or have a
-    ///   static Parse(<see cref="string"/>, <see cref="IFormatProvider"/>) or Parse(<see
-    ///   cref="string"/>) method, or have a constructor that takes a single parameter of type
-    ///   <see cref="string"/>.
+    ///   Otherwise, the type must implement <see cref="ISpanParsable{TSelf}"/>, implement
+    ///   <see cref="IParsable{TSelf}"/>, or have a static Parse(<see cref="string"/>,
+    ///   <see cref="IFormatProvider"/>) or Parse(<see cref="string"/>) method, or have a
+    ///   constructor that takes a single parameter of type <see cref="string"/>.
     /// </para>
     /// </remarks>
     /// <exception cref="ArgumentNullException">
@@ -1462,11 +1464,6 @@ public abstract class CommandLineArgument
         }
 
         return new VersionArgument(parser, argumentName);
-    }
-
-    internal object? GetConstructorParameterValue()
-    {
-        return Value;
     }
 
     internal void ApplyPropertyValue(object target)

@@ -110,8 +110,8 @@ existing application.
   - Optional support for [multi-value arguments](Arguments.md#arguments-with-multiple-values) that
     consume multiple argument tokens without a separator, e.g. `-Value 1 2 3` to assign three
     values.
-  - Arguments classes can [use a constructor parameter](DefiningArguments.md#commandlineparser-injection)
-    to receive the [`CommandLineParser`][] instance they were created with.
+  - Arguments classes can [use a constructor parameter](DefiningArguments.md) to receive the
+    [`CommandLineParser`][] instance they were created with.
   - Added the ability to customize error messages and other strings.
 - Subcommands
   - Renamed "shell commands" to "subcommands" because I never liked the old name.

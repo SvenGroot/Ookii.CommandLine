@@ -778,11 +778,13 @@ public class CommandLineParser
     /// </param>
     /// <remarks>
     ///   <para>
-    ///     The usage help consists of first the <see cref="Description"/>, followed by the usage syntax, followed by a description of all the arguments.
+    ///     The usage help consists of first the <see cref="Description"/>, followed by the usage
+    ///     syntax, followed by a description of all the arguments.
     ///   </para>
     ///   <para>
-    ///     You can add descriptions to the usage text by applying the <see cref="DescriptionAttribute"/> attribute to your command line arguments type,
-    ///     and the constructor parameters and properties defining command line arguments.
+    ///     You can add descriptions to the usage text by applying the <see cref="DescriptionAttribute"/>
+    ///     attribute to your command line arguments type, and the properties and methods defining
+    ///     command line arguments.
     ///   </para>
     ///   <para>
     ///     Color is applied to the output only if the <see cref="UsageWriter"/> instance
@@ -1554,7 +1556,7 @@ public class CommandLineParser
 
         foreach (CommandLineArgument argument in _arguments)
         {
-            // Apply property argument values (this does nothing for constructor or method arguments).
+            // Apply property argument values (this does nothing for method arguments).
             argument.ApplyPropertyValue(commandLineArguments);
         }
 

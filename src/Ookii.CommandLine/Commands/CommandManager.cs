@@ -31,10 +31,8 @@ namespace Ookii.CommandLine.Commands;
 ///   the <see cref="ICommand.Run"/> method to implement the command's functionality.
 /// </para>
 /// <para>
-///   Subcommands classes are instantiated using the <see cref="CommandLineParser"/>, and follow
-///   the same rules as command line arguments classes. They can define command line arguments
-///   using the properties and constructor parameters, which will be the arguments for the
-///   command.
+///   Subcommands classes are instantiated using the <see cref="CommandLineParser"/> class, and
+///   follow the same rules as command line arguments classes.
 /// </para>
 /// <para>
 ///   Commands can be defined in a single assembly, or multiple assemblies.

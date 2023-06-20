@@ -203,8 +203,8 @@ After the usage syntax, the usage help ends with a list of all arguments with th
 descriptions.
 
 The description of an argument can be specified using the [`DescriptionAttribute`][] attribute.
-Apply this attribute to the constructor parameter or property defining the argument. It's strongly
-recommended to add a description to every argument.
+Apply this attribute to the property or method defining the argument. It's strongly recommended to
+add a description to every argument.
 
 ```csharp
 [CommandLineArgument]

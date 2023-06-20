@@ -9,10 +9,7 @@
 ///   then apply the <see cref="CommandAttribute"/> attribute to it.
 /// </para>
 /// <para>
-///   The class will be used as an arguments type with the <see cref="CommandLineParser"/>, so
-///   it can define command line arguments using its properties and constructor parameters.
-/// </para>
-/// <para>
+///   The class will be used as an arguments type with the <see cref="CommandLineParser"/>.
 ///   Alternatively, a command can implement its own argument parsing by implementing the
 ///   <see cref="ICommandWithCustomParsing"/> interface.
 /// </para>
