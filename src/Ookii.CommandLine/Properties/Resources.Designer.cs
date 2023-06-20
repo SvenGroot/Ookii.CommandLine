@@ -70,7 +70,7 @@ namespace Ookii.CommandLine.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The name for argument &apos;{0}&apos; contains a colon (:), which is not allowed..
+        ///   Looks up a localized string similar to The name for argument &apos;{0}&apos; contains one of the name-value separators, which is not allowed..
         /// </summary>
         internal static string ArgumentNameContainsSeparatorFormat {
             get {
@@ -268,15 +268,6 @@ namespace Ookii.CommandLine.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The argument &apos;{0}&apos; has the same position value as the argument &apos;{1}&apos;..
-        /// </summary>
-        internal static string DuplicateArgumentPositionFormat {
-            get {
-                return ResourceManager.GetString("DuplicateArgumentPositionFormat", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Warning: the argument &apos;{0}&apos; was supplied more than once..
         /// </summary>
         internal static string DuplicateArgumentWarningFormat {
@@ -322,7 +313,7 @@ namespace Ookii.CommandLine.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to You must specify at least one name/value separator..
+        ///   Looks up a localized string similar to You must specify at least one name-value separator..
         /// </summary>
         internal static string EmptyNameValueSeparators {
             get {
@@ -439,15 +430,6 @@ namespace Ookii.CommandLine.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The IsSpanValid method must be overridden if CanValidateSpan is set to true..
-        /// </summary>
-        internal static string IsSpanValidNotImplemented {
-            get {
-                return ResourceManager.GetString("IsSpanValidNotImplemented", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to The &apos;minimum&apos; and &apos;maximum&apos; parameters cannot both be null..
         /// </summary>
         internal static string MinMaxBothNull {
@@ -493,29 +475,11 @@ namespace Ookii.CommandLine.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The command line arguments type has more than one constructor with the CommandLineConstructorAttribute attribute..
-        /// </summary>
-        internal static string MultipleMarkedConstructors {
-            get {
-                return ResourceManager.GetString("MultipleMarkedConstructors", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to No argument converter exists for type &apos;{0}&apos;. Use the ArgumentConverterAttribute to specify a custom ArgumentConverter..
+        ///   Looks up a localized string similar to The type &apos;{0}&apos; cannot be be parsed from a string using the default conversion rules. Use the ArgumentConverterAttribute to specify a custom ArgumentConverter..
         /// </summary>
         internal static string NoArgumentConverterFormat {
             get {
                 return ResourceManager.GetString("NoArgumentConverterFormat", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The command line arguments type does not have any public constructors..
-        /// </summary>
-        internal static string NoConstructor {
-            get {
-                return ResourceManager.GetString("NoConstructor", resourceCulture);
             }
         }
         
@@ -529,7 +493,7 @@ namespace Ookii.CommandLine.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to A key/value pair must contain &quot;{0}&quot; as a separator..
+        ///   Looks up a localized string similar to A key-value pair must contain &quot;{0}&quot; as a separator..
         /// </summary>
         internal static string NoKeyValuePairSeparatorFormat {
             get {
@@ -543,15 +507,6 @@ namespace Ookii.CommandLine.Properties {
         internal static string NoLongOrShortName {
             get {
                 return ResourceManager.GetString("NoLongOrShortName", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The command line arguments type has more than one constructor, none of which has the CommandLineConstructorAttribute attribute..
-        /// </summary>
-        internal static string NoMarkedConstructor {
-            get {
-                return ResourceManager.GetString("NoMarkedConstructor", resourceCulture);
             }
         }
         
@@ -583,20 +538,11 @@ namespace Ookii.CommandLine.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The property defining the argument &apos;{0}&apos; doesn&apos;t have a public set accessor..
+        ///   Looks up a localized string similar to The property defining the argument &apos;{0}&apos; does not have a public set accessor..
         /// </summary>
         internal static string PropertyIsReadOnlyFormat {
             get {
                 return ResourceManager.GetString("PropertyIsReadOnlyFormat", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The arguments type {0} has the GeneratedParserAttribute applied, but reflection is being used to create a parser for it. Use the generated {0}.CreateParser() or {0}.Parse() methods to use the generated parser. For subcommands, use the GeneratedCommandManagerAttribute..
-        /// </summary>
-        internal static string ReflectionWithGeneratedParserFormat {
-            get {
-                return ResourceManager.GetString("ReflectionWithGeneratedParserFormat", resourceCulture);
             }
         }
         
@@ -624,15 +570,6 @@ namespace Ookii.CommandLine.Properties {
         internal static string TooManyArguments {
             get {
                 return ResourceManager.GetString("TooManyArguments", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Could not convert type &apos;{0}&apos; to &apos;{1}&apos; for argument &apos;{2}&apos;..
-        /// </summary>
-        internal static string TypeConversionErrorFormat {
-            get {
-                return ResourceManager.GetString("TypeConversionErrorFormat", resourceCulture);
             }
         }
         
@@ -709,7 +646,7 @@ namespace Ookii.CommandLine.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The argument &apos;{0}&apos; must have at most {1} items..
+        ///   Looks up a localized string similar to The argument &apos;{0}&apos; must have at most {1} item(s)..
         /// </summary>
         internal static string ValidateCountMaxFormat {
             get {
@@ -718,7 +655,7 @@ namespace Ookii.CommandLine.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The argument &apos;{0}&apos; must have at least {1} items..
+        ///   Looks up a localized string similar to The argument &apos;{0}&apos; must have at least {1} item(s)..
         /// </summary>
         internal static string ValidateCountMinFormat {
             get {
@@ -736,7 +673,7 @@ namespace Ookii.CommandLine.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Must have at most {0} items..
+        ///   Looks up a localized string similar to Must have at most {0} item(s)..
         /// </summary>
         internal static string ValidateCountUsageHelpMaxFormat {
             get {
@@ -745,7 +682,7 @@ namespace Ookii.CommandLine.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Must have at least {0} items..
+        ///   Looks up a localized string similar to Must have at least {0} item(s)..
         /// </summary>
         internal static string ValidateCountUsageHelpMinFormat {
             get {
@@ -925,7 +862,7 @@ namespace Ookii.CommandLine.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The argument &apos;{0}&apos; must be at most {1} characters..
+        ///   Looks up a localized string similar to The argument &apos;{0}&apos; must be at most {1} character(s)..
         /// </summary>
         internal static string ValidateStringLengthMaxFormat {
             get {
@@ -934,7 +871,7 @@ namespace Ookii.CommandLine.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The argument &apos;{0}&apos; must be at least {1} characters..
+        ///   Looks up a localized string similar to The argument &apos;{0}&apos; must be at least {1} character(s)..
         /// </summary>
         internal static string ValidateStringLengthMinFormat {
             get {
@@ -952,7 +889,7 @@ namespace Ookii.CommandLine.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Must be at most {0} characters..
+        ///   Looks up a localized string similar to Must be at most {0} character(s)..
         /// </summary>
         internal static string ValidateStringLengthUsageHelpMaxFormat {
             get {
@@ -961,7 +898,7 @@ namespace Ookii.CommandLine.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Must be at least {0} characters..
+        ///   Looks up a localized string similar to Must be at least {0} character(s)..
         /// </summary>
         internal static string ValidateStringLengthUsageHelpMinFormat {
             get {
