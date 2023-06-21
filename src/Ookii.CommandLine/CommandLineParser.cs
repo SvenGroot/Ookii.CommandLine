@@ -15,27 +15,26 @@ using System.Runtime.InteropServices;
 namespace Ookii.CommandLine;
 
 /// <summary>
-/// Parses command line arguments defined by a class of the specified type.
+/// Parses command line arguments defined by a type's properties and methods.
 /// </summary>
 /// <remarks>
 /// <para>
-///   The <see cref="CommandLineParser"/> class can parse a set of command line arguments into
-///   values. Which arguments are accepted is determined from the properties and methods of the
-///   type passed to the <see cref="CommandLineParser(Type, ParseOptions)"/> constructor. The
-///   result of a parsing operation is an instance of that type, created using the values that
-///   were supplied on the command line.
+///   The <see cref="CommandLineParser"/> class parses command line arguments into named,
+///   strongly-typed values. The accepted arguments are defined by the properties and methods of the
+///   type passed to the <see cref="CommandLineParser(Type, ParseOptions)"/> constructor. The result
+///   of a parsing operation is an instance of that type, created using the values that were
+///   supplied on the command line.
 /// </para>
 /// <para>
-///   The arguments type must have a constructor that has no parameter, or a single parameter
-///   with the type <see cref="CommandLineParser"/>, which will be passed the instance of the
-///   <see cref="CommandLineParser"/> class that was used to parse the arguments when the type
-///   is instantiated.
+///   The arguments type must have a constructor that has no parameters, or a single parameter
+///   with the type <see cref="CommandLineParser"/>, which will receive the instance of the
+///   <see cref="CommandLineParser"/> class that was used to parse the arguments.
 /// </para>
 /// <para>
 ///   A property defines a command line argument if it is <see langword="public"/>, not
 ///   <see langword="static"/>, and has the <see cref="CommandLineArgumentAttribute"/> attribute
-///   defined. The properties of the argument are determined by the properties of the
-///   <see cref="CommandLineArgumentAttribute"/> class.
+///   applied. The <see cref="CommandLineArgumentAttribute"/> attribute has properties to
+///   determine the behavior of the argument, such as whether it's required or positional.
 /// </para>
 /// <para>
 ///   A method defines a command line argument if it is <see langword="public"/>, <see langword="static"/>,
@@ -44,23 +43,21 @@ namespace Ookii.CommandLine;
 ///   attribute.
 /// </para>
 /// <para>
-///   To parse arguments, invoke the <see cref="Parse()"/> method or one of its overloads.
-///   The static <see cref="Parse{T}(ParseOptions)"/> method is a helper that will
-///   parse arguments and print error and usage information if required. Calling this method
-///   will be sufficient for most use cases.
+///   To parse arguments, invoke the <see cref="Parse()"/> method or one of its overloads, or use
+///   <see cref="ParseWithErrorHandling()"/> or one of its overloads to automatically handle
+///   errors and print usage help when requested.
 /// </para>
 /// <para>
-///   The derived type <see cref="CommandLineParser{T}"/> also provides strongly-typed instance
-///   <see cref="CommandLineParser{T}.Parse()"/> methods, if you don't wish to use the static
+///   The static <see cref="Parse{T}(ParseOptions)"/> method is a helper that create a
+///   <see cref="CommandLineParser"/> instance, and parse arguments with error handling in a single
+///   call. If using source generation with the <see cref="GeneratedParserAttribute"/> attribute,
+///   you can also use the generated <see cref="IParser{TSelf}.Parse(Ookii.CommandLine.ParseOptions?)" qualifyHint="true"/>
 ///   method.
 /// </para>
 /// <para>
-///   The <see cref="CommandLineParser"/> class can generate detailed usage help for the
-///   defined arguments, which can be shown to the user to provide information about how to
-///   invoke your application from the command line. This usage is shown automatically by the
-///   <see cref="Parse{T}(ParseOptions?)"/> method and the <see cref="CommandManager"/> class,
-///   or you can use the <see cref="WriteUsage"/> and <see cref="GetUsage"/> methods to generate
-///   it manually.
+///   The derived type <see cref="CommandLineParser{T}"/> provides strongly-typed instance <see
+///   cref="CommandLineParser{T}.Parse()"/> and <see cref="CommandLineParser{T}.ParseWithErrorHandling()" qualifyHint="true"/>
+///   methods, if you don't wish to use the static methods.
 /// </para>
 /// <para>
 ///   The <see cref="CommandLineParser"/> class is for applications with a single (root) command.
@@ -69,15 +66,15 @@ namespace Ookii.CommandLine;
 /// </para>
 /// <para>
 ///   The <see cref="CommandLineParser"/> supports two sets of rules for how to parse arguments;
-///   <see cref="ParsingMode.Default"/> mode and <see cref="ParsingMode.LongShort"/> mode. For
+///   <see cref="ParsingMode.Default" qualifyHint="true"/> mode and <see cref="ParsingMode.LongShort" qualifyHint="true"/> mode. For
 ///   more details on these rules, please see
-///   <see href="https://www.github.com/SvenGroot/ookii.commandline">the documentation on GitHub</see>.
+///   <see href="https://www.github.com/SvenGroot/Ookii.CommandLine">the documentation on GitHub</see>.
 /// </para>
 /// </remarks>
 /// <threadsafety static="true" instance="false"/>
 /// <seealso cref="CommandLineParser{T}"/>
 /// <seealso cref="CommandManager"/>
-/// <seealso href="https://www.github.com/SvenGroot/ookii.commandline">Usage documentation</seealso>
+/// <seealso href="https://www.github.com/SvenGroot/Ookii.CommandLine">Usage documentation</seealso>
 public class CommandLineParser
 {
     #region Nested types
@@ -204,7 +201,7 @@ public class CommandLineParser
 
     /// <summary>
     /// Gets the default prefix used for long argument names if <see cref="Mode"/> is
-    /// <see cref="ParsingMode.LongShort"/>.
+    /// <see cref="ParsingMode.LongShort" qualifyHint="true"/>.
     /// </summary>
     /// <value>
     /// The default long argument name prefix, which is '--'.
@@ -222,18 +219,18 @@ public class CommandLineParser
     /// </summary>
     /// <remarks>
     /// <para>
-    ///   If the event handler sets the <see cref="CancelEventArgs.Cancel"/> property to <see langword="true"/>, command line processing will stop immediately,
+    ///   If the event handler sets the <see cref="CancelEventArgs.Cancel" qualifyHint="true"/> property to <see langword="true"/>, command line processing will stop immediately,
     ///   and the <see cref="Parse(string[],int)"/> method will return <see langword="null"/>. The
     ///   <see cref="HelpRequested"/> property will be set to <see langword="true"/> automatically.
     /// </para>
     /// <para>
-    ///   If the argument used <see cref="ArgumentKind.Method"/> and the argument's method
-    ///   canceled parsing, the <see cref="CancelEventArgs.Cancel"/> property will already be
+    ///   If the argument used <see cref="ArgumentKind.Method" qualifyHint="true"/> and the argument's method
+    ///   canceled parsing, the <see cref="CancelEventArgs.Cancel" qualifyHint="true"/> property will already be
     ///   true when the event is raised. In this case, the <see cref="HelpRequested"/> property
     ///   will not automatically be set to <see langword="true"/>.
     /// </para>
     /// <para>
-    ///   This event is invoked after the <see cref="CommandLineArgument.Value"/> and <see cref="CommandLineArgument.UsedArgumentName"/> properties have been set.
+    ///   This event is invoked after the <see cref="CommandLineArgument.Value" qualifyHint="true"/> and <see cref="CommandLineArgument.UsedArgumentName" qualifyHint="true"/> properties have been set.
     /// </para>
     /// </remarks>
     public event EventHandler<ArgumentParsedEventArgs>? ArgumentParsed;
@@ -277,8 +274,9 @@ public class CommandLineParser
     /// <para>
     ///   This constructor uses reflection to determine the arguments defined by the type indicated
     ///   by <paramref name="argumentsType"/> at runtime, unless the type has the
-    ///   <see cref="GeneratedParserAttribute"/> applied. In that case, you can also use the
-    ///   generated static <c>CreateParser()</c> or <c>Parse()</c> methods on that type instead.
+    ///   <see cref="GeneratedParserAttribute"/> applied. For a type using that attribute, you can
+    ///   also use the generated static <see cref="IParserProvider{TSelf}.CreateParser" qualifyHint="true"/> or 
+    ///   <see cref="IParser{TSelf}.Parse(ParseOptions?)" qualifyHint="true"/> methods on the arguments class instead.
     /// </para>
     /// <para>
     ///   If the <paramref name="options"/> parameter is not <see langword="null"/>, the
@@ -316,10 +314,13 @@ public class CommandLineParser
     /// <exception cref="NotSupportedException">
     ///   The <see cref="CommandLineParser"/> cannot use <paramref name="provider"/> for the command
     ///   line arguments, because it violates one of the rules concerning argument names or
-    ///   positions, or has an argument type that cannot
-    ///   be parsed.
+    ///   positions, or has an argument type that cannot be parsed.
     /// </exception>
     /// <remarks>
+    /// <para>
+    ///   This constructor supports source generation, and should not typically be used directly
+    ///   by application code.
+    /// </para>
     /// <para>
     ///   If the <paramref name="options"/> parameter is not <see langword="null"/>, the
     ///   instance passed in will be modified to reflect the options from the arguments class's
@@ -385,11 +386,11 @@ public class CommandLineParser
     /// Gets the command line argument parsing rules used by the parser.
     /// </summary>
     /// <value>
-    /// The <see cref="Ookii.CommandLine.ParsingMode"/> for this parser. The default is
-    /// <see cref="ParsingMode.Default"/>.
+    /// The <see cref="Ookii.CommandLine.ParsingMode" qualifyHint="true"/> for this parser. The default is
+    /// <see cref="ParsingMode.Default" qualifyHint="true"/>.
     /// </value>
-    /// <seealso cref="ParseOptionsAttribute.Mode"/>
-    /// <seealso cref="ParseOptions.Mode"/>
+    /// <seealso cref="ParseOptionsAttribute.Mode" qualifyHint="true"/>
+    /// <seealso cref="ParseOptions.Mode" qualifyHint="true"/>
     public ParsingMode Mode => _mode;
 
     /// <summary>
@@ -400,34 +401,36 @@ public class CommandLineParser
     /// </value>
     /// <remarks>
     /// <para>
-    ///   The argument name prefixes are used to distinguish argument names from positional argument values in a command line.
+    ///   The argument name prefixes are used to distinguish argument names from positional argument
+    ///   values in a command line.
     /// </para>
     /// <para>
-    ///   These prefixes will be used for short argument names if the <see cref="Mode"/>
-    ///   property is <see cref="ParsingMode.LongShort"/>. Use <see cref="LongArgumentNamePrefix"/>
+    ///   If the <see cref="Mode"/> property is <see cref="ParsingMode.LongShort" qualifyHint="true"/>, these are the
+    ///   prefixes for short argument names. Use the <see cref="LongArgumentNamePrefix"/> property
     ///   to get the prefix for long argument names.
     /// </para>
     /// </remarks>
-    /// <seealso cref="ParseOptionsAttribute.ArgumentNamePrefixes"/>
-    /// <seealso cref="ParseOptions.ArgumentNamePrefixes"/>
+    /// <seealso cref="ParseOptionsAttribute.ArgumentNamePrefixes" qualifyHint="true"/>
+    /// <seealso cref="ParseOptions.ArgumentNamePrefixes" qualifyHint="true"/>
     public ImmutableArray<string> ArgumentNamePrefixes => _argumentNamePrefixes;
 
     /// <summary>
     /// Gets the prefix to use for long argument names.
     /// </summary>
     /// <value>
-    /// The prefix for long argument names, or <see langword="null"/> if <see cref="Mode"/>
-    /// is not <see cref="ParsingMode.LongShort"/>.
+    /// The prefix for long argument names, or <see langword="null"/> if the <see cref="Mode"/>
+    /// property is not <see cref="ParsingMode.LongShort" qualifyHint="true"/>.
     /// </value>
     /// <remarks>
     /// <para>
-    ///   The long argument prefix is only used if <see cref="Mode"/> property is
-    ///   <see cref="ParsingMode.LongShort"/>. See <see cref="ArgumentNamePrefixes"/> to
-    ///   get the prefixes for short argument names.
+    ///   The long argument prefix is only used if the <see cref="Mode"/> property is
+    ///   <see cref="ParsingMode.LongShort" qualifyHint="true"/>. See <see cref="ArgumentNamePrefixes"/> to
+    ///   get the prefixes for short argument names, or for argument names if the <see cref="Mode"/>
+    ///   property is <see cref="ParsingMode.Default" qualifyHint="true"/>.
     /// </para>
     /// </remarks>
-    /// <seealso cref="ParseOptionsAttribute.LongArgumentNamePrefix"/>
-    /// <seealso cref="ParseOptions.LongArgumentNamePrefix"/>
+    /// <seealso cref="ParseOptionsAttribute.LongArgumentNamePrefix" qualifyHint="true"/>
+    /// <seealso cref="ParseOptions.LongArgumentNamePrefix" qualifyHint="true"/>
     public string? LongArgumentNamePrefix => _longArgumentNamePrefix;
 
     /// <summary>
@@ -439,7 +442,7 @@ public class CommandLineParser
     public Type ArgumentsType => _provider.ArgumentsType;
 
     /// <summary>
-    /// Gets the friendly name of the application.
+    /// Gets the friendly name of the application for use in the version information.
     /// </summary>
     /// <value>
     /// The friendly name of the application.
@@ -466,9 +469,9 @@ public class CommandLineParser
     /// </value>
     /// <remarks>
     /// <para>
-    ///   This description will be added to the usage returned by the <see cref="WriteUsage"/>
-    ///   method. This description can be set by applying the <see cref="DescriptionAttribute"/>
-    ///   to the command line arguments type.
+    ///   If not empty, this description will be added to the usage returned by the <see cref="WriteUsage"/>
+    ///   method. This description can be set by applying the <see cref="DescriptionAttribute"/> to
+    ///   the command line arguments type.
     /// </para>
     /// </remarks>
     public string Description => _provider.Description;
@@ -481,11 +484,11 @@ public class CommandLineParser
     /// </value>
     /// <remarks>
     /// <para>
-    ///   If you change the value of the <see cref="ParseOptions.Culture"/>, <see cref="ParseOptions.DuplicateArguments"/>,
-    ///   <see cref="ParseOptions.AllowWhiteSpaceValueSeparator"/>, <see cref="StringProvider"/> or
+    ///   If you change the value of the <see cref="ParseOptions.Culture" qualifyHint="true"/>, <see cref="ParseOptions.DuplicateArguments" qualifyHint="true"/>,
+    ///   <see cref="ParseOptions.AllowWhiteSpaceValueSeparator" qualifyHint="true"/>, <see cref="StringProvider"/> or
     ///   <see cref="UsageWriter"/> property, this will affect the behavior of this instance. The
     ///   other properties of the <see cref="ParseOptions"/> class are only used when the
-    ///   <see cref="CommandLineParser"/> class in constructed, so changing them afterwards will
+    ///   <see cref="CommandLineParser"/> class is constructed, so changing them afterwards will
     ///   have no effect.
     /// </para>
     /// </remarks>
@@ -496,14 +499,14 @@ public class CommandLineParser
     /// </summary>
     /// <value>
     /// The culture used to convert command line argument values from their string representation to the argument type. The default value
-    /// is <see cref="CultureInfo.InvariantCulture"/>.
+    /// is <see cref="CultureInfo.InvariantCulture" qualifyHint="true"/>.
     /// </value>
     /// <remarks>
     /// <para>
     ///   Use the <see cref="ParseOptions"/> class to change this value.
     /// </para>
     /// </remarks>
-    /// <seealso cref="ParseOptions.Culture"/>
+    /// <seealso cref="ParseOptions.Culture" qualifyHint="true"/>
     public CultureInfo Culture => _parseOptions.CultureOrDefault;
 
     /// <summary>
@@ -526,41 +529,45 @@ public class CommandLineParser
     ///   dictionary arguments, which can always be supplied multiple times.
     /// </para>
     /// <para>
-    ///   Use the <see cref="ParseOptions"/> or <see cref="ParseOptionsAttribute "/> class to
+    ///   Use the <see cref="ParseOptions"/> or <see cref="ParseOptionsAttribute"/> class to
     ///   change this value.
     /// </para>
     /// </remarks>
-    /// <see cref="ParseOptionsAttribute.DuplicateArguments"/>
-    /// <see cref="ParseOptions.DuplicateArguments"/>
+    /// <see cref="ParseOptionsAttribute.DuplicateArguments" qualifyHint="true"/>
+    /// <see cref="ParseOptions.DuplicateArguments" qualifyHint="true"/>
     public bool AllowDuplicateArguments => _parseOptions.DuplicateArgumentsOrDefault != ErrorMode.Error;
 
     /// <summary>
-    /// Gets value indicating whether the value of an argument may be in a separate
-    /// argument from its name.
+    /// Gets a value indicating whether the name and the value of an argument may be in separate
+    /// argument tokens.
     /// </summary>
     /// <value>
-    ///   <see langword="true"/> if names and values can be in separate arguments; <see langword="false"/> if the characters
-    ///   specified in the <see cref="NameValueSeparators"/> property must be used. The default
-    ///   value is <see langword="true"/>.
+    ///   <see langword="true"/> if names and values can be in separate tokens; <see langword="false"/>
+    ///   if the characters specified in the <see cref="NameValueSeparators"/> property must be
+    ///   used. The default value is <see langword="true"/>.
     /// </value>
     /// <remarks>
     /// <para>
-    ///   If the <see cref="AllowWhiteSpaceValueSeparator"/> property is <see langword="true"/>,
-    ///   the value of an argument can be separated from its name either by using the characters
-    ///   specified in the <see cref="NameValueSeparators"/> property or by using white space (i.e.
+    ///   If the <see cref="AllowWhiteSpaceValueSeparator"/> property is <see langword="true"/>, the
+    ///   value of an argument can be separated from its name either by using the characters
+    ///   specified in the <see cref="NameValueSeparators"/> property, or by using white space (i.e.
     ///   by having a second argument that has the value). Given a named argument named "Sample",
-    ///   the command lines <c>-Sample:value</c> and <c>-Sample value</c>
-    ///   are both valid and will assign the value "value" to the argument.
+    ///   the command lines <c>-Sample:value</c> and <c>-Sample value</c> are both valid and will
+    ///   assign the value "value" to the argument. In the latter case, the values "-Sample" and
+    ///   "value" will be two separate entry in the <see cref="string"/> array with the unparsed
+    ///   arguments.
     /// </para>
     /// <para>
-    ///   If the <see cref="AllowWhiteSpaceValueSeparator"/> property is <see langword="false"/>, only the characters
-    ///   specified in the <see cref="NameValueSeparators"/> property are allowed to separate the value from the name.
-    ///   The command line <c>-Sample:value</c> still assigns the value "value" to the argument, but for the command line "-Sample value" the argument 
-    ///   is considered not to have a value (which is only valid if <see cref="CommandLineArgument.IsSwitch"/> is <see langword="true"/>), and
-    ///   "value" is considered to be the value for the next positional argument.
+    ///   If the <see cref="AllowWhiteSpaceValueSeparator"/> property is <see langword="false"/>,
+    ///   only the characters specified in the <see cref="NameValueSeparators"/> property are
+    ///   allowed to separate the value from the name. The command line <c>-Sample:value</c> still
+    ///   assigns the value "value" to the argument, but for the command line `-Sample value` the
+    ///   argument is considered not to have a value (which is only valid if
+    ///   <see cref="CommandLineArgument.IsSwitch" qualifyHint="true"/> is <see langword="true"/>), and "value" is
+    ///   considered to be the value for the next positional argument.
     /// </para>
     /// <para>
-    ///   For switch arguments (the <see cref="CommandLineArgument.IsSwitch"/> property is <see langword="true"/>),
+    ///   For switch arguments (the <see cref="CommandLineArgument.IsSwitch" qualifyHint="true"/> property is <see langword="true"/>),
     ///   only the characters specified in the <see cref="NameValueSeparators"/> property are allowed
     ///   to specify an explicit value regardless of the value of the <see cref="AllowWhiteSpaceValueSeparator"/>
     ///   property. Given a switch argument named "Switch"  the command line <c>-Switch false</c>
@@ -569,12 +576,12 @@ public class CommandLineParser
     ///   property is <see langword="true"/>.
     /// </para>
     /// <para>
-    ///   Use the <see cref="ParseOptions"/> or <see cref="ParseOptionsAttribute "/> class to
+    ///   Use the <see cref="ParseOptions"/> or <see cref="ParseOptionsAttribute"/> class to
     ///   change this value.
     /// </para>
     /// </remarks>
-    /// <seealso cref="ParseOptionsAttribute.AllowWhiteSpaceValueSeparator"/>
-    /// <seealso cref="ParseOptions.AllowWhiteSpaceValueSeparator"/>
+    /// <seealso cref="ParseOptionsAttribute.AllowWhiteSpaceValueSeparator" qualifyHint="true"/>
+    /// <seealso cref="ParseOptions.AllowWhiteSpaceValueSeparator" qualifyHint="true"/>
     public bool AllowWhiteSpaceValueSeparator => _parseOptions.AllowWhiteSpaceValueSeparatorOrDefault;
 
     /// <summary>
@@ -585,12 +592,13 @@ public class CommandLineParser
     /// </value>
     /// <remarks>
     /// <para>
-    ///   Use the <see cref="ParseOptions"/> or <see cref="ParseOptionsAttribute "/> class to
+    ///   Use the <see cref="ParseOptions"/> or <see cref="ParseOptionsAttribute"/> class to
     ///   change this value.
     /// </para>
     /// </remarks>
-    /// <seealso cref="ParseOptionsAttribute.NameValueSeparators"/>
-    /// <seealso cref="ParseOptions.NameValueSeparators"/>
+    /// <seealso cref="AllowWhiteSpaceValueSeparator"/>
+    /// <seealso cref="ParseOptionsAttribute.NameValueSeparators" qualifyHint="true"/>
+    /// <seealso cref="ParseOptions.NameValueSeparators" qualifyHint="true"/>
     public ImmutableArray<char> NameValueSeparators => _nameValueSeparators;
 
     /// <summary>
@@ -602,33 +610,34 @@ public class CommandLineParser
     /// </value>
     /// <remarks>
     /// <para>
-    ///   Check this property after calling the <see cref="Parse(string[], int)"/> method
-    ///   to see if usage help should be displayed.
+    ///   Check this property after calling the <see cref="Parse(string[], int)"/> method or one
+    ///   of its overloads to see if usage help should be displayed.
     /// </para>
     /// <para>
-    ///   This property will be <see langword="true"/> if the <see cref="Parse(string[], int)"/>
-    ///   method threw a <see cref="CommandLineArgumentException"/>, if an argument used
-    ///   <see cref="CommandLineArgumentAttribute.CancelParsing"/>, if parsing was canceled
-    ///   using the <see cref="ArgumentParsed"/> event.
+    ///   This property will always be <see langword="false"/> if the <see cref="Parse(string[], int)"/>
+    ///   method returned a non-<see langword="null"/> value.
     /// </para>
     /// <para>
-    ///   If an argument that is defined by a method (<see cref="ArgumentKind.Method"/>) cancels
-    ///   parsing by returning <see langword="false"/> from the method, this property is <em>not</em>
-    ///   automatically set to <see langword="true"/>. Instead, the method should explicitly
-    ///   set the <see cref="HelpRequested"/> property if it wants usage help to be displayed.
+    ///   This property will always be <see langword="true"/> if the <see cref="Parse(string[], int)"/>
+    ///   method threw a <see cref="CommandLineArgumentException"/>, or if an argument used
+    ///   <see cref="CancelMode.Abort" qualifyHint="true"/> with the <see cref="CommandLineArgumentAttribute.CancelParsing" qualifyHint="true"/>
+    ///   property or the <see cref="ArgumentParsed"/> event.
+    /// </para>
+    /// <para>
+    ///   If an argument that is defined by a method (<see cref="ArgumentKind.Method" qualifyHint="true"/>) cancels
+    ///   parsing by returning <see cref="CancelMode.Abort" qualifyHint="true"/> or <see langword="false"/> from the
+    ///   method, this property is <em>not</em> automatically set to <see langword="true"/>.
+    ///   Instead, the method should explicitly set the <see cref="HelpRequested"/> property if it
+    ///   wants usage help to be displayed.
     /// </para>
     /// <code>
     /// [CommandLineArgument]
-    /// public static bool MethodArgument(CommandLineParser parser)
+    /// public static CancelMode MethodArgument(CommandLineParser parser)
     /// {
     ///     parser.HelpRequested = true;
-    ///     return false;
+    ///     return CancelMode.Abort;
     /// }
     /// </code>
-    /// <para>
-    ///   The <see cref="HelpRequested"/> property will always be <see langword="false"/> if
-    ///   <see cref="Parse(string[], int)"/> did not throw and returned a non-null value.
-    /// </para>
     /// </remarks>
     public bool HelpRequested { get; set; }
 
@@ -639,7 +648,7 @@ public class CommandLineParser
     /// <value>
     /// An instance of a class inheriting from the <see cref="LocalizedStringProvider"/> class.
     /// </value>
-    /// <seealso cref="ParseOptions.StringProvider"/>
+    /// <seealso cref="ParseOptions.StringProvider" qualifyHint="true"/>
     public LocalizedStringProvider StringProvider => _parseOptions.StringProvider;
 
     /// <summary>
@@ -652,13 +661,13 @@ public class CommandLineParser
         => ArgumentsType.GetCustomAttributes<ClassValidationAttribute>();
 
     /// <summary>
-    /// Gets the string comparer used for argument names.
+    /// Gets the string comparison used for argument names.
     /// </summary>
     /// <value>
-    /// One of the members of the <see cref="StringComparison"/> enumeration.
+    /// One of the values of the <see cref="StringComparison"/> enumeration.
     /// </value>
-    /// <seealso cref="ParseOptionsAttribute.CaseSensitive"/>
-    /// <seealso cref="ParseOptions.ArgumentNameComparison"/>
+    /// <seealso cref="ParseOptionsAttribute.CaseSensitive" qualifyHint="true"/>
+    /// <seealso cref="ParseOptions.ArgumentNameComparison" qualifyHint="true"/>
     public StringComparison ArgumentNameComparison { get; }
 
     /// <summary>
@@ -672,23 +681,39 @@ public class CommandLineParser
     ///   The <see cref="Arguments"/> property can be used to retrieve additional information about the arguments, including their name, description,
     ///   and default value. Their current value can also be retrieved this way, in addition to using the arguments type directly.
     /// </para>
+    /// <para>
+    ///   To find an argument by name or alias, use the <see cref="GetArgument"/> or
+    ///   <see cref="GetShortArgument"/> method.
+    /// </para>
     /// </remarks>
     public ImmutableArray<CommandLineArgument> Arguments => _arguments;
 
     /// <summary>
-    /// Gets the automatic help argument or an argument with the same name, if there is one.
+    /// Gets the automatic help argument, or an argument with the same name, if there is one.
     /// </summary>
     /// <value>
-    /// A <see cref="CommandLineArgument"/> instance, or <see langword="null"/> if there is no
-    /// argument using the name of the automatic help argument.
+    /// A <see cref="CommandLineArgument"/> instance, or <see langword="null"/> if the automatic
+    /// help argument was disabled using the <see cref="ParseOptions"/> class or the
+    /// <see cref="ParseOptionsAttribute"/> attribute.
     /// </value>
+    /// <remarks>
+    /// <para>
+    ///   If the automatic help argument is enabled, this will return either the created help
+    ///   argument, or the argument that conflicted with its name or one of its aliases, which is
+    ///   assumed to be the argument used to display help in that case.
+    /// </para>
+    /// <para>
+    ///   This is used the <see cref="UsageWriter.WriteMoreInfoMessage" qualifyHint="true"/> method to determine
+    ///   whether to show the message and the actual name of the argument to use.
+    /// </para>
+    /// </remarks>
     public CommandLineArgument? HelpArgument { get; private set; }
 
     /// <summary>
-    /// Gets the result of the last call to the <see cref="Parse(string[], int)"/> method.
+    /// Gets the result of the last command line argument parsing operation.
     /// </summary>
     /// <value>
-    /// An instance of the <see cref="CommandLine.ParseResult"/> class.
+    /// An instance of the <see cref="CommandLine.ParseResult" qualifyHint="true"/> class.
     /// </value>
     /// <remarks>
     /// <para>
@@ -703,7 +728,7 @@ public class CommandLineParser
     /// Gets the kind of provider that was used to determine the available arguments.
     /// </summary>
     /// <value>
-    /// One of the values of the <see cref="Support.ProviderKind"/> enumeration.
+    /// One of the values of the <see cref="Support.ProviderKind" qualifyHint="true"/> enumeration.
     /// </value>
     public ProviderKind ProviderKind => _provider.Kind;
 
@@ -722,19 +747,19 @@ public class CommandLineParser
     /// </returns>
     /// <remarks>
     /// <para>
-    ///   To determine the executable name, this method first checks the <see cref="Environment.ProcessPath"/>
+    ///   To determine the executable name, this method first checks the <see cref="Environment.ProcessPath" qualifyHint="true"/>
     ///   property (if using .Net 6.0 or later). If using the .Net Standard package, or if
-    ///   <see cref="Environment.ProcessPath"/> returns "dotnet", it checks the first item in
-    ///   the array returned by <see cref="Environment.GetCommandLineArgs"/>, and finally falls
+    ///   <see cref="Environment.ProcessPath" qualifyHint="true"/> returns "dotnet", it checks the first item in
+    ///   the array returned by <see cref="Environment.GetCommandLineArgs" qualifyHint="true"/>, and finally falls
     ///   back to the file name of the entry point assembly.
     /// </para>
     /// <para>
     ///   The return value of this function is used as the default executable name to show in
-    ///   the usage syntax when generating usage help, unless overridden by the <see cref="UsageWriter.ExecutableName"/>
+    ///   the usage syntax when generating usage help, unless overridden by the <see cref="UsageWriter.ExecutableName" qualifyHint="true"/>
     ///   property.
     /// </para>
     /// </remarks>
-    /// <seealso cref="UsageWriter.IncludeExecutableExtension"/>
+    /// <seealso cref="UsageWriter.IncludeExecutableExtension" qualifyHint="true"/>
     public static string GetExecutableName(bool includeExtension = false)
     {
         string? path = null;
@@ -773,7 +798,7 @@ public class CommandLineParser
     /// </summary>
     /// <param name="usageWriter">
     ///   The <see cref="UsageWriter"/> to use to create the usage. If <see langword="null"/>,
-    ///   the value from the <see cref="ParseOptions.UsageWriter"/> property in the
+    ///   the value from the <see cref="ParseOptions.UsageWriter" qualifyHint="true"/> property in the
     ///   <see cref="Options"/> property is sued.
     /// </param>
     /// <remarks>
@@ -807,8 +832,8 @@ public class CommandLineParser
     /// </param>
     /// <param name="usageWriter">
     ///   The <see cref="UsageWriter"/> to use to create the usage. If <see langword="null"/>,
-    ///   the value from the <see cref="ParseOptions.UsageWriter"/> property in the
-    ///   <see cref="Options"/> property is sued.
+    ///   the value from the <see cref="ParseOptions.UsageWriter" qualifyHint="true"/> property in the
+    ///   <see cref="Options"/> property is used.
     /// </param>
     /// <returns>
     ///   A string containing usage help for the command line options defined by the type
@@ -824,14 +849,15 @@ public class CommandLineParser
     }
 
     /// <summary>
-    /// Parses the arguments returned by the <see cref="Environment.GetCommandLineArgs"/>
+    /// Parses the arguments returned by the <see cref="Environment.GetCommandLineArgs" qualifyHint="true"/>
     /// method.
     /// </summary>
     /// <returns>
     ///   An instance of the type specified by the <see cref="ArgumentsType"/> property, or
     ///   <see langword="null"/> if argument parsing was canceled by the <see cref="ArgumentParsed"/>
-    ///   event handler, the <see cref="CommandLineArgumentAttribute.CancelParsing"/> property,
-    ///   or a method argument that returned <see langword="false"/>.
+    ///   event handler, the <see cref="CommandLineArgumentAttribute.CancelParsing" qualifyHint="true"/> property,
+    ///   or a method argument that returned <see cref="CancelMode.Abort" qualifyHint="true"/> or
+    ///   <see langword="false"/>.
     /// </returns>
     /// <remarks>
     /// <para>
@@ -840,7 +866,7 @@ public class CommandLineParser
     /// </para>
     /// </remarks>
     /// <exception cref="CommandLineArgumentException">
-    ///   An error occurred parsing the command line. Check the <see cref="CommandLineArgumentException.Category"/>
+    ///   An error occurred parsing the command line. Check the <see cref="CommandLineArgumentException.Category" qualifyHint="true"/>
     ///   property for the exact reason for the error.
     /// </exception>
     public object? Parse()
@@ -898,13 +924,13 @@ public class CommandLineParser
     }
 
     /// <summary>
-    /// Parses the arguments returned by the <see cref="Environment.GetCommandLineArgs"/>
+    /// Parses the arguments returned by the <see cref="Environment.GetCommandLineArgs" qualifyHint="true"/>
     /// method, and displays error messages and usage help if required.
     /// </summary>
     /// <returns>
     ///   An instance of the type specified by the <see cref="ArgumentsType"/> property, or
     ///   <see langword="null"/> if an error occurred, or argument parsing was canceled by the
-    ///   <see cref="CommandLineArgumentAttribute.CancelParsing"/> property or a method argument
+    ///   <see cref="CommandLineArgumentAttribute.CancelParsing" qualifyHint="true"/> property or a method argument
     ///   that returned <see langword="false"/>.
     /// </returns>
     /// <remarks>
@@ -1005,7 +1031,7 @@ public class CommandLineParser
     }
 
     /// <summary>
-    /// Parses the arguments returned by the <see cref="Environment.GetCommandLineArgs"/>
+    /// Parses the arguments returned by the <see cref="Environment.GetCommandLineArgs" qualifyHint="true"/>
     /// method using the type <typeparamref name="T"/>.
     /// </summary>
     /// <typeparam name="T">The type defining the command line arguments.</typeparam>
@@ -1015,8 +1041,9 @@ public class CommandLineParser
     /// </param>
     /// <returns>
     ///   An instance of the type <typeparamref name="T"/>, or <see langword="null"/> if an
-    ///   error occurred, or argument parsing was canceled by the <see cref="CommandLineArgumentAttribute.CancelParsing"/>
-    ///   property or a method argument that returned <see langword="false"/>.
+    ///   error occurred, or argument parsing was canceled by the <see cref="CommandLineArgumentAttribute.CancelParsing" qualifyHint="true"/>
+    ///   property or a method argument that returned <see cref="CancelMode.Abort" qualifyHint="true"/>
+    ///   or <see langword="false"/>.
     /// </returns>
     /// <exception cref="CommandLineArgumentException">
     ///   <inheritdoc cref="Parse()"/>
@@ -1030,32 +1057,34 @@ public class CommandLineParser
     /// <para>
     ///   This is a convenience function that instantiates a <see cref="CommandLineParser"/>,
     ///   calls the <see cref="Parse()"/> method, and returns the result. If an error occurs
-    ///   or parsing is canceled, it prints errors to the <see cref="ParseOptions.Error"/>
+    ///   or parsing is canceled, it prints errors to the <see cref="ParseOptions.Error" qualifyHint="true"/>
     ///   stream, and usage help to the <see cref="UsageWriter"/> if the <see cref="HelpRequested"/>
     ///   property is <see langword="true"/>. It then returns <see langword="null"/>.
     /// </para>
     /// <para>
-    ///   If the <see cref="ParseOptions.Error"/> parameter is <see langword="null"/>, output is
+    ///   If the <see cref="ParseOptions.Error" qualifyHint="true"/> parameter is <see langword="null"/>, output is
     ///   written to a <see cref="LineWrappingTextWriter"/> for the standard error stream,
     ///   wrapping at the console's window width. If the stream is redirected, output may still
-    ///   be wrapped, depending on the value returned by <see cref="Console.WindowWidth"/>.
+    ///   be wrapped, depending on the value returned by <see cref="Console.WindowWidth" qualifyHint="true"/>.
     /// </para>
     /// <para>
-    ///   Color is applied to the output depending on the value of the <see cref="UsageWriter.UseColor"/>
-    ///   property, the <see cref="ParseOptions.UseErrorColor"/> property, and the capabilities
+    ///   Color is applied to the output depending on the value of the <see cref="UsageWriter.UseColor" qualifyHint="true"/>
+    ///   property, the <see cref="ParseOptions.UseErrorColor" qualifyHint="true"/> property, and the capabilities
     ///   of the console.
     /// </para>
     /// <para>
     ///   If you want more control over the parsing process, including custom error/usage output
-    ///   or handling the <see cref="ArgumentParsed"/> event, you should manually create an
-    ///   instance of the <see cref="CommandLineParser{T}"/> class and call its <see cref="CommandLineParser{T}.Parse()"/>
-    ///   method.
+    ///   or handling the <see cref="ArgumentParsed"/> event, you should use the
+    ///   instance <see cref="CommandLineParser{T}.Parse()" qualifyHint="true"/> or
+    ///   <see cref="CommandLineParser{T}.ParseWithErrorHandling()" qualifyHint="true"/> method.
     /// </para>
     /// <para>
     ///   This method uses reflection to determine the arguments defined by the type <typeparamref name="T"/>
-    ///   at runtime, unless the type has the <see cref="GeneratedParserAttribute"/> applied. In
-    ///   that case, you can also use the generated static <c>CreateParser()</c> or <c>Parse()</c>
-    ///   methods on that type instead.
+    ///   at runtime, unless the type has the <see cref="GeneratedParserAttribute"/> applied. For a
+    ///   type using that attribute, you can also use the generated static
+    ///   <see cref="IParserProvider{TSelf}.CreateParser" qualifyHint="true"/> or
+    ///   <see cref="IParser{TSelf}.Parse(ParseOptions?)" qualifyHint="true"/> methods on the
+    ///   arguments class instead.
     /// </para>
     /// </remarks>
 #if NET6_0_OR_GREATER
@@ -1088,14 +1117,8 @@ public class CommandLineParser
     /// <exception cref="ArgumentOutOfRangeException">
     ///   <paramref name="index"/> does not fall within the bounds of <paramref name="args"/>.
     /// </exception>
-    /// <exception cref="InvalidOperationException">
-    ///   <inheritdoc cref="Parse{T}(ParseOptions?)"/>
-    /// </exception>
     /// <exception cref="NotSupportedException">
     ///   <inheritdoc cref="Parse{T}(ParseOptions?)"/>
-    /// </exception>
-    /// <exception cref="CommandLineArgumentException">
-    ///   <inheritdoc cref="Parse()"/>
     /// </exception>
     /// <remarks>
     ///   <inheritdoc cref="Parse{T}(ParseOptions?)"/>
@@ -1132,9 +1155,6 @@ public class CommandLineParser
     /// <exception cref="NotSupportedException">
     ///   <inheritdoc cref="Parse{T}(ParseOptions?)"/>
     /// </exception>
-    /// <exception cref="InvalidOperationException">
-    ///   <inheritdoc cref="Parse{T}(ParseOptions?)"/>
-    /// </exception>
     /// <remarks>
     ///   <inheritdoc cref="Parse{T}(ParseOptions?)"/>
     /// </remarks>
@@ -1155,8 +1175,15 @@ public class CommandLineParser
     /// the argument, or <see langword="null" /> if the argument was not found.</returns>
     /// <exception cref="ArgumentNullException"><paramref name="name"/> is <see langword="null"/>.</exception>
     /// <remarks>
-    ///   If the <see cref="Mode"/> property is <see cref="ParsingMode.LongShort"/>, this uses
+    /// <para>
+    ///   If the <see cref="Mode"/> property is <see cref="ParsingMode.LongShort" qualifyHint="true"/>, this uses
     ///   the long name and long aliases of the argument.
+    /// </para>
+    /// <para>
+    ///   This method only uses the actual names and aliases; it does not consider auto prefix
+    ///   aliases regardless of the value of the <see cref="ParseOptions.AutoPrefixAliases" qualifyHint="true"/>
+    ///   property.
+    /// </para>
     /// </remarks>
     public CommandLineArgument? GetArgument(string name)
     {
@@ -1176,14 +1203,14 @@ public class CommandLineParser
     }
 
     /// <summary>
-    /// Gets a command line argument by short name.
+    /// Gets a command line argument by short name or alias.
     /// </summary>
     /// <param name="shortName">The short name of the argument.</param>
     /// <returns>The <see cref="CommandLineArgument"/> instance containing information about
     /// the argument, or <see langword="null" /> if the argument was not found.</returns>
     /// <remarks>
     /// <para>
-    ///   If <see cref="Mode"/> is not <see cref="ParsingMode.LongShort"/>, this
+    ///   If <see cref="Mode"/> is not <see cref="ParsingMode.LongShort" qualifyHint="true"/>, this
     ///   method always returns <see langword="null"/>
     /// </para>
     /// </remarks>
@@ -1224,14 +1251,14 @@ public class CommandLineParser
     ///   </item>
     /// </list>
     /// <para>
-    ///   If the <see cref="Mode"/> property is <see cref="ParsingMode.LongShort"/>, these
+    ///   If the <see cref="Mode"/> property is <see cref="ParsingMode.LongShort" qualifyHint="true"/>, these
     ///   prefixes will be used for short argument names. The <see cref="DefaultLongArgumentNamePrefix"/>
     ///   constant is the default prefix for long argument names regardless of platform.
     /// </para>
     /// </remarks>
     /// <seealso cref="ArgumentNamePrefixes"/>
-    /// <seealso cref="ParseOptionsAttribute.ArgumentNamePrefixes"/>
-    /// <seealso cref="ParseOptions.ArgumentNamePrefixes"/>
+    /// <seealso cref="ParseOptionsAttribute.ArgumentNamePrefixes" qualifyHint="true"/>
+    /// <seealso cref="ParseOptions.ArgumentNamePrefixes" qualifyHint="true"/>
     public static ImmutableArray<string> GetDefaultArgumentNamePrefixes()
     {
         return RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
@@ -1240,7 +1267,7 @@ public class CommandLineParser
     }
 
     /// <summary>
-    /// Gets the default character used to separate the name and the value of an argument.
+    /// Gets the default characters used to separate the name and the value of an argument.
     /// </summary>
     /// <returns>
     /// The default characters used to separate the name and the value of an argument, which are
