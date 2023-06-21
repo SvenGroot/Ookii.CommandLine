@@ -271,6 +271,10 @@ public class CommandLineParser
     ///   be parsed.
     /// </exception>
     /// <remarks>
+    /// <note>
+    ///   Instead of this constructor, it's recommended to use the <see cref="CommandLineParser{T}"/>
+    ///   class instead.
+    /// </note>
     /// <para>
     ///   This constructor uses reflection to determine the arguments defined by the type indicated
     ///   by <paramref name="argumentsType"/> at runtime, unless the type has the
@@ -1093,8 +1097,8 @@ public class CommandLineParser
     public static T? Parse<T>(ParseOptions? options = null)
         where T : class
     {
-        // GetCommandLineArgs include the executable, so skip it.
-        return Parse<T>(Environment.GetCommandLineArgs(), 1, options);
+        var parser = new CommandLineParser<T>(options);
+        return parser.ParseWithErrorHandling();
     }
 
     /// <summary>
@@ -1129,10 +1133,45 @@ public class CommandLineParser
     public static T? Parse<T>(string[] args, int index, ParseOptions? options = null)
         where T : class
     {
-        options ??= new();
-        var parser = new CommandLineParser(typeof(T), options);
-        return (T?)parser.ParseWithErrorHandling(args, index);
+        var parser = new CommandLineParser<T>(options);
+        return parser.ParseWithErrorHandling(args, index);
     }
+
+    /// <summary>
+    /// Parses the specified command line arguments, starting at the specified index, using the
+    /// type <typeparamref name="T"/>.
+    /// </summary>
+    /// <typeparam name="T">The type defining the command line arguments.</typeparam>
+    /// <param name="args">The command line arguments.</param>
+    /// <param name="options">
+    ///   The options that control parsing behavior and usage help formatting. If
+    ///   <see langword="null" />, the default options are used.
+    /// </param>
+    /// <returns>
+    ///   <inheritdoc cref="Parse{T}(ParseOptions?)"/>
+    /// </returns>
+    /// <exception cref="ArgumentNullException">
+    ///   <paramref name="args"/> is <see langword="null"/>.
+    /// </exception>
+    /// <exception cref="ArgumentOutOfRangeException">
+    ///   <paramref name="index"/> does not fall within the bounds of <paramref name="args"/>.
+    /// </exception>
+    /// <exception cref="NotSupportedException">
+    ///   <inheritdoc cref="Parse{T}(ParseOptions?)"/>
+    /// </exception>
+    /// <remarks>
+    ///   <inheritdoc cref="Parse{T}(ParseOptions?)"/>
+    /// </remarks>
+#if NET6_0_OR_GREATER
+    [RequiresUnreferencedCode("Argument information cannot be statically determined using reflection. Consider using the GeneratedParserAttribute.", Url = UnreferencedCodeHelpUrl)]
+#endif
+    public static T? Parse<T>(ReadOnlyMemory<string> args, ParseOptions? options = null)
+        where T : class
+    {
+        var parser = new CommandLineParser<T>(options);
+        return parser.ParseWithErrorHandling(args);
+    }
+
 
     /// <summary>
     /// Parses the specified command line arguments using the type <typeparamref name="T"/>.
