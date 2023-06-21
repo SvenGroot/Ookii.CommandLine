@@ -168,14 +168,14 @@ public abstract class ParentCommand : ICommandWithCustomParsing, IAsyncCommand
     }
 
     /// <summary>
-    /// Method called when the <see cref="ParseOptions.DuplicateArguments"/> property is set to
-    /// <see cref="ErrorMode.Warning"/> and a duplicate argument value was encountered.
+    /// Method called when the <see cref="ParseOptions.DuplicateArguments" qualifyHint="true"/> property is set to
+    /// <see cref="ErrorMode.Warning" qualifyHint="true"/> and a duplicate argument value was encountered.
     /// </summary>
     /// <param name="argument">The duplicate argument.</param>
     /// <param name="newValue">The new value for the argument.</param>
     /// <remarks>
     /// <para>
-    ///   The base class implementation writes a warning to the <see cref="ParseOptions.Error"/>
+    ///   The base class implementation writes a warning to the <see cref="ParseOptions.Error" qualifyHint="true"/>
     ///   writer.
     /// </para>
     /// <para>

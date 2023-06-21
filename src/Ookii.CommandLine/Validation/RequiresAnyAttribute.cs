@@ -63,7 +63,7 @@ public class RequiresAnyAttribute : ClassValidationAttribute
     ///   <paramref name="argument1"/> or <paramref name="argument2"/> is <see langword="null"/>.
     /// </exception>
     /// <remarks>
-    ///   This constructor exists because <see cref="RequiresAnyAttribute.RequiresAnyAttribute(string[])"/>
+    ///   This constructor exists because <see cref="RequiresAnyAttribute.RequiresAnyAttribute(string[])" qualifyHint="true"/>
     ///   is not CLS-compliant.
     /// </remarks>
     public RequiresAnyAttribute(string argument1, string argument2)
@@ -120,7 +120,7 @@ public class RequiresAnyAttribute : ClassValidationAttribute
     /// validation fails.
     /// </summary>
     /// <value>
-    /// <see cref="CommandLineArgumentErrorCategory.MissingRequiredArgument"/>.
+    /// <see cref="CommandLineArgumentErrorCategory.MissingRequiredArgument" qualifyHint="true"/>.
     /// </value>
     public override CommandLineArgumentErrorCategory ErrorCategory
         => CommandLineArgumentErrorCategory.MissingRequiredArgument;
@@ -135,7 +135,7 @@ public class RequiresAnyAttribute : ClassValidationAttribute
     /// </value>
     /// <remarks>
     /// <para>
-    ///   This has no effect if the <see cref="UsageWriter.IncludeValidatorsInDescription"/>
+    ///   This has no effect if the <see cref="UsageWriter.IncludeValidatorsInDescription" qualifyHint="true"/>
     ///   property is <see langword="false"/>.
     /// </para>
     /// <para>

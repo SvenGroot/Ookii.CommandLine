@@ -11,7 +11,7 @@ namespace Ookii.CommandLine.Conversion;
 /// <typeparam name="T">The type to convert.</typeparam>
 /// <remarks>
 /// <para>
-///   Conversion is performed using the <see cref="ISpanParsable{TSelf}.Parse"/> method.
+///   Conversion is performed using the <see cref="ISpanParsable{TSelf}.Parse" qualifyHint="true"/> method.
 /// </para>
 /// <para>
 ///   For types that implement <see cref="IParsable{TSelf}"/>, but not <see cref="ISpanParsable{TSelf}"/>,

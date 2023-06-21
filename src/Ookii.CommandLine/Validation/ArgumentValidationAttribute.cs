@@ -14,8 +14,8 @@ namespace Ookii.CommandLine.Validation;
 /// <para>
 ///   If validation fails, it will throw a <see cref="CommandLineArgumentException"/> with
 ///   the category specified in the <see cref="ErrorCategory"/> property. The
-///   <see cref="CommandLineParser{T}.ParseWithErrorHandling()"/> method, the
-///   <see cref="CommandLineParser.Parse{T}(string[], int, ParseOptions?)"/> method and the
+///   <see cref="CommandLineParser{T}.ParseWithErrorHandling()" qualifyHint="true"/> method, the
+///   <see cref="CommandLineParser.Parse{T}(string[], int, ParseOptions?)" qualifyHint="true"/> method and the
 ///   <see cref="CommandManager"/> class will automatically display the error message and usage
 ///   help if validation failed.
 /// </para>
@@ -33,7 +33,7 @@ public abstract class ArgumentValidationAttribute : Attribute
     /// </summary>
     /// <value>
     /// One of the values of the <see cref="ValidationMode"/> enumeration. If not overridden
-    /// in a derived class, the value is <see cref="ValidationMode.AfterConversion"/>.
+    /// in a derived class, the value is <see cref="ValidationMode.AfterConversion" qualifyHint="true"/>.
     /// </value>
     public virtual ValidationMode Mode => ValidationMode.AfterConversion;
 
@@ -43,7 +43,7 @@ public abstract class ArgumentValidationAttribute : Attribute
     /// </summary>
     /// <value>
     /// One of the values of the <see cref="CommandLineArgumentErrorCategory"/> enumeration. If not overridden
-    /// in a derived class, the value is <see cref="CommandLineArgumentErrorCategory.ValidationFailed"/>.
+    /// in a derived class, the value is <see cref="CommandLineArgumentErrorCategory.ValidationFailed" qualifyHint="true"/>.
     /// </value>
     public virtual CommandLineArgumentErrorCategory ErrorCategory => CommandLineArgumentErrorCategory.ValidationFailed;
 
@@ -53,10 +53,10 @@ public abstract class ArgumentValidationAttribute : Attribute
     /// <param name="argument">The argument being validated.</param>
     /// <param name="value">
     ///   The argument value. If not <see langword="null"/>, this must be an instance of
-    ///   <see cref="CommandLineArgument.ArgumentType"/>.
+    ///   <see cref="CommandLineArgument.ArgumentType" qualifyHint="true"/>.
     /// </param>
     /// <exception cref="CommandLineArgumentException">
-    ///   The <paramref name="value"/> parameter is not a valid value. The <see cref="CommandLineArgumentException.Category"/>
+    ///   The <paramref name="value"/> parameter is not a valid value. The <see cref="CommandLineArgumentException.Category" qualifyHint="true"/>
     ///   property will be the value of the <see cref="ErrorCategory"/> property.
     /// </exception>
     public void Validate(CommandLineArgument argument, object? value)
@@ -78,7 +78,7 @@ public abstract class ArgumentValidationAttribute : Attribute
     /// <param name="argument">The argument being validated.</param>
     /// <param name="value">
     ///   The argument value. If not <see langword="null"/>, this must be an instance of
-    ///   <see cref="CommandLineArgument.ArgumentType"/>.
+    ///   <see cref="CommandLineArgument.ArgumentType" qualifyHint="true"/>.
     /// </param>
     /// <returns>
     ///   <see langword="true"/> if validation was performed and successful; <see langword="false"/>
@@ -88,11 +88,11 @@ public abstract class ArgumentValidationAttribute : Attribute
     /// <remarks>
     /// <para>
     ///   The <see cref="CommandLineParser"/> class will only call this method if the
-    ///   <see cref="Mode"/> property is <see cref="ValidationMode.BeforeConversion"/>.
+    ///   <see cref="Mode"/> property is <see cref="ValidationMode.BeforeConversion" qualifyHint="true"/>.
     /// </para>
     /// </remarks>
     /// <exception cref="CommandLineArgumentException">
-    ///   The <paramref name="value"/> parameter is not a valid value. The <see cref="CommandLineArgumentException.Category"/>
+    ///   The <paramref name="value"/> parameter is not a valid value. The <see cref="CommandLineArgumentException.Category" qualifyHint="true"/>
     ///   property will be the value of the <see cref="ErrorCategory"/> property.
     /// </exception>
     public bool ValidateSpan(CommandLineArgument argument, ReadOnlySpan<char> value)
@@ -118,31 +118,31 @@ public abstract class ArgumentValidationAttribute : Attribute
     /// <param name="argument">The argument being validated.</param>
     /// <param name="value">
     ///   The argument value. If not <see langword="null"/>, this must be a string or an
-    ///   instance of <see cref="CommandLineArgument.ArgumentType"/>.
+    ///   instance of <see cref="CommandLineArgument.ArgumentType" qualifyHint="true"/>.
     /// </param>
     /// <returns>
     ///   <see langword="true"/> if the value is valid; otherwise, <see langword="false"/>.
     /// </returns>
     /// <remarks>
     /// <para>
-    ///   If the <see cref="Mode"/> property is <see cref="ValidationMode.BeforeConversion"/>,
+    ///   If the <see cref="Mode"/> property is <see cref="ValidationMode.BeforeConversion" qualifyHint="true"/>,
     ///   the <paramref name="value"/> parameter will be the raw string value provided by the
     ///   user on the command line.
     /// </para>
     /// <para>
-    ///   If the <see cref="Mode"/> property is <see cref="ValidationMode.AfterConversion"/>,
+    ///   If the <see cref="Mode"/> property is <see cref="ValidationMode.AfterConversion" qualifyHint="true"/>,
     ///   for regular arguments, the <paramref name="value"/> parameter will be identical to
-    ///   the <see cref="CommandLineArgument.Value"/> property. For multi-value or dictionary
+    ///   the <see cref="CommandLineArgument.Value" qualifyHint="true"/> property. For multi-value or dictionary
     ///   arguments, the <paramref name="value"/> parameter will equal the last value added
     ///   to the collection or dictionary.
     /// </para>
     /// <para>
-    ///   If the <see cref="Mode"/> property is <see cref="ValidationMode.AfterParsing"/>,
+    ///   If the <see cref="Mode"/> property is <see cref="ValidationMode.AfterParsing" qualifyHint="true"/>,
     ///   <paramref name="value"/> will always be <see langword="null"/>. Use the
-    ///   <see cref="CommandLineArgument.Value"/> property instead.
+    ///   <see cref="CommandLineArgument.Value" qualifyHint="true"/> property instead.
     /// </para>
     /// <para>
-    ///   If you need to check the type of the argument, use the <see cref="CommandLineArgument.ElementType"/>
+    ///   If you need to check the type of the argument, use the <see cref="CommandLineArgument.ElementType" qualifyHint="true"/>
     ///   property unless you want to get the collection type for a multi-value or dictionary
     ///   argument.
     /// </para>
@@ -164,10 +164,10 @@ public abstract class ArgumentValidationAttribute : Attribute
     /// <remarks>
     /// <para>
     ///   The <see cref="CommandLineParser"/> class will only call this method if the
-    ///   <see cref="Mode"/> property is <see cref="ValidationMode.BeforeConversion"/>.
+    ///   <see cref="Mode"/> property is <see cref="ValidationMode.BeforeConversion" qualifyHint="true"/>.
     /// </para>
     /// <para>
-    ///   If you need to check the type of the argument, use the <see cref="CommandLineArgument.ElementType"/>
+    ///   If you need to check the type of the argument, use the <see cref="CommandLineArgument.ElementType" qualifyHint="true"/>
     ///   property unless you want to get the collection type for a multi-value or dictionary
     ///   argument.
     /// </para>
@@ -183,7 +183,7 @@ public abstract class ArgumentValidationAttribute : Attribute
     /// <param name="argument">The argument that was validated.</param>
     /// <param name="value">
     ///   The argument value. If not <see langword="null"/>, this must be an instance of
-    ///   <see cref="CommandLineArgument.ArgumentType"/>.
+    ///   <see cref="CommandLineArgument.ArgumentType" qualifyHint="true"/>.
     /// </param>
     /// <returns>The error message.</returns>
     /// <remarks>
@@ -205,7 +205,7 @@ public abstract class ArgumentValidationAttribute : Attribute
     /// </returns>
     /// <remarks>
     /// <para>
-    ///   This function is only called if the <see cref="UsageWriter.IncludeValidatorsInDescription"/>
+    ///   This function is only called if the <see cref="UsageWriter.IncludeValidatorsInDescription" qualifyHint="true"/>
     ///   property is <see langword="true"/>.
     /// </para>
     /// </remarks>

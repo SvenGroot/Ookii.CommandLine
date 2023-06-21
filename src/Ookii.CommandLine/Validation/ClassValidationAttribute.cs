@@ -16,8 +16,8 @@ namespace Ookii.CommandLine.Validation;
 /// <para>
 ///   If validation fails, it will throw a <see cref="CommandLineArgumentException"/> with
 ///   the category specified in the <see cref="ErrorCategory"/> property. The
-///   <see cref="CommandLineParser{T}.ParseWithErrorHandling()"/> method, the
-///   <see cref="CommandLineParser.Parse{T}(string[], int, ParseOptions?)"/> method and the
+///   <see cref="CommandLineParser{T}.ParseWithErrorHandling()" qualifyHint="true"/> method, the
+///   <see cref="CommandLineParser.Parse{T}(string[], int, ParseOptions?)" qualifyHint="true"/> method and the
 ///   <see cref="CommandManager"/> class will automatically display the error message and usage
 ///   help if validation failed.
 /// </para>
@@ -36,7 +36,7 @@ public abstract class ClassValidationAttribute : Attribute
     /// </summary>
     /// <value>
     /// One of the values of the <see cref="CommandLineArgumentErrorCategory"/> enumeration. If not overridden
-    /// in a derived class, the value is <see cref="CommandLineArgumentErrorCategory.ValidationFailed"/>.
+    /// in a derived class, the value is <see cref="CommandLineArgumentErrorCategory.ValidationFailed" qualifyHint="true"/>.
     /// </value>
     public virtual CommandLineArgumentErrorCategory ErrorCategory => CommandLineArgumentErrorCategory.ValidationFailed;
 
@@ -46,7 +46,7 @@ public abstract class ClassValidationAttribute : Attribute
     /// <param name="parser">The argument parser being validated.</param>
     /// <exception cref="CommandLineArgumentException">
     ///   The combination of arguments in the <paramref name="parser"/> is not valid.  The
-    ///   <see cref="CommandLineArgumentException.Category"/> property will be the value of the
+    ///   <see cref="CommandLineArgumentException.Category" qualifyHint="true"/> property will be the value of the
     ///   <see cref="ErrorCategory"/> property.
     /// </exception>
     public void Validate(CommandLineParser parser)
@@ -95,7 +95,7 @@ public abstract class ClassValidationAttribute : Attribute
     /// </returns>
     /// <remarks>
     /// <para>
-    ///   This function is only called if the <see cref="UsageWriter.IncludeValidatorsInDescription"/>
+    ///   This function is only called if the <see cref="UsageWriter.IncludeValidatorsInDescription" qualifyHint="true"/>
     ///   property is <see langword="true"/>.
     /// </para>
     /// </remarks>

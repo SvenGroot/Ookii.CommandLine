@@ -22,12 +22,12 @@ namespace Ookii.CommandLine.Validation;
 /// </para>
 /// <para>
 ///   This validator makes sure that the result of conversion is a valid value for the
-///   enumeration, by using the <see cref="Enum.IsDefined(Type, object)"/> method.
+///   enumeration, by using the <see cref="Enum.IsDefined(Type, object)" qualifyHint="true"/> method.
 /// </para>
 /// <para>
 ///   In addition, this validator provides usage help listing all the possible values. If the
 ///   enumeration has a lot of values, you may wish to turn this off by setting the
-///   <see cref="ArgumentValidationWithHelpAttribute.IncludeInUsageHelp"/> property to
+///   <see cref="ArgumentValidationWithHelpAttribute.IncludeInUsageHelp" qualifyHint="true"/> property to
 ///   <see langword="false"/>. Similarly, you can avoid listing all the values in the error
 ///   message by setting the <see cref="IncludeValuesInErrorMessage"/> property to
 ///   <see langword="false"/>.

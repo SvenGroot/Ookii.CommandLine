@@ -54,7 +54,7 @@ public class GeneratedArgument : CommandLineArgument
     /// Indicates if the argument used a C# 11 <c>required</c> property.
     /// </param>
     /// <param name="alternateDefaultValue">
-    /// Default value to use if the <see cref="CommandLineArgumentAttribute.DefaultValue"/> property
+    /// Default value to use if the <see cref="CommandLineArgumentAttribute.DefaultValue" qualifyHint="true"/> property
     /// is not set.
     /// </param>
     /// <param name="keyType">The type of the key of a dictionary argument.</param>

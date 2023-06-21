@@ -45,7 +45,7 @@ public class KeyValuePairConverter<TKey, TValue> : ArgumentConverter
     /// </param>
     /// <param name="separator">
     /// Provides an optional custom key/value separator. If <see langword="null" />, the value
-    /// of <see cref="KeyValuePairConverter.DefaultSeparator"/> is used.
+    /// of <see cref="KeyValuePairConverter.DefaultSeparator" qualifyHint="true"/> is used.
     /// </param>
     /// <param name="allowNullValues">
     /// Indicates whether the type of the pair's value accepts <see langword="null"/> values.

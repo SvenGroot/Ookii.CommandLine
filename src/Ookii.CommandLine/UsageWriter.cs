@@ -12,13 +12,13 @@ using System.Reflection;
 namespace Ookii.CommandLine;
 
 /// <summary>
-/// Creates usage help for the <see cref="CommandLineParser"/> class and the <see cref="Commands.CommandManager"/>
+/// Creates usage help for the <see cref="CommandLineParser"/> class and the <see cref="Commands.CommandManager" qualifyHint="true"/>
 /// class.
 /// </summary>
 /// <remarks>
 /// <para>
 ///   You can derive from this class to override the formatting of various aspects of the usage
-///   help. Set the <see cref="ParseOptions.UsageWriter"/> property to specify a custom instance.
+///   help. Set the <see cref="ParseOptions.UsageWriter" qualifyHint="true"/> property to specify a custom instance.
 /// </para>
 /// <para>
 ///   Depending on what methods you override, you can change small parts of the formatting, or
@@ -67,7 +67,7 @@ public class UsageWriter
     public const int DefaultSyntaxIndent = 3;
 
     /// <summary>
-    /// The default indentation for the argument descriptions for the <see cref="ParsingMode.Default"/>
+    /// The default indentation for the argument descriptions for the <see cref="ParsingMode.Default" qualifyHint="true"/>
     /// mode.
     /// </summary>
     /// <value>
@@ -115,14 +115,14 @@ public class UsageWriter
     /// <see langword="true"/> to enable color output using virtual terminal sequences;
     /// <see langword="false"/> to disable it; or, <see langword="null"/> to automatically
     /// enable it if <paramref name="writer"/> is <see langword="null"/> using the
-    /// <see cref="VirtualTerminal.EnableColor"/> method.
+    /// <see cref="VirtualTerminal.EnableColor" qualifyHint="true"/> method.
     /// </param>
     /// <remarks>
     /// <para>
     ///   If the <paramref name="writer"/> parameter is <see langword="null"/>, output is
     ///   written to a <see cref="LineWrappingTextWriter"/> for the standard output stream,
     ///   wrapping at the console's window width. If the stream is redirected, output may still
-    ///   be wrapped, depending on the value returned by <see cref="Console.WindowWidth"/>.
+    ///   be wrapped, depending on the value returned by <see cref="Console.WindowWidth" qualifyHint="true"/>.
     /// </para>
     /// </remarks>
     public UsageWriter(LineWrappingTextWriter? writer = null, bool? useColor = null)
@@ -132,11 +132,11 @@ public class UsageWriter
     }
 
     /// <summary>
-    /// Gets or sets a value indicating whether the value of the <see cref="CommandLineParser.Description"/> property
+    /// Gets or sets a value indicating whether the value of the <see cref="CommandLineParser.Description" qualifyHint="true"/> property
     /// is written before the syntax.
     /// </summary>
     /// <value>
-    ///   <see langword="true"/> if the value of the <see cref="CommandLineParser.Description"/> property
+    ///   <see langword="true"/> if the value of the <see cref="CommandLineParser.Description" qualifyHint="true"/> property
     ///   is written before the syntax; otherwise, <see langword="false"/>. The default value is <see langword="true"/>.
     /// </value>
     public bool IncludeApplicationDescription { get; set; } = true;
@@ -166,7 +166,7 @@ public class UsageWriter
     /// </summary>
     /// <value>
     /// The application executable name, or <see langword="null"/> to use the default value,
-    /// determined by calling <see cref="CommandLineParser.GetExecutableName(bool)"/>.
+    /// determined by calling <see cref="CommandLineParser.GetExecutableName(bool)" qualifyHint="true"/>.
     /// </value>
     /// <seealso cref="IncludeExecutableExtension"/>
 #if NET6_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
@@ -189,7 +189,7 @@ public class UsageWriter
     /// <remarks>
     /// <para>
     ///   If the <see cref="ExecutableName"/> property is <see langword="null"/>, the executable
-    ///   name is determined by calling <see cref="CommandLineParser.GetExecutableName(bool)"/>,
+    ///   name is determined by calling <see cref="CommandLineParser.GetExecutableName(bool)" qualifyHint="true"/>,
     ///   passing the value of this property as the argument.
     /// </para>
     /// <para>
@@ -212,7 +212,7 @@ public class UsageWriter
     /// </summary>
     /// <value>
     ///   The virtual terminal sequence for a color. The default value is
-    ///   <see cref="TextFormat.ForegroundCyan"/>.
+    ///   <see cref="TextFormat.ForegroundCyan" qualifyHint="true"/>.
     /// </value>
     /// <remarks>
     /// <para>
@@ -267,8 +267,8 @@ public class UsageWriter
     /// </value>
     /// <remarks>
     /// <note>
-    ///   This property is only used when the <see cref="CommandLineParser.Mode"/> property is
-    ///   <see cref="ParsingMode.LongShort"/>.
+    ///   This property is only used when the <see cref="CommandLineParser.Mode" qualifyHint="true"/> property is
+    ///   <see cref="ParsingMode.LongShort" qualifyHint="true"/>.
     /// </note>
     /// </remarks>
     public bool UseShortNamesForSyntax { get; set; }
@@ -297,8 +297,8 @@ public class UsageWriter
 
     /// <summary>
     /// Gets or sets the number of characters by which to indent all but the first line of each
-    /// argument's description, if the <see cref="CommandLineParser.Mode"/> property is
-    /// <see cref="ParsingMode.Default"/>.
+    /// argument's description, if the <see cref="CommandLineParser.Mode" qualifyHint="true"/> property is
+    /// <see cref="ParsingMode.Default" qualifyHint="true"/>.
     /// </summary>
     /// <value>
     /// The number of characters by which to indent the argument descriptions. The default
@@ -321,7 +321,7 @@ public class UsageWriter
     /// </summary>
     /// <value>
     /// One of the values of the <see cref="DescriptionListFilterMode"/> enumeration. The default
-    /// value is <see cref="DescriptionListFilterMode.Information"/>.
+    /// value is <see cref="DescriptionListFilterMode.Information" qualifyHint="true"/>.
     /// </value>
     public DescriptionListFilterMode ArgumentDescriptionListFilter { get; set; }
 
@@ -331,7 +331,7 @@ public class UsageWriter
     /// </summary>
     /// <value>
     /// One of the values of the <see cref="DescriptionListSortMode"/> enumeration. The default
-    /// value is <see cref="DescriptionListSortMode.UsageOrder"/>.
+    /// value is <see cref="DescriptionListSortMode.UsageOrder" qualifyHint="true"/>.
     /// </value>
     public DescriptionListSortMode ArgumentDescriptionListOrder { get; set; }
 
@@ -340,7 +340,7 @@ public class UsageWriter
     /// </summary>
     /// <value>
     ///   The virtual terminal sequence for a color. The default value is
-    ///   <see cref="TextFormat.ForegroundGreen"/>.
+    ///   <see cref="TextFormat.ForegroundGreen" qualifyHint="true"/>.
     /// </value>
     /// <remarks>
     /// <para>
@@ -365,7 +365,7 @@ public class UsageWriter
 
     /// <summary>
     /// Gets or sets a value indicating whether white space, rather than the first item of the
-    /// <see cref="CommandLineParser.NameValueSeparators"/> property, is used to separate
+    /// <see cref="CommandLineParser.NameValueSeparators" qualifyHint="true"/> property, is used to separate
     /// arguments and their values in the command line syntax.
     /// </summary>
     /// <value>
@@ -379,7 +379,7 @@ public class UsageWriter
     ///   it would be formatted as "-name:&lt;Value&gt;", using a colon as the separator.
     /// </para>
     /// <para>
-    ///   The command line syntax will only use a white space character as the value separator if both the <see cref="CommandLineParser.AllowWhiteSpaceValueSeparator"/> property
+    ///   The command line syntax will only use a white space character as the value separator if both the <see cref="CommandLineParser.AllowWhiteSpaceValueSeparator" qualifyHint="true"/> property
     ///   and the <see cref="UseWhiteSpaceValueSeparator"/> property are true.
     /// </para>
     /// </remarks>
@@ -414,7 +414,7 @@ public class UsageWriter
     public bool IncludeDefaultValueInDescription { get; set; } = true;
 
     /// <summary>
-    /// Gets or sets a value indicating whether the <see cref="Validation.ArgumentValidationAttribute"/>
+    /// Gets or sets a value indicating whether the <see cref="Validation.ArgumentValidationAttribute" qualifyHint="true"/>
     /// attributes of an argument should be included in the argument description.
     /// </summary>
     /// <value>
@@ -444,7 +444,7 @@ public class UsageWriter
     /// </summary>
     /// <value>
     ///   The virtual terminal sequence used to reset color. The default value is
-    ///   <see cref="TextFormat.Default"/>.
+    ///   <see cref="TextFormat.Default" qualifyHint="true"/>.
     /// </value>
     /// <remarks>
     /// <para>
@@ -488,7 +488,7 @@ public class UsageWriter
     /// </summary>
     /// <value>
     ///   The virtual terminal sequence for a color. The default value is
-    ///   <see cref="TextFormat.ForegroundGreen"/>.
+    ///   <see cref="TextFormat.ForegroundGreen" qualifyHint="true"/>.
     /// </value>
     /// <remarks>
     /// <para>
@@ -546,15 +546,15 @@ public class UsageWriter
     /// <remarks>
     /// <para>
     ///   If this property is <see langword="null"/>, the instruction will be shown under the
-    ///   following conditions: the <see cref="ParseOptions.AutoHelpArgument"/> property is
+    ///   following conditions: the <see cref="ParseOptions.AutoHelpArgument" qualifyHint="true"/> property is
     ///   <see langword="null"/> or <see langword="true"/>; for every command with a
-    ///   <see cref="ParseOptionsAttribute"/> attribute, the <see cref="ParseOptionsAttribute.AutoHelpArgument"/>
+    ///   <see cref="ParseOptionsAttribute"/> attribute, the <see cref="ParseOptionsAttribute.AutoHelpArgument" qualifyHint="true"/>
     ///   property is <see langword="true"/>; no command uses the <see cref="ICommandWithCustomParsing"/>
     ///   interface (this includes commands that derive from the <see cref="ParentCommand"/> class;
-    ///   no command specifies custom values for the <see cref="ParseOptionsAttribute.ArgumentNamePrefixes"/>
-    ///   and <see cref="ParseOptionsAttribute.LongArgumentNamePrefix"/> properties; and
-    ///   every command uses the same values for the <see cref="ParseOptionsAttribute.ArgumentNameTransform"/>
-    ///   and <see cref="ParseOptionsAttribute.Mode"/> properties.
+    ///   no command specifies custom values for the <see cref="ParseOptionsAttribute.ArgumentNamePrefixes" qualifyHint="true"/>
+    ///   and <see cref="ParseOptionsAttribute.LongArgumentNamePrefix" qualifyHint="true"/> properties; and
+    ///   every command uses the same values for the <see cref="ParseOptionsAttribute.ArgumentNameTransform" qualifyHint="true"/>
+    ///   and <see cref="ParseOptionsAttribute.Mode" qualifyHint="true"/> properties.
     /// </para>
     /// <para>
     ///   If set to <see langword="true"/>, the message is shown even if not all commands
@@ -582,7 +582,7 @@ public class UsageWriter
     ///   assembly has no description, nothing is written.
     /// </para>
     /// <para>
-    ///   If the <see cref="CommandOptions.ParentCommand"/> property is not <see langword="null"/>,
+    ///   If the <see cref="CommandOptions.ParentCommand" qualifyHint="true"/> property is not <see langword="null"/>,
     ///   and the specified type has a <see cref="DescriptionAttribute"/>, that description is
     ///   used instead.
     /// </para>
@@ -604,8 +604,8 @@ public class UsageWriter
     /// </summary>
     /// <value>
     /// The <see cref="LineWrappingTextWriter"/> passed to the <see cref="UsageWriter(LineWrappingTextWriter?, bool?)"/>
-    /// constructor, or an instance created by the <see cref="LineWrappingTextWriter.ForConsoleOut"/>
-    /// or <see cref="LineWrappingTextWriter.ForStringWriter(int, IFormatProvider?, bool)"/>
+    /// constructor, or an instance created by the <see cref="LineWrappingTextWriter.ForConsoleOut" qualifyHint="true"/>
+    /// or <see cref="LineWrappingTextWriter.ForStringWriter(int, IFormatProvider?, bool)" qualifyHint="true"/>
     /// function.
     /// </value>
     /// <exception cref="InvalidOperationException">
@@ -641,15 +641,15 @@ public class UsageWriter
     /// </value>
     /// <remarks>
     /// <para>
-    ///   If this property is not <see cref="Operation.ParserUsage"/>, the <see cref="Parser"/>
+    ///   If this property is not <see cref="Operation.ParserUsage" qualifyHint="true"/>, the <see cref="Parser"/>
     ///   property will throw an exception.
     /// </para>
     /// <para>
-    ///   If this property is not <see cref="Operation.CommandListUsage"/>, the <see cref="CommandManager"/>
+    ///   If this property is not <see cref="Operation.CommandListUsage" qualifyHint="true"/>, the <see cref="CommandManager"/>
     ///   property will throw an exception.
     /// </para>
     /// <para>
-    ///   If this property is <see cref="Operation.None"/>, the <see cref="Writer"/>
+    ///   If this property is <see cref="Operation.None" qualifyHint="true"/>, the <see cref="Writer"/>
     ///   property may throw an exception.
     /// </para>
     /// </remarks>
@@ -704,7 +704,7 @@ public class UsageWriter
     ///   If no writer was passed to the <see cref="UsageWriter(LineWrappingTextWriter?, bool?)"/>
     ///   constructor, this method will create a <see cref="LineWrappingTextWriter"/> for the
     ///   standard output stream. If color usage wasn't explicitly enabled, it will be enabled
-    ///   if the output supports it according to <see cref="VirtualTerminal.EnableColor"/>.
+    ///   if the output supports it according to <see cref="VirtualTerminal.EnableColor" qualifyHint="true"/>.
     /// </para>
     /// <para>
     ///   This method calls the <see cref="WriteParserUsageCore"/> method to create the usage help
@@ -720,7 +720,7 @@ public class UsageWriter
     /// <summary>
     /// Creates usage help for the specified command manager.
     /// </summary>
-    /// <param name="manager">The <see cref="Commands.CommandManager"/></param>
+    /// <param name="manager">The <see cref="Commands.CommandManager" qualifyHint="true"/></param>
     /// <exception cref="ArgumentNullException">
     /// <paramref name="manager"/> is <see langword="null"/>.
     /// </exception>
@@ -732,7 +732,7 @@ public class UsageWriter
     ///   If no writer was passed to the <see cref="UsageWriter(LineWrappingTextWriter?, bool?)"/>
     ///   constructor, this method will create a <see cref="LineWrappingTextWriter"/> for the
     ///   standard output stream. If color usage wasn't explicitly enabled, it will be enabled
-    ///   if the output supports it according to <see cref="VirtualTerminal.EnableColor"/>.
+    ///   if the output supports it according to <see cref="VirtualTerminal.EnableColor" qualifyHint="true"/>.
     /// </para>
     /// <para>
     ///   This method calls the <see cref="WriteCommandListUsageCore"/> method to create the
@@ -760,7 +760,7 @@ public class UsageWriter
     /// <remarks>
     /// <para>
     ///   This method ignores the writer passed to the <see cref="UsageWriter(LineWrappingTextWriter?, bool?)"/>
-    ///   constructor, and will use the <see cref="LineWrappingTextWriter.ForStringWriter"/>
+    ///   constructor, and will use the <see cref="LineWrappingTextWriter.ForStringWriter" qualifyHint="true"/>
     ///   method instead, and returns the resulting string. If color support was not explicitly
     ///   enabled, it will be disabled.
     /// </para>
@@ -779,7 +779,7 @@ public class UsageWriter
     /// Returns a string with usage help for the specified command manager.
     /// </summary>
     /// <returns>A string containing the usage help.</returns>
-    /// <param name="manager">The <see cref="Commands.CommandManager"/></param>
+    /// <param name="manager">The <see cref="Commands.CommandManager" qualifyHint="true"/></param>
     /// <param name="maximumLineLength">
     /// The length at which to white-space wrap lines in the output, or 0 to disable wrapping.
     /// </param>
@@ -792,7 +792,7 @@ public class UsageWriter
     /// </para>
     /// <para>
     ///   This method ignores the writer passed to the <see cref="UsageWriter(LineWrappingTextWriter?, bool?)"/>
-    ///   constructor, and will use the <see cref="LineWrappingTextWriter.ForStringWriter"/>
+    ///   constructor, and will use the <see cref="LineWrappingTextWriter.ForStringWriter" qualifyHint="true"/>
     ///   method instead, and returns the resulting string. If color support was not explicitly
     ///   enabled, it will be disabled.
     /// </para>
@@ -1079,7 +1079,7 @@ public class UsageWriter
     /// </summary>
     /// <param name="argumentName">The name of the argument.</param>
     /// <param name="prefix">
-    /// The argument name prefix; if using <see cref="ParsingMode.LongShort"/>, this may vary
+    /// The argument name prefix; if using <see cref="ParsingMode.LongShort" qualifyHint="true"/>, this may vary
     /// depending on whether the name is a short or long name.
     /// </param>
     /// <remarks>
@@ -1102,12 +1102,12 @@ public class UsageWriter
     /// </summary>
     /// <param name="argumentName">The name of the argument.</param>
     /// <param name="prefix">
-    /// The argument name prefix; if using <see cref="ParsingMode.LongShort"/>, this may vary
+    /// The argument name prefix; if using <see cref="ParsingMode.LongShort" qualifyHint="true"/>, this may vary
     /// depending on whether the name is a short or long name.
     /// </param>
     /// <param name="separator">
     /// The argument name/value separator, or <see langword="null"/> if the <see cref="UseWhiteSpaceValueSeparator"/>
-    /// property and the <see cref="CommandLineParser.AllowWhiteSpaceValueSeparator"/> property
+    /// property and the <see cref="CommandLineParser.AllowWhiteSpaceValueSeparator" qualifyHint="true"/> property
     /// are both <see langword="true"/>.
     /// </param>
     /// <remarks>
@@ -1417,7 +1417,7 @@ public class UsageWriter
     /// </summary>
     /// <param name="argumentName">The argument name or alias.</param>
     /// <param name="prefix">
-    /// The argument name prefix; if using <see cref="ParsingMode.LongShort"/>, this may vary
+    /// The argument name prefix; if using <see cref="ParsingMode.LongShort" qualifyHint="true"/>, this may vary
     /// depending on whether the name or alias is a short or long name or alias.
     /// </param>
     /// <remarks>
@@ -1478,7 +1478,7 @@ public class UsageWriter
     /// Writes the aliases of an argument for use in the argument description list.
     /// </summary>
     /// <param name="aliases">
-    /// The aliases of an argument, or the long aliases for <see cref="ParsingMode.LongShort"/>
+    /// The aliases of an argument, or the long aliases for <see cref="ParsingMode.LongShort" qualifyHint="true"/>
     /// mode, or <see langword="null"/> if the argument has no (long) aliases.
     /// </param>
     /// <param name="shortAliases">
@@ -1526,7 +1526,7 @@ public class UsageWriter
     /// </summary>
     /// <param name="alias">The alias.</param>
     /// <param name="prefix">
-    /// The argument name prefix; if using <see cref="ParsingMode.LongShort"/>, this may vary
+    /// The argument name prefix; if using <see cref="ParsingMode.LongShort" qualifyHint="true"/>, this may vary
     /// depending on whether the alias is a short or long alias.
     /// </param>
     /// <remarks>
@@ -1600,7 +1600,7 @@ public class UsageWriter
     /// <para>
     ///   This method is called by the base implementation of the <see cref="WriteArgumentDescription(CommandLineArgument)"/>
     ///   method if the <see cref="IncludeDefaultValueInDescription"/> property is
-    ///   <see langword="true"/> and the <see cref="CommandLineArgument.DefaultValue"/> property
+    ///   <see langword="true"/> and the <see cref="CommandLineArgument.DefaultValue" qualifyHint="true"/> property
     ///   is not <see langword="null"/>.
     /// </para>
     /// </remarks>
@@ -1616,12 +1616,12 @@ public class UsageWriter
     ///   information." or "Run 'executable command -Help' for more information."
     /// </para>
     /// <para>
-    ///   If the <see cref="CommandLineParser.HelpArgument"/> property returns <see langword="null"/>,
+    ///   If the <see cref="CommandLineParser.HelpArgument" qualifyHint="true"/> property returns <see langword="null"/>,
     ///   nothing is written.
     /// </para>
     /// <para>
     ///   This method is called by the base implementation of the <see cref="WriteParserUsageCore"/>
-    ///   method if the requested help is not <see cref="UsageHelpRequest.Full"/>.
+    ///   method if the requested help is not <see cref="UsageHelpRequest.Full" qualifyHint="true"/>.
     /// </para>
     /// </remarks>
     protected virtual void WriteMoreInfoMessage()
@@ -1678,11 +1678,11 @@ public class UsageWriter
     #region Subcommand usage
 
     /// <summary>
-    /// Creates the usage help for a <see cref="Commands.CommandManager"/> instance.
+    /// Creates the usage help for a <see cref="Commands.CommandManager" qualifyHint="true"/> instance.
     /// </summary>
     /// <remarks>
     /// <para>
-    ///   This is the primary method used to generate usage help for the <see cref="Commands.CommandManager"/>
+    ///   This is the primary method used to generate usage help for the <see cref="Commands.CommandManager" qualifyHint="true"/>
     ///   class. It calls into the various other methods of this class, so overriding this
     ///   method should not typically be necessary unless you wish to deviate from the order
     ///   in which usage elements are written.

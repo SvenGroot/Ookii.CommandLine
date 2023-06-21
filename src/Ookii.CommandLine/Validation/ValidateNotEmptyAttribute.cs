@@ -23,7 +23,7 @@ public class ValidateNotEmptyAttribute : ArgumentValidationWithHelpAttribute
     /// Gets a value that indicates when validation will run.
     /// </summary>
     /// <value>
-    /// <see cref="ValidationMode.BeforeConversion"/>.
+    /// <see cref="ValidationMode.BeforeConversion" qualifyHint="true"/>.
     /// </value>
     public override ValidationMode Mode => ValidationMode.BeforeConversion;
 

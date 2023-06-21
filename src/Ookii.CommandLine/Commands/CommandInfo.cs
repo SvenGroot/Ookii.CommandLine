@@ -68,9 +68,9 @@ public abstract class CommandInfo
     /// </value>
     /// <remarks>
     /// <para>
-    ///   The name is taken from the <see cref="CommandAttribute.CommandName"/> property. If
+    ///   The name is taken from the <see cref="CommandAttribute.CommandName" qualifyHint="true"/> property. If
     ///   that property is <see langword="null"/>, the name is determined by taking the command
-    ///   type's name, and applying the transformation specified by the <see cref="CommandOptions.CommandNameTransform"/>
+    ///   type's name, and applying the transformation specified by the <see cref="CommandOptions.CommandNameTransform" qualifyHint="true"/>
     ///   property.
     /// </para>
     /// </remarks>
@@ -115,7 +115,7 @@ public abstract class CommandInfo
     ///   displayed, but can still be invoked from the command line.
     /// </para>
     /// </remarks>
-    /// <seealso cref="CommandAttribute.IsHidden"/>
+    /// <seealso cref="CommandAttribute.IsHidden" qualifyHint="true"/>
     public bool IsHidden => _attribute.IsHidden;
 
     /// <summary>
@@ -146,7 +146,7 @@ public abstract class CommandInfo
     /// </para>
     /// <para>
     ///   The <see cref="CommandManager"/> class will only use commands whose parent command
-    ///   type matches the value of the <see cref="CommandOptions.ParentCommand"/> property.
+    ///   type matches the value of the <see cref="CommandOptions.ParentCommand" qualifyHint="true"/> property.
     /// </para>
     /// </remarks>
     public Type? ParentCommandType { get; }
@@ -181,8 +181,8 @@ public abstract class CommandInfo
     /// </returns>
     /// <remarks>
     /// <para>
-    ///   The <see cref="ParseResult.Status"/> property of the returned <see cref="ParseResult"/>
-    ///   will be <see cref="ParseStatus.None"/> if the command used custom parsing.
+    ///   The <see cref="ParseResult.Status" qualifyHint="true"/> property of the returned <see cref="ParseResult"/>
+    ///   will be <see cref="ParseStatus.None" qualifyHint="true"/> if the command used custom parsing.
     /// </para>
     /// </remarks>
     /// <exception cref="ArgumentNullException">
@@ -214,8 +214,8 @@ public abstract class CommandInfo
     /// </returns>
     /// <remarks>
     /// <para>
-    ///   The <see cref="ParseResult.Status"/> property of the returned <see cref="ParseResult"/>
-    ///   will be <see cref="ParseStatus.None"/> if the command used custom parsing.
+    ///   The <see cref="ParseResult.Status" qualifyHint="true"/> property of the returned <see cref="ParseResult"/>
+    ///   will be <see cref="ParseStatus.None" qualifyHint="true"/> if the command used custom parsing.
     /// </para>
     /// </remarks>
     public (ICommand?, ParseResult) CreateInstanceWithResult(ReadOnlyMemory<string> args)

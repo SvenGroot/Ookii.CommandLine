@@ -34,7 +34,7 @@ namespace Ookii.CommandLine;
 /// </para>
 /// </remarks>
 /// <threadsafety static="true" instance="false"/>
-/// <seealso cref="CommandLineArgument.Aliases"/>
+/// <seealso cref="CommandLineArgument.Aliases" qualifyHint="true"/>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Parameter | AttributeTargets.Class, AllowMultiple = true)]
 public sealed class AliasAttribute : Attribute
 {

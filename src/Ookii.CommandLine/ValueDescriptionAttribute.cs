@@ -9,7 +9,7 @@ namespace Ookii.CommandLine;
 /// <value>
 /// The description of the value, or <see langword="null"/> to indicate that the property's
 /// type name should be used, applying the <see cref="NameTransform"/> specified by the
-/// <see cref="ParseOptions.ValueDescriptionTransform"/> or <see cref="ParseOptionsAttribute.ValueDescriptionTransform"/>
+/// <see cref="ParseOptions.ValueDescriptionTransform" qualifyHint="true"/> or <see cref="ParseOptionsAttribute.ValueDescriptionTransform" qualifyHint="true"/>
 /// property.
 /// </value>
 /// <remarks>
@@ -18,16 +18,16 @@ namespace Ookii.CommandLine;
 ///   type of value that the user should supply.
 /// </para>
 /// <para>
-///   If this attribute is not present, it is retrieved from the <see cref="ParseOptions.DefaultValueDescriptions"/>
+///   If this attribute is not present, it is retrieved from the <see cref="ParseOptions.DefaultValueDescriptions" qualifyHint="true"/>
 ///   property. If not found there, the type of the argument is used, applying the <see
-///   cref="NameTransform"/> specified by the <see cref="ParseOptions.ValueDescriptionTransform"/>
-///   property or the <see cref="ParseOptionsAttribute.ValueDescriptionTransform"/> property. If
+///   cref="NameTransform"/> specified by the <see cref="ParseOptions.ValueDescriptionTransform" qualifyHint="true"/>
+///   property or the <see cref="ParseOptionsAttribute.ValueDescriptionTransform" qualifyHint="true"/> property. If
 ///   this is a multi-value argument, the element type is used. If the type is <see cref="Nullable{T}"/>,
 ///   its underlying type is used.
 /// </para>
 /// <para>
 ///   If you want to override the value description for all arguments of a specific type, 
-///   use the <see cref="ParseOptions.DefaultValueDescriptions"/> property.
+///   use the <see cref="ParseOptions.DefaultValueDescriptions" qualifyHint="true"/> property.
 /// </para>
 /// <para>
 ///   The value description is used only when generating usage help. For example, the usage for an
@@ -42,7 +42,7 @@ namespace Ookii.CommandLine;
 ///   using the <see cref="DescriptionAttribute"/> attribute.
 /// </note>
 /// </remarks>
-/// <seealso cref="CommandLineArgument.ValueDescription"/>
+/// <seealso cref="CommandLineArgument.ValueDescription" qualifyHint="true"/>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Method)]
 public class ValueDescriptionAttribute : Attribute
 {

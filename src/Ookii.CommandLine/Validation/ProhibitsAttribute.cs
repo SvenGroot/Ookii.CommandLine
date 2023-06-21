@@ -16,7 +16,7 @@ namespace Ookii.CommandLine.Validation;
 /// </para>
 /// <para>
 ///   If validation fails, a <see cref="CommandLineArgumentException"/> is thrown with the
-///   error category set to <see cref="CommandLineArgumentErrorCategory.DependencyFailed"/>.
+///   error category set to <see cref="CommandLineArgumentErrorCategory.DependencyFailed" qualifyHint="true"/>.
 /// </para>
 /// <para>
 ///   Names of arguments that are dependencies are not validated when the attribute is created.

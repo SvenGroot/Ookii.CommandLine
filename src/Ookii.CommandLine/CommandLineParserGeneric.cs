@@ -19,7 +19,7 @@ namespace Ookii.CommandLine;
 /// <para>
 ///   If you don't intend to manually handle errors and usage help printing, and don't need
 ///   to inspect the state of the <see cref="CommandLineParser"/> instance, the static
-///   <see cref="CommandLineParser.Parse{T}(string[], ParseOptions?)"/> should be used instead.
+///   <see cref="CommandLineParser.Parse{T}(string[], ParseOptions?)" qualifyHint="true"/> should be used instead.
 /// </para>
 /// </remarks>
 public class CommandLineParser<T> : CommandLineParser
@@ -64,7 +64,7 @@ public class CommandLineParser<T> : CommandLineParser
     ///   names or positions, or has an argument type that cannot be parsed.
     /// </exception>
     /// <exception cref="ArgumentException">
-    ///   The <see cref="ArgumentProvider.ArgumentsType"/> property for the <paramref name="provider"/>
+    ///   The <see cref="ArgumentProvider.ArgumentsType" qualifyHint="true"/> property for the <paramref name="provider"/>
     ///   if a different type than <typeparamref name="T"/>.
     /// </exception>
     /// <remarks>

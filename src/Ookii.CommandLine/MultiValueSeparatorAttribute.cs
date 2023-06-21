@@ -28,7 +28,7 @@ namespace Ookii.CommandLine;
 ///   positional arguments until another named argument has been supplied.
 /// </para>
 /// <para>
-///   Using white-space separators will not work if the <see cref="CommandLineParser.AllowWhiteSpaceValueSeparator"/>
+///   Using white-space separators will not work if the <see cref="CommandLineParser.AllowWhiteSpaceValueSeparator" qualifyHint="true"/>
 ///   is <see langword="false"/> or if the argument is a multi-value switch argument.
 /// </para>
 /// <para>

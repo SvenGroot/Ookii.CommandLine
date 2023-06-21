@@ -3,8 +3,8 @@
 namespace Ookii.CommandLine.Commands;
 
 /// <summary>
-/// Base class for asynchronous tasks that want the <see cref="ICommand.Run"/> method to
-/// invoke the <see cref="IAsyncCommand.RunAsync"/> method.
+/// Base class for asynchronous tasks that want the <see cref="ICommand.Run" qualifyHint="true"/> method to
+/// invoke the <see cref="IAsyncCommand.RunAsync" qualifyHint="true"/> method.
 /// </summary>
 public abstract class AsyncCommandBase : IAsyncCommand
 {

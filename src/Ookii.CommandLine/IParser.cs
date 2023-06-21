@@ -29,7 +29,7 @@ public interface IParser<TSelf> : IParserProvider<TSelf>
     where TSelf : class, IParser<TSelf>
 {
     /// <summary>
-    /// Parses the arguments returned by the <see cref="Environment.GetCommandLineArgs"/>
+    /// Parses the arguments returned by the <see cref="Environment.GetCommandLineArgs" qualifyHint="true"/>
     /// method using the type <typeparamref name="TSelf"/>.
     /// </summary>
     /// <param name="options">
@@ -38,10 +38,10 @@ public interface IParser<TSelf> : IParserProvider<TSelf>
     /// </param>
     /// <returns>
     ///   An instance of the type <typeparamref name="TSelf"/>, or <see langword="null"/> if an
-    ///   error occurred, or argument parsing was canceled by the <see cref="CommandLineArgumentAttribute.CancelParsing"/>
+    ///   error occurred, or argument parsing was canceled by the <see cref="CommandLineArgumentAttribute.CancelParsing" qualifyHint="true"/>
     ///   property or a method argument that returned <see langword="false"/>.
     /// </returns>
-    /// <seealso cref="CommandLineParser.Parse{T}(ParseOptions?)"/>
+    /// <seealso cref="CommandLineParser.Parse{T}(ParseOptions?)" qualifyHint="true"/>
     public static abstract TSelf? Parse(ParseOptions? options = null);
 
     /// <summary>
@@ -54,10 +54,10 @@ public interface IParser<TSelf> : IParserProvider<TSelf>
     /// </param>
     /// <returns>
     ///   An instance of the type <typeparamref name="TSelf"/>, or <see langword="null"/> if an
-    ///   error occurred, or argument parsing was canceled by the <see cref="CommandLineArgumentAttribute.CancelParsing"/>
+    ///   error occurred, or argument parsing was canceled by the <see cref="CommandLineArgumentAttribute.CancelParsing" qualifyHint="true"/>
     ///   property or a method argument that returned <see langword="false"/>.
     /// </returns>
-    /// <seealso cref="CommandLineParser.Parse{T}(string[], ParseOptions?)"/>
+    /// <seealso cref="CommandLineParser.Parse{T}(string[], ParseOptions?)" qualifyHint="true"/>
     public static abstract TSelf? Parse(string[] args, ParseOptions? options = null);
 
     /// <summary>
@@ -71,10 +71,10 @@ public interface IParser<TSelf> : IParserProvider<TSelf>
     /// </param>
     /// <returns>
     ///   An instance of the type <typeparamref name="TSelf"/>, or <see langword="null"/> if an
-    ///   error occurred, or argument parsing was canceled by the <see cref="CommandLineArgumentAttribute.CancelParsing"/>
+    ///   error occurred, or argument parsing was canceled by the <see cref="CommandLineArgumentAttribute.CancelParsing" qualifyHint="true"/>
     ///   property or a method argument that returned <see langword="false"/>.
     /// </returns>
-    /// <seealso cref="CommandLineParser.Parse{T}(string[], ParseOptions?)"/>
+    /// <seealso cref="CommandLineParser.Parse{T}(string[], ParseOptions?)" qualifyHint="true"/>
     public static abstract TSelf? Parse(ReadOnlyMemory<string> args, ParseOptions? options = null);
 }
 

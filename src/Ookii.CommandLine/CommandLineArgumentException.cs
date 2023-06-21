@@ -8,12 +8,12 @@ namespace Ookii.CommandLine;
 /// </summary>
 /// <remarks>
 /// <para>
-///   This exception indicates that the command line passed to the <see cref="CommandLineParser.Parse(string[], int)"/> method
+///   This exception indicates that the command line passed to the <see cref="CommandLineParser.Parse(string[], int)" qualifyHint="true"/> method
 ///   was invalid for the arguments defined by the <see cref="CommandLineParser"/> instance.
 /// </para>
 /// <para>
 ///   The exception can indicate that too many positional arguments were supplied, a required argument was not supplied, an unknown argument name was supplied,
-///   no value was supplied for a named argument, an argument was supplied more than once and the <see cref="CommandLineParser.AllowDuplicateArguments"/> property
+///   no value was supplied for a named argument, an argument was supplied more than once and the <see cref="CommandLineParser.AllowDuplicateArguments" qualifyHint="true"/> property
 ///   is <see langword="false"/>, or one of the argument values could not be converted to the argument's type.
 /// </para>
 /// </remarks>

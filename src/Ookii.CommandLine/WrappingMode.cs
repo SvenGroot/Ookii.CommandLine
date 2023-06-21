@@ -4,7 +4,7 @@ namespace Ookii.CommandLine;
 /// Indicates how the <see cref="LineWrappingTextWriter"/> class will wrap text at the maximum
 /// line length.
 /// </summary>
-/// <seealso cref="LineWrappingTextWriter.Wrapping"/>
+/// <seealso cref="LineWrappingTextWriter.Wrapping" qualifyHint="true"/>
 public enum WrappingMode
 {
     /// <summary>

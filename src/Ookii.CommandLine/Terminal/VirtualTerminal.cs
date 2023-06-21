@@ -25,7 +25,7 @@ public static class VirtualTerminal
     /// <param name="stream">The <see cref="StandardStream"/> to enable VT sequences for.</param>
     /// <returns>
     ///   An instance of the <see cref="VirtualTerminalSupport"/> class that will disable
-    ///   virtual terminal support when disposed or destructed. Use the <see cref="VirtualTerminalSupport.IsSupported"/>
+    ///   virtual terminal support when disposed or destructed. Use the <see cref="VirtualTerminalSupport.IsSupported" qualifyHint="true"/>
     ///   property to check if virtual terminal sequences are supported.
     /// </returns>
     /// <remarks>
@@ -36,7 +36,7 @@ public static class VirtualTerminal
     ///   environment variable is defined.
     /// </para>
     /// <para>
-    ///   For <see cref="StandardStream.Input"/>, this method does nothing and always returns
+    ///   For <see cref="StandardStream.Input" qualifyHint="true"/>, this method does nothing and always returns
     ///   <see langword="false"/>.
     /// </para>
     /// </remarks>
@@ -82,7 +82,7 @@ public static class VirtualTerminal
     /// <param name="stream">The <see cref="StandardStream"/> to enable color sequences for.</param>
     /// <returns>
     ///   An instance of the <see cref="VirtualTerminalSupport"/> class that will disable
-    ///   virtual terminal support when disposed or destructed. Use the <see cref="VirtualTerminalSupport.IsSupported"/>
+    ///   virtual terminal support when disposed or destructed. Use the <see cref="VirtualTerminalSupport.IsSupported" qualifyHint="true"/>
     ///   property to check if virtual terminal sequences are supported.
     /// </returns>
     /// <remarks>

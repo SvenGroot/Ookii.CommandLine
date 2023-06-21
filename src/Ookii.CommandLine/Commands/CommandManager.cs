@@ -28,7 +28,7 @@ namespace Ookii.CommandLine.Commands;
 /// <para>
 ///   A subcommand is created by creating a class that implements the <see cref="ICommand"/>
 ///   interface, and applying the <see cref="CommandAttribute"/> attribute to it. Implement
-///   the <see cref="ICommand.Run"/> method to implement the command's functionality.
+///   the <see cref="ICommand.Run" qualifyHint="true"/> method to implement the command's functionality.
 /// </para>
 /// <para>
 ///   Subcommands classes are instantiated using the <see cref="CommandLineParser"/> class, and
@@ -182,17 +182,17 @@ public class CommandManager
     /// Gets the result of parsing the arguments for the last call to <see cref="CreateCommand()"/>.
     /// </summary>
     /// <value>
-    /// The value of the <see cref="CommandLineParser.ParseResult"/> property after the call to the
-    /// <see cref="CommandLineParser.ParseWithErrorHandling()"/> method made while creating
+    /// The value of the <see cref="CommandLineParser.ParseResult" qualifyHint="true"/> property after the call to the
+    /// <see cref="CommandLineParser.ParseWithErrorHandling()" qualifyHint="true"/> method made while creating
     /// the command.
     /// </value>
     /// <remarks>
     /// <para>
-    ///   If the <see cref="CommandLineParser.ParseWithErrorHandling()"/> was not invoked, for
+    ///   If the <see cref="CommandLineParser.ParseWithErrorHandling()" qualifyHint="true"/> was not invoked, for
     ///   example because the <see cref="CreateCommand()"/> method has not been called, no
     ///   command name was specified, an unknown command name was specified, or the command used
-    ///   custom parsing, the value of the <see cref="ParseResult.Status"/> property will be
-    ///   <see cref="ParseStatus.None"/>.
+    ///   custom parsing, the value of the <see cref="ParseResult.Status" qualifyHint="true"/> property will be
+    ///   <see cref="ParseStatus.None" qualifyHint="true"/>.
     /// </para>
     /// </remarks>
     public ParseResult ParseResult { get; private set; }
@@ -201,7 +201,7 @@ public class CommandManager
     /// Gets the kind of <see cref="CommandProvider"/> used to supply the commands.
     /// </summary>
     /// <value>
-    /// One of the values of the <see cref="Support.ProviderKind"/> enumeration.
+    /// One of the values of the <see cref="Support.ProviderKind" qualifyHint="true"/> enumeration.
     /// </value>
     public ProviderKind ProviderKind => _provider.Kind;
 
@@ -213,18 +213,18 @@ public class CommandManager
     /// </returns>
     /// <remarks>
     /// <para>
-    ///   Commands that don't meet the criteria of the <see cref="CommandOptions.CommandFilter"/>
+    ///   Commands that don't meet the criteria of the <see cref="CommandOptions.CommandFilter" qualifyHint="true"/>
     ///   predicate are not returned.
     /// </para>
     /// <para>
-    ///   If the <see cref="CommandOptions.ParentCommand"/> is <see langword="null"/>, only
+    ///   If the <see cref="CommandOptions.ParentCommand" qualifyHint="true"/> is <see langword="null"/>, only
     ///   commands without a <see cref="ParentCommandAttribute"/> attribute are returned. If it is
     ///   not <see langword="null"/>, only commands where the type specified using the
     ///   <see cref="ParentCommandAttribute"/> attribute matches the value of the property are
     ///   returned.
     /// </para>
     /// <para>
-    ///   The automatic version command is added if the <see cref="CommandOptions.AutoVersionCommand"/>
+    ///   The automatic version command is added if the <see cref="CommandOptions.AutoVersionCommand" qualifyHint="true"/>
     ///   property is <see langword="true"/> and there is no command with a conflicting name.
     /// </para>
     /// </remarks>
@@ -263,32 +263,32 @@ public class CommandManager
     ///   the same name, the first matching one will be returned.
     /// </para>
     /// <para>
-    ///   If the <see cref="CommandOptions.AutoCommandPrefixAliases"/> property is <see langword="true"/>,
+    ///   If the <see cref="CommandOptions.AutoCommandPrefixAliases" qualifyHint="true"/> property is <see langword="true"/>,
     ///   this function will also return a command whose name or alias starts with
     ///   <paramref name="commandName"/>. In this case, the command will only be returned if there
     ///   is exactly one matching command; if the prefix is ambiguous, <see langword="null"/> is
     ///   returned.
     /// </para>
     /// <para>
-    ///   A command's name is taken from the <see cref="CommandAttribute.CommandName"/> property. If
+    ///   A command's name is taken from the <see cref="CommandAttribute.CommandName" qualifyHint="true"/> property. If
     ///   that property is <see langword="null"/>, the name is determined by taking the command
-    ///   type's name, and applying the transformation specified by the <see cref="CommandOptions.CommandNameTransform"/>
+    ///   type's name, and applying the transformation specified by the <see cref="CommandOptions.CommandNameTransform" qualifyHint="true"/>
     ///   property. A command's aliases are specified using the <see cref="AliasAttribute"/>
     ///   attribute.
     /// </para>
     /// <para>
-    ///   Commands that don't meet the criteria of the <see cref="CommandOptions.CommandFilter"/>
+    ///   Commands that don't meet the criteria of the <see cref="CommandOptions.CommandFilter" qualifyHint="true"/>
     ///   predicate are not returned.
     /// </para>
     /// <para>
-    ///   If the <see cref="CommandOptions.ParentCommand"/> is <see langword="null"/>, only
+    ///   If the <see cref="CommandOptions.ParentCommand" qualifyHint="true"/> is <see langword="null"/>, only
     ///   commands without a <see cref="ParentCommandAttribute"/> attribute are returned. If it is
     ///   not <see langword="null"/>, only commands where the type specified using the
     ///   <see cref="ParentCommandAttribute"/> attribute matches the value of the property are
     ///   returned.
     /// </para>
     /// <para>
-    ///   The automatic version command is returned if the <see cref="CommandOptions.AutoVersionCommand"/>
+    ///   The automatic version command is returned if the <see cref="CommandOptions.AutoVersionCommand" qualifyHint="true"/>
     ///   property is <see langword="true"/> and the <paramref name="commandName"/> matches the
     ///   name of the automatic version command, and not any other command name.
     /// </para>
@@ -357,29 +357,29 @@ public class CommandManager
     /// <remarks>
     /// <para>
     ///   If the command could not be found, a list of possible commands is written using the
-    ///   <see cref="ParseOptions.UsageWriter"/>. If an error occurs parsing the command's arguments,
-    ///   the error message is written to <see cref="ParseOptions.Error"/>, and the
-    ///   command's usage information is written to <see cref="ParseOptions.UsageWriter"/>.
+    ///   <see cref="ParseOptions.UsageWriter" qualifyHint="true"/>. If an error occurs parsing the command's arguments,
+    ///   the error message is written to <see cref="ParseOptions.Error" qualifyHint="true"/>, and the
+    ///   command's usage information is written to <see cref="ParseOptions.UsageWriter" qualifyHint="true"/>.
     /// </para>
     /// <para>
-    ///   If the <see cref="ParseOptions.Error"/> parameter is <see langword="null"/>, output is
+    ///   If the <see cref="ParseOptions.Error" qualifyHint="true"/> parameter is <see langword="null"/>, output is
     ///   written to a <see cref="LineWrappingTextWriter"/> for the standard error stream,
     ///   wrapping at the console's window width. If the stream is redirected, output may still
-    ///   be wrapped, depending on the value returned by <see cref="Console.WindowWidth"/>.
+    ///   be wrapped, depending on the value returned by <see cref="Console.WindowWidth" qualifyHint="true"/>.
     /// </para>
     /// <para>
-    ///   Commands that don't meet the criteria of the <see cref="CommandOptions.CommandFilter"/>
+    ///   Commands that don't meet the criteria of the <see cref="CommandOptions.CommandFilter" qualifyHint="true"/>
     ///   predicate are not returned.
     /// </para>
     /// <para>
-    ///   If the <see cref="CommandOptions.ParentCommand"/> is <see langword="null"/>, only
+    ///   If the <see cref="CommandOptions.ParentCommand" qualifyHint="true"/> is <see langword="null"/>, only
     ///   commands without a <see cref="ParentCommandAttribute"/> attribute are returned. If it is
     ///   not <see langword="null"/>, only commands where the type specified using the
     ///   <see cref="ParentCommandAttribute"/> attribute matches the value of the property are
     ///   returned.
     /// </para>
     /// <para>
-    ///   The automatic version command is returned if the <see cref="CommandOptions.AutoVersionCommand"/>
+    ///   The automatic version command is returned if the <see cref="CommandOptions.AutoVersionCommand" qualifyHint="true"/>
     ///   property is <see langword="true"/> and the command name matches the name of the
     ///   automatic version command, and not any other command name.
     /// </para>
@@ -468,7 +468,7 @@ public class CommandManager
     }
 
     /// <summary>
-    /// Finds and instantiates the subcommand using the arguments from <see cref="Environment.GetCommandLineArgs"/>,
+    /// Finds and instantiates the subcommand using the arguments from <see cref="Environment.GetCommandLineArgs" qualifyHint="true"/>,
     /// using the first argument for the command name. If that fails, writes error and usage information.
     /// </summary>
     /// <returns>
@@ -492,7 +492,7 @@ public class CommandManager
     /// <param name="args">The arguments to the command.</param>
     /// <param name="index">The index in <paramref name="args"/> at which to start parsing the arguments.</param>
     /// <returns>
-    ///   The value returned by <see cref="ICommand.Run"/>, or <see langword="null"/> if
+    ///   The value returned by <see cref="ICommand.Run" qualifyHint="true"/>, or <see langword="null"/> if
     ///   the command could not be created.
     /// </returns>
     /// <exception cref="ArgumentNullException">
@@ -504,14 +504,14 @@ public class CommandManager
     /// <remarks>
     /// <para>
     ///   This function creates the command by invoking the <see cref="CreateCommand(string?, string[], int)"/>,
-    ///   method and then invokes the <see cref="ICommand.Run"/> method on the command.
+    ///   method and then invokes the <see cref="ICommand.Run" qualifyHint="true"/> method on the command.
     /// </para>
     /// <para>
-    ///   Commands that don't meet the criteria of the <see cref="CommandOptions.CommandFilter"/>
+    ///   Commands that don't meet the criteria of the <see cref="CommandOptions.CommandFilter" qualifyHint="true"/>
     ///   predicate are not included.
     /// </para>
     /// <para>
-    ///   If the <see cref="CommandOptions.ParentCommand"/> is <see langword="null"/>, only
+    ///   If the <see cref="CommandOptions.ParentCommand" qualifyHint="true"/> is <see langword="null"/>, only
     ///   commands without a <see cref="ParentCommandAttribute"/> attribute are included. If it is
     ///   not <see langword="null"/>, only commands where the type specified using the
     ///   <see cref="ParentCommandAttribute"/> attribute matches the value of the property are
@@ -531,20 +531,20 @@ public class CommandManager
     /// <param name="commandName">The name of the command.</param>
     /// <param name="args">The arguments to the command.</param>
     /// <returns>
-    ///   The value returned by <see cref="ICommand.Run"/>, or <see langword="null"/> if
+    ///   The value returned by <see cref="ICommand.Run" qualifyHint="true"/>, or <see langword="null"/> if
     ///   the command could not be created.
     /// </returns>
     /// <remarks>
     /// <para>
     ///   This function creates the command by invoking the <see cref="CreateCommand(string?, ReadOnlyMemory{string})"/>,
-    ///   method and then invokes the <see cref="ICommand.Run"/> method on the command.
+    ///   method and then invokes the <see cref="ICommand.Run" qualifyHint="true"/> method on the command.
     /// </para>
     /// <para>
-    ///   Commands that don't meet the criteria of the <see cref="CommandOptions.CommandFilter"/>
+    ///   Commands that don't meet the criteria of the <see cref="CommandOptions.CommandFilter" qualifyHint="true"/>
     ///   predicate are not included.
     /// </para>
     /// <para>
-    ///   If the <see cref="CommandOptions.ParentCommand"/> is <see langword="null"/>, only
+    ///   If the <see cref="CommandOptions.ParentCommand" qualifyHint="true"/> is <see langword="null"/>, only
     ///   commands without a <see cref="ParentCommandAttribute"/> attribute are included. If it is
     ///   not <see langword="null"/>, only commands where the type specified using the
     ///   <see cref="ParentCommandAttribute"/> attribute matches the value of the property are
@@ -565,14 +565,14 @@ public class CommandManager
     /// <remarks>
     /// <para>
     ///   This function creates the command by invoking the <see cref="CreateCommand(ReadOnlyMemory{string})"/>,
-    ///   method and then invokes the <see cref="ICommand.Run"/> method on the command.
+    ///   method and then invokes the <see cref="ICommand.Run" qualifyHint="true"/> method on the command.
     /// </para>
     /// <para>
-    ///   Commands that don't meet the criteria of the <see cref="CommandOptions.CommandFilter"/>
+    ///   Commands that don't meet the criteria of the <see cref="CommandOptions.CommandFilter" qualifyHint="true"/>
     ///   predicate are not included.
     /// </para>
     /// <para>
-    ///   If the <see cref="CommandOptions.ParentCommand"/> is <see langword="null"/>, only
+    ///   If the <see cref="CommandOptions.ParentCommand" qualifyHint="true"/> is <see langword="null"/>, only
     ///   commands without a <see cref="ParentCommandAttribute"/> attribute are included. If it is
     ///   not <see langword="null"/>, only commands where the type specified using the
     ///   <see cref="ParentCommandAttribute"/> attribute matches the value of the property are
@@ -593,14 +593,14 @@ public class CommandManager
     /// <remarks>
     /// <para>
     ///   This function creates the command by invoking the <see cref="CreateCommand(string[], int)"/>,
-    ///   method and then invokes the <see cref="ICommand.Run"/> method on the command.
+    ///   method and then invokes the <see cref="ICommand.Run" qualifyHint="true"/> method on the command.
     /// </para>
     /// <para>
-    ///   Commands that don't meet the criteria of the <see cref="CommandOptions.CommandFilter"/>
+    ///   Commands that don't meet the criteria of the <see cref="CommandOptions.CommandFilter" qualifyHint="true"/>
     ///   predicate are not included.
     /// </para>
     /// <para>
-    ///   If the <see cref="CommandOptions.ParentCommand"/> is <see langword="null"/>, only
+    ///   If the <see cref="CommandOptions.ParentCommand" qualifyHint="true"/> is <see langword="null"/>, only
     ///   commands without a <see cref="ParentCommandAttribute"/> attribute are included. If it is
     ///   not <see langword="null"/>, only commands where the type specified using the
     ///   <see cref="ParentCommandAttribute"/> attribute matches the value of the property are
@@ -614,7 +614,7 @@ public class CommandManager
     }
 
     /// <summary>
-    /// Finds and instantiates the subcommand using the arguments from the <see cref="Environment.GetCommandLineArgs"/>
+    /// Finds and instantiates the subcommand using the arguments from the <see cref="Environment.GetCommandLineArgs" qualifyHint="true"/>
     /// method, using the first argument as the command name. If it succeeds, runs the command.
     /// If it fails, writes error and usage information.
     /// </summary>
@@ -624,14 +624,14 @@ public class CommandManager
     /// <remarks>
     /// <para>
     ///   This function creates the command by invoking the <see cref="CreateCommand()"/>,
-    ///   method and then invokes the <see cref="ICommand.Run"/> method on the command.
+    ///   method and then invokes the <see cref="ICommand.Run" qualifyHint="true"/> method on the command.
     /// </para>
     /// <para>
-    ///   Commands that don't meet the criteria of the <see cref="CommandOptions.CommandFilter"/>
+    ///   Commands that don't meet the criteria of the <see cref="CommandOptions.CommandFilter" qualifyHint="true"/>
     ///   predicate are not included.
     /// </para>
     /// <para>
-    ///   If the <see cref="CommandOptions.ParentCommand"/> is <see langword="null"/>, only
+    ///   If the <see cref="CommandOptions.ParentCommand" qualifyHint="true"/> is <see langword="null"/>, only
     ///   commands without a <see cref="ParentCommandAttribute"/> attribute are included. If it is
     ///   not <see langword="null"/>, only commands where the type specified using the
     ///   <see cref="ParentCommandAttribute"/> attribute matches the value of the property are
@@ -651,22 +651,22 @@ public class CommandManager
     /// </summary>
     /// <returns>
     ///   A task representing the asynchronous run operation. The result is the value returned
-    ///   by <see cref="IAsyncCommand.RunAsync"/>, or <see langword="null"/> if the command
+    ///   by <see cref="IAsyncCommand.RunAsync" qualifyHint="true"/>, or <see langword="null"/> if the command
     ///   could not be created.
     /// </returns>
     /// <remarks>
     /// <para>
     ///   This function creates the command by invoking the <see cref="CreateCommand(string?, ReadOnlyMemory{string})"/>,
     ///   method. If the command implements the <see cref="IAsyncCommand"/> interface, it
-    ///   invokes the <see cref="IAsyncCommand.RunAsync"/> method; otherwise, it invokes the
-    ///   <see cref="ICommand.Run"/> method on the command.
+    ///   invokes the <see cref="IAsyncCommand.RunAsync" qualifyHint="true"/> method; otherwise, it invokes the
+    ///   <see cref="ICommand.Run" qualifyHint="true"/> method on the command.
     /// </para>
     /// <para>
-    ///   Commands that don't meet the criteria of the <see cref="CommandOptions.CommandFilter"/>
+    ///   Commands that don't meet the criteria of the <see cref="CommandOptions.CommandFilter" qualifyHint="true"/>
     ///   predicate are not included.
     /// </para>
     /// <para>
-    ///   If the <see cref="CommandOptions.ParentCommand"/> is <see langword="null"/>, only
+    ///   If the <see cref="CommandOptions.ParentCommand" qualifyHint="true"/> is <see langword="null"/>, only
     ///   commands without a <see cref="ParentCommandAttribute"/> attribute are included. If it is
     ///   not <see langword="null"/>, only commands where the type specified using the
     ///   <see cref="ParentCommandAttribute"/> attribute matches the value of the property are
@@ -691,22 +691,22 @@ public class CommandManager
     /// </summary>
     /// <returns>
     ///   A task representing the asynchronous run operation. The result is the value returned
-    ///   by <see cref="IAsyncCommand.RunAsync"/>, or <see langword="null"/> if the command
+    ///   by <see cref="IAsyncCommand.RunAsync" qualifyHint="true"/>, or <see langword="null"/> if the command
     ///   could not be created.
     /// </returns>
     /// <remarks>
     /// <para>
     ///   This function creates the command by invoking the <see cref="CreateCommand(string?, string[], int)"/>,
     ///   method. If the command implements the <see cref="IAsyncCommand"/> interface, it
-    ///   invokes the <see cref="IAsyncCommand.RunAsync"/> method; otherwise, it invokes the
-    ///   <see cref="ICommand.Run"/> method on the command.
+    ///   invokes the <see cref="IAsyncCommand.RunAsync" qualifyHint="true"/> method; otherwise, it invokes the
+    ///   <see cref="ICommand.Run" qualifyHint="true"/> method on the command.
     /// </para>
     /// <para>
-    ///   Commands that don't meet the criteria of the <see cref="CommandOptions.CommandFilter"/>
+    ///   Commands that don't meet the criteria of the <see cref="CommandOptions.CommandFilter" qualifyHint="true"/>
     ///   predicate are not included.
     /// </para>
     /// <para>
-    ///   If the <see cref="CommandOptions.ParentCommand"/> is <see langword="null"/>, only
+    ///   If the <see cref="CommandOptions.ParentCommand" qualifyHint="true"/> is <see langword="null"/>, only
     ///   commands without a <see cref="ParentCommandAttribute"/> attribute are included. If it is
     ///   not <see langword="null"/>, only commands where the type specified using the
     ///   <see cref="ParentCommandAttribute"/> attribute matches the value of the property are
@@ -733,15 +733,15 @@ public class CommandManager
     /// <para>
     ///   This function creates the command by invoking the <see cref="CreateCommand(ReadOnlyMemory{string})"/>,
     ///   method. If the command implements the <see cref="IAsyncCommand"/> interface, it
-    ///   invokes the <see cref="IAsyncCommand.RunAsync"/> method; otherwise, it invokes the
-    ///   <see cref="ICommand.Run"/> method on the command.
+    ///   invokes the <see cref="IAsyncCommand.RunAsync" qualifyHint="true"/> method; otherwise, it invokes the
+    ///   <see cref="ICommand.Run" qualifyHint="true"/> method on the command.
     /// </para>
     /// <para>
-    ///   Commands that don't meet the criteria of the <see cref="CommandOptions.CommandFilter"/>
+    ///   Commands that don't meet the criteria of the <see cref="CommandOptions.CommandFilter" qualifyHint="true"/>
     ///   predicate are not included.
     /// </para>
     /// <para>
-    ///   If the <see cref="CommandOptions.ParentCommand"/> is <see langword="null"/>, only
+    ///   If the <see cref="CommandOptions.ParentCommand" qualifyHint="true"/> is <see langword="null"/>, only
     ///   commands without a <see cref="ParentCommandAttribute"/> attribute are included. If it is
     ///   not <see langword="null"/>, only commands where the type specified using the
     ///   <see cref="ParentCommandAttribute"/> attribute matches the value of the property are
@@ -768,15 +768,15 @@ public class CommandManager
     /// <para>
     ///   This function creates the command by invoking the <see cref="CreateCommand(string[], int)"/>,
     ///   method. If the command implements the <see cref="IAsyncCommand"/> interface, it
-    ///   invokes the <see cref="IAsyncCommand.RunAsync"/> method; otherwise, it invokes the
-    ///   <see cref="ICommand.Run"/> method on the command.
+    ///   invokes the <see cref="IAsyncCommand.RunAsync" qualifyHint="true"/> method; otherwise, it invokes the
+    ///   <see cref="ICommand.Run" qualifyHint="true"/> method on the command.
     /// </para>
     /// <para>
-    ///   Commands that don't meet the criteria of the <see cref="CommandOptions.CommandFilter"/>
+    ///   Commands that don't meet the criteria of the <see cref="CommandOptions.CommandFilter" qualifyHint="true"/>
     ///   predicate are not included.
     /// </para>
     /// <para>
-    ///   If the <see cref="CommandOptions.ParentCommand"/> is <see langword="null"/>, only
+    ///   If the <see cref="CommandOptions.ParentCommand" qualifyHint="true"/> is <see langword="null"/>, only
     ///   commands without a <see cref="ParentCommandAttribute"/> attribute are included. If it is
     ///   not <see langword="null"/>, only commands where the type specified using the
     ///   <see cref="ParentCommandAttribute"/> attribute matches the value of the property are
@@ -796,7 +796,7 @@ public class CommandManager
 
     /// <inheritdoc cref="RunCommandAsync(string?, string[], int)"/>
     /// <summary>
-    /// Finds and instantiates the subcommand using the arguments from the <see cref="Environment.GetCommandLineArgs"/>
+    /// Finds and instantiates the subcommand using the arguments from the <see cref="Environment.GetCommandLineArgs" qualifyHint="true"/>
     /// method, using the first argument as the command name. If it succeeds, runs the command
     /// asynchronously. If it fails, writes error and usage information.
     /// </summary>
@@ -804,15 +804,15 @@ public class CommandManager
     /// <para>
     ///   This function creates the command by invoking the <see cref="CreateCommand()"/>,
     ///   method. If the command implements the <see cref="IAsyncCommand"/> interface, it
-    ///   invokes the <see cref="IAsyncCommand.RunAsync"/> method; otherwise, it invokes the
-    ///   <see cref="ICommand.Run"/> method on the command.
+    ///   invokes the <see cref="IAsyncCommand.RunAsync" qualifyHint="true"/> method; otherwise, it invokes the
+    ///   <see cref="ICommand.Run" qualifyHint="true"/> method on the command.
     /// </para>
     /// <para>
-    ///   Commands that don't meet the criteria of the <see cref="CommandOptions.CommandFilter"/>
+    ///   Commands that don't meet the criteria of the <see cref="CommandOptions.CommandFilter" qualifyHint="true"/>
     ///   predicate are not included.
     /// </para>
     /// <para>
-    ///   If the <see cref="CommandOptions.ParentCommand"/> is <see langword="null"/>, only
+    ///   If the <see cref="CommandOptions.ParentCommand" qualifyHint="true"/> is <see langword="null"/>, only
     ///   commands without a <see cref="ParentCommandAttribute"/> attribute are included. If it is
     ///   not <see langword="null"/>, only commands where the type specified using the
     ///   <see cref="ParentCommandAttribute"/> attribute matches the value of the property are
@@ -836,18 +836,18 @@ public class CommandManager
     /// <remarks>
     /// <para>
     ///   This method writes usage help for the application, including a list of all
-    ///   subcommand names and their descriptions to <see cref="ParseOptions.UsageWriter"/>.
+    ///   subcommand names and their descriptions to <see cref="ParseOptions.UsageWriter" qualifyHint="true"/>.
     /// </para>
     /// <para>
     ///   A command's name is retrieved from its <see cref="CommandAttribute"/> attribute,
     ///   and the description is retrieved from its <see cref="DescriptionAttribute"/> attribute.
     /// </para>
     /// <para>
-    ///   Commands that don't meet the criteria of the <see cref="CommandOptions.CommandFilter"/>
+    ///   Commands that don't meet the criteria of the <see cref="CommandOptions.CommandFilter" qualifyHint="true"/>
     ///   predicate are not included.
     /// </para>
     /// <para>
-    ///   If the <see cref="CommandOptions.ParentCommand"/> is <see langword="null"/>, only
+    ///   If the <see cref="CommandOptions.ParentCommand" qualifyHint="true"/> is <see langword="null"/>, only
     ///   commands without a <see cref="ParentCommandAttribute"/> attribute are included. If it is
     ///   not <see langword="null"/>, only commands where the type specified using the
     ///   <see cref="ParentCommandAttribute"/> attribute matches the value of the property are
@@ -869,11 +869,11 @@ public class CommandManager
     ///   and the description is retrieved from its <see cref="DescriptionAttribute"/> attribute.
     /// </para>
     /// <para>
-    ///   Commands that don't meet the criteria of the <see cref="CommandOptions.CommandFilter"/>
+    ///   Commands that don't meet the criteria of the <see cref="CommandOptions.CommandFilter" qualifyHint="true"/>
     ///   predicate are not included.
     /// </para>
     /// <para>
-    ///   If the <see cref="CommandOptions.ParentCommand"/> is <see langword="null"/>, only
+    ///   If the <see cref="CommandOptions.ParentCommand" qualifyHint="true"/> is <see langword="null"/>, only
     ///   commands without a <see cref="ParentCommandAttribute"/> attribute are included. If it is
     ///   not <see langword="null"/>, only commands where the type specified using the
     ///   <see cref="ParentCommandAttribute"/> attribute matches the value of the property are
@@ -889,12 +889,12 @@ public class CommandManager
     /// Gets the application description that will optionally be included in the usage help.
     /// </summary>
     /// <returns>
-    /// If the <see cref="CommandOptions.ParentCommand"/> property is not <see langword="null"/>,
+    /// If the <see cref="CommandOptions.ParentCommand" qualifyHint="true"/> property is not <see langword="null"/>,
     /// and the command type referenced has the <see cref="DescriptionAttribute"/> attribute, the
     /// description given in that attribute. Otherwise, the value of the
     /// <see cref="AssemblyDescriptionAttribute"/> for the first assembly used by this instance.
     /// </returns>
-    /// <seealso cref="UsageWriter.IncludeApplicationDescriptionBeforeCommandList"/>
+    /// <seealso cref="UsageWriter.IncludeApplicationDescriptionBeforeCommandList" qualifyHint="true"/>
     public string? GetApplicationDescription()
     {
         var attribute = _options.ParentCommand?.GetCustomAttribute<DescriptionAttribute>();

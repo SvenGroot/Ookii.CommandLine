@@ -9,7 +9,7 @@ using System.IO;
 namespace Ookii.CommandLine;
 
 /// <summary>
-/// Provides options for the <see cref="CommandLineParser.Parse{T}(string[], ParseOptions)"/>
+/// Provides options for the <see cref="CommandLineParser.Parse{T}(string[], ParseOptions)" qualifyHint="true"/>
 /// method and the <see cref="CommandLineParser(Type, ParseOptions?)"/> constructor.
 /// </summary>
 /// <remarks>
@@ -30,9 +30,9 @@ public class ParseOptions
     /// </summary>
     /// <value>
     /// The culture used to convert command line argument values from their string representation to the argument type, or
-    /// <see langword="null" /> to use <see cref="CultureInfo.InvariantCulture"/>. The default value is <see langword="null"/>
+    /// <see langword="null" /> to use <see cref="CultureInfo.InvariantCulture" qualifyHint="true"/>. The default value is <see langword="null"/>
     /// </value>
-    /// <seealso cref="CommandLineParser.Culture"/>
+    /// <seealso cref="CommandLineParser.Culture" qualifyHint="true"/>
     public CultureInfo? Culture { get; set; }
 
     /// <summary>
@@ -40,7 +40,7 @@ public class ParseOptions
     /// representation to the argument type.
     /// </summary>
     /// <value>
-    /// The value of the <see cref="Culture"/> property, or <see cref="CultureInfo.InvariantCulture"/>
+    /// The value of the <see cref="Culture"/> property, or <see cref="CultureInfo.InvariantCulture" qualifyHint="true"/>
     /// if that property is <see langword="null"/>.
     /// </value>
     public CultureInfo CultureOrDefault => Culture ?? CultureInfo.InvariantCulture;
@@ -51,23 +51,23 @@ public class ParseOptions
     /// <value>
     /// One of the values of the <see cref="ParsingMode"/> enumeration, or <see langword="null"/>
     /// to use the value from the <see cref="ParseOptionsAttribute"/> attribute, or if that
-    /// attribute is not present, <see cref="ParsingMode.Default"/>. The default value is
+    /// attribute is not present, <see cref="ParsingMode.Default" qualifyHint="true"/>. The default value is
     /// <see langword="null"/>.
     /// </value>
     /// <remarks>
     /// <para>
     ///   If not <see langword="null"/>, this property overrides the value of the
-    ///   <see cref="ParseOptionsAttribute.Mode"/> property.
+    ///   <see cref="ParseOptionsAttribute.Mode" qualifyHint="true"/> property.
     /// </para>
     /// </remarks>
-    /// <seealso cref="CommandLineParser.Mode"/>
+    /// <seealso cref="CommandLineParser.Mode" qualifyHint="true"/>
     public ParsingMode? Mode { get; set; }
 
     /// <summary>
     /// Gets a value that indicates the command line argument parsing rules to use.
     /// </summary>
     /// <value>
-    /// The value of the <see cref="Mode"/> property, or <see cref="ParsingMode.Default"/>
+    /// The value of the <see cref="Mode"/> property, or <see cref="ParsingMode.Default" qualifyHint="true"/>
     /// if that property is <see langword="null"/>.
     /// </value>
     public ParsingMode ModeOrDefault => Mode ?? ParsingMode.Default;
@@ -88,10 +88,10 @@ public class ParseOptions
     /// </para>
     /// <para>
     ///   Setting this property to <see langword="true"/> is equivalent to setting the
-    ///   <see cref="Mode"/> property to <see cref="ParsingMode.LongShort"/>, the
-    ///   <see cref="ArgumentNameComparison"/> property to <see cref="StringComparison.InvariantCulture"/>,
-    ///   the <see cref="ArgumentNameTransform"/> property to <see cref="NameTransform.DashCase"/>,
-    ///   and the <see cref="ValueDescriptionTransform"/> property to <see cref="NameTransform.DashCase"/>.
+    ///   <see cref="Mode"/> property to <see cref="ParsingMode.LongShort" qualifyHint="true"/>, the
+    ///   <see cref="ArgumentNameComparison"/> property to <see cref="StringComparison.InvariantCulture" qualifyHint="true"/>,
+    ///   the <see cref="ArgumentNameTransform"/> property to <see cref="NameTransform.DashCase" qualifyHint="true"/>,
+    ///   and the <see cref="ValueDescriptionTransform"/> property to <see cref="NameTransform.DashCase" qualifyHint="true"/>.
     /// </para>
     /// <para>
     ///   This property will only return <see langword="true"/> if the above properties are the
@@ -101,14 +101,14 @@ public class ParseOptions
     /// </para>
     /// <para>
     ///   Setting this property to <see langword="false"/> is equivalent to setting the
-    ///   <see cref="Mode"/> property to <see cref="ParsingMode.Default"/>, the
-    ///   <see cref="ArgumentNameComparison"/> property to <see cref="StringComparison.OrdinalIgnoreCase"/>,
-    ///   the <see cref="ArgumentNameTransform"/> property to <see cref="NameTransform.None"/>,
-    ///   and the <see cref="ValueDescriptionTransform"/> property to <see cref="NameTransform.None"/>.
+    ///   <see cref="Mode"/> property to <see cref="ParsingMode.Default" qualifyHint="true"/>, the
+    ///   <see cref="ArgumentNameComparison"/> property to <see cref="StringComparison.OrdinalIgnoreCase" qualifyHint="true"/>,
+    ///   the <see cref="ArgumentNameTransform"/> property to <see cref="NameTransform.None" qualifyHint="true"/>,
+    ///   and the <see cref="ValueDescriptionTransform"/> property to <see cref="NameTransform.None" qualifyHint="true"/>.
     /// </para>
     /// </remarks>
-    /// <seealso cref="CommandOptions.IsPosix"/>
-    /// <seealso cref="ParseOptionsAttribute.IsPosix"/>
+    /// <seealso cref="CommandOptions.IsPosix" qualifyHint="true"/>
+    /// <seealso cref="ParseOptionsAttribute.IsPosix" qualifyHint="true"/>
     public virtual bool IsPosix
     {
         get => Mode == ParsingMode.LongShort && ArgumentNameComparisonOrDefault.IsCaseSensitive() &&
@@ -139,12 +139,12 @@ public class ParseOptions
     /// <value>
     /// One of the values of the <see cref="NameTransform"/> enumeration, or <see langword="null"/>
     /// to use the value from the <see cref="ParseOptionsAttribute"/> attribute, or if that
-    /// attribute is not present, <see cref="NameTransform.None"/>. The default value is
+    /// attribute is not present, <see cref="NameTransform.None" qualifyHint="true"/>. The default value is
     /// <see langword="null"/>.
     /// </value>
     /// <remarks>
     /// <para>
-    ///   If an argument doesn't have the <see cref="CommandLineArgumentAttribute.ArgumentName"/>
+    ///   If an argument doesn't have the <see cref="CommandLineArgumentAttribute.ArgumentName" qualifyHint="true"/>
     ///   property set, the argument name is determined by taking the name of the property, or
     ///   method that defines it, and applying the specified transform.
     /// </para>
@@ -154,12 +154,12 @@ public class ParseOptions
     /// </para>
     /// <para>
     ///   If not <see langword="null"/>, this property overrides the value of the
-    ///   <see cref="ParseOptionsAttribute.ArgumentNameTransform"/> property.
+    ///   <see cref="ParseOptionsAttribute.ArgumentNameTransform" qualifyHint="true"/> property.
     /// </para>
     /// </remarks>
     /// <seealso cref="NameTransform"/>
     /// <seealso cref="ValueDescriptionTransform"/>
-    /// <seealso cref="CommandOptions.CommandNameTransform"/>
+    /// <seealso cref="CommandOptions.CommandNameTransform" qualifyHint="true"/>
     public NameTransform? ArgumentNameTransform { get; set; }
 
     /// <summary>
@@ -167,7 +167,7 @@ public class ParseOptions
     /// name.
     /// </summary>
     /// <value>
-    /// The value of the <see cref="ArgumentNameTransform"/> property, or <see cref="NameTransform.None"/>
+    /// The value of the <see cref="ArgumentNameTransform"/> property, or <see cref="NameTransform.None" qualifyHint="true"/>
     /// if that property is <see langword="null"/>.
     /// </value>
     public NameTransform ArgumentNameTransformOrDefault => ArgumentNameTransform ?? NameTransform.None;
@@ -178,22 +178,22 @@ public class ParseOptions
     /// <value>
     /// The named argument switches, or <see langword="null"/> to use the values from the
     /// <see cref="ParseOptionsAttribute"/> attribute, or if not set, the default prefixes for
-    /// the current platform as returned by the <see cref="CommandLineParser.GetDefaultArgumentNamePrefixes"/>
+    /// the current platform as returned by the <see cref="CommandLineParser.GetDefaultArgumentNamePrefixes" qualifyHint="true"/>
     /// method. The default value is <see langword="null"/>.
     /// </value>
     /// <remarks>
     /// <para>
-    ///   If the parsing mode is set to <see cref="ParsingMode.LongShort"/>, either using the
+    ///   If the parsing mode is set to <see cref="ParsingMode.LongShort" qualifyHint="true"/>, either using the
     ///   <see cref="Mode"/> property or the <see cref="ParseOptionsAttribute"/> attribute,
     ///   this property sets the short argument name prefixes. Use the<see cref="LongArgumentNamePrefix"/>
     ///   property to set the argument prefix for long names.
     /// </para>
     /// <para>
     ///   If not <see langword="null"/>, this property overrides the value of the
-    ///   <see cref="ParseOptionsAttribute.ArgumentNamePrefixes"/> property.
+    ///   <see cref="ParseOptionsAttribute.ArgumentNamePrefixes" qualifyHint="true"/> property.
     /// </para>
     /// </remarks>
-    /// <seealso cref="CommandLineParser.ArgumentNamePrefixes"/>
+    /// <seealso cref="CommandLineParser.ArgumentNamePrefixes" qualifyHint="true"/>
 
     public IEnumerable<string>? ArgumentNamePrefixes { get; set; }
 
@@ -202,7 +202,7 @@ public class ParseOptions
     /// </summary>
     /// <value>
     /// The value of the <see cref="ArgumentNamePrefixes"/> property, or the return value of the
-    /// <see cref="CommandLineParser.GetDefaultArgumentNamePrefixes()"/> method if that property
+    /// <see cref="CommandLineParser.GetDefaultArgumentNamePrefixes()" qualifyHint="true"/> method if that property
     /// is <see langword="null"/>
     /// </value>
     public IEnumerable<string> ArgumentNamePrefixesOrDefault => ArgumentNamePrefixes ?? CommandLineParser.GetDefaultArgumentNamePrefixes();
@@ -213,12 +213,12 @@ public class ParseOptions
     /// <value>
     /// The long argument prefix, or <see langword="null"/> to use the value from the
     /// <see cref="ParseOptionsAttribute"/> attribute, or if not set, the default prefix from
-    /// the <see cref="CommandLineParser.DefaultLongArgumentNamePrefix"/> constant. The default
+    /// the <see cref="CommandLineParser.DefaultLongArgumentNamePrefix" qualifyHint="true"/> constant. The default
     /// value is <see langword="null"/>.
     /// </value>
     /// <remarks>
     /// <para>
-    ///   This property is only used if the if the parsing mode is set to <see cref="ParsingMode.LongShort"/>,
+    ///   This property is only used if the if the parsing mode is set to <see cref="ParsingMode.LongShort" qualifyHint="true"/>,
     ///   either using the <see cref="Mode"/> property or the <see cref="ParseOptionsAttribute"/>
     ///   attribute
     /// </para>
@@ -228,10 +228,10 @@ public class ParseOptions
     /// </para>
     /// <para>
     ///   If not <see langword="null"/>, this property overrides the value of the
-    ///   <see cref="ParseOptionsAttribute.LongArgumentNamePrefix"/> property.
+    ///   <see cref="ParseOptionsAttribute.LongArgumentNamePrefix" qualifyHint="true"/> property.
     /// </para>
     /// </remarks>
-    /// <seealso cref="CommandLineParser.LongArgumentNamePrefix"/>
+    /// <seealso cref="CommandLineParser.LongArgumentNamePrefix" qualifyHint="true"/>
     public string? LongArgumentNamePrefix { get; set; }
 
     /// <summary>
@@ -239,7 +239,7 @@ public class ParseOptions
     /// </summary>
     /// <value>
     /// The value of the <see cref="ArgumentNamePrefixes"/> property, or the value of the
-    /// <see cref="CommandLineParser.DefaultLongArgumentNamePrefix"/> constant if that property
+    /// <see cref="CommandLineParser.DefaultLongArgumentNamePrefix" qualifyHint="true"/> constant if that property
     /// is <see langword="null"/>
     /// </value>
     public string LongArgumentNamePrefixOrDefault => LongArgumentNamePrefix ?? CommandLineParser.DefaultLongArgumentNamePrefix;
@@ -250,25 +250,25 @@ public class ParseOptions
     /// <value>
     /// One of the values of the <see cref="StringComparison"/> enumeration, or
     /// <see langword="null"/> to use the one determined using the
-    /// <see cref="ParseOptionsAttribute.CaseSensitive"/> property, or if the
+    /// <see cref="ParseOptionsAttribute.CaseSensitive" qualifyHint="true"/> property, or if the
     /// <see cref="ParseOptionsAttribute"/> is not present,
-    /// <see cref="StringComparison.OrdinalIgnoreCase"/>. The default value is
+    /// <see cref="StringComparison.OrdinalIgnoreCase" qualifyHint="true"/>. The default value is
     /// <see langword="null"/>.
     /// </value>
     /// <remarks>
     /// <para>
     ///   If not <see langword="null"/>, this property overrides the value of the
-    ///   <see cref="ParseOptionsAttribute.CaseSensitive"/> property.
+    ///   <see cref="ParseOptionsAttribute.CaseSensitive" qualifyHint="true"/> property.
     /// </para>
     /// </remarks>
-    /// <seealso cref="CommandLineParser.ArgumentNameComparison"/>
+    /// <seealso cref="CommandLineParser.ArgumentNameComparison" qualifyHint="true"/>
     public StringComparison? ArgumentNameComparison { get; set; }
 
     /// <summary>
     /// Gets the type of string comparison to use for argument names.
     /// </summary>
     /// <value>
-    /// The value of the <see cref="ArgumentNameComparison"/> property, or <see cref="StringComparison.OrdinalIgnoreCase"/>
+    /// The value of the <see cref="ArgumentNameComparison"/> property, or <see cref="StringComparison.OrdinalIgnoreCase" qualifyHint="true"/>
     /// if that property is <see langword="null"/>.
     /// </value>
     public StringComparison ArgumentNameComparisonOrDefault => ArgumentNameComparison ?? StringComparison.OrdinalIgnoreCase;
@@ -284,7 +284,7 @@ public class ParseOptions
     /// <value>
     /// The <see cref="TextWriter"/> used to print error information, or <see langword="null"/>
     /// to print to a <see cref="LineWrappingTextWriter"/> for the standard error stream 
-    /// (<see cref="Console.Error"/>). The default value is <see langword="null"/>.
+    /// (<see cref="Console.Error" qualifyHint="true"/>). The default value is <see langword="null"/>.
     /// </value>
     public TextWriter? Error { get; set; }
 
@@ -294,36 +294,36 @@ public class ParseOptions
     /// <value>
     /// One of the values of the <see cref="ErrorMode"/> enumeration, or <see langword="null"/>
     /// to use the value from the <see cref="ParseOptionsAttribute"/> attribute, or if that
-    /// attribute is not present, <see cref="ErrorMode.Error"/>. The default value is
+    /// attribute is not present, <see cref="ErrorMode.Error" qualifyHint="true"/>. The default value is
     /// <see langword="null"/>.
     /// </value>
     /// <remarks>
     /// <para>
-    ///   If set to <see cref="ErrorMode.Error"/>, supplying a non-multi-value argument more
-    ///   than once will cause an exception. If set to <see cref="ErrorMode.Allow"/>, the
+    ///   If set to <see cref="ErrorMode.Error" qualifyHint="true"/>, supplying a non-multi-value argument more
+    ///   than once will cause an exception. If set to <see cref="ErrorMode.Allow" qualifyHint="true"/>, the
     ///   last value supplied will be used.
     /// </para>
     /// <para>
-    ///   If set to <see cref="ErrorMode.Warning"/>, the <see cref="CommandLineParser{T}.ParseWithErrorHandling()"/>
-    ///   method, the static <see cref="CommandLineParser.Parse{T}(ParseOptions?)"/> method and
+    ///   If set to <see cref="ErrorMode.Warning" qualifyHint="true"/>, the <see cref="CommandLineParser{T}.ParseWithErrorHandling()" qualifyHint="true"/>
+    ///   method, the static <see cref="CommandLineParser.Parse{T}(ParseOptions?)" qualifyHint="true"/> method and
     ///   the <see cref="CommandManager"/> class will print a warning to the <see cref="Error"/>
     ///   stream when a duplicate argument is found. If you are not using these methods,
-    ///   <see cref="ErrorMode.Warning"/> is identical to <see cref="ErrorMode.Allow"/> and no
+    ///   <see cref="ErrorMode.Warning" qualifyHint="true"/> is identical to <see cref="ErrorMode.Allow" qualifyHint="true"/> and no
     ///   warning is displayed.
     /// </para>
     /// <para>
     ///   If not <see langword="null"/>, this property overrides the value of the
-    ///   <see cref="ParseOptionsAttribute.DuplicateArguments"/> property.
+    ///   <see cref="ParseOptionsAttribute.DuplicateArguments" qualifyHint="true"/> property.
     /// </para>
     /// </remarks>
-    /// <seealso cref="CommandLineParser.AllowDuplicateArguments"/>
+    /// <seealso cref="CommandLineParser.AllowDuplicateArguments" qualifyHint="true"/>
     public ErrorMode? DuplicateArguments { get; set; }
 
     /// <summary>
     /// Gets a value indicating whether duplicate arguments are allowed.
     /// </summary>
     /// <value>
-    /// The value of the <see cref="DuplicateArguments"/> property, or <see cref="ErrorMode.Error"/>
+    /// The value of the <see cref="DuplicateArguments"/> property, or <see cref="ErrorMode.Error" qualifyHint="true"/>
     /// if that property is <see langword="null"/>.
     /// </value>
     public ErrorMode DuplicateArgumentsOrDefault => DuplicateArguments ?? ErrorMode.Error;
@@ -334,17 +334,17 @@ public class ParseOptions
     /// <value>
     ///   <see langword="true"/> if white space is allowed to separate an argument name and its
     ///   value; <see langword="false"/> if only the <see cref="NameValueSeparators"/> are allowed,
-    ///   or <see langword="null" /> to use the value from the <see cref="ParseOptionsAttribute.AllowWhiteSpaceValueSeparator"/>
+    ///   or <see langword="null" /> to use the value from the <see cref="ParseOptionsAttribute.AllowWhiteSpaceValueSeparator" qualifyHint="true"/>
     ///   property, or if the <see cref="ParseOptionsAttribute"/> is not present, the default
     ///   option which is <see langword="true"/>. The default value is <see langword="null"/>.
     /// </value>
     /// <remarks>
     /// <para>
     ///   If not <see langword="null"/>, this property overrides the value of the
-    ///   <see cref="ParseOptionsAttribute.AllowWhiteSpaceValueSeparator"/> property.
+    ///   <see cref="ParseOptionsAttribute.AllowWhiteSpaceValueSeparator" qualifyHint="true"/> property.
     /// </para>
     /// </remarks>
-    /// <seealso cref="CommandLineParser.AllowWhiteSpaceValueSeparator"/>
+    /// <seealso cref="CommandLineParser.AllowWhiteSpaceValueSeparator" qualifyHint="true"/>
     public bool? AllowWhiteSpaceValueSeparator { get; set; }
 
     /// <summary>
@@ -363,7 +363,7 @@ public class ParseOptions
     /// <value>
     ///   The character used to separate the name and the value of an argument, or <see langword="null"/>
     ///   to use the value from the <see cref="ParseOptionsAttribute"/> attribute, or if that
-    ///   is not present, the values returned by the <see cref="CommandLineParser.GetDefaultNameValueSeparators"/>
+    ///   is not present, the values returned by the <see cref="CommandLineParser.GetDefaultNameValueSeparators" qualifyHint="true"/>
     ///   method, which are a colon (:) and an equals sign (=). The default value is <see langword="null"/>.
     /// </value>
     /// <remarks>
@@ -387,7 +387,7 @@ public class ParseOptions
     /// </note>
     /// <para>
     ///   If not <see langword="null"/>, this property overrides the value of the
-    ///   <see cref="ParseOptionsAttribute.NameValueSeparators"/> property.
+    ///   <see cref="ParseOptionsAttribute.NameValueSeparators" qualifyHint="true"/> property.
     /// </para>
     /// </remarks>
     public IEnumerable<char>? NameValueSeparators { get; set; }
@@ -397,7 +397,7 @@ public class ParseOptions
     /// </summary>
     /// <value>
     /// The value of the <see cref="NameValueSeparators"/> property, or the return value of the
-    /// <see cref="CommandLineParser.GetDefaultNameValueSeparators"/> method if that property is
+    /// <see cref="CommandLineParser.GetDefaultNameValueSeparators" qualifyHint="true"/> method if that property is
     /// <see langword="null"/>.
     /// </value>
     public IEnumerable<char> NameValueSeparatorsOrDefault => NameValueSeparators ?? CommandLineParser.GetDefaultNameValueSeparators();
@@ -414,7 +414,7 @@ public class ParseOptions
     /// <remarks>
     /// <para>
     ///   If this property is <see langword="true"/>, the <see cref="CommandLineParser"/>
-    ///   will automatically add an argument with the name "Help". If using <see cref="ParsingMode.LongShort"/>,
+    ///   will automatically add an argument with the name "Help". If using <see cref="ParsingMode.LongShort" qualifyHint="true"/>,
     ///   this argument will have the short name "?" and a short alias "h"; otherwise, it
     ///   will have the aliases "?" and "h". When supplied, this argument will cancel parsing
     ///   and cause usage help to be printed.
@@ -429,12 +429,12 @@ public class ParseOptions
     /// </para>
     /// <para>
     ///   If not <see langword="null"/>, this property overrides the value of the
-    ///   <see cref="ParseOptionsAttribute.AutoHelpArgument"/> property.
+    ///   <see cref="ParseOptionsAttribute.AutoHelpArgument" qualifyHint="true"/> property.
     /// </para>
     /// </remarks>
-    /// <seealso cref="LocalizedStringProvider.AutomaticHelpName"/>
-    /// <seealso cref="LocalizedStringProvider.AutomaticHelpDescription"/>
-    /// <seealso cref="LocalizedStringProvider.AutomaticHelpShortName"/>
+    /// <seealso cref="LocalizedStringProvider.AutomaticHelpName" qualifyHint="true"/>
+    /// <seealso cref="LocalizedStringProvider.AutomaticHelpDescription" qualifyHint="true"/>
+    /// <seealso cref="LocalizedStringProvider.AutomaticHelpShortName" qualifyHint="true"/>
     public bool? AutoHelpArgument { get; set; }
 
     /// <summary>
@@ -452,7 +452,7 @@ public class ParseOptions
     /// <value>
     ///   <see langword="true"/> to automatically create a version argument; <see langword="false"/>
     ///   to not create one, or <see langword="null" /> to use the value from the
-    ///   <see cref="ParseOptionsAttribute.AutoVersionArgument"/> property, or if the
+    ///   <see cref="ParseOptionsAttribute.AutoVersionArgument" qualifyHint="true"/> property, or if the
     ///   <see cref="ParseOptionsAttribute"/> is not present, <see langword="true"/>.
     ///   The default value is <see langword="null"/>.
     /// </value>
@@ -472,11 +472,11 @@ public class ParseOptions
     /// </para>
     /// <para>
     ///   If not <see langword="null"/>, this property overrides the value of the
-    ///   <see cref="ParseOptionsAttribute.AutoVersionArgument"/> property.
+    ///   <see cref="ParseOptionsAttribute.AutoVersionArgument" qualifyHint="true"/> property.
     /// </para>
     /// </remarks>
-    /// <seealso cref="LocalizedStringProvider.AutomaticVersionName"/>
-    /// <seealso cref="LocalizedStringProvider.AutomaticVersionDescription"/>
+    /// <seealso cref="LocalizedStringProvider.AutomaticVersionName" qualifyHint="true"/>
+    /// <seealso cref="LocalizedStringProvider.AutomaticVersionDescription" qualifyHint="true"/>
     public bool? AutoVersionArgument { get; set; }
 
     /// <summary>
@@ -496,7 +496,7 @@ public class ParseOptions
     /// <value>
     ///   <see langword="true"/> to automatically use unique prefixes of an argument as aliases for
     ///   that argument; <see langword="false"/> to not have automatic prefixes; otherwise,
-    ///   <see langword="null" /> to use the value from the <see cref="ParseOptionsAttribute.AutoPrefixAliases"/>
+    ///   <see langword="null" /> to use the value from the <see cref="ParseOptionsAttribute.AutoPrefixAliases" qualifyHint="true"/>
     ///   property, or if the <see cref="ParseOptionsAttribute"/> attribute is not present,
     ///   <see langword="true"/>.
     /// </value>
@@ -510,17 +510,17 @@ public class ParseOptions
     ///   doesn't uniquely identify a single argument.
     /// </para>
     /// <para>
-    ///   When using <see cref="ParsingMode.LongShort"/>, this only applies to long names. Explicit
+    ///   When using <see cref="ParsingMode.LongShort" qualifyHint="true"/>, this only applies to long names. Explicit
     ///   aliases set with the <see cref="AliasAttribute"/> take precedence over automatic aliases.
     ///   Automatic prefix aliases are not shown in the usage help.
     /// </para>
     /// <para>
     ///   This behavior is enabled unless explicitly disabled here or using the
-    ///   <see cref="ParseOptionsAttribute.AutoPrefixAliases"/> property.
+    ///   <see cref="ParseOptionsAttribute.AutoPrefixAliases" qualifyHint="true"/> property.
     /// </para>
     /// <para>
     ///   If not <see langword="null"/>, this property overrides the value of the
-    ///   <see cref="ParseOptionsAttribute.AutoPrefixAliases"/> property.
+    ///   <see cref="ParseOptionsAttribute.AutoPrefixAliases" qualifyHint="true"/> property.
     /// </para>
     /// </remarks>
     public bool? AutoPrefixAliases { get; set; }
@@ -540,7 +540,7 @@ public class ParseOptions
     /// </summary>
     /// <value>
     ///   The virtual terminal sequence for a color. The default value is
-    ///   <see cref="TextFormat.ForegroundRed"/>.
+    ///   <see cref="TextFormat.ForegroundRed" qualifyHint="true"/>.
     /// </value>
     /// <remarks>
     /// <para>
@@ -553,7 +553,7 @@ public class ParseOptions
     ///   <see langword="true"/>.
     /// </para>
     /// <para>
-    ///   After the error message, the value of the <see cref="UsageWriter.ColorReset"/>
+    ///   After the error message, the value of the <see cref="UsageWriter.ColorReset" qualifyHint="true"/>
     ///   property will be written to undo the color change.
     /// </para>
     /// </remarks>
@@ -564,7 +564,7 @@ public class ParseOptions
     /// </summary>
     /// <value>
     ///   The virtual terminal sequence for a color. The default value is
-    ///   <see cref="TextFormat.ForegroundYellow"/>.
+    ///   <see cref="TextFormat.ForegroundYellow" qualifyHint="true"/>.
     /// </value>
     /// <remarks>
     /// <para>
@@ -573,7 +573,7 @@ public class ParseOptions
     /// </para>
     /// <para>
     ///   This color is used for the warning emitted if the <see cref="DuplicateArguments"/>
-    ///   property is <see cref="ErrorMode.Warning"/>.
+    ///   property is <see cref="ErrorMode.Warning" qualifyHint="true"/>.
     /// </para>
     /// <para>
     ///   If the string contains anything other than virtual terminal sequences, those parts
@@ -581,7 +581,7 @@ public class ParseOptions
     ///   <see langword="true"/>.
     /// </para>
     /// <para>
-    ///   After the warning message, the value of the <see cref="UsageWriter.ColorReset"/>
+    ///   After the warning message, the value of the <see cref="UsageWriter.ColorReset" qualifyHint="true"/>
     ///   property will be written to undo the color change.
     /// </para>
     /// </remarks>
@@ -597,10 +597,10 @@ public class ParseOptions
     /// <remarks>
     /// <para>
     ///   If this property is <see langword="null"/> and the <see cref="Error"/> property is
-    ///   <see langword="null"/>, the <see cref="CommandLineParser{T}.ParseWithErrorHandling()"/>
-    ///   method, the <see cref="CommandLineParser.Parse{T}(string[], int, ParseOptions?)"/>
+    ///   <see langword="null"/>, the <see cref="CommandLineParser{T}.ParseWithErrorHandling()" qualifyHint="true"/>
+    ///   method, the <see cref="CommandLineParser.Parse{T}(string[], int, ParseOptions?)" qualifyHint="true"/>
     ///   method and the <see cref="CommandManager"/> class will determine if color is supported
-    ///   using the <see cref="VirtualTerminal.EnableColor"/> method for the standard error
+    ///   using the <see cref="VirtualTerminal.EnableColor" qualifyHint="true"/> method for the standard error
     ///   stream.
     /// </para>
     /// <para>
@@ -626,7 +626,7 @@ public class ParseOptions
     ///   strings.
     /// </para>
     /// </remarks>
-    /// <seealso cref="CommandLineParser.StringProvider"/>
+    /// <seealso cref="CommandLineParser.StringProvider" qualifyHint="true"/>
     public LocalizedStringProvider StringProvider
     {
         get => _stringProvider ??= new LocalizedStringProvider();
@@ -638,15 +638,15 @@ public class ParseOptions
     /// </summary>
     /// <value>
     /// One of the values of the <see cref="UsageHelpRequest"/> enumeration. The default value
-    /// is <see cref="UsageHelpRequest.SyntaxOnly"/>.
+    /// is <see cref="UsageHelpRequest.SyntaxOnly" qualifyHint="true"/>.
     /// </value>
     /// <remarks>
     /// <para>
-    ///   If the value of this property is not <see cref="UsageHelpRequest.Full"/>, the
-    ///   <see cref="CommandLineParser{T}.ParseWithErrorHandling()"/> method, the
-    ///   <see cref="CommandLineParser.Parse{T}(string[], int, ParseOptions?)"/> method and the
+    ///   If the value of this property is not <see cref="UsageHelpRequest.Full" qualifyHint="true"/>, the
+    ///   <see cref="CommandLineParser{T}.ParseWithErrorHandling()" qualifyHint="true"/> method, the
+    ///   <see cref="CommandLineParser.Parse{T}(string[], int, ParseOptions?)" qualifyHint="true"/> method and the
     ///   <see cref="CommandManager"/> class will write the message returned by the
-    ///   <see cref="UsageWriter.WriteMoreInfoMessage"/> method instead of usage help.
+    ///   <see cref="UsageWriter.WriteMoreInfoMessage" qualifyHint="true"/> method instead of usage help.
     /// </para>
     /// </remarks>
     public UsageHelpRequest ShowUsageOnError { get; set; }
@@ -670,7 +670,7 @@ public class ParseOptions
     ///   the transformation specified by the <see cref="ValueDescriptionTransform"/> property.
     /// </para>
     /// </remarks>
-    /// <seealso cref="CommandLineArgument.ValueDescription"/>
+    /// <seealso cref="CommandLineArgument.ValueDescription" qualifyHint="true"/>
     public IDictionary<Type, string>? DefaultValueDescriptions { get; set; }
 
     /// <summary>
@@ -680,16 +680,16 @@ public class ParseOptions
     /// <value>
     /// One of the members of the <see cref="ArgumentNameTransform"/> enumeration, or <see langword="null"/>
     /// to use the value from the <see cref="ParseOptionsAttribute"/> attribute, or if that is
-    /// not present, <see cref="NameTransform.None"/>. The default value is <see langword="null"/>.
+    /// not present, <see cref="NameTransform.None" qualifyHint="true"/>. The default value is <see langword="null"/>.
     /// </value>
     /// <remarks>
     /// <para>
     ///   This property has no effect on explicit value description specified with the
-    ///   <see cref="CommandLineArgument.ValueDescription"/> property or the
+    ///   <see cref="CommandLineArgument.ValueDescription" qualifyHint="true"/> property or the
     ///   <see cref="DefaultValueDescriptions"/> property.
     /// </para>
     /// <para>
-    ///   If not <see langword="null"/>, this property overrides the <see cref="ParseOptionsAttribute.ValueDescriptionTransform"/>
+    ///   If not <see langword="null"/>, this property overrides the <see cref="ParseOptionsAttribute.ValueDescriptionTransform" qualifyHint="true"/>
     ///   property.
     /// </para>
     /// </remarks>
@@ -699,7 +699,7 @@ public class ParseOptions
     /// Gets a value that indicates how value descriptions derived from type names are transformed.
     /// </summary>
     /// <value>
-    /// The value of the <see cref="ValueDescriptionTransform"/> property, or <see cref="NameTransform.None"/>
+    /// The value of the <see cref="ValueDescriptionTransform"/> property, or <see cref="NameTransform.None" qualifyHint="true"/>
     /// if that property is <see langword="null"/>.
     /// </value>
     public NameTransform ValueDescriptionTransformOrDefault => ValueDescriptionTransform ?? NameTransform.None;
@@ -718,7 +718,7 @@ public class ParseOptions
     /// <para>
     ///   This property only applies when you manually construct an instance of the
     ///   <see cref="CommandLineParser"/> or <see cref="CommandLineParser{T}"/> class, or use one
-    ///   of the static <see cref="CommandLineParser.Parse{T}(ParseOptions?)"/> methods. If you use
+    ///   of the static <see cref="CommandLineParser.Parse{T}(ParseOptions?)" qualifyHint="true"/> methods. If you use
     ///   the generated static <c>CreateParser</c> and <c>Parse</c> methods on the command line
     ///   arguments type, the generated parser is used regardless of the value of this property.
     /// </para>

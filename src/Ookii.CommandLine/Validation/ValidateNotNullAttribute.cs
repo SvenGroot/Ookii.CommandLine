@@ -38,7 +38,7 @@ public class ValidateNotNullAttribute : ArgumentValidationAttribute
     /// <param name="argument">The argument being validated.</param>
     /// <param name="value">
     ///   The argument value. If not <see langword="null"/>, this must be an instance of
-    ///   <see cref="CommandLineArgument.ArgumentType"/>.
+    ///   <see cref="CommandLineArgument.ArgumentType" qualifyHint="true"/>.
     /// </param>
     /// <returns>
     ///   <see langword="true"/> if the value is valid; otherwise, <see langword="false"/>.

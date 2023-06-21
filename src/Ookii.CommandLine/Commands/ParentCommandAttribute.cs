@@ -10,7 +10,7 @@ namespace Ookii.CommandLine.Commands;
 /// <para>
 ///   If you wish to have a command with nested subcommands, apply this attribute to the nested
 ///   subcommand classes. The <see cref="CommandManager"/> class will only return commands whose
-///   <see cref="ParentCommandTypeName"/> property value matches the <see cref="CommandOptions.ParentCommand"/>
+///   <see cref="ParentCommandTypeName"/> property value matches the <see cref="CommandOptions.ParentCommand" qualifyHint="true"/>
 ///   property.
 /// </para>
 /// <para>

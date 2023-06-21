@@ -150,7 +150,7 @@ public partial class LocalizedStringProvider
     }
 
     /// <summary>
-    /// Gets a generic error message for the base implementation of <see cref="ArgumentValidationAttribute.GetErrorMessage"/>.
+    /// Gets a generic error message for the base implementation of <see cref="ArgumentValidationAttribute.GetErrorMessage" qualifyHint="true"/>.
     /// </summary>
     /// <param name="argumentName">The name of the argument.</param>
     /// <returns>The error message.</returns>
@@ -158,7 +158,7 @@ public partial class LocalizedStringProvider
         => Format(Resources.ValidationFailedFormat, argumentName);
 
     /// <summary>
-    /// Gets a generic error message for the base implementation of <see cref="ClassValidationAttribute.GetErrorMessage"/>.
+    /// Gets a generic error message for the base implementation of <see cref="ClassValidationAttribute.GetErrorMessage" qualifyHint="true"/>.
     /// </summary>
     /// <returns>The error message.</returns>
     public virtual string ClassValidationFailed() => Resources.ClassValidationFailed;

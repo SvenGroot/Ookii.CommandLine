@@ -3,7 +3,7 @@
 namespace Ookii.CommandLine;
 
 /// <summary>
-/// Provides data for the <see cref="CommandLineParser.DuplicateArgument"/> event.
+/// Provides data for the <see cref="CommandLineParser.DuplicateArgument" qualifyHint="true"/> event.
 /// </summary>
 public class DuplicateArgumentEventArgs : EventArgs
 {

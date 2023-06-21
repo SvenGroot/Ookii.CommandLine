@@ -3,7 +3,7 @@
 /// <summary>
 /// Indicates which arguments should be included in the description list when printing usage.
 /// </summary>
-/// <seealso cref="UsageWriter.ArgumentDescriptionListFilter"/>
+/// <seealso cref="UsageWriter.ArgumentDescriptionListFilter" qualifyHint="true"/>
 public enum DescriptionListFilterMode
 {
     /// <summary>

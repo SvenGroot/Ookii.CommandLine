@@ -7,7 +7,7 @@
 /// <para>
 ///   It's not required for argument validators that have help to derive from this class;
 ///   it's sufficient to derive from the <see cref="ArgumentValidationAttribute"/> class
-///   directly and override the <see cref="ArgumentValidationAttribute.GetUsageHelp"/> method.
+///   directly and override the <see cref="ArgumentValidationAttribute.GetUsageHelp" qualifyHint="true"/> method.
 ///   This class just adds some common functionality to make it easier.
 /// </para>
 /// </remarks>
@@ -23,7 +23,7 @@ public abstract class ArgumentValidationWithHelpAttribute : ArgumentValidationAt
     /// </value>
     /// <remarks>
     /// <para>
-    ///   This has no effect if the <see cref="UsageWriter.IncludeValidatorsInDescription"/>
+    ///   This has no effect if the <see cref="UsageWriter.IncludeValidatorsInDescription" qualifyHint="true"/>
     ///   property is <see langword="false"/>.
     /// </para>
     /// <para>
@@ -42,7 +42,7 @@ public abstract class ArgumentValidationWithHelpAttribute : ArgumentValidationAt
     /// </returns>
     /// <remarks>
     /// <para>
-    ///   This function is only called if the <see cref="UsageWriter.IncludeValidatorsInDescription"/>
+    ///   This function is only called if the <see cref="UsageWriter.IncludeValidatorsInDescription" qualifyHint="true"/>
     ///   property is <see langword="true"/>.
     /// </para>
     /// </remarks>

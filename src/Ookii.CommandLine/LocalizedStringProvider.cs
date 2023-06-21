@@ -11,7 +11,7 @@ namespace Ookii.CommandLine;
 /// <remarks>
 /// <para>
 ///   Inherit from this class and override its members to provide customized or localized
-///   strings. You can specify the implementation to use using <see cref="ParseOptions.StringProvider"/>.
+///   strings. You can specify the implementation to use using <see cref="ParseOptions.StringProvider" qualifyHint="true"/>.
 /// </para>
 /// <note>
 ///   For error messages, this only lets you customize error messages for the
@@ -23,14 +23,14 @@ namespace Ookii.CommandLine;
 public partial class LocalizedStringProvider
 {
     /// <summary>
-    /// Gets the name of the help argument created if the <see cref="ParseOptions.AutoHelpArgument"/>
-    /// or <see cref="ParseOptionsAttribute.AutoHelpArgument"/> property is <see langword="true"/>.
+    /// Gets the name of the help argument created if the <see cref="ParseOptions.AutoHelpArgument" qualifyHint="true"/>
+    /// or <see cref="ParseOptionsAttribute.AutoHelpArgument" qualifyHint="true"/> property is <see langword="true"/>.
     /// </summary>
     /// <returns>The string.</returns>
     public virtual string AutomaticHelpName() => Resources.AutomaticHelpName;
 
     /// <summary>
-    /// Gets the short name of the help argument created if the <see cref="ParseOptions.AutoHelpArgument"/>
+    /// Gets the short name of the help argument created if the <see cref="ParseOptions.AutoHelpArgument" qualifyHint="true"/>
     /// property is <see langword="true"/>, typically '?'.
     /// </summary>
     /// <returns>The string.</returns>
@@ -41,42 +41,42 @@ public partial class LocalizedStringProvider
     ///   is the same according to the argument name comparer, then no alias is added.
     /// </para>
     /// <para>
-    ///   If <see cref="CommandLineParser.Mode"/> is not <see cref="ParsingMode.LongShort"/>,
+    ///   If <see cref="CommandLineParser.Mode" qualifyHint="true"/> is not <see cref="ParsingMode.LongShort" qualifyHint="true"/>,
     ///   the short name and the short alias will be used as a regular aliases instead.
     /// </para>
     /// </remarks>
     public virtual char AutomaticHelpShortName() => Resources.AutomaticHelpShortName[0];
 
     /// <summary>
-    /// Gets the description of the help argument created if the <see cref="ParseOptions.AutoHelpArgument"/>
+    /// Gets the description of the help argument created if the <see cref="ParseOptions.AutoHelpArgument" qualifyHint="true"/>
     /// property is <see langword="true"/>.
     /// </summary>
     /// <returns>The string.</returns>
     public virtual string AutomaticHelpDescription() => Resources.AutomaticHelpDescription;
 
     /// <summary>
-    /// Gets the name of the version argument created if the <see cref="ParseOptions.AutoVersionArgument"/>
+    /// Gets the name of the version argument created if the <see cref="ParseOptions.AutoVersionArgument" qualifyHint="true"/>
     /// property is <see langword="true"/>.
     /// </summary>
     /// <returns>The string.</returns>
     public virtual string AutomaticVersionName() => Resources.AutomaticVersionName;
 
     /// <summary>
-    /// Gets the description of the version argument created if the <see cref="ParseOptions.AutoVersionArgument"/>
+    /// Gets the description of the version argument created if the <see cref="ParseOptions.AutoVersionArgument" qualifyHint="true"/>
     /// property is <see langword="true"/>.
     /// </summary>
     /// <returns>The string.</returns>
     public virtual string AutomaticVersionDescription() => Resources.AutomaticVersionDescription;
 
     /// <summary>
-    /// Gets the name of the version command created if the <see cref="CommandOptions.AutoVersionCommand"/>
+    /// Gets the name of the version command created if the <see cref="CommandOptions.AutoVersionCommand" qualifyHint="true"/>
     /// property is <see langword="true"/>.
     /// </summary>
     /// <returns>The string.</returns>
     public virtual string AutomaticVersionCommandName() => Resources.AutomaticVersionCommandName;
 
     /// <summary>
-    /// Gets the description of the version command created if the <see cref="CommandOptions.AutoVersionCommand"/>
+    /// Gets the description of the version command created if the <see cref="CommandOptions.AutoVersionCommand" qualifyHint="true"/>
     /// property is <see langword="true"/>.
     /// </summary>
     /// <returns>The string.</returns>
@@ -88,7 +88,7 @@ public partial class LocalizedStringProvider
     /// </summary>
     /// <param name="assembly">The assembly whose version to use.</param>
     /// <param name="friendlyName">
-    /// The friendly name of the application; typically the value of the <see cref="CommandLineParser.ApplicationFriendlyName"/>
+    /// The friendly name of the application; typically the value of the <see cref="CommandLineParser.ApplicationFriendlyName" qualifyHint="true"/>
     /// property.
     /// </param>
     /// <returns>The string.</returns>

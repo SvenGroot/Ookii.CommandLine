@@ -3,7 +3,7 @@
 /// <summary>
 /// Indicates whether something is an error, warning, or allowed.
 /// </summary>
-/// <seealso cref="ParseOptions.DuplicateArguments"/>
+/// <seealso cref="ParseOptions.DuplicateArguments" qualifyHint="true"/>
 public enum ErrorMode
 {
     /// <summary>

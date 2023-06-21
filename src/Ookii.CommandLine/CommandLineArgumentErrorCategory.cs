@@ -57,13 +57,13 @@ public enum CommandLineArgumentErrorCategory
     /// </summary>
     CombinedShortNameNonSwitch,
     /// <summary>
-    /// An instance of a class derived from the <see cref="Validation.ArgumentValidationAttribute"/>
+    /// An instance of a class derived from the <see cref="Validation.ArgumentValidationAttribute" qualifyHint="true"/>
     /// class failed to validate the argument.
     /// </summary>
     ValidationFailed,
     /// <summary>
-    /// An argument failed a dependency check performed by the <see cref="Validation.RequiresAttribute"/>
-    /// or the <see cref="Validation.ProhibitsAttribute"/> class.
+    /// An argument failed a dependency check performed by the <see cref="Validation.RequiresAttribute" qualifyHint="true"/>
+    /// or the <see cref="Validation.ProhibitsAttribute" qualifyHint="true"/> class.
     /// </summary>
     DependencyFailed,
 }

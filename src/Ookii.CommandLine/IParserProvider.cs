@@ -45,7 +45,7 @@ public interface IParserProvider<TSelf>
     ///   names or positions. Even when the parser was generated using the <see cref="GeneratedParserAttribute"/>
     ///   class, not all those rules can be checked at compile time.
     /// </exception>
-    /// <seealso cref="CommandLineParser{T}.CommandLineParser(ParseOptions?)"/>
+    /// <seealso cref="CommandLineParser{T}.CommandLineParser(ParseOptions?)" qualifyHint="true"/>
     public static abstract CommandLineParser<TSelf> CreateParser(ParseOptions? options = null);
 }
 

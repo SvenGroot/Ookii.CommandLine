@@ -3,7 +3,7 @@
 namespace Ookii.CommandLine;
 
 /// <summary>
-/// Provides data for the <see cref="CommandLineParser.ArgumentParsed"/> event.
+/// Provides data for the <see cref="CommandLineParser.ArgumentParsed" qualifyHint="true"/> event.
 /// </summary>
 /// <threadsafety static="true" instance="false"/>
 public class ArgumentParsedEventArgs : EventArgs
@@ -37,22 +37,22 @@ public class ArgumentParsedEventArgs : EventArgs
     /// </summary>
     /// <value>
     /// One of the values of the <see cref="CancelMode"/> enumeration. The default value is the
-    /// value of the <see cref="CommandLineArgumentAttribute.CancelParsing"/> attribute, or the
+    /// value of the <see cref="CommandLineArgumentAttribute.CancelParsing" qualifyHint="true"/> attribute, or the
     /// return value of a method argument.
     /// </value>
     /// <remarks>
     /// <para>
-    ///   If the event handler sets this property to a value other than <see cref="CancelMode.None"/>,
+    ///   If the event handler sets this property to a value other than <see cref="CancelMode.None" qualifyHint="true"/>,
     ///   command line processing will stop immediately, returning either <see langword="null"/> or
     ///   an instance of the arguments class according to the <see cref="CancelMode"/> value.
     /// </para>
     /// <para>
-    ///   If you want usage help to be displayed after canceling, set the <see cref="CommandLineParser.HelpRequested"/>
+    ///   If you want usage help to be displayed after canceling, set the <see cref="CommandLineParser.HelpRequested" qualifyHint="true"/>
     ///   property to <see langword="true"/>.
     /// </para>
     /// </remarks>
-    /// <seealso cref="CommandLineArgument.CancelParsing"/>
-    /// <seealso cref="ParseOptions.AutoHelpArgument"/>
-    /// <seealso cref="ParseOptions.AutoVersionArgument"/>
+    /// <seealso cref="CommandLineArgument.CancelParsing" qualifyHint="true"/>
+    /// <seealso cref="ParseOptions.AutoHelpArgument" qualifyHint="true"/>
+    /// <seealso cref="ParseOptions.AutoVersionArgument" qualifyHint="true"/>
     public CancelMode CancelParsing { get; set; }
 }

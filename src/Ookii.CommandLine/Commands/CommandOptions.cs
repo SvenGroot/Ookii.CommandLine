@@ -24,28 +24,28 @@ public class CommandOptions : ParseOptions
     /// </para>
     /// <para>
     ///   Setting this property to <see langword="true"/> is equivalent to setting the
-    ///   <see cref="ParseOptions.Mode"/> property to <see cref="ParsingMode.LongShort"/>, the
-    ///   <see cref="ParseOptions.ArgumentNameComparison"/> property to <see cref="StringComparison.InvariantCulture"/>,
-    ///   the <see cref="ParseOptions.ArgumentNameTransform"/> property to <see cref="NameTransform.DashCase"/>,
-    ///   the <see cref="ParseOptions.ValueDescriptionTransform"/> property to <see cref="NameTransform.DashCase"/>,
-    ///   the <see cref="CommandNameComparison"/> property to <see cref="StringComparison.InvariantCulture"/>,
-    ///   and the <see cref="CommandNameTransform"/> property to <see cref="NameTransform.DashCase"/>.
+    ///   <see cref="ParseOptions.Mode" qualifyHint="true"/> property to <see cref="ParsingMode.LongShort" qualifyHint="true"/>, the
+    ///   <see cref="ParseOptions.ArgumentNameComparison" qualifyHint="true"/> property to <see cref="StringComparison.InvariantCulture" qualifyHint="true"/>,
+    ///   the <see cref="ParseOptions.ArgumentNameTransform" qualifyHint="true"/> property to <see cref="NameTransform.DashCase" qualifyHint="true"/>,
+    ///   the <see cref="ParseOptions.ValueDescriptionTransform" qualifyHint="true"/> property to <see cref="NameTransform.DashCase" qualifyHint="true"/>,
+    ///   the <see cref="CommandNameComparison"/> property to <see cref="StringComparison.InvariantCulture" qualifyHint="true"/>,
+    ///   and the <see cref="CommandNameTransform"/> property to <see cref="NameTransform.DashCase" qualifyHint="true"/>.
     /// </para>
     /// <para>
     ///   This property will only return <see langword="true"/> if the above properties are the
-    ///   indicated values, except that <see cref="ParseOptions.ArgumentNameComparison"/> and
+    ///   indicated values, except that <see cref="ParseOptions.ArgumentNameComparison" qualifyHint="true"/> and
     ///   <see cref="CommandNameComparison"/> can be any case-sensitive comparison. It will
     ///   return <see langword="false"/> for any other combination of values, not just the ones
     ///   indicated below.
     /// </para>
     /// <para>
     ///   Setting this property to <see langword="false"/> is equivalent to setting the
-    ///   <see cref="ParseOptions.Mode"/> property to <see cref="ParsingMode.Default"/>, the
-    ///   <see cref="ParseOptions.ArgumentNameComparison"/> property to <see cref="StringComparison.OrdinalIgnoreCase"/>,
-    ///   the <see cref="ParseOptions.ArgumentNameTransform"/> property to <see cref="NameTransform.None"/>,
-    ///   the <see cref="ParseOptions.ValueDescriptionTransform"/> property to <see cref="NameTransform.None"/>,
-    ///   the <see cref="CommandNameComparison"/> property to <see cref="StringComparison.OrdinalIgnoreCase"/>,
-    ///   and the <see cref="CommandNameTransform"/> property to <see cref="NameTransform.None"/>.
+    ///   <see cref="ParseOptions.Mode" qualifyHint="true"/> property to <see cref="ParsingMode.Default" qualifyHint="true"/>, the
+    ///   <see cref="ParseOptions.ArgumentNameComparison" qualifyHint="true"/> property to <see cref="StringComparison.OrdinalIgnoreCase" qualifyHint="true"/>,
+    ///   the <see cref="ParseOptions.ArgumentNameTransform" qualifyHint="true"/> property to <see cref="NameTransform.None" qualifyHint="true"/>,
+    ///   the <see cref="ParseOptions.ValueDescriptionTransform" qualifyHint="true"/> property to <see cref="NameTransform.None" qualifyHint="true"/>,
+    ///   the <see cref="CommandNameComparison"/> property to <see cref="StringComparison.OrdinalIgnoreCase" qualifyHint="true"/>,
+    ///   and the <see cref="CommandNameTransform"/> property to <see cref="NameTransform.None" qualifyHint="true"/>.
     /// </para>
     /// </remarks>
     public override bool IsPosix
@@ -72,7 +72,7 @@ public class CommandOptions : ParseOptions
     /// </summary>
     /// <value>
     /// One of the values of the <see cref="StringComparison"/> enumeration. The default value
-    /// is <see cref="StringComparison.OrdinalIgnoreCase"/>.
+    /// is <see cref="StringComparison.OrdinalIgnoreCase" qualifyHint="true"/>.
     /// </value>
     public StringComparison CommandNameComparison { get; set; } = StringComparison.OrdinalIgnoreCase;
 
@@ -82,7 +82,7 @@ public class CommandOptions : ParseOptions
     /// </summary>
     /// <value>
     /// One of the values of the <see cref="NameTransform"/> enumeration. The default value
-    /// is <see cref="NameTransform.None"/>.
+    /// is <see cref="NameTransform.None" qualifyHint="true"/>.
     /// </value>
     /// <remarks>
     /// <para>
@@ -91,7 +91,7 @@ public class CommandOptions : ParseOptions
     ///   specified transformation.
     /// </para>
     /// <para>
-    ///   If this property is not <see cref="NameTransform.None"/>, the value specified by the
+    ///   If this property is not <see cref="NameTransform.None" qualifyHint="true"/>, the value specified by the
     ///   <see cref="StripCommandNameSuffix"/> property will be removed from the end of the
     ///   type name before applying the transformation.
     /// </para>
@@ -116,12 +116,12 @@ public class CommandOptions : ParseOptions
     /// <remarks>
     /// <para>
     ///   This property is only used if the <see cref="CommandNameTransform"/> property is not 
-    ///   <see cref="NameTransform.None"/>, and is never used for commands with an explicit
+    ///   <see cref="NameTransform.None" qualifyHint="true"/>, and is never used for commands with an explicit
     ///   name.
     /// </para>
     /// <para>
     ///   For example, if you have a subcommand class named "CreateFileCommand" and you use
-    ///   <see cref="NameTransform.DashCase"/> and the default value of "Command" for this
+    ///   <see cref="NameTransform.DashCase" qualifyHint="true"/> and the default value of "Command" for this
     ///   property, the name of the command will be "create-file" without having to explicitly
     ///   specify it.
     /// </para>

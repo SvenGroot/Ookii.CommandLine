@@ -8,7 +8,7 @@ namespace Ookii.CommandLine;
 public partial class LocalizedStringProvider
 {
     /// <summary>
-    /// Gets the error message for <see cref="CommandLineArgumentErrorCategory.Unspecified"/>.
+    /// Gets the error message for <see cref="CommandLineArgumentErrorCategory.Unspecified" qualifyHint="true"/>.
     /// </summary>
     /// <returns>The error message.</returns>
     /// <remarks>
@@ -20,7 +20,7 @@ public partial class LocalizedStringProvider
     public virtual string UnspecifiedError() => Resources.UnspecifiedError;
 
     /// <summary>
-    /// Gets the error message for <see cref="CommandLineArgumentErrorCategory.ArgumentValueConversion"/>.
+    /// Gets the error message for <see cref="CommandLineArgumentErrorCategory.ArgumentValueConversion" qualifyHint="true"/>.
     /// </summary>
     /// <param name="argumentName">The name of the argument.</param>
     /// <param name="argumentValue">The value of the argument.</param>
@@ -30,14 +30,14 @@ public partial class LocalizedStringProvider
         => Format(Resources.ArgumentConversionErrorFormat, argumentValue, argumentName, valueDescription);
 
     /// <summary>
-    /// Gets the error message for <see cref="CommandLineArgumentErrorCategory.UnknownArgument"/>.
+    /// Gets the error message for <see cref="CommandLineArgumentErrorCategory.UnknownArgument" qualifyHint="true"/>.
     /// </summary>
     /// <param name="argumentName">The name of the argument.</param>
     /// <returns>The error message.</returns>
     public virtual string UnknownArgument(string argumentName) => Format(Resources.UnknownArgumentFormat, argumentName);
 
     /// <summary>
-    /// Gets the error message for <see cref="CommandLineArgumentErrorCategory.MissingNamedArgumentValue"/>.
+    /// Gets the error message for <see cref="CommandLineArgumentErrorCategory.MissingNamedArgumentValue" qualifyHint="true"/>.
     /// </summary>
     /// <param name="argumentName">The name of the argument.</param>
     /// <returns>The error message.</returns>
@@ -45,28 +45,28 @@ public partial class LocalizedStringProvider
         => Format(Resources.MissingValueForNamedArgumentFormat, argumentName);
 
     /// <summary>
-    /// Gets the error message for <see cref="CommandLineArgumentErrorCategory.DuplicateArgument"/>.
+    /// Gets the error message for <see cref="CommandLineArgumentErrorCategory.DuplicateArgument" qualifyHint="true"/>.
     /// </summary>
     /// <param name="argumentName">The name of the argument.</param>
     /// <returns>The error message.</returns>
     public virtual string DuplicateArgument(string argumentName) => Format(Resources.DuplicateArgumentFormat, argumentName);
 
     /// <summary>
-    /// Gets the warning message used if the <see cref="ParseOptionsAttribute.DuplicateArguments"/>
-    /// or <see cref="ParseOptions.DuplicateArguments"/> property is <see cref="ErrorMode.Warning"/>.
+    /// Gets the warning message used if the <see cref="ParseOptionsAttribute.DuplicateArguments" qualifyHint="true"/>
+    /// or <see cref="ParseOptions.DuplicateArguments" qualifyHint="true"/> property is <see cref="ErrorMode.Warning" qualifyHint="true"/>.
     /// </summary>
     /// <param name="argumentName">The name of the argument.</param>
     /// <returns>The error message.</returns>
     public virtual string DuplicateArgumentWarning(string argumentName) => Format(Resources.DuplicateArgumentWarningFormat, argumentName);
 
     /// <summary>
-    /// Gets the error message for <see cref="CommandLineArgumentErrorCategory.TooManyArguments"/>.
+    /// Gets the error message for <see cref="CommandLineArgumentErrorCategory.TooManyArguments" qualifyHint="true"/>.
     /// </summary>
     /// <returns>The error message.</returns>
     public virtual string TooManyArguments() => Resources.TooManyArguments;
 
     /// <summary>
-    /// Gets the error message for <see cref="CommandLineArgumentErrorCategory.MissingRequiredArgument"/>.
+    /// Gets the error message for <see cref="CommandLineArgumentErrorCategory.MissingRequiredArgument" qualifyHint="true"/>.
     /// </summary>
     /// <param name="argumentName">The name of the argument.</param>
     /// <returns>The error message.</returns>
@@ -74,7 +74,7 @@ public partial class LocalizedStringProvider
         => Format(Resources.MissingRequiredArgumentFormat, argumentName);
 
     /// <summary>
-    /// Gets the error message for <see cref="CommandLineArgumentErrorCategory.InvalidDictionaryValue"/>.
+    /// Gets the error message for <see cref="CommandLineArgumentErrorCategory.InvalidDictionaryValue" qualifyHint="true"/>.
     /// </summary>
     /// <param name="argumentName">The name of the argument.</param>
     /// <param name="argumentValue">The value of the argument.</param>
@@ -84,7 +84,7 @@ public partial class LocalizedStringProvider
         => Format(Resources.InvalidDictionaryValueFormat, argumentName, argumentValue, message);
 
     /// <summary>
-    /// Gets the error message for <see cref="CommandLineArgumentErrorCategory.CreateArgumentsTypeError"/>.
+    /// Gets the error message for <see cref="CommandLineArgumentErrorCategory.CreateArgumentsTypeError" qualifyHint="true"/>.
     /// </summary>
     /// <param name="message">The error message of the conversion.</param>
     /// <returns>The error message.</returns>
@@ -92,7 +92,7 @@ public partial class LocalizedStringProvider
         => Format(Resources.CreateArgumentsTypeErrorFormat, message);
 
     /// <summary>
-    /// Gets the error message for <see cref="CommandLineArgumentErrorCategory.ApplyValueError"/>.
+    /// Gets the error message for <see cref="CommandLineArgumentErrorCategory.ApplyValueError" qualifyHint="true"/>.
     /// </summary>
     /// <param name="argumentName">The name of the argument.</param>
     /// <param name="message">The error message of the conversion.</param>
@@ -101,14 +101,14 @@ public partial class LocalizedStringProvider
         => Format(Resources.SetValueErrorFormat, argumentName, message);
 
     /// <summary>
-    /// Gets the error message for <see cref="CommandLineArgumentErrorCategory.NullArgumentValue"/>.
+    /// Gets the error message for <see cref="CommandLineArgumentErrorCategory.NullArgumentValue" qualifyHint="true"/>.
     /// </summary>
     /// <param name="argumentName">The name of the argument.</param>
     /// <returns>The error message.</returns>
     public virtual string NullArgumentValue(string argumentName) => Format(Resources.NullArgumentValueFormat, argumentName);
 
     /// <summary>
-    /// Gets the error message for <see cref="CommandLineArgumentErrorCategory.CombinedShortNameNonSwitch"/>.
+    /// Gets the error message for <see cref="CommandLineArgumentErrorCategory.CombinedShortNameNonSwitch" qualifyHint="true"/>.
     /// </summary>
     /// <param name="argumentName">The names of the combined short arguments.</param>
     /// <returns>The error message.</returns>

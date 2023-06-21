@@ -62,7 +62,7 @@ public abstract class DependencyValidationAttribute : ArgumentValidationWithHelp
     /// Gets a value that indicates when validation will run.
     /// </summary>
     /// <value>
-    /// <see cref="ValidationMode.AfterParsing"/>.
+    /// <see cref="ValidationMode.AfterParsing" qualifyHint="true"/>.
     /// </value>
     public override ValidationMode Mode => ValidationMode.AfterParsing;
 
@@ -71,7 +71,7 @@ public abstract class DependencyValidationAttribute : ArgumentValidationWithHelp
     /// validation fails.
     /// </summary>
     /// <value>
-    /// <see cref="CommandLineArgumentErrorCategory.ValidationFailed"/>.
+    /// <see cref="CommandLineArgumentErrorCategory.ValidationFailed" qualifyHint="true"/>.
     /// </value>
     public override CommandLineArgumentErrorCategory ErrorCategory => CommandLineArgumentErrorCategory.DependencyFailed;
 

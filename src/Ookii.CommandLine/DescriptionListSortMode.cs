@@ -3,7 +3,7 @@
 /// <summary>
 /// Indicates how the arguments in the description list should be sorted.
 /// </summary>
-/// <seealso cref="UsageWriter.ArgumentDescriptionListOrder"/>
+/// <seealso cref="UsageWriter.ArgumentDescriptionListOrder" qualifyHint="true"/>
 public enum DescriptionListSortMode
 {
     /// <summary>
@@ -14,7 +14,7 @@ public enum DescriptionListSortMode
     UsageOrder,
     /// <summary>
     /// The descriptions are listed in alphabetical order by argument name. If the parsing mode
-    /// is <see cref="ParsingMode.LongShort"/>, this uses the long name of the argument, unless
+    /// is <see cref="ParsingMode.LongShort" qualifyHint="true"/>, this uses the long name of the argument, unless
     /// the argument has no long name, in which case the short name is used.
     /// </summary>
     Alphabetical,
@@ -25,7 +25,7 @@ public enum DescriptionListSortMode
     /// <summary>
     /// The descriptions are listed in alphabetical order by the short argument name. If the
     /// argument has no short name, the long name is used. If the parsing mode is not
-    /// <see cref="ParsingMode.LongShort"/>, this has the same effect as <see cref="Alphabetical"/>.
+    /// <see cref="ParsingMode.LongShort" qualifyHint="true"/>, this has the same effect as <see cref="Alphabetical"/>.
     /// </summary>
     AlphabeticalShortName,
     /// <summary>

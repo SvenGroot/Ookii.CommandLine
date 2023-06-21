@@ -314,8 +314,8 @@ public partial class LineWrappingTextWriter : TextWriter
     ///   to avoid having to buffer large amounts of data to support these long line lengths.
     /// </para>
     /// <para>
-    ///   If you want to write to the console, use <see cref="Console.Out"/> or <see cref="Console.Error"/> as the <paramref name="baseWriter"/> and
-    ///   specify <see cref="Console.WindowWidth"/> - 1 as the <paramref name="maximumLineLength"/> and <see langword="false"/> for <paramref name="disposeBaseWriter"/>. If you don't
+    ///   If you want to write to the console, use <see cref="Console.Out" qualifyHint="true"/> or <see cref="Console.Error" qualifyHint="true"/> as the <paramref name="baseWriter"/> and
+    ///   specify <see cref="Console.WindowWidth" qualifyHint="true"/> - 1 as the <paramref name="maximumLineLength"/> and <see langword="false"/> for <paramref name="disposeBaseWriter"/>. If you don't
     ///   subtract one from the window width, additional empty lines can be printed if a line is exactly the width of the console. You can easily create a <see cref="LineWrappingTextWriter"/>
     ///   that writes to the console by using the <see cref="ForConsoleOut"/> and <see cref="ForConsoleError"/> methods.
     /// </para>
@@ -414,15 +414,15 @@ public partial class LineWrappingTextWriter : TextWriter
     /// </summary>
     /// <value>
     /// One of the values of the <see cref="WrappingMode"/> enumeration. If no maximum line
-    /// length is set, the value is always <see cref="WrappingMode.Disabled"/>.
+    /// length is set, the value is always <see cref="WrappingMode.Disabled" qualifyHint="true"/>.
     /// </value>
     /// <remarks>
     /// <para>
-    ///   When this property is changed to <see cref="WrappingMode.Disabled"/> the buffer will
+    ///   When this property is changed to <see cref="WrappingMode.Disabled" qualifyHint="true"/> the buffer will
     ///   be flushed synchronously if not empty.
     /// </para>
     /// <para>
-    ///   When this property is changed from <see cref="WrappingMode.Disabled"/> to another
+    ///   When this property is changed from <see cref="WrappingMode.Disabled" qualifyHint="true"/> to another
     ///   value, if the last character written was not a new line, the current line may not be
     ///   correctly wrapped.
     /// </para>
@@ -459,7 +459,7 @@ public partial class LineWrappingTextWriter : TextWriter
 
     /// <summary>
     /// Gets a <see cref="LineWrappingTextWriter"/> that writes to the standard output stream,
-    /// using <see cref="Console.WindowWidth"/> as the maximum line length.
+    /// using <see cref="Console.WindowWidth" qualifyHint="true"/> as the maximum line length.
     /// </summary>
     /// <returns>A <see cref="LineWrappingTextWriter"/> that writes to the standard output stream.</returns>
     public static LineWrappingTextWriter ForConsoleOut()
@@ -469,7 +469,7 @@ public partial class LineWrappingTextWriter : TextWriter
 
     /// <summary>
     /// Gets a <see cref="LineWrappingTextWriter"/> that writes to the standard error stream,
-    /// using <see cref="Console.WindowWidth"/> as the maximum line length.
+    /// using <see cref="Console.WindowWidth" qualifyHint="true"/> as the maximum line length.
     /// </summary>
     /// <returns>A <see cref="LineWrappingTextWriter"/> that writes to the standard error stream.</returns>
     public static LineWrappingTextWriter ForConsoleError()

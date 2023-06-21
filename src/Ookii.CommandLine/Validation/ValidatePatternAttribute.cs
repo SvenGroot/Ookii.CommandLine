@@ -45,7 +45,7 @@ public class ValidatePatternAttribute : ArgumentValidationAttribute
     /// Gets a value that indicates when validation will run.
     /// </summary>
     /// <value>
-    /// <see cref="ValidationMode.BeforeConversion"/>.
+    /// <see cref="ValidationMode.BeforeConversion" qualifyHint="true"/>.
     /// </value>
     public override ValidationMode Mode => ValidationMode.BeforeConversion;
 
@@ -60,7 +60,7 @@ public class ValidatePatternAttribute : ArgumentValidationAttribute
     /// <remarks>
     /// <para>
     ///   If this property is <see langword="null"/>, the message returned by
-    ///   <see cref="ArgumentValidationAttribute.GetErrorMessage"/> will be used.
+    ///   <see cref="ArgumentValidationAttribute.GetErrorMessage" qualifyHint="true"/> will be used.
     /// </para>
     /// <para>
     ///   This property is a compound format string, and may have three placeholders:

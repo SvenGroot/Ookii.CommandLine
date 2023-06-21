@@ -41,7 +41,7 @@ public class ValidateCountAttribute : ArgumentValidationWithHelpAttribute
     /// Gets a value that indicates when validation will run.
     /// </summary>
     /// <value>
-    /// <see cref="ValidationMode.AfterParsing"/>.
+    /// <see cref="ValidationMode.AfterParsing" qualifyHint="true"/>.
     /// </value>
     public override ValidationMode Mode => ValidationMode.AfterParsing;
 
@@ -67,7 +67,7 @@ public class ValidateCountAttribute : ArgumentValidationWithHelpAttribute
     /// <param name="argument">The argument being validated.</param>
     /// <param name="value">
     ///   The argument value. If not <see langword="null"/>, this must be an instance of
-    ///   <see cref="CommandLineArgument.ArgumentType"/>.
+    ///   <see cref="CommandLineArgument.ArgumentType" qualifyHint="true"/>.
     /// </param>
     /// <returns>
     ///   <see langword="true"/> if the value is valid; otherwise, <see langword="false"/>.

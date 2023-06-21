@@ -8,7 +8,7 @@ namespace Ookii.CommandLine.Commands;
 /// <remarks>
 /// <para>
 ///   This interface adds a <see cref="RunAsync"/> method to the <see cref="ICommand"/>
-///   interface, that will be invoked by the <see cref="CommandManager.RunCommandAsync()"/>
+///   interface, that will be invoked by the <see cref="CommandManager.RunCommandAsync()" qualifyHint="true"/>
 ///   method and its overloads. This allows you to write tasks that use asynchronous code.
 /// </para>
 /// </remarks>
@@ -27,9 +27,9 @@ public interface IAsyncCommand : ICommand
     ///   command that was executed.
     /// </para>
     /// <para>
-    ///   This method will only be invoked if you run commands with the <see cref="CommandManager.RunCommandAsync()"/>
+    ///   This method will only be invoked if you run commands with the <see cref="CommandManager.RunCommandAsync()" qualifyHint="true"/>
     ///   method or one of its overloads. Typically, it's recommended to implement the
-    ///   <see cref="ICommand.Run"/> method to invoke this task. Use the <see cref="AsyncCommandBase"/>
+    ///   <see cref="ICommand.Run" qualifyHint="true"/> method to invoke this task. Use the <see cref="AsyncCommandBase"/>
     ///   class for a default implementation that does this.
     /// </para>
     /// </remarks>

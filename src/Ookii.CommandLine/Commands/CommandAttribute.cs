@@ -17,7 +17,7 @@ namespace Ookii.CommandLine.Commands;
 /// </para>
 /// <para>
 ///   If a command has no explicit name, its name is determined by taking the type name
-///   and applying the transformation specified by the <see cref="CommandOptions.CommandNameTransform"/>
+///   and applying the transformation specified by the <see cref="CommandOptions.CommandNameTransform" qualifyHint="true"/>
 ///   property.
 /// </para>
 /// <para>
@@ -38,7 +38,7 @@ public sealed class CommandAttribute : Attribute
     /// <remarks>
     /// <para>
     ///   If a command has no explicit name, its name is determined by taking the type name
-    ///   and applying the transformation specified by the <see cref="CommandOptions.CommandNameTransform"/>
+    ///   and applying the transformation specified by the <see cref="CommandOptions.CommandNameTransform" qualifyHint="true"/>
     ///   property.
     /// </para>
     /// </remarks>
@@ -49,7 +49,7 @@ public sealed class CommandAttribute : Attribute
     /// <summary>
     /// Initializes a new instance of the <see cref="CommandAttribute"/> class using the specified command name.
     /// </summary>
-    /// <param name="commandName">The name of the command, which can be used to locate it using the <see cref="CommandManager.GetCommand"/> method.</param>
+    /// <param name="commandName">The name of the command, which can be used to locate it using the <see cref="CommandManager.GetCommand" qualifyHint="true"/> method.</param>
     /// <exception cref="ArgumentNullException">
     /// <paramref name="commandName"/> is <see langword="null"/>.
     /// </exception>
@@ -59,7 +59,7 @@ public sealed class CommandAttribute : Attribute
     }
 
     /// <summary>
-    /// Gets the name of the command, which can be used to locate it using the <see cref="CommandManager.GetCommand"/> method.
+    /// Gets the name of the command, which can be used to locate it using the <see cref="CommandManager.GetCommand" qualifyHint="true"/> method.
     /// </summary>
     /// <value>
     /// The name of the command, or <see langword="null"/> to use the type name as the command

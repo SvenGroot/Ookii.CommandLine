@@ -4,11 +4,11 @@ namespace Ookii.CommandLine;
 /// Indicates how to transform the property, parameter, or method name if an argument doesn't
 /// have an explicit name.
 /// </summary>
-/// <seealso cref="ParseOptionsAttribute.ArgumentNameTransform" />
-/// <seealso cref="ParseOptions.ArgumentNameTransform"/>
-/// <seealso cref="ParseOptions.ValueDescriptionTransform"/>
+/// <seealso cref="ParseOptionsAttribute.ArgumentNameTransform" qualifyHint="true"/>
+/// <seealso cref="ParseOptions.ArgumentNameTransform" qualifyHint="true"/>
+/// <seealso cref="ParseOptions.ValueDescriptionTransform" qualifyHint="true"/>
 /// <seealso cref="Commands.CommandOptions.CommandNameTransform"/>
-/// <seealso cref="NameTransformExtensions.Apply"/>
+/// <seealso cref="NameTransformExtensions.Apply" qualifyHint="true"/>
 public enum NameTransform
 {
     /// <summary>
