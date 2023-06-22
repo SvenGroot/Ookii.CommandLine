@@ -148,14 +148,15 @@ internal class ReflectionArgument : CommandLineArgument
 #endif
 
         ArgumentInfo info = CreateArgumentInfo(parser, argumentType, allowsNull, requiredProperty, member.Name, attribute,
-            multiValueSeparatorAttribute, descriptionAttribute, valueDescriptionAttribute, allowDuplicateDictionaryKeys,
-            keyValueSeparatorAttribute, aliasAttributes, shortAliasAttributes, validationAttributes);
+            multiValueSeparatorAttribute, descriptionAttribute, valueDescriptionAttribute, aliasAttributes, shortAliasAttributes,
+            validationAttributes);
 
-        DetermineAdditionalInfo(ref info, member);
+        DetermineAdditionalInfo(ref info, member, keyValueSeparatorAttribute, allowDuplicateDictionaryKeys);
         return new ReflectionArgument(info, property, method);
     }
 
-    private static void DetermineAdditionalInfo(ref ArgumentInfo info, MemberInfo member)
+    private static void DetermineAdditionalInfo(ref ArgumentInfo info, MemberInfo member,
+        KeyValueSeparatorAttribute? keyValueSeparatorAttribute, bool allowDuplicateDictionaryKeys)
     {
         var converterAttribute = member.GetCustomAttribute<ArgumentConverterAttribute>();
         var keyArgumentConverterAttribute = member.GetCustomAttribute<KeyConverterAttribute>();
@@ -173,17 +174,17 @@ internal class ReflectionArgument : CommandLineArgument
                 info.Kind = ArgumentKind.Dictionary;
                 info.ElementTypeWithNullable = elementType!;
                 info.AllowNull = DetermineDictionaryValueTypeAllowsNull(dictionaryType, property);
-                info.KeyValueSeparator ??= KeyValuePairConverter.DefaultSeparator;
                 var genericArguments = dictionaryType.GetGenericArguments();
-                info.KeyType = genericArguments[0];
-                info.ValueType = genericArguments[1];
+                info.DictionaryInfo = new(allowDuplicateDictionaryKeys, genericArguments[0], genericArguments[1],
+                    keyValueSeparatorAttribute?.Separator ?? KeyValuePairConverter.DefaultSeparator);
+
                 if (converterType == null)
                 {
                     converterType = typeof(KeyValuePairConverter<,>).MakeGenericType(genericArguments);
-                    var keyConverter = info.KeyType.GetStringConverter(keyArgumentConverterAttribute?.GetConverterType());
-                    var valueConverter = info.ValueType.GetStringConverter(valueArgumentConverterAttribute?.GetConverterType());
+                    var keyConverter = info.DictionaryInfo.KeyType.GetStringConverter(keyArgumentConverterAttribute?.GetConverterType());
+                    var valueConverter = info.DictionaryInfo.ValueType.GetStringConverter(valueArgumentConverterAttribute?.GetConverterType());
                     info.Converter = (ArgumentConverter)Activator.CreateInstance(converterType, keyConverter, valueConverter,
-                        info.KeyValueSeparator, info.AllowNull)!;
+                        info.DictionaryInfo.KeyValueSeparator, info.AllowNull)!;
                 }
             }
             else if (collectionType != null)

@@ -261,9 +261,9 @@ public partial class CommandLineParserTest
     public void ParseTestKeyValueSeparator(ProviderKind kind)
     {
         var target = CreateParser<KeyValueSeparatorArguments>(kind);
-        Assert.AreEqual("=", target.GetArgument("DefaultSeparator")!.KeyValueSeparator);
+        Assert.AreEqual("=", target.GetArgument("DefaultSeparator")!.DictionaryInfo!.KeyValueSeparator);
         Assert.AreEqual("String=Int32", target.GetArgument("DefaultSeparator")!.ValueDescription);
-        Assert.AreEqual("<=>", target.GetArgument("CustomSeparator")!.KeyValueSeparator);
+        Assert.AreEqual("<=>", target.GetArgument("CustomSeparator")!.DictionaryInfo!.KeyValueSeparator);
         Assert.AreEqual("String<=>String", target.GetArgument("CustomSeparator")!.ValueDescription);
 
         var result = CheckSuccess(target, new[] { "-CustomSeparator", "foo<=>bar", "-CustomSeparator", "baz<=>contains<=>separator", "-CustomSeparator", "hello<=>" });
@@ -1141,7 +1141,7 @@ public partial class CommandLineParserTest
 
         bool handlerCalled = false;
         bool keepOldValue = false;
-        EventHandler<DuplicateArgumentEventArgs> handler = (sender, e) =>
+        void handler(object? sender, DuplicateArgumentEventArgs e)
         {
             Assert.AreEqual("Argument1", e.Argument.ArgumentName);
             Assert.AreEqual("foo", e.Argument.Value);
@@ -1151,7 +1151,7 @@ public partial class CommandLineParserTest
             {
                 e.KeepOldValue = true;
             }
-        };
+        }
 
         parser.DuplicateArgument += handler;
 
@@ -1348,8 +1348,8 @@ public partial class CommandLineParserTest
         Assert.AreEqual(expected.Description ?? string.Empty, argument.Description);
         Assert.AreEqual(expected.ValueDescription ?? argument.ElementType.Name, argument.ValueDescription);
         Assert.AreEqual(expected.Kind, argument.Kind);
-        Assert.AreEqual(expected.Kind == ArgumentKind.MultiValue || expected.Kind == ArgumentKind.Dictionary, argument.IsMultiValue);
-        Assert.AreEqual(expected.Kind == ArgumentKind.Dictionary, argument.IsDictionary);
+        Assert.AreEqual(expected.Kind is ArgumentKind.MultiValue or ArgumentKind.Dictionary, argument.IsMultiValue);
+        Assert.AreEqual(expected.Kind == ArgumentKind.Dictionary, argument.DictionaryInfo != null);
         Assert.AreEqual(expected.IsSwitch, argument.IsSwitch);
         Assert.AreEqual(expected.DefaultValue, argument.DefaultValue);
         Assert.AreEqual(expected.IsHidden, argument.IsHidden);

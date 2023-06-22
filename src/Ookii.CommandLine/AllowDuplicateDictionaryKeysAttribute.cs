@@ -20,7 +20,7 @@ namespace Ookii.CommandLine;
 /// </para>
 /// </remarks>
 /// <threadsafety static="true" instance="false"/>
-/// <seealso cref="CommandLineArgument.AllowDuplicateDictionaryKeys" qualifyHint="true"/>
+/// <seealso cref="DictionaryArgumentInfo.AllowDuplicateDictionaryKeys" qualifyHint="true"/>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Parameter)]
 public sealed class AllowDuplicateDictionaryKeysAttribute : Attribute
 {

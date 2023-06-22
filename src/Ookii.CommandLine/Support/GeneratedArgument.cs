@@ -112,8 +112,8 @@ public class GeneratedArgument : CommandLineArgument
         }
 
         var info = CreateArgumentInfo(parser, argumentType, allowsNull, requiredProperty, memberName, attribute,
-            multiValueSeparatorAttribute, descriptionAttribute, valueDescriptionAttribute, allowDuplicateDictionaryKeys,
-            keyValueSeparatorAttribute, aliasAttributes, shortAliasAttributes, validationAttributes);
+            multiValueSeparatorAttribute, descriptionAttribute, valueDescriptionAttribute, aliasAttributes, shortAliasAttributes,
+            validationAttributes);
 
         info.ElementType = elementType;
         info.ElementTypeWithNullable = elementTypeWithNullable;
@@ -122,9 +122,8 @@ public class GeneratedArgument : CommandLineArgument
         info.DefaultValue ??= alternateDefaultValue;
         if (info.Kind == ArgumentKind.Dictionary)
         {
-            info.KeyValueSeparator ??= KeyValuePairConverter.DefaultSeparator;
-            info.KeyType = keyType;
-            info.ValueType = valueType;
+            info.DictionaryInfo = new(allowDuplicateDictionaryKeys, keyType!, valueType!,
+                keyValueSeparatorAttribute?.Separator ?? KeyValuePairConverter.DefaultSeparator);
         }
 
         return new GeneratedArgument(info, setProperty, getProperty, callMethod, defaultValueDescription, defaultKeyDescription);
@@ -169,8 +168,8 @@ public class GeneratedArgument : CommandLineArgument
     /// <inheritdoc/>
     protected override string DetermineValueDescriptionForType(Type type)
     {
-        Debug.Assert(type == KeyType || type == ValueType || (ValueType == null && type == ElementType));
-        if (KeyType != null && type == KeyType)
+        Debug.Assert(DictionaryInfo == null ? type == ElementType : (type == DictionaryInfo.KeyType || type == DictionaryInfo.ValueType));
+        if (DictionaryInfo != null && type == DictionaryInfo.KeyType)
         {
             return _defaultKeyDescription!;
         }

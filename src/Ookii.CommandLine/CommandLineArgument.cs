@@ -296,14 +296,11 @@ public abstract class CommandLineArgument
         public string? ValueDescription { get; set; }
         public string? MultiValueSeparator { get; set; }
         public bool AllowMultiValueWhiteSpaceSeparator { get; set; }
-        public string? KeyValueSeparator { get; set; }
-        public bool AllowDuplicateDictionaryKeys { get; set; }
         public bool AllowNull { get; set; }
         public CancelMode CancelParsing { get; set; }
         public bool IsHidden { get; set; }
-        public Type? KeyType { get; set; }
-        public Type? ValueType { get; set; }
         public IEnumerable<ArgumentValidationAttribute> Validators { get; set; }
+        public DictionaryArgumentInfo? DictionaryInfo { get; set; }
     }
 
     #endregion
@@ -318,17 +315,13 @@ public abstract class CommandLineArgument
     private readonly Type _argumentType;
     private readonly Type _elementType;
     private readonly Type _elementTypeWithNullable;
-    private readonly Type? _keyType;
-    private readonly Type? _valueType;
     private readonly string? _description;
     private readonly bool _isRequired;
     private readonly string _memberName;
     private readonly object? _defaultValue;
     private readonly ArgumentKind _argumentKind;
-    private readonly bool _allowDuplicateDictionaryKeys;
     private readonly string? _multiValueSeparator;
     private readonly bool _allowMultiValueWhiteSpaceSeparator;
-    private readonly string? _keyValueSeparator;
     private readonly bool _allowNull;
     private readonly CancelMode _cancelParsing;
     private readonly bool _isHidden;
@@ -383,8 +376,6 @@ public abstract class CommandLineArgument
         _argumentKind = info.Kind;
         _elementTypeWithNullable = info.ElementTypeWithNullable;
         _elementType = info.ElementType;
-        _keyType = info.KeyType;
-        _valueType = info.ValueType;
         _description = info.Description;
         _isRequired = info.IsRequired;
         IsRequiredProperty = info.IsRequiredProperty;
@@ -398,11 +389,10 @@ public abstract class CommandLineArgument
         _defaultValue = ConvertToArgumentTypeInvariant(info.DefaultValue);
         IncludeDefaultInUsageHelp = info.IncludeDefaultValueInHelp;
         _valueDescription = info.ValueDescription;
-        _allowDuplicateDictionaryKeys = info.AllowDuplicateDictionaryKeys;
         _allowMultiValueWhiteSpaceSeparator = IsMultiValue && !IsSwitch && info.AllowMultiValueWhiteSpaceSeparator;
         _allowNull = info.AllowNull;
-        _keyValueSeparator = info.KeyValueSeparator;
         _multiValueSeparator = info.MultiValueSeparator;
+        DictionaryInfo = info.DictionaryInfo;
     }
 
     /// <summary>
@@ -618,24 +608,6 @@ public abstract class CommandLineArgument
     /// </para>
     /// </remarks>
     public Type ElementType => _elementType;
-
-    /// <summary>
-    /// Gets the type of the keys of a dictionary argument.
-    /// </summary>
-    /// <value>
-    /// The type of the keys in the dictionary, or <see langword="null"/> if <see cref="IsDictionary"/>
-    /// is <see langword="false"/>.
-    /// </value>
-    public Type? KeyType => _keyType;
-
-    /// <summary>
-    /// Gets the type of the values of a dictionary argument.
-    /// </summary>
-    /// <value>
-    /// The type of the values in the dictionary, or <see langword="null"/> if the
-    /// <see cref="IsDictionary"/> property is <see langword="false"/>.
-    /// </value>
-    public Type? ValueType => _valueType;
 
     /// <summary>
     /// Gets the position of this argument.
@@ -883,45 +855,13 @@ public abstract class CommandLineArgument
     public bool AllowMultiValueWhiteSpaceSeparator => _allowMultiValueWhiteSpaceSeparator;
 
     /// <summary>
-    /// Gets the separator for key/value pairs if this argument is a dictionary argument.
+    /// Gets information that only applies to dictionary arguments.
     /// </summary>
     /// <value>
-    /// The custom value specified using the <see cref="KeyValueSeparatorAttribute"/> attribute, or <see cref="KeyValuePairConverter.DefaultSeparator" qualifyHint="true"/>
-    /// if no attribute was present, or <see langword="null" /> if this is not a dictionary argument.
+    /// An instance of the <see cref="DictionaryArgumentInfo"/> class, or <see langword="null"/>
+    /// if 
     /// </value>
-    /// <remarks>
-    /// <para>
-    ///   This property is only meaningful if the <see cref="Kind"/> property is <see cref="ArgumentKind.Dictionary" qualifyHint="true"/>.
-    /// </para>
-    /// </remarks>
-    /// <seealso cref="KeyValueSeparatorAttribute"/>
-    public string? KeyValueSeparator => _keyValueSeparator;
-
-    /// <summary>
-    /// Gets a value indicating whether this argument is a dictionary argument.
-    /// </summary>
-    /// <value>
-    ///   <see langword="true"/> if this the <see cref="Kind"/> property is <see cref="ArgumentKind.Dictionary" qualifyHint="true"/>;
-    ///   otherwise, <see langword="false"/>.
-    /// </value>
-#if NET6_0_OR_GREATER
-    [MemberNotNullWhen(true, nameof(KeyType), nameof(ValueType), nameof(KeyValueSeparator)), CLSCompliant(false)]
-#endif
-    public bool IsDictionary => _argumentKind == ArgumentKind.Dictionary;
-
-    /// <summary>
-    /// Gets a value indicating whether this argument, if it is a dictionary argument, allows duplicate keys.
-    /// </summary>
-    /// <value>
-    ///   <see langword="true"/> if this argument allows duplicate keys; otherwise, <see langword="false"/>.
-    /// </value>
-    /// <remarks>
-    /// <para>
-    ///   This property is only meaningful if the <see cref="Kind"/> property is <see cref="ArgumentKind.Dictionary" qualifyHint="true"/>.
-    /// </para>
-    /// </remarks>
-    /// <seealso cref="AllowDuplicateDictionaryKeysAttribute"/>
-    public bool AllowDuplicateDictionaryKeys => _allowDuplicateDictionaryKeys;
+    public DictionaryArgumentInfo? DictionaryInfo { get; }
 
     /// <summary>
     /// Gets the value that the argument was set to in the last call to <see cref="CommandLineParser.Parse(string[],int)" qualifyHint="true"/>.
@@ -1228,8 +1168,6 @@ public abstract class CommandLineArgument
                                                     MultiValueSeparatorAttribute? multiValueSeparatorAttribute,
                                                     DescriptionAttribute? descriptionAttribute,
                                                     ValueDescriptionAttribute? valueDescriptionAttribute,
-                                                    bool allowDuplicateDictionaryKeys,
-                                                    KeyValueSeparatorAttribute? keyValueSeparatorAttribute,
                                                     IEnumerable<AliasAttribute>? aliasAttributes,
                                                     IEnumerable<ShortAliasAttribute>? shortAliasAttributes,
                                                     IEnumerable<ArgumentValidationAttribute>? validationAttributes)
@@ -1247,10 +1185,8 @@ public abstract class CommandLineArgument
             Description = descriptionAttribute?.Description,
             ValueDescription = valueDescriptionAttribute?.ValueDescription,
             Position = attribute.Position < 0 ? null : attribute.Position,
-            AllowDuplicateDictionaryKeys = allowDuplicateDictionaryKeys,
             MultiValueSeparator = GetMultiValueSeparator(multiValueSeparatorAttribute),
             AllowMultiValueWhiteSpaceSeparator = multiValueSeparatorAttribute != null && multiValueSeparatorAttribute.Separator == null,
-            KeyValueSeparator = keyValueSeparatorAttribute?.Separator,
             Aliases = GetAliases(aliasAttributes, argumentName),
             ShortAliases = GetShortAliases(shortAliasAttributes, argumentName),
             DefaultValue = attribute.DefaultValue,
@@ -1273,11 +1209,11 @@ public abstract class CommandLineArgument
             return result;
         }
 
-        if (Kind == ArgumentKind.Dictionary && type == null)
+        if (type == null && DictionaryInfo != null)
         {
-            var key = DetermineValueDescription(_keyType!.GetUnderlyingType());
-            var value = DetermineValueDescription(_valueType!.GetUnderlyingType());
-            return $"{key}{KeyValueSeparator}{value}";
+            var key = DetermineValueDescription(DictionaryInfo.KeyType.GetUnderlyingType());
+            var value = DetermineValueDescription(DictionaryInfo.ValueType.GetUnderlyingType());
+            return $"{key}{DictionaryInfo.KeyValueSeparator}{value}";
         }
 
         var typeName = DetermineValueDescriptionForType(type ?? ElementType);
@@ -1342,7 +1278,7 @@ public abstract class CommandLineArgument
                 ? _converter.Convert(spanValue, culture, this)
                 : _converter.Convert(stringValue, culture, this);
 
-            if (converted == null && (!_allowNull || IsDictionary))
+            if (converted == null && (!_allowNull || Kind == ArgumentKind.Dictionary))
             {
                 throw _parser.StringProvider.CreateException(CommandLineArgumentErrorCategory.NullArgumentValue, this);
             }
@@ -1548,7 +1484,7 @@ public abstract class CommandLineArgument
         {
         case ArgumentKind.Dictionary:
             type = typeof(DictionaryValueHelper<,>).MakeGenericType(_elementType.GetGenericArguments());
-            return (IValueHelper)Activator.CreateInstance(type, _allowDuplicateDictionaryKeys, _allowNull)!;
+            return (IValueHelper)Activator.CreateInstance(type, DictionaryInfo!.AllowDuplicateDictionaryKeys, _allowNull)!;
 
         case ArgumentKind.MultiValue:
             type = typeof(MultiValueHelper<>).MakeGenericType(_elementTypeWithNullable);
