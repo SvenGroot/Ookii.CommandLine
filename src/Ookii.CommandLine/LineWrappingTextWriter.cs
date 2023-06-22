@@ -12,7 +12,8 @@ namespace Ookii.CommandLine;
 
 /// <summary>
 /// Implements a <see cref="TextWriter"/> that writes text to another <see cref="TextWriter"/>,
-/// white-space wrapping lines at the specified maximum line length, and supporting indentation.
+/// white-space wrapping lines at the specified maximum line length, and supporting hanging
+/// indentation.
 /// </summary>
 /// <remarks>
 /// <para>
@@ -31,12 +32,16 @@ namespace Ookii.CommandLine;
 /// </para>
 /// <para>
 ///   If no suitable place to break the line could be found, the line is broken at the maximum
-///   line length. This may occur in the middle of a word.
+///   line length. This may occur in the middle of a word. If the <see cref="Wrapping"/> property
+///   is set to <see cref="WrappingMode.EnabledNoForce"/>, lines without a suitable white-space
+///   character will not be wrapped and can be longer than the value of the
+///   <see cref="MaximumLineLength"/> property.
 /// </para>
 /// <para>
 ///   After a line break (either one that was caused by wrapping or one that was part of the
 ///   text), the next line is indented by the number of characters specified by the <see cref="Indent"/>
-///   property. The length of the indentation counts towards the maximum line length.
+///   property, unless the previous line was blank. The length of the indentation counts towards the
+///   maximum line length.
 /// </para>
 /// <para>
 ///   When the <see cref="Flush()"/> or <see cref="FlushAsync()"/> method is called, the current
@@ -348,13 +353,18 @@ public partial class LineWrappingTextWriter : TextWriter
         get { return _baseWriter; }
     }
 
-    /// <inheritdoc/>
-    public override Encoding Encoding
-    {
-        get { return _baseWriter.Encoding; }
-    }
+    /// <summary>
+    /// Gets the character encoding in which the output is written.
+    /// </summary>
+    /// <value>
+    /// The character encoding of the <see cref="BaseWriter"/>.
+    /// </value>
+    public override Encoding Encoding => _baseWriter.Encoding;
 
     /// <inheritdoc/>
+    /// <value>
+    /// The line terminator string use by the <see cref="BaseWriter"/>.
+    /// </value>
 #if NET6_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
     [AllowNull]
 #endif
@@ -388,11 +398,12 @@ public partial class LineWrappingTextWriter : TextWriter
     /// <remarks>
     /// <para>
     ///   Whenever a line break is encountered (either because of wrapping or because a line break was written to the
-    ///   <see cref="LineWrappingTextWriter"/>, the next line is indented by the number of characters specified
-    ///   by the <see cref="Indent"/> property.
+    ///   <see cref="LineWrappingTextWriter"/>), the next line is indented by the number of characters specified
+    ///   by this property, unless the previous line was blank.
     /// </para>
     /// <para>
-    ///   The output position can be reset to the start of the line after a line break by calling <see cref="ResetIndent"/>.
+    ///   The output position can be reset to the start of the line after a line break by calling
+    ///   the <see cref="ResetIndent"/> method.
     /// </para>
     /// </remarks>
     public int Indent
@@ -461,7 +472,10 @@ public partial class LineWrappingTextWriter : TextWriter
     /// Gets a <see cref="LineWrappingTextWriter"/> that writes to the standard output stream,
     /// using <see cref="Console.WindowWidth" qualifyHint="true"/> as the maximum line length.
     /// </summary>
-    /// <returns>A <see cref="LineWrappingTextWriter"/> that writes to the standard output stream.</returns>
+    /// <returns>
+    /// A <see cref="LineWrappingTextWriter"/> that writes to <see cref="Console.Out" qualifyHint="true"/>,
+    /// the standard output stream.
+    /// </returns>
     public static LineWrappingTextWriter ForConsoleOut()
     {
         return new LineWrappingTextWriter(Console.Out, GetLineLengthForConsole(), false);
@@ -471,7 +485,10 @@ public partial class LineWrappingTextWriter : TextWriter
     /// Gets a <see cref="LineWrappingTextWriter"/> that writes to the standard error stream,
     /// using <see cref="Console.WindowWidth" qualifyHint="true"/> as the maximum line length.
     /// </summary>
-    /// <returns>A <see cref="LineWrappingTextWriter"/> that writes to the standard error stream.</returns>
+    /// <returns>
+    /// A <see cref="LineWrappingTextWriter"/> that writes to <see cref="Console.Error" qualifyHint="true"/>,
+    /// the standard error stream.
+    /// </returns>
     public static LineWrappingTextWriter ForConsoleError()
     {
         return new LineWrappingTextWriter(Console.Error, GetLineLengthForConsole(), false);
@@ -491,8 +508,8 @@ public partial class LineWrappingTextWriter : TextWriter
     /// </param>
     /// <returns>A <see cref="LineWrappingTextWriter"/> that writes to a <see cref="StringWriter"/>.</returns>
     /// <remarks>
-    ///   To retrieve the resulting string, first call <see cref="Flush()"/>, then use the <see
-    ///   cref="StringWriter.ToString"/> method of the <see cref="BaseWriter"/>.
+    ///   To retrieve the resulting string, call the <see cref="ToString()"/> method. The result
+    ///   will include any unflushed text without flushing that text to the <see cref="BaseWriter"/>.
     /// </remarks>
     public static LineWrappingTextWriter ForStringWriter(int maximumLineLength = 0, IFormatProvider? formatProvider = null, bool countFormatting = false)
     {

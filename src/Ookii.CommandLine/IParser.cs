@@ -13,16 +13,16 @@ namespace Ookii.CommandLine;
 ///   This type is only available when using .Net 7 or later.
 /// </note>
 /// <para>
-///   This interface is automatically implemented on a class (on .Net 7 and later only) when the
+///   This interface is automatically implemented on a class when the
 ///   <see cref="GeneratedParserAttribute"/> is used. Classes without that attribute must parse
 ///   arguments using the <see cref="CommandLineParser.Parse{T}(Ookii.CommandLine.ParseOptions?)"/>
 ///   method, or create the parser directly by using the <see cref="CommandLineParser{T}.CommandLineParser(Ookii.CommandLine.ParseOptions?)"/>
 ///   constructor; these classes do not support this interface unless it is manually implemented.
 /// </para>
 /// <para>
-///   When using a version of .Net where static interface methods are not supported, the
-///   <see cref="GeneratedParserAttribute"/> will still generate the same methods defined by this
-///   interface, just without having them implement the interface.
+///   When using a version of .Net where static interface methods are not supported (versions prior
+///   to .Net 7.0), the <see cref="GeneratedParserAttribute"/> will still generate the same methods
+///   as defined by this interface, just without having them implement the interface.
 /// </para>
 /// </remarks>
 public interface IParser<TSelf> : IParserProvider<TSelf>
@@ -30,7 +30,8 @@ public interface IParser<TSelf> : IParserProvider<TSelf>
 {
     /// <summary>
     /// Parses the arguments returned by the <see cref="Environment.GetCommandLineArgs" qualifyHint="true"/>
-    /// method using the type <typeparamref name="TSelf"/>.
+    /// method using the type <typeparamref name="TSelf"/>, handling errors and showing usage help
+    /// as required.
     /// </summary>
     /// <param name="options">
     ///   The options that control parsing behavior and usage help formatting. If
@@ -45,7 +46,8 @@ public interface IParser<TSelf> : IParserProvider<TSelf>
     public static abstract TSelf? Parse(ParseOptions? options = null);
 
     /// <summary>
-    /// Parses the specified command line arguments using the type <typeparamref name="TSelf"/>.
+    /// Parses the specified command line arguments using the type <typeparamref name="TSelf"/>,
+    /// handling errors and showing usage help as required.
     /// </summary>
     /// <param name="args">The command line arguments.</param>
     /// <param name="options">
@@ -60,21 +62,8 @@ public interface IParser<TSelf> : IParserProvider<TSelf>
     /// <seealso cref="CommandLineParser.Parse{T}(string[], ParseOptions?)" qualifyHint="true"/>
     public static abstract TSelf? Parse(string[] args, ParseOptions? options = null);
 
-    /// <summary>
-    /// Parses the specified command line arguments, starting at the specified index, using the
-    /// type <typeparamref name="TSelf"/>.
-    /// </summary>
-    /// <param name="args">The command line arguments.</param>
-    /// <param name="options">
-    ///   The options that control parsing behavior and usage help formatting. If
-    ///   <see langword="null" />, the default options are used.
-    /// </param>
-    /// <returns>
-    ///   An instance of the type <typeparamref name="TSelf"/>, or <see langword="null"/> if an
-    ///   error occurred, or argument parsing was canceled by the <see cref="CommandLineArgumentAttribute.CancelParsing" qualifyHint="true"/>
-    ///   property or a method argument that returned <see langword="false"/>.
-    /// </returns>
-    /// <seealso cref="CommandLineParser.Parse{T}(string[], ParseOptions?)" qualifyHint="true"/>
+    /// <inheritdoc cref="Parse(string[], ParseOptions?)"/>
+    /// <seealso cref="CommandLineParser.Parse{T}(ReadOnlyMemory{string}, ParseOptions?)" qualifyHint="true"/>
     public static abstract TSelf? Parse(ReadOnlyMemory<string> args, ParseOptions? options = null);
 }
 

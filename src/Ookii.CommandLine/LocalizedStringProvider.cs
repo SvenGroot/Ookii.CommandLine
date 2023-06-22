@@ -11,7 +11,8 @@ namespace Ookii.CommandLine;
 /// <remarks>
 /// <para>
 ///   Inherit from this class and override its members to provide customized or localized
-///   strings. You can specify the implementation to use using <see cref="ParseOptions.StringProvider" qualifyHint="true"/>.
+///   strings. You can specify the implementation to use with the
+///   <see cref="ParseOptions.StringProvider" qualifyHint="true"/> property.
 /// </para>
 /// <note>
 ///   For error messages, this only lets you customize error messages for the
@@ -20,6 +21,7 @@ namespace Ookii.CommandLine;
 ///   correct program, and should therefore not be shown to the user.
 /// </note>
 /// </remarks>
+/// <threadsafety static="true" instance="false"/>
 public partial class LocalizedStringProvider
 {
     /// <summary>
@@ -37,8 +39,9 @@ public partial class LocalizedStringProvider
     /// <remarks>
     /// <para>
     ///   The argument will automatically have a short alias that is the lower case first
-    ///   character of the value returned by <see cref="AutomaticHelpName"/>. If this character
-    ///   is the same according to the argument name comparer, then no alias is added.
+    ///   character of the value returned by <see cref="AutomaticHelpName"/>. If the character
+    ///   returned by this method is the same as that character according to the
+    ///   <see cref="ParseOptions.ArgumentNameComparison"/> property, then no alias is added.
     /// </para>
     /// <para>
     ///   If <see cref="CommandLineParser.Mode" qualifyHint="true"/> is not <see cref="ParsingMode.LongShort" qualifyHint="true"/>,
@@ -94,8 +97,8 @@ public partial class LocalizedStringProvider
     /// <returns>The string.</returns>
     /// <remarks>
     /// <para>
-    ///   The base implementation uses the <see cref="AssemblyInformationalVersionAttribute"/>,
-    ///   and will fall back to the assembly version if none is defined.
+    ///   The base implementation uses the <see cref="AssemblyInformationalVersionAttribute"/>
+    ///   attribute, and will fall back to the assembly version if none is defined.
     /// </para>
     /// </remarks>
     public virtual string ApplicationNameAndVersion(Assembly assembly, string friendlyName)

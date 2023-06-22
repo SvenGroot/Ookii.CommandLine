@@ -21,7 +21,8 @@ public partial class LocalizedStringProvider
     ///   value to start with a white-space character.
     /// </note>
     /// <para>
-    ///   If you override the <see cref="UsageWriter"/> method, this method will not be called.
+    ///   If you override the <see cref="UsageWriter.WriteArgumentValidators" qualifyHint="true"/>
+    ///   method, this method will not be called.
     /// </para>
     /// </remarks>
     public virtual string ValidatorDescriptions(CommandLineArgument argument)
@@ -40,7 +41,7 @@ public partial class LocalizedStringProvider
     }
 
     /// <summary>
-    /// Gets the usage help for the <see cref="ValidateCountAttribute"/> class.
+    /// Gets the usage help for the <see cref="ValidateCountAttribute"/> attribute.
     /// </summary>
     /// <param name="attribute">The attribute instance.</param>
     /// <returns>The string.</returns>
@@ -59,21 +60,21 @@ public partial class LocalizedStringProvider
     }
 
     /// <summary>
-    /// Gets the usage help for the <see cref="ValidateNotEmptyAttribute"/> class.
+    /// Gets the usage help for the <see cref="ValidateNotEmptyAttribute"/> attribute.
     /// </summary>
     /// <returns>The string.</returns>
     public virtual string ValidateNotEmptyUsageHelp()
         => Resources.ValidateNotEmptyUsageHelp;
 
     /// <summary>
-    /// Gets the usage help for the <see cref="ValidateNotWhiteSpaceAttribute"/> class.
+    /// Gets the usage help for the <see cref="ValidateNotWhiteSpaceAttribute"/> attribute.
     /// </summary>
     /// <returns>The string.</returns>
     public virtual string ValidateNotWhiteSpaceUsageHelp()
         => Resources.ValidateNotWhiteSpaceUsageHelp;
 
     /// <summary>
-    /// Gets the usage help for the <see cref="ValidateRangeAttribute"/> class.
+    /// Gets the usage help for the <see cref="ValidateRangeAttribute"/> attribute.
     /// </summary>
     /// <param name="attribute">The attribute instance.</param>
     /// <returns>The string.</returns>
@@ -92,7 +93,7 @@ public partial class LocalizedStringProvider
     }
 
     /// <summary>
-    /// Gets the usage help for the <see cref="ValidateStringLengthAttribute"/> class.
+    /// Gets the usage help for the <see cref="ValidateStringLengthAttribute"/> attribute.
     /// </summary>
     /// <param name="attribute">The attribute instance.</param>
     /// <returns>The string.</returns>
@@ -111,7 +112,7 @@ public partial class LocalizedStringProvider
     }
 
     /// <summary>
-    /// Gets the usage help for the <see cref="ValidateEnumValueAttribute"/> class.
+    /// Gets the usage help for the <see cref="ValidateEnumValueAttribute"/> attribute.
     /// </summary>
     /// <param name="enumType">The enumeration type.</param>
     /// <returns>The string.</returns>
@@ -120,7 +121,7 @@ public partial class LocalizedStringProvider
 
 
     /// <summary>
-    /// Gets the usage help for the <see cref="ProhibitsAttribute"/> class.
+    /// Gets the usage help for the <see cref="ProhibitsAttribute"/> attribute.
     /// </summary>
     /// <param name="arguments">The prohibited arguments.</param>
     /// <returns>The string.</returns>
@@ -129,7 +130,7 @@ public partial class LocalizedStringProvider
                string.Join(ArgumentSeparator, arguments.Select(a => a.ArgumentNameWithPrefix)));
 
     /// <summary>
-    /// Gets the usage help for the <see cref="RequiresAttribute"/> class.
+    /// Gets the usage help for the <see cref="RequiresAttribute"/> attribute.
     /// </summary>
     /// <param name="arguments">The required arguments.</param>
     /// <returns>The string.</returns>
@@ -138,10 +139,10 @@ public partial class LocalizedStringProvider
                string.Join(ArgumentSeparator, arguments.Select(a => a.ArgumentNameWithPrefix)));
 
     /// <summary>
-    /// Gets an error message used if the <see cref="RequiresAnyAttribute"/> fails validation.
+    /// Gets the usage help for the <see cref="RequiresAnyAttribute"/> attribute.
     /// </summary>
     /// <param name="arguments">The names of the arguments.</param>
-    /// <returns>The error message.</returns>
+    /// <returns>The string.</returns>
     public virtual string RequiresAnyUsageHelp(IEnumerable<CommandLineArgument> arguments)
     {
         // This deliberately reuses the error messge.
@@ -164,7 +165,8 @@ public partial class LocalizedStringProvider
     public virtual string ClassValidationFailed() => Resources.ClassValidationFailed;
 
     /// <summary>
-    /// Gets an error message used if the <see cref="ValidateRangeAttribute"/> fails validation.
+    /// Gets an error message used if the <see cref="ValidateRangeAttribute"/> attribute fails
+    /// validation.
     /// </summary>
     /// <param name="argumentName">The name of the argument.</param>
     /// <param name="attribute">The <see cref="ValidateRangeAttribute"/>.</param>
@@ -186,7 +188,7 @@ public partial class LocalizedStringProvider
     }
 
     /// <summary>
-    /// Gets an error message used if the <see cref="ValidateNotEmptyAttribute"/> fails
+    /// Gets an error message used if the <see cref="ValidateNotEmptyAttribute"/> attribute fails
     /// validation because the string was empty.
     /// </summary>
     /// <param name="argumentName">The name of the argument.</param>
@@ -202,7 +204,7 @@ public partial class LocalizedStringProvider
 
     /// <summary>
     /// Gets an error message used if the <see cref="ValidateNotWhiteSpaceAttribute"/> fails
-    /// validation because the string was empty.
+    /// validation because the string was empty or white-space.
     /// </summary>
     /// <param name="argumentName">The name of the argument.</param>
     /// <returns>The error message.</returns>
@@ -216,7 +218,8 @@ public partial class LocalizedStringProvider
         => Format(Resources.ValidateNotWhiteSpaceFailedFormat, argumentName);
 
     /// <summary>
-    /// Gets an error message used if the <see cref="ValidateStringLengthAttribute"/> fails validation.
+    /// Gets an error message used if the <see cref="ValidateStringLengthAttribute"/> attribute 
+    /// fails validation.
     /// </summary>
     /// <param name="argumentName">The name of the argument.</param>
     /// <param name="attribute">The <see cref="ValidateStringLengthAttribute"/>.</param>
@@ -238,7 +241,8 @@ public partial class LocalizedStringProvider
     }
 
     /// <summary>
-    /// Gets an error message used if the <see cref="ValidateCountAttribute"/> fails validation.
+    /// Gets an error message used if the <see cref="ValidateCountAttribute"/> attribute fails
+    /// validation.
     /// </summary>
     /// <param name="argumentName">The name of the argument.</param>
     /// <param name="attribute">The <see cref="ValidateCountAttribute"/>.</param>
@@ -260,7 +264,8 @@ public partial class LocalizedStringProvider
     }
 
     /// <summary>
-    /// Gets an error message used if the <see cref="ValidateEnumValueAttribute"/> fails validation.
+    /// Gets an error message used if the <see cref="ValidateEnumValueAttribute"/> attribute fails
+    /// validation.
     /// </summary>
     /// <param name="argumentName">The name of the argument.</param>
     /// <param name="enumType">The type of the enumeration.</param>
@@ -279,7 +284,8 @@ public partial class LocalizedStringProvider
     }
 
     /// <summary>
-    /// Gets an error message used if the <see cref="RequiresAttribute"/> fails validation.
+    /// Gets an error message used if the <see cref="RequiresAttribute"/> attribute fails
+    /// validation.
     /// </summary>
     /// <param name="argumentName">The name of the argument.</param>
     /// <param name="dependencies">The names of the required arguments.</param>
@@ -289,7 +295,8 @@ public partial class LocalizedStringProvider
                string.Join(ArgumentSeparator, dependencies.Select(a => a.ArgumentNameWithPrefix)));
 
     /// <summary>
-    /// Gets an error message used if the <see cref="ProhibitsAttribute"/> fails validation.
+    /// Gets an error message used if the <see cref="ProhibitsAttribute"/> attribute fails
+    /// validation.
     /// </summary>
     /// <param name="argumentName">The name of the argument.</param>
     /// <param name="prohibitedArguments">The names of the prohibited arguments.</param>
@@ -299,7 +306,8 @@ public partial class LocalizedStringProvider
                string.Join(ArgumentSeparator, prohibitedArguments.Select(a => a.ArgumentNameWithPrefix)));
 
     /// <summary>
-    /// Gets an error message used if the <see cref="RequiresAnyAttribute"/> fails validation.
+    /// Gets an error message used if the <see cref="RequiresAnyAttribute"/> attribute fails
+    /// validation.
     /// </summary>
     /// <param name="arguments">The names of the arguments.</param>
     /// <returns>The error message.</returns>

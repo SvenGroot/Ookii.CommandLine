@@ -1,15 +1,15 @@
 ﻿namespace Ookii.CommandLine;
 
 /// <summary>
-/// Indicates how the arguments in the description list should be sorted.
+/// Indicates how the arguments in the description list should be sorted when generating usage help.
 /// </summary>
 /// <seealso cref="UsageWriter.ArgumentDescriptionListOrder" qualifyHint="true"/>
 public enum DescriptionListSortMode
 {
     /// <summary>
     /// The descriptions are listed in the same order as the usage syntax: first the positional
-    /// arguments, then the required named arguments sorted by name, then the remaining
-    /// arguments sorted by name.
+    /// arguments, then the non-positional required named arguments sorted by name, then the
+    /// remaining arguments sorted by name.
     /// </summary>
     UsageOrder,
     /// <summary>

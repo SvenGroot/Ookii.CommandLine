@@ -517,7 +517,7 @@ public class CommandLineParser
     /// </para>
     /// </remarks>
     /// <seealso cref="ParseOptions.Culture" qualifyHint="true"/>
-    public CultureInfo Culture => _parseOptions.CultureOrDefault;
+    public CultureInfo Culture => _parseOptions.Culture;
 
     /// <summary>
     /// Gets a value indicating whether duplicate arguments are allowed.

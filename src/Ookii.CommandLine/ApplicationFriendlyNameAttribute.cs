@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 
 namespace Ookii.CommandLine;
 
@@ -9,18 +10,20 @@ namespace Ookii.CommandLine;
 /// <remarks>
 /// <para>
 ///   This attribute is used when a "-Version" argument is automatically added to the arguments
-///   of your application. It can be applied to the type defining command line arguments, or
-///   to the assembly that contains it.
+///   of your application, and by the automatically added "version" subcommand. It can be applied to
+///   the type defining command line arguments, or to the assembly that contains it.
 /// </para>
 /// <para>
-///   If not present, the automatic "-Version" argument will use the assembly name of the
+///   If not present, the automatic "-Version" argument and "version" command will use the 
+///   value of the <see cref="AssemblyTitleAttribute"/> attribute, or the assembly name of the
 ///   assembly containing the arguments type.
 /// </para>
 /// <para>
-///   It is also used by the automatically created "version" command.
+///   For the "version" subcommand, this attribute must be applied to the entry point assembly of
+///   your application.
 /// </para>
 /// </remarks>
-/// <threadsafety static="true" instance="false"/>
+/// <threadsafety static="true" instance="true"/>
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Assembly)]
 public class ApplicationFriendlyNameAttribute : Attribute
 {

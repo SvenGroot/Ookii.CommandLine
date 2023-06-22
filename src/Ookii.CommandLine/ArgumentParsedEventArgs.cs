@@ -37,8 +37,8 @@ public class ArgumentParsedEventArgs : EventArgs
     /// </summary>
     /// <value>
     /// One of the values of the <see cref="CancelMode"/> enumeration. The default value is the
-    /// value of the <see cref="CommandLineArgumentAttribute.CancelParsing" qualifyHint="true"/> attribute, or the
-    /// return value of a method argument.
+    /// value of the <see cref="CommandLineArgumentAttribute.CancelParsing" qualifyHint="true"/>
+    /// property, or the return value of a method argument.
     /// </value>
     /// <remarks>
     /// <para>

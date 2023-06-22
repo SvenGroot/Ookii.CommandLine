@@ -1,7 +1,7 @@
 ﻿namespace Ookii.CommandLine;
 
 /// <summary>
-/// Indicates which arguments should be included in the description list when printing usage.
+/// Indicates which arguments should be included in the description list when generating usage help.
 /// </summary>
 /// <seealso cref="UsageWriter.ArgumentDescriptionListFilter" qualifyHint="true"/>
 public enum DescriptionListFilterMode

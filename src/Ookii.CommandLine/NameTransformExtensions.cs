@@ -6,6 +6,7 @@ namespace Ookii.CommandLine;
 /// <summary>
 /// Extension methods for the <see cref="NameTransform"/> enumeration.
 /// </summary>
+/// <threadsafety static="true" instance="true"/>
 public static class NameTransformExtensions
 {
     /// <summary>
@@ -15,7 +16,7 @@ public static class NameTransformExtensions
     /// <param name="name">The name to transform.</param>
     /// <param name="suffixToStrip">
     ///   An optional suffix to remove from the string before transformation. Only used if
-    ///   <paramref name="suffixToStrip"/> is not <see cref="NameTransform.None" qualifyHint="true"/>.
+    ///   <paramref name="transform"/> is not <see cref="NameTransform.None" qualifyHint="true"/>.
     /// </param>
     /// <returns>The transformed name.</returns>
     /// <exception cref="ArgumentNullException">

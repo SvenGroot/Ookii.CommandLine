@@ -13,16 +13,15 @@ namespace Ookii.CommandLine;
 ///   This type is only available when using .Net 7 or later.
 /// </note>
 /// <para>
-///   This interface is automatically implemented on a class (on .Net 7 and later only) when the
+///   This interface is automatically implemented on a class when the
 ///   <see cref="GeneratedParserAttribute"/> is used. Classes without that attribute must create
 ///   the parser directly by using the <see cref="CommandLineParser{T}.CommandLineParser(Ookii.CommandLine.ParseOptions?)"/>
-///   constructor directly; these classes do not support this interface unless it is manually
-///   implemented.
+///   constructor; these classes do not support this interface unless it is manually implemented.
 /// </para>
 /// <para>
-///   When using a version of .Net where static interface methods are not supported, the
-///   <see cref="GeneratedParserAttribute"/> will still generate the same method defined by this
-///   interface, just without having it implement the interface.
+///   When using a version of .Net where static interface methods are not supported (versions prior
+///   to .Net 7.0), the <see cref="GeneratedParserAttribute"/> will still generate the same method
+///   as defined by this interface, just without having it implement the interface.
 /// </para>
 /// </remarks>
 public interface IParserProvider<TSelf>

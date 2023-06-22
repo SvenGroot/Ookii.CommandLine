@@ -29,7 +29,7 @@ namespace Ookii.CommandLine;
 /// </para>
 /// <para>
 ///   Using white-space separators will not work if the <see cref="CommandLineParser.AllowWhiteSpaceValueSeparator" qualifyHint="true"/>
-///   is <see langword="false"/> or if the argument is a multi-value switch argument.
+///   property is <see langword="false"/> or if the argument is a multi-value switch argument.
 /// </para>
 /// <para>
 ///   Using the <see cref="MultiValueSeparatorAttribute(string)"/> constructor, you instead
@@ -47,6 +47,7 @@ namespace Ookii.CommandLine;
 ///   <c>-Sample Value1,Value2 -Sample Value3</c> will mean the argument "Sample" has three values.
 /// </para>
 /// </remarks>
+/// <threadsafety static="true" instance="true"/>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Parameter)]
 public class MultiValueSeparatorAttribute : Attribute
 {

@@ -1,7 +1,7 @@
 ﻿namespace Ookii.CommandLine;
 
 /// <summary>
-/// Indicates whether and how the argument should cancel parsing.
+/// Indicates whether and how an argument should cancel parsing.
 /// </summary>
 /// <seealso cref="CommandLineArgumentAttribute.CancelParsing" qualifyHint="true"/>
 /// <seealso cref="ArgumentParsedEventArgs"/>

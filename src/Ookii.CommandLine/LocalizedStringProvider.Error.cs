@@ -56,7 +56,7 @@ public partial class LocalizedStringProvider
     /// or <see cref="ParseOptions.DuplicateArguments" qualifyHint="true"/> property is <see cref="ErrorMode.Warning" qualifyHint="true"/>.
     /// </summary>
     /// <param name="argumentName">The name of the argument.</param>
-    /// <returns>The error message.</returns>
+    /// <returns>The warning message.</returns>
     public virtual string DuplicateArgumentWarning(string argumentName) => Format(Resources.DuplicateArgumentWarningFormat, argumentName);
 
     /// <summary>
@@ -78,7 +78,7 @@ public partial class LocalizedStringProvider
     /// </summary>
     /// <param name="argumentName">The name of the argument.</param>
     /// <param name="argumentValue">The value of the argument.</param>
-    /// <param name="message">The error message of the conversion.</param>
+    /// <param name="message">The error message of the exception that caused this error.</param>
     /// <returns>The error message.</returns>
     public virtual string InvalidDictionaryValue(string argumentName, string? argumentValue, string? message)
         => Format(Resources.InvalidDictionaryValueFormat, argumentName, argumentValue, message);
@@ -86,7 +86,7 @@ public partial class LocalizedStringProvider
     /// <summary>
     /// Gets the error message for <see cref="CommandLineArgumentErrorCategory.CreateArgumentsTypeError" qualifyHint="true"/>.
     /// </summary>
-    /// <param name="message">The error message of the conversion.</param>
+    /// <param name="message">The error message from instantiating the type.</param>
     /// <returns>The error message.</returns>
     public virtual string CreateArgumentsTypeError(string? message)
         => Format(Resources.CreateArgumentsTypeErrorFormat, message);
@@ -95,7 +95,7 @@ public partial class LocalizedStringProvider
     /// Gets the error message for <see cref="CommandLineArgumentErrorCategory.ApplyValueError" qualifyHint="true"/>.
     /// </summary>
     /// <param name="argumentName">The name of the argument.</param>
-    /// <param name="message">The error message of the conversion.</param>
+    /// <param name="message">The error message from setting the value.</param>
     /// <returns>The error message.</returns>
     public virtual string ApplyValueError(string argumentName, string? message)
         => Format(Resources.SetValueErrorFormat, argumentName, message);

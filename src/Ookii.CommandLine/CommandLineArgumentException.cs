@@ -8,13 +8,13 @@ namespace Ookii.CommandLine;
 /// </summary>
 /// <remarks>
 /// <para>
-///   This exception indicates that the command line passed to the <see cref="CommandLineParser.Parse(string[], int)" qualifyHint="true"/> method
-///   was invalid for the arguments defined by the <see cref="CommandLineParser"/> instance.
+///   This exception indicates that the command line passed to the
+///   <see cref="CommandLineParser{T}.Parse(ReadOnlyMemory{string})" qualifyHint="true"/> method, or
+///   another parsing method, was invalid for the arguments defined by the
+///   <see cref="CommandLineParser"/> instance.
 /// </para>
 /// <para>
-///   The exception can indicate that too many positional arguments were supplied, a required argument was not supplied, an unknown argument name was supplied,
-///   no value was supplied for a named argument, an argument was supplied more than once and the <see cref="CommandLineParser.AllowDuplicateArguments" qualifyHint="true"/> property
-///   is <see langword="false"/>, or one of the argument values could not be converted to the argument's type.
+///   Use the <see cref="Category"/> property to determine the exact cause of the exception.
 /// </para>
 /// </remarks>
 /// <threadsafety static="true" instance="false"/>
@@ -36,7 +36,8 @@ public class CommandLineArgumentException : Exception
     public CommandLineArgumentException(string? message) : base(message) { }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="CommandLineArgumentException"/> class with a specified error message.
+    /// Initializes a new instance of the <see cref="CommandLineArgumentException"/> class with a
+    /// specified error message and category.
     /// </summary>
     /// <param name="message">The message that describes the error.</param>
     /// <param name="category">The category of this error.</param>
@@ -95,7 +96,10 @@ public class CommandLineArgumentException : Exception
     /// <see cref="Exception"/> that is the cause of this <see cref="CommandLineArgumentException"/>. 
     /// </summary>
     /// <param name="message">The error message that explains the reason for the <see cref="CommandLineArgumentException"/>.</param>
-    /// <param name="argumentName">The name of the argument that was invalid.</param>
+    /// <param name="argumentName">
+    /// The name of the argument that was invalid, or <see langword="null"/> if the error was not
+    /// caused by a particular argument.
+    /// </param>
     /// <param name="category">The category of this error.</param>
     /// <param name="inner">
     /// The <see cref="Exception"/> that is the cause of the current <see cref="CommandLineArgumentException"/>,
@@ -142,7 +146,8 @@ public class CommandLineArgumentException : Exception
     }
 
     /// <summary>
-    /// Sets the <see cref="System.Runtime.Serialization.SerializationInfo"/> object with the parameter name and additional exception information.
+    /// Sets the <see cref="System.Runtime.Serialization.SerializationInfo"/> object with the
+    /// argument name and additional exception information.
     /// </summary>
     /// <param name="info">The object that holds the serialized object data.</param>
     /// <param name="context">The contextual information about the source or destination.</param>

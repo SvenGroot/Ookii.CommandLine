@@ -1450,7 +1450,7 @@ public abstract class CommandLineArgument
         {
         case ArgumentKind.Dictionary:
             type = typeof(DictionaryValueHelper<,>).MakeGenericType(_elementType.GetGenericArguments());
-            return (IValueHelper)Activator.CreateInstance(type, DictionaryInfo!.AllowDuplicateDictionaryKeys, _allowNull)!;
+            return (IValueHelper)Activator.CreateInstance(type, DictionaryInfo!.AllowDuplicateKeys, _allowNull)!;
 
         case ArgumentKind.MultiValue:
             type = typeof(MultiValueHelper<>).MakeGenericType(_elementTypeWithNullable);

@@ -35,8 +35,7 @@ public enum CommandLineArgumentErrorCategory
     /// </summary>
     MissingRequiredArgument,
     /// <summary>
-    /// Invalid value for a dictionary argument; typically the result of a duplicate key or
-    /// a value without a key/value separator.
+    /// Invalid value for a dictionary argument; typically the result of a duplicate key.
     /// </summary>
     InvalidDictionaryValue,
     /// <summary>
@@ -57,13 +56,13 @@ public enum CommandLineArgumentErrorCategory
     /// </summary>
     CombinedShortNameNonSwitch,
     /// <summary>
-    /// An instance of a class derived from the <see cref="Validation.ArgumentValidationAttribute" qualifyHint="true"/>
+    /// An instance of a class derived from the <see cref="Validation.ArgumentValidationAttribute"/>
     /// class failed to validate the argument.
     /// </summary>
     ValidationFailed,
     /// <summary>
-    /// An argument failed a dependency check performed by the <see cref="Validation.RequiresAttribute" qualifyHint="true"/>
-    /// or the <see cref="Validation.ProhibitsAttribute" qualifyHint="true"/> class.
+    /// An argument failed a dependency check performed by the <see cref="Validation.RequiresAttribute"/>
+    /// or the <see cref="Validation.ProhibitsAttribute"/> class.
     /// </summary>
     DependencyFailed,
 }

@@ -12,7 +12,7 @@ public sealed class DictionaryArgumentInfo
     /// <summary>
     /// Initializes a new instance of the <see cref="DictionaryArgumentInfo"/> class.
     /// </summary>
-    /// <param name="allowDuplicateDictionaryKeys">
+    /// <param name="allowDuplicateKeys">
     /// <see langword="true"/> if duplicate dictionary keys are allowed; otherwise,
     /// <see langword="false"/>.
     /// </param>
@@ -23,22 +23,22 @@ public sealed class DictionaryArgumentInfo
     /// <paramref name="keyType"/> or <paramref name="valueType"/> or <paramref name="keyValueSeparator"/>
     /// is <see langword="null"/>.
     /// </exception>
-    public DictionaryArgumentInfo(bool allowDuplicateDictionaryKeys, Type keyType, Type valueType, string keyValueSeparator)
+    public DictionaryArgumentInfo(bool allowDuplicateKeys, Type keyType, Type valueType, string keyValueSeparator)
     {
-        AllowDuplicateDictionaryKeys = allowDuplicateDictionaryKeys;
+        AllowDuplicateKeys = allowDuplicateKeys;
         KeyType = keyType ?? throw new ArgumentNullException(nameof(keyType));
         ValueType = valueType ?? throw new ArgumentNullException(nameof(valueType));
         KeyValueSeparator = keyValueSeparator ?? throw new ArgumentNullException(nameof(keyValueSeparator));
     }
 
     /// <summary>
-    /// Gets a value indicating whether this argument, if it is a dictionary argument, allows duplicate keys.
+    /// Gets a value indicating whether this argument allows duplicate keys.
     /// </summary>
     /// <value>
     ///   <see langword="true"/> if this argument allows duplicate keys; otherwise, <see langword="false"/>.
     /// </value>
     /// <seealso cref="AllowDuplicateDictionaryKeysAttribute"/>
-    public bool AllowDuplicateDictionaryKeys { get; }
+    public bool AllowDuplicateKeys { get; }
 
     /// <summary>
     /// Gets the type of the keys of a dictionary argument.
@@ -57,7 +57,7 @@ public sealed class DictionaryArgumentInfo
     public Type ValueType { get; }
 
     /// <summary>
-    /// Gets the separator for key/value pairs if this argument is a dictionary argument.
+    /// Gets the separator for key/value pairs.
     /// </summary>
     /// <value>
     /// The custom value specified using the <see cref="KeyValueSeparatorAttribute"/> attribute, or

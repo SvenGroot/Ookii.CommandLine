@@ -9,8 +9,7 @@ using System.IO;
 namespace Ookii.CommandLine;
 
 /// <summary>
-/// Provides options for the <see cref="CommandLineParser.Parse{T}(string[], ParseOptions)" qualifyHint="true"/>
-/// method and the <see cref="CommandLineParser(Type, ParseOptions?)"/> constructor.
+/// Provides options that control parsing behavior.
 /// </summary>
 /// <remarks>
 /// <para>
@@ -20,30 +19,34 @@ namespace Ookii.CommandLine;
 ///   value from the <see cref="ParseOptionsAttribute"/> attribute.
 /// </para>
 /// </remarks>
+/// <seealso cref="CommandLineParser.Parse{T}(Ookii.CommandLine.ParseOptions?)" qualifyHint="true"/>
+/// <seealso cref="CommandLineParser{T}.CommandLineParser(Ookii.CommandLine.ParseOptions?)"/>
+/// <seealso cref="IParser{TSelf}.Parse(Ookii.CommandLine.ParseOptions?)"/>
+/// <seealso cref="IParserProvider{TSelf}.CreateParser(Ookii.CommandLine.ParseOptions?)"/>
+/// <seealso cref="CommandOptions"/>
 public class ParseOptions
 {
+    private CultureInfo? _culture;
     private UsageWriter? _usageWriter;
     private LocalizedStringProvider? _stringProvider;
 
     /// <summary>
-    /// Gets or sets the culture used to convert command line argument values from their string representation to the argument type.
-    /// </summary>
-    /// <value>
-    /// The culture used to convert command line argument values from their string representation to the argument type, or
-    /// <see langword="null" /> to use <see cref="CultureInfo.InvariantCulture" qualifyHint="true"/>. The default value is <see langword="null"/>
-    /// </value>
-    /// <seealso cref="CommandLineParser.Culture" qualifyHint="true"/>
-    public CultureInfo? Culture { get; set; }
-
-    /// <summary>
-    /// Gets the culture used to convert command line argument values from their string
+    /// Gets or sets the culture used to convert command line argument values from their string
     /// representation to the argument type.
     /// </summary>
     /// <value>
-    /// The value of the <see cref="Culture"/> property, or <see cref="CultureInfo.InvariantCulture" qualifyHint="true"/>
-    /// if that property is <see langword="null"/>.
+    /// The culture used to convert command line argument values. The default value is
+    /// <see cref="CultureInfo.InvariantCulture" qualifyHint="true"/>.
     /// </value>
-    public CultureInfo CultureOrDefault => Culture ?? CultureInfo.InvariantCulture;
+    /// <seealso cref="CommandLineParser.Culture" qualifyHint="true"/>
+#if NET6_0_OR_GREATER
+    [AllowNull]
+#endif
+    public CultureInfo Culture
+    {
+        get => _culture ?? CultureInfo.InvariantCulture;
+        set => _culture = value;
+    }
 
     /// <summary>
     /// Gets or sets a value that indicates the command line argument parsing rules to use.
@@ -145,8 +148,8 @@ public class ParseOptions
     /// <remarks>
     /// <para>
     ///   If an argument doesn't have the <see cref="CommandLineArgumentAttribute.ArgumentName" qualifyHint="true"/>
-    ///   property set, the argument name is determined by taking the name of the property, or
-    ///   method that defines it, and applying the specified transform.
+    ///   property set, the argument name is determined by taking the name of the property or
+    ///   method that defines it, and applying the specified transformation.
     /// </para>
     /// <para>
     ///   The name transform will also be applied to the names of the automatically added
@@ -183,9 +186,9 @@ public class ParseOptions
     /// </value>
     /// <remarks>
     /// <para>
-    ///   If the parsing mode is set to <see cref="ParsingMode.LongShort" qualifyHint="true"/>, either using the
-    ///   <see cref="Mode"/> property or the <see cref="ParseOptionsAttribute"/> attribute,
-    ///   this property sets the short argument name prefixes. Use the<see cref="LongArgumentNamePrefix"/>
+    ///   If the parsing mode is set to <see cref="ParsingMode.LongShort" qualifyHint="true"/>,
+    ///   either using the <see cref="Mode"/> property or the <see cref="ParseOptionsAttribute.ArgumentNamePrefixes" qualifyHint="true"/>
+    ///   property, this property sets the short argument name prefixes. Use the <see cref="LongArgumentNamePrefix"/>
     ///   property to set the argument prefix for long names.
     /// </para>
     /// <para>
@@ -278,14 +281,22 @@ public class ParseOptions
     /// Gets or sets the <see cref="TextWriter"/> used to print error information if argument
     /// parsing fails.
     /// </summary>
-    /// <remarks>
-    /// If argument parsing is successful, nothing will be written.
-    /// </remarks>
     /// <value>
     /// The <see cref="TextWriter"/> used to print error information, or <see langword="null"/>
     /// to print to a <see cref="LineWrappingTextWriter"/> for the standard error stream 
     /// (<see cref="Console.Error" qualifyHint="true"/>). The default value is <see langword="null"/>.
     /// </value>
+    /// <remarks>
+    /// <para>
+    ///   Only the parsing methods that automatically handle errors will use this property.
+    /// </para>
+    /// <para>
+    ///   If argument parsing is successful, nothing will be written.
+    /// </para>
+    /// </remarks>
+    /// <seealso cref="CommandLineParser.Parse{T}(ParseOptions?)"/>
+    /// <seealso cref="CommandLineParser{T}.ParseWithErrorHandling()"/>
+    /// <seealso cref="IParser{TSelf}.Parse(ParseOptions?)"/>
     public TextWriter? Error { get; set; }
 
     /// <summary>
@@ -305,11 +316,13 @@ public class ParseOptions
     /// </para>
     /// <para>
     ///   If set to <see cref="ErrorMode.Warning" qualifyHint="true"/>, the <see cref="CommandLineParser{T}.ParseWithErrorHandling()" qualifyHint="true"/>
-    ///   method, the static <see cref="CommandLineParser.Parse{T}(ParseOptions?)" qualifyHint="true"/> method and
-    ///   the <see cref="CommandManager"/> class will print a warning to the <see cref="Error"/>
-    ///   stream when a duplicate argument is found. If you are not using these methods,
-    ///   <see cref="ErrorMode.Warning" qualifyHint="true"/> is identical to <see cref="ErrorMode.Allow" qualifyHint="true"/> and no
-    ///   warning is displayed.
+    ///   method, the static <see cref="CommandLineParser.Parse{T}(ParseOptions?)" qualifyHint="true"/>
+    ///   method, the generated <see cref="IParser{TSelf}.Parse(ParseOptions?)" qualifyHint="true"/>
+    ///   method and the <see cref="CommandManager"/> class will print a warning to the stream
+    ///   indicated by the <see cref="Error"/> property when a duplicate argument is found. If you
+    ///   are not using these methods, <see cref="ErrorMode.Warning" qualifyHint="true"/> is
+    ///   identical to <see cref="ErrorMode.Allow" qualifyHint="true"/>, and no warning is
+    ///   displayed.
     /// </para>
     /// <para>
     ///   If not <see langword="null"/>, this property overrides the value of the
@@ -373,14 +386,14 @@ public class ParseOptions
     ///   if the default value is used.
     /// </para>
     /// <note>
-    ///   The character chosen here cannot be used in the name of any parameter. Therefore,
+    ///   The characters chosen here cannot be used in the name of any parameter. Therefore,
     ///   it's usually best to choose a non-alphanumeric value such as the colon or equals sign.
-    ///   The character can appear in argument values (e.g. <c>-sample:foo:bar</c> is fine, in which
-    ///   case the value is "foo:bar").
+    ///   The characters can appear in argument values (e.g. <c>-sample:foo:bar</c> is fine, in\
+    ///   which case the value is "foo:bar").
     /// </note>
     /// <note>
     ///   Do not pick a white-space character as the separator. Doing this only works if the
-    ///   whitespace character is part of the argument, which usually means it needs to be
+    ///   white-space character is part of the argument token, which usually means it needs to be
     ///   quoted or escaped when invoking your application. Instead, use the
     ///   <see cref="AllowWhiteSpaceValueSeparator"/> property to control whether white space
     ///   is allowed as a separator.
@@ -544,6 +557,9 @@ public class ParseOptions
     /// </value>
     /// <remarks>
     /// <para>
+    ///   Only the parsing methods that automatically handle errors will use this property.
+    /// </para>
+    /// <para>
     ///   The color will only be used if the <see cref="UseErrorColor"/> property is
     ///   <see langword="true"/>; otherwise, it will be replaced with an empty string.
     /// </para>
@@ -557,6 +573,9 @@ public class ParseOptions
     ///   property will be written to undo the color change.
     /// </para>
     /// </remarks>
+    /// <seealso cref="CommandLineParser.Parse{T}(ParseOptions?)"/>
+    /// <seealso cref="CommandLineParser{T}.ParseWithErrorHandling()"/>
+    /// <seealso cref="IParser{TSelf}.Parse(ParseOptions?)"/>
     public string ErrorColor { get; set; } = TextFormat.ForegroundRed;
 
     /// <summary>
@@ -567,6 +586,9 @@ public class ParseOptions
     ///   <see cref="TextFormat.ForegroundYellow" qualifyHint="true"/>.
     /// </value>
     /// <remarks>
+    /// <para>
+    ///   Only the parsing methods that automatically handle errors will use this property.
+    /// </para>
     /// <para>
     ///   The color will only be used if the <see cref="UseErrorColor"/> property is
     ///   <see langword="true"/>; otherwise, it will be replaced with an empty string.
@@ -585,6 +607,9 @@ public class ParseOptions
     ///   property will be written to undo the color change.
     /// </para>
     /// </remarks>
+    /// <seealso cref="CommandLineParser.Parse{T}(ParseOptions?)"/>
+    /// <seealso cref="CommandLineParser{T}.ParseWithErrorHandling()"/>
+    /// <seealso cref="IParser{TSelf}.Parse(ParseOptions?)"/>
     public string WarningColor { get; set; } = TextFormat.ForegroundYellow;
 
     /// <summary>
@@ -596,12 +621,12 @@ public class ParseOptions
     /// </value>
     /// <remarks>
     /// <para>
+    ///   Only the parsing methods that automatically handle errors will use this property.
+    /// </para>
+    /// <para>
     ///   If this property is <see langword="null"/> and the <see cref="Error"/> property is
-    ///   <see langword="null"/>, the <see cref="CommandLineParser{T}.ParseWithErrorHandling()" qualifyHint="true"/>
-    ///   method, the <see cref="CommandLineParser.Parse{T}(string[], int, ParseOptions?)" qualifyHint="true"/>
-    ///   method and the <see cref="CommandManager"/> class will determine if color is supported
-    ///   using the <see cref="VirtualTerminal.EnableColor" qualifyHint="true"/> method for the standard error
-    ///   stream.
+    ///   <see langword="null"/>, color will be used if the standard error stream supports it, as
+    ///   determined by the <see cref="VirtualTerminal.EnableColor" qualifyHint="true"/> method.
     /// </para>
     /// <para>
     ///   If this property is set to <see langword="true"/> explicitly, virtual terminal
@@ -609,6 +634,9 @@ public class ParseOptions
     ///   garbage characters appearing in the output.
     /// </para>
     /// </remarks>
+    /// <seealso cref="CommandLineParser.Parse{T}(ParseOptions?)"/>
+    /// <seealso cref="CommandLineParser{T}.ParseWithErrorHandling()"/>
+    /// <seealso cref="IParser{TSelf}.Parse(ParseOptions?)"/>
     public bool? UseErrorColor { get; set; }
 
     /// <summary>
@@ -627,6 +655,9 @@ public class ParseOptions
     /// </para>
     /// </remarks>
     /// <seealso cref="CommandLineParser.StringProvider" qualifyHint="true"/>
+#if NET6_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+    [AllowNull]
+#endif
     public LocalizedStringProvider StringProvider
     {
         get => _stringProvider ??= new LocalizedStringProvider();
@@ -642,13 +673,17 @@ public class ParseOptions
     /// </value>
     /// <remarks>
     /// <para>
-    ///   If the value of this property is not <see cref="UsageHelpRequest.Full" qualifyHint="true"/>, the
-    ///   <see cref="CommandLineParser{T}.ParseWithErrorHandling()" qualifyHint="true"/> method, the
-    ///   <see cref="CommandLineParser.Parse{T}(string[], int, ParseOptions?)" qualifyHint="true"/> method and the
-    ///   <see cref="CommandManager"/> class will write the message returned by the
-    ///   <see cref="UsageWriter.WriteMoreInfoMessage" qualifyHint="true"/> method instead of usage help.
+    ///   Only the parsing methods that automatically handle errors will use this property.
+    /// </para>
+    /// <para>
+    ///   If the value of this property is not <see cref="UsageHelpRequest.Full" qualifyHint="true"/>,
+    ///   the message returned by the <see cref="UsageWriter.WriteMoreInfoMessage" qualifyHint="true"/>
+    ///   method is written instead of the omitted parts of the usage help.
     /// </para>
     /// </remarks>
+    /// <seealso cref="CommandLineParser.Parse{T}(ParseOptions?)"/>
+    /// <seealso cref="CommandLineParser{T}.ParseWithErrorHandling()"/>
+    /// <seealso cref="IParser{TSelf}.Parse(ParseOptions?)"/>
     public UsageHelpRequest ShowUsageOnError { get; set; }
 
     /// <summary>
@@ -685,8 +720,8 @@ public class ParseOptions
     /// <remarks>
     /// <para>
     ///   This property has no effect on explicit value description specified with the
-    ///   <see cref="CommandLineArgument.ValueDescription" qualifyHint="true"/> property or the
-    ///   <see cref="DefaultValueDescriptions"/> property.
+    ///   <see cref="ValueDescriptionAttribute"/> attribute or the <see cref="DefaultValueDescriptions"/>
+    ///   property.
     /// </para>
     /// <para>
     ///   If not <see langword="null"/>, this property overrides the <see cref="ParseOptionsAttribute.ValueDescriptionTransform" qualifyHint="true"/>
@@ -718,9 +753,10 @@ public class ParseOptions
     /// <para>
     ///   This property only applies when you manually construct an instance of the
     ///   <see cref="CommandLineParser"/> or <see cref="CommandLineParser{T}"/> class, or use one
-    ///   of the static <see cref="CommandLineParser.Parse{T}(ParseOptions?)" qualifyHint="true"/> methods. If you use
-    ///   the generated static <c>CreateParser</c> and <c>Parse</c> methods on the command line
-    ///   arguments type, the generated parser is used regardless of the value of this property.
+    ///   of the static <see cref="CommandLineParser.Parse{T}(ParseOptions?)" qualifyHint="true"/>
+    ///   methods. If you use the generated static <see cref="IParser{TSelf}"/> or
+    ///   <see cref="IParserProvider{TSelf}"/> interface methods on the command line arguments type,
+    ///   the generated parser is used regardless of the value of this property.
     /// </para>
     /// </remarks>
     public bool ForceReflection { get; set; } = ForceReflectionDefault;
@@ -733,7 +769,9 @@ public class ParseOptions
     /// Gets or sets the <see cref="UsageWriter"/> to use to create usage help.
     /// </summary>
     /// <value>
-    /// An instance of the <see cref="UsageWriter"/> class.
+    /// An instance of a class inheriting from the <see cref="UsageWriter"/> class.
+    /// The default value is an instance of the <see cref="UsageWriter"/> class
+    /// itself.
     /// </value>
 #if NET6_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
     [AllowNull]

@@ -1,8 +1,8 @@
 namespace Ookii.CommandLine;
 
 /// <summary>
-/// Indicates how to transform the property, parameter, or method name if an argument doesn't
-/// have an explicit name.
+/// Indicates how to transform the argument name, subcommand name, or value description if they are
+/// not explicitly specified but automatically derived from the member or type name.
 /// </summary>
 /// <seealso cref="ParseOptionsAttribute.ArgumentNameTransform" qualifyHint="true"/>
 /// <seealso cref="ParseOptions.ArgumentNameTransform" qualifyHint="true"/>
