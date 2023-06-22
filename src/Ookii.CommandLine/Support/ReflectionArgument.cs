@@ -148,15 +148,17 @@ internal class ReflectionArgument : CommandLineArgument
 #endif
 
         ArgumentInfo info = CreateArgumentInfo(parser, argumentType, allowsNull, requiredProperty, member.Name, attribute,
-            multiValueSeparatorAttribute, descriptionAttribute, valueDescriptionAttribute, aliasAttributes, shortAliasAttributes,
-            validationAttributes);
+            descriptionAttribute, valueDescriptionAttribute, aliasAttributes, shortAliasAttributes, validationAttributes);
 
-        DetermineAdditionalInfo(ref info, member, keyValueSeparatorAttribute, allowDuplicateDictionaryKeys);
+        DetermineAdditionalInfo(ref info, member, multiValueSeparatorAttribute, keyValueSeparatorAttribute,
+            allowDuplicateDictionaryKeys);
+
         return new ReflectionArgument(info, property, method);
     }
 
     private static void DetermineAdditionalInfo(ref ArgumentInfo info, MemberInfo member,
-        KeyValueSeparatorAttribute? keyValueSeparatorAttribute, bool allowDuplicateDictionaryKeys)
+        MultiValueSeparatorAttribute? multiValueSeparatorAttribute, KeyValueSeparatorAttribute? keyValueSeparatorAttribute,
+        bool allowDuplicateDictionaryKeys)
     {
         var converterAttribute = member.GetCustomAttribute<ArgumentConverterAttribute>();
         var keyArgumentConverterAttribute = member.GetCustomAttribute<KeyConverterAttribute>();
@@ -172,6 +174,7 @@ internal class ReflectionArgument : CommandLineArgument
             {
                 Debug.Assert(elementType != null);
                 info.Kind = ArgumentKind.Dictionary;
+                info.MultiValueInfo = GetMultiValueInfo(multiValueSeparatorAttribute);
                 info.ElementTypeWithNullable = elementType!;
                 info.AllowNull = DetermineDictionaryValueTypeAllowsNull(dictionaryType, property);
                 var genericArguments = dictionaryType.GetGenericArguments();
@@ -191,6 +194,7 @@ internal class ReflectionArgument : CommandLineArgument
             {
                 Debug.Assert(elementType != null);
                 info.Kind = ArgumentKind.MultiValue;
+                info.MultiValueInfo = GetMultiValueInfo(multiValueSeparatorAttribute);
                 info.ElementTypeWithNullable = elementType!;
                 info.AllowNull = DetermineCollectionElementTypeAllowsNull(collectionType, property);
             }

@@ -6,6 +6,7 @@ namespace Ookii.CommandLine;
 /// <summary>
 /// Provides information that only applies to dictionary arguments.
 /// </summary>
+/// <threadsafety static="true" instance="true"/>
 public sealed class DictionaryArgumentInfo
 {
     /// <summary>

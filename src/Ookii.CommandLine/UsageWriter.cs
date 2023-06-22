@@ -1068,7 +1068,7 @@ public class UsageWriter
             WriteValueDescription(argument.ValueDescription);
         }
 
-        if (argument.IsMultiValue)
+        if (argument.MultiValueInfo != null)
         {
             WriteMultiValueSuffix();
         }

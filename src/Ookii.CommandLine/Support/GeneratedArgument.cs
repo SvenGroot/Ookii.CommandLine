@@ -112,18 +112,21 @@ public class GeneratedArgument : CommandLineArgument
         }
 
         var info = CreateArgumentInfo(parser, argumentType, allowsNull, requiredProperty, memberName, attribute,
-            multiValueSeparatorAttribute, descriptionAttribute, valueDescriptionAttribute, aliasAttributes, shortAliasAttributes,
-            validationAttributes);
+            descriptionAttribute, valueDescriptionAttribute, aliasAttributes, shortAliasAttributes, validationAttributes);
 
         info.ElementType = elementType;
         info.ElementTypeWithNullable = elementTypeWithNullable;
         info.Converter = converter;
         info.Kind = kind;
         info.DefaultValue ??= alternateDefaultValue;
-        if (info.Kind == ArgumentKind.Dictionary)
+        if (info.Kind is ArgumentKind.MultiValue or ArgumentKind.Dictionary)
         {
-            info.DictionaryInfo = new(allowDuplicateDictionaryKeys, keyType!, valueType!,
-                keyValueSeparatorAttribute?.Separator ?? KeyValuePairConverter.DefaultSeparator);
+            info.MultiValueInfo = GetMultiValueInfo(multiValueSeparatorAttribute);
+            if (info.Kind == ArgumentKind.Dictionary)
+            {
+                info.DictionaryInfo = new(allowDuplicateDictionaryKeys, keyType!, valueType!,
+                    keyValueSeparatorAttribute?.Separator ?? KeyValuePairConverter.DefaultSeparator);
+            }
         }
 
         return new GeneratedArgument(info, setProperty, getProperty, callMethod, defaultValueDescription, defaultKeyDescription);

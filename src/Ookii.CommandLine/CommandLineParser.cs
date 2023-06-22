@@ -1499,13 +1499,13 @@ public class CommandLineParser
     private void VerifyPositionalArgumentRules()
     {
         bool hasOptionalArgument = false;
-        bool hasArrayArgument = false;
+        bool hasMultiValueArgument = false;
 
         for (int x = 0; x < _positionalArgumentCount; ++x)
         {
             CommandLineArgument argument = _arguments[x];
 
-            if (hasArrayArgument)
+            if (hasMultiValueArgument)
             {
                 throw new NotSupportedException(Properties.Resources.ArrayNotLastArgument);
             }
@@ -1520,9 +1520,9 @@ public class CommandLineParser
                 hasOptionalArgument = true;
             }
 
-            if (argument.IsMultiValue)
+            if (argument.MultiValueInfo != null)
             {
-                hasArrayArgument = true;
+                hasMultiValueArgument = true;
             }
 
             argument.Position = x;
@@ -1559,10 +1559,10 @@ public class CommandLineParser
             else
             {
                 // If this is a multi-value argument is must be the last argument.
-                if (positionalArgumentIndex < _positionalArgumentCount && !_arguments[positionalArgumentIndex].IsMultiValue)
+                if (positionalArgumentIndex < _positionalArgumentCount && _arguments[positionalArgumentIndex].MultiValueInfo == null)
                 {
                     // Skip named positional arguments that have already been specified by name.
-                    while (positionalArgumentIndex < _positionalArgumentCount && !_arguments[positionalArgumentIndex].IsMultiValue && _arguments[positionalArgumentIndex].HasValue)
+                    while (positionalArgumentIndex < _positionalArgumentCount && _arguments[positionalArgumentIndex].MultiValueInfo == null && _arguments[positionalArgumentIndex].HasValue)
                     {
                         ++positionalArgumentIndex;
                     }
@@ -1638,7 +1638,7 @@ public class CommandLineParser
 
     private CancelMode ParseArgumentValue(CommandLineArgument argument, string? stringValue, ReadOnlyMemory<char>? memoryValue)
     {
-        if (argument.HasValue && !argument.IsMultiValue)
+        if (argument.HasValue && argument.MultiValueInfo == null)
         {
             if (!AllowDuplicateArguments)
             {
@@ -1734,7 +1734,7 @@ public class CommandLineParser
                     return (cancelParsing, index, argument);
                 }
 
-                if (!argument.AllowMultiValueWhiteSpaceSeparator)
+                if (argument.MultiValueInfo is not MultiValueArgumentInfo { AllowWhiteSpaceSeparator: true })
                 {
                     break;
                 }

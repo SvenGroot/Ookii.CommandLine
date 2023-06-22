@@ -74,7 +74,7 @@ public class ValidateCountAttribute : ArgumentValidationWithHelpAttribute
     /// </returns>
     public override bool IsValid(CommandLineArgument argument, object? value)
     {
-        if (!argument.IsMultiValue)
+        if (argument.MultiValueInfo == null)
         {
             return false;
         }

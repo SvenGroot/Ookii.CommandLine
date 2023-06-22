@@ -294,12 +294,11 @@ public abstract class CommandLineArgument
         public bool IncludeDefaultValueInHelp { get; set; }
         public string? Description { get; set; }
         public string? ValueDescription { get; set; }
-        public string? MultiValueSeparator { get; set; }
-        public bool AllowMultiValueWhiteSpaceSeparator { get; set; }
         public bool AllowNull { get; set; }
         public CancelMode CancelParsing { get; set; }
         public bool IsHidden { get; set; }
         public IEnumerable<ArgumentValidationAttribute> Validators { get; set; }
+        public MultiValueArgumentInfo? MultiValueInfo { get; set; }
         public DictionaryArgumentInfo? DictionaryInfo { get; set; }
     }
 
@@ -320,8 +319,6 @@ public abstract class CommandLineArgument
     private readonly string _memberName;
     private readonly object? _defaultValue;
     private readonly ArgumentKind _argumentKind;
-    private readonly string? _multiValueSeparator;
-    private readonly bool _allowMultiValueWhiteSpaceSeparator;
     private readonly bool _allowNull;
     private readonly CancelMode _cancelParsing;
     private readonly bool _isHidden;
@@ -389,10 +386,13 @@ public abstract class CommandLineArgument
         _defaultValue = ConvertToArgumentTypeInvariant(info.DefaultValue);
         IncludeDefaultInUsageHelp = info.IncludeDefaultValueInHelp;
         _valueDescription = info.ValueDescription;
-        _allowMultiValueWhiteSpaceSeparator = IsMultiValue && !IsSwitch && info.AllowMultiValueWhiteSpaceSeparator;
         _allowNull = info.AllowNull;
-        _multiValueSeparator = info.MultiValueSeparator;
         DictionaryInfo = info.DictionaryInfo;
+        MultiValueInfo = info.MultiValueInfo;
+        if (MultiValueInfo != null && IsSwitch)
+        {
+            MultiValueInfo.AllowWhiteSpaceSeparator = false;
+        }
     }
 
     /// <summary>
@@ -597,16 +597,12 @@ public abstract class CommandLineArgument
     /// Gets the type of the elements of the argument value.
     /// </summary>
     /// <value>
-    /// If the <see cref="IsMultiValue"/> property is <see langword="true"/>, the <see cref="Type"/>
-    /// of each individual value; if the argument type is an instance of <see cref="Nullable{T}"/>,
+    /// If the <see cref="Kind"/> property is <see cref="ArgumentKind.MultiValue" qualifyHint="true"/>,
+    /// the <see cref="Type"/> of each individual value; if it is <see cref="ArgumentKind.Dictionary" qualifyHint="true"/>,
+    /// <see cref="KeyValuePair{TKey, TValue}"/>; if the argument type is <see cref="Nullable{T}"/>,
     /// the type <c>T</c>; otherwise, the same value as the <see cref="ArgumentType"/>
     /// property.
     /// </value>
-    /// <remarks>
-    /// <para>
-    ///   For a dictionary argument, the element type is <see cref="KeyValuePair{TKey, TValue}"/>.
-    /// </para>
-    /// </remarks>
     public Type ElementType => _elementType;
 
     /// <summary>
@@ -804,63 +800,36 @@ public abstract class CommandLineArgument
     public ArgumentKind Kind => _argumentKind;
 
     /// <summary>
-    /// Gets a value indicating whether this argument is a multi-value argument.
+    /// Gets information that only applies to multi-value or dictionary arguments.
     /// </summary>
     /// <value>
-    ///   <see langword="true"/> if the <see cref="Kind"/> property is <see cref="ArgumentKind.MultiValue" qualifyHint="true"/>
-    ///   or <see cref="ArgumentKind.Dictionary" qualifyHint="true"/>; otherwise, <see langword="false"/>.
-    /// </value>
-    /// <seealso cref="MultiValueSeparator"/>
-    /// <seealso cref="Kind"/>
-    public bool IsMultiValue => _argumentKind is ArgumentKind.MultiValue or ArgumentKind.Dictionary;
-
-    /// <summary>
-    /// Gets the separator for the values if this argument is a multi-value argument
-    /// </summary>
-    /// <value>
-    /// The separator for multi-value arguments, or <see langword="null"/> if no separator is used.
+    /// An instance of the <see cref="DictionaryArgumentInfo"/> class, or <see langword="null"/>
+    /// if the <see cref="Kind"/> property is not <see cref="ArgumentKind.MultiValue" qualifyHint="true"/>
+    /// or <see cref="ArgumentKind.Dictionary" qualifyHint="true"/>.
     /// </value>
     /// <remarks>
     /// <para>
-    ///   If the <see cref="IsMultiValue"/> property is <see langword="false"/>, this property
-    ///   is always <see langword="null"/>.
+    ///   For dictionary arguments, this property only returns the information that apples to both
+    ///   dictionary and multi-value arguments. For information that applies to dictionary
+    ///   arguments, but not other types of multi-value arguments, use the <see cref="DictionaryInfo"/>
+    ///   property.
     /// </para>
     /// </remarks>
-    /// <seealso cref="MultiValueSeparatorAttribute"/>
-    public string? MultiValueSeparator
-    {
-        get { return _multiValueSeparator; }
-    }
-
-    /// <summary>
-    /// Gets a value that indicates whether or not a multi-value argument can consume multiple
-    /// following argument values.
-    /// </summary>
-    /// <value>
-    /// <see langword="true"/> if a multi-value argument can consume multiple following values;
-    /// otherwise, <see langword="false"/>.
-    /// </value>
-    /// <remarks>
-    /// <para>
-    ///   A multi-value argument that allows white-space separators is able to consume multiple
-    ///   values from the command line that follow it. All values that follow the name, up until
-    ///   the next argument name, are considered values for this argument.
-    /// </para>
-    /// <para>
-    ///   If the <see cref="IsMultiValue"/> property is <see langword="false"/>, this property
-    ///   is always <see langword="false"/>.
-    /// </para>
-    /// </remarks>
-    /// <seealso cref="MultiValueSeparatorAttribute"/>
-    public bool AllowMultiValueWhiteSpaceSeparator => _allowMultiValueWhiteSpaceSeparator;
+    public MultiValueArgumentInfo? MultiValueInfo { get; }
 
     /// <summary>
     /// Gets information that only applies to dictionary arguments.
     /// </summary>
     /// <value>
     /// An instance of the <see cref="DictionaryArgumentInfo"/> class, or <see langword="null"/>
-    /// if 
+    /// if the <see cref="Kind"/> property is not <see cref="ArgumentKind.Dictionary" qualifyHint="true"/>.
     /// </value>
+    /// <remarks>
+    /// <para>
+    ///   Since dictionary arguments are a type of multi-value argument, also see the
+    ///   <see cref="MultiValueInfo"/> property.
+    /// </para>
+    /// </remarks>
     public DictionaryArgumentInfo? DictionaryInfo { get; }
 
     /// <summary>
@@ -1165,7 +1134,6 @@ public abstract class CommandLineArgument
                                                     bool requiredProperty,
                                                     string memberName,
                                                     CommandLineArgumentAttribute attribute,
-                                                    MultiValueSeparatorAttribute? multiValueSeparatorAttribute,
                                                     DescriptionAttribute? descriptionAttribute,
                                                     ValueDescriptionAttribute? valueDescriptionAttribute,
                                                     IEnumerable<AliasAttribute>? aliasAttributes,
@@ -1185,8 +1153,6 @@ public abstract class CommandLineArgument
             Description = descriptionAttribute?.Description,
             ValueDescription = valueDescriptionAttribute?.ValueDescription,
             Position = attribute.Position < 0 ? null : attribute.Position,
-            MultiValueSeparator = GetMultiValueSeparator(multiValueSeparatorAttribute),
-            AllowMultiValueWhiteSpaceSeparator = multiValueSeparatorAttribute != null && multiValueSeparatorAttribute.Separator == null,
             Aliases = GetAliases(aliasAttributes, argumentName),
             ShortAliases = GetShortAliases(shortAliasAttributes, argumentName),
             DefaultValue = attribute.DefaultValue,
@@ -1343,10 +1309,10 @@ public abstract class CommandLineArgument
         _valueHelper ??= CreateValueHelper();
 
         CancelMode cancelParsing;
-        if (IsMultiValue && hasValue && MultiValueSeparator != null)
+        if (MultiValueInfo?.Separator != null)
         {
             cancelParsing = CancelMode.None;
-            spanValue.Split(MultiValueSeparator.AsSpan(), separateValue =>
+            spanValue.Split(MultiValueInfo.Separator.AsSpan(), separateValue =>
             {
                 string? separateValueString = null;
                 PreValidate(ref separateValueString, separateValue);
@@ -1436,7 +1402,7 @@ public abstract class CommandLineArgument
 
     internal void Reset()
     {
-        if (!IsMultiValue && _defaultValue != null)
+        if (MultiValueInfo == null && _defaultValue != null)
         {
             _valueHelper = new SingleValueHelper(_defaultValue);
         }
@@ -1597,16 +1563,13 @@ public abstract class CommandLineArgument
             }
         }
     }
-    private static string? GetMultiValueSeparator(MultiValueSeparatorAttribute? attribute)
+
+    internal static MultiValueArgumentInfo GetMultiValueInfo(MultiValueSeparatorAttribute? attribute)
     {
         var separator = attribute?.Separator;
-        if (string.IsNullOrEmpty(separator))
-        {
-            return null;
-        }
-        else
-        {
-            return separator;
-        }
+        return new(
+            string.IsNullOrEmpty(separator) ? null : separator,
+            attribute != null && separator == null
+        );
     }
 }

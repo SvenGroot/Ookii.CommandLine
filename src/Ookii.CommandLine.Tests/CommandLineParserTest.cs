@@ -1100,9 +1100,9 @@ public partial class CommandLineParserTest
     public void TestMultiValueWhiteSpaceSeparator(ProviderKind kind)
     {
         var parser = CreateParser<MultiValueWhiteSpaceArguments>(kind);
-        Assert.IsTrue(parser.GetArgument("Multi")!.AllowMultiValueWhiteSpaceSeparator);
-        Assert.IsFalse(parser.GetArgument("MultiSwitch")!.AllowMultiValueWhiteSpaceSeparator);
-        Assert.IsFalse(parser.GetArgument("Other")!.AllowMultiValueWhiteSpaceSeparator);
+        Assert.IsTrue(parser.GetArgument("Multi")!.MultiValueInfo!.AllowWhiteSpaceSeparator);
+        Assert.IsFalse(parser.GetArgument("MultiSwitch")!.MultiValueInfo!.AllowWhiteSpaceSeparator);
+        Assert.IsNull(parser.GetArgument("Other")!.MultiValueInfo);
 
         var result = CheckSuccess(parser, new[] { "1", "-Multi", "2", "3", "4", "-Other", "5", "6" });
         Assert.AreEqual(result.Arg1, 1);
@@ -1348,12 +1348,12 @@ public partial class CommandLineParserTest
         Assert.AreEqual(expected.Description ?? string.Empty, argument.Description);
         Assert.AreEqual(expected.ValueDescription ?? argument.ElementType.Name, argument.ValueDescription);
         Assert.AreEqual(expected.Kind, argument.Kind);
-        Assert.AreEqual(expected.Kind is ArgumentKind.MultiValue or ArgumentKind.Dictionary, argument.IsMultiValue);
+        Assert.AreEqual(expected.Kind is ArgumentKind.MultiValue or ArgumentKind.Dictionary, argument.MultiValueInfo != null);
         Assert.AreEqual(expected.Kind == ArgumentKind.Dictionary, argument.DictionaryInfo != null);
         Assert.AreEqual(expected.IsSwitch, argument.IsSwitch);
         Assert.AreEqual(expected.DefaultValue, argument.DefaultValue);
         Assert.AreEqual(expected.IsHidden, argument.IsHidden);
-        Assert.IsFalse(argument.AllowMultiValueWhiteSpaceSeparator);
+        Assert.IsFalse(argument.MultiValueInfo?.AllowWhiteSpaceSeparator ?? false);
         Assert.IsNull(argument.Value);
         Assert.IsFalse(argument.HasValue);
         CollectionAssert.AreEqual(expected.Aliases ?? Array.Empty<string>(), argument.Aliases);
