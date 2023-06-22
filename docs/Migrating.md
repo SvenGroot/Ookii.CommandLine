@@ -24,8 +24,8 @@ As of version 3.0, .Net Framework 2.0 is no longer supported. You can still targ
   - If you have existing conversions that depend on a [`TypeConverter`][], use the
     [`TypeConverterArgumentConverter<T>`][] as a convenient way to keep using that conversion.
   - The [`KeyValuePairConverter<TKey, TValue>`][] class has moved into the
-    `Ookii.CommandLine.Conversion` namespace.
-  - The [`KeyValueSeparatorAttribute`][] has moved into the `Ookii.CommandLine.Conversion`
+    [`Ookii.CommandLine.Conversion`][] namespace.
+  - The [`KeyValueSeparatorAttribute`][] has moved into the [`Ookii.CommandLine.Conversion`][]
     namespace.
   - The `KeyTypeConverterAttribute` and `ValueTypeConverterAttribute` were renamed to
     [`KeyConverterAttribute`][] and [`ValueConverterAttribute`][] respectively
@@ -45,12 +45,16 @@ As of version 3.0, .Net Framework 2.0 is no longer supported. You can still targ
 - The [`CommandLineArgumentAttribute.CancelParsing`][] property now takes a [`CancelMode`][]
   enumeration rather than a boolean.
 - The [`ArgumentParsedEventArgs`][] class was changed to use the [`CancelMode`][] enumeration.
+- Canceling parsing using the [`ArgumentParsed`][] event no longer automatically sets the [`HelpRequested`][]
+  property; instead, you must set it manually in the event handler if desired.
 - The `ParseOptionsAttribute.NameValueSeparator` property was replaced with
   [`ParseOptionsAttribute.NameValueSeparators`][].
 - The `ParseOptions.NameValueSeparator` property was replaced with
   [`ParseOptions.NameValueSeparators`][].
 - Properties that previously returned a [`ReadOnlyCollection<T>`][] now return an
   [`ImmutableArray<T>`][].
+- The `CommandLineArgumentAttribute.AllowsDuplicateDictionaryKeys` property was renamed to
+  [`AllowDuplicateDictionaryKeys`][] for consistency.
 
 ## Breaking behavior changes from version 3.0
 
@@ -116,8 +120,10 @@ As of version 3.0, .Net Framework 2.0 is no longer supported. You can still targ
 - The [`LineWrappingTextWriter`][] class does not count virtual terminal sequences as part of the
   line length by default.
 
+[`AllowDuplicateDictionaryKeys`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_CommandLineArgument_AllowDuplicateDictionaryKeys.htm
 [`ArgumentConverter`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Conversion_ArgumentConverter.htm
 [`ArgumentConverterAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Conversion_ArgumentConverterAttribute.htm
+[`ArgumentParsed`]: https://www.ookii.org/docs/commandline-4.0/html/E_Ookii_CommandLine_CommandLineParser_ArgumentParsed.htm
 [`ArgumentParsedEventArgs`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_ArgumentParsedEventArgs.htm
 [`AsyncCommandBase`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Commands_AsyncCommandBase.htm
 [`CancelMode`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_CancelMode.htm
@@ -136,6 +142,7 @@ As of version 3.0, .Net Framework 2.0 is no longer supported. You can still targ
 [`CommandOptions`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Commands_CommandOptions.htm
 [`CultureInfo.InvariantCulture`]: https://learn.microsoft.com/dotnet/api/system.globalization.cultureinfo.invariantculture
 [`CurrentCulture`]: https://learn.microsoft.com/dotnet/api/system.globalization.cultureinfo.currentculture
+[`HelpRequested`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_CommandLineParser_HelpRequested.htm
 [`IAsyncCommand`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Commands_IAsyncCommand.htm
 [`ICommand.Run()`]: https://www.ookii.org/docs/commandline-4.0/html/M_Ookii_CommandLine_Commands_ICommand_Run.htm
 [`ICommand`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Commands_ICommand.htm
@@ -149,6 +156,7 @@ As of version 3.0, .Net Framework 2.0 is no longer supported. You can still targ
 [`LineWrappingTextWriter`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_LineWrappingTextWriter.htm
 [`Nullable<T>`]: https://learn.microsoft.com/dotnet/api/system.nullable-1
 [`Ookii.CommandLine.Commands`]: https://www.ookii.org/docs/commandline-4.0/html/N_Ookii_CommandLine_Commands.htm
+[`Ookii.CommandLine.Conversion`]: https://www.ookii.org/docs/commandline-4.0/html/N_Ookii_CommandLine_Conversion.htm
 [`ParseOptions.NameValueSeparators`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_ParseOptions_NameValueSeparators.htm
 [`ParseOptions.ShowUsageOnError`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_ParseOptions_ShowUsageOnError.htm
 [`ParseOptions`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_ParseOptions.htm
@@ -160,8 +168,8 @@ As of version 3.0, .Net Framework 2.0 is no longer supported. You can still targ
 [`TypeConverterArgumentConverter<T>`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Conversion_TypeConverterArgumentConverter_1.htm
 [`TypeConverterAttribute`]: https://learn.microsoft.com/dotnet/api/system.componentmodel.typeconverterattribute
 [`UsageWriter`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_UsageWriter.htm
-[`ValueDescriptionAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_ValueDescriptionAttribute.htm
 [`ValueConverterAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Conversion_ValueConverterAttribute.htm
+[`ValueDescriptionAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_ValueDescriptionAttribute.htm
 [ArgumentNameComparison_1]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_ParseOptions_ArgumentNameComparison.htm
 [CommandLineParser.Parse()_2]: https://www.ookii.org/docs/commandline-4.0/html/Overload_Ookii_CommandLine_CommandLineParser_Parse.htm
 [Parse()_5]: https://www.ookii.org/docs/commandline-4.0/html/Overload_Ookii_CommandLine_CommandLineParser_1_Parse.htm

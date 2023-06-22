@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
@@ -14,7 +15,8 @@ using System.Text;
 namespace Ookii.CommandLine;
 
 /// <summary>
-/// Provides information about command line arguments that are recognized by a <see cref="CommandLineParser"/>.
+/// Provides information about command line arguments that are recognized by an instance of the
+/// <see cref="CommandLineParser"/> class.
 /// </summary>
 /// <threadsafety static="true" instance="false"/>
 /// <seealso cref="CommandLineArgumentAttribute"/>
@@ -561,13 +563,13 @@ public abstract class CommandLineArgument
     /// Gets the alternative names for this command line argument.
     /// </summary>
     /// <value>
-    /// A list of alternative names for this command line argument, or an empty collection if none were specified.
+    /// A list of alternative names for this command line argument, or an empty array if none were specified.
     /// </value>
     /// <remarks>
     /// <para>
     ///   If the <see cref="CommandLineParser.Mode" qualifyHint="true"/> property is <see cref="ParsingMode.LongShort" qualifyHint="true"/>,
     ///   and the <see cref="HasLongName"/> property is <see langword="false"/>, this property
-    ///   will always return an empty collection.
+    ///   will always return an empty array.
     /// </para>
     /// </remarks>
     /// <seealso cref="AliasAttribute"/>
@@ -577,13 +579,14 @@ public abstract class CommandLineArgument
     /// Gets the alternative short names for this command line argument.
     /// </summary>
     /// <value>
-    /// A list of alternative short names for this command line argument, or an empty collection if none were specified.
+    /// A list of alternative short names for this command line argument, or an empty array if none
+    /// were specified.
     /// </value>
     /// <remarks>
     /// <para>
     ///   If the <see cref="CommandLineParser.Mode" qualifyHint="true"/> property is not <see cref="ParsingMode.LongShort" qualifyHint="true"/>,
     ///   or the <see cref="HasShortName"/> property is <see langword="false"/>, this property
-    ///   will always return an empty collection.
+    ///   will always return an empty array.
     /// </para>
     /// </remarks>
     /// <seealso cref="ShortAliasAttribute"/>
@@ -629,8 +632,8 @@ public abstract class CommandLineArgument
     /// Gets the type of the values of a dictionary argument.
     /// </summary>
     /// <value>
-    /// The type of the values in the dictionary, or <see langword="null"/> if
-    /// <see cref="IsDictionary"/> is <see langword="false"/>.
+    /// The type of the values in the dictionary, or <see langword="null"/> if the
+    /// <see cref="IsDictionary"/> property is <see langword="false"/>.
     /// </value>
     public Type? ValueType => _valueType;
 
@@ -757,20 +760,21 @@ public abstract class CommandLineArgument
     /// </value>
     /// <remarks>
     /// <para>
-    ///   The value description is a short, typically one-word description that indicates the type of value that
-    ///   the user should supply. By default, the type of the property is used, applying the <see cref="NameTransform"/>
-    ///   specified by the <see cref="ParseOptions.ValueDescriptionTransform" qualifyHint="true"/> property or the
-    ///   <see cref="ParseOptionsAttribute.ValueDescriptionTransform" qualifyHint="true"/> property. If this is a
-    ///   multi-value argument, the <see cref="ElementType"/> is used. If the type is a nullable
-    ///   value type, its underlying type is used.
+    ///   The value description is a short, typically one-word description that indicates the type
+    ///   of value that the user should supply. By default, the type of the property is used,
+    ///   applying the <see cref="NameTransform"/> specified by the <see cref="ParseOptions.ValueDescriptionTransform" qualifyHint="true"/>
+    ///   property or the <see cref="ParseOptionsAttribute.ValueDescriptionTransform" qualifyHint="true"/>
+    ///   property. If this is a multi-value argument or the argument's type is <see cref="Nullable{T}"/>,
+    ///   the <see cref="ElementType"/> is used.
     /// </para>
     /// <para>
-    ///   The value description is used only when generating usage help. For example, the usage for an argument named Sample with
-    ///   a value description of String would look like "-Sample &lt;String&gt;".
+    ///   The value description is used when generating usage help. For example, the usage for an
+    ///   argument named Sample with a value description of String would look like "-Sample
+    ///   &lt;String&gt;".
     /// </para>
     /// <note>
-    ///   This is not the long description used to describe the purpose of the argument. That can be retrieved
-    ///   using the <see cref="Description"/> property.
+    /// This is not the long description used to describe the purpose of the argument. That can be
+    /// retrieved using the <see cref="Description"/> property.
     /// </note>
     /// </remarks>
     /// <seealso cref="ValueDescriptionAttribute"/>
@@ -809,12 +813,12 @@ public abstract class CommandLineArgument
     ///   the <see cref="ICollection{T}"/> generic interface.
     /// </para>
     /// <para>
-    ///   An argument is <see cref="ArgumentKind.Dictionary" qualifyHint="true"/> dictionary argument is a
+    ///   An argument that is <see cref="ArgumentKind.Dictionary" qualifyHint="true"/> is a
     ///   multi-value argument whose values are key/value pairs, which get added to a
     ///   dictionary based on the key. An argument is a dictionary argument when its
     ///   <see cref="ArgumentType"/> is <see cref="Dictionary{TKey,TValue}"/>, or it was defined
     ///   by a read-only property whose type implements the <see cref="IDictionary{TKey,TValue}"/>
-    ///   property.
+    ///   interface.
     /// </para>
     /// <para>
     ///   An argument is <see cref="ArgumentKind.Method" qualifyHint="true"/> if it is backed by a method instead
@@ -825,7 +829,6 @@ public abstract class CommandLineArgument
     ///   Otherwise, the value will be <see cref="ArgumentKind.SingleValue" qualifyHint="true"/>.
     /// </para>
     /// </remarks>
-    /// <seealso cref="MultiValueSeparator"/>
     public ArgumentKind Kind => _argumentKind;
 
     /// <summary>
@@ -901,6 +904,9 @@ public abstract class CommandLineArgument
     ///   <see langword="true"/> if this the <see cref="Kind"/> property is <see cref="ArgumentKind.Dictionary" qualifyHint="true"/>;
     ///   otherwise, <see langword="false"/>.
     /// </value>
+#if NET6_0_OR_GREATER
+    [MemberNotNullWhen(true, nameof(KeyType), nameof(ValueType), nameof(KeyValueSeparator)), CLSCompliant(false)]
+#endif
     public bool IsDictionary => _argumentKind == ArgumentKind.Dictionary;
 
     /// <summary>
@@ -915,10 +921,7 @@ public abstract class CommandLineArgument
     /// </para>
     /// </remarks>
     /// <seealso cref="AllowDuplicateDictionaryKeysAttribute"/>
-    public bool AllowsDuplicateDictionaryKeys
-    {
-        get { return _allowDuplicateDictionaryKeys; }
-    }
+    public bool AllowDuplicateDictionaryKeys => _allowDuplicateDictionaryKeys;
 
     /// <summary>
     /// Gets the value that the argument was set to in the last call to <see cref="CommandLineParser.Parse(string[],int)" qualifyHint="true"/>.
@@ -981,15 +984,20 @@ public abstract class CommandLineArgument
     /// Gets the name or alias that was used on the command line to specify this argument.
     /// </summary>
     /// <value>
-    /// The name or alias that was used on the command line to specify this argument, or <see langword="null"/> if this argument was specified by position or not specified.
+    /// The name or alias that was used on the command line to specify this argument, or <see langword="null"/>
+    /// if this argument was specified by position or not specified.
     /// </value>
     /// <remarks>
     /// <para>
-    ///   This property can be the value of the <see cref="ArgumentName"/> property, the <see cref="ShortName"/> property,
-    ///   or any of the values in the <see cref="Aliases"/> and <see cref="ShortAliases"/> properties.
+    ///   This property can be the value of the <see cref="ArgumentName"/> property, the <see cref="ShortName"/>
+    ///   property, or any of the values in the <see cref="Aliases"/> and <see cref="ShortAliases"/>
+    ///   properties. Unless disabled using the <see cref="ParseOptions.AutoPrefixAliases" qualifyHint="true"/>
+    ///   or <see cref="ParseOptionsAttribute.AutoPrefixAliases" qualifyHint="true"/> property, it
+    ///   can also be any unique prefix of an argument name or alias.
     /// </para>
     /// <para>
-    ///   If the argument names are case-insensitive, the value of this property uses the casing as specified on the command line, not the original casing of the argument name or alias.
+    ///   If the argument names are case-insensitive, the value of this property uses the casing as
+    ///   specified on the command line, not the original casing of the argument name or alias.
     /// </para>
     /// </remarks>
     public string? UsedArgumentName => _usedArgumentName.Length > 0 ? _usedArgumentName.ToString() : null;
@@ -998,9 +1006,10 @@ public abstract class CommandLineArgument
     /// Gets a value that indicates whether or not this argument accepts <see langword="null" /> values.
     /// </summary>
     /// <value>
-    ///   <see langword="true" /> if the <see cref="ArgumentType"/> is a nullable reference type
-    ///   or <see cref="Nullable{T}"/>; <see langword="false" /> if the argument is any other
-    ///   value type or, for .Net 6.0 and later only, a non-nullable reference type.
+    ///   <see langword="true" /> if the <see cref="ElementType"/> property is a nullable reference
+    ///   type or the <see cref="ArgumentType"/> property is <see cref="Nullable{T}"/>;
+    ///   <see langword="false" /> if the argument's type any other value type or, for .Net 6.0 and
+    ///   later only, a non-nullable reference type.
     /// </value>
     /// <remarks>
     /// <para>
@@ -1011,14 +1020,13 @@ public abstract class CommandLineArgument
     ///   For a dictionary argument, this value indicates whether the type of the dictionary's values can be
     ///   <see langword="null" />. Dictionary key types are always non-nullable, as this is a constraint on
     ///   <see cref="Dictionary{TKey, TValue}"/>. This works only if the argument type is <see cref="Dictionary{TKey, TValue}"/>
-    ///   or <see cref="IDictionary{TKey, TValue}"/>. For other types that implement <see cref="IDictionary{TKey, TValue}"/>,
-    ///   it is not possible to determine the nullability of <c>TValue</c> except if it's
-    ///   a value type.
+    ///   or <see cref="IDictionary{TKey, TValue}"/>, or if source generation was used. For other
+    ///   types that implement <see cref="IDictionary{TKey, TValue}"/>, it is not possible to
+    ///   determine the nullability of <c>TValue</c> at runtime except if it's a value type.
     /// </para>
     /// <para>
-    ///   This property indicates what happens when the <see cref="ArgumentConverter"/> used for this argument returns
-    ///   <see langword="null" /> from its <see cref="ArgumentConverter.Convert(string, CultureInfo, CommandLineArgument)" qualifyHint="true"/>
-    ///   method.
+    ///   This property indicates what happens when the <see cref="ArgumentConverter.Convert(string, CultureInfo, CommandLineArgument)" qualifyHint="true"/>
+    ///   method used for this argument returns <see langword="null" />.
     /// </para>
     /// <para>
     ///   If this property is <see langword="true" />, the argument's value will be set to <see langword="null" />.
@@ -1026,11 +1034,13 @@ public abstract class CommandLineArgument
     ///   parsing with <see cref="CommandLineArgumentErrorCategory.NullArgumentValue" qualifyHint="true"/>.
     /// </para>
     /// <para>
-    ///   If the project containing the command line argument type does not use nullable reference types, or does
-    ///   not support them (e.g. on older .Net versions), this property will only be <see langword="false" /> for
-    ///   value types other than <see cref="Nullable{T}"/>. Only on .Net 6.0 and later will the property be
-    ///   <see langword="false"/> for non-nullable reference types. Although nullable reference types are available
-    ///   on .Net Core 3.x, only .Net 6.0 and later will get this behavior due to the necessary runtime support to
+    ///   If the project containing the command line argument type does not use nullable reference
+    ///   types, or does not support them (e.g. on older .Net versions), this property will only be
+    ///   <see langword="false" /> for value types other than <see cref="Nullable{T}"/>. Only on
+    ///   .Net 6.0 and later, or if source generation was used with the <see cref="GeneratedParserAttribute"/>,
+    ///   attribute will the property be <see langword="false"/> for non-nullable reference types.
+    ///   Although nullable reference types are available on .Net Core 3.x, only .Net 6.0 and later
+    ///   will get this behavior without source generation due to the necessary runtime support to
     ///   determine nullability of a property or method parameter.
     /// </para>
     /// </remarks>
@@ -1098,11 +1108,11 @@ public abstract class CommandLineArgument
     /// <remarks>
     /// <para>
     ///   Conversion is done by one of several methods. First, if a <see
-    ///   cref="ArgumentConverterAttribute"/> was present on the property, or method that
+    ///   cref="ArgumentConverterAttribute"/> was present on the property or method that
     ///   defined the argument, the specified <see cref="ArgumentConverter"/> is used.
     ///   Otherwise, the type must implement <see cref="ISpanParsable{TSelf}"/>, implement
-    ///   <see cref="IParsable{TSelf}"/>, or have a static Parse(<see cref="string"/>,
-    ///   <see cref="IFormatProvider"/>) or Parse(<see cref="string"/>) method, or have a
+    ///   <see cref="IParsable{TSelf}"/>, or have a static <c>Parse(<see cref="string"/>,
+    ///   <see cref="IFormatProvider"/>)</c> or <c>Parse(<see cref="string"/>)</c> method, or have a
     ///   constructor that takes a single parameter of type <see cref="string"/>.
     /// </para>
     /// </remarks>
@@ -1121,17 +1131,13 @@ public abstract class CommandLineArgument
     /// </summary>
     /// <param name="value">The value to convert.</param>
     /// <returns>The converted value.</returns>
-    /// <exception cref="NotSupportedException">
-    ///   The argument's <see cref="ArgumentConverter"/> cannot convert between the type of
-    ///   <paramref name="value"/> and the <see cref="ArgumentType"/>.
-    /// </exception>
     /// <remarks>
     /// <para>
     ///   If the type of <paramref name="value"/> is directly assignable to <see cref="ArgumentType"/>,
     ///   no conversion is done. If the <paramref name="value"/> is a <see cref="string"/>,
     ///   the same rules apply as for the <see cref="ConvertToArgumentType(CultureInfo, string?)"/>
-    ///   method, using <see cref="CultureInfo.InvariantCulture" qualifyHint="true"/>. Other types cannot be
-    ///   converted.
+    ///   method, using <see cref="CultureInfo.InvariantCulture" qualifyHint="true"/>. Other types
+    ///   will be converted to a string before conversion.
     /// </para>
     /// <para>
     ///   This method is used to convert the <see cref="CommandLineArgumentAttribute.DefaultValue" qualifyHint="true"/>
@@ -1139,7 +1145,10 @@ public abstract class CommandLineArgument
     ///   <see cref="ArgumentValidationAttribute"/> class to convert values when needed.
     /// </para>
     /// </remarks>
-    /// <exception cref="NotSupportedException">The conversion is not supported.</exception>
+    /// <exception cref="NotSupportedException">
+    ///   The argument's <see cref="ArgumentConverter"/> cannot convert between the type of
+    ///   <paramref name="value"/> and the <see cref="ArgumentType"/>.
+    /// </exception>
     public object? ConvertToArgumentTypeInvariant(object? value)
     {
         if (value == null || _elementTypeWithNullable.IsAssignableFrom(value.GetType()))

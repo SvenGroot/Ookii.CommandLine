@@ -42,7 +42,7 @@ namespace Ookii.CommandLine;
 ///   <see cref="CancelMode.Abort" qualifyHint="true"/>.
 /// </para>
 /// <para>
-///   Unlike using the <see cref="CancelParsing"/> property event, canceling parsing with the return
+///   Unlike using the <see cref="CancelParsing"/> property, canceling parsing with the return
 ///   value does not automatically print the usage help when using the
 ///   <see cref="CommandLineParser{T}.ParseWithErrorHandling()" qualifyHint="true"/> method, the
 ///   <see cref="CommandLineParser.Parse{T}(string[], int, ParseOptions?)" qualifyHint="true"/> method or the
@@ -143,12 +143,16 @@ public sealed class CommandLineArgumentAttribute : Attribute
     /// </value>
     /// <remarks>
     /// <note>
-    ///   This property is ignored if <see cref="CommandLineParser.Mode" qualifyHint="true"/> is not
-    ///   <see cref="ParsingMode.LongShort" qualifyHint="true"/>.
+    ///   This property is ignored if the <see cref="CommandLineParser.Mode" qualifyHint="true"/>
+    ///   property is not <see cref="ParsingMode.LongShort" qualifyHint="true"/>.
     /// </note>
     /// <para>
     ///   If the <see cref="ShortName"/> property is not set but this property is set to <see langword="true"/>,
     ///   the short name will be derived using the first character of the long name.
+    /// </para>
+    /// <para>
+    ///   If the <see cref="ShortName"/> property is set to a value other than the null character,
+    ///   this property will always return <see langword="true"/>.
     /// </para>
     /// </remarks>
     /// <seealso cref="CommandLineArgument.HasShortName" qualifyHint="true"/>
@@ -164,8 +168,8 @@ public sealed class CommandLineArgumentAttribute : Attribute
     /// <value>The short name, or a null character ('\0') if the argument has no short name.</value>
     /// <remarks>
     /// <note>
-    ///   This property is ignored if <see cref="CommandLineParser.Mode" qualifyHint="true"/> is not
-    ///   <see cref="ParsingMode.LongShort" qualifyHint="true"/>.
+    /// This property is ignored if the <see cref="CommandLineParser.Mode" qualifyHint="true"/>
+    /// property is not <see cref="ParsingMode.LongShort" qualifyHint="true"/>.
     /// </note>
     /// <para>
     ///   Setting this property implies the <see cref="IsShort"/> property is <see langword="true"/>.
@@ -176,7 +180,7 @@ public sealed class CommandLineArgumentAttribute : Attribute
     ///   <see cref="ShortName"/> property.
     /// </para>
     /// </remarks>
-    /// <see cref="CommandLineArgument.ShortName" qualifyHint="true"/>
+    /// <seealso cref="CommandLineArgument.ShortName" qualifyHint="true"/>
     public char ShortName { get; set; }
 
     /// <summary>
@@ -186,11 +190,18 @@ public sealed class CommandLineArgumentAttribute : Attribute
     ///   <see langword="true"/> if the argument must be supplied on the command line; otherwise, <see langword="false"/>.
     ///   The default value is <see langword="false"/>.
     /// </value>
-    /// <see cref="CommandLineArgument.IsRequired" qualifyHint="true"/>
+    /// <remarks>
+    /// <para>
+    ///   If the <see cref="CommandLineArgumentAttribute"/> attribute is used on a property with
+    ///   the C# <c>required</c> keyword, the argument will always be required, and the value of
+    ///   this property is ignored.
+    /// </para>
+    /// </remarks>
+    /// <seealso cref="CommandLineArgument.IsRequired" qualifyHint="true"/>
     public bool IsRequired { get; set; }
 
     /// <summary>
-    /// Gets or sets the position of a positional argument.
+    /// Gets or sets the relative position of a positional argument.
     /// </summary>
     /// <value>
     /// The position of the argument, or a negative value if the argument can only be specified by name. The default value is -1.
@@ -206,7 +217,7 @@ public sealed class CommandLineArgumentAttribute : Attribute
     /// </para>
     /// <para>
     ///   When using the <see cref="GeneratedParserAttribute"/>, you can also set the <see cref="IsPositional"/>
-    ///   property to <see langword="true"/> without setting the <see cref="Position"/> property
+    ///   property to <see langword="true"/>, without setting the <see cref="Position"/> property,
     ///   to order the positional arguments using the order of the members that define them.
     /// </para>
     /// <para>
@@ -215,7 +226,7 @@ public sealed class CommandLineArgumentAttribute : Attribute
     /// </para>
     /// <para>
     ///   The <see cref="CommandLineArgument.Position" qualifyHint="true"/> property will be set to reflect the actual position of the argument,
-    ///   which may not match the value of the <see cref="Position"/> property.
+    ///   which may not match the value of this property.
     /// </para>
     /// </remarks>
     /// <seealso cref="CommandLineArgument.Position" qualifyHint="true"/>
@@ -239,8 +250,8 @@ public sealed class CommandLineArgumentAttribute : Attribute
     ///   members that define them.
     /// </para>
     /// <para>
-    ///   Doing this is not supported without the <see cref="GeneratedParserAttribute"/>, because
-    ///   reflection is not guaranteed to return class members in any particular order. The
+    ///   Doing this is not supported without the <see cref="GeneratedParserAttribute"/> attribute,
+    ///   because reflection is not guaranteed to return class members in any particular order. The
     ///   <see cref="CommandLineParser"/> class will throw an exception if the <see cref="IsPositional"/>
     ///   property is <see langword="true"/> without a non-negative <see cref="Position"/> property
     ///   value if reflection is used.
@@ -294,8 +305,8 @@ public sealed class CommandLineArgumentAttribute : Attribute
     /// <remarks>
     /// <para>
     ///   The default value can be set using the <see cref="DefaultValue"/> property, or, when
-    ///   using source generation with the <see cref="GeneratedParserAttribute"/>, using a property
-    ///   initializer.
+    ///   using source generation with the <see cref="GeneratedParserAttribute"/> attribute, using a
+    ///   property initializer.
     /// </para>
     /// <para>
     ///   This property is ignored if the <see cref="UsageWriter.IncludeDefaultValueInDescription" qualifyHint="true"/>
@@ -330,13 +341,8 @@ public sealed class CommandLineArgumentAttribute : Attribute
     ///   cancellation.
     /// </para>
     /// <para>
-    ///   The <see cref="CommandLineParser{T}.ParseWithErrorHandling()" qualifyHint="true"/> method and the
-    ///   <see cref="CommandLineParser.Parse{T}(string[], ParseOptions?)" qualifyHint="true"/> static helper method
-    ///   will print usage information if parsing was canceled with <see cref="CancelMode.Abort" qualifyHint="true"/>.
-    /// </para>
-    /// <para>
-    ///   Canceling parsing in this way is identical to handling the <see cref="CommandLineParser.ArgumentParsed" qualifyHint="true"/>
-    ///   event and setting <see cref="ArgumentParsedEventArgs.CancelParsing" qualifyHint="true"/> property.
+    ///   If this property is <see cref="CancelMode.Abort" qualifyHint="true"/>, the <see cref="CommandLineParser.HelpRequested" qualifyHint="true"/>
+    ///   property will be automatically set to <see langword="true"/> when parsing is canceled.
     /// </para>
     /// <para>
     ///   It's possible to prevent cancellation when an argument has this property set by

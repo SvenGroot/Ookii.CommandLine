@@ -4,6 +4,7 @@
   "#suffix": ".htm",
   "AddCommand": null,
   "AliasAttribute": "T_Ookii_CommandLine_AliasAttribute",
+  "AllowDuplicateDictionaryKeys": "P_Ookii_CommandLine_CommandLineArgument_AllowDuplicateDictionaryKeys",
   "AllowDuplicateDictionaryKeysAttribute": "T_Ookii_CommandLine_AllowDuplicateDictionaryKeysAttribute",
   "ApplicationFriendlyNameAttribute": "T_Ookii_CommandLine_ApplicationFriendlyNameAttribute",
   "Arg1": null,
@@ -234,6 +235,7 @@
     "M_Ookii_CommandLine_LocalizedStringProvider_NullArgumentValue"
   ],
   "Ookii.CommandLine.Commands": "N_Ookii_CommandLine_Commands",
+  "Ookii.CommandLine.Conversion": "N_Ookii_CommandLine_Conversion",
   "Ookii.CommandLine.Conversion.Generated": null,
   "Ookii.CommandLine.Terminal": "N_Ookii_CommandLine_Terminal",
   "Ookii.CommandLine.Validation": "N_Ookii_CommandLine_Validation",

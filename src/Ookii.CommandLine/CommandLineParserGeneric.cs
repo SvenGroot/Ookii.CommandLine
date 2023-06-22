@@ -7,21 +7,18 @@ namespace Ookii.CommandLine;
 
 /// <summary>
 /// A generic version of the <see cref="CommandLineParser"/> class that offers strongly typed
-/// <see cref="Parse()"/> methods.
+/// <see cref="Parse()"/> and <see cref="ParseWithErrorHandling()"/> methods.
 /// </summary>
 /// <typeparam name="T">The type that defines the arguments.</typeparam>
 /// <remarks>
 /// <para>
 ///   This class provides the same functionality as the <see cref="CommandLineParser"/> class.
-///   The only difference is that the <see cref="Parse()"/> method and overloads return the
-///   correct type, which avoids casting.
-/// </para>
-/// <para>
-///   If you don't intend to manually handle errors and usage help printing, and don't need
-///   to inspect the state of the <see cref="CommandLineParser"/> instance, the static
-///   <see cref="CommandLineParser.Parse{T}(string[], ParseOptions?)" qualifyHint="true"/> should be used instead.
+///   The only difference is that the <see cref="Parse()"/> method, the <see cref="ParseWithErrorHandling()"/>
+///   method, and their overloads return the arguments type, which avoids the need to cast at the
+///   call site.
 /// </para>
 /// </remarks>
+/// <threadsafety static="true" instance="false"/>
 public class CommandLineParser<T> : CommandLineParser
     where T : class
 {
@@ -38,7 +35,23 @@ public class CommandLineParser<T> : CommandLineParser
     ///   names or positions, or has an argument type that cannot be parsed.
     /// </exception>
     /// <remarks>
-    ///   <inheritdoc cref="CommandLineParser(Type, ParseOptions?)"/>
+    /// <para>
+    ///   This constructor uses reflection to determine the arguments defined by the type <typeparamref name="T"/>
+    ///   t runtime, unless the type has the <see cref="GeneratedParserAttribute"/> applied. For a
+    ///   type using that attribute, you can also use the generated static <see cref="IParserProvider{TSelf}.CreateParser" qualifyHint="true"/>
+    ///   or <see cref="IParser{TSelf}.Parse(ParseOptions?)" qualifyHint="true"/> methods on the
+    ///   arguments class instead.
+    /// </para>
+    /// <para>
+    ///   If the <paramref name="options"/> parameter is not <see langword="null"/>, the
+    ///   instance passed in will be modified to reflect the options from the arguments class's
+    ///   <see cref="ParseOptionsAttribute"/> attribute, if it has one.
+    /// </para>
+    /// <para>
+    ///   Certain properties of the <see cref="ParseOptions"/> class can be changed after the
+    ///   <see cref="CommandLineParser"/> class has been constructed, and still affect the
+    ///   parsing behavior. See the <see cref="CommandLineParser.Options"/> property for details.
+    /// </para>
     /// </remarks>
 #if NET6_0_OR_GREATER
     [RequiresUnreferencedCode("Argument information cannot be statically determined using reflection. Consider using the GeneratedParserAttribute.", Url = UnreferencedCodeHelpUrl)]

@@ -200,8 +200,8 @@ public class CommandLineParser
     private List<CommandLineArgument>? _requiredPropertyArguments;
 
     /// <summary>
-    /// Gets the default prefix used for long argument names if <see cref="Mode"/> is
-    /// <see cref="ParsingMode.LongShort" qualifyHint="true"/>.
+    /// Gets the default prefix used for long argument names if the <see cref="Mode"/>
+    /// property is <see cref="ParsingMode.LongShort" qualifyHint="true"/>.
     /// </summary>
     /// <value>
     /// The default long argument name prefix, which is '--'.
@@ -209,6 +209,8 @@ public class CommandLineParser
     /// <remarks>
     /// <para>
     /// This constant is used as the default value of the <see cref="LongArgumentNamePrefix"/>
+    /// property if no custom value was specified using the <see cref="ParseOptions.LongArgumentNamePrefix" qualifyHint="true"/>
+    /// property of the <see cref="ParseOptionsAttribute.LongArgumentNamePrefix" qualifyHint="true"/>
     /// property.
     /// </para>
     /// </remarks>
@@ -219,24 +221,28 @@ public class CommandLineParser
     /// </summary>
     /// <remarks>
     /// <para>
-    ///   If the event handler sets the <see cref="CancelEventArgs.Cancel" qualifyHint="true"/> property to <see langword="true"/>, command line processing will stop immediately,
-    ///   and the <see cref="Parse(string[],int)"/> method will return <see langword="null"/>. The
-    ///   <see cref="HelpRequested"/> property will be set to <see langword="true"/> automatically.
+    ///   Set the <see cref="ArgumentParsedEventArgs.CancelParsing" qualifyHint="true"/> property in
+    ///   the event handler to cancel parsing at the current argument. To have usage help shown
+    ///   by the parse methods that do this automatically, you must set the <see cref="HelpRequested"/>
+    ///   property to <see langword="true"/> explicitly in the event handler.
     /// </para>
     /// <para>
-    ///   If the argument used <see cref="ArgumentKind.Method" qualifyHint="true"/> and the argument's method
-    ///   canceled parsing, the <see cref="CancelEventArgs.Cancel" qualifyHint="true"/> property will already be
-    ///   true when the event is raised. In this case, the <see cref="HelpRequested"/> property
-    ///   will not automatically be set to <see langword="true"/>.
+    ///   The <see cref="ArgumentParsedEventArgs.CancelParsing" qualifyHint="true"/> property is
+    ///   initialized to the value of the <see cref="CommandLineArgumentAttribute.CancelParsing" qualifyHint="true"/>
+    ///   property, or the method return value of an argument using <see cref="ArgumentKind.Method" qualifyHint="true"/>.
+    ///   Reset the value to <see cref="CancelMode.None" qualifyHint="true"/> to continue parsing
+    ///   anyway.
     /// </para>
     /// <para>
-    ///   This event is invoked after the <see cref="CommandLineArgument.Value" qualifyHint="true"/> and <see cref="CommandLineArgument.UsedArgumentName" qualifyHint="true"/> properties have been set.
+    ///   This event is invoked after the <see cref="CommandLineArgument.Value" qualifyHint="true"/>
+    ///   and <see cref="CommandLineArgument.UsedArgumentName" qualifyHint="true"/> properties have
+    ///   been set.
     /// </para>
     /// </remarks>
     public event EventHandler<ArgumentParsedEventArgs>? ArgumentParsed;
 
     /// <summary>
-    /// Event raised when a non-multi-value argument is specified more than once.
+    /// Event raised when an argument that is not multi-value is specified more than once.
     /// </summary>
     /// <remarks>
     /// <para>
@@ -798,7 +804,7 @@ public class CommandLineParser
     }
 
     /// <summary>
-    /// Writes command line usage help to the specified <see cref="TextWriter"/> using the specified options.
+    /// Writes command line usage help using the specified <see cref="UsageWriter"/> instance.
     /// </summary>
     /// <param name="usageWriter">
     ///   The <see cref="UsageWriter"/> to use to create the usage. If <see langword="null"/>,
@@ -935,14 +941,13 @@ public class CommandLineParser
     ///   An instance of the type specified by the <see cref="ArgumentsType"/> property, or
     ///   <see langword="null"/> if an error occurred, or argument parsing was canceled by the
     ///   <see cref="CommandLineArgumentAttribute.CancelParsing" qualifyHint="true"/> property or a method argument
-    ///   that returned <see langword="false"/>.
+    ///   that returned <see cref="CancelMode.Abort" qualifyHint="true"/> or <see langword="false"/>.
     /// </returns>
     /// <remarks>
     /// <para>
-    ///   If an error occurs or parsing is canceled, it prints errors to the <see
-    ///   cref="ParseOptions.Error"/> stream, and usage help to the <see cref="UsageWriter"/> if
-    ///   the <see cref="HelpRequested"/> property is <see langword="true"/>. It then returns
-    ///   <see langword="null"/>.
+    ///   If an error occurs or parsing is canceled, it prints errors to the <see cref="ParseOptions.Error" qualifyHint="true"/>
+    ///   stream, and usage help using the <see cref="UsageWriter"/> if the <see cref="HelpRequested"/>
+    ///   property is <see langword="true"/>. It then returns <see langword="null"/>.
     /// </para>
     /// <para>
     ///   If the return value is <see langword="null"/>, check the <see cref="ParseResult"/>
@@ -955,8 +960,8 @@ public class CommandLineParser
     /// </remarks>
     public object? ParseWithErrorHandling()
     {
-        // GetCommandLineArgs include the executable, so skip it.
-        return ParseWithErrorHandling(Environment.GetCommandLineArgs(), 1);
+        // GetCommandLineArgs includes the executable, so skip it.
+        return ParseWithErrorHandling(Environment.GetCommandLineArgs().AsMemory(1));
     }
 
     /// <inheritdoc cref="ParseWithErrorHandling()" />
@@ -1059,11 +1064,12 @@ public class CommandLineParser
     /// </exception>
     /// <remarks>
     /// <para>
-    ///   This is a convenience function that instantiates a <see cref="CommandLineParser"/>,
-    ///   calls the <see cref="Parse()"/> method, and returns the result. If an error occurs
-    ///   or parsing is canceled, it prints errors to the <see cref="ParseOptions.Error" qualifyHint="true"/>
-    ///   stream, and usage help to the <see cref="UsageWriter"/> if the <see cref="HelpRequested"/>
-    ///   property is <see langword="true"/>. It then returns <see langword="null"/>.
+    ///   This is a convenience function that instantiates a <see cref="CommandLineParser{T}"/>,
+    ///   calls the <see cref="CommandLineParser{T}.ParseWithErrorHandling()"/> method, and returns
+    ///   the result. If an error occurs or parsing is canceled, it prints errors to the
+    ///   <see cref="ParseOptions.Error" qualifyHint="true"/> stream, and usage help to the
+    ///   <see cref="UsageWriter"/> if the <see cref="HelpRequested"/> property is <see langword="true"/>.
+    ///   It then returns <see langword="null"/>.
     /// </para>
     /// <para>
     ///   If the <see cref="ParseOptions.Error" qualifyHint="true"/> parameter is <see langword="null"/>, output is
@@ -1150,12 +1156,6 @@ public class CommandLineParser
     /// <returns>
     ///   <inheritdoc cref="Parse{T}(ParseOptions?)"/>
     /// </returns>
-    /// <exception cref="ArgumentNullException">
-    ///   <paramref name="args"/> is <see langword="null"/>.
-    /// </exception>
-    /// <exception cref="ArgumentOutOfRangeException">
-    ///   <paramref name="index"/> does not fall within the bounds of <paramref name="args"/>.
-    /// </exception>
     /// <exception cref="NotSupportedException">
     ///   <inheritdoc cref="Parse{T}(ParseOptions?)"/>
     /// </exception>
@@ -1203,7 +1203,8 @@ public class CommandLineParser
     public static T? Parse<T>(string[] args, ParseOptions? options = null)
         where T : class
     {
-        return Parse<T>(args, 0, options);
+        var parser = new CommandLineParser<T>(options);
+        return parser.ParseWithErrorHandling(args);
     }
 
     /// <summary>
