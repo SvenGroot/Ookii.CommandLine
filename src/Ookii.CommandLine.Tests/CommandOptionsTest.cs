@@ -2,6 +2,7 @@
 using Ookii.CommandLine.Commands;
 using Ookii.CommandLine.Terminal;
 using System;
+using System.Globalization;
 
 namespace Ookii.CommandLine.Tests;
 
@@ -27,7 +28,7 @@ public class CommandOptionsTest
         Assert.IsNull(options.AutoHelpArgument);
         Assert.IsNull(options.AutoPrefixAliases);
         Assert.IsNull(options.AutoVersionArgument);
-        Assert.IsNull(options.Culture);
+        Assert.AreEqual(CultureInfo.InvariantCulture, options.Culture);
         Assert.IsNull(options.DefaultValueDescriptions);
         Assert.IsNull(options.DuplicateArguments);
         Assert.IsNull(options.Error);
