@@ -62,13 +62,19 @@ public static class VirtualTerminal
 
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
-            var previousMode = NativeMethods.EnableVirtualTerminalSequences(stream, true);
-            if (previousMode == null)
+            var (enabled, previousMode) = NativeMethods.EnableVirtualTerminalSequences(stream, true);
+            if (!enabled)
             {
                 return new VirtualTerminalSupport(false);
             }
 
-            return new VirtualTerminalSupport(NativeMethods.GetStandardHandle(stream), previousMode.Value);
+            if (previousMode is NativeMethods.ConsoleModes mode)
+            {
+                return new VirtualTerminalSupport(NativeMethods.GetStandardHandle(stream), mode);
+            }
+
+            // Support was already enabled externally, so don't change the console mode on dispose.
+            return new VirtualTerminalSupport(true);
         }
 
         // Support is assumed on non-Windows platforms if TERM is set.

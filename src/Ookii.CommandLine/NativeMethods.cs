@@ -8,7 +8,7 @@ static class NativeMethods
 {
     static readonly IntPtr INVALID_HANDLE_VALUE = new(-1);
 
-    public static ConsoleModes? EnableVirtualTerminalSequences(StandardStream stream, bool enable)
+    public static (bool, ConsoleModes?) EnableVirtualTerminalSequences(StandardStream stream, bool enable)
     {
         if (stream == StandardStream.Input)
         {
@@ -18,12 +18,12 @@ static class NativeMethods
         var handle = GetStandardHandle(stream);
         if (handle == INVALID_HANDLE_VALUE)
         {
-            return null;
+            return (false, null);
         }
 
         if (!GetConsoleMode(handle, out ConsoleModes mode))
         {
-            return null;
+            return (false, null);
         }
 
         var oldMode = mode;
@@ -36,12 +36,17 @@ static class NativeMethods
             mode &= ~ConsoleModes.ENABLE_VIRTUAL_TERMINAL_PROCESSING;
         }
 
-        if (!SetConsoleMode(handle, mode))
+        if (oldMode == mode)
         {
-            return null;
+            return (true, null);
         }
 
-        return oldMode;
+        if (!SetConsoleMode(handle, mode))
+        {
+            return (false, null);
+        }
+
+        return (true, oldMode);
     }
 
     public static IntPtr GetStandardHandle(StandardStream stream)
