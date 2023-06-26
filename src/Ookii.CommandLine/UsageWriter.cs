@@ -220,11 +220,6 @@ public class UsageWriter
     ///   <see langword="true"/>.
     /// </para>
     /// <para>
-    ///   If the string contains anything other than virtual terminal sequences, those parts
-    ///   will be included in the output, but only when the <see cref="UseColor"/> property is
-    ///   <see langword="true"/>.
-    /// </para>
-    /// <para>
     ///   The portion of the string that has color will end with the value of the
     ///   <see cref="ColorReset"/> property.
     /// </para>
@@ -233,7 +228,7 @@ public class UsageWriter
     ///   executable name does not.
     /// </para>
     /// </remarks>
-    public string UsagePrefixColor { get; set; } = TextFormat.ForegroundCyan;
+    public TextFormat UsagePrefixColor { get; set; } = TextFormat.ForegroundCyan;
 
     /// <summary>
     /// Gets or sets the number of characters by which to indent all except the first line of the command line syntax of the usage help.
@@ -348,11 +343,6 @@ public class UsageWriter
     ///   <see langword="true"/>.
     /// </para>
     /// <para>
-    ///   If the string contains anything other than virtual terminal sequences, those parts
-    ///   will be included in the output, but only when the <see cref="UseColor"/> property is
-    ///   <see langword="true"/>.
-    /// </para>
-    /// <para>
     ///   The portion of the string that has color will end with the value of the 
     ///   <see cref="ColorReset"/> property.
     /// </para>
@@ -361,7 +351,7 @@ public class UsageWriter
     ///   portion of the string has color; the actual argument description does not.
     /// </para>
     /// </remarks>
-    public string ArgumentDescriptionColor { get; set; } = TextFormat.ForegroundGreen;
+    public TextFormat ArgumentDescriptionColor { get; set; } = TextFormat.ForegroundGreen;
 
     /// <summary>
     /// Gets or sets a value indicating whether white space, rather than the first item of the
@@ -451,13 +441,8 @@ public class UsageWriter
     ///   This property will only be used if the <see cref="UseColor"/> property is
     ///   <see langword="true"/>.
     /// </para>
-    /// <para>
-    ///   If the string contains anything other than virtual terminal sequences, those parts
-    ///   will be included in the output, but only when the <see cref="UseColor"/> property is
-    ///   <see langword="true"/>.
-    /// </para>
     /// </remarks>
-    public string ColorReset { get; set; } = TextFormat.Default;
+    public TextFormat ColorReset { get; set; } = TextFormat.Default;
 
     /// <summary>
     /// Gets or sets the name of the subcommand.
@@ -496,11 +481,6 @@ public class UsageWriter
     ///   <see langword="true"/>.
     /// </para>
     /// <para>
-    ///   If the string contains anything other than virtual terminal sequences, those parts
-    ///   will be included in the output, but only when the <see cref="UseColor"/> property is
-    ///   <see langword="true"/>.
-    /// </para>
-    /// <para>
     ///   The portion of the string that has color will end with the <see cref="ColorReset"/>.
     /// </para>
     /// <para>
@@ -508,7 +488,7 @@ public class UsageWriter
     ///   application name does not.
     /// </para>
     /// </remarks>
-    public string CommandDescriptionColor { get; set; } = TextFormat.ForegroundGreen;
+    public TextFormat CommandDescriptionColor { get; set; } = TextFormat.ForegroundGreen;
 
     /// <summary>
     /// Gets or sets the number of characters by which to indent the all but the first line of command descriptions.
@@ -2018,11 +1998,11 @@ public class UsageWriter
     ///   Nothing is written if the <see cref="UseColor"/> property is <see langword="false"/>.
     /// </para>
     /// </remarks>
-    protected void WriteColor(string color)
+    protected void WriteColor(TextFormat color)
     {
         if (UseColor)
         {
-            Write(color);
+            Write(color.Value);
         }
     }
 

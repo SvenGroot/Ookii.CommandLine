@@ -564,11 +564,6 @@ public class ParseOptions
     ///   <see langword="true"/>; otherwise, it will be replaced with an empty string.
     /// </para>
     /// <para>
-    ///   If the string contains anything other than virtual terminal sequences, those parts
-    ///   will be included in the output, but only when the <see cref="UseErrorColor"/> property is
-    ///   <see langword="true"/>.
-    /// </para>
-    /// <para>
     ///   After the error message, the value of the <see cref="UsageWriter.ColorReset" qualifyHint="true"/>
     ///   property will be written to undo the color change.
     /// </para>
@@ -576,7 +571,7 @@ public class ParseOptions
     /// <seealso cref="CommandLineParser.Parse{T}(ParseOptions?)"/>
     /// <seealso cref="CommandLineParser{T}.ParseWithErrorHandling()"/>
     /// <seealso cref="IParser{TSelf}.Parse(ParseOptions?)"/>
-    public string ErrorColor { get; set; } = TextFormat.ForegroundRed;
+    public TextFormat ErrorColor { get; set; } = TextFormat.ForegroundRed;
 
     /// <summary>
     /// Gets or sets the color applied to warning messages.
@@ -598,11 +593,6 @@ public class ParseOptions
     ///   property is <see cref="ErrorMode.Warning" qualifyHint="true"/>.
     /// </para>
     /// <para>
-    ///   If the string contains anything other than virtual terminal sequences, those parts
-    ///   will be included in the output, but only when the <see cref="UseErrorColor"/> property is
-    ///   <see langword="true"/>.
-    /// </para>
-    /// <para>
     ///   After the warning message, the value of the <see cref="UsageWriter.ColorReset" qualifyHint="true"/>
     ///   property will be written to undo the color change.
     /// </para>
@@ -610,7 +600,7 @@ public class ParseOptions
     /// <seealso cref="CommandLineParser.Parse{T}(ParseOptions?)"/>
     /// <seealso cref="CommandLineParser{T}.ParseWithErrorHandling()"/>
     /// <seealso cref="IParser{TSelf}.Parse(ParseOptions?)"/>
-    public string WarningColor { get; set; } = TextFormat.ForegroundYellow;
+    public TextFormat WarningColor { get; set; } = TextFormat.ForegroundYellow;
 
     /// <summary>
     /// Gets or sets a value that indicates whether error messages should use color.

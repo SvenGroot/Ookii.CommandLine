@@ -1,5 +1,6 @@
 ﻿using Ookii.CommandLine.Commands;
 using Ookii.CommandLine.Support;
+using Ookii.CommandLine.Terminal;
 using Ookii.CommandLine.Validation;
 using System;
 using System.Collections.Generic;
@@ -1342,7 +1343,7 @@ public class CommandLineParser
         return writer.MaximumLineLength is 0 or >= 30;
     }
 
-    internal static void WriteError(ParseOptions options, string message, string color, bool blankLine = false)
+    internal static void WriteError(ParseOptions options, string message, TextFormat color, bool blankLine = false)
     {
         using var errorVtSupport = options.EnableErrorColor();
         try
