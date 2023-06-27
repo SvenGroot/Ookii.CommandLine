@@ -9,19 +9,17 @@ namespace Ookii.CommandLine.Commands;
 /// <remarks>
 /// <para>
 ///   To be considered a subcommand, a class must both implement the <see cref="ICommand"/>
-///   interface and have the <see cref="CommandAttribute"/> applied.
+///   interface and have the <see cref="CommandAttribute"/> attribute applied. This allows classes
+///   that implement the <see cref="ICommand"/> interface, but do not have the attribute, to be used
+///   as common base classes for other commands, without being commands themselves.
 /// </para>
 /// <para>
-///   This allows classes implementing <see cref="ICommand"/> but without the attribute to be
-///   used as common base classes for other commands, without being commands themselves.
+///   If a command does not have an explicit name, its name is determined by taking the type name
+///   of the command class and applying the transformation specified by the
+///   <see cref="CommandOptions.CommandNameTransform" qualifyHint="true"/> property.
 /// </para>
 /// <para>
-///   If a command has no explicit name, its name is determined by taking the type name
-///   and applying the transformation specified by the <see cref="CommandOptions.CommandNameTransform" qualifyHint="true"/>
-///   property.
-/// </para>
-/// <para>
-///   A command can be given more than one name by using the <see cref="AliasAttribute"/>
+///   Alternative names for a command can be given by using the <see cref="AliasAttribute"/>
 ///   attribute.
 /// </para>
 /// </remarks>
@@ -37,7 +35,7 @@ public sealed class CommandAttribute : Attribute
     /// </summary>
     /// <remarks>
     /// <para>
-    ///   If a command has no explicit name, its name is determined by taking the type name
+    ///   If a command does not have an explicit name, its name is determined by taking the type name
     ///   and applying the transformation specified by the <see cref="CommandOptions.CommandNameTransform" qualifyHint="true"/>
     ///   property.
     /// </para>
@@ -49,7 +47,10 @@ public sealed class CommandAttribute : Attribute
     /// <summary>
     /// Initializes a new instance of the <see cref="CommandAttribute"/> class using the specified command name.
     /// </summary>
-    /// <param name="commandName">The name of the command, which can be used to locate it using the <see cref="CommandManager.GetCommand" qualifyHint="true"/> method.</param>
+    /// <param name="commandName">
+    /// The name of the command, which can be used to invoke the command or to retrieve it using the
+    /// <see cref="CommandManager.GetCommand" qualifyHint="true"/> method.
+    /// </param>
     /// <exception cref="ArgumentNullException">
     /// <paramref name="commandName"/> is <see langword="null"/>.
     /// </exception>
@@ -59,11 +60,12 @@ public sealed class CommandAttribute : Attribute
     }
 
     /// <summary>
-    /// Gets the name of the command, which can be used to locate it using the <see cref="CommandManager.GetCommand" qualifyHint="true"/> method.
+    /// Gets the name of the command, which can be used to invoke the command or to retrieve it
+    /// using the <see cref="CommandManager.GetCommand" qualifyHint="true"/> method.
     /// </summary>
     /// <value>
-    /// The name of the command, or <see langword="null"/> to use the type name as the command
-    /// name.
+    /// The name of the command, or <see langword="null"/> if the target type name will be used as
+    /// the name.
     /// </value>
     public string? CommandName => _commandName;
 

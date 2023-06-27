@@ -23,14 +23,15 @@ public interface IAsyncCommand : ICommand
     /// </returns>
     /// <remarks>
     /// <para>
-    ///   Typically, your applications <c>Main()</c> method should return the exit code of the
+    ///   Typically, your application's <c>Main()</c> method should return the exit code of the
     ///   command that was executed.
     /// </para>
     /// <para>
     ///   This method will only be invoked if you run commands with the <see cref="CommandManager.RunCommandAsync()" qualifyHint="true"/>
     ///   method or one of its overloads. Typically, it's recommended to implement the
-    ///   <see cref="ICommand.Run" qualifyHint="true"/> method to invoke this task. Use the <see cref="AsyncCommandBase"/>
-    ///   class for a default implementation that does this.
+    ///   <see cref="ICommand.Run" qualifyHint="true"/> method to invoke this method and wait for
+    ///   it. Use the <see cref="AsyncCommandBase"/> class for a default implementation that does
+    ///   this.
     /// </para>
     /// </remarks>
     Task<int> RunAsync();

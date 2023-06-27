@@ -13,6 +13,7 @@ namespace Ookii.CommandLine.Commands;
 /// <seealso cref="CommandManager"/>
 /// <seealso cref="ICommand"/>
 /// <seealso cref="CommandAttribute"/>
+/// <threadsafety static="true" instance="true"/>
 public abstract class CommandInfo
 {
     private readonly CommandManager _manager;
@@ -31,9 +32,6 @@ public abstract class CommandInfo
     /// </param>
     /// <exception cref="ArgumentNullException">
     ///   <paramref name="commandType"/> or <paramref name="manager"/> is <see langword="null"/>.
-    /// </exception>
-    /// <exception cref="ArgumentException">
-    ///   <paramref name="commandType"/> is not a command type.
     /// </exception>
     protected CommandInfo(Type commandType, CommandAttribute attribute, CommandManager manager, Type? parentCommandType)
     {
@@ -126,8 +124,8 @@ public abstract class CommandInfo
     /// </value>
     /// <remarks>
     /// <para>
-    ///   Aliases for a command are specified by using the <see cref="AliasAttribute"/> on a
-    ///   class implementing the <see cref="ICommand"/> interface.
+    ///   Aliases for a command are specified by using the <see cref="AliasAttribute"/> attribute
+    ///   on a class implementing the <see cref="ICommand"/> interface.
     /// </para>
     /// </remarks>
     public abstract IEnumerable<string> Aliases { get; }
@@ -152,7 +150,7 @@ public abstract class CommandInfo
     public Type? ParentCommandType { get; }
 
     /// <summary>
-    /// Creates an instance of the command type.
+    /// Creates an instance of the command type parsing the specified arguments.
     /// </summary>
     /// <param name="args">The arguments to the command.</param>
     /// <param name="index">The index in <paramref name="args"/> at which to start parsing the arguments.</param>
@@ -160,18 +158,51 @@ public abstract class CommandInfo
     /// An instance of the <see cref="CommandType"/>, or <see langword="null"/> if an error
     /// occurred or parsing was canceled.
     /// </returns>
+    /// <remarks>
+    /// <para>
+    ///   If the type indicated by the <see cref="CommandType"/> property implements the
+    ///   <see cref="ICommandWithCustomParsing"/> parsing interface, an instance of the type is
+    ///   created and the <see cref="ICommandWithCustomParsing.Parse" qualifyHint="true"/> method
+    ///   invoked. Otherwise, an instance of the type is created using the <see cref="CommandLineParser{T}"/>
+    ///   class.
+    /// </para>
+    /// </remarks>
     /// <exception cref="ArgumentNullException">
-    ///   <paramref name="args"/> is <see langword="null"/>.
+    /// <paramref name="args"/> is <see langword="null"/>.
     /// </exception>
-    /// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> does not fall inside the bounds of <paramref name="args"/>.</exception>
+    /// <exception cref="ArgumentOutOfRangeException">
+    /// <paramref name="index"/> does not fall inside the bounds of <paramref name="args"/>.
+    /// </exception>
     public ICommand? CreateInstance(string[] args, int index)
+        => CreateInstance(args.AsMemory(index));
+
+    /// <summary>
+    /// Creates an instance of the command type parsing the specified arguments.
+    /// </summary>
+    /// <param name="args">The arguments to the command.</param>
+    /// <returns>
+    /// An instance of the <see cref="CommandType"/>, or <see langword="null"/> if an error
+    /// occurred or parsing was canceled.
+    /// </returns>
+    /// <remarks>
+    /// <para>
+    ///   If the type indicated by the <see cref="CommandType"/> property implements the
+    ///   <see cref="ICommandWithCustomParsing"/> parsing interface, an instance of the type is
+    ///   created and the <see cref="ICommandWithCustomParsing.Parse" qualifyHint="true"/> method
+    ///   invoked. Otherwise, an instance of the type is created using the <see cref="CommandLineParser{T}"/>
+    ///   class.
+    /// </para>
+    /// </remarks>
+    public ICommand? CreateInstance(ReadOnlyMemory<string> args)
     {
-        var (command, _) = CreateInstanceWithResult(args, index);
+        var (command, _) = CreateInstanceWithResult(args);
         return command;
     }
 
+
     /// <summary>
-    /// Creates an instance of the command type.
+    /// Creates an instance of the command type by parsing the specified arguments, and returns it
+    /// in addition to the result of the parsing operation.
     /// </summary>
     /// <param name="args">The arguments to the command.</param>
     /// <param name="index">The index in <paramref name="args"/> at which to start parsing the arguments.</param>
@@ -180,6 +211,13 @@ public abstract class CommandInfo
     /// occurred or parsing was canceled, and the <see cref="ParseResult"/> of the operation.
     /// </returns>
     /// <remarks>
+    /// <para>
+    ///   If the type indicated by the <see cref="CommandType"/> property implements the
+    ///   <see cref="ICommandWithCustomParsing"/> parsing interface, an instance of the type is
+    ///   created and the <see cref="ICommandWithCustomParsing.Parse" qualifyHint="true"/> method
+    ///   invoked. Otherwise, an instance of the type is created using the <see cref="CommandLineParser{T}"/>
+    ///   class.
+    /// </para>
     /// <para>
     ///   The <see cref="ParseResult.Status" qualifyHint="true"/> property of the returned <see cref="ParseResult"/>
     ///   will be <see cref="ParseStatus.None" qualifyHint="true"/> if the command used custom parsing.
@@ -205,7 +243,8 @@ public abstract class CommandInfo
     }
 
     /// <summary>
-    /// Creates an instance of the command type.
+    /// Creates an instance of the command type by parsing the specified arguments, and returns it
+    /// in addition to the result of the parsing operation.
     /// </summary>
     /// <param name="args">The arguments to the command.</param>
     /// <returns>
@@ -213,6 +252,13 @@ public abstract class CommandInfo
     /// occurred or parsing was canceled, and the <see cref="ParseResult"/> of the operation.
     /// </returns>
     /// <remarks>
+    /// <para>
+    ///   If the type indicated by the <see cref="CommandType"/> property implements the
+    ///   <see cref="ICommandWithCustomParsing"/> parsing interface, an instance of the type is
+    ///   created and the <see cref="ICommandWithCustomParsing.Parse" qualifyHint="true"/> method
+    ///   invoked. Otherwise, an instance of the type is created using the <see cref="CommandLineParser"/>
+    ///   class.
+    /// </para>
     /// <para>
     ///   The <see cref="ParseResult.Status" qualifyHint="true"/> property of the returned <see cref="ParseResult"/>
     ///   will be <see cref="ParseStatus.None" qualifyHint="true"/> if the command used custom parsing.
@@ -235,7 +281,8 @@ public abstract class CommandInfo
     }
 
     /// <summary>
-    /// Creates a <see cref="CommandLineParser"/> instance that can be used to instantiate
+    /// Creates a <see cref="CommandLineParser"/> instance for the type indicated by the
+    /// <see cref="CommandType"/> property.
     /// </summary>
     /// <returns>
     /// A <see cref="CommandLineParser"/> instance for the <see cref="CommandType"/>.
@@ -246,8 +293,9 @@ public abstract class CommandInfo
     /// <remarks>
     /// <para>
     ///   If the <see cref="UseCustomArgumentParsing"/> property is <see langword="true"/>, the
-    ///   command cannot be created suing the <see cref="CommandLineParser"/> class, and you
-    ///   must use the <see cref="CreateInstance"/> method.
+    ///   command cannot be created using the <see cref="CommandLineParser"/> class, and you
+    ///   must use the <see cref="CreateInstanceWithCustomParsing"/> method or
+    ///   <see cref="CreateInstanceWithResult(ReadOnlyMemory{string})"/> method instead.
     /// </para>
     /// </remarks>
     public abstract CommandLineParser CreateParser();
@@ -260,6 +308,12 @@ public abstract class CommandInfo
     /// <exception cref="InvalidOperationException">
     ///   The command does not use the <see cref="ICommandWithCustomParsing"/> interface.
     /// </exception>
+    /// <remarks>
+    /// <para>
+    ///   It is the responsibility of the caller to invoke the <see cref="ICommandWithCustomParsing.Parse" qualifyHint="true"/>
+    ///   method after the instance is created.
+    /// </para>
+    /// </remarks>
     public abstract ICommandWithCustomParsing CreateInstanceWithCustomParsing();
 
     /// <summary>
@@ -270,6 +324,13 @@ public abstract class CommandInfo
     /// <see langword="true"/> if the <paramref name="name"/> matches the <see cref="Name"/>
     /// property or any of the items in the <see cref="Aliases"/> property.
     /// </returns>
+    /// <remarks>
+    /// <para>
+    ///   Automatic prefix aliases are not considered by this method, regardless of the value of
+    ///   the <see cref="CommandOptions.AutoCommandPrefixAliases"/> property. To check for a prefix,
+    ///   use the <see cref="MatchesPrefix"/> method.
+    /// </para>
+    /// </remarks>
     /// <exception cref="ArgumentNullException">
     /// <paramref name="name"/> is <see langword="null"/>.
     /// </exception>
@@ -293,7 +354,7 @@ public abstract class CommandInfo
     /// </summary>
     /// <param name="prefix">The prefix to check for.</param>
     /// <returns>
-    /// <see langword="true"/> if the <paramref name="prefix"/> is a prefix of the <see cref="Name"/>
+    /// <see langword="true"/> if <paramref name="prefix"/> is a prefix of the <see cref="Name"/>
     /// property or any of the items in the <see cref="Aliases"/> property.
     /// </returns>
     /// <exception cref="ArgumentNullException">
@@ -326,8 +387,10 @@ public abstract class CommandInfo
     ///   <paramref name="commandType"/> or <paramref name="manager"/> is <see langword="null"/>.
     /// </exception>
     /// <returns>
-    ///   A <see cref="CommandInfo"/> class with information about the command, or
-    ///   <see langword="null"/> if <paramref name="commandType"/> was not a command.
+    ///   If the type specified by <paramref name="commandType"/> implements the <see cref="ICommand"/>
+    ///   interface, has the <see cref="CommandAttribute"/> attribute, and is not <see langword="abstract"/>,
+    ///   a <see cref="CommandInfo"/> class with information about the command; otherwise,
+    ///   <see langword="null"/>.
     /// </returns>
 #if NET6_0_OR_GREATER
     [RequiresUnreferencedCode("Command information cannot be statically determined using reflection. Consider using the GeneratedParserAttribute and GeneratedCommandManagerAttribute.", Url = CommandLineParser.UnreferencedCodeHelpUrl)]
@@ -347,7 +410,8 @@ public abstract class CommandInfo
     ///   <paramref name="commandType"/> or <paramref name="manager"/> is <see langword="null"/>.
     /// </exception>
     /// <exception cref="ArgumentException">
-    ///   <paramref name="commandType"/> is not a command.
+    ///   <paramref name="commandType"/> is does not implement the <see cref="ICommand"/> interface,
+    ///   does not have the <see cref="CommandAttribute"/> attribute, or is <see langword="abstract"/>.
     /// </exception>
     /// <returns>
     ///   A <see cref="CommandInfo"/> class with information about the command.
@@ -363,8 +427,9 @@ public abstract class CommandInfo
     /// </summary>
     /// <param name="commandType">The type that implements the subcommand.</param>
     /// <returns>
-    /// <see langword="true"/> if the type implements the <see cref="ICommand"/> interface and
-    /// has the <see cref="CommandAttribute"/> applied; otherwise, <see langword="false"/>.
+    /// <see langword="true"/> if the type implements the <see cref="ICommand"/> interface, has the
+    /// <see cref="CommandAttribute"/> attribute applied, and is not <see langword="abstract"/>;
+    /// otherwise, <see langword="false"/>.
     /// </returns>
     /// <exception cref="ArgumentNullException">
     /// <paramref name="commandType"/> is <see langword="null"/>.
