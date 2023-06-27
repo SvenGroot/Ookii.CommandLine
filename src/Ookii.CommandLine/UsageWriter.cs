@@ -12,7 +12,7 @@ using System.Reflection;
 namespace Ookii.CommandLine;
 
 /// <summary>
-/// Creates usage help for the <see cref="CommandLineParser"/> class and the <see cref="Commands.CommandManager" qualifyHint="true"/>
+/// Creates usage help for the <see cref="CommandLineParser"/> class and the <see cref="Commands.CommandManager"/>
 /// class.
 /// </summary>
 /// <remarks>
@@ -31,6 +31,7 @@ namespace Ookii.CommandLine;
 ///   these properties.
 /// </para>
 /// </remarks>
+/// <threadsafety static="true" instance="false"/>
 public class UsageWriter
 {
     #region Nested types
@@ -67,8 +68,7 @@ public class UsageWriter
     public const int DefaultSyntaxIndent = 3;
 
     /// <summary>
-    /// The default indentation for the argument descriptions for the <see cref="ParsingMode.Default" qualifyHint="true"/>
-    /// mode.
+    /// The default indentation for the argument descriptions.
     /// </summary>
     /// <value>
     /// The default indentation, which is eight characters.
@@ -161,13 +161,18 @@ public class UsageWriter
     public int ApplicationDescriptionIndent { get; set; } = DefaultApplicationDescriptionIndent;
 
     /// <summary>
-    /// Gets or sets a value that overrides the default application executable name used in the
-    /// usage syntax.
+    /// Gets or sets the application executable name used in the usage help.
     /// </summary>
     /// <value>
-    /// The application executable name, or <see langword="null"/> to use the default value,
-    /// determined by calling <see cref="CommandLineParser.GetExecutableName(bool)" qualifyHint="true"/>.
+    /// The application executable name.
     /// </value>
+    /// <remarks>
+    /// <para>
+    ///   Set this property to <see langword="null"/> to use the default value, determined by
+    ///   calling the <see cref="CommandLineParser.GetExecutableName(bool)" qualifyHint="true"/>
+    ///   method.
+    /// </para>
+    /// </remarks>
     /// <seealso cref="IncludeExecutableExtension"/>
 #if NET6_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
     [AllowNull]
@@ -231,7 +236,8 @@ public class UsageWriter
     public TextFormat UsagePrefixColor { get; set; } = TextFormat.ForegroundCyan;
 
     /// <summary>
-    /// Gets or sets the number of characters by which to indent all except the first line of the command line syntax of the usage help.
+    /// Gets or sets the number of characters by which to indent all except the first line of the
+    /// command line syntax of the usage help.
     /// </summary>
     /// <value>
     /// The number of characters by which to indent the usage syntax. The default value is the
@@ -245,8 +251,8 @@ public class UsageWriter
     ///   length.
     /// </para>
     /// <para>
-    ///   This value is not used if the maximum line length of the <see cref="LineWrappingTextWriter"/> to which the usage
-    ///   is being written is less than 30.
+    ///   This value is used by the base implementation of the <see cref="WriteParserUsageSyntax"/>
+    ///   class, unless the <see cref="ShouldIndent"/> property is <see langword="false"/>.
     /// </para>
     /// </remarks>
     public int SyntaxIndent { get; set; } = DefaultSyntaxIndent;
@@ -257,13 +263,12 @@ public class UsageWriter
     /// </summary>
     /// <value>
     /// <see langword="true"/> to use short names for arguments that have one; otherwise,
-    /// <see langword="false"/> to use an empty string. The default value is
-    /// <see langword="false"/>.
+    /// <see langword="false"/> to use the long name. The default value is <see langword="false"/>.
     /// </value>
     /// <remarks>
     /// <note>
-    ///   This property is only used when the <see cref="CommandLineParser.Mode" qualifyHint="true"/> property is
-    ///   <see cref="ParsingMode.LongShort" qualifyHint="true"/>.
+    ///   This property is only used when the <see cref="CommandLineParser.Mode" qualifyHint="true"/>
+    ///   property is <see cref="ParsingMode.LongShort" qualifyHint="true"/>.
     /// </note>
     /// </remarks>
     public bool UseShortNamesForSyntax { get; set; }
@@ -301,11 +306,8 @@ public class UsageWriter
     /// </value>
     /// <remarks>
     /// <para>
-    ///   This property is used by the <see cref="WriteArgumentDescriptions"/> method.
-    /// </para>
-    /// <para>
-    ///   This value is not used if the maximum line length of the <see cref="LineWrappingTextWriter"/> to which the usage
-    ///   is being written is less than 30.
+    ///   This value is used by the base implementation of the <see cref="WriteArgumentDescriptionHeader"/>
+    ///   method, unless the <see cref="ShouldIndent"/> property is <see langword="false"/>.
     /// </para>
     /// </remarks>
     public int ArgumentDescriptionIndent { get; set; } = DefaultArgumentDescriptionIndent;
@@ -354,23 +356,28 @@ public class UsageWriter
     public TextFormat ArgumentDescriptionColor { get; set; } = TextFormat.ForegroundGreen;
 
     /// <summary>
-    /// Gets or sets a value indicating whether white space, rather than the first item of the
-    /// <see cref="CommandLineParser.NameValueSeparators" qualifyHint="true"/> property, is used to separate
-    /// arguments and their values in the command line syntax.
+    /// Gets or sets a value indicating whether white space, rather than the first element of the
+    /// <see cref="CommandLineParser.NameValueSeparators" qualifyHint="true"/> property, is used to
+    /// separate arguments and their values in the command line syntax.
     /// </summary>
     /// <value>
-    ///   <see langword="true"/> if the command line syntax uses a white space value separator; <see langword="false"/> if it uses a colon.
-    ///   The default value is <see langword="true"/>.
+    ///   <see langword="true"/> if the command line syntax uses a white space value separator;
+    ///   <see langword="false"/> if it uses the first element of the <see cref="CommandLineParser.NameValueSeparators" qualifyHint="true"/>
+    ///   property. The default value is <see langword="true"/>.
     /// </value>
     /// <remarks>
     /// <para>
-    ///   If this property is <see langword="true"/>, an argument would be formatted in the command line syntax as "-name &lt;Value&gt;" (using
-    ///   default formatting), with a white space character separating the argument name and value description. If this property is <see langword="false"/>,
-    ///   it would be formatted as "-name:&lt;Value&gt;", using a colon as the separator.
+    ///   If this property is <see langword="true"/>, an argument would be formatted in the command
+    ///   line syntax as "-Name &lt;Value&gt;" (using default formatting), with a white space
+    ///   character separating the argument name and value description. If this property is
+    ///   <see langword="false"/>, it would be formatted as "-Name:&lt;Value&gt;", using a colon as the
+    ///   separator (when using the default separators).
     /// </para>
     /// <para>
-    ///   The command line syntax will only use a white space character as the value separator if both the <see cref="CommandLineParser.AllowWhiteSpaceValueSeparator" qualifyHint="true"/> property
-    ///   and the <see cref="UseWhiteSpaceValueSeparator"/> property are true.
+    ///   The command line syntax will only use a white space character as the value separator if
+    ///   both the <see cref="CommandLineParser.AllowWhiteSpaceValueSeparator" qualifyHint="true"/>
+    ///   property and the <see cref="UseWhiteSpaceValueSeparator"/> property are
+    ///   <see langword="true"/>.
     /// </para>
     /// </remarks>
     public bool UseWhiteSpaceValueSeparator { get; set; } = true;
@@ -400,11 +407,16 @@ public class UsageWriter
     /// <para>
     ///   For arguments with a default value of <see langword="null"/>, this property has no effect.
     /// </para>
+    /// <para>
+    ///   To exclude the default value for a particular argument only, use the
+    ///   <see cref="CommandLineArgumentAttribute.IncludeDefaultInUsageHelp" qualifyHint="true"/>
+    ///   property.
+    /// </para>
     /// </remarks>
     public bool IncludeDefaultValueInDescription { get; set; } = true;
 
     /// <summary>
-    /// Gets or sets a value indicating whether the <see cref="Validation.ArgumentValidationAttribute" qualifyHint="true"/>
+    /// Gets or sets a value indicating whether the <see cref="ArgumentValidationAttribute"/>
     /// attributes of an argument should be included in the argument description.
     /// </summary>
     /// <value>
@@ -416,12 +428,17 @@ public class UsageWriter
     ///   For arguments with no validators, or validators with no usage help, this property
     ///   has no effect.
     /// </para>
+    /// <para>
+    ///   For validators derived from the <see cref="ArgumentValidationWithHelpAttribute"/> class,
+    ///   you can use the <see cref="ArgumentValidationWithHelpAttribute.IncludeInUsageHelp"/>
+    ///   property to exclude the help text for individual validators.
+    /// </para>
     /// </remarks>
     public bool IncludeValidatorsInDescription { get; set; } = true;
 
     /// <summary>
     /// Gets or sets a value indicating whether the <see cref="WriteArgumentDescription(CommandLineArgument)"/>
-    /// method will write a blank lines between arguments in the description list.
+    /// method will write a blank line between arguments in the description list.
     /// </summary>
     /// <value>
     /// <see langword="true" /> to write a blank line; otherwise, <see langword="false" />. The
@@ -430,7 +447,8 @@ public class UsageWriter
     public bool BlankLineAfterDescription { get; set; } = true;
 
     /// <summary>
-    /// Gets or sets the sequence used to reset color applied a usage help element.
+    /// Gets or sets the virtual terminal sequence used to undo a color change that was applied
+    /// to a usage help element.
     /// </summary>
     /// <value>
     ///   The virtual terminal sequence used to reset color. The default value is
@@ -455,6 +473,10 @@ public class UsageWriter
     /// <para>
     ///   This property is set by the <see cref="CommandManager"/> class before writing usage
     ///   help for a subcommand.
+    /// </para>
+    /// <para>
+    ///   When nested subcommands are used with the <see cref="ParentCommand"/> class, this may be
+    ///   several subcommand names separated by spaces.
     /// </para>
     /// </remarks>
     public string? CommandName { get; set; }
@@ -484,8 +506,8 @@ public class UsageWriter
     ///   The portion of the string that has color will end with the <see cref="ColorReset"/>.
     /// </para>
     /// <para>
-    ///   With the default value, only the command name portion of the string has color; the
-    ///   application name does not.
+    ///   With the default implementation, only the command name portion of the string has color;
+    ///   the application name does not.
     /// </para>
     /// </remarks>
     public TextFormat CommandDescriptionColor { get; set; } = TextFormat.ForegroundGreen;
@@ -498,15 +520,15 @@ public class UsageWriter
     /// </value>
     /// <remarks>
     /// <para>
-    ///   This value is used by the base implementation of the <see cref="WriteCommandDescription(CommandInfo)"/>
-    ///   class, unless the <see cref="ShouldIndent"/> property is <see langword="false"/>.
+    ///   This value is used by the base implementation of the <see cref="WriteCommandDescriptionHeader"/>
+    ///   method, unless the <see cref="ShouldIndent"/> property is <see langword="false"/>.
     /// </para>
     /// </remarks>
     public int CommandDescriptionIndent { get; set; } = DefaultCommandDescriptionIndent;
 
     /// <summary>
     /// Gets or sets a value indicating whether the <see cref="WriteCommandDescription(CommandInfo)"/>
-    /// method will write a blank lines between commands in the command list.
+    /// method will write a blank line between commands in the command list.
     /// </summary>
     /// <value>
     /// <see langword="true" /> to write a blank line; otherwise, <see langword="false" />. The
@@ -526,23 +548,48 @@ public class UsageWriter
     /// <remarks>
     /// <para>
     ///   If this property is <see langword="null"/>, the instruction will be shown under the
-    ///   following conditions: the <see cref="ParseOptions.AutoHelpArgument" qualifyHint="true"/> property is
-    ///   <see langword="null"/> or <see langword="true"/>; for every command with a
-    ///   <see cref="ParseOptionsAttribute"/> attribute, the <see cref="ParseOptionsAttribute.AutoHelpArgument" qualifyHint="true"/>
-    ///   property is <see langword="true"/>; no command uses the <see cref="ICommandWithCustomParsing"/>
-    ///   interface (this includes commands that derive from the <see cref="ParentCommand"/> class;
-    ///   no command specifies custom values for the <see cref="ParseOptionsAttribute.ArgumentNamePrefixes" qualifyHint="true"/>
-    ///   and <see cref="ParseOptionsAttribute.LongArgumentNamePrefix" qualifyHint="true"/> properties; and
-    ///   every command uses the same values for the <see cref="ParseOptionsAttribute.ArgumentNameTransform" qualifyHint="true"/>
-    ///   and <see cref="ParseOptionsAttribute.Mode" qualifyHint="true"/> properties.
+    ///   following conditions:
+    /// </para>
+    /// <list type="bullet">
+    ///   <item>
+    ///     <description>
+    ///       The <see cref="ParseOptions.AutoHelpArgument" qualifyHint="true"/> property is
+    ///       <see langword="null"/> or <see langword="true"/>.
+    ///     </description>
+    ///   </item>
+    ///   <item>
+    ///     <description>
+    ///       For every command with a <see cref="ParseOptionsAttribute"/> attribute, the
+    ///       <see cref="ParseOptionsAttribute.AutoHelpArgument" qualifyHint="true"/> property is
+    ///       <see langword="true"/>.
+    ///     </description>
+    ///   </item>
+    ///   <item>
+    ///     <description>
+    ///       No command uses the <see cref="ICommandWithCustomParsing"/> interface (this includes
+    ///       commands that derive from the <see cref="ParentCommand"/> class).
+    ///     </description>
+    ///   </item>
+    ///   <item>
+    ///     <description>
+    ///       No command specifies custom values for the <see cref="ParseOptionsAttribute.ArgumentNamePrefixes" qualifyHint="true"/>
+    ///       and <see cref="ParseOptionsAttribute.LongArgumentNamePrefix" qualifyHint="true"/>
+    ///       properties.
+    ///     </description>
+    ///   </item>
+    ///   <item>
+    ///     <description>
+    ///       Every command uses the same values for the <see cref="ParseOptionsAttribute.ArgumentNameTransform" qualifyHint="true"/>
+    ///       and <see cref="ParseOptionsAttribute.Mode" qualifyHint="true"/> properties.
+    ///     </description>
+    ///   </item>
+    /// </list>
+    /// <para>
+    ///   If set to <see langword="true"/>, the message is shown even if not all commands meet these
+    ///   restrictions.
     /// </para>
     /// <para>
-    ///   If set to <see langword="true"/>, the message is shown even if not all commands
-    ///   meet these restrictions.
-    /// </para>
-    /// <para>
-    ///   To customize the message, override the <see cref="WriteCommandHelpInstruction"/>
-    ///   method.
+    ///   To customize the message, override the <see cref="WriteCommandHelpInstruction"/> method.
     /// </para>
     /// </remarks>
     public bool? IncludeCommandHelpInstruction { get; set; }
@@ -565,6 +612,10 @@ public class UsageWriter
     ///   If the <see cref="CommandOptions.ParentCommand" qualifyHint="true"/> property is not <see langword="null"/>,
     ///   and the specified type has a <see cref="DescriptionAttribute"/>, that description is
     ///   used instead.
+    /// </para>
+    /// <para>
+    ///   To use a custom description, set this property to <see langword="true"/>, and override
+    ///   the <see cref="WriteApplicationDescription"/> method.
     /// </para>
     /// </remarks>
     public bool IncludeApplicationDescriptionBeforeCommandList { get; set; }
@@ -664,7 +715,8 @@ public class UsageWriter
     protected virtual bool ShouldIndent => Writer.MaximumLineLength is 0 or >= MinimumLineWidthForIndent;
 
     /// <summary>
-    /// Gets the separator used for argument names, command names, and aliases.
+    /// Gets the separator used between multiple consecutive argument names, command names, and
+    /// aliases in the usage help.
     /// </summary>
     /// <value>
     /// The string ", ".
@@ -759,7 +811,7 @@ public class UsageWriter
     /// Returns a string with usage help for the specified command manager.
     /// </summary>
     /// <returns>A string containing the usage help.</returns>
-    /// <param name="manager">The <see cref="Commands.CommandManager" qualifyHint="true"/></param>
+    /// <param name="manager">The <see cref="Commands.CommandManager"/>.</param>
     /// <param name="maximumLineLength">
     /// The length at which to white-space wrap lines in the output, or 0 to disable wrapping.
     /// </param>
@@ -878,11 +930,6 @@ public class UsageWriter
         WriteUsageSyntaxPrefix();
         foreach (CommandLineArgument argument in GetArgumentsInUsageOrder())
         {
-            if (argument.IsHidden)
-            {
-                continue;
-            }
-
             Write(" ");
             if (UseAbbreviatedSyntax && argument.Position == null)
             {
@@ -919,8 +966,11 @@ public class UsageWriter
     ///   then required non-positional arguments in alphabetical order, then the remaining
     ///   arguments in alphabetical order.
     /// </para>
+    /// <para>
+    ///   Arguments that are hidden are excluded from the list.
+    /// </para>
     /// </remarks>
-    protected virtual IEnumerable<CommandLineArgument> GetArgumentsInUsageOrder() => Parser.Arguments;
+    protected virtual IEnumerable<CommandLineArgument> GetArgumentsInUsageOrder() => Parser.Arguments.Where(a => !a.IsHidden);
 
     /// <summary>
     /// Write the prefix for the usage syntax, including the executable name and, for
@@ -928,14 +978,14 @@ public class UsageWriter
     /// </summary>
     /// <remarks>
     /// <para>
-    ///   The base implementation returns a string like "Usage: executable" or "Usage:
-    ///   executable command", using the color specified. If color is enabled, part of the
-    ///   string will be colored using the <see cref="UsagePrefixColor"/> property.
+    ///   The base implementation returns a string like "Usage: executable" or "Usage: executable
+    ///   command". If color is enabled, part of the string will be colored using the
+    ///   <see cref="UsagePrefixColor"/> property.
     /// </para>
     /// <para>
     ///   An implementation of this method should typically include the value of the
     ///   <see cref="ExecutableName"/> property, and the value of the <see cref="CommandName"/>
-    ///   property if it's not <see langword="null"/>.
+    ///   property if it is not <see langword="null"/>.
     /// </para>
     /// <para>
     ///   This method is called by the base implementation of the <see cref="WriteParserUsageSyntax"/>
@@ -1302,7 +1352,8 @@ public class UsageWriter
     ///   If color is enabled, the <see cref="ArgumentDescriptionColor"/> property is used.
     /// </para>
     /// <para>
-    ///   This method is called by the base implementation of <see cref="WriteArgumentDescription(CommandLineArgument)"/>.
+    ///   This method is called by the base implementation of the
+    ///   <see cref="WriteArgumentDescription(CommandLineArgument)"/> method.
     /// </para>
     /// </remarks>
     protected virtual void WriteArgumentDescriptionHeader(CommandLineArgument argument)
@@ -1425,7 +1476,7 @@ public class UsageWriter
     ///   For example, "&lt;String&gt;".
     /// </para>
     /// <para>
-    ///   This method is called by the base implementation of the <see cref="WriteArgumentDescription(CommandLineArgument)"/>
+    ///   This method is called by the base implementation of the <see cref="WriteArgumentDescriptionHeader"/>
     ///   method and by the <see cref="WriteSwitchValueDescription"/> method..
     /// </para>
     /// </remarks>
@@ -1440,10 +1491,10 @@ public class UsageWriter
     /// <remarks>
     /// <para>
     ///   The default implementation surrounds the value written by the <see cref="WriteValueDescriptionForDescription"/>
-    ///   method with angle brackets, to indicate that it is optional.
+    ///   method with square brackets, to indicate that it is optional.
     /// </para>
     /// <para>
-    ///   This method is called by the base implementation of the <see cref="WriteArgumentDescription(CommandLineArgument)"/>
+    ///   This method is called by the base implementation of the <see cref="WriteArgumentDescriptionHeader"/>
     ///   method for switch arguments.
     /// </para>
     /// </remarks>
@@ -1530,7 +1581,7 @@ public class UsageWriter
     ///   The base implementation just writes the description text.
     /// </para>
     /// <para>
-    ///   This method is called by the base implementation of the <see cref="WriteArgumentDescription(CommandLineArgument)"/>
+    ///   This method is called by the base implementation of the <see cref="WriteArgumentDescriptionBody"/>
     ///   method.
     /// </para>
     /// </remarks>
@@ -1550,7 +1601,7 @@ public class UsageWriter
     ///   space.
     /// </para>
     /// <para>
-    ///   This method is called by the base implementation of the <see cref="WriteArgumentDescription(CommandLineArgument)"/>
+    ///   This method is called by the base implementation of the <see cref="WriteArgumentDescriptionBody"/>
     ///   method if the <see cref="IncludeValidatorsInDescription"/> property is
     ///   <see langword="true"/>.
     /// </para>
@@ -1578,7 +1629,7 @@ public class UsageWriter
     ///   leading space.
     /// </para>
     /// <para>
-    ///   This method is called by the base implementation of the <see cref="WriteArgumentDescription(CommandLineArgument)"/>
+    ///   This method is called by the base implementation of the <see cref="WriteArgumentDescriptionBody"/>
     ///   method if the <see cref="IncludeDefaultValueInDescription"/> property is
     ///   <see langword="true"/> and the <see cref="CommandLineArgument.DefaultValue" qualifyHint="true"/> property
     ///   is not <see langword="null"/>.
@@ -1898,7 +1949,7 @@ public class UsageWriter
     ///   The base implementation just writes the description text.
     /// </para>
     /// <para>
-    ///   This method is called by the base implementation of the <see cref="WriteCommandDescription(CommandInfo)"/>
+    ///   This method is called by the base implementation of the <see cref="WriteCommandDescriptionBody"/>
     ///   method.
     /// </para>
     /// </remarks>
@@ -1947,9 +1998,9 @@ public class UsageWriter
     /// <param name="value">The string to write.</param>
     /// <remarks>
     /// <para>
-    ///   This method, along with <see cref="Write(char)"/>, is called for every write by the
-    ///   base implementation. Override this method if you need to apply a transformation,
-    ///   like HTML encoding, to all written text.
+    ///   This method, along with the <see cref="Write(char)"/> method, is called for every write by
+    ///   the base implementation. Override this method if you need to apply a transformation, like
+    ///   HTML encoding, to all written text.
     /// </para>
     /// </remarks>
     protected virtual void Write(string? value) => Writer.Write(value);
@@ -1960,8 +2011,8 @@ public class UsageWriter
     /// <param name="value">The character to write.</param>
     /// <remarks>
     /// <para>
-    ///   This method, along with <see cref="Write(char)"/>, is called for every write by the
-    ///   base implementation. Override this method if you need to apply a transformation,
+    ///   This method, along with the <see cref="Write(string)"/> method, is called for every write
+    ///   by the base implementation. Override this method if you need to apply a transformation,
     ///   like HTML encoding, to all written text.
     /// </para>
     /// </remarks>
@@ -1987,13 +2038,8 @@ public class UsageWriter
     /// <summary>
     /// Writes a string with virtual terminal sequences only if color is enabled.
     /// </summary>
-    /// <param name="color">The string containing the color formatting.</param>
+    /// <param name="color">The color formatting.</param>
     /// <remarks>
-    /// <para>
-    ///   The <paramref name="color"/> should contain one or more virtual terminal sequences
-    ///   from the <see cref="TextFormat"/> class, or another virtual terminal sequence. It
-    ///   should not contain any other characters.
-    /// </para>
     /// <para>
     ///   Nothing is written if the <see cref="UseColor"/> property is <see langword="false"/>.
     /// </para>
@@ -2007,7 +2053,7 @@ public class UsageWriter
     }
 
     /// <summary>
-    /// Returns the color to the previous value, if color is enabled.
+    /// Returns the output color to the value before modifications, if color is enabled.
     /// </summary>
     /// <remarks>
     /// <para>

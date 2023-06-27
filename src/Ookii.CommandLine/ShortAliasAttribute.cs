@@ -10,10 +10,10 @@ namespace Ookii.CommandLine;
 ///   To specify multiple aliases, apply this attribute multiple times.
 /// </note>
 /// <note>
-///   This attribute specifies short name aliases used with <see cref="ParsingMode.LongShort" qualifyHint="true"/>
-///   mode. It is ignored if the <see cref="CommandLineParser.Mode" qualifyHint="true"/> property is not
-///   <see cref="ParsingMode.LongShort" qualifyHint="true"/>, or if the argument doesn't have a primary
-///   <see cref="CommandLineArgumentAttribute.ShortName" qualifyHint="true"/>.
+///   This attribute specifies short name aliases used with <see cref="ParsingMode.LongShort" qualifyHint="true"/>.
+///   It is ignored if the <see cref="CommandLineParser.Mode" qualifyHint="true"/> property is not
+///   <see cref="ParsingMode.LongShort" qualifyHint="true"/>, or if the argument doesn't have a
+///   primary <see cref="CommandLineArgumentAttribute.ShortName" qualifyHint="true"/>.
 /// </note>
 /// <para>
 ///   The short aliases for a command line argument can be used instead of the regular short
@@ -29,6 +29,7 @@ namespace Ookii.CommandLine;
 ///   property to <see langword="false"/> to exclude them.
 /// </para>
 /// </remarks>
+/// <threadsafety static="true" instance="true"/>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Parameter, AllowMultiple = true)]
 public sealed class ShortAliasAttribute : Attribute
 {

@@ -24,6 +24,7 @@ namespace Ookii.CommandLine;
 /// <seealso cref="IParser{TSelf}.Parse(Ookii.CommandLine.ParseOptions?)"/>
 /// <seealso cref="IParserProvider{TSelf}.CreateParser(Ookii.CommandLine.ParseOptions?)"/>
 /// <seealso cref="CommandOptions"/>
+/// <threadsafety static="true" instance="false"/>
 public class ParseOptions
 {
     private CultureInfo? _culture;

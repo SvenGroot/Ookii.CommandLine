@@ -8,24 +8,23 @@ namespace Ookii.CommandLine;
 /// </summary>
 /// <remarks>
 /// <para>
-///   Options can be provided in several ways; you can change the properties of the
-///   <see cref="CommandLineParser"/> class, you can use the <see cref="ParseOptions"/> class,
-///   or you can use the <see cref="ParseOptionsAttribute"/> attribute.
+///   Options for parsing command line arguments can be supplied either using this attribute, or
+///   by using the <see cref="ParseOptions"/> class. Options set using the <see cref="ParseOptions"/>
+///   class will override the equivalent options set in the <see cref="ParseOptionsAttribute"/>
+///   attribute.
 /// </para>
 /// <para>
-///   This attribute allows you to define your preferred parsing behavior declaratively, on
-///   the class that provides the arguments. Apply this attribute to the class to set the
-///   properties.
+///   For subcommands, options set using the <see cref="ParseOptionsAttribute"/> attribute apply
+///   only to the command with the attribute. Apply the attribute to a common base class to set
+///   options for multiple commands, or use the <see cref="Commands.CommandOptions"/> class, which
+///   derives from the <see cref="ParseOptions"/> class, to set options for all commands.
 /// </para>
 /// <para>
-///   If you also use the <see cref="ParseOptions"/> class, any options provided there will
-///   override the options set in this attribute.
-/// </para>
-/// <para>
-///   If you wish to use the default options, you do not need to apply this attribute to your
-///   class at all.
+///   If this is attribute is not present, the default options, or those set in the
+///   <see cref="ParseOptions"/> class, will be used.
 /// </para>
 /// </remarks>
+/// <threadsafety static="true" instance="true"/>
 [AttributeUsage(AttributeTargets.Class)]
 public class ParseOptionsAttribute : Attribute
 {
@@ -56,7 +55,7 @@ public class ParseOptionsAttribute : Attribute
     ///   This property is provided as a convenient way to set a number of related properties that
     ///   together indicate the parser is using POSIX conventions. POSIX conventions in this case
     ///   means that parsing uses long/short mode, argument names are case sensitive, and argument
-    ///   names and value descriptions use dash case (e.g. "argument-name").
+    ///   names and value descriptions use dash-case (e.g. "argument-name").
     /// </para>
     /// <para>
     ///   Setting this property to <see langword="true"/> is equivalent to setting the
@@ -134,14 +133,14 @@ public class ParseOptionsAttribute : Attribute
     /// <value>
     /// An array of prefixes, or <see langword="null"/> to use the value of
     /// <see cref="CommandLineParser.GetDefaultArgumentNamePrefixes()" qualifyHint="true"/>. The default value is
-    /// <see langword="null"/>
+    /// <see langword="null"/>.
     /// </value>
     /// <remarks>
     /// <para>
-    ///   If the <see cref="Mode"/> property is <see cref="ParsingMode.LongShort" qualifyHint="true"/>,
-    ///   or if the parsing mode is set to <see cref="ParsingMode.LongShort" qualifyHint="true"/>
-    ///   elsewhere, this property indicates the short argument name prefixes. Use
-    ///   <see cref="LongArgumentNamePrefix"/> to set the argument prefix for long names.
+    ///   If the <see cref="Mode"/> or <see cref="ParseOptions.Mode" qualifyHint="true"/> property
+    ///   is <see cref="ParsingMode.LongShort" qualifyHint="true"/>, this property indicates the
+    ///   short argument name prefixes. Use <see cref="LongArgumentNamePrefix"/> to set the argument
+    ///   prefix for long names.
     /// </para>
     /// <para>
     ///   This value can be overridden by the <see cref="ParseOptions.ArgumentNamePrefixes" qualifyHint="true"/>
@@ -184,8 +183,13 @@ public class ParseOptionsAttribute : Attribute
     /// <remarks>
     /// <para>
     ///   When <see langword="true" />, the <see cref="CommandLineParser"/> will use
-    ///   <see cref="StringComparer.Ordinal" qualifyHint="true"/> for command line argument comparisons; otherwise,
-    ///   it will use <see cref="StringComparer.OrdinalIgnoreCase" qualifyHint="true"/>.
+    ///   <see cref="StringComparison.Ordinal" qualifyHint="true"/> for command line argument comparisons; otherwise,
+    ///   it will use <see cref="StringComparison.InvariantCulture" qualifyHint="true"/>. Ordinal comparisons are not
+    ///   used for case-sensitive names so that lower and upper case arguments sort together in the usage help.
+    /// </para>
+    /// <para>
+    ///   To use a different <see cref="StringComparison"/> value than the two mentioned here, use the 
+    ///   <see cref="ParseOptions.ArgumentNameComparison" qualifyHint="true"/> property.
     /// </para>
     /// <para>
     ///   This value can be overridden by the <see cref="ParseOptions.ArgumentNameComparison" qualifyHint="true"/>
@@ -210,11 +214,14 @@ public class ParseOptionsAttribute : Attribute
     /// </para>
     /// <para>
     ///   If set to <see cref="ErrorMode.Warning" qualifyHint="true"/>, the <see cref="CommandLineParser{T}.ParseWithErrorHandling()" qualifyHint="true"/>
-    ///   method, the static <see cref="CommandLineParser.Parse{T}(ParseOptions?)" qualifyHint="true"/> method and
-    ///   the <see cref="Commands.CommandManager" qualifyHint="true"/> class will print a warning to the
-    ///   <see cref="ParseOptions.Error" qualifyHint="true"/> stream when a duplicate argument is found. If you are
-    ///   not using these methods, <see cref="ErrorMode.Warning" qualifyHint="true"/> is identical to
-    ///   <see cref="ErrorMode.Allow" qualifyHint="true"/> and no warning is displayed.
+    ///   method, the static <see cref="CommandLineParser.Parse{T}(ParseOptions?)" qualifyHint="true"/>
+    ///   method, the generated <see cref="IParser{TSelf}.Parse(ParseOptions?)" qualifyHint="true"/>
+    ///   method, and the <see cref="Commands.CommandManager" qualifyHint="true"/> class will print
+    ///   a warning to the <see cref="ParseOptions.Error" qualifyHint="true"/> stream when a
+    ///   duplicate argument is found. If you are not using these methods, <see cref="ErrorMode.Warning" qualifyHint="true"/>
+    ///   is identical to <see cref="ErrorMode.Allow" qualifyHint="true"/> and no warning is
+    ///   displayed. To manually display a warning, use the <see cref="CommandLineParser.DuplicateArgument" qualifyHint="true"/>
+    ///   event.
     /// </para>
     /// <para>
     ///   This value can be overridden by the <see cref="ParseOptions.DuplicateArguments" qualifyHint="true"/>
@@ -230,8 +237,8 @@ public class ParseOptionsAttribute : Attribute
     /// </summary>
     /// <value>
     ///   <see langword="true"/> if white space is allowed to separate an argument name and its
-    ///   value; <see langword="false"/> if only the values from <see cref="NameValueSeparators"/>
-    ///   are allowed. The default value is <see langword="true"/>.
+    ///   value; <see langword="false"/> if only the values from tne <see cref="NameValueSeparators"/>
+    ///   property are allowed. The default value is <see langword="true"/>.
     /// </value>
     /// <remarks>
     /// <para>
@@ -243,7 +250,7 @@ public class ParseOptionsAttribute : Attribute
     public bool AllowWhiteSpaceValueSeparator { get; set; } = true;
 
     /// <summary>
-    /// Gets or sets the character used to separate the name and the value of an argument.
+    /// Gets or sets the characters used to separate the name and the value of an argument.
     /// </summary>
     /// <value>
     ///   The characters used to separate the name and the value of an argument, or <see langword="null"/>
@@ -298,7 +305,8 @@ public class ParseOptionsAttribute : Attribute
     ///   <see langword="true"/>.
     /// </para>
     /// <para>
-    ///   The name, aliases and description can be customized by using a custom <see cref="LocalizedStringProvider"/>.
+    ///   The name, aliases and description can be customized by using a custom <see cref="LocalizedStringProvider"/>
+    ///   class.
     /// </para>
     /// <para>
     ///   This value can be overridden by the <see cref="ParseOptions.AutoHelpArgument" qualifyHint="true"/>
@@ -332,7 +340,8 @@ public class ParseOptionsAttribute : Attribute
     ///   The automatic version argument will never be created for subcommands.
     /// </note>
     /// <para>
-    ///   The name and description can be customized by using a custom <see cref="LocalizedStringProvider"/>.
+    ///   The name and description can be customized by using a custom <see cref="LocalizedStringProvider"/>
+    ///   class.
     /// </para>
     /// <para>
     ///   This value can be overridden by the <see cref="ParseOptions.AutoVersionArgument" qualifyHint="true"/>
@@ -357,9 +366,9 @@ public class ParseOptionsAttribute : Attribute
     ///   If this property is <see langword="true"/>, the <see cref="CommandLineParser"/> class
     ///   will consider any prefix that uniquely identifies an argument by its name or one of its
     ///   explicit aliases as an alias for that argument. For example, given two arguments "Port"
-    ///   and "Protocol", "Po" and "Port" would be an alias for "Port, and "Pr" an alias for
+    ///   and "Protocol", "Po" and "Por" would be an alias for "Port, and "Pr" an alias for
     ///   "Protocol" (as well as "Pro", "Prot", "Proto", etc.). "P" would not be an alias because it
-    ///   doesn't uniquely identify a single argument.
+    ///   does not uniquely identify a single argument.
     /// </para>
     /// <para>
     ///   When using <see cref="ParsingMode.LongShort" qualifyHint="true"/>, this only applies to long names. Explicit
@@ -388,7 +397,7 @@ public class ParseOptionsAttribute : Attribute
     /// <remarks>
     /// <para>
     ///   This property has no effect on explicit value description specified with the
-    ///   <see cref="CommandLineArgument.ValueDescription" qualifyHint="true"/> property or the
+    ///   <see cref="ValueDescriptionAttribute" qualifyHint="true"/> attribute or the
     ///   <see cref="ParseOptions.DefaultValueDescriptions" qualifyHint="true"/> property.
     /// </para>
     /// <para>

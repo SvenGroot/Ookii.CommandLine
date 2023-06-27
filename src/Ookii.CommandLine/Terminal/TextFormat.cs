@@ -250,7 +250,7 @@ public readonly struct TextFormat : IEquatable<TextFormat>
     public override int GetHashCode() => Value.GetHashCode();
 
     /// <summary>
-    /// Gets the text formatting string/
+    /// Gets the text formatting string.
     /// </summary>
     /// <value>
     /// A string containing virtual terminal sequences, or an empty string if this structure was

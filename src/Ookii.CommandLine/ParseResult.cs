@@ -3,10 +3,11 @@
 namespace Ookii.CommandLine;
 
 /// <summary>
-/// Indicates the result of the last call to the <see cref="CommandLineParser.Parse(string[], int)" qualifyHint="true"/>
-/// method.
+/// Indicates the result of the last call to the <see cref="CommandLineParser.Parse()" qualifyHint="true"/>
+/// method or one of its overloads.
 /// </summary>
 /// <seealso cref="CommandLineParser.ParseResult" qualifyHint="true"/>
+/// <threadsafety static="true" instance="true"/>
 public readonly struct ParseResult
 {
     private ParseResult(ParseStatus status, CommandLineArgumentException? exception = null, string? argumentName = null,
@@ -19,7 +20,7 @@ public readonly struct ParseResult
     }
 
     /// <summary>
-    /// Gets the status of the last call to the <see cref="CommandLineParser.Parse(string[], int)" qualifyHint="true"/>
+    /// Gets the status of the last call to the <see cref="CommandLineParser.Parse()" qualifyHint="true"/>
     /// method.
     /// </summary>
     /// <value>
@@ -29,7 +30,7 @@ public readonly struct ParseResult
 
     /// <summary>
     /// Gets the exception that occurred during the last call to the
-    /// <see cref="CommandLineParser.Parse(string[], int)" qualifyHint="true"/> method, if any.
+    /// <see cref="CommandLineParser.Parse()" qualifyHint="true"/> method, if any.
     /// </summary>
     /// <value>
     /// The exception, or <see langword="null"/> if parsing was successful or canceled.
@@ -40,10 +41,12 @@ public readonly struct ParseResult
     /// Gets the name of the argument that caused the error or cancellation.
     /// </summary>
     /// <value>
-    /// If the <see cref="Status"/> property is <see cref="ParseStatus.Error" qualifyHint="true"/>, the value of
-    /// the <see cref="CommandLineArgumentException.ArgumentName" qualifyHint="true"/> property. If it's
-    /// <see cref="ParseStatus.Canceled" qualifyHint="true"/>, the name of the argument that canceled parsing.
-    /// Otherwise, <see langword="null"/>.
+    /// If the <see cref="Status"/> property is <see cref="ParseStatus.Error" qualifyHint="true"/>,
+    /// the value of the <see cref="CommandLineArgumentException.ArgumentName" qualifyHint="true"/>
+    /// property. If it's <see cref="ParseStatus.Canceled" qualifyHint="true"/>, or
+    /// <see cref="ParseStatus.Success" qualifyHint="true"/> if <see cref="CancelMode.Success" qualifyHint="true"/>
+    /// was used, the name of the argument that canceled parsing. Otherwise,
+    /// <see langword="null"/>.
     /// </value>
     public string? ArgumentName { get; }
 
@@ -79,7 +82,8 @@ public readonly struct ParseResult
     /// Gets a <see cref="ParseResult"/> instance that represents successful parsing.
     /// </summary>
     /// <param name="cancelArgumentName">
-    /// The name of the argument that canceled parsing using <see cref="CancelMode.Success" qualifyHint="true"/>.
+    /// The name of the argument that canceled parsing using <see cref="CancelMode.Success" qualifyHint="true"/>,
+    /// or <see langword="null"/> if parsing was not canceled.
     /// </param>
     /// <param name="remainingArguments">Any remaining arguments that were not parsed.</param>
     /// <returns>

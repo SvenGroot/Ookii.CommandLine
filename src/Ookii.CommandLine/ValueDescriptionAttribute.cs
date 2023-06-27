@@ -6,12 +6,6 @@ namespace Ookii.CommandLine;
 /// <summary>
 /// Supplies a short description of the arguments's value to use when printing usage information.
 /// </summary>
-/// <value>
-/// The description of the value, or <see langword="null"/> to indicate that the property's
-/// type name should be used, applying the <see cref="NameTransform"/> specified by the
-/// <see cref="ParseOptions.ValueDescriptionTransform" qualifyHint="true"/> or <see cref="ParseOptionsAttribute.ValueDescriptionTransform" qualifyHint="true"/>
-/// property.
-/// </value>
 /// <remarks>
 /// <para>
 ///   The value description is a short, typically one-word description that indicates the
@@ -30,7 +24,7 @@ namespace Ookii.CommandLine;
 ///   use the <see cref="ParseOptions.DefaultValueDescriptions" qualifyHint="true"/> property.
 /// </para>
 /// <para>
-///   The value description is used only when generating usage help. For example, the usage for an
+///   The value description is used when generating usage help. For example, the usage for an
 ///   argument named Sample with a value description of String would look like "-Sample &lt;String&gt;".
 /// </para>
 /// <para>
@@ -49,8 +43,10 @@ public class ValueDescriptionAttribute : Attribute
     /// <summary>
     /// Initializes a new instance of the <see cref="ValueDescriptionAttribute"/> attribute.
     /// </summary>
-    /// <param name="valueDescription"></param>
-    /// <exception cref="ArgumentNullException"></exception>
+    /// <param name="valueDescription">The value description for the argument.</param>
+    /// <exception cref="ArgumentNullException">
+    /// <paramref name="valueDescription"/> is <see langword="null"/>.
+    /// </exception>
     public ValueDescriptionAttribute(string valueDescription)
     {
         ValueDescriptionValue = valueDescription ?? throw new ArgumentNullException(nameof(valueDescription));
