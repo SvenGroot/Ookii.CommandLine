@@ -11,6 +11,10 @@ namespace Ookii.CommandLine.Commands;
 ///   interface, that will be invoked by the <see cref="CommandManager.RunCommandAsync()" qualifyHint="true"/>
 ///   method and its overloads. This allows you to write tasks that use asynchronous code.
 /// </para>
+/// <para>
+///   Use the <see cref="AsyncCommandBase"/> class as a base class for your command to get a default
+///   implementation of the <see cref="ICommand.Run" qualifyHint="true"/>
+/// </para>
 /// </remarks>
 public interface IAsyncCommand : ICommand
 {

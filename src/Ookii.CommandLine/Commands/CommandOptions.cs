@@ -5,6 +5,7 @@ namespace Ookii.CommandLine.Commands;
 /// <summary>
 /// Provides options for the <see cref="CommandManager"/> class.
 /// </summary>
+/// <threadsafety static="true" instance="false"/>
 public class CommandOptions : ParseOptions
 {
     /// <summary>
@@ -19,8 +20,8 @@ public class CommandOptions : ParseOptions
     ///   This property is provided as a convenient way to set a number of related properties
     ///   that together indicate the parser is using POSIX conventions. POSIX conventions in
     ///   this case means that parsing uses long/short mode, argument and command names are case
-    ///   sensitive, and argument names, command names and value descriptions use dash case
-    ///   (e.g. "argument-name").
+    ///   sensitive, and argument names, command names and value descriptions use dash-case
+    ///   (e.g. "command-name").
     /// </para>
     /// <para>
     ///   Setting this property to <see langword="true"/> is equivalent to setting the
@@ -33,9 +34,9 @@ public class CommandOptions : ParseOptions
     /// </para>
     /// <para>
     ///   This property will only return <see langword="true"/> if the above properties are the
-    ///   indicated values, except that <see cref="ParseOptions.ArgumentNameComparison" qualifyHint="true"/> and
-    ///   <see cref="CommandNameComparison"/> can be any case-sensitive comparison. It will
-    ///   return <see langword="false"/> for any other combination of values, not just the ones
+    ///   indicated values, except that the <see cref="ParseOptions.ArgumentNameComparison" qualifyHint="true"/> and
+    ///   <see cref="CommandNameComparison"/> properties can be any case-sensitive comparison. It
+    ///   will return <see langword="false"/> for any other combination of values, not just the ones
     ///   indicated below.
     /// </para>
     /// <para>
@@ -68,7 +69,7 @@ public class CommandOptions : ParseOptions
     }
 
     /// <summary>
-    /// Gets or set the type of string comparison to use for argument names.
+    /// Gets or sets the type of string comparison to use for argument names.
     /// </summary>
     /// <value>
     /// One of the values of the <see cref="StringComparison"/> enumeration. The default value
@@ -120,13 +121,13 @@ public class CommandOptions : ParseOptions
     ///   name.
     /// </para>
     /// <para>
-    ///   For example, if you have a subcommand class named "CreateFileCommand" and you use
-    ///   <see cref="NameTransform.DashCase" qualifyHint="true"/> and the default value of "Command" for this
-    ///   property, the name of the command will be "create-file" without having to explicitly
-    ///   specify it.
+    ///   For example, if you have a subcommand class named <c>CreateFileCommand</c> and you use
+    ///   <see cref="NameTransform.DashCase" qualifyHint="true"/> and the default value of "Command"
+    ///   for this property, the name of the command will be "create-file" without having to
+    ///   explicitly specify it.
     /// </para>
     /// <para>
-    ///   The suffix is case sensitive.
+    ///   The value of this property is case sensitive.
     /// </para>
     /// </remarks>
     public string? StripCommandNameSuffix { get; set; } = "Command";
@@ -140,13 +141,15 @@ public class CommandOptions : ParseOptions
     /// </value>
     /// <remarks>
     /// <para>
-    ///   Use this to only use a subset of the commands defined in the assembly or assemblies.
-    ///   The remaining commands will not be possible to invoke by the user.
+    ///   Return <see langword="true"/> from the filter predicate to include a command, and
+    ///   <see langword="false"/> to exclude it. If this property is <see langword="null"/>, all
+    ///   commands will be included.
     /// </para>
-    /// <note>
-    ///   The filter is not invoked for the automatic version command. Set the <see cref="AutoVersionCommand"/>
-    ///   property to <see langword="false"/> if you wish to exclude that command.
-    /// </note>
+    /// <para>
+    ///   Use this filter to only use a subset of the commands defined in the assembly or
+    ///   assemblies. The commands that do not match this filter cannot be invoked by the end user,
+    ///   and will not be returned by the methods of the <see cref="CommandManager"/> class.
+    /// </para>
     /// </remarks>
     public Func<CommandInfo, bool>? CommandFilter { get; set; }
 
@@ -166,7 +169,7 @@ public class CommandOptions : ParseOptions
     /// </para>
     /// <para>
     ///   All other commands are filtered out and will not be returned, created, or executed
-    ///   by the command manager.
+    ///   by the <see cref="CommandManager"/> class.
     /// </para>
     /// </remarks>
     public Type? ParentCommand { get; set; }
@@ -183,14 +186,22 @@ public class CommandOptions : ParseOptions
     /// <para>
     ///   If this property is true, a command named "version" will be automatically added to
     ///   the list of available commands, unless a command with that name already exists.
+    /// </para>
+    /// <para>
     ///   When invoked, the command will show version information for the application, based
     ///   on the entry point assembly.
     /// </para>
+    /// <para>
+    ///   You can customize the name and description of the automatic version command using the
+    ///   <see cref="LocalizedStringProvider"/> class.
+    /// </para>
     /// </remarks>
+    /// <seealso cref="LocalizedStringProvider.AutomaticVersionCommandName" qualifyHint="true"/>
+    /// <seealso cref="LocalizedStringProvider.AutomaticVersionCommandDescription" qualifyHint="true"/>
     public bool AutoVersionCommand { get; set; } = true;
 
     /// <summary>
-    /// Gets or sets a value that indicates whether unique prefixes of a command name are
+    /// Gets or sets a value that indicates whether unique prefixes of a command name or alias are
     /// automatically used as aliases.
     /// </summary>
     /// <value>
@@ -202,7 +213,7 @@ public class CommandOptions : ParseOptions
     /// <para>
     ///   If this property is <see langword="true"/>, the <see cref="CommandManager"/> class
     ///   will consider any prefix that uniquely identifies a command by its name or one of its
-    ///   explicit aliases as an alias for that argument. For example, given two commands "read"
+    ///   explicit aliases as an alias for that command. For example, given two commands "read"
     ///   and "record", "rea" would be an alias for "read", and "rec" an alias for
     ///   "record" (as well as "reco" and "recor"). Both "r" and "re" would not be an alias
     ///   because they don't uniquely identify a single command.

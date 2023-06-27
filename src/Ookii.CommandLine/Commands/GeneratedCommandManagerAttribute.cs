@@ -8,17 +8,22 @@ namespace Ookii.CommandLine.Commands;
 /// </summary>
 /// <remarks>
 /// <para>
-///   When using this attribute, source generation is used to find and instantiate subcommand
-///   classes in the current assembly, or the assemblies specified using the <see cref="AssemblyNames"/> 
-///   property. The target class will be modified to inherit from the <see cref="CommandManager"/>
-///   class, and should be used instead of the <see cref="CommandManager"/> class to find, create,
-///   and run commands.
+///   When using this attribute, source generation is used to determine which classes are available
+///   at compile time, either in the assembly being compiled, or the assemblies specified using the
+///   <see cref="AssemblyNames"/> property. The target class will be modified to inherit from the
+///   <see cref="CommandManager"/> class, and should be used instead of the <see cref="CommandManager"/>
+///   class to find, create, and run commands.
+/// </para>
+/// <para>
+///   Using a class with this attribute avoids the use of runtime reflection to determine which
+///   commands are available, improving performance and allowing your application to be trimmed.
 /// </para>
 /// <para>
 ///   To use source generation for the command line arguments of individual commands, use the
-///   <see cref="GeneratedParserAttribute"/> attribute on the command class.
+///   <see cref="GeneratedParserAttribute"/> attribute on each command class.
 /// </para>
 /// </remarks>
+/// <threadsafety static="true" instance="true"/>
 /// <seealso href="https://github.com/SvenGroot/Ookii.CommandLine/blob/main/docs/SourceGeneration.md">Source generation</seealso>
 [AttributeUsage(AttributeTargets.Class)]
 public sealed class GeneratedCommandManagerAttribute : Attribute
@@ -34,8 +39,9 @@ public sealed class GeneratedCommandManagerAttribute : Attribute
     /// <remarks>
     /// <note>
     ///   The assemblies used must be directly referenced by your project. Dynamically loading
-    ///   assemblies is not supported by this method; use the <see cref="CommandManager(IEnumerable{System.Reflection.Assembly}, CommandOptions?)"/>
-    ///   constructor instead.
+    ///   assemblies is not supported by this attribute; use the
+    ///   <see cref="CommandManager(IEnumerable{System.Reflection.Assembly}, CommandOptions?)"/>
+    ///   constructor instead for that purpose.
     /// </note>
     /// <para>
     ///   The names in this array can be either just the assembly name, or the full assembly

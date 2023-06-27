@@ -8,8 +8,8 @@ namespace Ookii.CommandLine.Commands;
 /// </summary>
 /// <remarks>
 /// <para>
-///   If you wish to have a command with nested subcommands, apply this attribute to the nested
-///   subcommand classes. The <see cref="CommandManager"/> class will only return commands whose
+///   If you wish to have a command with nested subcommands, apply this attribute to the children
+///   of another command. The <see cref="CommandManager"/> class will only return commands whose
 ///   <see cref="ParentCommandTypeName"/> property value matches the <see cref="CommandOptions.ParentCommand" qualifyHint="true"/>
 ///   property.
 /// </para>
@@ -24,7 +24,7 @@ namespace Ookii.CommandLine.Commands;
 ///   nested subcommands.
 /// </para>
 /// </remarks>
-/// <threadsafety static="true" instance="true"/>
+/// <threadsafety static="true" instance="true"/>   
 [AttributeUsage(AttributeTargets.Class)]
 public sealed class ParentCommandAttribute : Attribute
 {
