@@ -60,21 +60,6 @@ internal class ReflectionCommandInfo : CommandInfo
         return (ICommandWithCustomParsing)Activator.CreateInstance(CommandType)!;
     }
 
-    internal static CommandAttribute? GetCommandAttribute(Type commandType)
-    {
-        if (commandType == null)
-        {
-            throw new ArgumentNullException(nameof(commandType));
-        }
-
-        if (commandType.IsAbstract || !commandType.ImplementsInterface(typeof(ICommand)))
-        {
-            return null;
-        }
-
-        return commandType.GetCustomAttribute<CommandAttribute>();
-    }
-
     private static CommandAttribute GetCommandAttributeOrThrow(Type commandType)
     {
         return GetCommandAttribute(commandType) ??

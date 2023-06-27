@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Reflection;
 
 namespace Ookii.CommandLine.Commands;
 
@@ -434,13 +435,34 @@ public abstract class CommandInfo
     /// <exception cref="ArgumentNullException">
     /// <paramref name="commandType"/> is <see langword="null"/>.
     /// </exception>
+    public static bool IsCommand(
 #if NET6_0_OR_GREATER
-    [RequiresUnreferencedCode("Command information cannot be statically determined using reflection. Consider using the GeneratedParserAttribute and GeneratedCommandManagerAttribute.", Url = CommandLineParser.UnreferencedCodeHelpUrl)]
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.Interfaces)]
 #endif
-    public static bool IsCommand(Type commandType) => ReflectionCommandInfo.GetCommandAttribute(commandType) != null;
+        Type commandType
+        ) => GetCommandAttribute(commandType) != null;
 
     internal static CommandInfo GetAutomaticVersionCommand(CommandManager manager)
         => new AutomaticVersionCommandInfo(manager);
+
+    internal static CommandAttribute? GetCommandAttribute(
+#if NET6_0_OR_GREATER
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.Interfaces)]
+#endif
+        Type commandType)
+    {
+        if (commandType == null)
+        {
+            throw new ArgumentNullException(nameof(commandType));
+        }
+
+        if (commandType.IsAbstract || !commandType.ImplementsInterface(typeof(ICommand)))
+        {
+            return null;
+        }
+
+        return commandType.GetCustomAttribute<CommandAttribute>();
+    }
 
     private static string GetName(CommandAttribute attribute, Type commandType, CommandOptions? options)
     {
