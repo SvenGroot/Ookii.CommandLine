@@ -343,6 +343,7 @@ public class CommandLineParser
     ///   parsing behavior. See the <see cref="Options"/> property for details.
     /// </para>
     /// </remarks>
+    /// <seealso cref="GeneratedParserAttribute"/>
     public CommandLineParser(ArgumentProvider provider, ParseOptions? options = null)
     {
         _provider = provider ?? throw new ArgumentNullException(nameof(provider));

@@ -23,7 +23,7 @@ public interface ICommand
     /// <returns>The exit code for the command.</returns>
     /// <remarks>
     /// <para>
-    ///   Typically, your applications <c>Main()</c> method should return the exit code of the
+    ///   Typically, your application's <c>Main()</c> method should return the exit code of the
     ///   command that was executed.
     /// </para>
     /// </remarks>
