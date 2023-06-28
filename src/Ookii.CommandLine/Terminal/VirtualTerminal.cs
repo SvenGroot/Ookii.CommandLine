@@ -12,6 +12,7 @@ namespace Ookii.CommandLine.Terminal;
 ///   if enabled by the <see cref="UsageWriter"/> class.
 /// </para>
 /// </remarks>
+/// <threadsafety static="true" instance="false"/>
 public static class VirtualTerminal
 {
     /// <summary>

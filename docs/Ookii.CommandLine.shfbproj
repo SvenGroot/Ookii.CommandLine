@@ -31,7 +31,7 @@
   Provides functionality for creating applications with multiple subcommands, each with their own arguments.
 &lt;/para&gt;</NamespaceSummaryItem>
 <NamespaceSummaryItem name="Ookii.CommandLine.Terminal" isDocumented="True">&lt;para&gt;
-  Provides helpers for supporting virtual terminal sequences and color output.
+  Provides helpers for using virtual terminal sequences and color output on the console.
 &lt;/para&gt;</NamespaceSummaryItem>
 <NamespaceSummaryItem name="Ookii.CommandLine.Validation" isDocumented="True">&lt;para&gt;
   Provides attributes used to validate the value of arguments, and the relation between arguments.

@@ -8,9 +8,9 @@ namespace Ookii.CommandLine.Terminal;
 /// </summary>
 /// <remarks>
 /// <para>
-///   Write one of the predefined values in this class to a stream representing the console, such
-///   as <see cref="Console.Out"/> or <see cref="Console.Error"/>, to set the specified text format
-///   on that stream.
+///   Write one of the predefined values in this structure to a stream representing the console,
+///   such as <see cref="Console.Out"/> or <see cref="Console.Error"/>, to set the specified text
+///   format on that stream.
 /// </para>
 /// <para>
 ///   You should only write VT sequences to the console if they are supported. Use the
@@ -22,6 +22,7 @@ namespace Ookii.CommandLine.Terminal;
 ///   the <see cref="Combine"/> method or the <see cref="operator +"/> operator.
 /// </para>
 /// </remarks>
+/// <threadsafety static="true" instance="true"/>
 public readonly struct TextFormat : IEquatable<TextFormat>
 {
     /// <summary>
@@ -33,23 +34,23 @@ public readonly struct TextFormat : IEquatable<TextFormat>
     /// </summary>
     public static readonly TextFormat BoldBright = new("\x1b[1m");
     /// <summary>
-    /// Removes the brightness/intensity flag to the foreground color.
+    /// Removes the brightness/intensity flag from the foreground color.
     /// </summary>
     public static readonly TextFormat NoBoldBright = new("\x1b[22m");
     /// <summary>
-    /// Adds underline.
+    /// Adds underlining to the text.
     /// </summary>
     public static readonly TextFormat Underline = new("\x1b[4m");
     /// <summary>
-    /// Removes underline.
+    /// Removes underlining from the text.
     /// </summary>
     public static readonly TextFormat NoUnderline = new("\x1b[24m");
     /// <summary>
-    /// Swaps foreground and background colors.
+    /// Swaps the foreground and background colors.
     /// </summary>
     public static readonly TextFormat Negative = new("\x1b[7m");
     /// <summary>
-    /// Returns foreground and background colors to normal.
+    /// Returns the foreground and background colors to their normal, non-swapped state.
     /// </summary>
     public static readonly TextFormat Positive = new("\x1b[27m");
     /// <summary>
@@ -192,8 +193,8 @@ public readonly struct TextFormat : IEquatable<TextFormat>
     private readonly string? _value;
 
     /// <summary>
-    /// Returns the virtual terminal sequence to the foreground or background color to an RGB
-    /// color.
+    /// Returns a virtual terminal sequence that can be used to set the foreground or background
+    /// color to an RGB color.
     /// </summary>
     /// <param name="color">The color to use.</param>
     /// <param name="foreground">
@@ -267,7 +268,7 @@ public readonly struct TextFormat : IEquatable<TextFormat>
     public static TextFormat operator +(TextFormat left, TextFormat right) => left.Combine(right);
 
     /// <summary>
-    /// Determine whether this instance and another <see cref="TextFormat"/> instance have the
+    /// Determines whether this instance and another <see cref="TextFormat"/> instance have the
     /// same value.
     /// </summary>
     /// <param name="left">The first <see cref="TextFormat"/> value.</param>
@@ -278,7 +279,7 @@ public readonly struct TextFormat : IEquatable<TextFormat>
     public static bool operator ==(TextFormat left, TextFormat right) => left.Equals(right);
 
     /// <summary>
-    /// Determine whether this instance and another <see cref="TextFormat"/> instance have a
+    /// Determines whether this instance and another <see cref="TextFormat"/> instance have a
     /// different value.
     /// </summary>
     /// <param name="left">The first <see cref="TextFormat"/> value.</param>

@@ -9,6 +9,7 @@ namespace Ookii.CommandLine.Terminal;
 /// On Windows, this restores the terminal mode to its previous value when disposed or
 /// destructed. On other platforms, this does nothing.
 /// </remarks>
+/// <threadsafety static="true" instance="false"/>
 public sealed class VirtualTerminalSupport : IDisposable
 {
     private readonly bool _supported;
@@ -31,6 +32,14 @@ public sealed class VirtualTerminalSupport : IDisposable
     /// <summary>
     /// Cleans up resources for the <see cref="VirtualTerminalSupport"/> class.
     /// </summary>
+    /// <remarks>
+    /// <para>
+    ///   This method will disable VT support on Windows if it was enabled by the call to
+    ///   <see cref="VirtualTerminal.EnableColor" qualifyHint="true"/> or
+    ///   <see cref="VirtualTerminal.EnableVirtualTerminalSequences" qualifyHint="true"/> that
+    ///   created this instance.
+    /// </para>
+    /// </remarks>
     ~VirtualTerminalSupport()
     {
         ResetConsoleMode();
@@ -45,7 +54,17 @@ public sealed class VirtualTerminalSupport : IDisposable
     /// </value>
     public bool IsSupported => _supported;
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Cleans up resources for the <see cref="VirtualTerminalSupport"/> class.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    ///   This method will disable VT support on Windows if it was enabled by the call to
+    ///   <see cref="VirtualTerminal.EnableColor" qualifyHint="true"/> or
+    ///   <see cref="VirtualTerminal.EnableVirtualTerminalSequences" qualifyHint="true"/> that
+    ///   created this instance.
+    /// </para>
+    /// </remarks>
     public void Dispose()
     {
         ResetConsoleMode();
