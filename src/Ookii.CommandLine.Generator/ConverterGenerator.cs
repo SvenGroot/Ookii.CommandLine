@@ -182,37 +182,15 @@ internal class ConverterGenerator
         string inputType = info.UseSpan ? "System.ReadOnlySpan<char>" : "string";
         string culture = info.HasCulture ? ", culture" : string.Empty;
         builder.AppendLine($"public override object? Convert({inputType} value, System.Globalization.CultureInfo culture, Ookii.CommandLine.CommandLineArgument argument)");
-        builder.OpenBlock();
-        builder.AppendLine("try");
-        builder.OpenBlock();
         if (info.ParseMethod)
         {
-            builder.AppendLine($"return {type.ToQualifiedName()}.Parse(value{culture});");
+            builder.AppendLine($"    => {type.ToQualifiedName()}.Parse(value{culture});");
         }
         else
         {
-            builder.AppendLine($"return new {type.ToQualifiedName()}(value);");
+            builder.AppendLine($"    => new {type.ToQualifiedName()}(value);");
         }
 
-        builder.CloseBlock(); // try
-        builder.AppendLine("catch (Ookii.CommandLine.CommandLineArgumentException ex)");
-        builder.OpenBlock();
-        // Patch the exception with the argument name.
-        builder.AppendLine("throw new Ookii.CommandLine.CommandLineArgumentException(ex.Message, argument.ArgumentName, ex.Category, ex.InnerException);");
-        builder.CloseBlock(); // catch
-        builder.AppendLine("catch (System.FormatException)");
-        builder.OpenBlock();
-        builder.AppendLine("throw;");
-        builder.CloseBlock(); // catch
-        builder.AppendLine("catch (System.OverflowException)");
-        builder.OpenBlock();
-        builder.AppendLine("throw;");
-        builder.CloseBlock(); // catch
-        builder.AppendLine("catch (System.Exception ex)");
-        builder.OpenBlock();
-        builder.AppendLine("throw new System.FormatException(ex.Message, ex);");
-        builder.CloseBlock(); // catch
-        builder.CloseBlock(); // Convert method
         if (info.UseSpan)
         {
             builder.AppendLine();

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.Reflection;
+using System.Runtime.ExceptionServices;
 
 namespace Ookii.CommandLine.Conversion;
 
@@ -25,26 +27,21 @@ internal class ConstructorConverter : ArgumentConverter
     {
         try
         {
-            return _type.CreateInstance(value);
+            // Since we are passing BindingFlags.Public, the correct annotation is present.
+            return Activator.CreateInstance(_type, value);
         }
-        catch (CommandLineArgumentException ex)
+        catch (TargetInvocationException ex)
         {
-            // Patch the exception with the argument name.
-            throw new CommandLineArgumentException(ex.Message, argument.ArgumentName, ex.Category, ex.InnerException);
-        }
-        catch (FormatException)
-        {
+            if (ex.InnerException == null)
+            {
+                throw;
+            }
+
+            // Rethrow inner exception with original call stack.
+            ExceptionDispatchInfo.Capture(ex.InnerException).Throw();
+
+            // Actually unreachable.
             throw;
-        }
-        catch (OverflowException)
-        {
-            throw;
-        }
-        catch (Exception ex)
-        {
-            // Since we don't know what the constructor will throw, we'll wrap anything in a
-            // FormatException.
-            throw new FormatException(ex.Message, ex);
         }
     }
 }

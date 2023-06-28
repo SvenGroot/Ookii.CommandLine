@@ -1259,16 +1259,19 @@ public abstract class CommandLineArgument
 
             return converted;
         }
-        catch (NotSupportedException ex)
+        catch (CommandLineArgumentException ex)
         {
-            throw _parser.StringProvider.CreateException(CommandLineArgumentErrorCategory.ArgumentValueConversion, ex, this, stringValue ?? spanValue.ToString());
+            if (ex.ArgumentName == ArgumentName)
+            {
+                throw;
+            }
+
+            // Patch with the correct argument name.
+            throw new CommandLineArgumentException(ex.Message, ArgumentName, ex.Category, ex);
         }
-        catch (FormatException ex)
+        catch (Exception ex)
         {
-            throw _parser.StringProvider.CreateException(CommandLineArgumentErrorCategory.ArgumentValueConversion, ex, this, stringValue ?? spanValue.ToString());
-        }
-        catch (OverflowException ex)
-        {
+            // Wrap any other exception in a CommandLineArgumentException.
             throw _parser.StringProvider.CreateException(CommandLineArgumentErrorCategory.ArgumentValueConversion, ex, this, stringValue ?? spanValue.ToString());
         }
     }

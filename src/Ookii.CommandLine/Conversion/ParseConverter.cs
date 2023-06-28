@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using System.Reflection;
+using System.Runtime.ExceptionServices;
 
 namespace Ookii.CommandLine.Conversion;
 
@@ -25,24 +26,18 @@ internal class ParseConverter : ArgumentConverter
         {
             return _method.Invoke(null, parameters);
         }
-        catch (CommandLineArgumentException ex)
+        catch (TargetInvocationException ex)
         {
-            // Patch the exception with the argument name.
-            throw new CommandLineArgumentException(ex.Message, argument.ArgumentName, ex.Category, ex.InnerException);
-        }
-        catch (FormatException)
-        {
+            if (ex.InnerException == null)
+            {
+                throw;
+            }
+
+            // Rethrow inner exception with original call stack.
+            ExceptionDispatchInfo.Capture(ex.InnerException).Throw();
+
+            // Actually unreachable.
             throw;
-        }
-        catch (OverflowException)
-        {
-            throw;
-        }
-        catch (Exception ex)
-        {
-            // Since we don't know what the method will throw, we'll wrap anything in a
-            // FormatException.
-            throw new FormatException(ex.Message, ex);
         }
     }
 }

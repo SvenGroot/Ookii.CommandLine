@@ -73,20 +73,6 @@ static class TypeHelper
         return Activator.CreateInstance(type);
     }
 
-    public static object? CreateInstance(
-#if NET6_0_OR_GREATER
-        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
-#endif
-        this Type type, params object?[]? args)
-    {
-        if (type == null)
-        {
-            throw new ArgumentNullException(nameof(type));
-        }
-
-        return Activator.CreateInstance(type, args);
-    }
-
 #if NET6_0_OR_GREATER
     [RequiresUnreferencedCode("Argument information cannot be statically determined using reflection. Consider using the GeneratedParserAttribute.", Url = CommandLineParser.UnreferencedCodeHelpUrl)]
 #endif
