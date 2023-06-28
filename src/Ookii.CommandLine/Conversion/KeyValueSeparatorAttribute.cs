@@ -16,6 +16,7 @@ namespace Ookii.CommandLine.Conversion;
 ///   attribute, or if the argument is not a dictionary argument.
 /// </para>
 /// </remarks>
+/// <threadsafety static="true" instance="true"/>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Parameter)]
 public class KeyValueSeparatorAttribute : Attribute
 {
@@ -45,5 +46,8 @@ public class KeyValueSeparatorAttribute : Attribute
     /// <summary>
     /// Gets the separator.
     /// </summary>
+    /// <value>
+    /// The separator.
+    /// </value>
     public string Separator => _separator;
 }

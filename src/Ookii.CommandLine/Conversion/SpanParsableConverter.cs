@@ -6,16 +6,17 @@ using System.Globalization;
 namespace Ookii.CommandLine.Conversion;
 
 /// <summary>
-/// An argument converter for types that implement <see cref="ISpanParsable{TSelf}"/>.
+/// An argument converter for types that implement the <see cref="ISpanParsable{TSelf}"/> interface.
 /// </summary>
-/// <typeparam name="T">The type to convert.</typeparam>
+/// <typeparam name="T">The type to convert to.</typeparam>
 /// <remarks>
 /// <para>
-///   Conversion is performed using the <see cref="ISpanParsable{TSelf}.Parse" qualifyHint="true"/> method.
+///   Conversion is performed using the <see cref="ISpanParsable{TSelf}.Parse" qualifyHint="true"/>
+///   method.
 /// </para>
 /// <para>
-///   For types that implement <see cref="IParsable{TSelf}"/>, but not <see cref="ISpanParsable{TSelf}"/>,
-///   use the <see cref="ParsableConverter{T}"/>.
+///   For types that implement the <see cref="IParsable{TSelf}"/> interface, but not the <see cref="ISpanParsable{TSelf}"/>
+///   interface, use the <see cref="ParsableConverter{T}"/> class.
 /// </para>
 /// </remarks>
 /// <threadsafety instance="true" static="true"/>

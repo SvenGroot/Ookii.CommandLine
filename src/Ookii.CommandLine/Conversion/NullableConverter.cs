@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 
 namespace Ookii.CommandLine.Conversion;
@@ -10,7 +11,7 @@ namespace Ookii.CommandLine.Conversion;
 /// <para>
 ///   This converter uses the specified converter for the type T, except when the input is an
 ///   empty string, in which case it return <see langword="null"/>. This parallels the behavior
-///   of the standard <see cref="System.ComponentModel.NullableConverter"/>.
+///   of the <see cref="System.ComponentModel.NullableConverter" qualifyHint="true"/>.
 /// </para>
 /// </remarks>
 /// <threadsafety instance="true" static="true" />
@@ -28,8 +29,17 @@ public class NullableConverter : ArgumentConverter
     }
 
     /// <inheritdoc/>
+    /// <returns>
+    /// An object representing the converted value, or <see langword="null"/> if the value was an
+    /// empty string.
+    /// </returns>
     public override object? Convert(string value, CultureInfo culture, CommandLineArgument argument)
     {
+        if (value == null)
+        {
+            throw new ArgumentNullException(nameof(value));
+        }
+
         if (value.Length == 0)
         {
             return null;
@@ -39,6 +49,10 @@ public class NullableConverter : ArgumentConverter
     }
 
     /// <inheritdoc/>
+    /// <returns>
+    /// An object representing the converted value, or <see langword="null"/> if the value was an
+    /// empty string span.
+    /// </returns>
     public override object? Convert(ReadOnlySpan<char> value, CultureInfo culture, CommandLineArgument argument)
     {
         if (value.Length == 0)

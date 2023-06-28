@@ -5,12 +5,12 @@ using System.Diagnostics.CodeAnalysis;
 namespace Ookii.CommandLine.Conversion;
 
 /// <summary>
-/// Specifies a <see cref="ArgumentConverter"/> to use for the keys of a dictionary argument.
+/// Specifies a custom <see cref="ArgumentConverter"/> to use for the keys of a dictionary argument.
 /// </summary>
 /// <remarks>
 /// <para>
 ///   This attribute can be used along with the <see cref="KeyConverterAttribute"/> and 
-///   <see cref="KeyValueSeparatorAttribute"/> attribute to customize the parsing of a dictionary
+///   <see cref="KeyValueSeparatorAttribute"/> attributes to customize the parsing of a dictionary
 ///   argument without having to write a custom <see cref="ArgumentConverter"/> that returns a
 ///   <see cref="KeyValuePair{TKey, TValue}"/>.
 /// </para>
@@ -23,6 +23,7 @@ namespace Ookii.CommandLine.Conversion;
 ///   or if the argument is not a dictionary argument.
 /// </para>
 /// </remarks>
+/// <threadsafety static="true" instance="true"/>
 /// <seealso cref="KeyValuePairConverter{TKey, TValue}"/>
 [AttributeUsage(AttributeTargets.Method | AttributeTargets.Property)]
 public sealed class ValueConverterAttribute : Attribute
@@ -53,6 +54,12 @@ public sealed class ValueConverterAttribute : Attribute
     /// <param name="converterTypeName">
     ///   The fully qualified name of the <see cref="Type"/> to use as a converter.
     /// </param>
+    /// <remarks>
+    /// <para>
+    ///   This constructor is not compatible with the <see cref="GeneratedParserAttribute"/>;
+    ///   use the <see cref="ValueConverterAttribute(Type)"/> constructor instead.
+    /// </para>
+    /// </remarks>
     /// <exception cref="ArgumentNullException">
     ///   <paramref name="converterTypeName"/> is <see langword="null"/>
     /// </exception>

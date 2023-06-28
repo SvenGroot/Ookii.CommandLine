@@ -26,25 +26,27 @@ public static class KeyValuePairConverter
 /// <para>
 ///   This <see cref="ArgumentConverter"/> is used for dictionary command line arguments by default.
 /// </para>
+/// <para>
+///   The behavior of this converter can be customized by applying the <see cref="KeyConverterAttribute"/>,
+///   <see cref="ValueConverterAttribute"/> or <see cref="KeyValueSeparatorAttribute"/> attribute
+///   to the property or method defining a dictionary argument.
+/// </para>
 /// </remarks>
+/// <threadsafety static="true" instance="true"/>
 public class KeyValuePairConverter<TKey, TValue> : ArgumentConverter
 {
-    private readonly ArgumentConverter _keyConverter;
-    private readonly ArgumentConverter _valueConverter;
-    private readonly bool _allowNullValues;
-    private readonly string _separator;
-
     /// <summary>
-    /// Initializes a new instance of the <see cref="KeyValuePairConverter{TKey, TValue}"/> class.
+    /// Initializes a new instance of the <see cref="KeyValuePairConverter{TKey, TValue}"/> class
+    /// with the specified key and value converters and options.
     /// </summary>
     /// <param name="keyConverter">
-    /// Provides the <see cref="ArgumentConverter"/> used to convert the key/value pair's keys.
+    /// The <see cref="ArgumentConverter"/> used to convert the key/value pair's keys.
     /// </param>
     /// <param name="valueConverter">
-    /// Provides the <see cref="ArgumentConverter"/> used to convert the key/value pair's values.
+    /// The <see cref="ArgumentConverter"/> used to convert the key/value pair's values.
     /// </param>
     /// <param name="separator">
-    /// Provides an optional custom key/value separator. If <see langword="null" />, the value
+    /// An optional custom key/value separator. If <see langword="null" />, the value
     /// of <see cref="KeyValuePairConverter.DefaultSeparator" qualifyHint="true"/> is used.
     /// </param>
     /// <param name="allowNullValues">
@@ -58,11 +60,11 @@ public class KeyValuePairConverter<TKey, TValue> : ArgumentConverter
     /// </exception>
     public KeyValuePairConverter(ArgumentConverter keyConverter, ArgumentConverter valueConverter, string? separator, bool allowNullValues)
     {
-        _allowNullValues = allowNullValues;
-        _keyConverter = keyConverter ?? throw new ArgumentNullException(nameof(keyConverter));
-        _valueConverter = valueConverter ?? throw new ArgumentNullException(nameof(valueConverter));
-        _separator = separator ?? KeyValuePairConverter.DefaultSeparator;
-        if (_separator.Length == 0)
+        AllowNullValues = allowNullValues;
+        KeyConverter = keyConverter ?? throw new ArgumentNullException(nameof(keyConverter));
+        ValueConverter = valueConverter ?? throw new ArgumentNullException(nameof(valueConverter));
+        Separator = separator ?? KeyValuePairConverter.DefaultSeparator;
+        if (Separator.Length == 0)
         {
             throw new ArgumentException(Properties.Resources.EmptyKeyValueSeparator, nameof(separator));
         }
@@ -75,26 +77,110 @@ public class KeyValuePairConverter<TKey, TValue> : ArgumentConverter
     [RequiresUnreferencedCode("Key and value converters cannot be statically determined.")]
 #endif
     public KeyValuePairConverter()
-        : this(typeof(TKey).GetStringConverter(null), typeof(TValue).GetStringConverter(null), null, true)
+        : this(typeof(TKey).GetStringConverter(null), typeof(TValue).GetStringConverter(null), null,
+              !typeof(TValue).IsValueType || typeof(TValue).IsNullableValueType())
     {
     }
 
-    /// <inheritdoc />
+    /// <summary>
+    /// Gets the converter used for the keys of the key/value pair.
+    /// </summary>
+    /// <remarks>
+    /// The <see cref="ArgumentConverter"/> used for the keys.
+    /// </remarks>
+    public ArgumentConverter KeyConverter { get; }
+
+    /// <summary>
+    /// Gets the converter used for the values of the key/value pair.
+    /// </summary>
+    /// <remarks>
+    /// The <see cref="ArgumentConverter"/> used for the values.
+    /// </remarks>
+    public ArgumentConverter ValueConverter { get; }
+
+    /// <summary>
+    /// Gets the key/value separator.
+    /// </summary>
+    /// <value>
+    /// The string used to separate the key and value in a key/value pair.
+    /// </value>
+    public string Separator { get; }
+
+    /// <summary>
+    /// Gets a value which indicates whether the values of the key/value pair can be
+    /// <see langword="null"/>.
+    /// </summary>
+    /// <value>
+    /// <see langword="true"/> if <see langword="null"/> values are allowed; otherwise, <see langword="false"/>.
+    /// </value>
+    /// <remarks>
+    /// <para>
+    ///   This property should only be true if <typeparamref name="TValue"/> is a value type other
+    ///   than <see cref="Nullable{T}"/> or a reference type without a nullable annotation.
+    /// </para>
+    /// <para>
+    ///   The keys of a key/value pair can never be <see langword="null"/>.
+    /// </para>
+    /// </remarks>
+    public bool AllowNullValues { get; }
+
+    /// <summary>
+    /// Converts a string to a <see cref="KeyValuePair{TKey, TValue}"/>.
+    /// </summary>
+    /// <param name="value">The string to convert.</param>
+    /// <param name="culture">The culture to use for the conversion.</param>
+    /// <param name="argument">
+    /// The <see cref="CommandLineArgument"/> that will use the converted value.
+    /// </param>
+    /// <returns>An object representing the converted value.</returns>
+    /// <exception cref="ArgumentNullException">
+    ///   <paramref name="value"/> or <paramref name="culture"/> or <paramref name="argument"/> is
+    ///   <see langword="null"/>.
+    /// </exception>
+    /// <exception cref="FormatException">
+    ///   The value was not in a correct format for the target type.
+    /// </exception>
+    /// <exception cref="CommandLineArgumentException">
+    ///   The value was not in a correct format for the target type.
+    /// </exception>
     public override object? Convert(string value, CultureInfo culture, CommandLineArgument argument)
         => Convert((value ?? throw new ArgumentNullException(nameof(value))).AsSpan(), culture, argument);
 
-    /// <inheritdoc />
+    /// <summary>
+    /// Converts a string span to a <see cref="KeyValuePair{TKey, TValue}"/>.
+    /// </summary>
+    /// <param name="value">The <see cref="ReadOnlySpan{T}"/> containing the string to convert.</param>
+    /// <param name="culture">The culture to use for the conversion.</param>
+    /// <param name="argument">
+    /// The <see cref="CommandLineArgument"/> that will use the converted value.
+    /// </param>
+    /// <returns>An object representing the converted value.</returns>
+    /// <exception cref="ArgumentNullException">
+    ///   <paramref name="value"/> or <paramref name="culture"/> or <paramref name="argument"/> is
+    ///   <see langword="null"/>.
+    /// </exception>
+    /// <exception cref="FormatException">
+    ///   The value was not in a correct format for the target type.
+    /// </exception>
+    /// <exception cref="CommandLineArgumentException">
+    ///   The value was not in a correct format for the target type.
+    /// </exception>
     public override object? Convert(ReadOnlySpan<char> value, CultureInfo culture, CommandLineArgument argument)
     {
-        var (key, valueForKey) = value.SplitOnce(_separator.AsSpan(), out bool hasSeparator);
-        if (!hasSeparator)
+        if (argument == null)
         {
-            throw new FormatException(argument.Parser.StringProvider.MissingKeyValuePairSeparator(_separator));
+            throw new ArgumentNullException(nameof(argument));
         }
 
-        var convertedKey = _keyConverter.Convert(key, culture, argument);
-        var convertedValue = _valueConverter.Convert(valueForKey, culture, argument);
-        if (convertedKey == null || !_allowNullValues && convertedValue == null)
+        var (key, valueForKey) = value.SplitOnce(Separator.AsSpan(), out bool hasSeparator);
+        if (!hasSeparator)
+        {
+            throw new FormatException(argument.Parser.StringProvider.MissingKeyValuePairSeparator(Separator));
+        }
+
+        var convertedKey = KeyConverter.Convert(key, culture, argument);
+        var convertedValue = ValueConverter.Convert(valueForKey, culture, argument);
+        if (convertedKey == null || !AllowNullValues && convertedValue == null)
         {
             throw argument.Parser.StringProvider.CreateException(CommandLineArgumentErrorCategory.NullArgumentValue,
                 argument.ArgumentName);

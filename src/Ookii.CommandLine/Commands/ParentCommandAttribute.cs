@@ -38,7 +38,7 @@ public sealed class ParentCommandAttribute : Attribute
     /// <remarks>
     /// <para>
     ///   This constructor is not compatible with the <see cref="GeneratedCommandManagerAttribute"/>;
-    ///   use <see cref="ParentCommandAttribute(Type)"/> instead.
+    ///   use the <see cref="ParentCommandAttribute(Type)"/> constructor instead.
     /// </para>
     /// </remarks>
     public ParentCommandAttribute(string parentCommandTypeName)

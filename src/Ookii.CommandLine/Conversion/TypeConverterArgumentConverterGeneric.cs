@@ -8,6 +8,7 @@ namespace Ookii.CommandLine.Conversion;
 /// type.
 /// </summary>
 /// <typeparam name="T">The type to convert to.</typeparam>
+/// <threadsafety static="true" instance="false"/>
 #if NET6_0_OR_GREATER
 [RequiresUnreferencedCode("Determining the TypeConverter for a type may require the type to be annotated.")]
 #endif

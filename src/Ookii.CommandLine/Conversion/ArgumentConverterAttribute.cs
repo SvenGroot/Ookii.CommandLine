@@ -10,16 +10,17 @@ namespace Ookii.CommandLine.Conversion;
 /// <remarks>
 /// <para>
 ///   The type specified by this attribute must derive from the <see cref="ArgumentConverter"/>
-///   class.
+///   class, and must convert to the type of the argument the attribute is applied to.
 /// </para>
 /// <para>
-///   Apply this attribute to the property or method defining the argument to use a custom
+///   Apply this attribute to the property or method defining an argument to use a custom
 ///   conversion from a string to the type of the argument.
 /// </para>
 /// <para>
 ///   If this attribute is not present, the default conversion will be used.
 /// </para>
 /// </remarks>
+/// <threadsafety static="true" instance="true"/>
 [AttributeUsage(AttributeTargets.Method | AttributeTargets.Property)]
 public sealed class ArgumentConverterAttribute : Attribute
 {
@@ -49,6 +50,12 @@ public sealed class ArgumentConverterAttribute : Attribute
     /// <param name="converterTypeName">
     ///   The fully qualified name of the <see cref="Type"/> to use as a converter.
     /// </param>
+    /// <remarks>
+    /// <para>
+    ///   This constructor is not compatible with the <see cref="GeneratedParserAttribute"/>;
+    ///   use the <see cref="ArgumentConverterAttribute(Type)"/> constructor instead.
+    /// </para>
+    /// </remarks>
     /// <exception cref="ArgumentNullException">
     ///   <paramref name="converterTypeName"/> is <see langword="null"/>
     /// </exception>

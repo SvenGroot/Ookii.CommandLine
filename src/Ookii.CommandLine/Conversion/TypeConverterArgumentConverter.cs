@@ -5,7 +5,7 @@ using System.Globalization;
 namespace Ookii.CommandLine.Conversion;
 
 /// <summary>
-/// A <see cref="ArgumentConverter"/> that wraps an existing <see cref="TypeConverter"/> for a
+/// An <see cref="ArgumentConverter"/> that wraps an existing <see cref="TypeConverter"/> for a
 /// type.
 /// </summary>
 /// <remarks>
@@ -14,6 +14,7 @@ namespace Ookii.CommandLine.Conversion;
 ///   <see cref="TypeConverterArgumentConverter{T}"/> class.
 /// </para>
 /// </remarks>
+/// <threadsafety static="true" instance="false"/>
 public class TypeConverterArgumentConverter : ArgumentConverter
 {
     /// <summary>

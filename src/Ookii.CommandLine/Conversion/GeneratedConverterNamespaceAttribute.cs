@@ -19,6 +19,7 @@ namespace Ookii.CommandLine.Conversion;
 ///   Use this attribute to modify the namespace used.
 /// </para>
 /// </remarks>
+/// <threadsafety static="true" instance="true"/>
 [AttributeUsage(AttributeTargets.Assembly)]
 public sealed class GeneratedConverterNamespaceAttribute : Attribute
 {
@@ -27,9 +28,12 @@ public sealed class GeneratedConverterNamespaceAttribute : Attribute
     /// with the specified namespace.
     /// </summary>
     /// <param name="namespace">The namespace to use.</param>
+    /// <exception cref="ArgumentNullException">
+    /// <paramref name="namespace"/> is <see langword="null"/>.
+    /// </exception>
     public GeneratedConverterNamespaceAttribute(string @namespace)
     {
-        Namespace = @namespace;
+        Namespace = @namespace ?? throw new ArgumentNullException(nameof(@namespace));
     }
 
     /// <summary>

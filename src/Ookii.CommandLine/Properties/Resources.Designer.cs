@@ -583,6 +583,15 @@ namespace Ookii.CommandLine.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The type &apos;{0}&apos; is not an enumeration type..
+        /// </summary>
+        internal static string TypeIsNotEnumFormat {
+            get {
+                return ResourceManager.GetString("TypeIsNotEnumFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The type must be a generic type definition..
         /// </summary>
         internal static string TypeNotGenericDefinition {

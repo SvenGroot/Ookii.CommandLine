@@ -405,4 +405,7 @@
   <data name="NullPropertyValue" xml:space="preserve">
     <value>A read-only property for a multi-value or dictionary argument returned null.</value>
   </data>
+  <data name="TypeIsNotEnumFormat" xml:space="preserve">
+    <value>The type '{0}' is not an enumeration type.</value>
+  </data>
 </root>

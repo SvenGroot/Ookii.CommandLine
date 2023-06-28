@@ -15,6 +15,7 @@ namespace Ookii.CommandLine.Conversion;
 ///   method.
 /// </para>
 /// </remarks>
+/// <threadsafety static="true" instance="true"/>
 public abstract class ArgumentConverter
 {
     /// <summary>
@@ -26,6 +27,10 @@ public abstract class ArgumentConverter
     /// The <see cref="CommandLineArgument"/> that will use the converted value.
     /// </param>
     /// <returns>An object representing the converted value.</returns>
+    /// <exception cref="ArgumentNullException">
+    ///   <paramref name="value"/> or <paramref name="culture"/> or <paramref name="argument"/> is
+    ///   <see langword="null"/>.
+    /// </exception>
     /// <exception cref="FormatException">
     ///   The value was not in a correct format for the target type.
     /// </exception>
@@ -37,7 +42,7 @@ public abstract class ArgumentConverter
     public abstract object? Convert(string value, CultureInfo culture, CommandLineArgument argument);
 
     /// <summary>
-    /// Converts a string to the type of the argument.
+    /// Converts a string span to the type of the argument.
     /// </summary>
     /// <param name="value">The <see cref="ReadOnlySpan{T}"/> containing the string to convert.</param>
     /// <param name="culture">The culture to use for the conversion.</param>
@@ -53,6 +58,9 @@ public abstract class ArgumentConverter
     ///   type.
     /// </para>
     /// </remarks>
+    /// <exception cref="ArgumentNullException">
+    ///   <paramref name="culture"/> or <paramref name="argument"/> is <see langword="null"/>.
+    /// </exception>
     /// <exception cref="FormatException">
     ///   The value was not in a correct format for the target type.
     /// </exception>

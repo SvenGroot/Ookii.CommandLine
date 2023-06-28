@@ -37,7 +37,7 @@
   Provides attributes used to validate the value of arguments, and the relation between arguments.
 &lt;/para&gt;</NamespaceSummaryItem>
 <NamespaceSummaryItem name="Ookii.CommandLine.Conversion" isDocumented="True">&lt;para&gt;
-  Provides functionality for converting strings to the actual type of the argument.
+  Provides functionality for converting argument strings from the command line to the actual type of an argument.
 &lt;/para&gt;</NamespaceSummaryItem>
 <NamespaceSummaryItem name="Ookii.CommandLine.Support" isDocumented="True">&lt;para&gt;
   Provides types to support source generation. Types in this namespace should not be used directly in your code.
