@@ -17,16 +17,25 @@ namespace Ookii.CommandLine.Conversion;
 /// <threadsafety instance="true" static="true" />
 public class NullableConverter : ArgumentConverter
 {
-    private readonly ArgumentConverter _baseConverter;
-
     /// <summary>
     /// Initializes a new instance of the <see cref="NullableConverter"/> class.
     /// </summary>
-    /// <param name="baseConverter">The converter to use for the type T.</param>
+    /// <param name="baseConverter">The converter to use for the target type.</param>
+    /// <exception cref="ArgumentNullException">
+    /// <paramref name="baseConverter"/> is <see langword="null"/>.
+    /// </exception>
     public NullableConverter(ArgumentConverter baseConverter)
     {
-        _baseConverter = baseConverter;
+        BaseConverter = baseConverter ?? throw new ArgumentNullException(nameof(baseConverter));
     }
+
+    /// <summary>
+    /// Gets the converter for the underlying type.
+    /// </summary>
+    /// <value>
+    /// The <see cref="ArgumentConverter"/> for the underlying type.
+    /// </value>
+    public ArgumentConverter BaseConverter { get; }
 
     /// <inheritdoc/>
     /// <returns>
@@ -45,7 +54,7 @@ public class NullableConverter : ArgumentConverter
             return null;
         }
 
-        return _baseConverter.Convert(value, culture, argument);
+        return BaseConverter.Convert(value, culture, argument);
     }
 
     /// <inheritdoc/>
@@ -60,6 +69,6 @@ public class NullableConverter : ArgumentConverter
             return null;
         }
 
-        return _baseConverter.Convert(value, culture, argument);
+        return BaseConverter.Convert(value, culture, argument);
     }
 }

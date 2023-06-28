@@ -606,6 +606,14 @@ public abstract class CommandLineArgument
     public Type ElementType => _elementType;
 
     /// <summary>
+    /// Gets the converter used to convert string values to the argument's type.
+    /// </summary>
+    /// <value>
+    /// The <see cref="ArgumentConverter"/> for this argument.
+    /// </value>
+    public ArgumentConverter Converter => _converter;
+
+    /// <summary>
     /// Gets the position of this argument.
     /// </summary>
     /// <value>
@@ -1256,6 +1264,10 @@ public abstract class CommandLineArgument
             throw _parser.StringProvider.CreateException(CommandLineArgumentErrorCategory.ArgumentValueConversion, ex, this, stringValue ?? spanValue.ToString());
         }
         catch (FormatException ex)
+        {
+            throw _parser.StringProvider.CreateException(CommandLineArgumentErrorCategory.ArgumentValueConversion, ex, this, stringValue ?? spanValue.ToString());
+        }
+        catch (OverflowException ex)
         {
             throw _parser.StringProvider.CreateException(CommandLineArgumentErrorCategory.ArgumentValueConversion, ex, this, stringValue ?? spanValue.ToString());
         }

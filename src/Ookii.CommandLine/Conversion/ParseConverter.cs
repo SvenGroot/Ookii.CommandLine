@@ -34,6 +34,10 @@ internal class ParseConverter : ArgumentConverter
         {
             throw;
         }
+        catch (OverflowException)
+        {
+            throw;
+        }
         catch (Exception ex)
         {
             // Since we don't know what the method will throw, we'll wrap anything in a

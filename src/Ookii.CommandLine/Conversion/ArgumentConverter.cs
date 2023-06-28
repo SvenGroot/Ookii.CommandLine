@@ -34,10 +34,13 @@ public abstract class ArgumentConverter
     /// <exception cref="FormatException">
     ///   The value was not in a correct format for the target type.
     /// </exception>
+    /// <exception cref="OverflowException">
+    ///   The value was out of range for the target type.
+    /// </exception>
     /// <exception cref="CommandLineArgumentException">
-    ///   The value was not in a correct format for the target type. Unlike <see cref="FormatException"/>,
-    ///   a <see cref="CommandLineArgumentException"/> thrown by this method will be passed down to
-    ///   the user unmodified.
+    ///   The value was not in a correct format for the target type. Unlike <see cref="FormatException"/>
+    ///   and <see cref="OverflowException"/>, a <see cref="CommandLineArgumentException"/> thrown
+    ///   by this method will be passed down to the user unmodified.
     /// </exception>
     public abstract object? Convert(string value, CultureInfo culture, CommandLineArgument argument);
 
@@ -64,10 +67,13 @@ public abstract class ArgumentConverter
     /// <exception cref="FormatException">
     ///   The value was not in a correct format for the target type.
     /// </exception>
+    /// <exception cref="OverflowException">
+    ///   The value was out of range for the target type.
+    /// </exception>
     /// <exception cref="CommandLineArgumentException">
-    ///   The value was not in a correct format for the target type. Unlike <see cref="FormatException"/>,
-    ///   a <see cref="CommandLineArgumentException"/> thrown by this method will be passed down to
-    ///   the user unmodified.
+    ///   The value was not in a correct format for the target type. Unlike <see cref="FormatException"/>
+    ///   and <see cref="OverflowException"/>, a <see cref="CommandLineArgumentException"/> thrown
+    ///   by this method will be passed down to the user unmodified.
     /// </exception>
     public virtual object? Convert(ReadOnlySpan<char> value, CultureInfo culture, CommandLineArgument argument)
     {

@@ -204,6 +204,10 @@ internal class ConverterGenerator
         builder.OpenBlock();
         builder.AppendLine("throw;");
         builder.CloseBlock(); // catch
+        builder.AppendLine("catch (System.OverflowException)");
+        builder.OpenBlock();
+        builder.AppendLine("throw;");
+        builder.CloseBlock(); // catch
         builder.AppendLine("catch (System.Exception ex)");
         builder.OpenBlock();
         builder.AppendLine("throw new System.FormatException(ex.Message, ex);");

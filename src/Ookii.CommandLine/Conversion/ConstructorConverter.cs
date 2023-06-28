@@ -36,6 +36,10 @@ internal class ConstructorConverter : ArgumentConverter
         {
             throw;
         }
+        catch (OverflowException)
+        {
+            throw;
+        }
         catch (Exception ex)
         {
             // Since we don't know what the constructor will throw, we'll wrap anything in a

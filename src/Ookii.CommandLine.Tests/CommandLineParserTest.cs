@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Ookii.CommandLine.Conversion;
 using Ookii.CommandLine.Support;
 using Ookii.CommandLine.Tests.Commands;
 using System;
@@ -1201,6 +1202,18 @@ public partial class CommandLineParserTest
         Assert.AreEqual(3, result.ParseNullableMulti[0]!.Value.Value);
         Assert.IsNull(result.ParseNullableMulti[1]!);
         Assert.AreEqual(4, result.ParseNullableMulti[2]!.Value.Value);
+#if NET7_0_OR_GREATER
+        Assert.IsInstanceOfType(((NullableConverter)parser.GetArgument("Nullable")!.Converter).BaseConverter, typeof(SpanParsableConverter<int>));
+#endif
+    }
+
+    [TestMethod]
+    [DynamicData(nameof(ProviderKinds), DynamicDataDisplayName = nameof(GetCustomDynamicDataDisplayName))]
+    public void TestConversionInvalid(ProviderKind kind)
+    {
+        var parser = CreateParser<ConversionArguments>(kind);
+        CheckThrows(parser, new[] { "-Nullable", "abc" }, CommandLineArgumentErrorCategory.ArgumentValueConversion, "Nullable", typeof(FormatException), 2);
+        CheckThrows(parser, new[] { "-Nullable", "12345678901234567890" }, CommandLineArgumentErrorCategory.ArgumentValueConversion, "Nullable", typeof(OverflowException), 2);
     }
 
     [TestMethod]
