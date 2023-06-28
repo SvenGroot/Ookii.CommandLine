@@ -6,9 +6,15 @@ using System.ComponentModel;
 namespace Ookii.CommandLine.Support;
 
 /// <summary>
-/// This class is for internal use by the source generator, and should not be used in your code.
+/// Represents information about a subcommand that uses the <see cref="ICommandWithCustomParsing"/>
+/// interface, determined by the source generator.
 /// </summary>
 /// <typeparam name="T">The command class.</typeparam>
+/// <remarks>
+/// This class is used by the source generator when using the <see cref="GeneratedCommandManagerAttribute"/>
+/// attribute. It should not normally be used by other code.
+/// </remarks>
+/// <threadsafety static="true" instance="false"/>
 public class GeneratedCommandInfoWithCustomParsing<T> : GeneratedCommandInfo
     where T : class, ICommandWithCustomParsing, new()
 {

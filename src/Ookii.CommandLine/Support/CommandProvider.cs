@@ -7,9 +7,10 @@ namespace Ookii.CommandLine.Support;
 /// A source of commands for the <see cref="CommandManager"/>.
 /// </summary>
 /// <remarks>
-/// This class is used by the source generator when using <see cref="GeneratedCommandManagerAttribute"/>
+/// This class is used by the source generator when using the <see cref="GeneratedCommandManagerAttribute"/>
 /// attribute. It should not normally be used by other code.
 /// </remarks>
+/// <threadsafety static="true" instance="false"/>
 public abstract class CommandProvider
 {
     /// <summary>

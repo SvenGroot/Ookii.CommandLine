@@ -7,8 +7,13 @@ using System.Linq;
 namespace Ookii.CommandLine.Support;
 
 /// <summary>
-/// This class is for internal use by the source generator, and should not be used in your code.
+/// Represents information about a subcommand determined by the source generator.
 /// </summary>
+/// <remarks>
+/// This class is used by the source generator when using the <see cref="GeneratedCommandManagerAttribute"/>
+/// attribute. It should not normally be used by other code.
+/// </remarks>
+/// <threadsafety static="true" instance="false"/>
 public class GeneratedCommandInfo : CommandInfo
 {
     private readonly DescriptionAttribute? _descriptionAttribute;

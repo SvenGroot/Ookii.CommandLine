@@ -1,7 +1,7 @@
 ﻿namespace Ookii.CommandLine.Support;
 
 /// <summary>
-/// Specifies the kind of provider that was the source of the arguments.
+/// Specifies the kind of provider that was the source of the arguments or subcommands.
 /// </summary>
 public enum ProviderKind
 {
@@ -10,11 +10,13 @@ public enum ProviderKind
     /// </summary>
     Unknown,
     /// <summary>
-    /// An argument provider that uses reflection.
+    /// An provider that uses reflection.
     /// </summary>
     Reflection,
     /// <summary>
-    /// An argument provider that uses code generation.
+    /// An provider that uses source generation. These are typically created using the
+    /// <see cref="GeneratedParserAttribute"/> and <see cref="Commands.GeneratedCommandManagerAttribute"/>
+    /// attributes.
     /// </summary>
     Generated
 }

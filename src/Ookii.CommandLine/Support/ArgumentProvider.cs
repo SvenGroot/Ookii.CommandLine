@@ -9,9 +9,10 @@ namespace Ookii.CommandLine.Support;
 /// A source of arguments for the <see cref="CommandLineParser"/>.
 /// </summary>
 /// <remarks>
-/// This class is used by the source generator when using <see cref="GeneratedParserAttribute"/>
+/// This class is used by the source generator when using the <see cref="GeneratedParserAttribute"/>
 /// attribute. It should not normally be used by other code.
 /// </remarks>
+/// <threadsafety static="true" instance="false"/>
 public abstract class ArgumentProvider
 {
     private readonly IEnumerable<ClassValidationAttribute> _validators;
@@ -74,10 +75,10 @@ public abstract class ArgumentProvider
     public ParseOptionsAttribute? OptionsAttribute { get; }
 
     /// <summary>
-    /// Gets a value that indicates whether this arguments type is a shell command.
+    /// Gets a value that indicates whether this arguments type is a subcommand.
     /// </summary>
     /// <value>
-    /// <see langword="true"/> if the arguments type is a shell command; otherwise, <see langword="false"/>.
+    /// <see langword="true"/> if the arguments type is a subcommand; otherwise, <see langword="false"/>.
     /// </value>
     public abstract bool IsCommand { get; }
 
@@ -117,6 +118,6 @@ public abstract class ArgumentProvider
     /// if there are no required properties, or if the <see cref="Kind"/> property equals
     /// <see cref="ProviderKind.Reflection" qualifyHint="true"/>.
     /// </param>
-    /// <returns>An instance of the type indicated by <see cref="ArgumentsType"/>.</returns>
+    /// <returns>An instance of the type indicated by the <see cref="ArgumentsType"/> property.</returns>
     public abstract object CreateInstance(CommandLineParser parser, object?[]? requiredPropertyValues);
 }
