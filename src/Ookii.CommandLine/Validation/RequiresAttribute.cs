@@ -8,7 +8,7 @@ namespace Ookii.CommandLine.Validation;
 /// <remarks>
 /// <para>
 ///   This attribute can be used to indicate that an argument can only be used in combination
-///   with one or more other attributes. If one or more of the dependencies does not have
+///   with one or more other arguments. If one or more of the dependencies does not have
 ///   a value, validation will fail.
 /// </para>
 /// <para>
@@ -20,7 +20,8 @@ namespace Ookii.CommandLine.Validation;
 /// </para>
 /// <para>
 ///   The names of the arguments that are dependencies are not validated when the attribute is
-///   created. If one of the specified arguments does not exist, validation will always fail.
+///   created. If one of the specified arguments does not exist, an exception is thrown during
+///   validation.
 /// </para>
 /// </remarks>
 /// <threadsafety static="true" instance="true"/>

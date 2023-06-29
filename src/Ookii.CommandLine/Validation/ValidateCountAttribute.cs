@@ -8,9 +8,9 @@ namespace Ookii.CommandLine.Validation;
 /// </summary>
 /// <remarks>
 /// <para>
-///   If the argument is optional and has no value, this validator will not be used, so no
-///   values is valid regardless of the lower bound specified. If you want the argument to have
-///   a value, make is a required argument.
+///   If the argument is optional and has no value, this validator will not be used, so zero
+///   values is valid regardless of the lower bound specified. If you want zero values to be
+///   invalid, make it a required argument.
 /// </para>
 /// <para>
 ///   This validator will not be checked until all arguments have been parsed.
@@ -27,7 +27,7 @@ public class ValidateCountAttribute : ArgumentValidationWithHelpAttribute
     private readonly int _maximum;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="ValidateStringLengthAttribute"/> class.
+    /// Initializes a new instance of the <see cref="ValidateCountAttribute"/> class.
     /// </summary>
     /// <param name="minimum">The inclusive lower bound on the number of elements.</param>
     /// <param name="maximum">The inclusive upper bound on the number of elements.</param>

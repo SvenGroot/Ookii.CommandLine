@@ -9,6 +9,7 @@ namespace Ookii.CommandLine.Validation;
 /// <summary>
 /// Base class for the <see cref="RequiresAttribute"/> and <see cref="ProhibitsAttribute"/> class.
 /// </summary>
+/// <threadsafety static="true" instance="true"/>
 public abstract class DependencyValidationAttribute : ArgumentValidationWithHelpAttribute
 {
     private readonly string? _argument;
@@ -26,7 +27,7 @@ public abstract class DependencyValidationAttribute : ArgumentValidationWithHelp
     /// <exception cref="ArgumentNullException">
     ///   <paramref name="argument"/> is <see langword="null"/>.
     /// </exception>
-    public DependencyValidationAttribute(bool requires, string argument)
+    protected DependencyValidationAttribute(bool requires, string argument)
     {
         _argument = argument ?? throw new ArgumentNullException(nameof(argument));
         _requires = requires;
@@ -44,7 +45,7 @@ public abstract class DependencyValidationAttribute : ArgumentValidationWithHelp
     /// <exception cref="ArgumentNullException">
     ///   <paramref name="arguments"/> is <see langword="null"/>.
     /// </exception>
-    public DependencyValidationAttribute(bool requires, params string[] arguments)
+    protected DependencyValidationAttribute(bool requires, params string[] arguments)
     {
         _arguments = arguments ?? throw new ArgumentNullException(nameof(arguments));
         _requires = requires;
@@ -102,7 +103,7 @@ public abstract class DependencyValidationAttribute : ArgumentValidationWithHelp
 
     /// <summary>
     /// Resolves the argument names in the <see cref="Arguments"/> property to their actual
-    /// <see cref="CommandLineArgument"/> property.
+    /// <see cref="CommandLineArgument"/> instances.
     /// </summary>
     /// <param name="parser">The <see cref="CommandLineParser"/> instance.</param>
     /// <returns>A list of the arguments.</returns>

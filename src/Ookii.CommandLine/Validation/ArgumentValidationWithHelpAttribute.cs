@@ -11,6 +11,7 @@
 ///   This class just adds some common functionality to make it easier.
 /// </para>
 /// </remarks>
+/// <threadsafety static="true" instance="true"/>
 public abstract class ArgumentValidationWithHelpAttribute : ArgumentValidationAttribute
 {
     /// <summary>
@@ -35,7 +36,7 @@ public abstract class ArgumentValidationWithHelpAttribute : ArgumentValidationAt
     /// <summary>
     /// Gets the usage help message for this validator.
     /// </summary>
-    /// <param name="argument">The argument is the validator is for.</param>
+    /// <param name="argument">The argument that the validator is for.</param>
     /// <returns>
     /// The usage help message, or <see langword="null"/> if the <see cref="IncludeInUsageHelp"/>
     /// property is <see langword="false"/>.
@@ -53,7 +54,7 @@ public abstract class ArgumentValidationWithHelpAttribute : ArgumentValidationAt
     /// <summary>
     /// Gets the usage help message for this validator.
     /// </summary>
-    /// <param name="argument">The argument is the validator is for.</param>
+    /// <param name="argument">The argument that the validator is for.</param>
     /// <returns>
     /// The usage help message.
     /// </returns>

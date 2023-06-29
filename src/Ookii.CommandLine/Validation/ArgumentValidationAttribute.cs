@@ -12,12 +12,13 @@ namespace Ookii.CommandLine.Validation;
 ///   you to check whether an argument's value meets certain conditions.
 /// </para>
 /// <para>
-///   If validation fails, it will throw a <see cref="CommandLineArgumentException"/> with
-///   the category specified in the <see cref="ErrorCategory"/> property. The
+///   If validation fails, the validator will throw a <see cref="CommandLineArgumentException"/>
+///   with the category specified in the <see cref="ErrorCategory"/> property. The
 ///   <see cref="CommandLineParser{T}.ParseWithErrorHandling()" qualifyHint="true"/> method, the
-///   <see cref="CommandLineParser.Parse{T}(string[], int, ParseOptions?)" qualifyHint="true"/> method and the
-///   <see cref="CommandManager"/> class will automatically display the error message and usage
-///   help if validation failed.
+///   <see cref="CommandLineParser.Parse{T}(string[], int, ParseOptions?)" qualifyHint="true"/> method,
+///   the generated <see cref="IParser{TSelf}.Parse(Ookii.CommandLine.ParseOptions?)" qualifyHint="true"/>,
+///   and the <see cref="CommandManager"/> class will automatically display the error message and
+///   usage help if validation failed.
 /// </para>
 /// <para>
 ///   Several built-in validators are provided, and you can derive from this class to create
@@ -52,7 +53,7 @@ public abstract class ArgumentValidationAttribute : Attribute
     /// </summary>
     /// <param name="argument">The argument being validated.</param>
     /// <param name="value">
-    ///   The argument value. If not <see langword="null"/>, this must be an instance of
+    ///   The argument value. If not <see langword="null"/>, this must be a string or an instance of
     ///   <see cref="CommandLineArgument.ArgumentType" qualifyHint="true"/>.
     /// </param>
     /// <exception cref="CommandLineArgumentException">
@@ -82,7 +83,7 @@ public abstract class ArgumentValidationAttribute : Attribute
     /// </param>
     /// <returns>
     ///   <see langword="true"/> if validation was performed and successful; <see langword="false"/>
-    ///   if this validator doesn't support validating spans and the <see cref="IsValid"/>
+    ///   if this validator doesn't support validating spans and the <see cref="Validate"/>
     ///   method should be used instead.
     /// </returns>
     /// <remarks>
@@ -133,7 +134,7 @@ public abstract class ArgumentValidationAttribute : Attribute
     ///   If the <see cref="Mode"/> property is <see cref="ValidationMode.AfterConversion" qualifyHint="true"/>,
     ///   for regular arguments, the <paramref name="value"/> parameter will be identical to
     ///   the <see cref="CommandLineArgument.Value" qualifyHint="true"/> property. For multi-value or dictionary
-    ///   arguments, the <paramref name="value"/> parameter will equal the last value added
+    ///   arguments, the <paramref name="value"/> parameter will be equal to the last value added
     ///   to the collection or dictionary.
     /// </para>
     /// <para>
@@ -198,7 +199,7 @@ public abstract class ArgumentValidationAttribute : Attribute
     /// <summary>
     /// Gets the usage help message for this validator.
     /// </summary>
-    /// <param name="argument">The argument is the validator is for.</param>
+    /// <param name="argument">The argument that the validator is for.</param>
     /// <returns>
     /// The usage help message, or <see langword="null"/> if there is none. The
     /// base implementation always returns  <see langword="null"/>.

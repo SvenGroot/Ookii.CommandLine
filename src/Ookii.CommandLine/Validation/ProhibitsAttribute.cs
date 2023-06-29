@@ -3,13 +3,13 @@
 namespace Ookii.CommandLine.Validation;
 
 /// <summary>
-/// Validates that an argument cannot be used together with other arguments.
+/// Validates that an argument is not used together with other arguments.
 /// </summary>
 /// <remarks>
 /// <para>
-///   This attribute can be used to indicate that an argument can only be used in combination
-///   with one or more other attributes. If one or more of the dependencies does not have
-///   a value, validation will fail.
+///   This attribute can be used to indicate that an argument can only be used when one or more
+///   other arguments are not used. If one or more of the prohibited arguments has a value,
+///   validation will fail.
 /// </para>
 /// <para>
 ///   This validator will not be checked until all arguments have been parsed.
@@ -19,15 +19,16 @@ namespace Ookii.CommandLine.Validation;
 ///   error category set to <see cref="CommandLineArgumentErrorCategory.DependencyFailed" qualifyHint="true"/>.
 /// </para>
 /// <para>
-///   Names of arguments that are dependencies are not validated when the attribute is created.
-///   If one of the specified arguments does not exist, validation will always fail.
+///   The names of arguments that are dependencies are not validated when the attribute is created.
+///   If one of the specified arguments does not exist, an exception will be thrown during
+///   validation.
 /// </para>
 /// </remarks>
 /// <threadsafety static="true" instance="true"/>
 public class ProhibitsAttribute : DependencyValidationAttribute
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="RequiresAttribute"/> class.
+    /// Initializes a new instance of the <see cref="ProhibitsAttribute"/> class.
     /// </summary>
     /// <param name="argument">The name of the argument that this argument prohibits.</param>
     /// <exception cref="ArgumentNullException">
@@ -39,8 +40,8 @@ public class ProhibitsAttribute : DependencyValidationAttribute
     }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="RequiresAttribute"/> class with multiple
-    /// dependencies.
+    /// Initializes a new instance of the <see cref="ProhibitsAttribute"/> class with multiple
+    /// prohibited arguments.
     /// </summary>
     /// <param name="arguments">The names of the arguments that this argument prohibits.</param>
     /// <exception cref="ArgumentNullException">

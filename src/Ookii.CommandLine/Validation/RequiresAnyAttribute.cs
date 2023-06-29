@@ -42,11 +42,11 @@ namespace Ookii.CommandLine.Validation;
 /// </code>
 /// <note>
 ///   You can only use <c>nameof</c> if the name of the argument matches the name of the
-///   property. Be careful if you have explicit names or are using <see cref="NameTransform"/>.
+///   property. Be careful if you have explicit names or are using a <see cref="NameTransform"/>.
 /// </note>
 /// <para>
 ///   The names of the arguments are not validated when the attribute is created. If one of the
-///   specified arguments does not exist, it is assumed to have no value.
+///   specified arguments does not exist, an exception is thrown during validation.
 /// </para>
 /// </remarks>
 /// <threadsafety static="true" instance="true"/>
@@ -145,10 +145,10 @@ public class RequiresAnyAttribute : ClassValidationAttribute
     public bool IncludeInUsageHelp { get; set; } = true;
 
     /// <summary>
-    /// Determines if the at least one of the arguments in <see cref="Arguments"/> was
+    /// Determines if at least one of the arguments in the <see cref="Arguments"/> property was
     /// supplied on the command line.
     /// </summary>
-    /// <param name="parser">The argument parser being validated.</param>
+    /// <param name="parser">The command line parser being validated.</param>
     /// <returns>
     ///   <see langword="true"/> if the arguments are valid; otherwise, <see langword="false"/>.
     /// </returns>
@@ -162,7 +162,7 @@ public class RequiresAnyAttribute : ClassValidationAttribute
     /// <summary>
     /// Gets the usage help message for this validator.
     /// </summary>
-    /// <param name="parser">The parser is the validator is for.</param>
+    /// <param name="parser">The command line parser that the validator is for.</param>
     /// <returns>
     /// The usage help message, or <see langword="null"/> if the <see cref="IncludeInUsageHelp"/>
     /// property is <see langword="false"/>.
@@ -172,7 +172,7 @@ public class RequiresAnyAttribute : ClassValidationAttribute
 
     /// <summary>
     /// Resolves the argument names in the <see cref="Arguments"/> property to their actual
-    /// <see cref="CommandLineArgument"/> property.
+    /// <see cref="CommandLineArgument"/> instances.
     /// </summary>
     /// <param name="parser">The <see cref="CommandLineParser"/> instance.</param>
     /// <returns>A list of the arguments.</returns>

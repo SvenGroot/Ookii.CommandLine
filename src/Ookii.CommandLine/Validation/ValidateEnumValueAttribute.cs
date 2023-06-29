@@ -10,10 +10,10 @@ namespace Ookii.CommandLine.Validation;
 /// </summary>
 /// <remarks>
 /// <para>
-///   The default <see cref="ArgumentConverter"/> for enumerations allows conversion using the
-///   string representation of the underlying value, as well as the name. While names are
-///   checked against the members, any underlying value can be converted to an enumeration,
-///   regardless of whether it's a defined value for the enumeration.
+///   The <see cref="EnumConverter"/> used to convert values for arguments with enumeration types
+///   allows conversion using the string representation of the underlying value, as well as the
+///   name. While names are checked against the members, any underlying value can be converted to an
+///   enumeration, regardless of whether it's a defined value for the enumeration.
 /// </para>
 /// <para>
 ///   For example, using the <see cref="DayOfWeek"/> enumeration, converting a string value of
@@ -36,6 +36,7 @@ namespace Ookii.CommandLine.Validation;
 ///   It is an error to use this validator on an argument whose type is not an enumeration.
 /// </para>
 /// </remarks>
+/// <threadsafety static="true" instance="true"/>
 public class ValidateEnumValueAttribute : ArgumentValidationWithHelpAttribute
 {
     /// <inheritdoc/>

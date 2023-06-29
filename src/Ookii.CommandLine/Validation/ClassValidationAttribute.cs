@@ -14,12 +14,13 @@ namespace Ookii.CommandLine.Validation;
 ///   be performed even if the argument(s) don't have values.
 /// </para>
 /// <para>
-///   If validation fails, it will throw a <see cref="CommandLineArgumentException"/> with
-///   the category specified in the <see cref="ErrorCategory"/> property. The
+///   If validation fails, the validator will throw a <see cref="CommandLineArgumentException"/>
+///   with the category specified in the <see cref="ErrorCategory"/> property. The
 ///   <see cref="CommandLineParser{T}.ParseWithErrorHandling()" qualifyHint="true"/> method, the
-///   <see cref="CommandLineParser.Parse{T}(string[], int, ParseOptions?)" qualifyHint="true"/> method and the
-///   <see cref="CommandManager"/> class will automatically display the error message and usage
-///   help if validation failed.
+///   <see cref="CommandLineParser.Parse{T}(string[], int, ParseOptions?)" qualifyHint="true"/> method,
+///   the generated <see cref="IParser{TSelf}.Parse(Ookii.CommandLine.ParseOptions?)" qualifyHint="true"/>,
+///   and the <see cref="CommandManager"/> class will automatically display the error message and
+///   usage help if validation failed.
 /// </para>
 /// <para>
 ///   A built-in validator is provided, and you can derive from this class to create custom
@@ -65,7 +66,7 @@ public abstract class ClassValidationAttribute : Attribute
     /// <summary>
     /// Gets the error message to display if validation failed.
     /// </summary>
-    /// <param name="parser">The argument parser that was validated.</param>
+    /// <param name="parser">The command line parser that was validated.</param>
     /// <returns>The error message.</returns>
     /// <remarks>
     /// <para>
@@ -79,7 +80,7 @@ public abstract class ClassValidationAttribute : Attribute
     /// <summary>
     /// When overridden in a derived class, determines if the arguments are valid.
     /// </summary>
-    /// <param name="parser">The argument parser being validated.</param>
+    /// <param name="parser">The command line parser being validated.</param>
     /// <returns>
     ///   <see langword="true"/> if the arguments are valid; otherwise, <see langword="false"/>.
     /// </returns>
@@ -88,7 +89,7 @@ public abstract class ClassValidationAttribute : Attribute
     /// <summary>
     /// Gets the usage help message for this validator.
     /// </summary>
-    /// <param name="parser">The parser is the validator is for.</param>
+    /// <param name="parser">The command line parser that the validator is for.</param>
     /// <returns>
     /// The usage help message, or <see langword="null"/> if there is none. The
     /// base implementation always returns  <see langword="null"/>.
