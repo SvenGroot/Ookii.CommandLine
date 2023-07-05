@@ -73,10 +73,24 @@ public class ValidateEnumValueAttribute : ArgumentValidationWithHelpAttribute
     public bool IncludeValuesInErrorMessage { get; set; }
 
     /// <inheritdoc/>
+    /// <remarks>
+    /// <para>
+    ///   Use a custom <see cref="LocalizedStringProvider"/> class that overrides the
+    ///   <see cref="LocalizedStringProvider.ValidateEnumValueUsageHelp" qualifyHint="true"/> method
+    ///   to customize this message.
+    /// </para>
+    /// </remarks>
     protected override string GetUsageHelpCore(CommandLineArgument argument)
         => argument.Parser.StringProvider.ValidateEnumValueUsageHelp(argument.ElementType);
 
     /// <inheritdoc/>
+    /// <remarks>
+    /// <para>
+    ///   Use a custom <see cref="LocalizedStringProvider"/> class that overrides the
+    ///   <see cref="LocalizedStringProvider.ValidateEnumValueFailed" qualifyHint="true"/> method
+    ///   to customize this message.
+    /// </para>
+    /// </remarks>
     public override string GetErrorMessage(CommandLineArgument argument, object? value)
         => argument.Parser.StringProvider.ValidateEnumValueFailed(argument.ArgumentName, argument.ElementType, value,
                 IncludeValuesInErrorMessage);

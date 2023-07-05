@@ -1,22 +1,24 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Text.RegularExpressions;
 
 namespace Ookii.CommandLine.Validation;
 
 /// <summary>
-/// Validates that an argument's value matches the specified <see cref="Regex"/>.
+/// Validates that an argument's value matches the specified regular expression.
 /// </summary>
 /// <remarks>
 /// <note>
-///   If the argument's type is not <see cref="string"/>, this validator uses the raw string
-///   value provided by the user, before type conversion takes place.
+/// This validator uses the raw string value provided by the user, before type conversion takes
+/// place.
 /// </note>
 /// <para>
 ///   This validator does not add any help text to the argument description.
 /// </para>
 /// </remarks>
 /// <threadsafety static="true" instance="true"/>
+/// <seealso cref="Regex"/>
 public class ValidatePatternAttribute : ArgumentValidationAttribute
 {
     private readonly string _pattern;
@@ -35,9 +37,13 @@ public class ValidatePatternAttribute : ArgumentValidationAttribute
     ///   is performed.
     /// </para>
     /// </remarks>
-    public ValidatePatternAttribute(string pattern, RegexOptions options = RegexOptions.None)
+    public ValidatePatternAttribute(
+#if NET7_0_OR_GREATER
+        [StringSyntax(StringSyntaxAttribute.Regex, nameof(options))]
+#endif
+        string pattern, RegexOptions options = RegexOptions.None)
     {
-        _pattern = pattern;
+        _pattern = pattern ?? throw new ArgumentNullException(nameof(pattern));
         _options = options;
     }
 
@@ -67,15 +73,26 @@ public class ValidatePatternAttribute : ArgumentValidationAttribute
     ///   {0} for the argument name, {1} for the value, and {2} for the pattern.
     /// </para>
     /// </remarks>
+#if NET7_0_OR_GREATER
+    [StringSyntax(StringSyntaxAttribute.CompositeFormat)]
+#endif
     public string? ErrorMessage { get; set; }
 
     /// <summary>
-    /// Gets the pattern that values must match.
+    /// Gets the regular expression that values must match.
     /// </summary>
     /// <value>
     /// The <see cref="Regex"/> pattern that values must match.
     /// </value>
-    public Regex Pattern => _patternRegex ??= new Regex(_pattern, _options);
+    public virtual Regex Pattern => _patternRegex ??= new Regex(_pattern, _options);
+
+    /// <summary>
+    /// Gets the regular expression string stored in this attribute.
+    /// </summary>
+    /// <value>
+    /// The regular expression.
+    /// </value>
+    public string PatternValue => _pattern;
 
     /// <summary>
     /// Determines if the argument's value matches the pattern.

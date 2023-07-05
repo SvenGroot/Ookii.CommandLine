@@ -12,7 +12,7 @@ namespace Ookii.CommandLine.Validation;
 /// </note>
 /// <para>
 ///   If the argument is optional, validation is only performed if the argument is specified,
-///   so the value may still be <see langword="null"/> if the argument is not supplied, if that
+///   so the value may still be an empty string if the argument is not supplied, if that
 ///   is the default value.
 /// </para>
 /// </remarks>
@@ -28,7 +28,7 @@ public class ValidateNotEmptyAttribute : ArgumentValidationWithHelpAttribute
     public override ValidationMode Mode => ValidationMode.BeforeConversion;
 
     /// <summary>
-    /// Determines if the argument is valid.
+    /// Determines if the argument is not an empty string.
     /// </summary>
     /// <param name="argument">The argument being validated.</param>
     /// <param name="value">

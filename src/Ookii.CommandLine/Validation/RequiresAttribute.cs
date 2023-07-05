@@ -58,10 +58,24 @@ public class RequiresAttribute : DependencyValidationAttribute
     /// <param name="argument">The argument that was validated.</param>
     /// <param name="value">Not used.</param>
     /// <returns>The error message.</returns>
+    /// <remarks>
+    /// <para>
+    ///   Use a custom <see cref="LocalizedStringProvider"/> class that overrides the
+    ///   <see cref="LocalizedStringProvider.ValidateRequiresFailed" qualifyHint="true"/> method
+    ///   to customize this message.
+    /// </para>
+    /// </remarks>
     public override string GetErrorMessage(CommandLineArgument argument, object? value)
         => argument.Parser.StringProvider.ValidateRequiresFailed(argument.MemberName, GetArguments(argument.Parser));
 
     /// <inheritdoc/>
+    /// <remarks>
+    /// <para>
+    ///   Use a custom <see cref="LocalizedStringProvider"/> class that overrides the
+    ///   <see cref="LocalizedStringProvider.RequiresUsageHelp" qualifyHint="true"/> method
+    ///   to customize this message.
+    /// </para>
+    /// </remarks>
     protected override string GetUsageHelpCore(CommandLineArgument argument)
         => argument.Parser.StringProvider.RequiresUsageHelp(GetArguments(argument.Parser));
 }

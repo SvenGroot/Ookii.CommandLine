@@ -9,13 +9,13 @@ namespace Ookii.CommandLine.Validation;
 /// </summary>
 /// <remarks>
 /// <note>
-///   If the argument's type is not <see cref="string"/>, this validator uses the raw string
-///   value provided by the user, before type conversion takes place.
+///   This validator uses the raw string value provided by the user, before type conversion takes
+///   place.
 /// </note>
 /// <para>
 ///   If the argument is optional, validation is only performed if the argument is specified,
-///   so the value may still be <see langword="null"/> if the argument is not supplied, if that
-///   is the default value.
+///   so the value may still be an empty or white-space-only string if the argument is not supplied,
+///   if that is the default value.
 /// </para>
 /// </remarks>
 /// <threadsafety static="true" instance="true"/>
@@ -30,7 +30,8 @@ public class ValidateNotWhiteSpaceAttribute : ArgumentValidationWithHelpAttribut
     public override ValidationMode Mode => ValidationMode.BeforeConversion;
 
     /// <summary>
-    /// Determines if the argument's value is not null or only white-space characters.
+    /// Determines if the argument's value is not an empty string, or contains only white-space
+    /// characters.
     /// </summary>
     /// <param name="argument">The argument being validated.</param>
     /// <param name="value">
@@ -54,6 +55,13 @@ public class ValidateNotWhiteSpaceAttribute : ArgumentValidationWithHelpAttribut
     /// <param name="argument">The argument that was validated.</param>
     /// <param name="value">Not used.</param>
     /// <returns>The error message.</returns>
+    /// <remarks>
+    /// <para>
+    ///   Use a custom <see cref="LocalizedStringProvider"/> class that overrides the
+    ///   <see cref="LocalizedStringProvider.ValidateNotWhiteSpaceFailed" qualifyHint="true"/>
+    ///   method to customize this message.
+    /// </para>
+    /// </remarks>
     public override string GetErrorMessage(CommandLineArgument argument, object? value)
     {
         if (value == null)
@@ -67,6 +75,13 @@ public class ValidateNotWhiteSpaceAttribute : ArgumentValidationWithHelpAttribut
     }
 
     /// <inheritdoc/>
+    /// <remarks>
+    /// <para>
+    ///   Use a custom <see cref="LocalizedStringProvider"/> class that overrides the
+    ///   <see cref="LocalizedStringProvider.ValidateNotWhiteSpaceUsageHelp" qualifyHint="true"/> method
+    ///   to customize this message.
+    /// </para>
+    /// </remarks>
     protected override string GetUsageHelpCore(CommandLineArgument argument)
         => argument.Parser.StringProvider.ValidateNotWhiteSpaceUsageHelp();
 

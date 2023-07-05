@@ -118,6 +118,10 @@ public class ArgumentValidatorTest
         Assert.IsTrue(validator.IsValid(argument, "ABCD"));
         Assert.IsFalse(validator.IsValid(argument, ""));
         Assert.IsFalse(validator.IsValid(argument, null));
+
+        Assert.AreEqual("The value for the argument 'Arg3' is not valid.", validator.GetErrorMessage(argument, "foo"));
+        validator.ErrorMessage = "Name {0}, value {1}, pattern {2}";
+        Assert.AreEqual("Name Arg3, value foo, pattern ^[a-z]+$", validator.GetErrorMessage(argument, "foo"));
     }
 
     [TestMethod]

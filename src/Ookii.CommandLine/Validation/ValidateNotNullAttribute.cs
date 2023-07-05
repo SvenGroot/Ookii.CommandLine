@@ -16,7 +16,7 @@ namespace Ookii.CommandLine.Validation;
 /// </para>
 /// <para>
 ///   It is not necessary to use this attribute on required arguments with types that can't be
-///   <see langword="null"/>, such as value types (except <see cref="Nullable{T}"/>, and if
+///   <see langword="null"/>, such as value types (except <see cref="Nullable{T}"/>), and if
 ///   using .Net 6.0 or later, non-nullable reference types. The <see cref="CommandLineParser"/>
 ///   already ensures it will not assign <see langword="null"/> to these arguments.
 /// </para>
@@ -33,7 +33,7 @@ namespace Ookii.CommandLine.Validation;
 public class ValidateNotNullAttribute : ArgumentValidationAttribute
 {
     /// <summary>
-    /// Determines if the argument's value is not null.
+    /// Determines if the argument's value is not <see langword="null"/>.
     /// </summary>
     /// <param name="argument">The argument being validated.</param>
     /// <param name="value">
@@ -54,8 +54,13 @@ public class ValidateNotNullAttribute : ArgumentValidationAttribute
     /// <param name="argument">The argument that was validated.</param>
     /// <param name="value">Not used.</param>
     /// <returns>The error message.</returns>
+    /// <remarks>
+    /// <para>
+    ///   Use a custom <see cref="LocalizedStringProvider"/> class that overrides the
+    ///   <see cref="LocalizedStringProvider.NullArgumentValue" qualifyHint="true"/> method
+    ///   to customize this message.
+    /// </para>
+    /// </remarks>
     public override string GetErrorMessage(CommandLineArgument argument, object? value)
-    {
-        return argument.Parser.StringProvider.NullArgumentValue(argument.ArgumentName);
-    }
+        => argument.Parser.StringProvider.NullArgumentValue(argument.ArgumentName);
 }

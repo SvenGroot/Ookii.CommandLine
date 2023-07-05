@@ -1,7 +1,7 @@
 ﻿namespace Ookii.CommandLine.Validation;
 
 /// <summary>
-/// Specifies when a derived class of the <see cref="ArgumentValidationAttribute"/> class
+/// Specifies when a class that derives from the <see cref="ArgumentValidationAttribute"/> class
 /// will run validation.
 /// </summary>
 public enum ValidationMode

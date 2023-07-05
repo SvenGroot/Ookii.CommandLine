@@ -46,18 +46,18 @@ public class ValidateCountAttribute : ArgumentValidationWithHelpAttribute
     public override ValidationMode Mode => ValidationMode.AfterParsing;
 
     /// <summary>
-    /// Gets the inclusive lower bound on the string length.
+    /// Gets the inclusive lower bound on the number of elements.
     /// </summary>
     /// <value>
-    /// The inclusive lower bound on the string length.
+    /// The inclusive lower bound on the number of elements.
     /// </value>
     public int Minimum => _minimum;
 
     /// <summary>
-    /// Get the inclusive upper bound on the string length.
+    /// Get the inclusive upper bound on the number of elements.
     /// </summary>
     /// <value>
-    /// The inclusive upper bound on the string length.
+    /// The inclusive upper bound on the number of elements.
     /// </value>
     public int Maximum => _maximum;
 
@@ -89,10 +89,24 @@ public class ValidateCountAttribute : ArgumentValidationWithHelpAttribute
     /// <param name="argument">The argument that was validated.</param>
     /// <param name="value">Not used.</param>
     /// <returns>The error message.</returns>
+    /// <remarks>
+    /// <para>
+    ///   Use a custom <see cref="LocalizedStringProvider"/> class that overrides the
+    ///   <see cref="LocalizedStringProvider.ValidateCountFailed" qualifyHint="true"/> method
+    ///   to customize this message.
+    /// </para>
+    /// </remarks>
     public override string GetErrorMessage(CommandLineArgument argument, object? value)
         => argument.Parser.StringProvider.ValidateCountFailed(argument.ArgumentName, this);
 
     /// <inheritdoc/>
+    /// <remarks>
+    /// <para>
+    ///   Use a custom <see cref="LocalizedStringProvider"/> class that overrides the
+    ///   <see cref="LocalizedStringProvider.ValidateCountUsageHelp" qualifyHint="true"/> method
+    ///   to customize this message.
+    /// </para>
+    /// </remarks>
     protected override string GetUsageHelpCore(CommandLineArgument argument)
         => argument.Parser.StringProvider.ValidateCountUsageHelp(this);
 }

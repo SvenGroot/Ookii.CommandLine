@@ -7,8 +7,8 @@ namespace Ookii.CommandLine.Validation;
 /// </summary>
 /// <remarks>
 /// <note>
-///   If the argument's type is not <see cref="string"/>, this validator uses the raw string
-///   value provided by the user, before type conversion takes place.
+/// This validator uses the raw string value provided by the user, before type conversion takes
+/// place.
 /// </note>
 /// </remarks>
 /// <threadsafety static="true" instance="true"/>
@@ -81,10 +81,24 @@ public class ValidateStringLengthAttribute : ArgumentValidationWithHelpAttribute
     /// <param name="argument">The argument that was validated.</param>
     /// <param name="value">Not used.</param>
     /// <returns>The error message.</returns>
+    /// <remarks>
+    /// <para>
+    ///   Use a custom <see cref="LocalizedStringProvider"/> class that overrides the
+    ///   <see cref="LocalizedStringProvider.ValidateStringLengthFailed" qualifyHint="true"/> method
+    ///   to customize this message.
+    /// </para>
+    /// </remarks>
     public override string GetErrorMessage(CommandLineArgument argument, object? value)
         => argument.Parser.StringProvider.ValidateStringLengthFailed(argument.ArgumentName, this);
 
     /// <inheritdoc/>
+    /// <remarks>
+    /// <para>
+    ///   Use a custom <see cref="LocalizedStringProvider"/> class that overrides the
+    ///   <see cref="LocalizedStringProvider.ValidateStringLengthUsageHelp" qualifyHint="true"/> method
+    ///   to customize this message.
+    /// </para>
+    /// </remarks>
     protected override string GetUsageHelpCore(CommandLineArgument argument)
         => argument.Parser.StringProvider.ValidateStringLengthUsageHelp(this);
 }

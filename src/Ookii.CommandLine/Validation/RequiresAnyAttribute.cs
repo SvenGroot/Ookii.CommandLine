@@ -156,6 +156,13 @@ public class RequiresAnyAttribute : ClassValidationAttribute
         => _arguments.Any(name => parser.GetArgument(name)?.HasValue ?? false);
 
     /// <inheritdoc/>
+    /// <remarks>
+    /// <para>
+    ///   Use a custom <see cref="LocalizedStringProvider"/> class that overrides the
+    ///   <see cref="LocalizedStringProvider.ValidateRequiresAnyFailed" qualifyHint="true"/> method
+    ///   to customize this message.
+    /// </para>
+    /// </remarks>
     public override string GetErrorMessage(CommandLineParser parser)
         => parser.StringProvider.ValidateRequiresAnyFailed(GetArguments(parser));
 
@@ -167,6 +174,13 @@ public class RequiresAnyAttribute : ClassValidationAttribute
     /// The usage help message, or <see langword="null"/> if the <see cref="IncludeInUsageHelp"/>
     /// property is <see langword="false"/>.
     /// </returns>
+    /// <remarks>
+    /// <para>
+    ///   Use a custom <see cref="LocalizedStringProvider"/> class that overrides the
+    ///   <see cref="LocalizedStringProvider.RequiresAnyUsageHelp" qualifyHint="true"/> method
+    ///   to customize this message.
+    /// </para>
+    /// </remarks>
     public override string? GetUsageHelp(CommandLineParser parser)
         => IncludeInUsageHelp ? parser.StringProvider.RequiresAnyUsageHelp(GetArguments(parser)) : null;
 
