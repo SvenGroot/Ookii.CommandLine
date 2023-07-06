@@ -11,7 +11,7 @@ If you use the generated [`Parse()`][Parse()_7] method (with [source generation]
 static [`CommandLineParser.Parse<T>()`][] method, or the
 [`CommandLineParser<T>.ParseWithErrorHandling()`][] method, usage help will be printed automatically
 in the event the command line is invalid, or the `-Help` argument was used. You can customize the
-output using the [`ParseOptions.UsageWriter`][] property.
+format using the [`ParseOptions.UsageWriter`][] property.
 
 If you don't use those methods, you can generate the usage help using the
 [`CommandLineParser.WriteUsage()`][] method. By default, the [`CommandLineParser.WriteUsage()`][]
@@ -250,7 +250,7 @@ To hide an argument, use the [`CommandLineArgumentAttribute.IsHidden`][] propert
 public int Argument { get; set; }
 ```
 
-Note that positional arguments cannot be hidden.
+Note that positional and required arguments cannot be hidden.
 
 ## Color output
 
@@ -267,7 +267,7 @@ determine whether color is supported. Color will only be enabled if:
 [`UsageWriter`][] uses virtual terminal sequences to set color. Several components of the help have
 preset colors, which can be customized using properties of the [`UsageWriter`][] class. Set them to any
 of the constants of the [`TextFormat`][] class, or the return value of the [`GetExtendedColor()`][] method
-for any 24-bit color, or any other valid virtual terminal sequence.
+for any 24-bit color.
 
 In order to support proper white-space wrapping for text that contains virtual terminal sequences,
 the [`LineWrappingTextWriter`][] class will not count virtual terminal sequences as part of the line
@@ -282,7 +282,8 @@ The below is an example of the usage help with the default colors.
 The usage help can be heavily customized. We've already seen how it can be customized using things
 such as custom value descriptions, or various properties of the [`UsageWriter`][] class. These can
 also be used to control the indentation of the text, what elements to include, and various small
-formatting changes such as whether to white space or the custom name/value separator.
+formatting changes such as whether to use white space or the custom separator between argument names
+and values.
 
 To customize the usage even further, you can derive a class from the [`UsageWriter`][] class. The
 [`UsageWriter`][] class has protected virtual methods for every part of the usage. These range from
@@ -332,7 +333,7 @@ OPTIONS:
 ```
 
 The [WPF usage sample](../src/Samples/Wpf) is another example that uses a custom [`UsageWriter`][], in
-this case to output the usage help as HTML.
+this case to format the usage help as HTML.
 
 You can see that the [`UsageWriter`][] class offers a lot of flexibility to customize the usage help
 to your liking.

@@ -30,7 +30,7 @@ namespace Ookii.CommandLine;
 /// </remarks>
 /// <threadsafety static="true" instance="true"/>
 /// <seealso href="https://github.com/SvenGroot/Ookii.CommandLine/blob/main/docs/SourceGeneration.md">Source generation</seealso>
-[AttributeUsage(AttributeTargets.Class)]
+[AttributeUsage(AttributeTargets.Class, Inherited = false)]
 public sealed class GeneratedParserAttribute : Attribute
 {
     /// <summary>

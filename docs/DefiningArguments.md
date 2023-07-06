@@ -16,8 +16,8 @@ partial class Arguments
 }
 ```
 
-This enables the use of [source generation](SourceGeneration.md), which has several advantages and
-should be used unless you cannot meet the requirements.
+The use of the [`GeneratedParserAttribute`][] enables [source generation](SourceGeneration.md),
+which has several advantages and should be used unless you cannot meet the requirements.
 
 The class must have a public constructor with no parameters, or one that takes a single
 [`CommandLineParser`][] parameters. If the latter is used, the [`CommandLineParser`][] instance that
@@ -96,7 +96,7 @@ public int OtherArgument { get; set; }
 
 The [`CommandLineArgumentAttribute.Position`][] property specifies the relative position of the
 arguments, not their actual position. Therefore, it's okay to skip numbers; only the order matters.
-The order of the properties themselves does not matter.
+The order of the properties themselves does not matter in this case.
 
 That means that this:
 
@@ -124,6 +124,19 @@ public int Argument2 { get; set; }
 public int Argument1 { get; set; }
 ```
 
+And is also equivalent to this when using the [`GeneratedParserAttribute`][]:
+
+```csharp
+[CommandLineArgument(IsPositional = true)]
+public int Argument1 { get; set; }
+
+[CommandLineArgument(IsPositional = true)]
+public int Argument2 { get; set; }
+
+[CommandLineArgument(IsPositional = true)]
+public int Argument3 { get; set; }
+```
+
 ### Required arguments
 
 To create a required argument, use a `required` property (.Net 7 and later only), or set the
@@ -138,7 +151,7 @@ public required string SomeArgument { get; set; }
 public int OtherArgument { get; set; }
 ```
 
-Now, both `-SomeArgument` and `-OtherArgument` are required and positional.
+Here, both `-SomeArgument` and `-OtherArgument` are required and positional.
 
 You cannot define a required positional argument after an optional positional argument, and a
 multi-value positional argument must be the last positional argument. If your properties violate
@@ -168,8 +181,8 @@ explicitly set to true with `-Switch:true`, and false only if the user supplied 
 
 ### Multi-value arguments
 
-There are two ways to define multi-value arguments using properties. The first is to use a
-read-write property of any array type:
+There are two ways to define multi-value arguments. The first is to use a read-write property of any
+array type:
 
 ```csharp
 [CommandLineArgument]
@@ -189,13 +202,14 @@ the list after parsing has completed.
 public List<string> AlsoMultiValue { get; } = new();
 ```
 
-If you are _not_ using source generation, using .Net 6.0 or later, and using a read-only property
-like this, it is recommended to use [`ICollection<T>`][] as the type of the property. Otherwise,
-[`CommandLineParser`][] will not be able to determine the
+If you are _not_ using the [`GeneratedParserAttribute`][] attribute, using .Net 6.0 or later, and
+using a read-only property like this, it is recommended to use [`ICollection<T>`][] as the type of
+the property. Otherwise, [`CommandLineParser`][] will not be able to determine the
 [nullability](Arguments.md#arguments-with-non-nullable-types) of the collection's elements. This
 limitation does not apply to source generation.
 
-A multi-value argument whose type is a boolean is both a switch and a multi-value argument.
+A multi-value argument whose type is a boolean or a nullable boolean is both a switch and a
+multi-value argument.
 
 ```csharp
 [CommandLineArgument]
@@ -223,9 +237,9 @@ public Dictionary<string, int>? Dictionary { get; set; }
 public SortedDictionary<string, int> AlsoDictionary { get; } = new();
 ```
 
-As above, when using a read-only property when not using source generation, you should use either
-[`Dictionary<TKey, TValue>`][] or [`IDictionary<TKey, TValue>`][] as the type of the property,
-otherwise the nullability of the value type cannot be determined..
+As above, when using a read-only property and not using the [`GeneratedParserAttribute`][]
+attribute, you should use either [`Dictionary<TKey, TValue>`][] or [`IDictionary<TKey, TValue>`][]
+as the type of the property, otherwise the nullability of `TValue` cannot be determined.
 
 ### Default values
 
@@ -242,8 +256,8 @@ this case.
 
 When using source generation, the value of the property initializer will be included in the
 argument's description in the [usage help](UsageHelp.md) as long as the value is either a literal, a
-constant, or an enumeration value. Other types of initializers (such as a `new` expression or a
-method call), will not have their value shown in the usage help.
+constant, a property reference, or an enumeration value. Other types of initializers (such as a
+`new` expression or a method call), will not have their value shown in the usage help.
 
 > You can disable showing default values in the usage help if you do not want it.
 
@@ -255,7 +269,7 @@ Alternatively, you can specify the default value using the
 public int SomeArgument { get; set; }
 ```
 
-The [`DefaultValue`] property must be either the type of the argument, or a string that can be
+The [`DefaultValue`][] property must use either the type of the argument, or a string that can be
 converted to the argument type. This enables you to set a default value for types that don't have
 literals.
 
@@ -268,7 +282,8 @@ The value of the [`CommandLineArgumentAttribute.DefaultValue`][] property will b
 argument's description in the [usage help](UsageHelp.md). In this case, it will be included
 regardless of whether you are using source generation.
 
-Default values will be ignored if specified for a required argument.
+Default values will be ignored if specified for a required argument or a multi-value or dictionary
+argument.
 
 ### Argument descriptions
 
@@ -345,8 +360,8 @@ as a base class to adapt it.
 
 ### Arguments that cancel parsing
 
-You can indicate that argument parsing should stop immediately return when an argument is supplied
-by setting the [`CommandLineArgumentAttribute.CancelParsing`][] property.
+You can indicate that argument parsing should stop immediately when an argument is supplied by
+setting the [`CommandLineArgumentAttribute.CancelParsing`][] property.
 
 When this property is set to [`CancelMode.Abort`][], parsing is stopped when the argument is
 encountered. The rest of the command line is not processed, and
@@ -354,7 +369,8 @@ encountered. The rest of the command line is not processed, and
 [`ParseWithErrorHandling()`][ParseWithErrorHandling()_1] and the static [`Parse<T>()`][Parse<T>()_1]
 helper methods will automatically print usage in this case.
 
-This can be used to implement a custom `-Help` argument, if you don't wish to use the default one.
+This can be used, for example, to implement a custom `-Help` argument, if you don't wish to use the
+default one.
 
 ```csharp
 [CommandLineArgument(CancelParsing = CancelMode.Abort)]
@@ -450,7 +466,6 @@ only `-`.
 [ParseOptions(ArgumentNamesPrefixes = new[] { '-' })]
 partial class Arguments
 {
-
 }
 ```
 
@@ -604,9 +619,9 @@ names. So with long/short mode and the dash-case transformation, you would have 
 The names and aliases of the automatic arguments can be customized using the
 [`LocalizedStringProvider`][] class.
 
-If your class defined an argument with the a name or alias matching the names or aliases of either
+If your class defines an argument where the name or an alias matches the names or aliases of either
 of the automatic arguments, that argument will not be automatically added. In addition, you can
-disable either automatic argument using the [`ParseOptions`][].
+disable either automatic argument using the [`ParseOptions`][] class.
 
 Next, we'll take a look at how to [parse the arguments we've defined](ParsingArguments.md)
 
@@ -629,8 +644,10 @@ Next, we'll take a look at how to [parse the arguments we've defined](ParsingArg
 [`CommandLineParser.HelpRequested`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_CommandLineParser_HelpRequested.htm
 [`CommandLineParser`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_CommandLineParser.htm
 [`CommandLineParser<T>.Parse()`]: https://www.ookii.org/docs/commandline-4.0/html/Overload_Ookii_CommandLine_CommandLineParser_1_Parse.htm
+[`DefaultValue`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_DefaultValue.htm
 [`DescriptionAttribute`]: https://learn.microsoft.com/dotnet/api/system.componentmodel.descriptionattribute
 [`Dictionary<TKey, TValue>`]: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2
+[`GeneratedParserAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_GeneratedParserAttribute.htm
 [`ICollection<T>`]: https://learn.microsoft.com/dotnet/api/system.collections.generic.icollection-1
 [`IDictionary<TKey, TValue>`]: https://learn.microsoft.com/dotnet/api/system.collections.generic.idictionary-2
 [`IsPositional`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_IsPositional.htm

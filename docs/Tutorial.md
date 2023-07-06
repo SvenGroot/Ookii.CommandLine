@@ -1,8 +1,8 @@
 # Tutorial: getting started with Ookii.CommandLine
 
-This tutorial will show you the basics of how to use Ookii.CommandLine. It will show you how to
+This tutorial will show you the basics of how to use Ookii.CommandLine. It will demonstrate how to
 create an application that parses the command line and shows usage help, how to customize some of
-the options—including the POSIX-like long/short mode—and how to use subcommands.
+the options—including using POSIX conventions—and how to use subcommands.
 
 Refer to the [documentation](README.md) for more detailed information.
 
@@ -42,7 +42,7 @@ partial class Arguments
 ```
 
 If you are targeting a .Net version before .Net 7.0, the `required` keyword is not available. In
-that case, use the following code instead:
+that case, use the following code instead for the `Path` property:
 
 ```csharp
 [CommandLineArgument(IsPositional = true, IsRequired = true)]
@@ -84,7 +84,7 @@ return 0;
 This code parses the arguments we defined, returns an error code if it was unsuccessful, and writes
 the contents of the file specified by the path argument to the console.
 
-The important part is the call to `Arguments.Parse()`. This static method was created by the
+The important part is the call to [`Arguments.Parse()`][]. This static method was created by the
 [`GeneratedParserAttribute`][], and will parse your arguments, handle and print any errors, and print
 usage help if required.
 
@@ -190,7 +190,7 @@ tutorial 1.0.0
 ```
 
 By default, it shows the assembly's name and informational version. It'll also show the assembly's
-copyright information, if there is any (there's not in this case). You can also use the
+copyright information, if there is any (there's not in this case). You can use the
 [`AssemblyTitleAttribute`][] or [`ApplicationFriendlyNameAttribute`][] attribute to specify a custom
 name instead of the assembly name.
 
@@ -241,9 +241,9 @@ public bool Inverted { get; set; }
 ```
 
 This defines two new arguments. The first, `-MaxLines`, uses `int?` as its type, so it will only
-accept integer numbers, and be null if not supplied. This argument is not positional (you must use
-the name), and it's optional. We've also added a validator to ensure the value is positive, and
-since `-MaxLines` might be a bit verbose, we've given it an alias `-Lines`, which can be used as an
+accept integers, and be null if not supplied. This argument is not positional (you must use the
+name), and it's optional. We've also added a validator to ensure the value is positive, and since
+`-MaxLines` might be a bit verbose, we've given it an alias `-Lines`, which can be used as an
 alternative name to supply the argument.
 
 > An argument can have any number of aliases; just repeat the [`AliasAttribute`][] attribute.
@@ -416,11 +416,12 @@ default (on Windows only, `/` is also accepted by default). You can make the arg
 sensitive. And there's more.
 
 One thing you may want to do is use POSIX-like conventions, instead of the default PowerShell-like
-parsing behavior. With POSIX conventions, arguments have separate long and short, one-character
-names, which use different prefixes (typically `--` for long names and `-` for short). Argument
-names are typically lowercase, with dashes between words, and are case sensitive. These are the same
-conventions followed by tools such as `dotnet` or `git`, and many others. For a cross-platform
-application, you may prefer these conventions over the default, but it's up to you of course.
+parsing behavior. With POSIX conventions, arguments can have a short, one-character name, and a
+separate long name, which uses a different prefix (typically `--` is used for long names, and `-`
+for short). Argument names are typically lowercase, with dashes between words, and are case
+sensitive. These are the same conventions followed by tools such as `dotnet` or `git`, and many
+others. For a cross-platform application, you may prefer these conventions over the default, but
+it's up to you of course.
 
 A convenient way to change these options is to use the [`ParseOptionsAttribute`][], which you can
 apply to your class. Let's use it to enable POSIX mode:
@@ -483,7 +484,7 @@ and the short name `-i`. Finally, `--path` only has a long name, and is still po
 these names are now case sensitive.
 
 > Name transformations don't apply to names or value descriptions that are explicitly specified, so
-> we had to change "number" and "max" manually to match.
+> we had to change "number" and the alias "lines" manually to match.
 
 Now, the usage help looks like this:
 
@@ -737,8 +738,8 @@ argument, since that would be redundant with the `version` command.
 The usage help for the single arguments class would print an application description at the top,
 but the command list doesn't have anything like that. We can, however, add it.
 
-To do, make the following change to the [`CommandOptions`][] (and add `using Ookii.CommandLine` at
-the top of the file):
+To do this, make the following change to the [`CommandOptions`][] (and add `using Ookii.CommandLine`
+at the top of the file):
 
 ```csharp
 var options = new CommandOptions()
@@ -975,6 +976,7 @@ following resources:
 
 [`AliasAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_AliasAttribute.htm
 [`ApplicationFriendlyNameAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_ApplicationFriendlyNameAttribute.htm
+[`Arguments.Parse()`]: https://www.ookii.org/docs/commandline-4.0/html/M_Ookii_CommandLine_IParser_1_Parse.htm
 [`AssemblyTitleAttribute`]: https://learn.microsoft.com/dotnet/api/system.reflection.assemblytitleattribute
 [`AsyncCommandBase.Run()`]: https://www.ookii.org/docs/commandline-4.0/html/M_Ookii_CommandLine_Commands_AsyncCommandBase_Run.htm
 [`AsyncCommandBase`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Commands_AsyncCommandBase.htm

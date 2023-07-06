@@ -22,16 +22,16 @@ There are validators that check the value of an argument, and validators that ch
 inter-dependencies. The following are the built-in argument value validators (dependency validators
 are discussed [below](#argument-dependencies-and-restrictions)):
 
-Validator                            | Description                                                                                                                                                                                                                                                                                                                                              | Applied
--------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------
-[`ValidateCountAttribute`][]         | Validates that the number of items for a multi-value argument is in the specified range.                                                                                                                                                                                                                                                                 | After parsing.
-[`ValidateEnumValueAttribute`][]     | Validates that the value is one of the defined values for an enumeration. The default [`TypeConverter`][] for an enumeration allows conversion from the underlying value, even if that value is not a defined value for the enumeration. This validator prevents that. See also [enumeration type conversion](Arguments.md#enumeration-conversion).      | After conversion.
-[`ValidateNotEmptyAttribute`][]      | Validates that the value of an argument is not an empty string.                                                                                                                                                                                                                                                                                          | Before conversion.
-[`ValidateNotNullAttribute`][]       | Validates that the value of an argument is not null. This is only useful if the [`TypeConverter`][] for an argument can return null (for example, the [`NullableConverter`][] can). It's not necessary to use this validator on non-nullable value types, or if using .Net 6.0 or later, on non-nullable reference types.                                | After conversion.
-[`ValidateNotWhiteSpaceAttribute`][] | Validates that the value of an argument is not an empty string or a string containing only white-space characters.                                                                                                                                                                                                                                       | Before conversion.
-[`ValidatePatternAttribute`][]       | Validates that the value of an argument matches the specified regular expression.                                                                                                                                                                                                                                                                        | Before conversion.
-[`ValidateRangeAttribute`][]         | Validates that the value of an argument is in the specified range. This can be used on any type that implements the [`IComparable<T>`][] interface.                                                                                                                                                                                                      | After conversion.
-[`ValidateStringLengthAttribute`][]  | Validates that the length of an argument's string value is in the specified range.                                                                                                                                                                                                                                                                       | Before conversion.
+Validator                            | Description                                                                                                                                                                                                                                                                                                                                                                | Applied
+-------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------
+[`ValidateCountAttribute`][]         | Validates that the number of items for a multi-value argument is in the specified range.                                                                                                                                                                                                                                                                                   | After parsing.
+[`ValidateEnumValueAttribute`][]     | Validates that the value is one of the defined values for an enumeration. The [`EnumConverter`][] class allows conversion from the underlying value, even if that value is not a defined value for the enumeration. This validator prevents that. See also [enumeration type conversion](Arguments.md#enumeration-conversion).                                             | After conversion.
+[`ValidateNotEmptyAttribute`][]      | Validates that the value of an argument is not an empty string.                                                                                                                                                                                                                                                                                                            | Before conversion.
+[`ValidateNotNullAttribute`][]       | Validates that the value of an argument is not null. This is only useful if the [`ArgumentConverter`][] for an argument can return null (for example, the [`NullableConverter`][] can). It's not necessary to use this validator on non-nullable value types, or if using .Net 6.0 or later, or [source generation](SourceGeneration.md), on non-nullable reference types. | After conversion.
+[`ValidateNotWhiteSpaceAttribute`][] | Validates that the value of an argument is not an empty string or a string containing only white-space characters.                                                                                                                                                                                                                                                         | Before conversion.
+[`ValidatePatternAttribute`][]       | Validates that the value of an argument matches the specified regular expression.                                                                                                                                                                                                                                                                                          | Before conversion.
+[`ValidateRangeAttribute`][]         | Validates that the value of an argument is in the specified range. This can be used on any type that implements the [`IComparable<T>`][] interface.                                                                                                                                                                                                                        | After conversion.
+[`ValidateStringLengthAttribute`][]  | Validates that the length of an argument's string value is in the specified range.                                                                                                                                                                                                                                                                                         | Before conversion.
 
 Note that there is no `ValidateSetAttribute`, or an equivalent way to make sure that an argument is
 one of a predefined set of values, because you're encouraged to use an enumeration type for this
@@ -93,16 +93,15 @@ because it cannot know the purpose of the of the pattern used. Instead, it will 
 error message stating the value is invalid. You can use the
 [`ValidatePatternAttribute.ErrorMessage`][] property to specify a custom error message.
 
-The [`ValidateEnumValueAttribute`][] validator includes the possible enum values in the error
+The [`ValidateEnumValueAttribute`][] validator includes the possible enumeration values in the error
 message by default. If there are a lot of values, you may wish to disable this, which can be done
-with the [`ValidateEnumValueAttribute.IncludeValuesInErrorMessage`][] property. Note that this error
-message is only used if validation failed, which only happens if a numeric value was used that
-didn't match a defined value. This message is not shown if an invalid string value was used, as that
-will fail at the point of conversion, before the validator is applied.
+with the [`ValidateEnumValueAttribute.IncludeValuesInErrorMessage`][] property. This same error
+message, with the values included, is used by the [`EnumConverter`][] class when the value is an
+unrecognized name.
 
-As with all other error messages, the messages for all built-in validators are obtained from the
-[`LocalizedStringProvider`][] class and can be customized by deriving a custom string provider from
-that class.
+As with all other library error messages, the messages for all built-in validators are obtained from
+the [`LocalizedStringProvider`][] class and can be customized by deriving a custom string provider
+from that class.
 
 ### Usage help
 
@@ -110,7 +109,7 @@ One benefit of using validators is that they can add a help message for their co
 usage help. For example, the [`ValidateRangeAttribute`][] will show a usage help message like "Must
 be between 0 and 100." These messages will be added to the end of the argument's description.
 
-The only exceptions is the [`ValidatePatternAttribute`][], which does not know the intent of the
+The only exceptions are the [`ValidatePatternAttribute`][], which does not know the intent of the
 pattern and can therefore not provide a meaningful help message to the user, and the
 [`ValidateNotNullAttribute`][]. In this case, you should manually add a message to the argument's
 description to make the intent clear.
@@ -134,10 +133,10 @@ Besides argument value validators, there are also a number of built-in validator
 dependencies or restrictions on other arguments. The following validators are available:
 
 Validate                   | Description
----------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 [`ProhibitsAttribute`][]   | Indicates that an argument cannot be used in combination with another argument.
 [`RequiresAttribute`][]    | Indicates that an argument can only be used in combination with another argument.
-[`RequiresAnyAttribute`][] | This is a class validator, that must be applied to the arguments class instead of an argument, which validates that at least one of the specified arguments is present on the command line.
+[`RequiresAnyAttribute`][] | Validates that at least one of the specified arguments is present on the command line. This is a class validator, that must be applied to the arguments class instead of an argument.
 
 For example, you might have an application that can read data from a file, or from a server at a
 specified IP address and port. You could express these arguments as follows:
@@ -147,7 +146,7 @@ specified IP address and port. You could express these arguments as follows:
 [RequiresAny(nameof(Path), nameof(Ip))]
 partial class ProgramArguments
 {
-    [CommandLineArgument(Position = 0)]
+    [CommandLineArgument(IsPositional = true)]
     [Description("The path to use.")]
     public FileInfo? Path { get; set; }
 
@@ -156,12 +155,16 @@ partial class ProgramArguments
     [Prohibits(nameof(Path))]
     public IPAddress? Ip { get; set; }
 
-    [CommandLineArgument(DefaultValue = 80)]
+    [CommandLineArgument]
     [Description("The port to connect to.")]
     [Requires(nameof(Ip))]
-    public int Port { get; set; }
+    public int Port { get; set; } = 80;
 }
 ```
+
+:warning: **IMPORTANT:** The [`RequiresAttribute`][], [`ProhibitsAttribute`][] and
+[`RequiresAnyAttribute`][] all take the name of an _argument_ as their parameters. The use of
+`nameof()` as above is only safe if the member names match the argument names.
 
 The `-Ip` argument uses the [`ProhibitsAttribute`][] to indicate it is mutually exclusive with the
 "Path" argument. The `-Port` argument uses the [`RequiresAttribute`][] to indicate it can only be
@@ -176,9 +179,28 @@ Just like the argument value validators, the dependency validators will add a us
 desired. In the case of a class validator like the [`RequiresAnyAttribute`][], this message is shown
 before the description list.
 
-:warning: **IMPORTANT:** The [`RequiresAttribute`][], [`ProhibitsAttribute`][] and
-[`RequiresAnyAttribute`][] all take the name of an _argument_ as their parameters. The use of
-`nameof()` as above is only safe if the member names match the argument names.
+For example, the usage help of the above arguments looks like this:
+
+```text
+Usage: cscoretest [[-Path] <FileInfo>] [-Help] [-Ip <IPAddress>] [-Port <Int32>] [-Version]
+
+You must use at least one of: -Path, -Ip.
+
+    -Path <FileInfo>
+        The path to use.
+
+    -Help [<Boolean>] (-?, -h)
+        Displays this help message.
+
+    -Ip <IPAddress>
+        The IP address to connect to. Cannot be used with: -Path.
+
+    -Port <Int32>
+        The port to connect to. Must be used with: -Ip. Default value: 80.
+
+    -Version [<Boolean>]
+        Displays version information.
+```
 
 Check out the [argument dependencies sample](../src/Samples/ArgumentDependencies/) to see this in
 action.
@@ -258,6 +280,7 @@ does not apply to validators that don't use [`ValidationMode.BeforeConversion`][
 Now that you know (almost) everything there is to know about arguments, let's move on to
 [subcommands](Subcommands.md).
 
+[`ArgumentConverter`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Conversion_ArgumentConverter.htm
 [`ArgumentValidationAttribute.IsSpanValid`]: https://www.ookii.org/docs/commandline-4.0/html/M_Ookii_CommandLine_Validation_ArgumentValidationAttribute_IsSpanValid.htm
 [`ArgumentValidationAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Validation_ArgumentValidationAttribute.htm
 [`ArgumentValidationWithHelpAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Validation_ArgumentValidationWithHelpAttribute.htm
@@ -269,6 +292,7 @@ Now that you know (almost) everything there is to know about arguments, let's mo
 [`CommandLineParser`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_CommandLineParser.htm
 [`CommandLineParser<T>.ParseWithErrorHandling()`]: https://www.ookii.org/docs/commandline-4.0/html/M_Ookii_CommandLine_CommandLineParser_1_ParseWithErrorHandling.htm
 [`DateOnly`]: https://learn.microsoft.com/dotnet/api/system.dateonly
+[`EnumConverter`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Conversion_EnumConverter.htm
 [`ErrorCategory`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_Validation_ArgumentValidationAttribute_ErrorCategory.htm
 [`GetErrorMessage()`]: https://www.ookii.org/docs/commandline-4.0/html/M_Ookii_CommandLine_Validation_ArgumentValidationAttribute_GetErrorMessage.htm
 [`GetUsageHelp()`]: https://www.ookii.org/docs/commandline-4.0/html/M_Ookii_CommandLine_Validation_ArgumentValidationAttribute_GetUsageHelp.htm
@@ -276,13 +300,12 @@ Now that you know (almost) everything there is to know about arguments, let's mo
 [`IComparable<T>`]: https://learn.microsoft.com/dotnet/api/system.icomparable-1
 [`IsValid()`]: https://www.ookii.org/docs/commandline-4.0/html/M_Ookii_CommandLine_Validation_ArgumentValidationAttribute_IsValid.htm
 [`LocalizedStringProvider`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_LocalizedStringProvider.htm
-[`NullableConverter`]: https://learn.microsoft.com/dotnet/api/system.componentmodel.nullableconverter
+[`NullableConverter`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Conversion_NullableConverter.htm
 [`Ookii.CommandLine.Validation`]: https://www.ookii.org/docs/commandline-4.0/html/N_Ookii_CommandLine_Validation.htm
 [`ProhibitsAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Validation_ProhibitsAttribute.htm
 [`ReadOnlySpan<char>`]: https://learn.microsoft.com/dotnet/api/system.readonlyspan-1
 [`RequiresAnyAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Validation_RequiresAnyAttribute.htm
 [`RequiresAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Validation_RequiresAttribute.htm
-[`TypeConverter`]: https://learn.microsoft.com/dotnet/api/system.componentmodel.typeconverter
 [`UsageWriter.IncludeValidatorsInDescription`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_UsageWriter_IncludeValidatorsInDescription.htm
 [`ValidateCountAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Validation_ValidateCountAttribute.htm
 [`ValidateEnumValueAttribute.IncludeValuesInErrorMessage`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_Validation_ValidateEnumValueAttribute_IncludeValuesInErrorMessage.htm

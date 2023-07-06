@@ -99,10 +99,10 @@ The [`VirtualTerminal`][] class allows you to determine whether virtual terminal
 supported, and to enable them. The [`UsageWriter`][] class uses this internally to enable color output
 when possible.
 
-The [`TextFormat`][] class provides a number of constants for the predefined background and foreground
-colors and formats supported by the console, as well as a method to create a VT sequence for any
-24-bit color. These can be used to change the default usage help colors, or to apply color to your
-own text.
+The [`TextFormat`][] structure provides a number of values for the predefined background and
+foreground colors and formats supported by the console, as well as a method to create a VT sequence
+for any 24-bit color. These can be used to change the default usage help colors, or to apply color
+to your own text by writing them to the console.
 
 For example, you can use the following to write in color when supported:
 
@@ -127,6 +127,40 @@ On Windows, VT support must be enabled for a process. In addition to checking fo
 and they return a disposable type that will revert the console mode when disposed or garbage
 collected. On other platforms, it only checks for support and disposing the returned instance does
 nothing.
+
+In the [tutorial](Tutorial.md), we created an application with an `--inverted` argument, that
+actually just set the console to use a white background and a black foreground, instead of truly
+inverting the console colors. With virtual terminal support, we can update the `read` command to use
+true inversion.
+
+```csharp
+public int Run()
+{
+    using var support = VirtualTerminal.EnableColor(StandardStream.Output);
+    if (support.IsSupported && Inverted)
+    {
+        Console.Write(TextFormat.Negative);
+    }
+
+    var lines = File.ReadLines(Path);
+    if (MaxLines is int maxLines)
+    {
+        lines = lines.Take(maxLines);
+    }
+
+    foreach (var line in lines)
+    {
+        Console.WriteLine(line);
+    }
+
+    if (support.IsSupported && Inverted)
+    {
+        Console.Write(TextFormat.Default);
+    }
+
+    return 0;
+}
+```
 
 [`Console.WindowWidth`]: https://learn.microsoft.com/dotnet/api/system.console.windowwidth
 [`EnableColor()`]: https://www.ookii.org/docs/commandline-4.0/html/M_Ookii_CommandLine_Terminal_VirtualTerminal_EnableColor.htm

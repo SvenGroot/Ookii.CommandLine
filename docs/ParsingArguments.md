@@ -59,7 +59,7 @@ The generated [`Parse()`][Parse()_7] methods and the static [`Parse<T>()`][Parse
 a [`CommandLineArgumentException`][]. They can throw other exceptions if the arguments type violates one
 of the rules for valid arguments (such as defining an optional positional argument after a required
 one). An exception from this method typically indicates a mistake in your arguments class. When
-using source generation, these kinds of errors are typically caught at compile time.
+using source generation, these kinds of errors are often caught at compile time.
 
 You can customize various aspects of the parsing behavior using either the
 [`ParseOptionsAttribute`][], applied to your arguments class, or a [`ParseOptions`][] instance
@@ -78,7 +78,7 @@ var options = new ParseOptions()
     UsageWriter = new UsageWriter(writer);
 };
 
-var arguments = CommandLineParser.Parse<MyArguments>(options);
+var arguments = MyArguments.Parse(options);
 if (arguments == null)
 {
     // There are probably better ways to show help in a GUI app than this.
@@ -104,11 +104,11 @@ and create your own error message.
 
 ## Manual parsing and error handling
 
-The static [`Parse<T>()`][Parse<T>()_1] method and its overloads will likely be sufficient for most
-use cases. However, sometimes you may want even more fine-grained control. This includes the ability
-to handle the [`ArgumentParsed`][] and [`DuplicateArgument`][DuplicateArgument_0] events, and to get
-additional information about the arguments using the [`Arguments`][Arguments_0] property or the
-[`GetArgument`][] function.
+The generated [`Parse()`][Parse()_7] methods and the static [`Parse<T>()`][Parse<T>()_1] method and
+their overloads will likely be sufficient for most use cases. However, sometimes you may want even
+more fine-grained control. This includes the ability to handle the [`ArgumentParsed`][] and
+[`DuplicateArgument`][DuplicateArgument_0] events, and to get additional information about the
+arguments using the [`Arguments`][Arguments_0] property or the [`GetArgument`][] function.
 
 In this case, you can manually create an instance of the [`CommandLineParser<T>`][] class. Then, call
 the instance [`ParseWithErrorHandling()`][ParseWithErrorHandling()_1] or [`Parse()`][Parse()_5] method.

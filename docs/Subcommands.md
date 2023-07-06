@@ -70,8 +70,9 @@ name. Then, the [`ICommand.Run()`][] method will be called.
 
 All of the functionality and [options](#subcommand-options) available with regular arguments types
 are available with commands too, including [usage help generation](#subcommand-usage-help),
-[long/short mode](Arguments.md#longshort-mode), all kinds of arguments, validators, source
-generation, etc.
+[long/short mode](Arguments.md#longshort-mode), [name transformation](#name-transformation),
+[all kinds of arguments](DefiningArguments.md), [validators](Validation.md),
+[source generation](SourceGeneration.md), etc.
 
 ### Name transformation
 
@@ -104,8 +105,8 @@ value, the `ReadDirectoryCommand` class above will create a command named `read-
 
 ### Command aliases
 
-Like argument names, a command can have one or more aliases, alternative names that can be used
-to invoke the command. Simply apply the [`AliasAttribute`][] to the command class.
+Like command line arguments, a command can have one or more aliases, alternative names that can be
+used to invoke the command. Simply apply the [`AliasAttribute`][] to the command class.
 
 ```csharp
 [GeneratedParser]
@@ -130,7 +131,7 @@ Automatic prefix aliases for command names can be disabled using the
 
 ### Asynchronous commands
 
-It's possible to use asynchronous code with subcommands. To do this, implement the
+It's possible to create subcommands that execute asynchronous code. To do this, implement the
 [`IAsyncCommand`][] interface, which derives from [`ICommand`][], and use the
 [`CommandManager.RunCommandAsync()`][] method (see [below](#using-subcommands)).
 

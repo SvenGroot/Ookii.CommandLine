@@ -9,12 +9,11 @@ through the parameter of the `static void Main(string[] args)` method. This prov
 as an array of strings, which Ookii.CommandLine will parse to extract strongly-typed, named values
 that you can easily access in your application.
 
-The method used to extract values from the array of string arguments is determined by the command
-line argument parsing rules. Ookii.CommandLine supports two sets of parsing rules: the default mode,
-which uses parsing rules similar to those used by PowerShell, and [long/short mode](#longshort-mode),
-which is more POSIX-like, and lets arguments have a long name and a short name, with different
-prefixes. Most of the below information applies to both modes, with the differences described at the
-end.
+The way the raw string arguments are interpreted is determined by the command line argument parsing
+rules. Ookii.CommandLine supports two sets of parsing rules: the default mode, which uses parsing
+rules similar to those used by PowerShell, and [long/short mode](#longshort-mode), which is more
+POSIX-like, and lets arguments have a long name and a short name, with different prefixes. Most of
+the below information applies to both modes, with the differences described when applicable.
 
 ## Named arguments
 
@@ -57,9 +56,25 @@ argument values. For example, `-ArgumentName:foo:bar` will give `-ArgumentName` 
 Not all arguments require values; those that do not are called [_switch arguments_](#switch-arguments)
 and have a value determined by their presence or absence on the command line.
 
+### Short names
+
+In long/short mode, an argument can have an additional, one-character short name. This short name
+is often the first character of the long name, but it can be any character. Where long names in
+long/short mode use the long argument prefix (`--` by default), short names have their own prefix,
+which is `-` (and on Windows, `/`) by default.
+
+For example, if the argument `--argument-name` has the short name `-a`, the following are equivalent:
+
+```text
+--argument-name value
+-a value
+```
+
+### Aliases
+
 An argument can have one or more aliases: alternative names that can also be used to supply the same
 argument. For example, an argument named `-Verbose` might use the alias `-v` as a shorter to type
-alternative.
+alternative. In long/short mode, an argument can have both long and short aliases.
 
 By default, Ookii.CommandLine accepts [any prefix](DefiningArguments.md#automatic-prefix-aliases)
 that uniquely identifies a single argument as an alias for that argument, without having to
@@ -91,8 +106,8 @@ Now, consider the following invocation:
 value1 -NamedOnly value2 value3
 ```
 
-In this case, "value1" is not preceded by a name; therefore, it is matched to `-Positional1`
-argument. The value "value2" follows a name, so it is matched to the argument with the name
+In this case, "value1" is not preceded by a name; therefore, it is matched to the argument
+`-Positional1`. The value "value2" follows a name, so it is matched to the argument with the name
 `-NamedOnly`. Finally, "value3" is matched to the second positional argument, which is
 `-Positional2`.
 
@@ -147,6 +162,24 @@ A switch argument’s value can be specified explicitly, as in the following exa
 You must use the name/value separator (a colon or equals sign by default) to specify an explicit
 value for a switch argument; you cannot use white space. If the command line contains `-Switch false`,
 then `false` is the value of the next positional argument, not the value for `-Switch`.
+
+### Combined switch arguments
+
+For switch arguments with short names when using long/short mode, the switches can be combined in a
+single argument. For example, given the switches with the short names `-a`, `-b` and `-c`, the
+following command line sets all three switches:
+
+```text
+-abc
+```
+
+This is equivalent to:
+
+```text
+-a -b -c
+```
+
+This only works for switch arguments, and does not apply to long names or the default parsing mode.
 
 ## Arguments with multiple values
 
@@ -320,23 +353,26 @@ change this using the [`ParseOptions.Culture`][] property, but be very careful i
 ## Arguments with non-nullable types
 
 Ookii.CommandLine provides support for nullable reference types. Not only is the library itself
-fully annotated, but if you use the .Net 6.0 version of the library, command line argument parsing
-takes into account the nullability of the argument types. If the argument is declared with a
-nullable reference or value type (e.g. `string?` or `int?`), nothing changes. But if the argument is
-not nullable (e.g. `string` (in a context with NRT support) or `int`), [`CommandLineParser`][] will
-ensure that the value will not be null.
+fully annotated, but if you use [source generation](SourceGeneration.md) or the .Net 6.0 version of
+the library, command line argument parsing takes into account the nullability of the argument types.
+If the argument is declared with a nullable reference or value type (e.g. `string?` or `int?`),
+nothing changes. But if the argument is not nullable (e.g. `string` (in a context with NRT support)
+or `int`), [`CommandLineParser`][] will ensure that the value will not be null.
 
 Assigning a null value to an argument only happens if the [`ArgumentConverter`][] for that argument
 returns null as the result of the conversion. If this happens and the argument is not nullable, a
 [`CommandLineArgumentException`][] is thrown with the category set to
 [`NullArgumentValue`][NullArgumentValue_0].
 
-Null-checking for non-nullable reference types is only available in .Net 6.0 and later. If you are
-using the .Net Standard versions of Ookii.CommandLine, this check is only done for value types.
-
 For multi-value arguments, the nullability check applies to the type of the elements (e.g.
 `string?[]` for an array), and for dictionary arguments, it applies to the value (e.g.
 `Dictionary<string, string?>`); the key may never be nullable for a dictionary argument.
+
+Null-checking for non-nullable reference types is available for all runtime versions if you use
+source generation. If you cannot use source generation, only the .Net 6.0 and later versions of
+Ookii.CommandLine can determine the nullability of reference types when using reflection. The
+.Net Standard versions of the library will only apply this check to value types unless source
+generation was used.
 
 See also the [`CommandLineArgument.AllowNull`][] property.
 
@@ -355,49 +391,13 @@ place of the regular argument name, and an additional single-character short nam
 Ookii.CommandLine follows the convention of using the prefix `--` for long names, and `-` (and `/`
 on Windows only) for short names.
 
+Besides allowing the alternative names, long/short mode follows the same rules as the default mode,
+with the differences as explained above.
+
 POSIX conventions also specify the use of lower case argument names, with dashes separating words
 ("dash-case"), which you can easily achieve using [name transformation](DefiningArguments.md#name-transformation),
 and case-sensitive argument names. For information on how to set these options,
 [see here](DefiningArguments.md#longshort-mode).
-
-When using long/short mode, an argument named `--path` could have a short name `-p`. It could then
-be supplied using either name:
-
-```text
---path value
-```
-
-Or:
-
-```text
--p value
-```
-
-Note that you must use the correct prefix: using `-path` or `--p` will not work.
-
-An argument can have either a short name or a long name, or both. The short name doesn't have to
-use the first letter of the long name; it can be anything.
-
-Arguments in this mode can still have aliases. You can set separate long and short aliases, which
-follow the same rules as the long and short names.
-
-For switch arguments with short names, the switches can be combined in a single argument. For
-example, given the switches `-a`, `-b` and `-c`, the following command line sets all three switches:
-
-```text
--abc
-```
-
-This is equivalent to:
-
-```text
--a -b -c
-```
-
-This only works for switch arguments, and does not apply to long names.
-
-Besides these differences, long/short mode follows the same rules and conventions outlined above,
-with all the same options.
 
 ## More information
 
