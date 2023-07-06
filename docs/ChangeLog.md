@@ -23,6 +23,8 @@ please check the [migration guide](Migrating.md).
   - This enables conversion using [`ReadOnlySpan<char>`][] for better performance, makes it easier to
     implement new converters, provides better error messages for enumeration conversion, and enables
     the use of trimming (when source generation is used).
+  - For .Net 7 and later, support value conversion using the [`ISpanParsable<TSelf>`][] and
+    [`IParsable<TSelf>`][] interfaces.
 - Automatically accept [any unique prefix](DefiningArguments.md#automatic-prefix-aliases) of an
   argument name as an alias.
 - Use the `required` keyword in C# 11 and .Net 7.0 to create required arguments.
@@ -225,6 +227,8 @@ may require substantial code changes and may change how command lines are parsed
 [`Environment.GetCommandLineArgs()`]: https://learn.microsoft.com/dotnet/api/system.environment.getcommandlineargs
 [`GeneratedCommandManagerAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Commands_GeneratedCommandManagerAttribute.htm
 [`GeneratedParserAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_GeneratedParserAttribute.htm
+[`IParsable<TSelf>`]: https://learn.microsoft.com/dotnet/api/system.iparsable-1
+[`ISpanParsable<TSelf>`]: https://learn.microsoft.com/dotnet/api/system.ispanparsable-1
 [`LineWrappingTextWriter.ToString()`]: https://www.ookii.org/docs/commandline-4.0/html/M_Ookii_CommandLine_LineWrappingTextWriter_ToString.htm
 [`LineWrappingTextWriter`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_LineWrappingTextWriter.htm
 [`ParseOptions.IsPosix`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_ParseOptions_IsPosix.htm

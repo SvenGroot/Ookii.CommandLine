@@ -26,7 +26,7 @@ parse the supplied arguments for those values. In addition, you can generate usa
 displayed to the user.
 
 Ookii.CommandLine can be used with any kind of .Net application, whether console or GUI. Some
-functionality, such as creating usage help, are primarily designed for console applications, but
+functionality, such as creating usage help, is primarily designed for console applications, but
 even those can be easily adapted for use with other styles of applications.
 
 Two styles of [command line parsing rules](docs/Arguments.md) are supported: the default mode uses
@@ -51,7 +51,7 @@ partial class MyArguments
 
     [CommandLineArgument(IsPositional = true)]
     [Description("An optional positional argument.")]
-    public required int Optional { get; set; } = 42;
+    public int Optional { get; set; } = 42;
 
     [CommandLineArgument]
     [Description("An argument that can only be supplied by name.")]
@@ -76,7 +76,7 @@ var arguments = MyArguments.Parse();
 
 The `Parse()` method is added to the class through [source generation](docs/SourceGeneration.md).
 
-This code will take the arguments from `Environment.GetCommandLineArgs()` (you can also manually
+This method will take the arguments from `Environment.GetCommandLineArgs()` (you can also manually
 pass a `string[]` array if you want), will handle and print errors to the console, and will print
 usage help if needed. It returns an instance of `MyArguments` if successful, and `null` if not.
 
@@ -145,9 +145,10 @@ The .Net Standard 2.1 and .Net 6.0 and 7.0 versions utilize the framework `ReadO
 
 The .Net 6.0 version has additional support for [nullable reference types](docs/Arguments.md#arguments-with-non-nullable-types),
 and is annotated to allow [trimming](https://learn.microsoft.com/dotnet/core/deploying/trimming/trimming-options)
+when [source generation](docs/SourceGeneration.md) is used.
 
 The .Net 7.0 version has additional support for `required` properties, and can utilize
-`ISpanParsable<TSelf>` and `IParsable<TSelf>` for argument conversion.
+`ISpanParsable<TSelf>` and `IParsable<TSelf>` for argument value conversions.
 
 ## Building and testing
 
@@ -183,9 +184,6 @@ then, should you use Ookii.CommandLine?
 Ookii.CommandLine has a very different design. It uses a declarative approach to defining command
 line arguments, using properties and attributes, which I personally prefer to the fluent API used
 by System.CommandLine, as it reduces the amount of code you typically need to write.
-
-Additionally, Ookii.CommandLine is highly configurable, and supports a more PowerShell-like syntax,
-as well as the POSIX-like syntax that System.CommandLine uses.
 
 In the end, it comes down to personal preference. You should use whichever one suits your needs and
 coding style best.

@@ -4,7 +4,8 @@ Ookii.CommandLine 4.0 and later have a number of breaking changes from version 3
 versions. This article explains what you need to know to migrate your code to the new version.
 
 Although there are quite a few changes, it's likely your application will not require many
-modifications unless you used subcommands or heavily customized the usage help format.
+modifications unless you used subcommands, heavily customized the usage help format, or used
+custom argument value conversion.
 
 ## .Net Framework support
 
@@ -14,9 +15,11 @@ As of version 3.0, .Net Framework 2.0 is no longer supported. You can still targ
 
 ## Breaking API changes from version 3.0
 
+- It's strongly recommended to use [source generation](SourceGeneration.md) unless you cannot meet
+  the requirements.
 - The `CommandLineArgumentAttribute.ValueDescription` property has been replaced by the
   [`ValueDescriptionAttribute`][] attribute. This new attribute is not sealed, enabling derived
-  attributes e.g. to load a value description from localized resource.
+  attributes e.g. to load a value description from a localized resource.
 - Converting argument values from a string to their final type is no longer done using the
   [`TypeConverter`][] class, but instead using a custom [`ArgumentConverter`][] class. Custom
   converters must be specified using the [`ArgumentConverterAttribute`][] instead of the
@@ -31,10 +34,6 @@ As of version 3.0, .Net Framework 2.0 is no longer supported. You can still targ
     [`KeyConverterAttribute`][] and [`ValueConverterAttribute`][] respectively
 - Constructor parameters can no longer be used to define command line arguments. Instead, all
   arguments must be defined using properties.
-- The [`CommandManager`][], when using an assembly that is not the calling assembly, will only use
-  public command classes, where before it would also use internal ones. This is to better respect
-  access modifiers, and to make sure generated and reflection-based command managers behave the
-  same.
 - `ParseOptions.ArgumentNameComparer` and `CommandOptions.CommandNameComparer` have been replaced by
   [`ArgumentNameComparison`][ArgumentNameComparison_1] and [`CommandNameComparison`][] respectively,
   both now taking a [`StringComparison`][] value instead of an [`IComparer<string>`][].
@@ -71,6 +70,12 @@ As of version 3.0, .Net Framework 2.0 is no longer supported. You can still targ
 
 - By default, both `:` and `=` are accepted as argument name/value separators.
 - The default value of [`ParseOptions.ShowUsageOnError`][] has changed to [`UsageHelpRequest.SyntaxOnly`][].
+- [Automatic prefix aliases](DefiningArguments.md#automatic-prefix-aliases) are enabled by default
+  for both argument names and [command names](Subcommands.md#command-aliases).
+- The [`CommandManager`][], when using an assembly that is not the calling assembly, will only use
+  public command classes, where before it would also use internal ones. This is to better respect
+  access modifiers, and to make sure generated and reflection-based command managers behave the
+  same.
 
 ## Breaking API changes from version 2.4
 
