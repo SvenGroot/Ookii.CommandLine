@@ -9,8 +9,8 @@ custom property setters that perform the validation, Ookii.CommandLine also prov
 attributes. The advantage of this is that you can reuse common validation rules, if you use one of
 the generated [`Parse()`][Parse()_7], static [`CommandLineParser.Parse<T>()`][] or
 [`CommandLineParser<T>.ParseWithErrorHandling()`][] methods it will handle printing validation error
-messages, and validators can also add a help message to the argument descriptions in the [usage
-help](UsageHelp.md).
+messages, and validators can also add a help message to the argument descriptions in the
+[usage help](UsageHelp.md).
 
 ## Built-in validators
 
