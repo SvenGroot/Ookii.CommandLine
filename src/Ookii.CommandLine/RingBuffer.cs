@@ -195,5 +195,5 @@ internal partial class RingBuffer
         _buffer = newBuffer;
     }
 
-    private partial void WriteHelper(TextWriter writer, char[] buffer, int index, int length);
+    private static partial void WriteHelper(TextWriter writer, char[] buffer, int index, int length);
 }

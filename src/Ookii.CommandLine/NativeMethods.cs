@@ -97,11 +97,13 @@ static partial class NativeMethods
         ENABLE_EXTENDED_FLAGS = 0x0080,
         ENABLE_AUTO_POSITION = 0x0100,
 
+#pragma warning disable CA1069 // Enums values should not be duplicated
         ENABLE_PROCESSED_OUTPUT = 0x0001,
         ENABLE_WRAP_AT_EOL_OUTPUT = 0x0002,
         ENABLE_VIRTUAL_TERMINAL_PROCESSING = 0x0004,
         DISABLE_NEWLINE_AUTO_RETURN = 0x0008,
         ENABLE_LVB_GRID_WORLDWIDE = 0x0010
+#pragma warning restore CA1069 // Enums values should not be duplicated
     }
 
     private enum StandardHandle

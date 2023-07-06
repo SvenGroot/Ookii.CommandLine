@@ -38,7 +38,7 @@ internal partial class RingBuffer
         }
     }
 
-    private async Task WriteAsyncHelper(TextWriter writer, char[] buffer, int index, int length, CancellationToken cancellationToken)
+    private static async Task WriteAsyncHelper(TextWriter writer, char[] buffer, int index, int length, CancellationToken cancellationToken)
     {
 #if NETSTANDARD2_1_OR_GREATER || NET6_0_OR_GREATER
         await writer.WriteAsync(buffer.AsMemory(index, length), cancellationToken);

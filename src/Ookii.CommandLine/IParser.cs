@@ -42,6 +42,18 @@ public interface IParser<TSelf> : IParserProvider<TSelf>
     ///   error occurred, or argument parsing was canceled by the <see cref="CommandLineArgumentAttribute.CancelParsing" qualifyHint="true"/>
     ///   property or a method argument that returned <see langword="false"/>.
     /// </returns>
+    /// <exception cref="NotSupportedException">
+    ///   The <see cref="CommandLineParser{T}"/> cannot use type <typeparamref name="TSelf"/> as the
+    ///   command line arguments type, because it violates one of the rules concerning argument
+    ///   names or positions. Even when the parser was generated using the <see cref="GeneratedParserAttribute"/>
+    ///   class, not all those rules can be checked at compile time.
+    /// </exception>
+    /// <remarks>
+    /// <para>
+    ///   This method is typically generated for a class that defines command line arguments by
+    ///   the <see cref="GeneratedParserAttribute"/> attribute.
+    /// </para>
+    /// </remarks>
     /// <seealso cref="CommandLineParser.Parse{T}(ParseOptions?)" qualifyHint="true"/>
     public static abstract TSelf? Parse(ParseOptions? options = null);
 
@@ -59,6 +71,18 @@ public interface IParser<TSelf> : IParserProvider<TSelf>
     ///   error occurred, or argument parsing was canceled by the <see cref="CommandLineArgumentAttribute.CancelParsing" qualifyHint="true"/>
     ///   property or a method argument that returned <see langword="false"/>.
     /// </returns>
+    /// <exception cref="NotSupportedException">
+    ///   The <see cref="CommandLineParser{T}"/> cannot use type <typeparamref name="TSelf"/> as the
+    ///   command line arguments type, because it violates one of the rules concerning argument
+    ///   names or positions. Even when the parser was generated using the <see cref="GeneratedParserAttribute"/>
+    ///   class, not all those rules can be checked at compile time.
+    /// </exception>
+    /// <remarks>
+    /// <para>
+    ///   This method is typically generated for a class that defines command line arguments by
+    ///   the <see cref="GeneratedParserAttribute"/> attribute.
+    /// </para>
+    /// </remarks>
     /// <seealso cref="CommandLineParser.Parse{T}(string[], ParseOptions?)" qualifyHint="true"/>
     public static abstract TSelf? Parse(string[] args, ParseOptions? options = null);
 
