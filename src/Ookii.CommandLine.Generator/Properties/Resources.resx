@@ -165,6 +165,12 @@
   <data name="CommandAttributeWithoutInterfaceTitle" xml:space="preserve">
     <value>The command line arguments class has the CommandAttribute but does not implement ICommand.</value>
   </data>
+  <data name="CommandInterfaceWithoutAttributeMessageFormat" xml:space="preserve">
+    <value>The command line arguments class {0} implements the ICommand interface but does not have the CommandAttribute attribute.</value>
+  </data>
+  <data name="CommandInterfaceWithoutAttributeTitle" xml:space="preserve">
+    <value>The command line arguments class implements the ICommand interface but does not have the CommandAttribute attribute.</value>
+  </data>
   <data name="CommandWithoutDescriptionMessageFormat" xml:space="preserve">
     <value>The subcommand defined by {0} should have a description for the usage help. Use the System.ComponentModel.DescriptionAttribute attribute on the class to supply a description.</value>
   </data>

@@ -88,11 +88,14 @@ internal class ParserGenerator
             }
             else
             {
-                // The other way around (interface without attribute) doesn't need a warning since
-                // it could be a base class for a command (though it's kind of weird that the
-                // GeneratedParserAttribute was used on a base class).
                 _context.ReportDiagnostic(Diagnostics.CommandAttributeWithoutInterface(_argumentsClass));
             }
+        }
+        else if (_argumentsClass.ImplementsInterface(_typeHelper.ICommand))
+        {
+            // Although this is a common pattern for base classes, it makes no sense to apply the
+            // GeneratedParserAttribute to a base class.
+            _context.ReportDiagnostic(Diagnostics.CommandInterfaceWithoutAttribute(_argumentsClass));
         }
 
         // Don't generate the parse methods for commands unless explicitly asked for.

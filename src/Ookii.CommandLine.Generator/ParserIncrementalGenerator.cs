@@ -64,6 +64,8 @@ public class ParserIncrementalGenerator : IIncrementalGenerator
                 }
                 else
                 {
+                    // The other way around (interface without attribute) doesn't need a warning
+                    // since it could be a base class for a command.
                     context.ReportDiagnostic(Diagnostics.CommandAttributeWithoutInterface(symbol));
                 }
 

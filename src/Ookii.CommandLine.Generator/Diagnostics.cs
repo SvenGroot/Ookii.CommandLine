@@ -183,6 +183,14 @@ internal static class Diagnostics
         symbol.Locations.FirstOrDefault(),
         symbol.ToDisplayString());
 
+    public static Diagnostic CommandInterfaceWithoutAttribute(INamedTypeSymbol symbol) => CreateDiagnostic(
+        "OCL0019", // Intentially the same as above.
+        nameof(Resources.CommandInterfaceWithoutAttributeTitle),
+        nameof(Resources.CommandInterfaceWithoutAttributeMessageFormat),
+        DiagnosticSeverity.Warning,
+        symbol.Locations.FirstOrDefault(),
+        symbol.ToDisplayString());
+
     public static Diagnostic DefaultValueWithRequired(ISymbol symbol) => CreateDiagnostic(
         "OCL0020",
         nameof(Resources.DefaultValueIgnoredTitle),

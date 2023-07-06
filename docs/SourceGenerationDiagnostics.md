@@ -471,7 +471,7 @@ partial class Arguments
 ### OCL0019
 
 A command line arguments class has the [`CommandAttribute`][] but does not implement the [`ICommand`][]
-interface.
+interface, or vice versa.
 
 Without the interface, the [`CommandAttribute`][] is ignored and the class will not be treated as a
 command by a regular or generated [`CommandManager`][]. Both the [`CommandAttribute`][] and the [`ICommand`][]
@@ -489,8 +489,10 @@ partial class MyCommand // WARNING: The class doesn't implement ICommand
 }
 ```
 
-The inverse, implementing [`ICommand`][] without using the [`CommandAttribute`][], does not generate a
-warning as this is a common pattern for subcommand base classes.
+The inverse, implementing [`ICommand`][] without using the [`CommandAttribute`][], can be used for
+subcommand base classes. This still triggers a warning with the [`GeneratedParserAttribute`][],
+since that attribute does not need to be applied to base classes, only to the derived classes that
+are actually used as commands.
 
 ### OCL0020
 

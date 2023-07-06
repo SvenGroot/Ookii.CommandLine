@@ -205,6 +205,24 @@ namespace Ookii.CommandLine.Generator.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The command line arguments class {0} implements the ICommand interface but does not have the CommandAttribute attribute..
+        /// </summary>
+        internal static string CommandInterfaceWithoutAttributeMessageFormat {
+            get {
+                return ResourceManager.GetString("CommandInterfaceWithoutAttributeMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The command line arguments class implements the ICommand interface but does not have the CommandAttribute attribute..
+        /// </summary>
+        internal static string CommandInterfaceWithoutAttributeTitle {
+            get {
+                return ResourceManager.GetString("CommandInterfaceWithoutAttributeTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The subcommand defined by {0} should have a description for the usage help. Use the System.ComponentModel.DescriptionAttribute attribute on the class to supply a description..
         /// </summary>
         internal static string CommandWithoutDescriptionMessageFormat {
