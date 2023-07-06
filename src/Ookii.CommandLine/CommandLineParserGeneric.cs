@@ -98,10 +98,10 @@ public class CommandLineParser<T> : CommandLineParser
         return (T?)base.Parse();
     }
 
-    /// <inheritdoc cref="CommandLineParser.Parse(string[], int)"/>
-    public new T? Parse(string[] args, int index = 0)
+    /// <inheritdoc cref="CommandLineParser.Parse(string[])"/>
+    public new T? Parse(string[] args)
     {
-        return (T?)base.Parse(args, index);
+        return (T?)base.Parse(args);
     }
 
     /// <inheritdoc cref="CommandLineParser.Parse(ReadOnlyMemory{string})"/>
@@ -116,10 +116,10 @@ public class CommandLineParser<T> : CommandLineParser
         return (T?)base.ParseWithErrorHandling();
     }
 
-    /// <inheritdoc cref="CommandLineParser.ParseWithErrorHandling(string[], int)"/>
-    public new T? ParseWithErrorHandling(string[] args, int index = 0)
+    /// <inheritdoc cref="CommandLineParser.ParseWithErrorHandling(string[])"/>
+    public new T? ParseWithErrorHandling(string[] args)
     {
-        return (T?)base.ParseWithErrorHandling(args, index);
+        return (T?)base.ParseWithErrorHandling(args);
     }
 
     /// <inheritdoc cref="CommandLineParser.ParseWithErrorHandling(ReadOnlyMemory{String})"/>

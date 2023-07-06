@@ -45,7 +45,7 @@ namespace Ookii.CommandLine;
 ///   Unlike using the <see cref="CancelParsing"/> property, canceling parsing with the return
 ///   value does not automatically print the usage help when using the
 ///   <see cref="CommandLineParser{T}.ParseWithErrorHandling()" qualifyHint="true"/> method, the
-///   <see cref="CommandLineParser.Parse{T}(string[], int, ParseOptions?)" qualifyHint="true"/> method or the
+///   <see cref="CommandLineParser.Parse{T}(string[], ParseOptions?)" qualifyHint="true"/> method or the
 ///   <see cref="CommandManager"/> class. Instead, it must be requested using by setting the
 ///   <see cref="CommandLineParser.HelpRequested" qualifyHint="true"/> property to <see langword="true"/> in the
 ///   target method.

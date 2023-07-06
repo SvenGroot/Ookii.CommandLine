@@ -103,7 +103,7 @@ public partial class SubCommandTest
         };
 
         var manager = CreateManager(kind, options);
-        var command = (TestCommand?)manager.CreateCommand("test", new[] { "-Argument", "Foo" }, 0);
+        var command = (TestCommand?)manager.CreateCommand("test", new[] { "-Argument", "Foo" });
         Assert.IsNotNull(command);
         Assert.AreEqual(ParseStatus.Success, manager.ParseResult.Status);
         Assert.AreEqual("Foo", command.Argument);
@@ -115,7 +115,7 @@ public partial class SubCommandTest
         Assert.AreEqual("Bar", command.Argument);
         Assert.AreEqual("", writer.BaseWriter.ToString());
 
-        var command2 = (AnotherSimpleCommand?)manager.CreateCommand("anothersimplecommand", new[] { "skip", "-Value", "42" }, 1);
+        var command2 = (AnotherSimpleCommand?)manager.CreateCommand("anothersimplecommand", (new[] { "skip", "-Value", "42" }).AsMemory(1));
         Assert.IsNotNull(command2);
         Assert.AreEqual(ParseStatus.Success, manager.ParseResult.Status);
         Assert.AreEqual(42, command2.Value);

@@ -841,7 +841,7 @@ public abstract class CommandLineArgument
     public DictionaryArgumentInfo? DictionaryInfo { get; }
 
     /// <summary>
-    /// Gets the value that the argument was set to in the last call to <see cref="CommandLineParser.Parse(string[],int)" qualifyHint="true"/>.
+    /// Gets the value that the argument was set to in the last call to <see cref="CommandLineParser.Parse(string[])" qualifyHint="true"/>.
     /// </summary>
     /// <value>
     ///   The value of the argument that was obtained when the command line arguments were parsed.
@@ -849,7 +849,7 @@ public abstract class CommandLineArgument
     /// <remarks>
     /// <para>
     ///   The <see cref="Value"/> property provides an alternative method for accessing supplied argument
-    ///   values, in addition to using the object returned by <see cref="CommandLineParser.Parse(string[], int)" qualifyHint="true"/>.
+    ///   values, in addition to using the object returned by <see cref="CommandLineParser.Parse(string[])" qualifyHint="true"/>.
     /// </para>
     /// <para>
     ///   If an argument was supplied on the command line, the <see cref="Value"/> property will equal the
@@ -874,7 +874,7 @@ public abstract class CommandLineArgument
 
     /// <summary>
     /// Gets a value indicating whether the value of this argument was supplied on the command line in the last
-    /// call to <see cref="CommandLineParser.Parse(string[],int)" qualifyHint="true"/>.
+    /// call to <see cref="CommandLineParser.Parse(string[])" qualifyHint="true"/>.
     /// </summary>
     /// <value>
     ///   <see langword="true"/> if this argument's value was supplied on the command line when the arguments were parsed; otherwise, <see langword="false"/>.

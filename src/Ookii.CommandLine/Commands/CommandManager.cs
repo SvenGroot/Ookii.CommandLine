@@ -469,61 +469,40 @@ public class CommandManager
     /// <inheritdoc cref="CreateCommand(string?, ReadOnlyMemory{string})"/>
     /// <param name="commandName">The name of the command.</param>
     /// <param name="args">The arguments to the command.</param>
-    /// <param name="index">The index in <paramref name="args"/> at which to start parsing the arguments.</param>
     /// <exception cref="ArgumentNullException">
     ///   <paramref name="args"/> is <see langword="null"/>.
     /// </exception>
-    /// <exception cref="ArgumentOutOfRangeException">
-    ///   <paramref name="index"/> does not fall within the bounds of <paramref name="args"/>.
-    /// </exception>
-    public ICommand? CreateCommand(string? commandName, string[] args, int index)
+    public ICommand? CreateCommand(string? commandName, string[] args)
     {
         if (args == null)
         {
             throw new ArgumentNullException(nameof(args));
         }
 
-        if (index < 0 || index > args.Length)
-        {
-            throw new ArgumentOutOfRangeException(nameof(index));
-        }
-
-        return CreateCommand(commandName, args.AsMemory(index));
+        return CreateCommand(commandName, args.AsMemory());
     }
 
-    /// <inheritdoc cref="CreateCommand(string?, string[], int)"/>
+    /// <inheritdoc cref="CreateCommand(string?, string[])"/>
     /// <summary>
     /// Finds and instantiates the subcommand with the name from the first argument, or if that
     /// fails, writes error and usage information.
     /// </summary>
     /// <param name="args">
-    /// The command line arguments, where the first argument (starting at <paramref name="index"/>)
-    /// is the command name and the remaining ones are arguments for the command.
-    /// </param>
-    /// <param name="index">
-    /// The index in <paramref name="args"/> at which to start parsing the arguments.
+    /// The command line arguments, where the first argument is the command name and the remaining
+    /// ones are arguments for the command.
     /// </param>
     /// <exception cref="ArgumentNullException">
     ///   <paramref name="args"/> is <see langword="null"/>.
     /// </exception>
-    /// <exception cref="ArgumentOutOfRangeException">
-    ///   <paramref name="index"/> does not fall within the bounds of <paramref name="args"/>.
-    /// </exception>
-    public ICommand? CreateCommand(string[] args, int index = 0)
+    public ICommand? CreateCommand(string[] args)
     {
         if (args == null)
         {
             throw new ArgumentNullException(nameof(args));
         }
 
-        if (index < 0 || index > args.Length)
-        {
-            throw new ArgumentOutOfRangeException(nameof(index));
-        }
-
-        return CreateCommand(args.AsMemory(index));
+        return CreateCommand(args.AsMemory());
     }
-
 
     /// <inheritdoc cref="CreateCommand(string?, ReadOnlyMemory{string})"/>
     /// <summary>
@@ -560,7 +539,7 @@ public class CommandManager
     public ICommand? CreateCommand()
     {
         // Skip the first argument, it's the application name.
-        return CreateCommand(Environment.GetCommandLineArgs(), 1);
+        return CreateCommand(Environment.GetCommandLineArgs().AsMemory(1));
     }
 
 
@@ -570,7 +549,6 @@ public class CommandManager
     /// </summary>
     /// <param name="commandName">The name of the command.</param>
     /// <param name="args">The arguments to the command.</param>
-    /// <param name="index">The index in <paramref name="args"/> at which to start parsing the arguments.</param>
     /// <returns>
     ///   The value returned by <see cref="ICommand.Run" qualifyHint="true"/>, or <see langword="null"/> if
     ///   the command could not be created.
@@ -578,12 +556,9 @@ public class CommandManager
     /// <exception cref="ArgumentNullException">
     ///   <paramref name="args"/> is <see langword="null"/>
     /// </exception>
-    /// <exception cref="ArgumentOutOfRangeException">
-    ///   <paramref name="index"/> does not fall inside the bounds of <paramref name="args"/>.
-    /// </exception>
     /// <remarks>
     /// <para>
-    ///   This function creates the command by invoking the <see cref="CreateCommand(string?, string[], int)"/>
+    ///   This function creates the command by invoking the <see cref="CreateCommand(string?, string[])"/>
     ///   method, and then invokes the <see cref="ICommand.Run" qualifyHint="true"/> method on the command.
     /// </para>
     /// <para>
@@ -598,9 +573,9 @@ public class CommandManager
     ///   included.
     /// </para>
     /// </remarks>
-    public int? RunCommand(string? commandName, string[] args, int index)
+    public int? RunCommand(string? commandName, string[] args)
     {
-        var command = CreateCommand(commandName, args, index);
+        var command = CreateCommand(commandName, args);
         return command?.Run();
     }
 
@@ -669,21 +644,18 @@ public class CommandManager
         return command?.Run();
     }
 
-    /// <inheritdoc cref="RunCommand(string?, string[], int)"/>
+    /// <inheritdoc cref="RunCommand(string?, string[])"/>
     /// <summary>
     /// Finds and instantiates the subcommand with the name from the first argument, and if it
     /// succeeds, runs it. If it fails, writes error and usage information.
     /// </summary>
     /// <param name="args">
-    /// The command line arguments, where the first argument (starting at <paramref name="index"/>)
-    /// is the command name and the remaining ones are arguments for the command.
-    /// </param>
-    /// <param name="index">
-    /// The index in <paramref name="args"/> at which to start parsing the arguments.
+    /// The command line arguments, where the first argument is the command name and the remaining
+    /// ones are arguments for the command.
     /// </param>
     /// <remarks>
     /// <para>
-    ///   This function creates the command by invoking the <see cref="CreateCommand(string[], int)"/>
+    ///   This function creates the command by invoking the <see cref="CreateCommand(string[])"/>
     ///   method, and then invokes the <see cref="ICommand.Run" qualifyHint="true"/> method on the command.
     /// </para>
     /// <para>
@@ -698,9 +670,9 @@ public class CommandManager
     ///   included.
     /// </para>
     /// </remarks>
-    public int? RunCommand(string[] args, int index = 0)
+    public int? RunCommand(string[] args)
     {
-        var command = CreateCommand(args, index);
+        var command = CreateCommand(args);
         return command?.Run();
     }
 
@@ -710,7 +682,7 @@ public class CommandManager
     /// If it fails, writes error and usage information.
     /// </summary>
     /// <returns>
-    /// <inheritdoc cref="RunCommand(string?, string[], int)"/>
+    /// <inheritdoc cref="RunCommand(string?, string[])"/>
     /// </returns>
     /// <remarks>
     /// <para>
@@ -739,7 +711,7 @@ public class CommandManager
     public int? RunCommand()
     {
         // Skip the first argument, it's the application name.
-        return RunCommand(Environment.GetCommandLineArgs(), 1);
+        return RunCommand(Environment.GetCommandLineArgs().AsMemory(1));
     }
 
     /// <inheritdoc cref="RunCommand(string?, ReadOnlyMemory{string})"/>
@@ -789,7 +761,7 @@ public class CommandManager
         return command?.Run();
     }
 
-    /// <inheritdoc cref="RunCommand(string?, string[], int)"/>
+    /// <inheritdoc cref="RunCommand(string?, string[])"/>
     /// <summary>
     /// Finds and instantiates the subcommand with the specified name, and if it succeeds,
     /// runs it asynchronously. If it fails, writes error and usage information.
@@ -801,7 +773,7 @@ public class CommandManager
     /// </returns>
     /// <remarks>
     /// <para>
-    ///   This function creates the command by invoking the <see cref="CreateCommand(string?, string[], int)"/>
+    ///   This function creates the command by invoking the <see cref="CreateCommand(string?, string[])"/>
     ///   method. If the command implements the <see cref="IAsyncCommand"/> interface, it
     ///   invokes the <see cref="IAsyncCommand.RunAsync" qualifyHint="true"/> method; otherwise, it invokes the
     ///   <see cref="ICommand.Run" qualifyHint="true"/> method on the command.
@@ -825,9 +797,9 @@ public class CommandManager
     ///   whether the version command is included.
     /// </para>
     /// </remarks>
-    public async Task<int?> RunCommandAsync(string? commandName, string[] args, int index)
+    public async Task<int?> RunCommandAsync(string? commandName, string[] args)
     {
-        var command = CreateCommand(commandName, args, index);
+        var command = CreateCommand(commandName, args);
         if (command is IAsyncCommand asyncCommand)
         {
             return await asyncCommand.RunAsync();
@@ -882,21 +854,18 @@ public class CommandManager
         return command?.Run();
     }
 
-    /// <inheritdoc cref="RunCommandAsync(string?, string[], int)"/>
+    /// <inheritdoc cref="RunCommandAsync(string?, string[])"/>
     /// <summary>
     /// Finds and instantiates the subcommand with the name from the first argument, and if it
     /// succeeds, runs it asynchronously. If it fails, writes error and usage information.
     /// </summary>
     /// <param name="args">
-    /// The command line arguments, where the first argument (starting at <paramref name="index"/>)
-    /// is the command name and the remaining ones are arguments for the command.
-    /// </param>
-    /// <param name="index">
-    /// The index in <paramref name="args"/> at which to start parsing the arguments.
+    /// The command line arguments, where the first argument is the command name and the remaining
+    /// ones are arguments for the command.
     /// </param>
     /// <remarks>
     /// <para>
-    ///   This function creates the command by invoking the <see cref="CreateCommand(string[], int)"/>
+    ///   This function creates the command by invoking the <see cref="CreateCommand(string[])"/>
     ///   method. If the command implements the <see cref="IAsyncCommand"/> interface, it
     ///   invokes the <see cref="IAsyncCommand.RunAsync" qualifyHint="true"/> method; otherwise, it invokes the
     ///   <see cref="ICommand.Run" qualifyHint="true"/> method on the command.
@@ -920,9 +889,9 @@ public class CommandManager
     ///   whether the version command is included.
     /// </para>
     /// </remarks>
-    public async Task<int?> RunCommandAsync(string[] args, int index = 0)
+    public async Task<int?> RunCommandAsync(string[] args)
     {
-        var command = CreateCommand(args, index);
+        var command = CreateCommand(args);
         if (command is IAsyncCommand asyncCommand)
         {
             return await asyncCommand.RunAsync();
@@ -937,7 +906,7 @@ public class CommandManager
     /// asynchronously. If it fails, writes error and usage information.
     /// </summary>
     /// <returns>
-    /// <inheritdoc cref="RunCommandAsync(string?, string[], int)"/>
+    /// <inheritdoc cref="RunCommandAsync(string?, string[])"/>
     /// </returns>
     /// <remarks>
     /// <para>

@@ -530,7 +530,7 @@ public class CommandLineParser
     /// </value>
     /// <remarks>
     /// <para>
-    ///   If the <see cref="AllowDuplicateArguments"/> property is <see langword="false"/>, a <see cref="CommandLineArgumentException"/> is thrown by the <see cref="Parse(string[],int)"/>
+    ///   If the <see cref="AllowDuplicateArguments"/> property is <see langword="false"/>, a <see cref="CommandLineArgumentException"/> is thrown by the <see cref="Parse(string[])"/>
     ///   method if an argument's value is supplied more than once.
     /// </para>
     /// <para>
@@ -614,7 +614,7 @@ public class CommandLineParser
     public ImmutableArray<char> NameValueSeparators => _nameValueSeparators;
 
     /// <summary>
-    /// Gets or sets a value that indicates whether usage help should be displayed if the <see cref="Parse(string[], int)"/>
+    /// Gets or sets a value that indicates whether usage help should be displayed if the <see cref="Parse(string[])"/>
     /// method returned <see langword="null"/>.
     /// </summary>
     /// <value>
@@ -622,15 +622,15 @@ public class CommandLineParser
     /// </value>
     /// <remarks>
     /// <para>
-    ///   Check this property after calling the <see cref="Parse(string[], int)"/> method or one
+    ///   Check this property after calling the <see cref="Parse(string[])"/> method or one
     ///   of its overloads to see if usage help should be displayed.
     /// </para>
     /// <para>
-    ///   This property will always be <see langword="false"/> if the <see cref="Parse(string[], int)"/>
+    ///   This property will always be <see langword="false"/> if the <see cref="Parse(string[])"/>
     ///   method returned a non-<see langword="null"/> value.
     /// </para>
     /// <para>
-    ///   This property will always be <see langword="true"/> if the <see cref="Parse(string[], int)"/>
+    ///   This property will always be <see langword="true"/> if the <see cref="Parse(string[])"/>
     ///   method threw a <see cref="CommandLineArgumentException"/>, or if an argument used
     ///   <see cref="CancelMode.Abort" qualifyHint="true"/> with the <see cref="CommandLineArgumentAttribute.CancelParsing" qualifyHint="true"/>
     ///   property or the <see cref="ArgumentParsed"/> event.
@@ -884,7 +884,25 @@ public class CommandLineParser
     public object? Parse()
     {
         // GetCommandLineArgs include the executable, so skip it.
-        return Parse(Environment.GetCommandLineArgs(), 1);
+        return Parse(Environment.GetCommandLineArgs().AsMemory(1));
+    }
+
+    /// <inheritdoc cref="Parse()" />
+    /// <summary>
+    /// Parses the specified command line arguments.
+    /// </summary>
+    /// <param name="args">The command line arguments.</param>
+    /// <exception cref="ArgumentNullException">
+    ///   <paramref name="args"/> is <see langword="null"/>.
+    /// </exception>
+    public object? Parse(string[] args)
+    {
+        if (args == null)
+        {
+            throw new ArgumentNullException(nameof(args));
+        }
+
+        return Parse(args.AsMemory());
     }
 
     /// <inheritdoc cref="Parse()" />
@@ -906,33 +924,6 @@ public class CommandLineParser
             ParseResult = ParseResult.FromException(ex, args.Slice(index));
             throw;
         }
-    }
-
-    /// <inheritdoc cref="Parse()" />
-    /// <summary>
-    /// Parses the specified command line arguments, starting at the specified index.
-    /// </summary>
-    /// <param name="args">The command line arguments.</param>
-    /// <param name="index">The index of the first argument to parse.</param>
-    /// <exception cref="ArgumentNullException">
-    ///   <paramref name="args"/> is <see langword="null"/>.
-    /// </exception>
-    /// <exception cref="ArgumentOutOfRangeException">
-    ///   <paramref name="index"/> does not fall within the bounds of <paramref name="args"/>.
-    /// </exception>
-    public object? Parse(string[] args, int index = 0)
-    {
-        if (args == null)
-        {
-            throw new ArgumentNullException(nameof(index));
-        }
-
-        if (index < 0 || index > args.Length)
-        {
-            throw new ArgumentOutOfRangeException(nameof(index));
-        }
-
-        return Parse(args.AsMemory(index));
     }
 
     /// <summary>
@@ -968,30 +959,21 @@ public class CommandLineParser
 
     /// <inheritdoc cref="ParseWithErrorHandling()" />
     /// <summary>
-    /// Parses the specified command line arguments, starting at the specified index, and
-    /// displays error messages and usage help if required.
+    /// Parses the specified command line arguments and displays error messages and usage help if
+    /// required.
     /// </summary>
     /// <param name="args">The command line arguments.</param>
-    /// <param name="index">The index of the first argument to parse.</param>
     /// <exception cref="ArgumentNullException">
     ///   <paramref name="args"/> is <see langword="null"/>.
     /// </exception>
-    /// <exception cref="ArgumentOutOfRangeException">
-    ///   <paramref name="index"/> does not fall within the bounds of <paramref name="args"/>.
-    /// </exception>
-    public object? ParseWithErrorHandling(string[] args, int index = 0)
+    public object? ParseWithErrorHandling(string[] args)
     {
         if (args == null)
         {
-            throw new ArgumentNullException(nameof(index));
+            throw new ArgumentNullException(nameof(args));
         }
 
-        if (index < 0 || index > args.Length)
-        {
-            throw new ArgumentOutOfRangeException(nameof(index));
-        }
-
-        return ParseWithErrorHandling(args.AsMemory(index));
+        return ParseWithErrorHandling(args.AsMemory());
     }
 
     /// <inheritdoc cref="ParseWithErrorHandling()" />
@@ -1110,44 +1092,7 @@ public class CommandLineParser
     }
 
     /// <summary>
-    /// Parses the specified command line arguments, starting at the specified index, using the
-    /// type <typeparamref name="T"/>.
-    /// </summary>
-    /// <typeparam name="T">The type defining the command line arguments.</typeparam>
-    /// <param name="args">The command line arguments.</param>
-    /// <param name="index">The index of the first argument to parse.</param>
-    /// <param name="options">
-    ///   The options that control parsing behavior and usage help formatting. If
-    ///   <see langword="null" />, the default options are used.
-    /// </param>
-    /// <returns>
-    ///   <inheritdoc cref="Parse{T}(ParseOptions?)"/>
-    /// </returns>
-    /// <exception cref="ArgumentNullException">
-    ///   <paramref name="args"/> is <see langword="null"/>.
-    /// </exception>
-    /// <exception cref="ArgumentOutOfRangeException">
-    ///   <paramref name="index"/> does not fall within the bounds of <paramref name="args"/>.
-    /// </exception>
-    /// <exception cref="NotSupportedException">
-    ///   <inheritdoc cref="Parse{T}(ParseOptions?)"/>
-    /// </exception>
-    /// <remarks>
-    ///   <inheritdoc cref="Parse{T}(ParseOptions?)"/>
-    /// </remarks>
-#if NET6_0_OR_GREATER
-    [RequiresUnreferencedCode("Argument information cannot be statically determined using reflection. Consider using the GeneratedParserAttribute.", Url = UnreferencedCodeHelpUrl)]
-#endif
-    public static T? Parse<T>(string[] args, int index, ParseOptions? options = null)
-        where T : class
-    {
-        var parser = new CommandLineParser<T>(options);
-        return parser.ParseWithErrorHandling(args, index);
-    }
-
-    /// <summary>
-    /// Parses the specified command line arguments, starting at the specified index, using the
-    /// type <typeparamref name="T"/>.
+    /// Parses the specified command line arguments using the type <typeparamref name="T"/>.
     /// </summary>
     /// <typeparam name="T">The type defining the command line arguments.</typeparam>
     /// <param name="args">The command line arguments.</param>

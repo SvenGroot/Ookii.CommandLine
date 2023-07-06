@@ -15,7 +15,7 @@ namespace Ookii.CommandLine.Validation;
 ///   If validation fails, the validator will throw a <see cref="CommandLineArgumentException"/>
 ///   with the category specified in the <see cref="ErrorCategory"/> property. The
 ///   <see cref="CommandLineParser{T}.ParseWithErrorHandling()" qualifyHint="true"/> method, the
-///   <see cref="CommandLineParser.Parse{T}(string[], int, ParseOptions?)" qualifyHint="true"/> method,
+///   <see cref="CommandLineParser.Parse{T}(string[], ParseOptions?)" qualifyHint="true"/> method,
 ///   the generated <see cref="IParser{TSelf}.Parse(Ookii.CommandLine.ParseOptions?)" qualifyHint="true"/>,
 ///   and the <see cref="CommandManager"/> class will automatically display the error message and
 ///   usage help if validation failed.

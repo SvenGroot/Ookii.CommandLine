@@ -154,33 +154,6 @@ public abstract class CommandInfo
     /// Creates an instance of the command type parsing the specified arguments.
     /// </summary>
     /// <param name="args">The arguments to the command.</param>
-    /// <param name="index">The index in <paramref name="args"/> at which to start parsing the arguments.</param>
-    /// <returns>
-    /// An instance of the <see cref="CommandType"/>, or <see langword="null"/> if an error
-    /// occurred or parsing was canceled.
-    /// </returns>
-    /// <remarks>
-    /// <para>
-    ///   If the type indicated by the <see cref="CommandType"/> property implements the
-    ///   <see cref="ICommandWithCustomParsing"/> parsing interface, an instance of the type is
-    ///   created and the <see cref="ICommandWithCustomParsing.Parse" qualifyHint="true"/> method
-    ///   invoked. Otherwise, an instance of the type is created using the <see cref="CommandLineParser{T}"/>
-    ///   class.
-    /// </para>
-    /// </remarks>
-    /// <exception cref="ArgumentNullException">
-    /// <paramref name="args"/> is <see langword="null"/>.
-    /// </exception>
-    /// <exception cref="ArgumentOutOfRangeException">
-    /// <paramref name="index"/> does not fall inside the bounds of <paramref name="args"/>.
-    /// </exception>
-    public ICommand? CreateInstance(string[] args, int index)
-        => CreateInstance(args.AsMemory(index));
-
-    /// <summary>
-    /// Creates an instance of the command type parsing the specified arguments.
-    /// </summary>
-    /// <param name="args">The arguments to the command.</param>
     /// <returns>
     /// An instance of the <see cref="CommandType"/>, or <see langword="null"/> if an error
     /// occurred or parsing was canceled.
@@ -198,49 +171,6 @@ public abstract class CommandInfo
     {
         var (command, _) = CreateInstanceWithResult(args);
         return command;
-    }
-
-
-    /// <summary>
-    /// Creates an instance of the command type by parsing the specified arguments, and returns it
-    /// in addition to the result of the parsing operation.
-    /// </summary>
-    /// <param name="args">The arguments to the command.</param>
-    /// <param name="index">The index in <paramref name="args"/> at which to start parsing the arguments.</param>
-    /// <returns>
-    /// A tuple containing an instance of the <see cref="CommandType"/>, or <see langword="null"/> if an error
-    /// occurred or parsing was canceled, and the <see cref="ParseResult"/> of the operation.
-    /// </returns>
-    /// <remarks>
-    /// <para>
-    ///   If the type indicated by the <see cref="CommandType"/> property implements the
-    ///   <see cref="ICommandWithCustomParsing"/> parsing interface, an instance of the type is
-    ///   created and the <see cref="ICommandWithCustomParsing.Parse" qualifyHint="true"/> method
-    ///   invoked. Otherwise, an instance of the type is created using the <see cref="CommandLineParser{T}"/>
-    ///   class.
-    /// </para>
-    /// <para>
-    ///   The <see cref="ParseResult.Status" qualifyHint="true"/> property of the returned <see cref="ParseResult"/>
-    ///   will be <see cref="ParseStatus.None" qualifyHint="true"/> if the command used custom parsing.
-    /// </para>
-    /// </remarks>
-    /// <exception cref="ArgumentNullException">
-    ///   <paramref name="args"/> is <see langword="null"/>.
-    /// </exception>
-    /// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> does not fall inside the bounds of <paramref name="args"/>.</exception>
-    public (ICommand?, ParseResult) CreateInstanceWithResult(string[] args, int index)
-    {
-        if (args == null)
-        {
-            throw new ArgumentNullException(nameof(index));
-        }
-
-        if (index < 0 || index > args.Length)
-        {
-            throw new ArgumentOutOfRangeException(nameof(index));
-        }
-
-        return CreateInstanceWithResult(args.AsMemory(index));
     }
 
     /// <summary>
