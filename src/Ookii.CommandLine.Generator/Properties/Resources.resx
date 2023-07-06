@@ -124,7 +124,7 @@
     <value>The AliasAttribute is ignored on an argument with no long name.</value>
   </data>
   <data name="ArgumentConverterStringNotSupportedMessageFormat" xml:space="preserve">
-    <value>The command line argument defined by {0} uses the ArgumentConverterAttribute with a string argument, which is not supported by the GeneratedParserAttribute. Use a Type argument instead by using the typeof keyword.</value>
+    <value>The command line argument defined by {0} uses the ArgumentConverterAttribute with a string parameter, which is not supported by the GeneratedParserAttribute. Use a Type parameter instead by using the typeof keyword.</value>
   </data>
   <data name="ArgumentConverterStringNotSupportedTitle" xml:space="preserve">
     <value>The ArgumentConverterAttribute must use the typeof keyword.</value>
@@ -163,7 +163,7 @@
     <value>The command line arguments class {0} has the CommandAttribute but does not implement the ICommand interface.</value>
   </data>
   <data name="CommandAttributeWithoutInterfaceTitle" xml:space="preserve">
-    <value>The command line arguments class has the CommandAttribute but does not implement ICommand.</value>
+    <value>The command line arguments class has the CommandAttribute but does not implement the ICommand interface.</value>
   </data>
   <data name="CommandInterfaceWithoutAttributeMessageFormat" xml:space="preserve">
     <value>The command line arguments class {0} implements the ICommand interface but does not have the CommandAttribute attribute.</value>
@@ -211,7 +211,7 @@
     <value>The attribute '{0}' on '{1}' will be ignored because '{1}' is not a subcommand.</value>
   </data>
   <data name="IgnoredAttributeForNonCommandTitle" xml:space="preserve">
-    <value>The attribute is not used for command line arguments classes that are not commands.</value>
+    <value>The attribute is not used for command line arguments classes that are not subcommands.</value>
   </data>
   <data name="IgnoredAttributeForNonDictionaryMessageFormat" xml:space="preserve">
     <value>The {0} attribute is ignored for the non-dictionary argument defined by {1}.</value>
@@ -223,7 +223,7 @@
     <value>The {0} attribute is ignored for the non-multi-value argument defined by {1}.</value>
   </data>
   <data name="IgnoredAttributeForNonMultiValueTitle" xml:space="preserve">
-    <value>The attribute is not used for a non-dictionary argument.</value>
+    <value>The attribute is not used for a non-multi-value argument.</value>
   </data>
   <data name="IgnoredFriendlyNameAttributeMessageFormat" xml:space="preserve">
     <value>The ApplicationFriendlyNameAttribute on '{0}' is ignored because '{0}' is a subcommand. Use '[assembly: ApplicationFriendlyName(...)]' instead.</value>
@@ -232,7 +232,7 @@
     <value>The ApplicationFriendlyNameAttribute is ignored on a subcommand.</value>
   </data>
   <data name="InvalidArrayRankMessageFormat" xml:space="preserve">
-    <value>The multi-value command line argument defined by {0}.{1} must have an array rank of one.</value>
+    <value>The multi-value command line argument defined by {0} must have an array rank of one.</value>
   </data>
   <data name="InvalidArrayRankTitle" xml:space="preserve">
     <value>A multi-value command line argument defined by an array properties must have an array rank of one.</value>
@@ -250,7 +250,7 @@
     <value>The specified namespace for generated converters is not valid.</value>
   </data>
   <data name="InvalidMethodSignatureMessageFormat" xml:space="preserve">
-    <value>The method {0}.{1} does not have a valid signature for a command line argument.</value>
+    <value>The method {0} does not have a valid signature for a command line argument.</value>
   </data>
   <data name="InvalidMethodSignatureTitle" xml:space="preserve">
     <value>A method command line argument has an invalid signature.</value>
@@ -262,7 +262,7 @@
     <value>The CommandLineArgumentAttribute.IsHidden property is ignored for positional or required arguments.</value>
   </data>
   <data name="IsRequiredWithRequiredPropertyMessageFormat" xml:space="preserve">
-    <value>The CommandLineArgumentAttribute.IsRequired property is ignored for the required property {0}.</value>
+    <value>The CommandLineArgumentAttribute.IsRequired property is ignored for the required property {0}. Arguments defined by a required property are always required.</value>
   </data>
   <data name="IsRequiredWithRequiredPropertyTitle" xml:space="preserve">
     <value>The CommandLineArgumentAttribute.IsRequired property is ignored for a required property.</value>
@@ -280,7 +280,7 @@
     <value>Positional arguments with an explicit position value and those with a position inferred from the member order cannot be mixed.</value>
   </data>
   <data name="NoConverterMessageFormat" xml:space="preserve">
-    <value>No command line argument converter exists for type {0} used by the argument defined by {1}.{2}, and none could be generated. Use the Ookii.CommandLine.Conversion.ArgumentConverterAttribute to specify a custom converter.</value>
+    <value>No command line argument converter exists for type {0} used by the argument defined by {1}, and none could be generated. Use the Ookii.CommandLine.Conversion.ArgumentConverterAttribute to specify a custom converter.</value>
   </data>
   <data name="NoConverterTitle" xml:space="preserve">
     <value>No command line argument converter exists for the argument's type.</value>
@@ -292,25 +292,25 @@
     <value>Argument has neither a long nor short name.</value>
   </data>
   <data name="NonPublicInstancePropertyMessageFormat" xml:space="preserve">
-    <value>The property {0}.{1} will not create a command line argument because it is not a public instance property.</value>
+    <value>The property {0} will not create a command line argument because it is not a public instance property.</value>
   </data>
   <data name="NonPublicInstancePropertyTitle" xml:space="preserve">
     <value>Properties that are not public instance will be ignored.</value>
   </data>
   <data name="NonPublicStaticMethodMessageFormat" xml:space="preserve">
-    <value>The method {0}.{1} will not create a command line argument because it is not a public static method.</value>
+    <value>The method {0} will not create a command line argument because it is not a public static method.</value>
   </data>
   <data name="NonPublicStaticMethodTitle" xml:space="preserve">
     <value>Methods that are not public and static will be ignored.</value>
   </data>
   <data name="NonRequiredInitOnlyPropertyMessageFormat" xml:space="preserve">
-    <value>The command line argument property {0}.{1} may only have an 'init' accessor if the property is also declared as 'required'.</value>
+    <value>The command line argument property {0} may only have an 'init' accessor if the property is also declared as 'required'.</value>
   </data>
   <data name="NonRequiredInitOnlyPropertyTitle" xml:space="preserve">
     <value>Init accessors may only be used on required properties.</value>
   </data>
   <data name="ParentCommandStringNotSupportedMessageFormat" xml:space="preserve">
-    <value>The subcommand defined by {0} uses the ParentCommandAttribute with a string argument, which is not supported by the GeneratedParserAttribute. Use a Type argument instead by using the typeof keyword.</value>
+    <value>The subcommand defined by {0} uses the ParentCommandAttribute with a string parameter, which is not supported by the GeneratedParserAttribute. Use a Type parameter instead by using the typeof keyword.</value>
   </data>
   <data name="ParentCommandStringNotSupportedTitle" xml:space="preserve">
     <value>The ParentCommandAttribute must use the typeof keyword.</value>
@@ -328,7 +328,7 @@
     <value>Required positional arguments must come before optional positional arguments.</value>
   </data>
   <data name="PropertyIsReadOnlyMessageFormat" xml:space="preserve">
-    <value>The property {0}.{1} must have a public set accessor.</value>
+    <value>The property {0} must have a public set accessor.</value>
   </data>
   <data name="PropertyIsReadOnlyTitle" xml:space="preserve">
     <value>A command line argument property must have a public set accessor.</value>
@@ -358,7 +358,7 @@
     <value>Unknown attribute will be ignored.</value>
   </data>
   <data name="UnsupportedInitializerSyntaxMessageFormat" xml:space="preserve">
-    <value>The initial value of the property '{0}' will not be included in the usage help because it is not a literal expression, enum value, or constant. Consider changing the initializer, or use CommandLineArgumentAttribute.DefaultValue as an alternative.</value>
+    <value>The initial value of the property '{0}' will not be included in the usage help because it is not a literal expression, enum value, constant, or property. Consider changing the initializer, or use CommandLineArgumentAttribute.DefaultValue as an alternative.</value>
   </data>
   <data name="UnsupportedInitializerSyntaxTitle" xml:space="preserve">
     <value>The property's initial value uses an unsupported expression.</value>

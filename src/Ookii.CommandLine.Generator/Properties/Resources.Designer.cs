@@ -79,7 +79,7 @@ namespace Ookii.CommandLine.Generator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The command line argument defined by {0} uses the ArgumentConverterAttribute with a string argument, which is not supported by the GeneratedParserAttribute. Use a Type argument instead by using the typeof keyword..
+        ///   Looks up a localized string similar to The command line argument defined by {0} uses the ArgumentConverterAttribute with a string parameter, which is not supported by the GeneratedParserAttribute. Use a Type parameter instead by using the typeof keyword..
         /// </summary>
         internal static string ArgumentConverterStringNotSupportedMessageFormat {
             get {
@@ -196,7 +196,7 @@ namespace Ookii.CommandLine.Generator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The command line arguments class has the CommandAttribute but does not implement ICommand..
+        ///   Looks up a localized string similar to The command line arguments class has the CommandAttribute but does not implement the ICommand interface..
         /// </summary>
         internal static string CommandAttributeWithoutInterfaceTitle {
             get {
@@ -340,7 +340,7 @@ namespace Ookii.CommandLine.Generator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The attribute is not used for command line arguments classes that are not commands..
+        ///   Looks up a localized string similar to The attribute is not used for command line arguments classes that are not subcommands..
         /// </summary>
         internal static string IgnoredAttributeForNonCommandTitle {
             get {
@@ -376,7 +376,7 @@ namespace Ookii.CommandLine.Generator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The attribute is not used for a non-dictionary argument..
+        ///   Looks up a localized string similar to The attribute is not used for a non-multi-value argument..
         /// </summary>
         internal static string IgnoredAttributeForNonMultiValueTitle {
             get {
@@ -403,7 +403,7 @@ namespace Ookii.CommandLine.Generator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The multi-value command line argument defined by {0}.{1} must have an array rank of one..
+        ///   Looks up a localized string similar to The multi-value command line argument defined by {0} must have an array rank of one..
         /// </summary>
         internal static string InvalidArrayRankMessageFormat {
             get {
@@ -457,7 +457,7 @@ namespace Ookii.CommandLine.Generator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The method {0}.{1} does not have a valid signature for a command line argument..
+        ///   Looks up a localized string similar to The method {0} does not have a valid signature for a command line argument..
         /// </summary>
         internal static string InvalidMethodSignatureMessageFormat {
             get {
@@ -493,7 +493,7 @@ namespace Ookii.CommandLine.Generator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The CommandLineArgumentAttribute.IsRequired property is ignored for the required property {0}..
+        ///   Looks up a localized string similar to The CommandLineArgumentAttribute.IsRequired property is ignored for the required property {0}. Arguments defined by a required property are always required..
         /// </summary>
         internal static string IsRequiredWithRequiredPropertyMessageFormat {
             get {
@@ -547,7 +547,7 @@ namespace Ookii.CommandLine.Generator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to No command line argument converter exists for type {0} used by the argument defined by {1}.{2}, and none could be generated. Use the Ookii.CommandLine.Conversion.ArgumentConverterAttribute to specify a custom converter..
+        ///   Looks up a localized string similar to No command line argument converter exists for type {0} used by the argument defined by {1}, and none could be generated. Use the Ookii.CommandLine.Conversion.ArgumentConverterAttribute to specify a custom converter..
         /// </summary>
         internal static string NoConverterMessageFormat {
             get {
@@ -583,7 +583,7 @@ namespace Ookii.CommandLine.Generator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The property {0}.{1} will not create a command line argument because it is not a public instance property..
+        ///   Looks up a localized string similar to The property {0} will not create a command line argument because it is not a public instance property..
         /// </summary>
         internal static string NonPublicInstancePropertyMessageFormat {
             get {
@@ -601,7 +601,7 @@ namespace Ookii.CommandLine.Generator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The method {0}.{1} will not create a command line argument because it is not a public static method..
+        ///   Looks up a localized string similar to The method {0} will not create a command line argument because it is not a public static method..
         /// </summary>
         internal static string NonPublicStaticMethodMessageFormat {
             get {
@@ -619,7 +619,7 @@ namespace Ookii.CommandLine.Generator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The command line argument property {0}.{1} may only have an &apos;init&apos; accessor if the property is also declared as &apos;required&apos;..
+        ///   Looks up a localized string similar to The command line argument property {0} may only have an &apos;init&apos; accessor if the property is also declared as &apos;required&apos;..
         /// </summary>
         internal static string NonRequiredInitOnlyPropertyMessageFormat {
             get {
@@ -637,7 +637,7 @@ namespace Ookii.CommandLine.Generator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The subcommand defined by {0} uses the ParentCommandAttribute with a string argument, which is not supported by the GeneratedParserAttribute. Use a Type argument instead by using the typeof keyword..
+        ///   Looks up a localized string similar to The subcommand defined by {0} uses the ParentCommandAttribute with a string parameter, which is not supported by the GeneratedParserAttribute. Use a Type parameter instead by using the typeof keyword..
         /// </summary>
         internal static string ParentCommandStringNotSupportedMessageFormat {
             get {
@@ -691,7 +691,7 @@ namespace Ookii.CommandLine.Generator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The property {0}.{1} must have a public set accessor..
+        ///   Looks up a localized string similar to The property {0} must have a public set accessor..
         /// </summary>
         internal static string PropertyIsReadOnlyMessageFormat {
             get {
@@ -781,7 +781,7 @@ namespace Ookii.CommandLine.Generator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The initial value of the property &apos;{0}&apos; will not be included in the usage help because it is not a literal expression, enum value, or constant. Consider changing the initializer, or use CommandLineArgumentAttribute.DefaultValue as an alternative..
+        ///   Looks up a localized string similar to The initial value of the property &apos;{0}&apos; will not be included in the usage help because it is not a literal expression, enum value, constant, or property. Consider changing the initializer, or use CommandLineArgumentAttribute.DefaultValue as an alternative..
         /// </summary>
         internal static string UnsupportedInitializerSyntaxMessageFormat {
             get {

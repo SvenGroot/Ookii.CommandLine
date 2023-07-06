@@ -13,7 +13,7 @@ internal static class Diagnostics
         nameof(Resources.TypeNotReferenceTypeMessageFormat),
         DiagnosticSeverity.Error,
         symbol.Locations.FirstOrDefault(),
-        symbol.ToDisplayString(),
+        symbol.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat),
         attributeName);
 
     public static Diagnostic ClassNotPartial(INamedTypeSymbol symbol, string attributeName) => CreateDiagnostic(
@@ -22,7 +22,7 @@ internal static class Diagnostics
         nameof(Resources.ClassNotPartialMessageFormat),
         DiagnosticSeverity.Error,
         symbol.Locations.FirstOrDefault(),
-        symbol.ToDisplayString(),
+        symbol.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat),
         attributeName);
 
     public static Diagnostic ClassIsGeneric(INamedTypeSymbol symbol, string attributeName) => CreateDiagnostic(
@@ -31,7 +31,7 @@ internal static class Diagnostics
         nameof(Resources.ClassIsGenericMessageFormat),
         DiagnosticSeverity.Error,
         symbol.Locations.FirstOrDefault(),
-        symbol.ToDisplayString(),
+        symbol.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat),
         attributeName);
 
     public static Diagnostic ClassIsNested(INamedTypeSymbol symbol, string attributeName) => CreateDiagnostic(
@@ -40,7 +40,7 @@ internal static class Diagnostics
         nameof(Resources.ClassIsNestedMessageFormat),
         DiagnosticSeverity.Error,
         symbol.Locations.FirstOrDefault(),
-        symbol.ToDisplayString(),
+        symbol.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat),
         attributeName);
 
 
@@ -50,8 +50,7 @@ internal static class Diagnostics
         nameof(Resources.InvalidArrayRankMessageFormat),
         DiagnosticSeverity.Error,
         property.Locations.FirstOrDefault(),
-        property.ContainingType?.ToDisplayString(),
-        property.Name);
+        property.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat));
 
     public static Diagnostic PropertyIsReadOnly(IPropertySymbol property) => CreateDiagnostic(
         "OCL0006",
@@ -59,8 +58,7 @@ internal static class Diagnostics
         nameof(Resources.PropertyIsReadOnlyMessageFormat),
         DiagnosticSeverity.Error,
         property.Locations.FirstOrDefault(),
-        property.ContainingType?.ToDisplayString(),
-        property.Name);
+        property.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat));
 
     public static Diagnostic NoConverter(ISymbol member, ITypeSymbol elementType) => CreateDiagnostic(
         "OCL0007",
@@ -68,9 +66,8 @@ internal static class Diagnostics
         nameof(Resources.NoConverterMessageFormat),
         DiagnosticSeverity.Error,
         member.Locations.FirstOrDefault(),
-        elementType.ToDisplayString(),
-        member.ContainingType?.ToDisplayString(),
-        member.Name);
+        elementType.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat),
+        member.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat));
 
     public static Diagnostic InvalidMethodSignature(ISymbol method) => CreateDiagnostic(
         "OCL0008",
@@ -78,8 +75,7 @@ internal static class Diagnostics
         nameof(Resources.InvalidMethodSignatureMessageFormat),
         DiagnosticSeverity.Error,
         method.Locations.FirstOrDefault(),
-        method.ContainingType?.ToDisplayString(),
-        method.Name);
+        method.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat));
 
     public static Diagnostic NonRequiredInitOnlyProperty(IPropertySymbol property) => CreateDiagnostic(
         "OCL0009",
@@ -87,8 +83,7 @@ internal static class Diagnostics
         nameof(Resources.NonRequiredInitOnlyPropertyMessageFormat),
         DiagnosticSeverity.Error,
         property.Locations.FirstOrDefault(),
-        property.ContainingType?.ToDisplayString(),
-        property.Name);
+        property.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat));
 
     public static Diagnostic GeneratedCustomParsingCommand(INamedTypeSymbol symbol) => CreateDiagnostic(
         "OCL0010",
@@ -96,7 +91,7 @@ internal static class Diagnostics
         nameof(Resources.GeneratedCustomParsingCommandMessageFormat),
         DiagnosticSeverity.Error,
         symbol.Locations.FirstOrDefault(),
-        symbol.ToDisplayString());
+        symbol.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat));
 
     public static Diagnostic PositionalArgumentAfterMultiValue(ISymbol symbol, string other) => CreateDiagnostic(
         "OCL0011",
@@ -104,7 +99,7 @@ internal static class Diagnostics
         nameof(Resources.PositionalArgumentAfterMultiValueMessageFormat),
         DiagnosticSeverity.Error,
         symbol.Locations.FirstOrDefault(),
-        symbol.ToDisplayString(),
+        symbol.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat),
         other);
 
     public static Diagnostic PositionalRequiredArgumentAfterOptional(ISymbol symbol, string other) => CreateDiagnostic(
@@ -113,7 +108,7 @@ internal static class Diagnostics
         nameof(Resources.PositionalRequiredArgumentAfterOptionalMessageFormat),
         DiagnosticSeverity.Error,
         symbol.Locations.FirstOrDefault(),
-        symbol.ToDisplayString(),
+        symbol.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat),
         other);
 
     public static Diagnostic InvalidAssemblyName(ISymbol symbol, string name) => CreateDiagnostic(
@@ -138,7 +133,7 @@ internal static class Diagnostics
         nameof(Resources.ArgumentConverterStringNotSupportedMessageFormat),
         DiagnosticSeverity.Error,
         attribute.GetLocation(),
-        symbol.ToDisplayString());
+        symbol.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat));
 
     public static Diagnostic ParentCommandStringNotSupported(AttributeData attribute, ISymbol symbol) => CreateDiagnostic(
         "OCL0015", // Intentially the same as above.
@@ -146,7 +141,7 @@ internal static class Diagnostics
         nameof(Resources.ParentCommandStringNotSupportedMessageFormat),
         DiagnosticSeverity.Error,
         attribute.GetLocation(),
-        symbol.ToDisplayString());
+        symbol.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat));
 
     public static Diagnostic IgnoredAttribute(ISymbol symbol, AttributeData attribute) => CreateDiagnostic(
         "OCL0016",
@@ -154,8 +149,8 @@ internal static class Diagnostics
         nameof(Resources.UnknownAttributeMessageFormat),
         DiagnosticSeverity.Warning,
         attribute.GetLocation(),
-        attribute.AttributeClass?.ToDisplayString(),
-        symbol.ToDisplayString());
+        attribute.AttributeClass?.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat),
+        symbol.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat));
 
     public static Diagnostic NonPublicStaticMethod(ISymbol method) => CreateDiagnostic(
         "OCL0017",
@@ -163,8 +158,7 @@ internal static class Diagnostics
         nameof(Resources.NonPublicStaticMethodMessageFormat),
         DiagnosticSeverity.Warning,
         method.Locations.FirstOrDefault(),
-        method.ContainingType?.ToDisplayString(),
-        method.Name);
+        method.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat));
 
     public static Diagnostic NonPublicInstanceProperty(ISymbol property) => CreateDiagnostic(
         "OCL0018",
@@ -172,8 +166,7 @@ internal static class Diagnostics
         nameof(Resources.NonPublicInstancePropertyMessageFormat),
         DiagnosticSeverity.Warning,
         property.Locations.FirstOrDefault(),
-        property.ContainingType?.ToDisplayString(),
-        property.Name);
+        property.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat));
 
     public static Diagnostic CommandAttributeWithoutInterface(INamedTypeSymbol symbol) => CreateDiagnostic(
         "OCL0019",
@@ -181,7 +174,7 @@ internal static class Diagnostics
         nameof(Resources.CommandAttributeWithoutInterfaceMessageFormat),
         DiagnosticSeverity.Warning,
         symbol.Locations.FirstOrDefault(),
-        symbol.ToDisplayString());
+        symbol.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat));
 
     public static Diagnostic CommandInterfaceWithoutAttribute(INamedTypeSymbol symbol) => CreateDiagnostic(
         "OCL0019", // Intentially the same as above.
@@ -189,7 +182,7 @@ internal static class Diagnostics
         nameof(Resources.CommandInterfaceWithoutAttributeMessageFormat),
         DiagnosticSeverity.Warning,
         symbol.Locations.FirstOrDefault(),
-        symbol.ToDisplayString());
+        symbol.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat));
 
     public static Diagnostic DefaultValueWithRequired(ISymbol symbol) => CreateDiagnostic(
         "OCL0020",
@@ -197,7 +190,7 @@ internal static class Diagnostics
         nameof(Resources.DefaultValueWithRequiredMessageFormat),
         DiagnosticSeverity.Warning,
         symbol.Locations.FirstOrDefault(),
-        symbol.ToDisplayString());
+        symbol.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat));
 
     public static Diagnostic DefaultValueWithMultiValue(ISymbol symbol) => CreateDiagnostic(
         "OCL0020", // Deliberately the same as above.
@@ -205,7 +198,7 @@ internal static class Diagnostics
         nameof(Resources.DefaultValueWithMultiValueMessageFormat),
         DiagnosticSeverity.Warning,
         symbol.Locations.FirstOrDefault(),
-        symbol.ToDisplayString());
+        symbol.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat));
 
     public static Diagnostic DefaultValueWithMethod(ISymbol symbol) => CreateDiagnostic(
         "OCL0020", // Deliberately the same as above.
@@ -213,7 +206,7 @@ internal static class Diagnostics
         nameof(Resources.DefaultValueWithMethodMessageFormat),
         DiagnosticSeverity.Warning,
         symbol.Locations.FirstOrDefault(),
-        symbol.ToDisplayString());
+        symbol.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat));
 
     public static Diagnostic IsRequiredWithRequiredProperty(ISymbol symbol) => CreateDiagnostic(
         "OCL0021",
@@ -221,7 +214,7 @@ internal static class Diagnostics
         nameof(Resources.IsRequiredWithRequiredPropertyMessageFormat),
         DiagnosticSeverity.Warning,
         symbol.Locations.FirstOrDefault(),
-        symbol.ToDisplayString());
+        symbol.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat));
 
     public static Diagnostic DuplicatePosition(ISymbol symbol, string otherName) => CreateDiagnostic(
         "OCL0022",
@@ -229,7 +222,7 @@ internal static class Diagnostics
         nameof(Resources.DuplicatePositionMessageFormat),
         DiagnosticSeverity.Warning,
         symbol.Locations.FirstOrDefault(),
-        symbol.ToDisplayString(),
+        symbol.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat),
         otherName);
 
     public static Diagnostic ShortAliasWithoutShortName(AttributeData attribute, ISymbol symbol) => CreateDiagnostic(
@@ -238,7 +231,7 @@ internal static class Diagnostics
         nameof(Resources.ShortAliasWithoutShortNameMessageFormat),
         DiagnosticSeverity.Warning,
         attribute.GetLocation(),
-        symbol.ToDisplayString());
+        symbol.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat));
 
     public static Diagnostic AliasWithoutLongName(AttributeData attribute, ISymbol symbol) => CreateDiagnostic(
         "OCL0024",
@@ -246,7 +239,7 @@ internal static class Diagnostics
         nameof(Resources.AliasWithoutLongNameMessageFormat),
         DiagnosticSeverity.Warning,
         attribute.GetLocation(),
-        symbol.ToDisplayString());
+        symbol.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat));
 
     public static Diagnostic IsHiddenWithPositionalOrRequired(ISymbol symbol) => CreateDiagnostic(
         "OCL0025",
@@ -254,7 +247,7 @@ internal static class Diagnostics
         nameof(Resources.IsHiddenWithPositionalOrRequiredMessageFormat),
         DiagnosticSeverity.Warning,
         symbol.Locations.FirstOrDefault(),
-        symbol.ToDisplayString());
+        symbol.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat));
 
     public static Diagnostic InvalidGeneratedConverterNamespace(string ns, AttributeData attribute) => CreateDiagnostic(
         "OCL0026",
@@ -271,7 +264,7 @@ internal static class Diagnostics
         DiagnosticSeverity.Warning,
         attribute.GetLocation(),
         attribute.AttributeClass?.Name,
-        member.ToDisplayString());
+        member.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat));
 
     public static Diagnostic IgnoredAttributeForDictionaryWithConverter(ISymbol member, AttributeData attribute) => CreateDiagnostic(
         "OCL0028",
@@ -280,7 +273,7 @@ internal static class Diagnostics
         DiagnosticSeverity.Warning,
         attribute.GetLocation(),
         attribute.AttributeClass?.Name,
-        member.ToDisplayString());
+        member.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat));
 
     public static Diagnostic IgnoredAttributeForNonMultiValue(ISymbol member, AttributeData attribute) => CreateDiagnostic(
         "OCL0029",
@@ -289,7 +282,7 @@ internal static class Diagnostics
         DiagnosticSeverity.Warning,
         attribute.GetLocation(),
         attribute.AttributeClass?.Name,
-        member.ToDisplayString());
+        member.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat));
 
     public static Diagnostic ArgumentStartsWithNumber(ISymbol member, string name) => CreateDiagnostic(
         "OCL0030",
@@ -298,7 +291,7 @@ internal static class Diagnostics
         DiagnosticSeverity.Warning,
         member.Locations.FirstOrDefault(),
         name,
-        member.ToDisplayString());
+        member.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat));
 
     public static Diagnostic NoLongOrShortName(ISymbol member, AttributeData attribute) => CreateDiagnostic(
         "OCL0031",
@@ -306,7 +299,7 @@ internal static class Diagnostics
         nameof(Resources.NoLongOrShortNameMessageFormat),
         DiagnosticSeverity.Error,
         attribute.GetLocation(),
-        member.ToDisplayString());
+        member.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat));
 
     public static Diagnostic IsShortIgnored(ISymbol member, AttributeData attribute) => CreateDiagnostic(
         "OCL0032",
@@ -314,7 +307,7 @@ internal static class Diagnostics
         nameof(Resources.IsShortIgnoredMessageFormat),
         DiagnosticSeverity.Warning,
         attribute.GetLocation(),
-        member.ToDisplayString());
+        member.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat));
 
     public static Diagnostic ArgumentWithoutDescription(ISymbol member) => CreateDiagnostic(
         "OCL0033",
@@ -322,7 +315,7 @@ internal static class Diagnostics
         nameof(Resources.ArgumentWithoutDescriptionMessageFormat),
         DiagnosticSeverity.Warning,
         member.Locations.FirstOrDefault(),
-        member.ToDisplayString());
+        member.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat));
 
     public static Diagnostic CommandWithoutDescription(ISymbol symbol) => CreateDiagnostic(
         "OCL0034",
@@ -330,7 +323,7 @@ internal static class Diagnostics
         nameof(Resources.CommandWithoutDescriptionMessageFormat),
         DiagnosticSeverity.Warning,
         symbol.Locations.FirstOrDefault(),
-        symbol.ToDisplayString());
+        symbol.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat));
 
     public static Diagnostic IgnoredAttributeForNonCommand(ISymbol symbol, AttributeData attribute) => CreateDiagnostic(
         "OCL0035",
@@ -338,8 +331,8 @@ internal static class Diagnostics
         nameof(Resources.IgnoredAttributeForNonCommandMessageFormat),
         DiagnosticSeverity.Warning,
         attribute.GetLocation(),
-        attribute.AttributeClass?.ToDisplayString(),
-        symbol.ToDisplayString());
+        attribute.AttributeClass?.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat),
+        symbol.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat));
 
     public static Diagnostic IgnoredFriendlyNameAttribute(ISymbol symbol, AttributeData attribute) => CreateDiagnostic(
         "OCL0036",
@@ -347,7 +340,7 @@ internal static class Diagnostics
         nameof(Resources.IgnoredFriendlyNameAttributeMessageFormat),
         DiagnosticSeverity.Warning,
         attribute.GetLocation(),
-        symbol.ToDisplayString());
+        symbol.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat));
 
     public static Diagnostic UnsupportedLanguageVersion(ISymbol symbol, string attributeName) => CreateDiagnostic(
         "OCL0037",
@@ -355,7 +348,7 @@ internal static class Diagnostics
         nameof(Resources.UnsupportedLanguageVersionMessageFormat),
         DiagnosticSeverity.Error,
         symbol.Locations.FirstOrDefault(),
-        symbol.ToDisplayString(),
+        symbol.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat),
         attributeName);
 
     public static Diagnostic MixedImplicitExplicitPositions(ISymbol symbol) => CreateDiagnostic(
@@ -364,7 +357,7 @@ internal static class Diagnostics
         nameof(Resources.MixedImplicitExplicitPositionsMessageFormat),
         DiagnosticSeverity.Error,
         symbol.Locations.FirstOrDefault(),
-        symbol.ToDisplayString());
+        symbol.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat));
 
     public static Diagnostic UnsupportedInitializerSyntax(ISymbol symbol, Location location) => CreateDiagnostic(
         "OCL0039",
@@ -372,7 +365,7 @@ internal static class Diagnostics
         nameof(Resources.UnsupportedInitializerSyntaxMessageFormat),
         DiagnosticSeverity.Warning,
         location,
-        symbol.ToDisplayString());
+        symbol.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat));
 
     private static Diagnostic CreateDiagnostic(string id, string titleResource, string messageResource, DiagnosticSeverity severity, Location? location, params object?[]? messageArgs)
         => Diagnostic.Create(
