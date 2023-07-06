@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 
 namespace Ookii.CommandLine;
 
-static class NativeMethods
+static partial class NativeMethods
 {
     static readonly IntPtr INVALID_HANDLE_VALUE = new(-1);
 
@@ -62,6 +62,18 @@ static class NativeMethods
         return GetStdHandle(stdHandle);
     }
 
+#if NET7_0_OR_GREATER
+    [LibraryImport("kernel32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static partial bool SetConsoleMode(IntPtr hConsoleHandle, ConsoleModes dwMode);
+
+    [LibraryImport("kernel32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static partial bool GetConsoleMode(IntPtr hConsoleHandle, out ConsoleModes lpMode);
+
+    [LibraryImport("kernel32.dll", SetLastError = true)]
+    private static partial IntPtr GetStdHandle(StandardHandle nStdHandle);
+#else
     [DllImport("kernel32.dll", SetLastError = true)]
     public static extern bool SetConsoleMode(IntPtr hConsoleHandle, ConsoleModes dwMode);
 
@@ -70,6 +82,7 @@ static class NativeMethods
 
     [DllImport("kernel32.dll", SetLastError = true)]
     static extern IntPtr GetStdHandle(StandardHandle nStdHandle);
+#endif
 
     [Flags]
     public enum ConsoleModes : uint
