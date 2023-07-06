@@ -56,6 +56,10 @@ internal class CommandLineArgumentAttributeInfo
             case nameof(IsHidden):
                 IsHidden = (bool)named.Value.Value!;
                 break;
+
+            case nameof(IncludeDefaultInUsageHelp):
+                IncludeDefaultInUsageHelp = (bool)named.Value.Value!;
+                break;
             }
         }
     }
@@ -81,4 +85,6 @@ internal class CommandLineArgumentAttributeInfo
     public bool IsLong { get; } = true;
 
     public bool IsHidden { get; }
+
+    public bool IncludeDefaultInUsageHelp { get; set; } = true;
 }

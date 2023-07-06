@@ -1248,6 +1248,8 @@ public partial class CommandLineParserTest
         Assert.IsNull(parser.GetArgument("Arg8")!.DefaultValue);
         // Null because explicit null.
         Assert.IsNull(parser.GetArgument("Arg9")!.DefaultValue);
+        // Null because IncludeDefaultInUsageHelp is false.
+        Assert.IsNull(parser.GetArgument("Arg10")!.DefaultValue);
     }
 
     [TestMethod]

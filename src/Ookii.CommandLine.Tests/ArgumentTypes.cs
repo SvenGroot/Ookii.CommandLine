@@ -635,6 +635,9 @@ partial class InitializerDefaultValueArguments
     public string? Arg9 { get; set; } = null!;
 #nullable disable
 
+    [CommandLineArgument(IncludeDefaultInUsageHelp = false)]
+    public int Arg10 { get; set; } = 10;
+
     private const int Value = 47;
 
     public static int GetValue() => 42;

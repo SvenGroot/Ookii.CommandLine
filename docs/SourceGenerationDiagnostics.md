@@ -906,6 +906,8 @@ the property's description manually, if desired.
 To avoid this warning, use one of the supported expression types, or use the
 [`CommandLineArgumentAttribute.DefaultValue`][] property. This warning will not be emitted if the
 [`CommandLineArgumentAttribute.DefaultValue`][] property is not null, regardless of the initializer.
+It will also not be emitted if the [`CommandLineArgumentAttribute.IncludeDefaultInUsageHelp`][]
+property is false.
 
 Note that default values set by property initializers are only shown in the usage help if the
 [`GeneratedParserAttribute`][] is used. When reflection is used, only
@@ -919,6 +921,7 @@ Note that default values set by property initializers are only shown in the usag
 [`CommandAttribute.IsHidden`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_Commands_CommandAttribute_IsHidden.htm
 [`CommandAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Commands_CommandAttribute.htm
 [`CommandLineArgumentAttribute.DefaultValue`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_DefaultValue.htm
+[`CommandLineArgumentAttribute.IncludeDefaultInUsageHelp`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_IncludeDefaultInUsageHelp.htm
 [`CommandLineArgumentAttribute.IsHidden`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_IsHidden.htm
 [`CommandLineArgumentAttribute.IsLong`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_IsLong.htm
 [`CommandLineArgumentAttribute.IsPositional`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_IsPositional.htm

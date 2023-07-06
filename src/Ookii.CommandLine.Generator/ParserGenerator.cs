@@ -506,7 +506,7 @@ internal class ParserGenerator
             }
 
             // Check if we should use the initializer for a default value.
-            if (!isMultiValue && !property.IsRequired && !argumentInfo.IsRequired && argumentInfo.DefaultValue == null)
+            if (!isMultiValue && !property.IsRequired && !argumentInfo.IsRequired && argumentInfo.DefaultValue == null && argumentInfo.IncludeDefaultInUsageHelp)
             {
                 var alternateDefaultValue = GetInitializerValue(property);
                 if (alternateDefaultValue != null)
