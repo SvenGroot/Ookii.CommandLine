@@ -8,8 +8,8 @@
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     <IsTrimmable>True</IsTrimmable>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageProjectUrl>https://github.com/SvenGroot/ookii.commandline</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/SvenGroot/ookii.commandline</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/SvenGroot/Ookii.CommandLine</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/SvenGroot/Ookii.CommandLine</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <SignAssembly>true</SignAssembly>

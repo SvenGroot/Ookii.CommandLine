@@ -45,7 +45,7 @@ namespace Ookii.CommandLine.Commands;
 /// </note>
 /// </remarks>
 /// <seealso cref="CommandLineParser"/>
-/// <seealso href="https://www.github.com/SvenGroot/ookii.commandline">Usage documentation</seealso>
+/// <seealso href="https://www.github.com/SvenGroot/Ookii.CommandLine">Usage documentation</seealso>
 /// <threadsafety static="true" instance="false"/>
 public class CommandManager
 {
