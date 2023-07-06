@@ -14,7 +14,7 @@ using System.Net;
 #nullable disable
 
 // We deliberately have some properties and methods that cause warnings, so disable those.
-#pragma warning disable OCL0017,OCL0018,OCL0020,OCL0023,OCL0029,OCL0033,OCL0038
+#pragma warning disable OCL0017,OCL0018,OCL0020,OCL0023,OCL0029,OCL0033,OCL0039
 
 namespace Ookii.CommandLine.Tests;
 
