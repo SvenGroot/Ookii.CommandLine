@@ -63,7 +63,7 @@ writer.WriteLine();
 writer.WriteLine("After a blank line, no indentation is used.");
 writer.WriteLine("The next line is indented again.");
 writer.ResetIndent();
-writer.WriteLine("This line is not.");
+writer.WriteLine("This line is not because ResetIndent was called.");
 writer.WriteLine("And this one is.");
 ```
 
@@ -76,16 +76,16 @@ The first line is not indented. This line is pretty long, so it'll probably be w
 
 After a blank line, no indentation is used.
     The next line is indented again.
-This line is not.
+This line is not because ResetIndent was called.
     And this one is.
 ```
 
 ## Virtual terminal support
 
-Virtual terminal (VT) sequences are a method to manipulate the console utilized, supported by many
-console applications on many operating systems. It is supported by the console host on recent
+Virtual terminal (VT) sequences are a method to manipulate the console output, supported by many
+terminal applications on many operating systems. It is supported by the console host on recent
 versions of Windows, by [Windows Terminal](https://learn.microsoft.com/windows/terminal/install),
-and many console applications on other platforms.
+and many terminal applications on other platforms.
 
 A VT sequence consists of an escape character, followed by a string that specifies what action to
 take. They can be used to set colors and other formatting options, but also to do things like move

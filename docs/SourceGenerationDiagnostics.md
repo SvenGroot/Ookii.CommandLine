@@ -8,7 +8,8 @@ does anything unsupported by Ookii.CommandLine. Among others, it checks for thin
 - Whether positional arguments have duplicate numbering.
 - Arguments with types that cannot be converted from a string.
 - Attribute or property combinations that are ignored.
-- Using the [`CommandLineArgument`][] with a private member, or a method with an incorrect signature.
+- Using the [`CommandLineArgumentAttribute`][] with a private member, or a method with an incorrect
+  signature.
 
 Without source generation, these mistakes would either lead to a runtime exception when creating the
 [`CommandLineParser<T>`][] class, or would be silently ignored. With source generation, you can instead
@@ -217,14 +218,12 @@ class, so a generated parser would not be used.
 
 For example, the following code triggers this error:
 
-TODO: Update with span/memory if used.
-
 ```csharp
 [Command]
 [GeneratedParser]
 partial class Arguments : ICommandWithCustomParsing // ERROR: The command uses custom parsing.
 {
-    public void Parse(string[] args, int index, CommandOptions options)
+    public void Parse(ReadOnlyMemory<string> args, CommandManager manager)
     {
         // Omitted
     }
@@ -249,11 +248,11 @@ For example, the following code triggers this error:
 [GeneratedParser]
 partial class Arguments
 {
-    [CommandLineAttribute(Position = 0)]
+    [CommandLineAttribute(IsPositional = true)]
     public string[]? Argument1 { get; set; }
 
      // ERROR: Argument2 comes after Argument1, which is multi-value.
-    [CommandLineAttribute(Position = 1)]
+    [CommandLineAttribute(IsPositional = true]
     public string? Argument2 { get; set; }
 }
 ```
@@ -270,12 +269,12 @@ For example, the following code triggers this error:
 [GeneratedParser]
 partial class Arguments
 {
-    [CommandLineAttribute(Position = 0)]
+    [CommandLineAttribute(IsPositional = true)]
     public string? Argument1 { get; set; }
 
      // ERROR: Required argument Argument2 comes after Argument1, which is optional.
-    [CommandLineAttribute(IsRequired = true, Position = 1)]
-    public string? Argument2 { get; set; }
+    [CommandLineAttribute(IsPositional = true)]
+    public required string Argument2 { get; set; }
 }
 ```
 
@@ -540,8 +539,8 @@ partial class Arguments
 
 The same position value is used for two or more arguments.
 
-While the actual position values do not matter--merely the order of the values do, so skipping
-numbers is fine--using the same number more than once can lead to unpredictable or unstable ordering
+While the actual position values do not matter—merely the order of the values do, so skipping
+numbers is fine—using the same number more than once can lead to unpredictable or unstable ordering
 of the arguments, which should be avoided.
 
 ```csharp
@@ -560,7 +559,7 @@ partial class Arguments
 ### OCL0023
 
 The [`ShortAliasAttribute`][] is ignored on an argument that does not have a short name. Set the
-[`CommandLineArgumentAttribute.IsShort`][] property to true set an explicit short name using the
+[`CommandLineArgumentAttribute.IsShort`][] property to true or set an explicit short name using the
 [`CommandLineArgumentAttribute.ShortName`][] property. Without a short name, any short aliases will not
 be used.
 
@@ -863,8 +862,8 @@ Instead, the attribute should be applied to the assembly:
 
 The initial value of a property will not be included in the usage help, because it uses an
 expression type that is not supported by the source generator. Supported expression types are
-literals, enumeration values, constants, and null-forgiving expressions containing any of those
-expression types.
+literals, enumeration values, constants, properties, and null-forgiving expressions containing any
+of those expression types.
 
 For example, `5`, `"value"`, `DayOfWeek.Tuesday`, `int.MaxValue` and `default!` are all supported
 expressions for property initializers.
@@ -875,7 +874,6 @@ supported and will not be included in the usage help.
 For example, the following code triggers this warning:
 
 ```csharp
-// WARNING: ApplicationFriendlyName is ignored for commands.
 [GeneratedParser]
 partial class Arguments
 {
@@ -910,7 +908,6 @@ Note that default values set by property initializers are only shown in the usag
 [`ArgumentConverterAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Conversion_ArgumentConverterAttribute.htm
 [`CommandAttribute.IsHidden`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_Commands_CommandAttribute_IsHidden.htm
 [`CommandAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Commands_CommandAttribute.htm
-[`CommandLineArgument`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_CommandLineArgument.htm
 [`CommandLineArgumentAttribute.DefaultValue`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_DefaultValue.htm
 [`CommandLineArgumentAttribute.IsHidden`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_IsHidden.htm
 [`CommandLineArgumentAttribute.IsLong`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_IsLong.htm

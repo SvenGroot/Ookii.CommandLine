@@ -174,7 +174,7 @@ accomplished by having a common base class for each command that needs the commo
 ```csharp
 abstract class DatabaseCommand : ICommand
 {
-    [CommandLineArgument(Position = 0, IsRequired = true)]
+    [CommandLineArgument(IsPositional = true, IsRequired = true)]
     public string? ConnectionString { get; set; }
 
     public abstract int Run();
@@ -184,7 +184,7 @@ abstract class DatabaseCommand : ICommand
 [Command]
 partial class AddCommand : DatabaseCommand
 {
-    [CommandLineArgument(Position = 1, IsRequired = true)]
+    [CommandLineArgument(IsPositional = true, IsRequired = true)]
     public string? NewValue { get; set; }
 
     public override int Run()
@@ -197,7 +197,7 @@ partial class AddCommand : DatabaseCommand
 [Command]
 partial class DeleteCommand : DatabaseCommand
 {
-    [CommandLineArgument(Position = 1, IsRequired = true)]
+    [CommandLineArgument(IsPositional = true, IsRequired = true)]
     public int Id { get; set; }
 
     [CommandLineArgument]
@@ -211,7 +211,8 @@ partial class DeleteCommand : DatabaseCommand
 ```
 
 The two commands, `AddCommand` and `DeleteCommand` both inherit the `-ConnectionString` argument, and
-add their own additional arguments.
+add their own additional arguments. When using the [`CommandLineArgumentAttribute.IsPositional`][]
+property, base class arguments come before derived class arguments.
 
 The `DatabaseCommand` class is not considered a subcommand by the [`CommandManager`][], because it
 does not have the [`CommandAttribute`][] attribute, and because it is abstract. It also does not
@@ -668,6 +669,7 @@ detail.
 [`CancelMode.Success`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_CancelMode.htm
 [`CommandAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Commands_CommandAttribute.htm
 [`CommandLineArgumentAttribute.CancelParsing`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_CancelParsing.htm
+[`CommandLineArgumentAttribute.IsPositional`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_IsPositional.htm
 [`CommandLineParser.Parse<T>()`]: https://www.ookii.org/docs/commandline-4.0/html/M_Ookii_CommandLine_CommandLineParser_Parse__1.htm
 [`CommandLineParser`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_CommandLineParser.htm
 [`CommandManager.GetCommand()`]: https://www.ookii.org/docs/commandline-4.0/html/M_Ookii_CommandLine_Commands_CommandManager_GetCommand.htm

@@ -29,8 +29,8 @@ Using source generation has several benefits:
 
 A few restrictions apply to projects that use Ookii.CommandLine's source generation:
 
-- The project must be a C# project (other languages are not supported), using C# version 8 or later.
-  Other languages or older C# versions are not supported.
+- The project must be a C# project, using C# version 8 or later. Other languages or older C#
+  versions are not supported.
 - The project must be built using using the .Net 6.0 SDK or a later version.
   - You can still target older runtimes supported by Ookii.CommandLine, down to .Net Framework 4.6,
     but you must build the project using the .Net 6.0 SDK or newer.
@@ -187,7 +187,7 @@ partial class Arguments
 ```
 
 When using a reflection-based parser, `Arg2` would have its value set to "foo" when omitted (since
-Ookii.CommandLine doesn't assign the property if the argument is not specifies), but that default
+Ookii.CommandLine doesn't assign the property if the argument is not specified), but that default
 value would not be included in the usage help, whereas the default value of `Arg1` will be.
 
 With the [`GeneratedParserAttribute`][], both `Arg1` and `Arg2` will have the default value of "foo"
@@ -195,11 +195,11 @@ shown in the usage help, making the two forms identical. Additionally, `Arg2` co
 non-nullable because it was initialized to a non-null value, something which isn't possible for
 `Arg1` without initializing the property to a value that will not be used.
 
-If both a property initializer and the [`DefaultValue`][DefaultValue_1] property are both used, the [`DefaultValue`][DefaultValue_1]
-property takes precedence.
+If both a property initializer and the [`DefaultValue`][DefaultValue_1] property are used, the
+[`DefaultValue`][DefaultValue_1] property takes precedence.
 
 This only works if the property initializer is a literal, enumeration value, reference to a constant,
-or a null-forgiving expression with any of those expression types.
+reference to a property, or a null-forgiving expression with any of those expression types.
 
 For example, `5`, `"value"`, `DayOfWeek.Tuesday`, `int.MaxValue` and `default!` are all supported
 expressions for property initializers.
@@ -230,7 +230,7 @@ partial class GeneratedManager
 ```
 
 The source generator will find all command classes in your project, and generate C# code to provide
-those command to the generated command manager without needing reflection.
+those commands to the generated command manager without needing reflection.
 
 If you need to load commands from a different assembly, or multiple assemblies, you can use the
 [`GeneratedCommandManagerAttribute.AssemblyNames`][] property. This property can use either just the
