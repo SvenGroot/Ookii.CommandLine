@@ -13,7 +13,7 @@ Child commands are just regular commands using the [`CommandLineParser`][], and 
 anything special except to add the [`ParentCommandAttribute`][] attribute to specify which command is
 their parent. For an example, see [CourseCommands.cs](CourseCommands.cs).
 
-This sample creates a simple "database" application that lets your add and remove students and
+This sample creates a simple "database" application that lets you add and remove students and
 courses to a json file. It has top-level commands `student` and `course`, which both have child
 commands `add` and `remove` (and a few others).
 
@@ -72,7 +72,7 @@ You can see the parent command will:
 
 - Show the command description at the top, rather than the application description.
 - Include the top-level command name in the usage syntax.
-- Remove the `version` command.
+- Show only its child commands (which also excludes the `version` command).
 
 If we run `./NestedCommand student -Help`, we get the same output. While the `student` command
 doesn't have a help argument (since the [`ParentCommand`][] uses [`ICommandWithCustomParsing`][],
@@ -104,7 +104,7 @@ Usage: NestedCommands student add [-FirstName] <String> [-LastName] <String> [[-
         The json file holding the data. Default value: data.json.
 ```
 
-We can see the usage syntax correctly shows both command names before the arguments.
+The usage syntax shows both command names before the arguments.
 
 [`CommandLineParser`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_CommandLineParser.htm
 [`CommandManager`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Commands_CommandManager.htm

@@ -20,7 +20,7 @@ arguments last, and to indicate additional command-specific arguments can follow
 shows the command list after the usage help for the arguments.
 
 The [`CommandUsageWriter`](CommandUsageWriter.cs) is used for the command manager and the commands
-themselves. It is used to disable the command list usage help when writing the command list as part
+themselves. It is used to disable the command list usage syntax when writing the command list as part
 of the top-level usage help, and to include text in the syntax to indicate there are additional
 global arguments.
 

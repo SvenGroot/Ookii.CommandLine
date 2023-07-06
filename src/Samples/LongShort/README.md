@@ -15,7 +15,7 @@ equivalent to the following:
     ValueDescriptionTransform = NameTransform.DashCase)]
 ```
 
-This sample uses the same arguments as the [parser Sample](../Parser), so see that sample's source
+This sample uses the same arguments as the [parser sample](../Parser), so see that sample's source
 for more details about each argument.
 
 In long/short mode, each argument can have a long name, using the `--` prefix, and a one-character

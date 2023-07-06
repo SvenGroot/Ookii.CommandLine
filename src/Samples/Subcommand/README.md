@@ -11,10 +11,9 @@ For detailed information, check the source of the [`ReadCommand`](ReadCommand.cs
 
 This application uses [source generation](../../../docs/SourceGeneration.md) for both the commands,
 and for the [`CommandManager`][] to find all commands and arguments at compile time. This enables
-the application to be safely trimmed. A publish profile for Visual Studio that trims the application
-is included so you can try this out, or you can run `dotnet publish --self-contained` in the
-project's folder. This also works for applications without subcommands, even though this is the only
-sample that demonstrates this.
+the application to be safely trimmed. You can try this out by running `dotnet publish --self-contained`
+in the project's folder. This also works for applications without subcommands, even though this is
+the only sample that demonstrates this by setting the `PublishTrimmed` property in the project file.
 
 When invoked without arguments, a subcommand application prints the list of commands.
 
