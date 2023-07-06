@@ -558,6 +558,10 @@ partial class Arguments
 }
 ```
 
+When using the [`GeneratedParserAttribute`][], you can use the [`CommandLineArgumentAttribute.IsPositional`][]
+property to create positional arguments by their definition order, without having to worry about
+keeping explicitly set numbers correct.
+
 ### OCL0023
 
 The [`ShortAliasAttribute`][] is ignored on an argument that does not have a short name. Set the
@@ -608,11 +612,15 @@ partial class Arguments
 
 ### OCL0025
 
-The [`CommandLineArgumentAttribute.IsHidden`][] property is ignored for positional arguments.
+The [`CommandLineArgumentAttribute.IsHidden`][] property is ignored for positional or required
+arguments.
 
 Positional arguments cannot be hidden, because excluding them from the usage help would give
 incorrect positions for any additional positional arguments. A positional argument is therefore not
 hidden even if [`IsHidden`][IsHidden_1] is set to true.
+
+Required arguments cannot be hidden, because the application cannot be easily used if they user does
+not know about them.
 
 For example, the following code triggers this warning:
 
@@ -621,7 +629,7 @@ For example, the following code triggers this warning:
 partial class Arguments
 {
     // WARNING: The argument is not hidden because it's positional.
-    [CommandLineAttribute(Position = 0, IsHidden = true)]
+    [CommandLineAttribute(IsPositional = true, IsHidden = true)]
     public string? Argument { get; set; }
 }
 ```

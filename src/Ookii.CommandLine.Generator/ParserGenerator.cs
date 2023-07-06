@@ -617,9 +617,9 @@ internal class ParserGenerator
         bool isHidden = false;
         if (argumentInfo.IsHidden)
         {
-            if (argumentInfo.Position != null)
+            if (argumentInfo.IsPositional || argumentInfo.IsRequired || (property?.IsRequired ?? false))
             {
-                _context.ReportDiagnostic(Diagnostics.IsHiddenWithPositional(member));
+                _context.ReportDiagnostic(Diagnostics.IsHiddenWithPositionalOrRequired(member));
             }
             else
             {

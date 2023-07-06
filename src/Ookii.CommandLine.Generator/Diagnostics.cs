@@ -248,10 +248,10 @@ internal static class Diagnostics
         attribute.GetLocation(),
         symbol.ToDisplayString());
 
-    public static Diagnostic IsHiddenWithPositional(ISymbol symbol) => CreateDiagnostic(
+    public static Diagnostic IsHiddenWithPositionalOrRequired(ISymbol symbol) => CreateDiagnostic(
         "OCL0025",
-        nameof(Resources.IsHiddenWithPositionalTitle),
-        nameof(Resources.IsHiddenWithPositionalMessageFormat),
+        nameof(Resources.IsHiddenWithPositionalOrRequiredTitle),
+        nameof(Resources.IsHiddenWithPositionalOrRequiredMessageFormat),
         DiagnosticSeverity.Warning,
         symbol.Locations.FirstOrDefault(),
         symbol.ToDisplayString());
