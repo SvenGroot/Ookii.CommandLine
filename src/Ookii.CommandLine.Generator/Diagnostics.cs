@@ -358,20 +358,20 @@ internal static class Diagnostics
         symbol.ToDisplayString(),
         attributeName);
 
-    public static Diagnostic UnsupportedInitializerSyntax(ISymbol symbol, Location location) => CreateDiagnostic(
-        "OCL0038",
-        nameof(Resources.UnsupportedInitializerSyntaxTitle),
-        nameof(Resources.UnsupportedInitializerSyntaxMessageFormat),
-        DiagnosticSeverity.Warning,
-        location,
-        symbol.ToDisplayString());
-
     public static Diagnostic MixedImplicitExplicitPositions(ISymbol symbol) => CreateDiagnostic(
-        "OCL0039",
+        "OCL0038",
         nameof(Resources.MixedImplicitExplicitPositionsTitle),
         nameof(Resources.MixedImplicitExplicitPositionsMessageFormat),
         DiagnosticSeverity.Error,
         symbol.Locations.FirstOrDefault(),
+        symbol.ToDisplayString());
+
+    public static Diagnostic UnsupportedInitializerSyntax(ISymbol symbol, Location location) => CreateDiagnostic(
+        "OCL0039",
+        nameof(Resources.UnsupportedInitializerSyntaxTitle),
+        nameof(Resources.UnsupportedInitializerSyntaxMessageFormat),
+        DiagnosticSeverity.Warning,
+        location,
         symbol.ToDisplayString());
 
     private static Diagnostic CreateDiagnostic(string id, string titleResource, string messageResource, DiagnosticSeverity severity, Location? location, params object?[]? messageArgs)
