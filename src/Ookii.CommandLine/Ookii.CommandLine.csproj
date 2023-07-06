@@ -15,6 +15,8 @@
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>ookii.snk</AssemblyOriginatorKeyFile>
     <DelaySign>false</DelaySign>
+    <NeutralLanguage>en-US</NeutralLanguage>
+    <Title>Ookii.CommandLine</Title>
     <Description>Ookii.CommandLine is a powerful command line parsing library for .Net applications.
 
 - Easily define arguments by creating a class with properties.
@@ -28,7 +30,7 @@
     <PackageIcon>icon.png</PackageIcon>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
-    <NeutralLanguage>en-US</NeutralLanguage>
+    <PackageReadmeFile>PackageReadme.md</PackageReadmeFile>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -49,6 +51,7 @@
 
   <ItemGroup>
     <None Include="icon.png" Pack="True" PackagePath="" />
+    <None Include="PackageReadme.md" Pack="True" PackagePath="" />
     <None Include="../Ookii.CommandLine.Generator/$(OutputPath)/netstandard2.0/**/*.dll" Pack="True" PackagePath="analyzers/dotnet/cs" />
   </ItemGroup>
 
