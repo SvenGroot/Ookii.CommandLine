@@ -38,6 +38,10 @@ As of version 3.0, .Net Framework 2.0 is no longer supported. You can still targ
 - `ParseOptions.ArgumentNameComparer` and `CommandOptions.CommandNameComparer` have been replaced by
   [`ArgumentNameComparison`][ArgumentNameComparison_1] and [`CommandNameComparison`][] respectively,
   both now taking a [`StringComparison`][] value instead of an [`IComparer<string>`][].
+- Overloads of the [`CommandLineParser.Parse()`][CommandLineParser.Parse()_2], [`CommandLineParser.ParseWithErrorHandling()`][],
+  [`CommandLineParser<T>.Parse()`][], [`CommandLineParser<T>.ParseWithErrorHandling()`][],
+  [`CommandManager.CreateCommand()`][] and [`CommandManager.RunCommand()`][] methods that took an index have
+  been replaced by overloads that take a [`ReadOnlyMemory<string>`][].
 - The [`CommandInfo`][] type is now a class instead of a structure.
 - The [`ICommandWithCustomParsing.Parse()`][] method signature has changed to use a
   [`ReadOnlyMemory<string>`][] structure for the arguments and to receive a reference to the calling
@@ -53,13 +57,20 @@ As of version 3.0, .Net Framework 2.0 is no longer supported. You can still targ
   [`ParseOptions.NameValueSeparators`][].
 - Properties that previously returned a [`ReadOnlyCollection<T>`][] now return an
   [`ImmutableArray<T>`][].
-- The `CommandLineArgumentAttribute.AllowsDuplicateDictionaryKeys` property was renamed to
-  [`AllowDuplicateDictionaryKeys`][] for consistency.
+- The `CommandLineArgument.MultiValueSeparator` and `CommandLineArgument.AllowMultiValueWhiteSpaceSeparator`
+  properties have been moved into the [`CommandLineArgument.MultiValueInfo`][] property.
+- The `CommandLineArgument.AllowsDuplicateDictionaryKeys` and `CommandLineArgument.KeyValueSeparator`
+  properties have been moved into the [`CommandLineArgument.DictionaryInfo`][] property.
+- The `CommandLineArgument.IsDictionary` and `CommandLineArgument.IsMultiValue` properties have been
+  removed; instead, check [`CommandLineArgument.DictionaryInfo`][] or [`CommandLineArgument.MultiValueInfo`][]
+  for null values, or use the [`CommandLineArgument.Kind`][] property.
+- [`TextFormat`][] is now a structure with strongly-typed values for VT sequences, and that structure is
+  used by the [`UsageWriter`][] class for the various color formatting options.
 
 ## Breaking behavior changes from version 3.0
 
 - By default, both `:` and `=` are accepted as argument name/value separators.
-- The default value of [`ParseOptions.ShowUsageOnError`][] has changed.
+- The default value of [`ParseOptions.ShowUsageOnError`][] has changed to [`UsageHelpRequest.SyntaxOnly`][].
 
 ## Breaking API changes from version 2.4
 
@@ -120,7 +131,6 @@ As of version 3.0, .Net Framework 2.0 is no longer supported. You can still targ
 - The [`LineWrappingTextWriter`][] class does not count virtual terminal sequences as part of the
   line length by default.
 
-[`AllowDuplicateDictionaryKeys`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_CommandLineArgument_AllowDuplicateDictionaryKeys.htm
 [`ArgumentConverter`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Conversion_ArgumentConverter.htm
 [`ArgumentConverterAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Conversion_ArgumentConverterAttribute.htm
 [`ArgumentParsed`]: https://www.ookii.org/docs/commandline-4.0/html/E_Ookii_CommandLine_CommandLineParser_ArgumentParsed.htm
@@ -129,13 +139,21 @@ As of version 3.0, .Net Framework 2.0 is no longer supported. You can still targ
 [`CancelMode`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_CancelMode.htm
 [`CommandAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Commands_CommandAttribute.htm
 [`CommandInfo`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Commands_CommandInfo.htm
+[`CommandLineArgument.DictionaryInfo`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_CommandLineArgument_DictionaryInfo.htm
 [`CommandLineArgument.ElementType`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_CommandLineArgument_ElementType.htm
+[`CommandLineArgument.Kind`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_CommandLineArgument_Kind.htm
+[`CommandLineArgument.MultiValueInfo`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_CommandLineArgument_MultiValueInfo.htm
 [`CommandLineArgumentAttribute.CancelParsing`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_CancelParsing.htm
 [`CommandLineParser.HelpRequested`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_CommandLineParser_HelpRequested.htm
 [`CommandLineParser.Parse<T>()`]: https://www.ookii.org/docs/commandline-4.0/html/M_Ookii_CommandLine_CommandLineParser_Parse__1.htm
+[`CommandLineParser.ParseWithErrorHandling()`]: https://www.ookii.org/docs/commandline-4.0/html/Overload_Ookii_CommandLine_CommandLineParser_ParseWithErrorHandling.htm
 [`CommandLineParser.WriteUsage()`]: https://www.ookii.org/docs/commandline-4.0/html/M_Ookii_CommandLine_CommandLineParser_WriteUsage.htm
 [`CommandLineParser`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_CommandLineParser.htm
+[`CommandLineParser<T>.Parse()`]: https://www.ookii.org/docs/commandline-4.0/html/Overload_Ookii_CommandLine_CommandLineParser_1_Parse.htm
+[`CommandLineParser<T>.ParseWithErrorHandling()`]: https://www.ookii.org/docs/commandline-4.0/html/M_Ookii_CommandLine_CommandLineParser_1_ParseWithErrorHandling.htm
 [`CommandLineParser<T>`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_CommandLineParser_1.htm
+[`CommandManager.CreateCommand()`]: https://www.ookii.org/docs/commandline-4.0/html/Overload_Ookii_CommandLine_Commands_CommandManager_CreateCommand.htm
+[`CommandManager.RunCommand()`]: https://www.ookii.org/docs/commandline-4.0/html/Overload_Ookii_CommandLine_Commands_CommandManager_RunCommand.htm
 [`CommandManager.RunCommandAsync()`]: https://www.ookii.org/docs/commandline-4.0/html/Overload_Ookii_CommandLine_Commands_CommandManager_RunCommandAsync.htm
 [`CommandManager`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Commands_CommandManager.htm
 [`CommandNameComparison`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_Commands_CommandOptions_CommandNameComparison.htm
@@ -164,9 +182,11 @@ As of version 3.0, .Net Framework 2.0 is no longer supported. You can still targ
 [`ReadOnlyCollection<T>`]: https://learn.microsoft.com/dotnet/api/system.collections.objectmodel.readonlycollection-1
 [`ReadOnlyMemory<string>`]: https://learn.microsoft.com/dotnet/api/system.readonlymemory-1
 [`StringComparison`]: https://learn.microsoft.com/dotnet/api/system.stringcomparison
+[`TextFormat`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Terminal_TextFormat.htm
 [`TypeConverter`]: https://learn.microsoft.com/dotnet/api/system.componentmodel.typeconverter
 [`TypeConverterArgumentConverter<T>`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Conversion_TypeConverterArgumentConverter_1.htm
 [`TypeConverterAttribute`]: https://learn.microsoft.com/dotnet/api/system.componentmodel.typeconverterattribute
+[`UsageHelpRequest.SyntaxOnly`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_UsageHelpRequest.htm
 [`UsageWriter`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_UsageWriter.htm
 [`ValueConverterAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Conversion_ValueConverterAttribute.htm
 [`ValueDescriptionAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_ValueDescriptionAttribute.htm
