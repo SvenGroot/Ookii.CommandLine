@@ -65,7 +65,7 @@ internal class ConverterGenerator
                 return null;
             }
 
-            info.Name = GenerateName(type.ToQualifiedName());
+            info.Name = GenerateName(type.ToDisplayString());
             _converters.Add(type, info);
             converter = info;
         }
