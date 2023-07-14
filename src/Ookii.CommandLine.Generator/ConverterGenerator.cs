@@ -65,7 +65,7 @@ internal class ConverterGenerator
                 return null;
             }
 
-            info.Name = GenerateName(type.ToDisplayString());
+            info.Name = GenerateName(type);
             _converters.Add(type, info);
             converter = info;
         }
@@ -170,8 +170,15 @@ internal class ConverterGenerator
         return info;
     }
 
-    private static string GenerateName(string displayName)
+    private static string GenerateName(ITypeSymbol type)
     {
+        // Use the full framework name even for types that have keywords, and don't include global
+        // namespace.
+        var format = SymbolDisplayFormat.FullyQualifiedFormat
+            .WithGlobalNamespaceStyle(SymbolDisplayGlobalNamespaceStyle.Omitted)
+            .RemoveMiscellaneousOptions(SymbolDisplayMiscellaneousOptions.UseSpecialTypes);
+
+        var displayName = type.ToDisplayString(format);
         return displayName.ToIdentifier(ConverterSuffix);
     }
 

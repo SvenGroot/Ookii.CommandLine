@@ -80,7 +80,7 @@ internal class CommandGenerator
             var source = GenerateManager(manager);
             if (source != null)
             {
-                _context.AddSource(manager.ToQualifiedName().ToIdentifier(".g.cs"), SourceText.From(source, Encoding.UTF8));
+                _context.AddSource(manager.ToDisplayString().ToIdentifier(".g.cs"), SourceText.From(source, Encoding.UTF8));
             }
         }
     }
