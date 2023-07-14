@@ -1,4 +1,5 @@
 ﻿using Microsoft.CodeAnalysis;
+using System;
 
 namespace Ookii.CommandLine.Generator;
 
@@ -19,9 +20,10 @@ internal class ArgumentAttributes
 
     public ArgumentAttributes(ISymbol member, TypeHelper typeHelper, SourceProductionContext context)
     {
+        AttributeData? typeConverterAttribute = null;
         foreach (var attribute in member.GetAttributes())
         {
-            if (attribute.CheckType(typeHelper.CommandLineArgumentAttribute, ref _commandLineArgumentAttribute) ||
+            var _ = attribute.CheckType(typeHelper.CommandLineArgumentAttribute, ref _commandLineArgumentAttribute) ||
                 attribute.CheckType(typeHelper.MultiValueSeparatorAttribute, ref _multiValueSeparator) ||
                 attribute.CheckType(typeHelper.DescriptionAttribute, ref _description) ||
                 attribute.CheckType(typeHelper.ValueDescriptionAttribute, ref _valueDescription) ||
@@ -32,14 +34,14 @@ internal class ArgumentAttributes
                 attribute.CheckType(typeHelper.ValueConverterAttribute, ref _valueConverterAttribute) ||
                 attribute.CheckType(typeHelper.AliasAttribute, ref _aliases) ||
                 attribute.CheckType(typeHelper.ShortAliasAttribute, ref _shortAliases) ||
-                attribute.CheckType(typeHelper.ArgumentValidationAttribute, ref _validators) ||
-                // Don't warn about attributes used by the compiler.
-                (attribute.AttributeClass?.ContainingNamespace.ToDisplayString().StartsWith("System.Runtime.CompilerServices") ?? false))
-            {
-                continue;
-            }
+                attribute.CheckType(typeHelper.ArgumentValidationAttribute, ref _validators);
+                attribute.CheckType(typeHelper.TypeConverterAttribute, ref typeConverterAttribute);
+        }
 
-            context.ReportDiagnostic(Diagnostics.IgnoredAttribute(member, attribute));
+        // Only warn if the TypeConverterAttribute is present.
+        if (CommandLineArgument != null && typeConverterAttribute != null)
+        {
+            context.ReportDiagnostic(Diagnostics.IgnoredTypeConverterAttribute(member, typeConverterAttribute));
         }
     }
 

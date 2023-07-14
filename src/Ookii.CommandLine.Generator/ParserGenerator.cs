@@ -71,7 +71,7 @@ internal class ParserGenerator
         // This code also finds attributes that inherit from those attribute. By instantiating the
         // possibly derived attribute classes, we can support for example a class that derives from
         // DescriptionAttribute that gets the description from a resource.
-        var attributes = new ArgumentsClassAttributes(_argumentsClass, _typeHelper, _context);
+        var attributes = new ArgumentsClassAttributes(_argumentsClass, _typeHelper);
 
         var isCommand = false;
         if (attributes.Command != null)

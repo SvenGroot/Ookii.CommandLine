@@ -31,6 +31,8 @@ internal class TypeHelper
 
     public INamedTypeSymbol? AssemblyDescriptionAttribute => _compilation.GetTypeByMetadataName(typeof(AssemblyDescriptionAttribute).FullName);
 
+    public INamedTypeSymbol? TypeConverterAttribute => _compilation.GetTypeByMetadataName(typeof(TypeConverterAttribute).FullName);
+
     public INamedTypeSymbol? ISpanParsable => _compilation.GetTypeByMetadataName("System.ISpanParsable`1");
 
     public INamedTypeSymbol? IParsable => _compilation.GetTypeByMetadataName("System.IParsable`1");

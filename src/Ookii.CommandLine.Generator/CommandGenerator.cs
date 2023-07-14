@@ -36,7 +36,7 @@ internal class CommandGenerator
         {
             if (symbol.DeclaredAccessibility == Accessibility.Public && symbol.ImplementsInterface(_typeHelper.ICommand))
             {
-                var attributes = new ArgumentsClassAttributes(symbol, _typeHelper, null);
+                var attributes = new ArgumentsClassAttributes(symbol, _typeHelper);
                 if (attributes.Command != null)
                 {
                     Commands.Add((symbol, attributes));
@@ -184,7 +184,7 @@ internal class CommandGenerator
             builder.AppendArgument($"typeof({commandTypeName})");
         }
 
-        var attributes = commandAttributes ?? new ArgumentsClassAttributes(commandType, _typeHelper, null);
+        var attributes = commandAttributes ?? new ArgumentsClassAttributes(commandType, _typeHelper);
         builder.AppendArgument($"{attributes.Command!.CreateInstantiation()}");
         if (attributes.Description != null)
         {

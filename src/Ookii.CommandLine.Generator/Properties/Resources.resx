@@ -231,6 +231,12 @@
   <data name="IgnoredFriendlyNameAttributeTitle" xml:space="preserve">
     <value>The ApplicationFriendlyNameAttribute is ignored on a subcommand.</value>
   </data>
+  <data name="IgnoredTypeConverterAttributeMessageFormat" xml:space="preserve">
+    <value>The TypeConverterAttribute on '{0}' will be ignored by the CommandLineParser. Use the ArgumentConverterAttribute instead.</value>
+  </data>
+  <data name="IgnoredTypeConverterAttributeTitle" xml:space="preserve">
+    <value>The TypeConverterAttribute will be ignored.</value>
+  </data>
   <data name="InvalidArrayRankMessageFormat" xml:space="preserve">
     <value>The multi-value command line argument defined by {0} must have an array rank of one.</value>
   </data>
@@ -350,12 +356,6 @@
   </data>
   <data name="UnknownAssemblyNameTitle" xml:space="preserve">
     <value>Unknown assembly name.</value>
-  </data>
-  <data name="UnknownAttributeMessageFormat" xml:space="preserve">
-    <value>The attribute '{0}' on '{1}' is unknown and will be ignored by the GeneratedParserAttribute.</value>
-  </data>
-  <data name="UnknownAttributeTitle" xml:space="preserve">
-    <value>Unknown attribute will be ignored.</value>
   </data>
   <data name="UnsupportedInitializerSyntaxMessageFormat" xml:space="preserve">
     <value>The initial value of the property '{0}' will not be included in the usage help because it is not a literal expression, enum value, constant, or property. Consider changing the initializer, or use CommandLineArgumentAttribute.DefaultValue as an alternative.</value>

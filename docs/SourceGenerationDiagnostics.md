@@ -408,14 +408,13 @@ work without the [`GeneratedParserAttribute`][].
 
 ### OCL0016
 
-Unknown attribute will be ignored.
+The [`TypeConverterAttribute`][] is no longer used by Ookii.CommandLine, and will be ignored.
 
-The arguments class itself, or one of the members defining an argument, has an attribute that is
-not used by Ookii.CommandLine.
+As of Ookii.CommandLine 4.0, argument values are converted from a string using the
+[`ArgumentConverter`][] class and [`TypeConverter`][] is no longer used. Custom converters should be
+specified using the [`ArgumentConverterAttribute`][] attribute.
 
-For example, the following code triggers this warning, because the current version of
-Ookii.CommandLine no longer uses the [`TypeConverterAttribute`][], having replaced it with the
-[`ArgumentConverterAttribute`][]:
+For example, the following code triggers this warning:
 
 ```csharp
 [GeneratedParser]
@@ -427,8 +426,27 @@ partial class Arguments
 }
 ```
 
-To fix this warning, remove the relevant attribute. If the attribute is present for some purpose
-other than Ookii.CommandLine, you should suppress or disable this warning.
+To fix this warning, switch to using the [`ArgumentConverterAttribute`][] attribute. To use the
+existing [`TypeConverter`][], you can inherit from the [`TypeConverterArgumentConverter`][] class.
+
+```csharp
+public class MyArgumentConverter : TypeConverterArgumentConverter
+{
+    public MyArgumentConverter()
+        : base(new MyNamespace.MyConverter())
+    {
+    }
+}
+
+[GeneratedParser]
+partial class Arguments
+{
+    [CommandLineAttribute]
+    [ArgumentConverter(typeof(MyArgumentConverter)]
+    public CustomType? Argument { get; set; }
+}
+```
+
 
 ### OCL0017
 
@@ -955,6 +973,8 @@ Note that default values set by property initializers are only shown in the usag
 [`ParsingMode.LongShort`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_ParsingMode.htm
 [`ShortAliasAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_ShortAliasAttribute.htm
 [`Type`]: https://learn.microsoft.com/dotnet/api/system.type
+[`TypeConverter`]: https://learn.microsoft.com/dotnet/api/system.componentmodel.typeconverter
+[`TypeConverterArgumentConverter`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Conversion_TypeConverterArgumentConverter.htm
 [`TypeConverterAttribute`]: https://learn.microsoft.com/dotnet/api/system.componentmodel.typeconverterattribute
 [`ValueConverterAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Conversion_ValueConverterAttribute.htm
 [IsHidden_1]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_IsHidden.htm

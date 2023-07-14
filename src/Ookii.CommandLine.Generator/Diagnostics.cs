@@ -143,13 +143,12 @@ internal static class Diagnostics
         attribute.GetLocation(),
         symbol.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat));
 
-    public static Diagnostic IgnoredAttribute(ISymbol symbol, AttributeData attribute) => CreateDiagnostic(
+    public static Diagnostic IgnoredTypeConverterAttribute(ISymbol symbol, AttributeData attribute) => CreateDiagnostic(
         "OCL0016",
-        nameof(Resources.UnknownAttributeTitle),
-        nameof(Resources.UnknownAttributeMessageFormat),
+        nameof(Resources.IgnoredTypeConverterAttributeTitle),
+        nameof(Resources.IgnoredTypeConverterAttributeMessageFormat),
         DiagnosticSeverity.Warning,
         attribute.GetLocation(),
-        attribute.AttributeClass?.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat),
         symbol.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat));
 
     public static Diagnostic NonPublicStaticMethod(ISymbol method) => CreateDiagnostic(

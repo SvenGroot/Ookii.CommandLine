@@ -403,6 +403,24 @@ namespace Ookii.CommandLine.Generator.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The TypeConverterAttribute on &apos;{0}&apos; will be ignored by the CommandLineParser. Use the ArgumentConverterAttribute instead..
+        /// </summary>
+        internal static string IgnoredTypeConverterAttributeMessageFormat {
+            get {
+                return ResourceManager.GetString("IgnoredTypeConverterAttributeMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The TypeConverterAttribute will be ignored..
+        /// </summary>
+        internal static string IgnoredTypeConverterAttributeTitle {
+            get {
+                return ResourceManager.GetString("IgnoredTypeConverterAttributeTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The multi-value command line argument defined by {0} must have an array rank of one..
         /// </summary>
         internal static string InvalidArrayRankMessageFormat {
@@ -759,24 +777,6 @@ namespace Ookii.CommandLine.Generator.Properties {
         internal static string UnknownAssemblyNameTitle {
             get {
                 return ResourceManager.GetString("UnknownAssemblyNameTitle", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The attribute &apos;{0}&apos; on &apos;{1}&apos; is unknown and will be ignored by the GeneratedParserAttribute..
-        /// </summary>
-        internal static string UnknownAttributeMessageFormat {
-            get {
-                return ResourceManager.GetString("UnknownAttributeMessageFormat", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Unknown attribute will be ignored..
-        /// </summary>
-        internal static string UnknownAttributeTitle {
-            get {
-                return ResourceManager.GetString("UnknownAttributeTitle", resourceCulture);
             }
         }
         
