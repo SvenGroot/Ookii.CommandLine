@@ -427,22 +427,14 @@ partial class Arguments
 ```
 
 To fix this warning, switch to using the [`ArgumentConverterAttribute`][] attribute. To use the
-existing [`TypeConverter`][], you can inherit from the [`TypeConverterArgumentConverter`][] class.
+existing [`TypeConverter`][], you can use the [`WrappedTypeConverter<T>`][] class.
 
 ```csharp
-public class MyArgumentConverter : TypeConverterArgumentConverter
-{
-    public MyArgumentConverter()
-        : base(new MyNamespace.MyConverter())
-    {
-    }
-}
-
 [GeneratedParser]
 partial class Arguments
 {
     [CommandLineAttribute]
-    [ArgumentConverter(typeof(MyArgumentConverter)]
+    [ArgumentConverter(typeof(WrappedTypeConverter<MyNamespace.MyConverter>)]
     public CustomType? Argument { get; set; }
 }
 ```
@@ -974,7 +966,7 @@ Note that default values set by property initializers are only shown in the usag
 [`ShortAliasAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_ShortAliasAttribute.htm
 [`Type`]: https://learn.microsoft.com/dotnet/api/system.type
 [`TypeConverter`]: https://learn.microsoft.com/dotnet/api/system.componentmodel.typeconverter
-[`TypeConverterArgumentConverter`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Conversion_TypeConverterArgumentConverter.htm
+[`WrappedTypeConverter<T>`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Conversion_WrappedTypeConverter_1.htm
 [`TypeConverterAttribute`]: https://learn.microsoft.com/dotnet/api/system.componentmodel.typeconverterattribute
 [`ValueConverterAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Conversion_ValueConverterAttribute.htm
 [IsHidden_1]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_IsHidden.htm

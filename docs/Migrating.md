@@ -25,7 +25,8 @@ As of version 3.0, .Net Framework 2.0 is no longer supported. You can still targ
   converters must be specified using the [`ArgumentConverterAttribute`][] instead of the
   [`TypeConverterAttribute`][].
   - If you have existing conversions that depend on a [`TypeConverter`][], use the
-    [`TypeConverterArgumentConverter<T>`][] as a convenient way to keep using that conversion.
+    [`WrappedTypeConverter<T>`][] and [`WrappedDefaultTypeConverter<T>`][] as a convenient way to
+    keep using that conversion.
   - The [`KeyValuePairConverter<TKey, TValue>`][] class has moved into the
     [`Ookii.CommandLine.Conversion`][] namespace.
   - The [`KeyValueSeparatorAttribute`][] has moved into the [`Ookii.CommandLine.Conversion`][]
@@ -189,12 +190,13 @@ As of version 3.0, .Net Framework 2.0 is no longer supported. You can still targ
 [`StringComparison`]: https://learn.microsoft.com/dotnet/api/system.stringcomparison
 [`TextFormat`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Terminal_TextFormat.htm
 [`TypeConverter`]: https://learn.microsoft.com/dotnet/api/system.componentmodel.typeconverter
-[`TypeConverterArgumentConverter<T>`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Conversion_TypeConverterArgumentConverter_1.htm
 [`TypeConverterAttribute`]: https://learn.microsoft.com/dotnet/api/system.componentmodel.typeconverterattribute
 [`UsageHelpRequest.SyntaxOnly`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_UsageHelpRequest.htm
 [`UsageWriter`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_UsageWriter.htm
 [`ValueConverterAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Conversion_ValueConverterAttribute.htm
 [`ValueDescriptionAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_ValueDescriptionAttribute.htm
+[`WrappedTypeConverter<T>`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Conversion_WrappedTypeConverter_1.htm
+[`WrappedDefaultTypeConverter<T>`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Conversion_WrappedDefaultTypeConverter_1.htm
 [ArgumentNameComparison_1]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_ParseOptions_ArgumentNameComparison.htm
 [CommandLineParser.Parse()_2]: https://www.ookii.org/docs/commandline-4.0/html/Overload_Ookii_CommandLine_CommandLineParser_Parse.htm
 [Parse()_5]: https://www.ookii.org/docs/commandline-4.0/html/Overload_Ookii_CommandLine_CommandLineParser_1_Parse.htm

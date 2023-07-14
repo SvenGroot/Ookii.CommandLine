@@ -343,11 +343,11 @@ Ookii.CommandLine 4.0, this is no longer the case, and the [`ArgumentConverter`]
 instead.
 
 To help with transitioning code that relied on [`TypeConverter`][], you can use the
-[`TypeConverterArgumentConverter<T>`][] class to use a type's default argument converter.
+[`WrappedDefaultTypeConverter<T>`][] class to use a type's default type converter.
 
 ```csharp
 [CommandLineArgument]
-[ArgumentConverter(typeof(TypeConverterArgumentConverter<SomeType>))]
+[ArgumentConverter(typeof(WrappedDefaultTypeConverter<SomeType>))]
 public SomeType Argument { get; set; }
 ```
 
@@ -355,8 +355,7 @@ This will use [`TypeDescriptor.GetConverter()`][] function to get the default [`
 the type. Note that using that function will make it impossible to trim your application; this is
 the main reason [`TypeConverter`][] is no longer the default for converting arguments.
 
-If you were using a custom [`TypeConverter`][], you can use the [`TypeConverterArgumentConverter`][] class
-as a base class to adapt it.
+If you were using a custom [`TypeConverter`][], you can use the [`WrappedTypeConverter<T>`][] class.
 
 ### Arguments that cancel parsing
 
@@ -664,10 +663,10 @@ Next, we'll take a look at how to [parse the arguments we've defined](ParsingArg
 [`String`]: https://learn.microsoft.com/dotnet/api/system.string
 [`System.ComponentModel.DescriptionAttribute`]: https://learn.microsoft.com/dotnet/api/system.componentmodel.descriptionattribute
 [`TypeConverter`]: https://learn.microsoft.com/dotnet/api/system.componentmodel.typeconverter
-[`TypeConverterArgumentConverter`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Conversion_TypeConverterArgumentConverter.htm
-[`TypeConverterArgumentConverter<T>`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Conversion_TypeConverterArgumentConverter_1.htm
 [`TypeDescriptor.GetConverter()`]: https://learn.microsoft.com/dotnet/api/system.componentmodel.typedescriptor.getconverter
 [`ValueDescriptionAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_ValueDescriptionAttribute.htm
+[`WrappedTypeConverter<T>`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Conversion_WrappedTypeConverter_1.htm
+[`WrappedDefaultTypeConverter<T>`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Conversion_WrappedDefaultTypeConverter_1.htm
 [CancelParsing_1]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_CancelParsing.htm
 [DefaultValue_1]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_DefaultValue.htm
 [IsPosix_2]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_ParseOptionsAttribute_IsPosix.htm

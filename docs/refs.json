@@ -347,8 +347,6 @@
   "ToString()": "#system.object.tostring",
   "Type": "#system.type",
   "TypeConverter": "#system.componentmodel.typeconverter",
-  "TypeConverterArgumentConverter": "T_Ookii_CommandLine_Conversion_TypeConverterArgumentConverter",
-  "TypeConverterArgumentConverter<T>": "T_Ookii_CommandLine_Conversion_TypeConverterArgumentConverter_1",
   "TypeConverterAttribute": "#system.componentmodel.typeconverterattribute",
   "TypeDescriptor.GetConverter()": "#system.componentmodel.typedescriptor.getconverter",
   "Uri": "#system.uri",

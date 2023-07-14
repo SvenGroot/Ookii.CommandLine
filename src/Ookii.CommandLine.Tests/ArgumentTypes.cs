@@ -50,7 +50,7 @@ partial class TestArguments
     [CommandLineArgument("other2", DefaultValue = "47", Position = 5), Description("Arg4 description.")]
     [ValueDescription("Number")]
     [ValidateRange(0, 1000, IncludeInUsageHelp = false)]
-    [ArgumentConverter(typeof(TypeConverterArgumentConverter<int>))]
+    [ArgumentConverter(typeof(WrappedDefaultTypeConverter<int>))]
     public int Arg4 { get; set; }
 
     // Short/long name stuff should be ignored if not using LongShort mode.
