@@ -15,8 +15,8 @@ As of version 3.0, .Net Framework 2.0 is no longer supported. You can still targ
 
 ## Breaking API changes from version 3.0
 
-- It's strongly recommended to use [source generation](SourceGeneration.md) unless you cannot meet
-  the requirements.
+- It's strongly recommended to apply the [`GeneratedParserAttribute`][] to your arguments classes
+  unless you cannot meet the requirements for [source generation](SourceGeneration.md).
 - The `CommandLineArgumentAttribute.ValueDescription` property has been replaced by the
   [`ValueDescriptionAttribute`][] attribute. This new attribute is not sealed, enabling derived
   attributes e.g. to load a value description from a localized resource.
@@ -166,6 +166,7 @@ As of version 3.0, .Net Framework 2.0 is no longer supported. You can still targ
 [`CommandOptions`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Commands_CommandOptions.htm
 [`CultureInfo.InvariantCulture`]: https://learn.microsoft.com/dotnet/api/system.globalization.cultureinfo.invariantculture
 [`CurrentCulture`]: https://learn.microsoft.com/dotnet/api/system.globalization.cultureinfo.currentculture
+[`GeneratedParserAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_GeneratedParserAttribute.htm
 [`HelpRequested`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_CommandLineParser_HelpRequested.htm
 [`IAsyncCommand`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Commands_IAsyncCommand.htm
 [`ICommand.Run()`]: https://www.ookii.org/docs/commandline-4.0/html/M_Ookii_CommandLine_Commands_ICommand_Run.htm
