@@ -39,8 +39,7 @@ public interface IParser<TSelf> : IParserProvider<TSelf>
     /// </param>
     /// <returns>
     ///   An instance of the type <typeparamref name="TSelf"/>, or <see langword="null"/> if an
-    ///   error occurred, or argument parsing was canceled by the <see cref="CommandLineArgumentAttribute.CancelParsing" qualifyHint="true"/>
-    ///   property or a method argument that returned <see langword="false"/>.
+    ///   error occurred or argument parsing was canceled.
     /// </returns>
     /// <exception cref="NotSupportedException">
     ///   The <see cref="CommandLineParser{T}"/> cannot use type <typeparamref name="TSelf"/> as the
@@ -68,8 +67,7 @@ public interface IParser<TSelf> : IParserProvider<TSelf>
     /// </param>
     /// <returns>
     ///   An instance of the type <typeparamref name="TSelf"/>, or <see langword="null"/> if an
-    ///   error occurred, or argument parsing was canceled by the <see cref="CommandLineArgumentAttribute.CancelParsing" qualifyHint="true"/>
-    ///   property or a method argument that returned <see langword="false"/>.
+    ///   error occurred or argument parsing was canceled.
     /// </returns>
     /// <exception cref="NotSupportedException">
     ///   The <see cref="CommandLineParser{T}"/> cannot use type <typeparamref name="TSelf"/> as the

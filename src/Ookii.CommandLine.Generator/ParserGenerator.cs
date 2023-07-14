@@ -154,6 +154,17 @@ internal class ParserGenerator
             }
         }
 
+        _builder.AppendLine();
+        _builder.AppendLine("/// <summary>");
+        _builder.AppendLine("/// Creates a <see cref=\"Ookii.CommandLine.CommandLineParser{T}\"/> instance using the specified options.");
+        _builder.AppendLine("/// </summary>");
+        _builder.AppendLine("/// <param name=\"options\">");
+        _builder.AppendLine("/// The options that control parsing behavior, or <see langword=\"null\"/> to use the");
+        _builder.AppendLine("/// default options.");
+        _builder.AppendLine("/// </param>");
+        _builder.AppendLine("/// <returns>");
+        _builder.AppendLine($"/// An instance of the <see cref=\"Ookii.CommandLine.CommandLineParser{{T}}\"/> class for the <see cref=\"{_argumentsClass.ToQualifiedName()}\"/> class.");
+        _builder.AppendLine("/// </returns>");
         _builder.AppendLine($"public static Ookii.CommandLine.CommandLineParser<{_argumentsClass.ToQualifiedName()}> CreateParser(Ookii.CommandLine.ParseOptions? options = null) => new Ookii.CommandLine.CommandLineParser<{_argumentsClass.ToQualifiedName()}>(new OokiiCommandLineArgumentProvider(), options);");
         _builder.AppendLine();
         var nullableType = _argumentsClass.WithNullableAnnotation(NullableAnnotation.Annotated);
@@ -162,10 +173,46 @@ internal class ParserGenerator
         {
             // We cannot rely on default interface implementations, because that makes the methods
             // uncallable without a generic type argument.
+            _builder.AppendLine("/// <summary>");
+            _builder.AppendLine("/// Parses the arguments returned by the <see cref=\"System.Environment.GetCommandLineArgs\" qualifyHint=\"true\"/>");
+            _builder.AppendLine("/// method, handling errors and showing usage help as required.");
+            _builder.AppendLine("/// </summary>");
+            _builder.AppendLine("/// <param name=\"options\">");
+            _builder.AppendLine("///   The options that control parsing behavior and usage help formatting. If");
+            _builder.AppendLine("///   <see langword=\"null\" />, the default options are used.");
+            _builder.AppendLine("/// </param>");
+            _builder.AppendLine("/// <returns>");
+            _builder.AppendLine($"///   An instance of the <see cref=\"{_argumentsClass.ToQualifiedName()}\"/> class, or <see langword=\"null\"/> if an");
+            _builder.AppendLine("///   error occurred or argument parsing was canceled.");
+            _builder.AppendLine("/// </returns>");
             _builder.AppendLine($"public static {nullableType.ToQualifiedName()} Parse(Ookii.CommandLine.ParseOptions? options = null) => CreateParser(options).ParseWithErrorHandling();");
             _builder.AppendLine();
+            _builder.AppendLine("/// <summary>");
+            _builder.AppendLine("/// Parses the specified command line arguments, handling errors and showing usage help as required.");
+            _builder.AppendLine("/// </summary>");
+            _builder.AppendLine("/// <param name=\"args\">The command line arguments.</param>");
+            _builder.AppendLine("/// <param name=\"options\">");
+            _builder.AppendLine("///   The options that control parsing behavior and usage help formatting. If");
+            _builder.AppendLine("///   <see langword=\"null\" />, the default options are used.");
+            _builder.AppendLine("/// </param>");
+            _builder.AppendLine("/// <returns>");
+            _builder.AppendLine($"///   An instance of the <see cref=\"{_argumentsClass.ToQualifiedName()}\"/> class, or <see langword=\"null\"/> if an");
+            _builder.AppendLine("///   error occurred or argument parsing was canceled.");
+            _builder.AppendLine("/// </returns>");
             _builder.AppendLine($"public static {nullableType.ToQualifiedName()} Parse(string[] args, Ookii.CommandLine.ParseOptions? options = null) => CreateParser(options).ParseWithErrorHandling(args);");
             _builder.AppendLine();
+            _builder.AppendLine("/// <summary>");
+            _builder.AppendLine("/// Parses the specified command line arguments, handling errors and showing usage help as required.");
+            _builder.AppendLine("/// </summary>");
+            _builder.AppendLine("/// <param name=\"args\">The command line arguments.</param>");
+            _builder.AppendLine("/// <param name=\"options\">");
+            _builder.AppendLine("///   The options that control parsing behavior and usage help formatting. If");
+            _builder.AppendLine("///   <see langword=\"null\" />, the default options are used.");
+            _builder.AppendLine("/// </param>");
+            _builder.AppendLine("/// <returns>");
+            _builder.AppendLine($"///   An instance of the <see cref=\"{_argumentsClass.ToQualifiedName()}\"/> class, or <see langword=\"null\"/> if an");
+            _builder.AppendLine("///   error occurred or argument parsing was canceled.");
+            _builder.AppendLine("/// </returns>");
             _builder.AppendLine($"public static {nullableType.ToQualifiedName()} Parse(System.ReadOnlyMemory<string> args, Ookii.CommandLine.ParseOptions? options = null) => CreateParser(options).ParseWithErrorHandling(args);");
             _builder.CloseBlock(); // class
         }
