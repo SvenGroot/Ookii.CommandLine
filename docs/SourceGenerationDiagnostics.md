@@ -439,7 +439,6 @@ partial class Arguments
 }
 ```
 
-
 ### OCL0017
 
 Methods that are not public and static will be ignored.
