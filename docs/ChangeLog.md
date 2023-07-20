@@ -48,6 +48,7 @@ please check the [migration guide](Migrating.md).
   to get full help.
 - Exclude the default value from the usage help on a per argument basis with the
   [`CommandLineArgumentAttribute.IncludeDefaultInUsageHelp`][] property.
+- [Source link](https://github.com/dotnet/sourcelink) integration.
 - Various bug fixes and minor improvements.
 
 ## Ookii.CommandLine 3.1.1

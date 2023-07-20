@@ -181,12 +181,20 @@ arguments; the only way was a third-party library, or do it yourself.
 Nowadays, System.CommandLine offers an official Microsoft solution for command line parsing. Why,
 then, should you use Ookii.CommandLine?
 
-Ookii.CommandLine has a very different design. It uses a declarative approach to defining command
-line arguments, using properties and attributes, which I personally prefer to the fluent API used
-by System.CommandLine, as it reduces the amount of code you typically need to write.
+Here are some of the most important differences (as of this writing, and to the best of my knowledge):
 
-In the end, it comes down to personal preference. You should use whichever one suits your needs and
-coding style best.
+Ookii.CommandLine                                                             | System.CommandLine
+------------------------------------------------------------------------------|---------------------------------------------------------------------------------------
+Declarative approach to defining arguments with properties and attributes.    | Fluent API with a builder pattern to define arguments.
+Supports PowerShell-like and POSIX-like parsing rules.                        | Supports POSIX-like rules with some modifications.
+Supports any type with a `Parse()` method or constructor that takes a string. | Supports a limited number of types, and requires custom conversion methods for others.
+Supports automatic prefix aliases.                                            | Does not support automatic prefix aliases.
+Does not support middleware or dependency injection.                          | Supports middleware and dependency injection.
+Fully released with a stable API between major releases.                      | Still in preview.
+
+These are by no means the only differences. Both are highly customizable, and each has its pros and
+cons. In the end, it mostly comes down to personal preference. You should use whichever one suits
+your needs and coding style best.
 
 ## More information
 
