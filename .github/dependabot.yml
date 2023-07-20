@@ -1,0 +1,21 @@
+version: 2
+updates:
+  - package-ecosystem: "nuget"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    target-branch: "main"
+    groups:
+       # Group all dependencies in one PR.
+       all-dependencies:
+          patterns:
+             - "*"
+    ignore:
+        # 4.3 is the latest version that can work with the .Net 6.0 SDK.
+      - dependency-name: "Microsoft.CodeAnalysis.CSharp"
+        update-types: ["version-update:semver-major", "version-update:semver-minor"]
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    target-branch: "main"
