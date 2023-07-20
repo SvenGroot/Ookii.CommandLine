@@ -2,21 +2,21 @@
 
 This sample shows the basic functionality of Ookii.CommandLine. It shows you how to define a number
 of arguments with different types and options, and how to parse them. It then prints the value of
-the supplied arguments (it does nothing else).
+the supplied arguments (it does nothing else). It also uses [source generation](../../../docs/SourceGeneration.md).
 
 The sample contains detailed information about every step it takes, so it should be a good learning
-resource to get started. Check [ProgramArguments.cs](ProgramArguments.cs) for the arguments, and
-[Program.cs](Program.cs) for the main function.
+resource to get started, along with the [tutorial](../../../docs/Tutorial.md). Check
+[ProgramArguments.cs](ProgramArguments.cs) for the arguments, and [Program.cs](Program.cs) for the
+main function.
 
 This sample prints the following usage help, when invoked with the `-Help` argument:
 
 ```text
-Sample command line application. The application parses the command line and prints the results,
-but otherwise does nothing and none of the arguments are actually used for anything.
+Sample command line application. The application parses the command line and prints the results, but
+otherwise does nothing and none of the arguments are actually used for anything.
 
 Usage: Parser [-Source] <String> [-Destination] <String> [[-OperationIndex] <Int32>] [-Count
-   <Number>] [-Date <DateTime>] [-Day <DayOfWeek>] [-Help] [-Value <String>...] [-Verbose]
-   [-Version]
+   <Number>] [-Date <DateTime>] [-Day <DayOfWeek>] [-Help] [-Value <String>...] [-Verbose] [-Version]
 
     -Source <String>
         The source data.
@@ -74,21 +74,21 @@ Usage: Parser [-Source] <String> [-Destination] <String> [[-OperationIndex] <Int
 Run 'Parser -Help' for more information.
 ```
 
-Here, it only shows the usage syntax and a message indicating how to get more help. This is because
-the sample sets the [`ParseOptions.ShowUsageOnError`][] property to [`UsageHelpRequest.SyntaxOnly`][].
+Here, it only shows the usage syntax and a message indicating how to get more help. This is the
+default behavior, but it can be changed with the [`ParseOptions.ShowUsageOnError`][] property.
 
 You can also use the automatic `-Version` argument:
 
 ```text
-Ookii.CommandLine Sample 3.0.0
+Ookii.CommandLine Sample 4.0.0
 Copyright (c) Sven Groot (Ookii.org)
 This is sample code, so you can use it freely.
 ```
 
-The `-Version` argument shows the value of the [`ApplicationFriendlyNameAttribute`][] (or the assembly
-name, if there isn't one), the assembly's informational version, and the assembly's copyright text.
+The `-Version` argument shows the value of the [`ApplicationFriendlyNameAttribute`][] (or the
+assembly title or name, if there isn't one), the assembly's informational version, and the
+assembly's copyright text.
 
-[`ApplicationFriendlyNameAttribute`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_ApplicationFriendlyNameAttribute.htm
-[`ParseOptions.ShowUsageOnError`]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_ParseOptions_ShowUsageOnError.htm
-[`UsageHelpRequest.SyntaxOnly`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_UsageHelpRequest.htm
-[`ValidateRangeAttribute`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_Validation_ValidateRangeAttribute.htm
+[`ApplicationFriendlyNameAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_ApplicationFriendlyNameAttribute.htm
+[`ParseOptions.ShowUsageOnError`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_ParseOptions_ShowUsageOnError.htm
+[`ValidateRangeAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Validation_ValidateRangeAttribute.htm

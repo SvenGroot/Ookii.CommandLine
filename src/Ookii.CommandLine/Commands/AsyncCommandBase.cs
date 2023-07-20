@@ -1,23 +1,29 @@
 ﻿using System.Threading.Tasks;
 
-namespace Ookii.CommandLine.Commands
+namespace Ookii.CommandLine.Commands;
+
+/// <summary>
+/// Base class for asynchronous commands that want the <see cref="ICommand.Run" qualifyHint="true"/> method to
+/// invoke the <see cref="IAsyncCommand.RunAsync" qualifyHint="true"/> method.
+/// </summary>
+/// <remarks>
+/// <para>
+///   This class is provided for convenience for creating asynchronous commands without having to
+///   implement the <see cref="ICommand.Run" qualifyHint="true"/> method.
+/// </para>
+/// </remarks>
+/// <threadsafety static="true" instance="false"/>
+public abstract class AsyncCommandBase : IAsyncCommand
 {
     /// <summary>
-    /// Base class for asynchronous tasks that want the <see cref="ICommand.Run"/> method to
-    /// invoke the <see cref="IAsyncCommand.RunAsync"/> method.
+    /// Calls the <see cref="RunAsync"/> method and waits synchronously for it to complete.
     /// </summary>
-    public abstract class AsyncCommandBase : IAsyncCommand
+    /// <returns>The exit code of the command.</returns>
+    public virtual int Run()
     {
-        /// <summary>
-        /// Calls the <see cref="RunAsync"/> method and waits synchronously for it to complete.
-        /// </summary>
-        /// <returns>The exit code of the command.</returns>
-        public virtual int Run()
-        {
-            return Task.Run(RunAsync).ConfigureAwait(false).GetAwaiter().GetResult();
-        }
-
-        /// <inheritdoc/>
-        public abstract Task<int> RunAsync();
+        return Task.Run(RunAsync).ConfigureAwait(false).GetAwaiter().GetResult();
     }
+
+    /// <inheritdoc/>
+    public abstract Task<int> RunAsync();
 }

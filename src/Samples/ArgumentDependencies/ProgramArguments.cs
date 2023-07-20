@@ -19,12 +19,13 @@ namespace ArgumentDependencies;
 //
 // If you use a NameTransform that changes the argument names, or use any explicit argument
 // names, you CANNOT use nameof()!
+[GeneratedParser]
 [ApplicationFriendlyName("Ookii.CommandLine Dependency Sample")]
 [Description("Sample command line application with argument dependencies. The application parses the command line and prints the results, but otherwise does nothing and none of the arguments are actually used for anything.")]
 [RequiresAny(nameof(Path), nameof(Ip))]
-internal class ProgramArguments
+partial class ProgramArguments
 {
-    [CommandLineArgument(Position = 0)]
+    [CommandLineArgument(IsPositional = true)]
     [Description("The path to use.")]
     public FileInfo? Path { get; set; }
 
@@ -36,13 +37,8 @@ internal class ProgramArguments
 
     // This argument uses the RequiresAttribute to indicate it can only be used if "-Ip" is also
     // specified.
-    [CommandLineArgument(DefaultValue = 80)]
+    [CommandLineArgument]
     [Description("The port to connect to.")]
     [Requires(nameof(Ip))]
-    public int Port { get; set; }
-
-    public static ProgramArguments? Parse()
-    {
-        return CommandLineParser.Parse<ProgramArguments>();
-    }
+    public int Port { get; set; } = 80;
 }

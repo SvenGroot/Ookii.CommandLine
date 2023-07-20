@@ -6,9 +6,10 @@ namespace NestedCommands;
 
 // A top-level command that lists all the values in the database. Since it inherits from
 // BaseCommand, it has a Path argument even though no arguments are defined here
+[GeneratedParser]
 [Command("list")]
 [Description("Lists all students and courses.")]
-internal class ListCommand : BaseCommand
+internal partial class ListCommand : BaseCommand
 {
     protected override Task<int> RunAsync(Database db)
     {

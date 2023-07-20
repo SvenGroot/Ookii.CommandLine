@@ -15,20 +15,21 @@ internal class CourseCommand : ParentCommand
 
 // Command to add courses. Since it inherits from BaseCommand, it has a Path argument in addition
 // to the arguments created here.
+[GeneratedParser]
 [Command("add")]
 [ParentCommand(typeof(CourseCommand))]
 [Description("Adds a course to the database.")]
-internal class AddCourseCommand : BaseCommand
+internal partial class AddCourseCommand : BaseCommand
 {
-    [CommandLineArgument(Position = 0, IsRequired = true)]
+    [CommandLineArgument(IsPositional = true)]
     [Description("The name of the course.")]
     [ValidateNotWhiteSpace]
-    public string Name { get; set; } = string.Empty;
+    public required string Name { get; set; }
 
-    [CommandLineArgument(Position = 1, IsRequired = true)]
+    [CommandLineArgument(IsPositional = true)]
     [Description("The name of the teacher of the course.")]
     [ValidateNotWhiteSpace]
-    public string Teacher { get; set; } = string.Empty;
+    public required string Teacher { get; set; }
 
     protected override async Task<int> RunAsync(Database db)
     {
@@ -42,15 +43,16 @@ internal class AddCourseCommand : BaseCommand
 
 // Command to remove courses. Since it inherits from BaseCommand, it has a Path argument in addition
 // to the arguments created here.
+[GeneratedParser]
 [Command("remove")]
 [ParentCommand(typeof(CourseCommand))]
 [Description("Removes a course from the database.")]
-internal class RemoveCourseCommand : BaseCommand
+internal partial class RemoveCourseCommand : BaseCommand
 {
 
-    [CommandLineArgument(Position = 0, IsRequired = true)]
+    [CommandLineArgument(IsPositional = true)]
     [Description("The ID of the course to remove.")]
-    public int Id { get; set; }
+    public required int Id { get; set; }
 
     protected override async Task<int> RunAsync(Database db)
     {

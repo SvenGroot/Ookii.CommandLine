@@ -56,13 +56,14 @@
           <Namespace>System.ComponentModel</Namespace>
         </Import>
       </Imports>
-      <Code Language="csharp"><![CDATA[[Command($CommandName$)]
+      <Code Language="csharp"><![CDATA[[GeneratedParser]
+[Command($CommandName$)]
 [Description("$Description$")]
-class $Name$ : ICommand
+partial class $Name$ : ICommand
 {
-    // [CommandLineArgument(Position = 0, IsRequired = true)]
+    // [CommandLineArgument(IsPositional = true)]
     // [Description("Argument description.")]
-    // public string SampleArgument { get; set; }
+    // public required string SampleArgument { get; set; }
 
     public int Run()
     {

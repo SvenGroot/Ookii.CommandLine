@@ -102,21 +102,15 @@ internal class CustomUsageWriter : UsageWriter
             names = names.Append(argument.ShortNameWithPrefix!);
         }
 
-        if (argument.ShortAliases != null)
-        {
-            var shortPrefix = argument.Parser.ArgumentNamePrefixes[0];
-            names = names.Concat(argument.ShortAliases.Select(alias => shortPrefix + alias));
-        }
+        var shortPrefix = argument.Parser.ArgumentNamePrefixes[0];
+        names = names.Concat(argument.ShortAliases.Select(alias => shortPrefix + alias));
 
         if (argument.HasLongName)
         {
             names = names.Append(argument.LongNameWithPrefix!);
         }
 
-        if (argument.Aliases != null)
-        {
-            names = names.Concat(argument.Aliases.Select(alias => argument.Parser.LongArgumentNamePrefix + alias));
-        }
+        names = names.Concat(argument.Aliases.Select(alias => argument.Parser.LongArgumentNamePrefix + alias));
 
         // Join up all the names.
         string name = string.Join('|', names);
@@ -156,12 +150,9 @@ internal class CustomUsageWriter : UsageWriter
             length += argument.ShortNameWithPrefix!.Length + 1;
         }
 
-        if (argument.ShortAliases != null)
-        {
-            var shortPrefixLength = argument.Parser.ArgumentNamePrefixes[0].Length;
-            // Space for prefix, short name, separator.
-            length += argument.ShortAliases.Count * (shortPrefixLength + 1 + 1);
-        }
+        var shortPrefixLength = argument.Parser.ArgumentNamePrefixes[0].Length;
+        // Space for prefix, short name, separator.
+        length += argument.ShortAliases.Length * (shortPrefixLength + 1 + 1);
 
         if (argument.HasLongName)
         {
@@ -169,12 +160,9 @@ internal class CustomUsageWriter : UsageWriter
             length += argument.LongNameWithPrefix!.Length + 1;
         }
 
-        if (argument.Aliases != null)
-        {
-            var longPrefixLength = argument.Parser.LongArgumentNamePrefix!.Length;
-            // Space for prefix, long name, separator.
-            length += argument.Aliases.Sum(alias => longPrefixLength + alias.Length + 1);
-        }
+        var longPrefixLength = argument.Parser.LongArgumentNamePrefix!.Length;
+        // Space for prefix, long name, separator.
+        length += argument.Aliases.Sum(alias => longPrefixLength + alias.Length + 1);
 
         // There is one separator too many
         length -= 1;

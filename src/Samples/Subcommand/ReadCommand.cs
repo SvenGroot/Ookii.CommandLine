@@ -1,10 +1,8 @@
 ﻿using Ookii.CommandLine;
 using Ookii.CommandLine.Commands;
-using System;
+using Ookii.CommandLine.Conversion;
 using System.ComponentModel;
-using System.IO;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace SubcommandSample;
 
@@ -19,29 +17,24 @@ namespace SubcommandSample;
 // IAsyncCommand ourselves.
 //
 // Check the Program.cs file to see how this command is invoked.
+[GeneratedParser]
 [Command]
 [Description("Reads and displays data from a file using the specified encoding, wrapping the text to fit the console.")]
-[ParseOptions(ArgumentNameTransform = NameTransform.PascalCase)]
-class ReadCommand : AsyncCommandBase
+partial class ReadCommand : AsyncCommandBase
 {
-    private readonly FileInfo _path;
-
-    // The constructor is used to define the path property. Since it's a required argument, it's
-    // good to use a non-nullable reference type, but FileInfo doesn't have a good default to
-    // initialize a property with. So, we use the constructor.
-    //
-    // The NameTransform makes sure the argument matches the naming style of the other arguments.
-    public ReadCommand([Description("The name of the file to read.")] FileInfo path)
-    {
-        _path = path;
-    }
+    // A required, positional argument to specify the file name.
+    [CommandLineArgument(IsPositional = true)]
+    [Description("The path of the file to read.")]
+    public required FileInfo Path { get; set; }
 
     // An argument to specify the encoding.
-    // Because Encoding doesn't have a default TypeConverter, we use a custom one provided in
+    // Because Encoding doesn't have a default ArgumentConverter, we use a custom one provided in
     // this sample.
-    [CommandLineArgument]
+    // Encoding's ToString() implementation just gives the class name, so don't include the default
+    // value in the usage help; we'll write it ourself instead.
+    [CommandLineArgument(IncludeDefaultInUsageHelp = false)]
     [Description("The encoding to use to read the file. The default value is utf-8.")]
-    [TypeConverter(typeof(EncodingConverter))]
+    [ArgumentConverter(typeof(EncodingConverter))]
     public Encoding Encoding { get; set; } = Encoding.UTF8;
 
     // Run the command after the arguments have been parsed.
@@ -49,22 +42,11 @@ class ReadCommand : AsyncCommandBase
     {
         try
         {
-            var options = new FileStreamOptions()
-            {
-                Access = FileAccess.Read,
-                Mode = FileMode.Open,
-                Share = FileShare.ReadWrite | FileShare.Delete,
-                Options = FileOptions.Asynchronous
-            };
-
-            using var reader = new StreamReader(_path.FullName, Encoding, true, options);
-
             // We use a LineWrappingTextWriter to neatly wrap console output
             using var writer = LineWrappingTextWriter.ForConsoleOut();
 
             // Write the contents of the file to the console.
-            string? line;
-            while ((line = await reader.ReadLineAsync()) != null)
+            await foreach (var line in File.ReadLinesAsync(Path.FullName, Encoding))
             {
                 await writer.WriteLineAsync(line);
             }

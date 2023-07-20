@@ -1,28 +1,25 @@
 # Nested commands sample
 
-While Ookii.CommandLine has no built-in way to nest subcommands, such functionality is easy to
-implement using the [`CommandOptions.CommandFilter`][] property. All you need is a way to
-distinguish top-level commands and child commands.
+This sample demonstrates how to use the [`ParentCommandAttribute`][] attribute and the [`ParentCommand`][]
+class to build an application that has commands with nested subcommands. Commands with the
+[`ParentCommandAttribute`][] are nested under the specified command, and commands without this attribute
+are top-level commands.
 
-This sample demonstrates one way to do this. It defines a [`ParentCommandAttribute`](ParentCommandAttribute.cs)
-that can be used to specify which command is the parent of a command, and commands without this
-attribute are top-level commands.
-
-Commands that have children use the [`ICommandWithCustomParsing`][] interface so they can do their
-own parsing, rather than relying on the [`CommandLineParser`][]. This allows them to create a new
-[`CommandManager`][] that filters only the children of that command, and passes the remaining
-arguments to that. Check the [ParentCommand.cs](ParentCommand.cs) file to see how this works.
+Commands that have children derive from the [`ParentCommand`][]  class. This class will use your
+[`CommandManager`][], but sets the [`CommandOptions.ParentCommand`][] property to filter only the
+children of that command. The remaining arguments are passed to the nested subcommand.
 
 Child commands are just regular commands using the [`CommandLineParser`][], and don't need to do
-anything special except to add the `ParentCommandAttribute` attribute to specify which command is
+anything special except to add the [`ParentCommandAttribute`][] attribute to specify which command is
 their parent. For an example, see [CourseCommands.cs](CourseCommands.cs).
 
-This sample uses this framework to create a simple "database" application that lets your add and
-remove students and courses to a json file. It has top-level commands `student` and `course`, which
-both have child commands `add` and `remove` (and a few others).
+This sample creates a simple "database" application that lets you add and remove students and
+courses to a json file. It has top-level commands `student` and `course`, which both have child
+commands `add` and `remove` (and a few others).
 
 All the leaf commands use a common base class, so they can specify the path to the json file. This
-is the way you add common arguments to multiple commands in Ookii.CommandLine.
+is the primary way you add common arguments to multiple commands in Ookii.CommandLine (for an
+alternative, see the [top-level arguments sample](../TopLevelArguments)).
 
 When invoked without arguments, we see only the top-level commands:
 
@@ -57,7 +54,7 @@ Add or remove a student.
 
 Usage: NestedCommands student <command> [arguments]
 
-The 'student' command has the following subcommands:
+The following commands are available:
 
     add
         Adds a student to the database.
@@ -71,19 +68,16 @@ The 'student' command has the following subcommands:
 Run 'NestedCommands student <command> -Help' for more information about a command.
 ```
 
-You can see the sample has customized the parent command to:
+You can see the parent command will:
 
 - Show the command description at the top, rather than the application description.
 - Include the top-level command name in the usage syntax.
-- Change the header above the commands to indicate these are nested subcommands.
-- Remove the a `version` command (nested version commands would kind of redundant).
-
-This was done by changing the [`CommandOptions`][] and using a simple custom
-[`UsageWriter`][] derived class (see [CustomUsageWriter.cs](CustomUsageWriter.cs)).
+- Show only its child commands (which also excludes the `version` command).
 
 If we run `./NestedCommand student -Help`, we get the same output. While the `student` command
-doesn't have a help argument (since it uses custom parsing, and not the [`CommandLineParser`][]),
-there is no command named `-Help` so it still just shows the command list.
+doesn't have a help argument (since the [`ParentCommand`][] uses [`ICommandWithCustomParsing`][],
+and not the [`CommandLineParser`][]), there is no command named `-Help` so it still just shows the
+command list.
 
 If we run `./NestedCommand student add -Help`, we get the help for the command's arguments as
 usual:
@@ -110,11 +104,11 @@ Usage: NestedCommands student add [-FirstName] <String> [-LastName] <String> [[-
         The json file holding the data. Default value: data.json.
 ```
 
-We can see the usage syntax correctly shows both command names before the arguments.
+The usage syntax shows both command names before the arguments.
 
-[`CommandLineParser`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_CommandLineParser.htm
-[`CommandManager`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_Commands_CommandManager.htm
-[`CommandOptions.CommandFilter`]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_Commands_CommandOptions_CommandFilter.htm
-[`CommandOptions`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_Commands_CommandOptions.htm
-[`ICommandWithCustomParsing`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_Commands_ICommandWithCustomParsing.htm
-[`UsageWriter`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_UsageWriter.htm
+[`CommandLineParser`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_CommandLineParser.htm
+[`CommandManager`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Commands_CommandManager.htm
+[`CommandOptions.ParentCommand`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_Commands_CommandOptions_ParentCommand.htm
+[`ICommandWithCustomParsing`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Commands_ICommandWithCustomParsing.htm
+[`ParentCommand`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Commands_ParentCommand.htm
+[`ParentCommandAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Commands_ParentCommandAttribute.htm

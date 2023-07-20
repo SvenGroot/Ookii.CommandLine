@@ -1,25 +1,31 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net6.0;net48</TargetFrameworks>
-    <Nullable>disable</Nullable>
+    <TargetFrameworks>net7.0;net6.0;net48</TargetFrameworks>
+    <Nullable>enable</Nullable>
+    <AssemblyTitle>Ookii.CommandLine Unit Tests</AssemblyTitle>
     <Description>Tests for Ookii.CommandLine.</Description>
     <IsPackable>false</IsPackable>
-    <LangVersion>9.0</LangVersion>
+    <LangVersion>11.0</LangVersion>
+    <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>ookii.snk</AssemblyOriginatorKeyFile>
+    <DelaySign>false</DelaySign>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.5.0" />
-    <PackageReference Include="MSTest.TestAdapter" Version="3.0.2" />
-    <PackageReference Include="MSTest.TestFramework" Version="3.0.2" />
-    <PackageReference Include="coverlet.collector" Version="3.2.0">
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.6.3" />
+    <PackageReference Include="MSTest.TestAdapter" Version="3.1.1" />
+    <PackageReference Include="MSTest.TestFramework" Version="3.1.1" />
+    <PackageReference Include="coverlet.collector" Version="6.0.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Ookii.CommandLine.Tests.Commands\Ookii.CommandLine.Tests.Commands.csproj" />
     <ProjectReference Include="..\Ookii.CommandLine\Ookii.CommandLine.csproj" />
+    <ProjectReference Include="..\Ookii.CommandLine.Generator\Ookii.CommandLine.Generator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />    
   </ItemGroup>
-
 </Project>

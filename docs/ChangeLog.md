@@ -1,13 +1,62 @@
 # What’s new in Ookii.CommandLine
 
-**IMPORTANT:** If you are upgrading from version 2.x, please check the [migration guide](Migrating.md).
+## Ookii.CommandLine 4.0 - 2023-07-20
 
-## Ookii.CommandLine 3.1.1
+**IMPORTANT:** Version 4.0 contains breaking changes. If you are upgrading from version 2.x or 3.x,
+please check the [migration guide](Migrating.md).
+
+- Add support for [source generation](SourceGeneration.md).
+  - Use the [`GeneratedParserAttribute`][] to determine command line arguments at compile time.
+    - Get errors and warnings for many mistakes.
+    - Automatically determine the order of positional arguments.
+    - Use property initializers to set default values that are used in the usage help.
+    - Allow your application to be trimmed.
+    - Improved performance.
+  - Use the [`GeneratedCommandManagerAttribute`][] to determine subcommands at compile time.
+    - Allow an application with subcommands to be trimmed.
+    - Improved performance.
+  - Using source generation is recommended unless you are not able to meet the requirements.
+- Constructor parameters can no longer be used to define command line arguments.
+- Converting strings to argument types is now done using Ookii.CommandLine's own [`ArgumentConverter`][]
+  class.
+  - See the [migration guide](Migrating.md) for more information.
+  - This enables conversion using [`ReadOnlySpan<char>`][] for better performance, makes it easier to
+    implement new converters, provides better error messages for enumeration conversion, and enables
+    the use of trimming (when source generation is used).
+  - For .Net 7 and later, support value conversion using the [`ISpanParsable<TSelf>`][] and
+    [`IParsable<TSelf>`][] interfaces.
+- Automatically accept [any unique prefix](DefiningArguments.md#automatic-prefix-aliases) of an
+  argument name as an alias.
+- Use the `required` keyword in C# 11 and .Net 7.0 to create required arguments.
+- Support for using properties with `init` accessors (only if they are `required`).
+- Value descriptions are now specified using the [`ValueDescriptionAttribute`][] attribute. This
+  attribute is not sealed to allow derived classes that implement localization.
+- Conveniently set several related options to enable POSIX-like conventions using the
+  [`ParseOptions.IsPosix`][], [`CommandOptions.IsPosix`][] or [`ParseOptionsAttribute.IsPosix`][] property.
+- Support for multiple argument name/value separators, with the default now accepting both `:` and
+  `=`.
+- You can now [cancel parsing](DefiningArguments.md#arguments-that-cancel-parsing) and still return
+  success.
+- The remaining unparsed arguments, if parsing was canceled or encountered an error, are available
+  through the [`CommandLineParser.ParseResult`][] property.
+- Argument validators used before conversion can implement validation on [`ReadOnlySpan<char>`][] for
+  better performance.
+- Built-in support for [nested subcommands](Subcommands.md#nested-subcommands).
+- The automatic version argument and command will use the [`AssemblyTitleAttribute`][] if the
+  [`ApplicationFriendlyNameAttribute`][] was not used.
+- By default, only usage syntax is shown if a parsing error occurs; the help argument must be used
+  to get full help.
+- Exclude the default value from the usage help on a per argument basis with the
+  [`CommandLineArgumentAttribute.IncludeDefaultInUsageHelp`][] property.
+- [Source link](https://github.com/dotnet/sourcelink) integration.
+- Various bug fixes and minor improvements.
+
+## Ookii.CommandLine 3.1.1 - 2023-03-29
 
 - .Net Standard 2.0: use the System.Memory package to remove some downlevel-only code.
 - There are no changes for the .Net Standard 2.1 and .Net 6.0 assemblies.
 
-## Ookii.CommandLine 3.1
+## Ookii.CommandLine 3.1 - 2023-03-21
 
 - Added an instance [`CommandLineParser<T>.ParseWithErrorHandling()`][] method, which handles errors
   and displays usage help the same way as the static [`Parse<T>()`][Parse<T>()_1] method, but allows access to more
@@ -30,7 +79,7 @@
     writer yet.
   - Some minor bug fixes.
 
-## Ookii.CommandLine 3.0
+## Ookii.CommandLine 3.0 - 2022-12-01
 
 **IMPORTANT:** Several of the changes in version 3.0 are *breaking changes*. There are breaking API
 changes as well as several behavior changes. In general, it's not expected that you'll need to make
@@ -64,8 +113,8 @@ existing application.
   - Optional support for [multi-value arguments](Arguments.md#arguments-with-multiple-values) that
     consume multiple argument tokens without a separator, e.g. `-Value 1 2 3` to assign three
     values.
-  - Arguments classes can [use a constructor parameter](DefiningArguments.md#commandlineparser-injection)
-    to receive the [`CommandLineParser`][] instance they were created with.
+  - Arguments classes can [use a constructor parameter](DefiningArguments.md) to receive the
+    [`CommandLineParser`][] instance they were created with.
   - Added the ability to customize error messages and other strings.
 - Subcommands
   - Renamed "shell commands" to "subcommands" because I never liked the old name.
@@ -95,7 +144,7 @@ existing application.
 - No longer targets .Net Framework 2.0
   - Now targets .Net Standard 2.0, .Net Standard 2.1, and .Net 6.0 and later.
 
-## Ookii.CommandLine 2.4
+## Ookii.CommandLine 2.4 - 2022-09-01
 
 - Ookii.CommandLine now comes in a .Net 6.0 version that fully supports nullable reference types
   (.Net Framework 2.0 and .Net Standard 2.0 versions are also still provided).
@@ -107,18 +156,18 @@ existing application.
 - Arguments can indicate they cancel parsing to make adding a `-Help` or `-?` argument easier.
 - Some small bug fixes.
 
-## Ookii.CommandLine 2.3
+## Ookii.CommandLine 2.3 - 2019-09-05
 
 - Ookii.CommandLine now comes in both a .Net Framework 2.0 and .Net Standard 2.0 version.
 
-## Ookii.CommandLine 2.2
+## Ookii.CommandLine 2.2 - 2013-02-06
 
 - Added support for alternative names (aliases) for command line arguments.
 - An argument’s aliases and default value can be included in the argument description when
   generating usage.
 - Added code snippets.
 
-## Ookii.CommandLine 2.1
+## Ookii.CommandLine 2.1 - 2012-02-19
 
 - Added support for dictionary arguments; these are special multi-value arguments whose values take
   the form key=value.
@@ -138,7 +187,7 @@ existing application.
 - Shell commands can use custom argument parsing.
 - Various minor bug fixes.
 
-## Ookii.CommandLine 2.0
+## Ookii.CommandLine 2.0 - 2011-08-13
 
 - Improved argument parsing:
   - All arguments can be specified by name.
@@ -165,25 +214,38 @@ and usage.
 Upgrading an existing project that is using Ookii.CommandLine 1.0 to Ookii.CommandLine 2.0 or newer
 may require substantial code changes and may change how command lines are parsed.
 
-[`CommandLineParser`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_CommandLineParser.htm
-[`CommandLineParser<T>`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_CommandLineParser_1.htm
+[`ApplicationFriendlyNameAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_ApplicationFriendlyNameAttribute.htm
+[`ArgumentConverter`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Conversion_ArgumentConverter.htm
+[`AssemblyTitleAttribute`]: https://learn.microsoft.com/dotnet/api/system.reflection.assemblytitleattribute
+[`CommandLineArgumentAttribute.IncludeDefaultInUsageHelp`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_IncludeDefaultInUsageHelp.htm
+[`CommandLineParser.ParseResult`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_CommandLineParser_ParseResult.htm
+[`CommandLineParser`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_CommandLineParser.htm
+[`CommandLineParser<T>.ParseWithErrorHandling()`]: https://www.ookii.org/docs/commandline-4.0/html/M_Ookii_CommandLine_CommandLineParser_1_ParseWithErrorHandling.htm
+[`CommandLineParser<T>`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_CommandLineParser_1.htm
+[`CommandManager.ParseResult`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_Commands_CommandManager_ParseResult.htm
+[`CommandOptions.IsPosix`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_Commands_CommandOptions_IsPosix.htm
 [`CultureInfo.InvariantCulture`]: https://learn.microsoft.com/dotnet/api/system.globalization.cultureinfo.invariantculture
 [`Environment.GetCommandLineArgs()`]: https://learn.microsoft.com/dotnet/api/system.environment.getcommandlineargs
-[`ParseOptions`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_ParseOptions.htm
-[`ParseOptionsAttribute`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_ParseOptionsAttribute.htm
-[`TypeConverter`]: https://learn.microsoft.com/dotnet/api/system.componentmodel.typeconverter
-[Parse()_6]: https://www.ookii.org/docs/commandline-3.1/html/M_Ookii_CommandLine_CommandLineParser_Parse.htm
-[Parse<T>()_1]: https://www.ookii.org/docs/commandline-3.1/html/M_Ookii_CommandLine_CommandLineParser_Parse__1.htm
-[UsageWriter_1]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_UsageWriter.htm
-[`CommandLineParser.ParseResult`]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_CommandLineParser_ParseResult.htm
-[`CommandLineParser<T>.ParseWithErrorHandling()`]: https://www.ookii.org/docs/commandline-3.1/html/M_Ookii_CommandLine_CommandLineParser_1_ParseWithErrorHandling.htm
-[`CommandManager.ParseResult`]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_Commands_CommandManager_ParseResult.htm
-[`LineWrappingTextWriter.ToString()`]: https://www.ookii.org/docs/commandline-3.1/html/M_Ookii_CommandLine_LineWrappingTextWriter_ToString.htm
-[`LineWrappingTextWriter`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_LineWrappingTextWriter.htm
-[`ResetIndentAsync()`]: https://www.ookii.org/docs/commandline-3.1/html/M_Ookii_CommandLine_LineWrappingTextWriter_ResetIndentAsync.htm
+[`GeneratedCommandManagerAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Commands_GeneratedCommandManagerAttribute.htm
+[`GeneratedParserAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_GeneratedParserAttribute.htm
+[`IParsable<TSelf>`]: https://learn.microsoft.com/dotnet/api/system.iparsable-1
+[`ISpanParsable<TSelf>`]: https://learn.microsoft.com/dotnet/api/system.ispanparsable-1
+[`LineWrappingTextWriter.ToString()`]: https://www.ookii.org/docs/commandline-4.0/html/M_Ookii_CommandLine_LineWrappingTextWriter_ToString.htm
+[`LineWrappingTextWriter`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_LineWrappingTextWriter.htm
+[`ParseOptions.IsPosix`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_ParseOptions_IsPosix.htm
+[`ParseOptions`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_ParseOptions.htm
+[`ParseOptionsAttribute.IsPosix`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_ParseOptionsAttribute_IsPosix.htm
+[`ParseOptionsAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_ParseOptionsAttribute.htm
+[`ReadOnlySpan<char>`]: https://learn.microsoft.com/dotnet/api/system.readonlyspan-1
+[`ResetIndentAsync()`]: https://www.ookii.org/docs/commandline-4.0/html/M_Ookii_CommandLine_LineWrappingTextWriter_ResetIndentAsync.htm
 [`StringWriter`]: https://learn.microsoft.com/dotnet/api/system.io.stringwriter
-[`Wrapping`]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_LineWrappingTextWriter_Wrapping.htm
-[Flush()_0]: https://www.ookii.org/docs/commandline-3.1/html/M_Ookii_CommandLine_LineWrappingTextWriter_Flush_1.htm
-[ParseWithErrorHandling()_1]: https://www.ookii.org/docs/commandline-3.1/html/M_Ookii_CommandLine_CommandLineParser_1_ParseWithErrorHandling.htm
-[WriteAsync()_4]: https://www.ookii.org/docs/commandline-3.1/html/Overload_Ookii_CommandLine_LineWrappingTextWriter_WriteAsync.htm
-[WriteLineAsync()_5]: https://www.ookii.org/docs/commandline-3.1/html/Overload_Ookii_CommandLine_LineWrappingTextWriter_WriteLineAsync.htm
+[`TypeConverter`]: https://learn.microsoft.com/dotnet/api/system.componentmodel.typeconverter
+[`ValueDescriptionAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_ValueDescriptionAttribute.htm
+[`Wrapping`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_LineWrappingTextWriter_Wrapping.htm
+[Flush()_0]: https://www.ookii.org/docs/commandline-4.0/html/M_Ookii_CommandLine_LineWrappingTextWriter_Flush_1.htm
+[Parse()_6]: https://www.ookii.org/docs/commandline-4.0/html/M_Ookii_CommandLine_CommandLineParser_Parse.htm
+[Parse<T>()_1]: https://www.ookii.org/docs/commandline-4.0/html/M_Ookii_CommandLine_CommandLineParser_Parse__1.htm
+[ParseWithErrorHandling()_1]: https://www.ookii.org/docs/commandline-4.0/html/M_Ookii_CommandLine_CommandLineParser_1_ParseWithErrorHandling.htm
+[UsageWriter_1]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_UsageWriter.htm
+[WriteAsync()_4]: https://www.ookii.org/docs/commandline-4.0/html/Overload_Ookii_CommandLine_LineWrappingTextWriter_WriteAsync.htm
+[WriteLineAsync()_5]: https://www.ookii.org/docs/commandline-4.0/html/Overload_Ookii_CommandLine_LineWrappingTextWriter_WriteLineAsync.htm

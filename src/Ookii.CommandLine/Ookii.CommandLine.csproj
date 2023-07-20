@@ -1,46 +1,74 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net6.0;netstandard2.0;netstandard2.1</TargetFrameworks>
+    <TargetFrameworks>net7.0;net6.0;netstandard2.0;netstandard2.1</TargetFrameworks>
     <Nullable>enable</Nullable>
-    <LangVersion>9.0</LangVersion>
+    <LangVersion>11.0</LangVersion>
     <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <IsTrimmable>True</IsTrimmable>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageProjectUrl>https://github.com/SvenGroot/ookii.commandline</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/SvenGroot/ookii.commandline</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/SvenGroot/Ookii.CommandLine</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/SvenGroot/Ookii.CommandLine</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>ookii.snk</AssemblyOriginatorKeyFile>
     <DelaySign>false</DelaySign>
-    <Description>Ookii.CommandLine is a powerful command line parsing library for .Net applications.
+    <NeutralLanguage>en-US</NeutralLanguage>
+    <Title>Ookii.CommandLine</Title>
+    <Description>Ookii.CommandLine is a powerful, flexible and highly customizable command line argument parsing
+library for .Net applications.
 
 - Easily define arguments by creating a class with properties.
 - Create applications with multiple subcommands.
 - Generate fully customizable usage help.
-- Supports PowerShell-like and POSIX-like parsing rules.</Description>
+- Supports PowerShell-like and POSIX-like parsing rules.
+- Trim-friendly</Description>
     <PackageTags>command line arguments parsing parser parse argument args console</PackageTags>
-    <PackageReleaseNotes>This version contains breaking changes compared to version 2.x. For details, please view: https://www.ookii.org/Link/CommandLineVersionHistory</PackageReleaseNotes>
+    <PackageReleaseNotes>This version contains breaking changes compared to version 2.x and 3.x. For details, please view: https://www.ookii.org/Link/CommandLineVersionHistory</PackageReleaseNotes>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <PackageIcon>icon.png</PackageIcon>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <PackageReadmeFile>PackageReadme.md</PackageReadmeFile>
   </PropertyGroup>
 
   <PropertyGroup>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <!-- Turn off unknown reference warning for older frameworks, since we reference some .Net 6.0 types -->
-    <NoWarn Condition="'$(TargetFramework)'!='net6.0'">CS1574</NoWarn>
+    <!-- Turn off unknown reference warning for older frameworks, since we reference some .Net 7.0 types -->
+    <NoWarn Condition="'$(TargetFramework)'!='net7.0'">CS1574</NoWarn>
+  </PropertyGroup>
+
+  <!-- Deterministic build; to build with this manually, use dotnet build /p:ContinuousIntegrationBuild=true -->
+  <PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">
+    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="icon.png" Pack="True" PackagePath="" />
+    <!-- This is just here to ensure this is built before this project -->
+    <ProjectReference Include="../Ookii.CommandLine.Generator/Ookii.CommandLine.Generator.csproj" ReferenceOutputAssembly="false" />
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="icon.png" Pack="True" PackagePath="" />
+    <None Include="PackageReadme.md" Pack="True" PackagePath="" />
+    <None Include="../Ookii.CommandLine.Generator/$(OutputPath)/netstandard2.0/**/*.dll" Pack="True" PackagePath="analyzers/dotnet/cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="System.Collections.Immutable" Version="7.0.0" Condition="'$(TargetFramework)'=='netstandard2.0' Or '$(TargetFramework)'=='netstandard2.1'" />
     <PackageReference Include="System.Memory" Version="4.5.5" Condition="'$(TargetFramework)'=='netstandard2.0'" />
   </ItemGroup>
 
+  <ItemGroup>
+    <InternalsVisibleTo Include="Ookii.CommandLine.Tests, PublicKey=00240000048000009400000006020000002400005253413100040000010001007fe1af257fa87a9a6602636ac8ea1afaebcb1b755b73cf31deb0c7c91b2604ad50570535f3e9e6e43525725daad5cd9cb09382331957108e70a320426d5db111674d2538d3f33c84bb72b16fd7ad43f00c17abf72a9d8ad18bc57f213e1aa3d891d44a184a9707f45ec0a435846544f80144c0df25debf40eb50d50f9e7d4fb0" />
+  </ItemGroup>
 
   <ItemGroup>
     <Compile Update="Properties/Resources.Designer.cs">

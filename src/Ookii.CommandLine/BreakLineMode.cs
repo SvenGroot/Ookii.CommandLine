@@ -1,9 +1,8 @@
-namespace Ookii.CommandLine
+namespace Ookii.CommandLine;
+
+internal enum BreakLineMode
 {
-    internal enum BreakLineMode
-    {
-        Backward,
-        Forward,
-        Force
-    }
+    Backward,
+    Forward,
+    Force
 }

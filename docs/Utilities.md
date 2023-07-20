@@ -1,8 +1,8 @@
 # Utility types
 
 Ookii.CommandLine comes with a few utilities that it uses internally, but which may be of use to
-anyone writing console applications. These are the [`LineWrappingTextWriter`][] class, virtual
-terminal support, and the [`TypeConverterBase<T>`][] class.
+anyone writing console applications. These are the [`LineWrappingTextWriter`][] class and virtual
+terminal support.
 
 ## LineWrappingTextWriter
 
@@ -63,7 +63,7 @@ writer.WriteLine();
 writer.WriteLine("After a blank line, no indentation is used.");
 writer.WriteLine("The next line is indented again.");
 writer.ResetIndent();
-writer.WriteLine("This line is not.");
+writer.WriteLine("This line is not because ResetIndent was called.");
 writer.WriteLine("And this one is.");
 ```
 
@@ -76,16 +76,16 @@ The first line is not indented. This line is pretty long, so it'll probably be w
 
 After a blank line, no indentation is used.
     The next line is indented again.
-This line is not.
+This line is not because ResetIndent was called.
     And this one is.
 ```
 
 ## Virtual terminal support
 
-Virtual terminal (VT) sequences are a method to manipulate the console utilized, supported by many
-console applications on many operating systems. It is supported by the console host on recent
+Virtual terminal (VT) sequences are a method to manipulate the console output, supported by many
+terminal applications on many operating systems. It is supported by the console host on recent
 versions of Windows, by [Windows Terminal](https://learn.microsoft.com/windows/terminal/install),
-and many console applications on other platforms.
+and many terminal applications on other platforms.
 
 A VT sequence consists of an escape character, followed by a string that specifies what action to
 take. They can be used to set colors and other formatting options, but also to do things like move
@@ -99,10 +99,10 @@ The [`VirtualTerminal`][] class allows you to determine whether virtual terminal
 supported, and to enable them. The [`UsageWriter`][] class uses this internally to enable color output
 when possible.
 
-The [`TextFormat`][] class provides a number of constants for the predefined background and foreground
-colors and formats supported by the console, as well as a method to create a VT sequence for any
-24-bit color. These can be used to change the default usage help colors, or to apply color to your
-own text.
+The [`TextFormat`][] structure provides a number of values for the predefined background and
+foreground colors and formats supported by the console, as well as a method to create a VT sequence
+for any 24-bit color. These can be used to change the default usage help colors, or to apply color
+to your own text by writing them to the console.
 
 For example, you can use the following to write in color when supported:
 
@@ -128,62 +128,55 @@ and they return a disposable type that will revert the console mode when dispose
 collected. On other platforms, it only checks for support and disposing the returned instance does
 nothing.
 
-## TypeConverterBase\<T>
-
-If a type does not have a suitable default [`TypeConverter`][], `Parse()` method or constructor, or if
-you want to use a custom conversion that's different than the default, Ookii.CommandLine requires
-you to create a [`TypeConverter`][] that can convert from a string. To make this process easier, the
-[`TypeConverterBase<T>`][] class is provided.
-
-This class implements the [`CanConvertFrom()`][] and [`ConvertFrom()`][] method for you to check if the source
-type is a string, and provides strongly typed conversion methods that you can implement.
-
-For example, the following is a custom type converter for booleans that accepts "yes", "no", "1" and
-"0" in addition to the regular "true" and "false" values.
+In the [tutorial](Tutorial.md), we created an application with an `--inverted` argument, that
+actually just set the console to use a white background and a black foreground, instead of truly
+inverting the console colors. With virtual terminal support, we can update the `read` command to use
+true inversion.
 
 ```csharp
-class YesNoConverter : TypeConverterBase<bool>
+public int Run()
 {
-    protected override bool Convert(ITypeDescriptorContext? context, CultureInfo? culture, string value)
+    using var support = VirtualTerminal.EnableColor(StandardStream.Output);
+    if (support.IsSupported && Inverted)
     {
-        return value.ToLower(culture) switch
-        {
-            "yes" or "1" => true,
-            "no" or "0" => false,
-            _ => bool.Parse(value),
-        };
+        Console.Write(TextFormat.Negative);
     }
+
+    var lines = File.ReadLines(Path);
+    if (MaxLines is int maxLines)
+    {
+        lines = lines.Take(maxLines);
+    }
+
+    foreach (var line in lines)
+    {
+        Console.WriteLine(line);
+    }
+
+    if (support.IsSupported && Inverted)
+    {
+        Console.Write(TextFormat.Default);
+    }
+
+    return 0;
 }
 ```
 
-You can then use this converter as the custom converter for a boolean (switch) argument using the
-[`TypeConverterAttribute`][].
-
-If you want to customize the conversion to string, you can do this too (it uses [`ToString()`][] by
-default), but Ookii.CommandLine never uses this, so it's only relevant if you want to use the
-converter in other contexts.
-
-[`CanConvertFrom()`]: https://www.ookii.org/docs/commandline-3.1/html/M_Ookii_CommandLine_TypeConverterBase_1_CanConvertFrom.htm
 [`Console.WindowWidth`]: https://learn.microsoft.com/dotnet/api/system.console.windowwidth
-[`ConvertFrom()`]: https://www.ookii.org/docs/commandline-3.1/html/M_Ookii_CommandLine_TypeConverterBase_1_ConvertFrom.htm
-[`EnableColor()`]: https://www.ookii.org/docs/commandline-3.1/html/M_Ookii_CommandLine_Terminal_VirtualTerminal_EnableColor.htm
-[`EnableVirtualTerminalSequences()`]: https://www.ookii.org/docs/commandline-3.1/html/M_Ookii_CommandLine_Terminal_VirtualTerminal_EnableVirtualTerminalSequences.htm
-[`Indent`]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_LineWrappingTextWriter_Indent.htm
-[`LineWrappingTextWriter.ForConsoleError()`]: https://www.ookii.org/docs/commandline-3.1/html/M_Ookii_CommandLine_LineWrappingTextWriter_ForConsoleError.htm
-[`LineWrappingTextWriter.ForConsoleOut()`]: https://www.ookii.org/docs/commandline-3.1/html/M_Ookii_CommandLine_LineWrappingTextWriter_ForConsoleOut.htm
-[`LineWrappingTextWriter.Indent`]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_LineWrappingTextWriter_Indent.htm
-[`LineWrappingTextWriter.ResetIndent()`]: https://www.ookii.org/docs/commandline-3.1/html/M_Ookii_CommandLine_LineWrappingTextWriter_ResetIndent.htm
-[`LineWrappingTextWriter`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_LineWrappingTextWriter.htm
-[`Ookii.CommandLine.Terminal`]: https://www.ookii.org/docs/commandline-3.1/html/N_Ookii_CommandLine_Terminal.htm
-[`ResetIndent()`]: https://www.ookii.org/docs/commandline-3.1/html/M_Ookii_CommandLine_LineWrappingTextWriter_ResetIndent.htm
-[`TextFormat`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_Terminal_TextFormat.htm
+[`EnableColor()`]: https://www.ookii.org/docs/commandline-4.0/html/M_Ookii_CommandLine_Terminal_VirtualTerminal_EnableColor.htm
+[`EnableVirtualTerminalSequences()`]: https://www.ookii.org/docs/commandline-4.0/html/M_Ookii_CommandLine_Terminal_VirtualTerminal_EnableVirtualTerminalSequences.htm
+[`Indent`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_LineWrappingTextWriter_Indent.htm
+[`LineWrappingTextWriter.ForConsoleError()`]: https://www.ookii.org/docs/commandline-4.0/html/M_Ookii_CommandLine_LineWrappingTextWriter_ForConsoleError.htm
+[`LineWrappingTextWriter.ForConsoleOut()`]: https://www.ookii.org/docs/commandline-4.0/html/M_Ookii_CommandLine_LineWrappingTextWriter_ForConsoleOut.htm
+[`LineWrappingTextWriter.Indent`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_LineWrappingTextWriter_Indent.htm
+[`LineWrappingTextWriter.ResetIndent()`]: https://www.ookii.org/docs/commandline-4.0/html/M_Ookii_CommandLine_LineWrappingTextWriter_ResetIndent.htm
+[`LineWrappingTextWriter`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_LineWrappingTextWriter.htm
+[`Ookii.CommandLine.Terminal`]: https://www.ookii.org/docs/commandline-4.0/html/N_Ookii_CommandLine_Terminal.htm
+[`ResetIndent()`]: https://www.ookii.org/docs/commandline-4.0/html/M_Ookii_CommandLine_LineWrappingTextWriter_ResetIndent.htm
+[`TextFormat`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Terminal_TextFormat.htm
 [`TextWriter`]: https://learn.microsoft.com/dotnet/api/system.io.textwriter
-[`ToString()`]: https://learn.microsoft.com/dotnet/api/system.object.tostring
-[`TypeConverter`]: https://learn.microsoft.com/dotnet/api/system.componentmodel.typeconverter
-[`TypeConverterAttribute`]: https://learn.microsoft.com/dotnet/api/system.componentmodel.typeconverterattribute
-[`TypeConverterBase<T>`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_TypeConverterBase_1.htm
-[`UsageWriter`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_UsageWriter.htm
-[`VirtualTerminal`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_Terminal_VirtualTerminal.htm
-[`LineWrappingTextWriter.Wrapping`]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_LineWrappingTextWriter_Wrapping.htm
-[`WrappingMode.Disabled`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_WrappingMode.htm
-[`WrappingMode.EnabledNoForce`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_WrappingMode.htm
+[`UsageWriter`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_UsageWriter.htm
+[`VirtualTerminal`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Terminal_VirtualTerminal.htm
+[`LineWrappingTextWriter.Wrapping`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_LineWrappingTextWriter_Wrapping.htm
+[`WrappingMode.Disabled`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_WrappingMode.htm
+[`WrappingMode.EnabledNoForce`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_WrappingMode.htm

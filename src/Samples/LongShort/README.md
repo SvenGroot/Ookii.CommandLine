@@ -1,11 +1,21 @@
-﻿# Long/short mode sample
+# Long/short mode sample
 
 This sample alters the behavior of Ookii.CommandLine to be more like the POSIX conventions for
 command line arguments. To do this, it enables the alternate long/short parsing mode, uses a
 [name transformation](../../../docs/DefiningArguments.md#name-transformation) to make all the
 argument names lower case with dashes between the words, and uses case-sensitive argument names.
 
-This sample uses the same arguments as the [parser Sample](../Parser), so see that sample's source
+The [`ParseOptionsAttribute.IsPosix`][] property is used to enable all these options at once. It is
+equivalent to the following:
+
+```csharp
+[ParseOptions(Mode = ParsingMode.LongShort,
+    CaseSensitive = true,
+    ArgumentNameTransform = NameTransform.DashCase,
+    ValueDescriptionTransform = NameTransform.DashCase)]
+```
+
+This sample uses the same arguments as the [parser sample](../Parser), so see that sample's source
 for more details about each argument.
 
 In long/short mode, each argument can have a long name, using the `--` prefix, and a one-character
@@ -63,4 +73,6 @@ Note that there is both a `-d` and a `-D` argument, possible due to the use of c
 argument names.
 
 Long/short mode allows you to combine switches with short names, so running `LongShort -vp` sets
-both `Verbose` and `Process` to true.
+both `--verbose` and `--process` to true.
+
+[`ParseOptionsAttribute.IsPosix`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_ParseOptionsAttribute_IsPosix.htm

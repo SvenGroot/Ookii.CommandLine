@@ -1,21 +1,20 @@
-﻿namespace Ookii.CommandLine.Terminal
+﻿namespace Ookii.CommandLine.Terminal;
+
+/// <summary>
+/// Represents one of the standard console streams.
+/// </summary>
+public enum StandardStream
 {
     /// <summary>
-    /// Represents one of the standard console streams.
+    /// The standard output stream.
     /// </summary>
-    public enum StandardStream
-    {
-        /// <summary>
-        /// The standard output stream.
-        /// </summary>
-        Output,
-        /// <summary>
-        /// The standard input stream.
-        /// </summary>
-        Input,
-        /// <summary>
-        /// The standard error stream.
-        /// </summary>
-        Error
-    }
+    Output,
+    /// <summary>
+    /// The standard input stream.
+    /// </summary>
+    Input,
+    /// <summary>
+    /// The standard error stream.
+    /// </summary>
+    Error
 }

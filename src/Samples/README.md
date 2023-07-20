@@ -12,10 +12,12 @@ Ookii.CommandLine comes with several samples that demonstrate various aspects of
   arguments that require or prohibit the presence of other arguments.
 - The [**WPF sample**](Wpf) shows how you can use Ookii.CommandLine with a GUI application.
 
-There are two samples demonstrating how to use subcommands:
+There are three samples demonstrating how to use subcommands:
 
 - The [**subcommand sample**](Subcommand) demonstrates how to create a simple application that has
   multiple subcommands.
 - The [**nested commands sample**](NestedCommands) demonstrates how to create an application where
   commands can contain other commands. It also demonstrates how to create common arguments for
   multiple commands using a common base class.
+- The [**top-level arguments sample**](TopLevelArguments) demonstrates how to use arguments that
+  don't belong to any subcommand before the command name.

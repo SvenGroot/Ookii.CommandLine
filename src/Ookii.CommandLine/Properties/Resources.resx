@@ -138,9 +138,6 @@
   <data name="DuplicateArgumentFormat" xml:space="preserve">
     <value>The argument '{0}' was supplied more than once.</value>
   </data>
-  <data name="DuplicateArgumentPositionFormat" xml:space="preserve">
-    <value>The argument '{0}' has the same position value as the argument '{1}'.</value>
-  </data>
   <data name="EmptyArgumentNamePrefixes" xml:space="preserve">
     <value>You must specify at least one argument name prefix.</value>
   </data>
@@ -157,7 +154,7 @@
     <value>Multi-dimensional arrays are not supported for command line arguments.</value>
   </data>
   <data name="InvalidOptionalArgumentOrder" xml:space="preserve">
-    <value>The command line constructor cannot have non-optional arguments after an optional argument.</value>
+    <value>The command line arguments class cannot have non-optional arguments after an optional argument.</value>
   </data>
   <data name="MissingArgumentAttribute" xml:space="preserve">
     <value>The specified property or method is not a command line argument.</value>
@@ -168,17 +165,8 @@
   <data name="MissingValueForNamedArgumentFormat" xml:space="preserve">
     <value>No value was supplied for the argument '{0}'.</value>
   </data>
-  <data name="MultipleMarkedConstructors" xml:space="preserve">
-    <value>The command line arguments type has more than one constructor with the CommandLineConstructorAttribute attribute.</value>
-  </data>
   <data name="ArgumentNameContainsSeparatorFormat" xml:space="preserve">
-    <value>The name for argument '{0}' contains a colon (:), which is not allowed.</value>
-  </data>
-  <data name="NoConstructor" xml:space="preserve">
-    <value>The command line arguments type does not have any public constructors.</value>
-  </data>
-  <data name="NoMarkedConstructor" xml:space="preserve">
-    <value>The command line arguments type has more than one constructor, none of which has the CommandLineConstructorAttribute attribute.</value>
+    <value>The name for argument '{0}' contains one of the name-value separators, which is not allowed.</value>
   </data>
   <data name="TooManyArguments" xml:space="preserve">
     <value>Too many arguments were supplied.</value>
@@ -193,7 +181,7 @@
     <value>The value must be zero or larger.</value>
   </data>
   <data name="PropertyIsReadOnlyFormat" xml:space="preserve">
-    <value>The property defining the argument '{0}' doesn't have a public set accessor.</value>
+    <value>The property defining the argument '{0}' does not have a public set accessor.</value>
   </data>
   <data name="TypeNotGenericDefinition" xml:space="preserve">
     <value>The type must be a generic type definition.</value>
@@ -202,10 +190,10 @@
     <value>The value '{1}' provided for argument '{0}' was invalid: {2}</value>
   </data>
   <data name="NoKeyValuePairSeparatorFormat" xml:space="preserve">
-    <value>A key/value pair must contain "{0}" as a separator.</value>
+    <value>A key-value pair must contain "{0}" as a separator.</value>
   </data>
-  <data name="NoTypeConverterFormat" xml:space="preserve">
-    <value>No type converter that can convert to and from a string exists for type '{0}'. Use the TypeConverterAttribute to specify a custom TypeConverter.</value>
+  <data name="NoArgumentConverterFormat" xml:space="preserve">
+    <value>The type '{0}' cannot be be parsed from a string using the default conversion rules. Use the ArgumentConverterAttribute to specify a custom ArgumentConverter.</value>
   </data>
   <data name="CreateArgumentsTypeErrorFormat" xml:space="preserve">
     <value>An error occurred creating an instance of the arguments type: {0}</value>
@@ -267,17 +255,14 @@
   <data name="MinMaxBothNull" xml:space="preserve">
     <value>The 'minimum' and 'maximum' parameters cannot both be null.</value>
   </data>
-  <data name="TypeConversionErrorFormat" xml:space="preserve">
-    <value>Could not convert type '{0}' to '{1}' for argument '{2}'.</value>
-  </data>
   <data name="ValidateCountBothFormat" xml:space="preserve">
     <value>The argument '{0}' must have between {1} and {2} items.</value>
   </data>
   <data name="ValidateCountMaxFormat" xml:space="preserve">
-    <value>The argument '{0}' must have at most {1} items.</value>
+    <value>The argument '{0}' must have at most {1} item(s).</value>
   </data>
   <data name="ValidateCountMinFormat" xml:space="preserve">
-    <value>The argument '{0}' must have at least {1} items.</value>
+    <value>The argument '{0}' must have at least {1} item(s).</value>
   </data>
   <data name="ValidateNotEmptyFailedFormat" xml:space="preserve">
     <value>The argument '{0}' must not be empty.</value>
@@ -295,10 +280,10 @@
     <value>The argument '{0}' must be between {1} and {2} characters.</value>
   </data>
   <data name="ValidateStringLengthMaxFormat" xml:space="preserve">
-    <value>The argument '{0}' must be at most {1} characters.</value>
+    <value>The argument '{0}' must be at most {1} character(s).</value>
   </data>
   <data name="ValidateStringLengthMinFormat" xml:space="preserve">
-    <value>The argument '{0}' must be at least {1} characters.</value>
+    <value>The argument '{0}' must be at least {1} character(s).</value>
   </data>
   <data name="ValidateNotWhiteSpaceFailedFormat" xml:space="preserve">
     <value>The argument '{0}' must not be empty or contain only white-space characters.</value>
@@ -334,10 +319,10 @@
     <value>Must have between {0} and {1} items.</value>
   </data>
   <data name="ValidateCountUsageHelpMaxFormat" xml:space="preserve">
-    <value>Must have at most {0} items.</value>
+    <value>Must have at most {0} item(s).</value>
   </data>
   <data name="ValidateCountUsageHelpMinFormat" xml:space="preserve">
-    <value>Must have at least {0} items.</value>
+    <value>Must have at least {0} item(s).</value>
   </data>
   <data name="ValidateNotEmptyUsageHelp" xml:space="preserve">
     <value>Must not be empty.</value>
@@ -355,10 +340,10 @@
     <value>Must be between {0} and {1} characters.</value>
   </data>
   <data name="ValidateStringLengthUsageHelpMaxFormat" xml:space="preserve">
-    <value>Must be at most {0} characters.</value>
+    <value>Must be at most {0} character(s).</value>
   </data>
   <data name="ValidateStringLengthUsageHelpMinFormat" xml:space="preserve">
-    <value>Must be at least {0} characters.</value>
+    <value>Must be at least {0} character(s).</value>
   </data>
   <data name="UnknownDependencyFormat" xml:space="preserve">
     <value>A {0} refers to an unknown argument '{1}'.</value>
@@ -392,5 +377,35 @@
   </data>
   <data name="AsyncWriteInProgress" xml:space="preserve">
     <value>An async write operation is already in progress.</value>
+  </data>
+  <data name="IncorrectProviderTypeFormat" xml:space="preserve">
+    <value>The provided ArgumentProvider is not for the type '{0}'.</value>
+  </data>
+  <data name="NoCustomParsing" xml:space="preserve">
+    <value>The command does not use custom parsing.</value>
+  </data>
+  <data name="InvalidStringComparison" xml:space="preserve">
+    <value>Invalid value for the StringComparison enumeration.</value>
+  </data>
+  <data name="InvalidTypeConverter" xml:space="preserve">
+    <value>The specified TypeConverter cannot converter from a string.</value>
+  </data>
+  <data name="EmptyNameValueSeparators" xml:space="preserve">
+    <value>You must specify at least one name-value separator.</value>
+  </data>
+  <data name="AutoPositionNotSupportedFormat" xml:space="preserve">
+    <value>The member '{0}' uses CommandLineArgumentAttribute.IsPositional without setting an explicit Position, which is only supported when the GeneratedParserAttribute is used.</value>
+  </data>
+  <data name="InvalidMethodAccess" xml:space="preserve">
+    <value>Cannot call the method for this argument.</value>
+  </data>
+  <data name="InvalidPropertyAccess" xml:space="preserve">
+    <value>Cannot get or set the property for this argument.</value>
+  </data>
+  <data name="NullPropertyValue" xml:space="preserve">
+    <value>A read-only property for a multi-value or dictionary argument returned null.</value>
+  </data>
+  <data name="TypeIsNotEnumFormat" xml:space="preserve">
+    <value>The type '{0}' is not an enumeration type.</value>
   </data>
 </root>

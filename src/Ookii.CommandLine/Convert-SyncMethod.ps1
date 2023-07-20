@@ -11,7 +11,12 @@ $replacements = @(
     @("await ", ""), # Remove await keyword
     @("ReadOnlyMemory", "ReadOnlySpan"), # Async stream functions uses Memory instead of span
     @(".Span", ""), # Needed to convert Memory usage to Span.
-    @("async ", "") # Remove keyword from async lambda
+    @("async ", ""), # Remove keyword from async lambda
+    @(", CancellationToken cancellationToken = default", ""), # Remove cancellation token parameter
+    @(", CancellationToken cancellationToken", ""), # Remove cancellation token parameter
+    @("(CancellationToken cancellationToken)", "()"), # Remove cancellation token parameter
+    @(", cancellationToken", ""), # Remove cancellation token parameter value
+    @("(cancellationToken)", "()") # Remove cancellation token parameter value
 )
 
 $files = Get-Item $Path

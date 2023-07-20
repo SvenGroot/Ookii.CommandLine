@@ -70,7 +70,7 @@ namespace Ookii.CommandLine.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The name for argument &apos;{0}&apos; contains a colon (:), which is not allowed..
+        ///   Looks up a localized string similar to The name for argument &apos;{0}&apos; contains one of the name-value separators, which is not allowed..
         /// </summary>
         internal static string ArgumentNameContainsSeparatorFormat {
             get {
@@ -156,6 +156,15 @@ namespace Ookii.CommandLine.Properties {
         internal static string AutomaticVersionName {
             get {
                 return ResourceManager.GetString("AutomaticVersionName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The member &apos;{0}&apos; uses CommandLineArgumentAttribute.IsPositional without setting an explicit Position, which is only supported when the GeneratedParserAttribute is used..
+        /// </summary>
+        internal static string AutoPositionNotSupportedFormat {
+            get {
+                return ResourceManager.GetString("AutoPositionNotSupportedFormat", resourceCulture);
             }
         }
         
@@ -259,15 +268,6 @@ namespace Ookii.CommandLine.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The argument &apos;{0}&apos; has the same position value as the argument &apos;{1}&apos;..
-        /// </summary>
-        internal static string DuplicateArgumentPositionFormat {
-            get {
-                return ResourceManager.GetString("DuplicateArgumentPositionFormat", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Warning: the argument &apos;{0}&apos; was supplied more than once..
         /// </summary>
         internal static string DuplicateArgumentWarningFormat {
@@ -313,6 +313,24 @@ namespace Ookii.CommandLine.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to You must specify at least one name-value separator..
+        /// </summary>
+        internal static string EmptyNameValueSeparators {
+            get {
+                return ResourceManager.GetString("EmptyNameValueSeparators", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The provided ArgumentProvider is not for the type &apos;{0}&apos;..
+        /// </summary>
+        internal static string IncorrectProviderTypeFormat {
+            get {
+                return ResourceManager.GetString("IncorrectProviderTypeFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The indent must be greater than or equal to zero, and less than the maximum line length..
         /// </summary>
         internal static string IndentOutOfRange {
@@ -349,6 +367,15 @@ namespace Ookii.CommandLine.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cannot call the method for this argument..
+        /// </summary>
+        internal static string InvalidMethodAccess {
+            get {
+                return ResourceManager.GetString("InvalidMethodAccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The method &apos;{0}&apos; has an unsupported signature..
         /// </summary>
         internal static string InvalidMethodSignatureFormat {
@@ -358,11 +385,20 @@ namespace Ookii.CommandLine.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The command line constructor cannot have non-optional arguments after an optional argument..
+        ///   Looks up a localized string similar to The command line arguments class cannot have non-optional arguments after an optional argument..
         /// </summary>
         internal static string InvalidOptionalArgumentOrder {
             get {
                 return ResourceManager.GetString("InvalidOptionalArgumentOrder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot get or set the property for this argument..
+        /// </summary>
+        internal static string InvalidPropertyAccess {
+            get {
+                return ResourceManager.GetString("InvalidPropertyAccess", resourceCulture);
             }
         }
         
@@ -372,6 +408,24 @@ namespace Ookii.CommandLine.Properties {
         internal static string InvalidStandardStream {
             get {
                 return ResourceManager.GetString("InvalidStandardStream", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid value for the StringComparison enumeration..
+        /// </summary>
+        internal static string InvalidStringComparison {
+            get {
+                return ResourceManager.GetString("InvalidStringComparison", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The specified TypeConverter cannot converter from a string..
+        /// </summary>
+        internal static string InvalidTypeConverter {
+            get {
+                return ResourceManager.GetString("InvalidTypeConverter", resourceCulture);
             }
         }
         
@@ -421,25 +475,25 @@ namespace Ookii.CommandLine.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The command line arguments type has more than one constructor with the CommandLineConstructorAttribute attribute..
+        ///   Looks up a localized string similar to The type &apos;{0}&apos; cannot be be parsed from a string using the default conversion rules. Use the ArgumentConverterAttribute to specify a custom ArgumentConverter..
         /// </summary>
-        internal static string MultipleMarkedConstructors {
+        internal static string NoArgumentConverterFormat {
             get {
-                return ResourceManager.GetString("MultipleMarkedConstructors", resourceCulture);
+                return ResourceManager.GetString("NoArgumentConverterFormat", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The command line arguments type does not have any public constructors..
+        ///   Looks up a localized string similar to The command does not use custom parsing..
         /// </summary>
-        internal static string NoConstructor {
+        internal static string NoCustomParsing {
             get {
-                return ResourceManager.GetString("NoConstructor", resourceCulture);
+                return ResourceManager.GetString("NoCustomParsing", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to A key/value pair must contain &quot;{0}&quot; as a separator..
+        ///   Looks up a localized string similar to A key-value pair must contain &quot;{0}&quot; as a separator..
         /// </summary>
         internal static string NoKeyValuePairSeparatorFormat {
             get {
@@ -457,29 +511,11 @@ namespace Ookii.CommandLine.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The command line arguments type has more than one constructor, none of which has the CommandLineConstructorAttribute attribute..
-        /// </summary>
-        internal static string NoMarkedConstructor {
-            get {
-                return ResourceManager.GetString("NoMarkedConstructor", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Cannot create a parser for a command with custom parsing..
         /// </summary>
         internal static string NoParserForCustomParsingCommand {
             get {
                 return ResourceManager.GetString("NoParserForCustomParsingCommand", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to No type converter that can convert to and from a string exists for type &apos;{0}&apos;. Use the TypeConverterAttribute to specify a custom TypeConverter..
-        /// </summary>
-        internal static string NoTypeConverterFormat {
-            get {
-                return ResourceManager.GetString("NoTypeConverterFormat", resourceCulture);
             }
         }
         
@@ -493,7 +529,16 @@ namespace Ookii.CommandLine.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The property defining the argument &apos;{0}&apos; doesn&apos;t have a public set accessor..
+        ///   Looks up a localized string similar to A read-only property for a multi-value or dictionary argument returned null..
+        /// </summary>
+        internal static string NullPropertyValue {
+            get {
+                return ResourceManager.GetString("NullPropertyValue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The property defining the argument &apos;{0}&apos; does not have a public set accessor..
         /// </summary>
         internal static string PropertyIsReadOnlyFormat {
             get {
@@ -529,20 +574,20 @@ namespace Ookii.CommandLine.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Could not convert type &apos;{0}&apos; to &apos;{1}&apos; for argument &apos;{2}&apos;..
-        /// </summary>
-        internal static string TypeConversionErrorFormat {
-            get {
-                return ResourceManager.GetString("TypeConversionErrorFormat", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to The type &apos;{0}&apos; does not implement the ICommand interface or does not have the CommandAttribute attribute..
         /// </summary>
         internal static string TypeIsNotCommandFormat {
             get {
                 return ResourceManager.GetString("TypeIsNotCommandFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The type &apos;{0}&apos; is not an enumeration type..
+        /// </summary>
+        internal static string TypeIsNotEnumFormat {
+            get {
+                return ResourceManager.GetString("TypeIsNotEnumFormat", resourceCulture);
             }
         }
         
@@ -610,7 +655,7 @@ namespace Ookii.CommandLine.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The argument &apos;{0}&apos; must have at most {1} items..
+        ///   Looks up a localized string similar to The argument &apos;{0}&apos; must have at most {1} item(s)..
         /// </summary>
         internal static string ValidateCountMaxFormat {
             get {
@@ -619,7 +664,7 @@ namespace Ookii.CommandLine.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The argument &apos;{0}&apos; must have at least {1} items..
+        ///   Looks up a localized string similar to The argument &apos;{0}&apos; must have at least {1} item(s)..
         /// </summary>
         internal static string ValidateCountMinFormat {
             get {
@@ -637,7 +682,7 @@ namespace Ookii.CommandLine.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Must have at most {0} items..
+        ///   Looks up a localized string similar to Must have at most {0} item(s)..
         /// </summary>
         internal static string ValidateCountUsageHelpMaxFormat {
             get {
@@ -646,7 +691,7 @@ namespace Ookii.CommandLine.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Must have at least {0} items..
+        ///   Looks up a localized string similar to Must have at least {0} item(s)..
         /// </summary>
         internal static string ValidateCountUsageHelpMinFormat {
             get {
@@ -826,7 +871,7 @@ namespace Ookii.CommandLine.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The argument &apos;{0}&apos; must be at most {1} characters..
+        ///   Looks up a localized string similar to The argument &apos;{0}&apos; must be at most {1} character(s)..
         /// </summary>
         internal static string ValidateStringLengthMaxFormat {
             get {
@@ -835,7 +880,7 @@ namespace Ookii.CommandLine.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The argument &apos;{0}&apos; must be at least {1} characters..
+        ///   Looks up a localized string similar to The argument &apos;{0}&apos; must be at least {1} character(s)..
         /// </summary>
         internal static string ValidateStringLengthMinFormat {
             get {
@@ -853,7 +898,7 @@ namespace Ookii.CommandLine.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Must be at most {0} characters..
+        ///   Looks up a localized string similar to Must be at most {0} character(s)..
         /// </summary>
         internal static string ValidateStringLengthUsageHelpMaxFormat {
             get {
@@ -862,7 +907,7 @@ namespace Ookii.CommandLine.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Must be at least {0} characters..
+        ///   Looks up a localized string similar to Must be at least {0} character(s)..
         /// </summary>
         internal static string ValidateStringLengthUsageHelpMinFormat {
             get {

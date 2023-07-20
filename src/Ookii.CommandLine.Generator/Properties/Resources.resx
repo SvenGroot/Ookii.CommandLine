@@ -1,0 +1,372 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="AliasWithoutLongNameMessageFormat" xml:space="preserve">
+    <value>The AliasAttribute is ignored on the argument defined by {0} because it has no long name.</value>
+  </data>
+  <data name="AliasWithoutLongNameTitle" xml:space="preserve">
+    <value>The AliasAttribute is ignored on an argument with no long name.</value>
+  </data>
+  <data name="ArgumentConverterStringNotSupportedMessageFormat" xml:space="preserve">
+    <value>The command line argument defined by {0} uses the ArgumentConverterAttribute with a string parameter, which is not supported by the GeneratedParserAttribute. Use a Type parameter instead by using the typeof keyword.</value>
+  </data>
+  <data name="ArgumentConverterStringNotSupportedTitle" xml:space="preserve">
+    <value>The ArgumentConverterAttribute must use the typeof keyword.</value>
+  </data>
+  <data name="ArgumentStartsWithNumberMessageFormat" xml:space="preserve">
+    <value>The argument name '{0}' defined by '{1}' starts with a number, which cannot be used with the '-' argument prefix since it will be interpreted as a negative number.</value>
+  </data>
+  <data name="ArgumentStartsWithNumberTitle" xml:space="preserve">
+    <value>Argument names starting with a number cannot be used with the '-' prefix.</value>
+  </data>
+  <data name="ArgumentWithoutDescriptionMessageFormat" xml:space="preserve">
+    <value>The argument defined by {0} should have a description for the usage help. Use the System.ComponentModel.DescriptionAttribute attribute on the member to supply a description.</value>
+  </data>
+  <data name="ArgumentWithoutDescriptionTitle" xml:space="preserve">
+    <value>Arguments should have a description.</value>
+  </data>
+  <data name="ClassIsGenericMessageFormat" xml:space="preserve">
+    <value>The class {0} may not be a generic class when the {1} attribute is used.</value>
+  </data>
+  <data name="ClassIsGenericTitle" xml:space="preserve">
+    <value>The class may not be a generic type.</value>
+  </data>
+  <data name="ClassIsNestedMessageFormat" xml:space="preserve">
+    <value>The class {0} may not be nested in another type when the {1} attribute is used.</value>
+  </data>
+  <data name="ClassIsNestedTitle" xml:space="preserve">
+    <value>The class may not be a nested type.</value>
+  </data>
+  <data name="ClassNotPartialMessageFormat" xml:space="preserve">
+    <value>The class {0} must use the 'partial' modifier when the {1} attribute is used.</value>
+  </data>
+  <data name="ClassNotPartialTitle" xml:space="preserve">
+    <value>The class must be a partial class.</value>
+  </data>
+  <data name="CommandAttributeWithoutInterfaceMessageFormat" xml:space="preserve">
+    <value>The command line arguments class {0} has the CommandAttribute but does not implement the ICommand interface.</value>
+  </data>
+  <data name="CommandAttributeWithoutInterfaceTitle" xml:space="preserve">
+    <value>The command line arguments class has the CommandAttribute but does not implement the ICommand interface.</value>
+  </data>
+  <data name="CommandInterfaceWithoutAttributeMessageFormat" xml:space="preserve">
+    <value>The command line arguments class {0} implements the ICommand interface but does not have the CommandAttribute attribute.</value>
+  </data>
+  <data name="CommandInterfaceWithoutAttributeTitle" xml:space="preserve">
+    <value>The command line arguments class implements the ICommand interface but does not have the CommandAttribute attribute.</value>
+  </data>
+  <data name="CommandWithoutDescriptionMessageFormat" xml:space="preserve">
+    <value>The subcommand defined by {0} should have a description for the usage help. Use the System.ComponentModel.DescriptionAttribute attribute on the class to supply a description.</value>
+  </data>
+  <data name="CommandWithoutDescriptionTitle" xml:space="preserve">
+    <value>Subcommands should have a description.</value>
+  </data>
+  <data name="DefaultValueIgnoredTitle" xml:space="preserve">
+    <value>The default value is ignored if the argument is required, multi-value, or a method argument.</value>
+  </data>
+  <data name="DefaultValueWithMethodMessageFormat" xml:space="preserve">
+    <value>The default value of the argument defined by {0} is ignored because it is a method argument.</value>
+  </data>
+  <data name="DefaultValueWithMultiValueMessageFormat" xml:space="preserve">
+    <value>The default value of the argument defined by {0} is ignored because it is a multi-value argument.</value>
+  </data>
+  <data name="DefaultValueWithRequiredMessageFormat" xml:space="preserve">
+    <value>The default value of the argument defined by {0} is ignored because the argument is required.</value>
+  </data>
+  <data name="DuplicatePositionMessageFormat" xml:space="preserve">
+    <value>The argument defined by {0} uses the same position value as {1}.</value>
+  </data>
+  <data name="DuplicatePositionTitle" xml:space="preserve">
+    <value>Two or more arguments use the same position value.</value>
+  </data>
+  <data name="GeneratedCustomParsingCommandMessageFormat" xml:space="preserve">
+    <value>The command class {0} cannot use the GeneratedParserAttribute class, because it implements the ICommandWithCustomParsing interface.</value>
+  </data>
+  <data name="GeneratedCustomParsingCommandTitle" xml:space="preserve">
+    <value>The GeneratedParserAttribute cannot be used with a class that implements the ICommandWithCustomParsing interface.</value>
+  </data>
+  <data name="IgnoredAttributeForDictionaryWithConverterMessageFormat" xml:space="preserve">
+    <value>The {0} attribute is ignored for the dictionary argument defined by {1} that has the ArgumentConverterAttribute attribute.</value>
+  </data>
+  <data name="IgnoredAttributeForDictionaryWithConverterTitle" xml:space="preserve">
+    <value>The attribute is not used for a dictionary argument that has the ArgumentConverterAttribute attribute.</value>
+  </data>
+  <data name="IgnoredAttributeForNonCommandMessageFormat" xml:space="preserve">
+    <value>The attribute '{0}' on '{1}' will be ignored because '{1}' is not a subcommand.</value>
+  </data>
+  <data name="IgnoredAttributeForNonCommandTitle" xml:space="preserve">
+    <value>The attribute is not used for command line arguments classes that are not subcommands.</value>
+  </data>
+  <data name="IgnoredAttributeForNonDictionaryMessageFormat" xml:space="preserve">
+    <value>The {0} attribute is ignored for the non-dictionary argument defined by {1}.</value>
+  </data>
+  <data name="IgnoredAttributeForNonDictionaryTitle" xml:space="preserve">
+    <value>The attribute is not used for a non-dictionary argument.</value>
+  </data>
+  <data name="IgnoredAttributeForNonMultiValueMessageFormat" xml:space="preserve">
+    <value>The {0} attribute is ignored for the non-multi-value argument defined by {1}.</value>
+  </data>
+  <data name="IgnoredAttributeForNonMultiValueTitle" xml:space="preserve">
+    <value>The attribute is not used for a non-multi-value argument.</value>
+  </data>
+  <data name="IgnoredFriendlyNameAttributeMessageFormat" xml:space="preserve">
+    <value>The ApplicationFriendlyNameAttribute on '{0}' is ignored because '{0}' is a subcommand. Use '[assembly: ApplicationFriendlyName(...)]' instead.</value>
+  </data>
+  <data name="IgnoredFriendlyNameAttributeTitle" xml:space="preserve">
+    <value>The ApplicationFriendlyNameAttribute is ignored on a subcommand.</value>
+  </data>
+  <data name="IgnoredTypeConverterAttributeMessageFormat" xml:space="preserve">
+    <value>The TypeConverterAttribute on '{0}' will be ignored by the CommandLineParser. Use the ArgumentConverterAttribute instead.</value>
+  </data>
+  <data name="IgnoredTypeConverterAttributeTitle" xml:space="preserve">
+    <value>The TypeConverterAttribute will be ignored.</value>
+  </data>
+  <data name="InvalidArrayRankMessageFormat" xml:space="preserve">
+    <value>The multi-value command line argument defined by {0} must have an array rank of one.</value>
+  </data>
+  <data name="InvalidArrayRankTitle" xml:space="preserve">
+    <value>A multi-value command line argument defined by an array properties must have an array rank of one.</value>
+  </data>
+  <data name="InvalidAssemblyNameMessageFormat" xml:space="preserve">
+    <value>The assembly name '{0}' is not valid.</value>
+  </data>
+  <data name="InvalidAssemblyNameTitle" xml:space="preserve">
+    <value>Invalid assembly name.</value>
+  </data>
+  <data name="InvalidGeneratedConverterNamespaceMessageFormat" xml:space="preserve">
+    <value>The value '{0}' is not a valid C# namespace name. The default namespace will be used instead.</value>
+  </data>
+  <data name="InvalidGeneratedConverterNamespaceTitle" xml:space="preserve">
+    <value>The specified namespace for generated converters is not valid.</value>
+  </data>
+  <data name="InvalidMethodSignatureMessageFormat" xml:space="preserve">
+    <value>The method {0} does not have a valid signature for a command line argument.</value>
+  </data>
+  <data name="InvalidMethodSignatureTitle" xml:space="preserve">
+    <value>A method command line argument has an invalid signature.</value>
+  </data>
+  <data name="IsHiddenWithPositionalOrRequiredMessageFormat" xml:space="preserve">
+    <value>The CommandLineArgumentAttribute.IsHidden property is ignored for the argument defined by {0} because it is positional or required.</value>
+  </data>
+  <data name="IsHiddenWithPositionalOrRequiredTitle" xml:space="preserve">
+    <value>The CommandLineArgumentAttribute.IsHidden property is ignored for positional or required arguments.</value>
+  </data>
+  <data name="IsRequiredWithRequiredPropertyMessageFormat" xml:space="preserve">
+    <value>The CommandLineArgumentAttribute.IsRequired property is ignored for the required property {0}. Arguments defined by a required property are always required.</value>
+  </data>
+  <data name="IsRequiredWithRequiredPropertyTitle" xml:space="preserve">
+    <value>The CommandLineArgumentAttribute.IsRequired property is ignored for a required property.</value>
+  </data>
+  <data name="IsShortIgnoredMessageFormat" xml:space="preserve">
+    <value>The argument defined by {0} has an explicit short name, so setting IsShort to false has no effect.</value>
+  </data>
+  <data name="IsShortIgnoredTitle" xml:space="preserve">
+    <value>IsShort is ignored if an explicit short name is set.</value>
+  </data>
+  <data name="MixedImplicitExplicitPositionsMessageFormat" xml:space="preserve">
+    <value>The arguments class '{0}' contains positional arguments using an explicit Position value, and ones using IsPositional for member-based ordering, which is not allowed. Note that this may include arguments defined by a base class.</value>
+  </data>
+  <data name="MixedImplicitExplicitPositionsTitle" xml:space="preserve">
+    <value>Positional arguments with an explicit position value and those with a position inferred from the member order cannot be mixed.</value>
+  </data>
+  <data name="NoConverterMessageFormat" xml:space="preserve">
+    <value>No command line argument converter exists for type {0} used by the argument defined by {1}, and none could be generated. Use the Ookii.CommandLine.Conversion.ArgumentConverterAttribute to specify a custom converter.</value>
+  </data>
+  <data name="NoConverterTitle" xml:space="preserve">
+    <value>No command line argument converter exists for the argument's type.</value>
+  </data>
+  <data name="NoLongOrShortNameMessageFormat" xml:space="preserve">
+    <value>The argument defined by {0} has both IsLong and IsShort set to false, which means it has no name if long/short mode is used.</value>
+  </data>
+  <data name="NoLongOrShortNameTitle" xml:space="preserve">
+    <value>Argument has neither a long nor short name.</value>
+  </data>
+  <data name="NonPublicInstancePropertyMessageFormat" xml:space="preserve">
+    <value>The property {0} will not create a command line argument because it is not a public instance property.</value>
+  </data>
+  <data name="NonPublicInstancePropertyTitle" xml:space="preserve">
+    <value>Properties that are not public instance will be ignored.</value>
+  </data>
+  <data name="NonPublicStaticMethodMessageFormat" xml:space="preserve">
+    <value>The method {0} will not create a command line argument because it is not a public static method.</value>
+  </data>
+  <data name="NonPublicStaticMethodTitle" xml:space="preserve">
+    <value>Methods that are not public and static will be ignored.</value>
+  </data>
+  <data name="NonRequiredInitOnlyPropertyMessageFormat" xml:space="preserve">
+    <value>The command line argument property {0} may only have an 'init' accessor if the property is also declared as 'required'.</value>
+  </data>
+  <data name="NonRequiredInitOnlyPropertyTitle" xml:space="preserve">
+    <value>Init accessors may only be used on required properties.</value>
+  </data>
+  <data name="ParentCommandStringNotSupportedMessageFormat" xml:space="preserve">
+    <value>The subcommand defined by {0} uses the ParentCommandAttribute with a string parameter, which is not supported by the GeneratedParserAttribute. Use a Type parameter instead by using the typeof keyword.</value>
+  </data>
+  <data name="ParentCommandStringNotSupportedTitle" xml:space="preserve">
+    <value>The ParentCommandAttribute must use the typeof keyword.</value>
+  </data>
+  <data name="PositionalArgumentAfterMultiValueMessageFormat" xml:space="preserve">
+    <value>The positional argument defined by {0} comes after {1}, which is a multi-value argument and must come last.</value>
+  </data>
+  <data name="PositionalArgumentAfterMultiValueTitle" xml:space="preserve">
+    <value>A positional multi-value argument must be the last positional argument.</value>
+  </data>
+  <data name="PositionalRequiredArgumentAfterOptionalMessageFormat" xml:space="preserve">
+    <value>The required positional argument defined by {0} comes after {1}, which is optional.</value>
+  </data>
+  <data name="PositionalRequiredArgumentAfterOptionalTitle" xml:space="preserve">
+    <value>Required positional arguments must come before optional positional arguments.</value>
+  </data>
+  <data name="PropertyIsReadOnlyMessageFormat" xml:space="preserve">
+    <value>The property {0} must have a public set accessor.</value>
+  </data>
+  <data name="PropertyIsReadOnlyTitle" xml:space="preserve">
+    <value>A command line argument property must have a public set accessor.</value>
+  </data>
+  <data name="ShortAliasWithoutShortNameMessageFormat" xml:space="preserve">
+    <value>The ShortAliasAttribute is ignored on the argument defined by {0} because it has no short name.</value>
+  </data>
+  <data name="ShortAliasWithoutShortNameTitle" xml:space="preserve">
+    <value>The ShortAliasAttribute is ignored on an argument with no short name.</value>
+  </data>
+  <data name="TypeNotReferenceTypeMessageFormat" xml:space="preserve">
+    <value>The type {0} must be a reference type (class) when the {1} attribute is used.</value>
+  </data>
+  <data name="TypeNotReferenceTypeTitle" xml:space="preserve">
+    <value>The command line arguments or command manager type must be a reference type.</value>
+  </data>
+  <data name="UnknownAssemblyNameMessageFormat" xml:space="preserve">
+    <value>An assembly matching the name '{0}' was not found.</value>
+  </data>
+  <data name="UnknownAssemblyNameTitle" xml:space="preserve">
+    <value>Unknown assembly name.</value>
+  </data>
+  <data name="UnsupportedInitializerSyntaxMessageFormat" xml:space="preserve">
+    <value>The initial value of the property '{0}' will not be included in the usage help because it is not a literal expression, enum value, constant, or property. Consider changing the initializer, or use CommandLineArgumentAttribute.DefaultValue as an alternative.</value>
+  </data>
+  <data name="UnsupportedInitializerSyntaxTitle" xml:space="preserve">
+    <value>The property's initial value uses an unsupported expression.</value>
+  </data>
+  <data name="UnsupportedLanguageVersionMessageFormat" xml:space="preserve">
+    <value>The type '{0}' uses the '{1}' attribute, which requires at least C# 8.0.</value>
+  </data>
+  <data name="UnsupportedLanguageVersionTitle" xml:space="preserve">
+    <value>Ookii.CommandLine source generation requires at least C# 8.0.</value>
+  </data>
+</root>

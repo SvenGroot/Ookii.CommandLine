@@ -8,9 +8,10 @@ namespace WpfSample;
 
 // This class defines the arguments for the sample. It uses the same arguments as the Parser
 // sample, so see that sample for more detailed descriptions.
+[GeneratedParser]
 [ApplicationFriendlyName("Ookii.CommandLine WPF Sample")]
 [Description("Sample command line application for WPF. The application parses the command line and shows the results, but otherwise does nothing and none of the arguments are actually used for anything.")]
-public class Arguments
+public partial class Arguments
 {
     // The automatic version argument writes to the console, which is not useful in a WPF
     // application. Instead, we define our own, which shows the same information in a dialog.
@@ -23,7 +24,7 @@ public class Arguments
     // (as in this case), it defaults to a switch argument.
     [CommandLineArgument]
     [Description("Displays version information.")]
-    public static bool Version(CommandLineParser parser)
+    public static CancelMode Version(CommandLineParser parser)
     {
         var assembly = Assembly.GetExecutingAssembly();
 
@@ -44,26 +45,27 @@ public class Arguments
 
         // Indicate parsing should be canceled and the application should exit. Because we didn't
         // set the CommandLineParser.HelpRequested property, usage help will not be shown.
-        return false;
+        return CancelMode.Abort;
     }
 
-    [CommandLineArgument(Position = 0, IsRequired = true)]
+    [CommandLineArgument(IsPositional = true)]
     [Description("The source data.")]
-    public string Source { get; set; } = string.Empty;
+    public required string Source { get; set; }
 
-    [CommandLineArgument(Position = 1, IsRequired = true)]
+    [CommandLineArgument(IsPositional = true)]
     [Description("The destination data.")]
-    public string Destination { get; set; } = string.Empty;
+    public required string Destination { get; set; }
 
-    [CommandLineArgument(Position = 2, DefaultValue = 1)]
+    [CommandLineArgument(IsPositional = true)]
     [Description("The operation's index.")]
-    public int OperationIndex { get; set; }
+    public int OperationIndex { get; set; } = 1;
 
     [CommandLineArgument]
     [Description("Provides a date to the application.")]
     public DateTime? Date { get; set; }
 
-    [CommandLineArgument(ValueDescription = "Number")]
+    [CommandLineArgument]
+    [ValueDescription("Number")]
     [Description("Provides the count for something to the application.")]
     [ValidateRange(0, 100)]
     public int Count { get; set; }

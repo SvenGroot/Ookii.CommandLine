@@ -1,7 +1,6 @@
 ﻿using Ookii.CommandLine;
 using Ookii.CommandLine.Commands;
 using Ookii.CommandLine.Terminal;
-using System.Threading.Tasks;
 
 // For an application using subcommands, set the friendly name used for the automatic version
 // command by using this attribute on the assembly rather than an arguments type.
@@ -24,19 +23,17 @@ static class Program
             CommandNameTransform = NameTransform.DashCase,
             UsageWriter = new UsageWriter()
             {
-                // Since all the commands have an automatic "-Help" argument, show the instruction
-                // how to get help on a command.
-                IncludeCommandHelpInstruction = true,
                 // Show the application description before the command list.
                 IncludeApplicationDescriptionBeforeCommandList = true,
             },
         };
 
-        // Create a CommandManager for the commands in the current assembly.
+        // Create a CommandManager for the commands in the current assembly. We use the manager we
+        // defined to use source generation, which allows trimming even when using commands.
         //
         // In addition to our commands, it will also have an automatic "version" command (this can
         // be disabled with the options).
-        var manager = new CommandManager(options);
+        var manager = new GeneratedManager(options);
 
         // Run the command indicated in the first argument to this application, and use the return
         // value of its Run method as the application exit code. If the command could not be

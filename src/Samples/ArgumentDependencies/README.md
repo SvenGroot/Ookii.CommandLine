@@ -1,9 +1,9 @@
 # Argument dependencies sample
 
-This sample shows how to use the argument dependency validators. These validators let you specify
-that certain arguments must or cannot be used together. It also makes it possible to specify that
-the user must use one of a set of arguments, something that can't be expressed with regular
-required arguments.
+This sample shows how to use the [argument dependency validators](../../../docs/Validation.md#argument-dependencies-and-restrictions).
+These validators let you specify that certain arguments must or cannot be used together. It also
+makes it possible to specify that the user must use one of a set of arguments, something that can't
+be expressed with regular required arguments.
 
 The validators in question are the [`RequiresAttribute`][], the [`ProhibitsAttribute`][], and the
 [`RequiresAnyAttribute`][]. You can see them in action in
@@ -47,9 +47,9 @@ validators like [`ValidateRangeAttribute`][]), and all the included validators c
 case-by-case basis with the [`IncludeInUsageHelp`][IncludeInUsageHelp_0] property on each validator
 attribute.
 
-[`ProhibitsAttribute`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_Validation_ProhibitsAttribute.htm
-[`RequiresAnyAttribute`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_Validation_RequiresAnyAttribute.htm
-[`RequiresAttribute`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_Validation_RequiresAttribute.htm
-[`UsageWriter.IncludeValidatorsInDescription`]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_UsageWriter_IncludeValidatorsInDescription.htm
-[`ValidateRangeAttribute`]: https://www.ookii.org/docs/commandline-3.1/html/T_Ookii_CommandLine_Validation_ValidateRangeAttribute.htm
-[IncludeInUsageHelp_0]: https://www.ookii.org/docs/commandline-3.1/html/P_Ookii_CommandLine_Validation_ArgumentValidationWithHelpAttribute_IncludeInUsageHelp.htm
+[`ProhibitsAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Validation_ProhibitsAttribute.htm
+[`RequiresAnyAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Validation_RequiresAnyAttribute.htm
+[`RequiresAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Validation_RequiresAttribute.htm
+[`UsageWriter.IncludeValidatorsInDescription`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_UsageWriter_IncludeValidatorsInDescription.htm
+[`ValidateRangeAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Validation_ValidateRangeAttribute.htm
+[IncludeInUsageHelp_0]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_Validation_ArgumentValidationWithHelpAttribute_IncludeInUsageHelp.htm

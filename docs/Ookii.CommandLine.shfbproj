@@ -31,15 +31,21 @@
   Provides functionality for creating applications with multiple subcommands, each with their own arguments.
 &lt;/para&gt;</NamespaceSummaryItem>
       <NamespaceSummaryItem name="Ookii.CommandLine.Terminal" isDocumented="True">&lt;para&gt;
-  Provides helpers for supporting virtual terminal sequences and color output.
+  Provides helpers for using virtual terminal sequences and color output on the console.
 &lt;/para&gt;</NamespaceSummaryItem>
       <NamespaceSummaryItem name="Ookii.CommandLine.Validation" isDocumented="True">&lt;para&gt;
   Provides attributes used to validate the value of arguments, and the relation between arguments.
 &lt;/para&gt;</NamespaceSummaryItem>
+      <NamespaceSummaryItem name="Ookii.CommandLine.Conversion" isDocumented="True">&lt;para&gt;
+  Provides functionality for converting argument strings from the command line to the actual type of an argument.
+&lt;/para&gt;</NamespaceSummaryItem>
+      <NamespaceSummaryItem name="Ookii.CommandLine.Support" isDocumented="True">&lt;para&gt;
+  Provides types to support source generation. Types in this namespace should not be used directly in your code.
+&lt;/para&gt;</NamespaceSummaryItem>
     </NamespaceSummaries>
     <CopyrightHref>https://github.com/SvenGroot/Ookii.CommandLine</CopyrightHref>
     <CopyrightText>Copyright &amp;#169%3b Sven Groot %28Ookii.org%29</CopyrightText>
-    <HelpTitle>Ookii.CommandLine 3.1 documentation</HelpTitle>
+    <HelpTitle>Ookii.CommandLine 4.0 documentation</HelpTitle>
     <NamingMethod>MemberName</NamingMethod>
     <PresentationStyle>Default2022</PresentationStyle>
     <SyntaxFilters>C#, Visual Basic, Visual Basic Usage, Managed C++</SyntaxFilters>
@@ -84,6 +90,8 @@
 &amp;lt%3bpara&amp;gt%3b
   Functionality for creating applications that support multiple subcommands, where each command has its own arguments, is provided by the &amp;lt%3bsee cref=&amp;quot%3bT:Ookii.CommandLine.Commands.CommandManager&amp;quot%3b/&amp;gt%3b class.
 &amp;lt%3b/para&amp;gt%3b</ProjectSummary>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <!-- There are no properties for these groups.  AnyCPU needs to appear in
        order for Visual Studio to perform the build.  The others are optional

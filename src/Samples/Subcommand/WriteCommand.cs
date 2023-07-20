@@ -1,16 +1,13 @@
 ﻿using Ookii.CommandLine;
 using Ookii.CommandLine.Commands;
+using Ookii.CommandLine.Conversion;
 using Ookii.CommandLine.Validation;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.IO;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace SubcommandSample;
 
-// This is a sample subcommand that can be invoked by specifying "read" as the first argument
+// This is a sample subcommand that can be invoked by specifying "write" as the first argument
 // to the sample application.
 //
 // Subcommand argument parsing works just like a regular command line argument class. After the
@@ -21,43 +18,37 @@ namespace SubcommandSample;
 // IAsyncCommand ourselves.
 //
 // Check the Program.cs file to see how this command is invoked.
+[GeneratedParser]
 [Command]
 [Description("Writes lines to a file, wrapping them to the specified width.")]
-[ParseOptions(ArgumentNameTransform = NameTransform.PascalCase)]
-class WriteCommand : AsyncCommandBase
+partial class WriteCommand : AsyncCommandBase
 {
-    private readonly FileInfo _path;
-
-    // The constructor is used to define the path argument. Since it's a required argument, it's
-    // good to use a non-nullable reference type, but FileInfo doesn't have a good default to
-    // initialize a property with. So, we use the constructor.
-    //
-    // The NameTransform makes sure the argument matches the naming style of the other arguments.
-    public WriteCommand([Description("The name of the file to write to.")] FileInfo path)
-    {
-        _path = path;
-    }
-
+    // A required, positional argument to specify the file name.
+    [CommandLineArgument(IsPositional = true)]
+    [Description("The path of the file to write to.")]
+    public required FileInfo Path { get; set; }
 
     // Positional multi-value argument to specify the text to write
-    [CommandLineArgument(Position = 1)]
+    [CommandLineArgument(IsPositional = true)]
     [Description("The lines of text to write to the file; if no lines are specified, this application will read from standard input instead.")]
     public string[]? Lines { get; set; }
 
     // An argument to specify the encoding.
-    // Because Encoding doesn't have a default TypeConverter, we use a custom one provided in
+    // Because Encoding doesn't have a default ArgumentConverter, we use a custom one provided in
     // this sample.
-    [CommandLineArgument]
+    // Encoding's ToString() implementation just gives the class name, so don't include the default
+    // value in the usage help; we'll write it ourself instead.
+    [CommandLineArgument(IncludeDefaultInUsageHelp = false)]
     [Description("The encoding to use to write the file. Default value: utf-8.")]
-    [TypeConverter(typeof(EncodingConverter))]
+    [ArgumentConverter(typeof(EncodingConverter))]
     public Encoding Encoding { get; set; } = Encoding.UTF8;
 
     // An argument that specifies the maximum line length of the output.
-    [CommandLineArgument(DefaultValue = 79)]
+    [CommandLineArgument]
     [Description("The maximum length of the lines in the file, or 0 to have no limit.")]
     [Alias("Length")]
     [ValidateRange(0, null)]
-    public int MaximumLineLength { get; set; }
+    public int MaximumLineLength { get; set; } = 79;
 
     // A switch argument that indicates it's okay to overwrite files.
     [CommandLineArgument]
@@ -70,7 +61,7 @@ class WriteCommand : AsyncCommandBase
         try
         {
             // Check if we're allowed to overwrite the file.
-            if (!Overwrite && _path.Exists)
+            if (!Overwrite && Path.Exists)
             {
                 // The Main method will return the exit status to the operating system. The numbers
                 // are made up for the sample, they don't mean anything. Usually, 0 means success,
@@ -87,7 +78,7 @@ class WriteCommand : AsyncCommandBase
                 Options = FileOptions.Asynchronous
             };
 
-            using var writer = new StreamWriter(_path.FullName, Encoding, options);
+            using var writer = new StreamWriter(Path.FullName, Encoding, options);
 
             // We use a LineWrappingTextWriter to neatly white-space wrap the output.
             using var lineWriter = new LineWrappingTextWriter(writer, MaximumLineLength);

@@ -11,9 +11,10 @@ public partial class App : Application
 {
     protected override void OnStartup(StartupEventArgs e)
     {
-        // Use the CommandLineParser<T> class, instead of the static CommandLineParser.Parse<T>
-        // method, so we can manually handle errors.
-        var parser = new CommandLineParser<Arguments>();
+        // Use the CommandLineParser<T> class, instead of the static Parse() method, so we can
+        // manually handle errors. The GeneratedParserAttribute generates a CreateParser() method
+        // for this purpose.
+        var parser = Arguments.CreateParser();
         try
         {
             var args = parser.Parse(e.Args);
