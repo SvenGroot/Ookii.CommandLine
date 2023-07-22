@@ -147,7 +147,8 @@ class Arguments
 You can now do this:
 
 ```csharp
-class Arguments
+[GeneratedParser]
+partial class Arguments
 {
     [CommandLineArgument(IsPositional = true)]
     public string? SomeArgument { get; set; }
