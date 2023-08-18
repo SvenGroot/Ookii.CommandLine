@@ -21,7 +21,9 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: 7.0.x
+        # Workaround for https://github.com/microsoft/vstest/issues/4549 with 7.0.400.
+        # Revert once a newer version is available.
+        dotnet-version: 7.0.307
     - name: Restore dependencies
       run: dotnet restore src
     - name: Build
