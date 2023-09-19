@@ -26,7 +26,7 @@ namespace Ookii.CommandLine.Validation;
 /// </para>
 /// </remarks>
 /// <threadsafety static="true" instance="true"/>
-[AttributeUsage(AttributeTargets.Property | AttributeTargets.Method | AttributeTargets.Parameter)]
+[AttributeUsage(AttributeTargets.Property | AttributeTargets.Method)]
 public abstract class ArgumentValidationAttribute : Attribute
 {
     /// <summary>

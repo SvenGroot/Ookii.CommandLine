@@ -17,7 +17,7 @@ namespace Ookii.CommandLine.Conversion;
 /// </para>
 /// </remarks>
 /// <threadsafety static="true" instance="true"/>
-[AttributeUsage(AttributeTargets.Property | AttributeTargets.Parameter)]
+[AttributeUsage(AttributeTargets.Property | AttributeTargets.Method)]
 public class KeyValueSeparatorAttribute : Attribute
 {
     private readonly string _separator;

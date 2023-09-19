@@ -30,7 +30,7 @@ namespace Ookii.CommandLine;
 /// </para>
 /// </remarks>
 /// <threadsafety static="true" instance="true"/>
-[AttributeUsage(AttributeTargets.Property | AttributeTargets.Parameter, AllowMultiple = true)]
+[AttributeUsage(AttributeTargets.Property | AttributeTargets.Method, AllowMultiple = true)]
 public sealed class ShortAliasAttribute : Attribute
 {
     private readonly char _alias;
