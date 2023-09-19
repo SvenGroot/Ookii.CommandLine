@@ -1,6 +1,10 @@
 # What’s new in Ookii.CommandLine
 
-## Ookii.CommandLine 4.0 - 2023-07-20
+## Ookii.CommandLine 4.0.1 (2023-09-19)
+
+- Fix an issue where arguments defined by methods could not have aliases.
+
+## Ookii.CommandLine 4.0 (2023-07-20)
 
 **IMPORTANT:** Version 4.0 contains breaking changes. If you are upgrading from version 2.x or 3.x,
 please check the [migration guide](Migrating.md).
@@ -51,12 +55,12 @@ please check the [migration guide](Migrating.md).
 - [Source link](https://github.com/dotnet/sourcelink) integration.
 - Various bug fixes and minor improvements.
 
-## Ookii.CommandLine 3.1.1 - 2023-03-29
+## Ookii.CommandLine 3.1.1 (2023-03-29)
 
 - .Net Standard 2.0: use the System.Memory package to remove some downlevel-only code.
 - There are no changes for the .Net Standard 2.1 and .Net 6.0 assemblies.
 
-## Ookii.CommandLine 3.1 - 2023-03-21
+## Ookii.CommandLine 3.1 (2023-03-21)
 
 - Added an instance [`CommandLineParser<T>.ParseWithErrorHandling()`][] method, which handles errors
   and displays usage help the same way as the static [`Parse<T>()`][Parse<T>()_1] method, but allows access to more
@@ -79,7 +83,7 @@ please check the [migration guide](Migrating.md).
     writer yet.
   - Some minor bug fixes.
 
-## Ookii.CommandLine 3.0 - 2022-12-01
+## Ookii.CommandLine 3.0 (2022-12-01)
 
 **IMPORTANT:** Several of the changes in version 3.0 are *breaking changes*. There are breaking API
 changes as well as several behavior changes. In general, it's not expected that you'll need to make
@@ -144,7 +148,7 @@ existing application.
 - No longer targets .Net Framework 2.0
   - Now targets .Net Standard 2.0, .Net Standard 2.1, and .Net 6.0 and later.
 
-## Ookii.CommandLine 2.4 - 2022-09-01
+## Ookii.CommandLine 2.4 (2022-09-01)
 
 - Ookii.CommandLine now comes in a .Net 6.0 version that fully supports nullable reference types
   (.Net Framework 2.0 and .Net Standard 2.0 versions are also still provided).
@@ -156,18 +160,18 @@ existing application.
 - Arguments can indicate they cancel parsing to make adding a `-Help` or `-?` argument easier.
 - Some small bug fixes.
 
-## Ookii.CommandLine 2.3 - 2019-09-05
+## Ookii.CommandLine 2.3 (2019-09-05)
 
 - Ookii.CommandLine now comes in both a .Net Framework 2.0 and .Net Standard 2.0 version.
 
-## Ookii.CommandLine 2.2 - 2013-02-06
+## Ookii.CommandLine 2.2 (2013-02-06)
 
 - Added support for alternative names (aliases) for command line arguments.
 - An argument’s aliases and default value can be included in the argument description when
   generating usage.
 - Added code snippets.
 
-## Ookii.CommandLine 2.1 - 2012-02-19
+## Ookii.CommandLine 2.1 (2012-02-19)
 
 - Added support for dictionary arguments; these are special multi-value arguments whose values take
   the form key=value.
@@ -187,7 +191,7 @@ existing application.
 - Shell commands can use custom argument parsing.
 - Various minor bug fixes.
 
-## Ookii.CommandLine 2.0 - 2011-08-13
+## Ookii.CommandLine 2.0 (2011-08-13)
 
 - Improved argument parsing:
   - All arguments can be specified by name.
