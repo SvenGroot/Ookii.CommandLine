@@ -48,7 +48,7 @@ namespace Ookii.CommandLine;
 /// </para>
 /// </remarks>
 /// <threadsafety static="true" instance="true"/>
-[AttributeUsage(AttributeTargets.Property | AttributeTargets.Parameter)]
+[AttributeUsage(AttributeTargets.Property)]
 public class MultiValueSeparatorAttribute : Attribute
 {
     private readonly string? _separator;

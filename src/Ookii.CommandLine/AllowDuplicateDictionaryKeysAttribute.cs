@@ -25,7 +25,7 @@ namespace Ookii.CommandLine;
 /// </remarks>
 /// <threadsafety static="true" instance="true"/>
 /// <seealso cref="DictionaryArgumentInfo.AllowDuplicateKeys" qualifyHint="true"/>
-[AttributeUsage(AttributeTargets.Property | AttributeTargets.Parameter)]
+[AttributeUsage(AttributeTargets.Property)]
 public sealed class AllowDuplicateDictionaryKeysAttribute : Attribute
 {
 }

@@ -736,13 +736,13 @@ public partial class CommandLineParserTest
         Assert.AreEqual(7, result.Arg2);
         Assert.AreEqual(8, result.Arg1);
         Assert.IsTrue(result.Switch1);
-        Assert.IsFalse(result.Switch2);
+        Assert.IsFalse(LongShortArguments.Switch2Value);
         Assert.IsFalse(result.Switch3);
 
         // Combine switches.
         result = CheckSuccess(parser, new[] { "-su" });
         Assert.IsTrue(result.Switch1);
-        Assert.IsFalse(result.Switch2);
+        Assert.IsFalse(LongShortArguments.Switch2Value);
         Assert.IsTrue(result.Switch3);
 
         // Use a short alias.

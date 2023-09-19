@@ -63,7 +63,7 @@ Usage: test [/arg1] <String> [[/other] <Number>] [[/notSwitch] <Boolean>] [[/Arg
     -S, --Switch1 [<Boolean>]
             Switch1 description.
 
-    -k, --Switch2 [<Boolean>]
+    -k, --Switch2 [<Boolean>] (-x, --Switch2Alias)
             Switch2 description.
 
     -u [<Boolean>]
@@ -94,7 +94,7 @@ Usage: test [/arg1] <String> [[/other] <Number>] [[/notSwitch] <Boolean>] [[/Arg
     -S, --Switch1 [<Boolean>]
             Switch1 description.
 
-    -k, --Switch2 [<Boolean>]
+    -k, --Switch2 [<Boolean>] (-x, --Switch2Alias)
             Switch2 description.
 
     -u [<Boolean>]
@@ -125,7 +125,7 @@ Usage: test [/arg1] <String> [[/other] <Number>] [[/notSwitch] <Boolean>] [[/Arg
     -S, --Switch1 [<Boolean>]
             Switch1 description.
 
-    -k, --Switch2 [<Boolean>]
+    -k, --Switch2 [<Boolean>] (-x, --Switch2Alias)
             Switch2 description.
 
     -u [<Boolean>]
@@ -290,7 +290,7 @@ Usage: test [-arg1] <String> [[-other] <Number>] [[-notSwitch] <Boolean>] [[-Arg
     [32m-S, --Switch1 [<Boolean>][0m
             Switch1 description.
 
-    [32m-k, --Switch2 [<Boolean>][0m
+    [32m-k, --Switch2 [<Boolean>] (-x, --Switch2Alias)[0m
             Switch2 description.
 
     [32m-u [<Boolean>][0m
@@ -417,7 +417,7 @@ You must use at least one of: -Address, -Path.
     -S, --Switch1 [<Boolean>]
             Switch1 description.
 
-    -k, --Switch2 [<Boolean>]
+    -k, --Switch2 [<Boolean>] (-x, --Switch2Alias)
             Switch2 description.
 
     -u [<Boolean>]
@@ -436,7 +436,7 @@ You must use at least one of: -Address, -Path.
     -u [<Boolean>]
             Switch3 description.
 
-    -k, --Switch2 [<Boolean>]
+    -k, --Switch2 [<Boolean>] (-x, --Switch2Alias)
             Switch2 description.
 
     -S, --Switch1 [<Boolean>]
@@ -476,7 +476,7 @@ You must use at least one of: -Address, -Path.
     -f, --foo <Int32>
             Foo description. Default value: 0.
 
-    -k, --Switch2 [<Boolean>]
+    -k, --Switch2 [<Boolean>] (-x, --Switch2Alias)
             Switch2 description.
 
     -S, --Switch1 [<Boolean>]
@@ -501,7 +501,7 @@ You must use at least one of: -Address, -Path.
     -S, --Switch1 [<Boolean>]
             Switch1 description.
 
-    -k, --Switch2 [<Boolean>]
+    -k, --Switch2 [<Boolean>] (-x, --Switch2Alias)
             Switch2 description.
 
     -f, --foo <Int32>
@@ -541,7 +541,7 @@ You must use at least one of: -Address, -Path.
     -Switch1 [<Boolean>]
         Switch1 description.
 
-    -Switch2 [<Boolean>]
+    -Switch2 [<Boolean>] (-Switch2Alias)
         Switch2 description.
 
     -Switch3 [<Boolean>]
@@ -560,7 +560,7 @@ You must use at least one of: -Address, -Path.
     -Switch3 [<Boolean>]
         Switch3 description.
 
-    -Switch2 [<Boolean>]
+    -Switch2 [<Boolean>] (-Switch2Alias)
         Switch2 description.
 
     -Switch1 [<Boolean>]

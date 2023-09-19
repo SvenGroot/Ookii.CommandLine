@@ -227,6 +227,8 @@ partial class CultureArguments
 [ParseOptions(Mode = ParsingMode.LongShort)]
 partial class LongShortArguments
 {
+    public static bool Switch2Value { get; set; }
+
     [CommandLineArgument, ShortAlias('c')]
     [Description("Arg1 description.")]
     public int Arg1 { get; set; }
@@ -240,8 +242,13 @@ partial class LongShortArguments
     public bool Switch1 { get; set; }
 
     [CommandLineArgument(ShortName = 'k')]
+    [Alias("Switch2Alias")]
+    [ShortAlias('x')]
     [Description("Switch2 description.")]
-    public bool Switch2 { get; set; }
+    public static void Switch2(bool value)
+    {
+        Switch2Value = value;
+    }
 
     [CommandLineArgument(ShortName = 'u', IsLong = false)]
     [Description("Switch3 description.")]
