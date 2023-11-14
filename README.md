@@ -154,7 +154,7 @@ The .Net 7.0 version has additional support for `required` properties, and can u
 
 To build Ookii.CommandLine, make sure you have the following installed:
 
-- [Microsoft .Net 7.0 SDK](https://dotnet.microsoft.com/download) or later
+- [Microsoft .Net 8.0 SDK](https://dotnet.microsoft.com/download) or later
 - [Microsoft PowerShell 6 or later](https://github.com/PowerShell/PowerShell)
 
 PowerShell is used to generate some source files during the build. Besides installing it normally,
@@ -164,8 +164,9 @@ To build the library, tests and samples, simply use the `dotnet build` command i
 directory. You can run the unit tests using `dotnet test`. The tests should pass on all platforms
 (Windows and Linux have been tested).
 
-The tests are built and run for .Net 7.0, .Net 6.0, and .Net Framework 4.8. Running the .Net
-Framework tests on a non-Windows platform may require the use of [Mono](https://www.mono-project.com/).
+The tests are built and run for .Net 8.0, .Net 7.0, .Net 6.0, and .Net Framework 4.8. Running the
+.Net Framework tests on a non-Windows platform may require the use of
+[Mono](https://www.mono-project.com/).
 
 Ookii.CommandLine uses a strongly-typed resources file, which will not update correctly unless the
 `Resources.resx` file is edited with [Microsoft Visual Studio](https://visualstudio.microsoft.com/).
