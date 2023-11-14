@@ -62,7 +62,7 @@ library for .Net applications.
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="System.Collections.Immutable" Version="7.0.0" Condition="'$(TargetFramework)'=='netstandard2.0' Or '$(TargetFramework)'=='netstandard2.1'" />
+    <PackageReference Include="System.Collections.Immutable" Version="8.0.0" Condition="'$(TargetFramework)'=='netstandard2.0' Or '$(TargetFramework)'=='netstandard2.1'" />
     <PackageReference Include="System.Memory" Version="4.5.5" Condition="'$(TargetFramework)'=='netstandard2.0'" />
   </ItemGroup>
 
