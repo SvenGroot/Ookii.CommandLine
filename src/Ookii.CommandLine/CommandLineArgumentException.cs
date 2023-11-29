@@ -116,6 +116,9 @@ public class CommandLineArgumentException : Exception
     /// <summary>
     /// Initializes a new instance of the <see cref="CommandLineArgumentException"/> class with serialized data. 
     /// </summary>
+#if NET8_0_OR_GREATER
+    [Obsolete("This API supports obsolete formatter-based serialization. It should not be called or extended by application code.")]
+#endif
     protected CommandLineArgumentException(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context)
         : base(info, context)
     {
@@ -154,6 +157,9 @@ public class CommandLineArgumentException : Exception
     /// <exception cref="ArgumentNullException"><paramref name="info"/> is <see langword="null"/>.</exception>
 #if !NET6_0_OR_GREATER
     [SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.SerializationFormatter)]
+#endif
+#if NET8_0_OR_GREATER
+    [Obsolete("This API supports obsolete formatter-based serialization. It should not be called or extended by application code.")]
 #endif
     public override void GetObjectData(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context)
     {
