@@ -115,7 +115,7 @@ partial class AsyncCancelableCommand : IAsyncCancelableCommand
     public async Task<int> RunAsync(CancellationToken cancellationToken)
     {
         await Task.Delay(Value, cancellationToken);
-        return 0;
+        return 10;
     }
 }
 

@@ -353,6 +353,9 @@ public partial class SubCommandTest
         var manager = CreateManager(kind);
         await Assert.ThrowsExceptionAsync<TaskCanceledException>(
             async () => await manager.RunCommandAsync(["AsyncCancelableCommand", "10000"], source.Token));
+
+        // Command works if not passed a token.
+        Assert.AreEqual(10, await manager.RunCommandAsync(["AsyncCancelableCommand", "10"]));
     }
 
 
