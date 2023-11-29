@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Ookii.CommandLine.Commands;
@@ -34,6 +35,10 @@ namespace Ookii.CommandLine.Commands;
 ///   Subcommand classes are instantiated using the <see cref="CommandLineParser"/> class, and
 ///   follow the same rules as command line arguments classes, unless they implement the
 ///   <see cref="ICommandWithCustomParsing"/> interface.
+/// </para>
+/// <para>
+///   Subcommands can be asynchronous by implementing the <see cref="IAsyncCommand"/> or
+///   <see cref="IAsyncCancelableCommand"/> interface.
 /// </para>
 /// <para>
 ///   Commands can be defined in a single assembly, or in multiple assemblies.
@@ -714,21 +719,34 @@ public class CommandManager
         return RunCommand(Environment.GetCommandLineArgs().AsMemory(1));
     }
 
-    /// <inheritdoc cref="RunCommand(string?, ReadOnlyMemory{string})"/>
+    /// <inheritdoc cref="RunCommandAsync(string?, ReadOnlyMemory{string}, CancellationToken)"/>
+    public async Task<int?> RunCommandAsync(string? commandName, ReadOnlyMemory<string> args)
+        => await RunCommandAsync(commandName, args, CancellationToken.None);
+
     /// <summary>
     /// Finds and instantiates the subcommand with the specified name, and if it succeeds,
     /// runs it asynchronously. If it fails, writes error and usage information.
     /// </summary>
+    /// <param name="commandName">The name of the command.</param>
+    /// <param name="args">The arguments to the command.</param>
+    /// <param name="cancellationToken">
+    /// The token to monitor for cancellation requests. If the command implements the <see cref="IAsyncCancelableCommand"/>
+    /// interface, this token will be forwarded to it.
+    /// </param>
     /// <returns>
     ///   A task representing the asynchronous run operation. The result is the value returned
-    ///   by <see cref="IAsyncCommand.RunAsync" qualifyHint="true"/>, or <see langword="null"/> if the command
+    ///   by <see cref="IAsyncCommand.RunAsync" qualifyHint="true"/>,
+    ///   <see cref="IAsyncCancelableCommand.RunAsync" qualifyHint="true"/>,
+    ///   <see cref="ICommand.Run" qualifyHint="true"/>, or <see langword="null"/> if the command
     ///   could not be created.
     /// </returns>
     /// <remarks>
     /// <para>
     ///   This function creates the command by invoking the <see cref="CreateCommand(string?, ReadOnlyMemory{string})"/>
-    ///   method. If the command implements the <see cref="IAsyncCommand"/> interface, it
-    ///   invokes the <see cref="IAsyncCommand.RunAsync" qualifyHint="true"/> method; otherwise, it invokes the
+    ///   method. If the command implements the <see cref="IAsyncCancelableCommand"/> interface, it
+    ///   invokes the <see cref="IAsyncCancelableCommand.RunAsync" qualifyHint="true"/> method; if
+    ///   the command implements the <see cref="IAsyncCommand"/> interface, it invokes the
+    ///   <see cref="IAsyncCommand.RunAsync" qualifyHint="true"/> method; otherwise, it invokes the
     ///   <see cref="ICommand.Run" qualifyHint="true"/> method on the command.
     /// </para>
     /// <para>
@@ -750,32 +768,38 @@ public class CommandManager
     ///   whether the version command is included.
     /// </para>
     /// </remarks>
-    public async Task<int?> RunCommandAsync(string? commandName, ReadOnlyMemory<string> args)
-    {
-        var command = CreateCommand(commandName, args);
-        if (command is IAsyncCommand asyncCommand)
-        {
-            return await asyncCommand.RunAsync();
-        }
+    public async Task<int?> RunCommandAsync(string? commandName, ReadOnlyMemory<string> args, CancellationToken cancellationToken)
+        // These functions must be overloads (not using default params) for binary compatibility with v4.0.
+        => await RunCommandAsync(CreateCommand(commandName, args), cancellationToken);
 
-        return command?.Run();
-    }
+    /// <inheritdoc cref="RunCommandAsync(string?, string[], CancellationToken)"/>
+    public async Task<int?> RunCommandAsync(string? commandName, string[] args)
+        => await RunCommandAsync(commandName, args, CancellationToken.None);
 
-    /// <inheritdoc cref="RunCommand(string?, string[])"/>
     /// <summary>
     /// Finds and instantiates the subcommand with the specified name, and if it succeeds,
     /// runs it asynchronously. If it fails, writes error and usage information.
     /// </summary>
+    /// <param name="commandName">The name of the command.</param>
+    /// <param name="args">The arguments to the command.</param>
+    /// <param name="cancellationToken">
+    /// The token to monitor for cancellation requests. If the command implements the <see cref="IAsyncCancelableCommand"/>
+    /// interface, this token will be forwarded to it.
+    /// </param>
     /// <returns>
     ///   A task representing the asynchronous run operation. The result is the value returned
-    ///   by <see cref="IAsyncCommand.RunAsync" qualifyHint="true"/>, or <see langword="null"/> if the command
+    ///   by <see cref="IAsyncCommand.RunAsync" qualifyHint="true"/>,
+    ///   <see cref="IAsyncCancelableCommand.RunAsync" qualifyHint="true"/>,
+    ///   <see cref="ICommand.Run" qualifyHint="true"/>, or <see langword="null"/> if the command
     ///   could not be created.
     /// </returns>
     /// <remarks>
     /// <para>
     ///   This function creates the command by invoking the <see cref="CreateCommand(string?, string[])"/>
-    ///   method. If the command implements the <see cref="IAsyncCommand"/> interface, it
-    ///   invokes the <see cref="IAsyncCommand.RunAsync" qualifyHint="true"/> method; otherwise, it invokes the
+    ///   method. If the command implements the <see cref="IAsyncCancelableCommand"/> interface, it
+    ///   invokes the <see cref="IAsyncCancelableCommand.RunAsync" qualifyHint="true"/> method; if
+    ///   the command implements the <see cref="IAsyncCommand"/> interface, it invokes the
+    ///   <see cref="IAsyncCommand.RunAsync" qualifyHint="true"/> method; otherwise, it invokes the
     ///   <see cref="ICommand.Run" qualifyHint="true"/> method on the command.
     /// </para>
     /// <para>
@@ -797,31 +821,40 @@ public class CommandManager
     ///   whether the version command is included.
     /// </para>
     /// </remarks>
-    public async Task<int?> RunCommandAsync(string? commandName, string[] args)
-    {
-        var command = CreateCommand(commandName, args);
-        if (command is IAsyncCommand asyncCommand)
-        {
-            return await asyncCommand.RunAsync();
-        }
+    public async Task<int?> RunCommandAsync(string? commandName, string[] args, CancellationToken cancellationToken)
+        // These functions must be overloads (not using default params) for binary compatibility with v4.0.
+        => await RunCommandAsync(CreateCommand(commandName, args), cancellationToken);
 
-        return command?.Run();
-    }
+    /// <inheritdoc cref="RunCommandAsync(ReadOnlyMemory{string}, CancellationToken)"/>
+    public async Task<int?> RunCommandAsync(ReadOnlyMemory<string> args)
+        => await RunCommandAsync(args, CancellationToken.None);
 
-    /// <inheritdoc cref="RunCommandAsync(string?, ReadOnlyMemory{string})"/>
     /// <summary>
     /// Finds and instantiates the subcommand with the name from the first argument, and if it
     /// succeeds, runs it asynchronously. If it fails, writes error and usage information.
     /// </summary>
-    /// <remarks>
     /// <param name="args">
     /// The command line arguments, where the first argument is the command name and the remaining
     /// ones are arguments for the command.
     /// </param>
+    /// <param name="cancellationToken">
+    /// The token to monitor for cancellation requests. If the command implements the <see cref="IAsyncCancelableCommand"/>
+    /// interface, this token will be forwarded to it.
+    /// </param>
+    /// <returns>
+    ///   A task representing the asynchronous run operation. The result is the value returned
+    ///   by <see cref="IAsyncCommand.RunAsync" qualifyHint="true"/>,
+    ///   <see cref="IAsyncCancelableCommand.RunAsync" qualifyHint="true"/>,
+    ///   <see cref="ICommand.Run" qualifyHint="true"/>, or <see langword="null"/> if the command
+    ///   could not be created.
+    /// </returns>
+    /// <remarks>
     /// <para>
     ///   This function creates the command by invoking the <see cref="CreateCommand(ReadOnlyMemory{string})"/>
-    ///   method. If the command implements the <see cref="IAsyncCommand"/> interface, it
-    ///   invokes the <see cref="IAsyncCommand.RunAsync" qualifyHint="true"/> method; otherwise, it invokes the
+    ///   method. If the command implements the <see cref="IAsyncCancelableCommand"/> interface, it
+    ///   invokes the <see cref="IAsyncCancelableCommand.RunAsync" qualifyHint="true"/> method; if
+    ///   the command implements the <see cref="IAsyncCommand"/> interface, it invokes the
+    ///   <see cref="IAsyncCommand.RunAsync" qualifyHint="true"/> method; otherwise, it invokes the
     ///   <see cref="ICommand.Run" qualifyHint="true"/> method on the command.
     /// </para>
     /// <para>
@@ -843,18 +876,14 @@ public class CommandManager
     ///   whether the version command is included.
     /// </para>
     /// </remarks>
-    public async Task<int?> RunCommandAsync(ReadOnlyMemory<string> args)
-    {
-        var command = CreateCommand(args);
-        if (command is IAsyncCommand asyncCommand)
-        {
-            return await asyncCommand.RunAsync();
-        }
+    public async Task<int?> RunCommandAsync(ReadOnlyMemory<string> args, CancellationToken cancellationToken)
+        // These functions must be overloads (not using default params) for binary compatibility with v4.0.
+        => await RunCommandAsync(CreateCommand(args), cancellationToken);
 
-        return command?.Run();
-    }
+    /// <inheritdoc cref="RunCommandAsync(string[], CancellationToken)"/>
+    public async Task<int?> RunCommandAsync(string[] args)
+        => await RunCommandAsync(args, CancellationToken.None);
 
-    /// <inheritdoc cref="RunCommandAsync(string?, string[])"/>
     /// <summary>
     /// Finds and instantiates the subcommand with the name from the first argument, and if it
     /// succeeds, runs it asynchronously. If it fails, writes error and usage information.
@@ -863,11 +892,24 @@ public class CommandManager
     /// The command line arguments, where the first argument is the command name and the remaining
     /// ones are arguments for the command.
     /// </param>
+    /// <param name="cancellationToken">
+    /// The token to monitor for cancellation requests. If the command implements the <see cref="IAsyncCancelableCommand"/>
+    /// interface, this token will be forwarded to it.
+    /// </param>
+    /// <returns>
+    ///   A task representing the asynchronous run operation. The result is the value returned
+    ///   by <see cref="IAsyncCommand.RunAsync" qualifyHint="true"/>,
+    ///   <see cref="IAsyncCancelableCommand.RunAsync" qualifyHint="true"/>,
+    ///   <see cref="ICommand.Run" qualifyHint="true"/>, or <see langword="null"/> if the command
+    ///   could not be created.
+    /// </returns>
     /// <remarks>
     /// <para>
     ///   This function creates the command by invoking the <see cref="CreateCommand(string[])"/>
-    ///   method. If the command implements the <see cref="IAsyncCommand"/> interface, it
-    ///   invokes the <see cref="IAsyncCommand.RunAsync" qualifyHint="true"/> method; otherwise, it invokes the
+    ///   method. If the command implements the <see cref="IAsyncCancelableCommand"/> interface, it
+    ///   invokes the <see cref="IAsyncCancelableCommand.RunAsync" qualifyHint="true"/> method; if
+    ///   the command implements the <see cref="IAsyncCommand"/> interface, it invokes the
+    ///   <see cref="IAsyncCommand.RunAsync" qualifyHint="true"/> method; otherwise, it invokes the
     ///   <see cref="ICommand.Run" qualifyHint="true"/> method on the command.
     /// </para>
     /// <para>
@@ -889,30 +931,33 @@ public class CommandManager
     ///   whether the version command is included.
     /// </para>
     /// </remarks>
-    public async Task<int?> RunCommandAsync(string[] args)
-    {
-        var command = CreateCommand(args);
-        if (command is IAsyncCommand asyncCommand)
-        {
-            return await asyncCommand.RunAsync();
-        }
+    public async Task<int?> RunCommandAsync(string[] args, CancellationToken cancellationToken)
+        // These functions must be overloads (not using default params) for binary compatibility with v4.0.
+        => await RunCommandAsync(CreateCommand(args), cancellationToken);
 
-        return command?.Run();
-    }
+    /// <inheritdoc cref="RunCommandAsync(CancellationToken)"/>
+    public async Task<int?> RunCommandAsync()
+        => await RunCommandAsync(CancellationToken.None);
 
     /// <summary>
     /// Finds and instantiates the subcommand using the arguments from the <see cref="Environment.GetCommandLineArgs" qualifyHint="true"/>
     /// method, using the first argument as the command name. If it succeeds, runs the command
     /// asynchronously. If it fails, writes error and usage information.
     /// </summary>
+    /// <param name="cancellationToken">
+    /// The token to monitor for cancellation requests. If the command implements the <see cref="IAsyncCancelableCommand"/>
+    /// interface, this token will be forwarded to it.
+    /// </param>
     /// <returns>
     /// <inheritdoc cref="RunCommandAsync(string?, string[])"/>
     /// </returns>
     /// <remarks>
     /// <para>
     ///   This function creates the command by invoking the <see cref="CreateCommand()"/>
-    ///   method. If the command implements the <see cref="IAsyncCommand"/> interface, it
-    ///   invokes the <see cref="IAsyncCommand.RunAsync" qualifyHint="true"/> method; otherwise, it invokes the
+    ///   method. If the command implements the <see cref="IAsyncCancelableCommand"/> interface, it
+    ///   invokes the <see cref="IAsyncCancelableCommand.RunAsync" qualifyHint="true"/> method; if
+    ///   the command implements the <see cref="IAsyncCommand"/> interface, it invokes the
+    ///   <see cref="IAsyncCommand.RunAsync" qualifyHint="true"/> method; otherwise, it invokes the
     ///   <see cref="ICommand.Run" qualifyHint="true"/> method on the command.
     /// </para>
     /// <para>
@@ -934,16 +979,9 @@ public class CommandManager
     ///   whether the version command is included.
     /// </para>
     /// </remarks>
-    public async Task<int?> RunCommandAsync()
-    {
-        var command = CreateCommand();
-        if (command is IAsyncCommand asyncCommand)
-        {
-            return await asyncCommand.RunAsync();
-        }
-
-        return command?.Run();
-    }
+    public async Task<int?> RunCommandAsync(CancellationToken cancellationToken)
+        // These functions must be overloads (not using default params) for binary compatibility with v4.0.
+        => await RunCommandAsync(CreateCommand(), cancellationToken);
 
     /// <summary>
     /// Writes usage help with a list of all the commands.
@@ -1045,5 +1083,15 @@ public class CommandManager
         }
 
         return commands;
+    }
+
+    private static async Task<int?> RunCommandAsync(ICommand? command, CancellationToken cancellationToken)
+    {
+        return command switch
+        {
+            IAsyncCancelableCommand asyncCancelableCommand => await asyncCancelableCommand.RunAsync(cancellationToken),
+            IAsyncCommand asyncCommand => await asyncCommand.RunAsync(),
+            _ => command?.Run()
+        };
     }
 }

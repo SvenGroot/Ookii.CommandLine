@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Ookii.CommandLine.Tests;
@@ -32,6 +33,7 @@ public partial class SubCommandTest
         VerifyCommands(
             manager.GetCommands(),
             new("AnotherSimpleCommand", typeof(AnotherSimpleCommand), false, "alias"),
+            new("AsyncCancelableCommand", typeof(AsyncCancelableCommand)),
             new("AsyncCommand", typeof(AsyncCommand)),
             new("custom", typeof(CustomParsingCommand), true),
             new("HiddenCommand", typeof(HiddenCommand)),
@@ -103,13 +105,13 @@ public partial class SubCommandTest
         };
 
         var manager = CreateManager(kind, options);
-        var command = (TestCommand?)manager.CreateCommand("test", new[] { "-Argument", "Foo" });
+        var command = (TestCommand?)manager.CreateCommand("test", ["-Argument", "Foo"]);
         Assert.IsNotNull(command);
         Assert.AreEqual(ParseStatus.Success, manager.ParseResult.Status);
         Assert.AreEqual("Foo", command.Argument);
         Assert.AreEqual("", writer.BaseWriter.ToString());
 
-        command = (TestCommand?)manager.CreateCommand(new[] { "test", "-Argument", "Bar" });
+        command = (TestCommand?)manager.CreateCommand(["test", "-Argument", "Bar"]);
         Assert.IsNotNull(command);
         Assert.AreEqual(ParseStatus.Success, manager.ParseResult.Status);
         Assert.AreEqual("Bar", command.Argument);
@@ -121,26 +123,26 @@ public partial class SubCommandTest
         Assert.AreEqual(42, command2.Value);
         Assert.AreEqual("", writer.BaseWriter.ToString());
 
-        var command3 = (CustomParsingCommand?)manager.CreateCommand(new[] { "custom", "hello" });
+        var command3 = (CustomParsingCommand?)manager.CreateCommand(["custom", "hello"]);
         Assert.IsNotNull(command3);
         // None because of custom parsing.
         Assert.AreEqual(ParseStatus.None, manager.ParseResult.Status);
         Assert.AreEqual("hello", command3.Value);
         Assert.AreEqual("", writer.BaseWriter.ToString());
 
-        var versionCommand = manager.CreateCommand(new[] { "version" });
+        var versionCommand = manager.CreateCommand(["version"]);
         Assert.IsNotNull(versionCommand);
         Assert.AreEqual(ParseStatus.Success, manager.ParseResult.Status);
         Assert.AreEqual("", writer.BaseWriter.ToString());
 
         options.AutoVersionCommand = false;
-        versionCommand = manager.CreateCommand(new[] { "version" });
+        versionCommand = manager.CreateCommand(["version"]);
         Assert.IsNull(versionCommand);
         Assert.AreEqual(ParseStatus.None, manager.ParseResult.Status);
         Assert.AreEqual(_expectedUsageNoVersion, writer.BaseWriter.ToString());
 
         ((StringWriter)writer.BaseWriter).GetStringBuilder().Clear();
-        versionCommand = manager.CreateCommand(new[] { "test", "-Foo" });
+        versionCommand = manager.CreateCommand(["test", "-Foo"]);
         Assert.IsNull(versionCommand);
         Assert.AreEqual(ParseStatus.Error, manager.ParseResult.Status);
         Assert.AreEqual(CommandLineArgumentErrorCategory.UnknownArgument, manager.ParseResult.LastException!.Category);
@@ -265,7 +267,7 @@ public partial class SubCommandTest
 
         // This tests whether the command name is included in the help for the command.
         var manager = CreateManager(kind, options);
-        var result = manager.CreateCommand(new[] { "AsyncCommand", "-Help" });
+        var result = manager.CreateCommand(["AsyncCommand", "-Help"]);
         Assert.IsNull(result);
         Assert.AreEqual(ParseStatus.Canceled, manager.ParseResult.Status);
         Assert.AreEqual("Help", manager.ParseResult.ArgumentName);
@@ -330,17 +332,29 @@ public partial class SubCommandTest
     public async Task TestAsyncCommand(ProviderKind kind)
     {
         var manager = CreateManager(kind);
-        var result = await manager.RunCommandAsync(new[] { "AsyncCommand", "5" });
+        var result = await manager.RunCommandAsync(["AsyncCommand", "5"]);
         Assert.AreEqual(5, result);
 
         // RunCommand works but calls Run.
-        result = manager.RunCommand(new[] { "AsyncCommand", "5" });
+        result = manager.RunCommand(["AsyncCommand", "5"]);
         Assert.AreEqual(6, result);
 
         // RunCommandAsync works on non-async tasks.
-        result = await manager.RunCommandAsync(new[] { "AnotherSimpleCommand", "-Value", "5" });
+        result = await manager.RunCommandAsync(["AnotherSimpleCommand", "-Value", "5"]);
         Assert.AreEqual(5, result);
     }
+
+    [TestMethod]
+    [DynamicData(nameof(ProviderKinds), DynamicDataDisplayName = nameof(GetCustomDynamicDataDisplayName))]
+    public async Task TestAsyncCancelableCommand(ProviderKind kind)
+    {
+        var source = new CancellationTokenSource();
+        source.Cancel();
+        var manager = CreateManager(kind);
+        await Assert.ThrowsExceptionAsync<TaskCanceledException>(
+            async () => await manager.RunCommandAsync(["AsyncCancelableCommand", "10000"], source.Token));
+    }
+
 
     [TestMethod]
     public async Task TestAsyncCommandBase()
@@ -363,7 +377,7 @@ public partial class SubCommandTest
             // Using the calling assembly explicitly loads all the commands, including internal,
             // same as the default constructor.
             var mgr = new CommandManager(_commandAssembly);
-            Assert.AreEqual(7, mgr.GetCommands().Count());
+            Assert.AreEqual(8, mgr.GetCommands().Count());
         }
 
         // Explicitly specify the external assembly, which loads only public commands.
@@ -387,6 +401,7 @@ public partial class SubCommandTest
         VerifyCommands(
             manager.GetCommands(),
             new("AnotherSimpleCommand", typeof(AnotherSimpleCommand), false, "alias"),
+            new("AsyncCancelableCommand", typeof(AsyncCancelableCommand)),
             new("AsyncCommand", typeof(AsyncCommand)),
             new("custom", typeof(CustomParsingCommand), true),
             new("external", typeof(ExternalCommand)),
@@ -426,7 +441,7 @@ public partial class SubCommandTest
         Assert.IsNull(command);
 
         manager.Options.ParentCommand = null;
-        var result = manager.RunCommand(new[] { "TestParentCommand", "TestChildCommand", "-Value", "5" });
+        var result = manager.RunCommand(["TestParentCommand", "TestChildCommand", "-Value", "5"]);
         Assert.AreEqual(5, result);
     }
 
@@ -448,17 +463,17 @@ public partial class SubCommandTest
         };
 
         var manager = CreateManager(kind, options);
-        var result = manager.RunCommand(new[] { "TestParentCommand" });
+        var result = manager.RunCommand(["TestParentCommand"]);
         Assert.AreEqual(1, result);
         Assert.AreEqual(_expectedParentCommandUsage, writer.ToString());
 
         ((StringWriter)writer.BaseWriter).GetStringBuilder().Clear();
-        result = manager.RunCommand(new[] { "TestParentCommand", "NestedParentCommand" });
+        result = manager.RunCommand(["TestParentCommand", "NestedParentCommand"]);
         Assert.AreEqual(1, result);
         Assert.AreEqual(_expectedNestedParentCommandUsage, writer.ToString());
 
         ((StringWriter)writer.BaseWriter).GetStringBuilder().Clear();
-        result = manager.RunCommand(new[] { "TestParentCommand", "NestedParentCommand", "NestedParentChildCommand", "-Foo" });
+        result = manager.RunCommand(["TestParentCommand", "NestedParentCommand", "NestedParentChildCommand", "-Foo"]);
         Assert.AreEqual(1, result);
         Assert.AreEqual(_expectedNestedChildCommandUsage, writer.ToString());
     }
@@ -596,6 +611,6 @@ public partial class SubCommandTest
         => new[]
         {
             new object[] { ProviderKind.Reflection },
-            new object[] { ProviderKind.Generated }
+            [ProviderKind.Generated]
         };
 }

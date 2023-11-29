@@ -6,7 +6,7 @@
     <AssemblyTitle>Ookii.CommandLine Unit Tests</AssemblyTitle>
     <Description>Tests for Ookii.CommandLine.</Description>
     <IsPackable>false</IsPackable>
-    <LangVersion>11.0</LangVersion>
+    <LangVersion>12.0</LangVersion>
     <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>ookii.snk</AssemblyOriginatorKeyFile>
