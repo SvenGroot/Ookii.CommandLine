@@ -355,9 +355,13 @@ public partial class SubCommandTest
             async () => await manager.RunCommandAsync(["AsyncCancelableCommand", "10000"], source.Token));
 
         // Command works if not passed a token.
-        Assert.AreEqual(10, await manager.RunCommandAsync(["AsyncCancelableCommand", "10"]));
-    }
+        var result = await manager.RunCommandAsync(["AsyncCancelableCommand", "10"]);
+        Assert.AreEqual(10, result);
 
+        // RunCommand works but calls Run.
+        result = manager.RunCommand(["AsyncCancelableCommand", "5"]);
+        Assert.AreEqual(5, result);
+    }
 
     [TestMethod]
     public async Task TestAsyncCommandBase()

@@ -99,23 +99,16 @@ partial class AsyncCommand : IAsyncCommand
 
 [Command(IsHidden = true)]
 [Description("Async command description.")]
-partial class AsyncCancelableCommand : IAsyncCancelableCommand
+partial class AsyncCancelableCommand : AsyncCancelableCommandBase
 {
     [CommandLineArgument(Position = 0)]
     [Description("Argument description.")]
     public int Value { get; set; }
 
-    public int Run()
-    {
-        // Do something different than RunAsync so the test can differentiate which one was
-        // called.
-        return Value + 1;
-    }
-
-    public async Task<int> RunAsync(CancellationToken cancellationToken)
+    public override async Task<int> RunAsync(CancellationToken cancellationToken)
     {
         await Task.Delay(Value, cancellationToken);
-        return 10;
+        return Value;
     }
 }
 
