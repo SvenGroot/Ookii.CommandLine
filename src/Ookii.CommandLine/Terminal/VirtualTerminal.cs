@@ -1,5 +1,9 @@
-﻿using System;
+﻿using Microsoft.Win32.SafeHandles;
+using System;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
+using Windows.Win32;
+using Windows.Win32.System.Console;
 
 namespace Ookii.CommandLine.Terminal;
 
@@ -26,8 +30,9 @@ public static class VirtualTerminal
     /// <param name="stream">The <see cref="StandardStream"/> to enable VT sequences for.</param>
     /// <returns>
     ///   An instance of the <see cref="VirtualTerminalSupport"/> class that will disable
-    ///   virtual terminal support when disposed or destructed. Use the <see cref="VirtualTerminalSupport.IsSupported" qualifyHint="true"/>
-    ///   property to check if virtual terminal sequences are supported.
+    ///   virtual terminal support when disposed or finalized. Use the
+    ///   <see cref="VirtualTerminalSupport.IsSupported" qualifyHint="true"/> property to check if
+    ///   virtual terminal sequences are supported.
     /// </returns>
     /// <remarks>
     /// <para>
@@ -37,8 +42,12 @@ public static class VirtualTerminal
     ///   environment variable is defined.
     /// </para>
     /// <para>
-    ///   For <see cref="StandardStream.Input" qualifyHint="true"/>, this method does nothing and always returns
-    ///   <see langword="false"/>.
+    ///   If you also want to check for a NO_COLOR environment variable, use the
+    ///   <see cref="EnableColor"/> method instead.
+    /// </para>
+    /// <para>
+    ///   For <see cref="StandardStream.Input" qualifyHint="true"/>, this method does nothing and
+    ///   always returns <see langword="false"/>.
     /// </para>
     /// </remarks>
     public static VirtualTerminalSupport EnableVirtualTerminalSequences(StandardStream stream)
@@ -63,19 +72,16 @@ public static class VirtualTerminal
 
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
-            var (enabled, previousMode) = NativeMethods.EnableVirtualTerminalSequences(stream, true);
-            if (!enabled)
+            var result = SetVirtualTerminalSequences(stream, true);
+            if (result.NeedRestore)
             {
-                return new VirtualTerminalSupport(false);
+                Debug.Assert(result.Supported);
+                return new VirtualTerminalSupport(stream);
             }
 
-            if (previousMode is NativeMethods.ConsoleModes mode)
-            {
-                return new VirtualTerminalSupport(NativeMethods.GetStandardHandle(stream), mode);
-            }
-
-            // Support was already enabled externally, so don't change the console mode on dispose.
-            return new VirtualTerminalSupport(true);
+            // VT sequences are either not supported, or were already enabled so we don't need to
+            // disable them.
+            return new VirtualTerminalSupport(result.Supported);
         }
 
         // Support is assumed on non-Windows platforms if TERM is set.
@@ -194,5 +200,61 @@ public static class VirtualTerminal
 
         type = hasEscape ? StringSegmentType.PartialFormattingOscWithEscape : StringSegmentType.PartialFormattingOsc;
         return -1;
+    }
+
+    internal static (bool Supported, bool NeedRestore) SetVirtualTerminalSequences(StandardStream stream, bool enable)
+    {
+        if (stream == StandardStream.Input)
+        {
+            throw new ArgumentException(Properties.Resources.InvalidStandardStream, nameof(stream));
+        }
+
+        var handle = GetStandardHandle(stream);
+        if (handle.IsInvalid)
+        {
+            return (false, false);
+        }
+
+        if (!PInvoke.GetConsoleMode(handle, out var mode))
+        {
+            return (false, false);
+        }
+
+        var oldMode = mode;
+        if (enable)
+        {
+            mode |= CONSOLE_MODE.ENABLE_VIRTUAL_TERMINAL_PROCESSING;
+        }
+        else
+        {
+            mode &= ~CONSOLE_MODE.ENABLE_VIRTUAL_TERMINAL_PROCESSING;
+        }
+
+        if (oldMode == mode)
+        {
+            return (true, false);
+        }
+
+        if (!PInvoke.SetConsoleMode(handle, mode))
+        {
+            return (false, false);
+        }
+
+        return (true, true);
+    }
+
+    private static SafeFileHandle GetStandardHandle(StandardStream stream)
+    {
+        var stdHandle = stream switch
+        {
+            StandardStream.Output => STD_HANDLE.STD_OUTPUT_HANDLE,
+            StandardStream.Input => STD_HANDLE.STD_INPUT_HANDLE,
+            StandardStream.Error => STD_HANDLE.STD_ERROR_HANDLE,
+            _ => throw new ArgumentException(Properties.Resources.InvalidStandardStream, nameof(stream)),
+        };
+
+        // Generated function uses ownsHandle: false so the standard handle is not closed, as
+        // expected.
+        return PInvoke.GetStdHandle_SafeHandle(stdHandle);
     }
 }

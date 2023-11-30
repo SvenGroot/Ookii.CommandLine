@@ -12,21 +12,18 @@ namespace Ookii.CommandLine.Terminal;
 /// <threadsafety static="true" instance="false"/>
 public sealed class VirtualTerminalSupport : IDisposable
 {
-    private readonly bool _supported;
-    private IntPtr _handle;
-    private readonly NativeMethods.ConsoleModes _previousMode;
+    private StandardStream? _restoreStream;
 
     internal VirtualTerminalSupport(bool supported)
     {
-        _supported = supported;
+        IsSupported = supported;
         GC.SuppressFinalize(this);
     }
 
-    internal VirtualTerminalSupport(IntPtr handle, NativeMethods.ConsoleModes previousMode)
+    internal VirtualTerminalSupport(StandardStream restoreStream)
     {
-        _supported = true;
-        _handle = handle;
-        _previousMode = previousMode;
+        IsSupported = true;
+        _restoreStream = restoreStream;
     }
 
     /// <summary>
@@ -52,7 +49,7 @@ public sealed class VirtualTerminalSupport : IDisposable
     /// <see langword="true"/> if virtual terminal sequences are supported; otherwise,
     /// <see langword="false"/>.
     /// </value>
-    public bool IsSupported => _supported;
+    public bool IsSupported { get; }
 
     /// <summary>
     /// Cleans up resources for the <see cref="VirtualTerminalSupport"/> class.
@@ -73,10 +70,10 @@ public sealed class VirtualTerminalSupport : IDisposable
 
     private void ResetConsoleMode()
     {
-        if (_handle != IntPtr.Zero)
+        if (_restoreStream is StandardStream stream)
         {
-            NativeMethods.SetConsoleMode(_handle, _previousMode);
-            _handle = IntPtr.Zero;
+            VirtualTerminal.SetVirtualTerminalSequences(stream, false);
+            _restoreStream = null;
         }
     }
 }
