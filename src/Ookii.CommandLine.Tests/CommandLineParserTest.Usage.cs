@@ -668,4 +668,35 @@ Usage: test [-arg1] <String> [[-other] <Number>] [[-notSwitch] <Boolean>] [[-Arg
     Displays version information.
 
 ".ReplaceLineEndings();
+
+    private static readonly string _expectedEmptyLineDefaultUsage = @"Usage: test [-Argument <String>] [-Help] [-Version]
+
+    -Argument <String>
+        A description with
+
+a blank line.
+
+    -Help [<Boolean>] (-?, -h)
+        Displays this help message.
+
+    -Version [<Boolean>]
+        Displays version information.
+
+".ReplaceLineEndings();
+
+    private static readonly string _expectedEmptyLineIndentAfterBlankLineUsage = @"Usage: test [-Argument <String>] [-Help] [-Version]
+
+    -Argument <String>
+        A description with
+
+        a blank line.
+
+    -Help [<Boolean>] (-?, -h)
+        Displays this help message.
+
+    -Version [<Boolean>]
+        Displays version information.
+
+".ReplaceLineEndings();
+
 }

@@ -689,3 +689,11 @@ partial class AutoPositionArguments : AutoPositionArgumentsBase
     [CommandLineArgument]
     public int Arg3 { get; set; }
 }
+
+[GeneratedParser]
+partial class EmptyLineDescriptionArguments
+{
+    [CommandLineArgument]
+    [Description("A description with\n\na blank line.")]
+    public string Argument { get; set; }
+}

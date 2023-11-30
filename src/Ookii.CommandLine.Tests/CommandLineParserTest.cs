@@ -461,6 +461,27 @@ public partial class CommandLineParserTest
 
     [TestMethod]
     [DynamicData(nameof(ProviderKinds), DynamicDataDisplayName = nameof(GetCustomDynamicDataDisplayName))]
+    public void TestWriteUsageIndentAfterBlankLine(ProviderKind kind)
+    {
+        var options = new ParseOptions()
+        {
+            UsageWriter = new UsageWriter()
+            {
+                ExecutableName = _executableName,
+            }
+        };
+
+        var target = CreateParser<EmptyLineDescriptionArguments>(kind, options);
+        string actual = target.GetUsage(options.UsageWriter);
+        Assert.AreEqual(_expectedEmptyLineDefaultUsage, actual);
+
+        options.UsageWriter.IndentAfterEmptyLine = true;
+        actual = target.GetUsage(options.UsageWriter);
+        Assert.AreEqual(_expectedEmptyLineIndentAfterBlankLineUsage, actual);
+    }
+
+    [TestMethod]
+    [DynamicData(nameof(ProviderKinds), DynamicDataDisplayName = nameof(GetCustomDynamicDataDisplayName))]
     public void TestStaticParse(ProviderKind kind)
     {
         using var output = new StringWriter();

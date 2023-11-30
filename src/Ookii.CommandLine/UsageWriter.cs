@@ -482,6 +482,29 @@ public class UsageWriter
     public string? CommandName { get; set; }
 
     /// <summary>
+    /// Gets or sets a value which indicates whether a line after an empty line should have
+    /// indentation.
+    /// </summary>
+    /// <value>
+    /// <see langword="true"/> if a line after am empty line should be indented; otherwise,
+    /// <see langword="false"/>. The default value is <see langword="false"/>.
+    /// </value>
+    /// <remarks>
+    /// <para>
+    ///   By default, the <see cref="UsageWriter"/> class will start lines that follow an empty line
+    ///   at the beginning of the line, regardless of the value of the <see cref="SyntaxIndent"/>,
+    ///   <see cref="ArgumentDescriptionIndent"/>, or <see cref="CommandDescriptionIndent"/>
+    ///   property. Set this property to <see langword="true"/> to apply indentation even to lines
+    ///   following an empty line.
+    /// </para>
+    /// <para>
+    ///   This can be useful if you have argument descriptions that contain blank lines when
+    ///   argument descriptions are indented, such as in the default format.
+    /// </para>
+    /// </remarks>
+    public bool IndentAfterEmptyLine { get; set; }
+
+    /// <summary>
     /// Gets or sets a value that indicates whether the usage help should use color.
     /// </summary>
     /// <value>
@@ -2195,6 +2218,7 @@ public class UsageWriter
     {
         try
         {
+            Writer.IndentAfterEmptyLine = IndentAfterEmptyLine;
             if (_parser == null)
             {
                 WriteCommandListUsageCore();
