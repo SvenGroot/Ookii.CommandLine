@@ -106,12 +106,14 @@ public partial class LineWrappingTextWriter : TextWriter
 
     private partial class LineBuffer
     {
+        private readonly LineWrappingTextWriter _writer;
         private readonly RingBuffer _buffer;
         private readonly List<Segment> _segments = new();
         private bool _hasOverflow;
 
-        public LineBuffer(int capacity)
+        public LineBuffer(LineWrappingTextWriter writer, int capacity)
         {
+            _writer = writer;
             _buffer = new(capacity);
         }
 
@@ -260,7 +262,7 @@ public partial class LineWrappingTextWriter : TextWriter
                 _segments.Clear();
             }
 
-            if (!IsContentEmpty)
+            if (_writer.IndentAfterEmptyLine || !IsContentEmpty)
             {
                 Indentation = indent;
             }
@@ -337,7 +339,7 @@ public partial class LineWrappingTextWriter : TextWriter
         if (_maximumLineLength > 0)
         {
             // Add some slack for formatting characters.
-            _lineBuffer = new(countFormatting ? _maximumLineLength : _maximumLineLength * 2);
+            _lineBuffer = new(this, countFormatting ? _maximumLineLength : _maximumLineLength * 2);
         }
     }
 
@@ -419,6 +421,24 @@ public partial class LineWrappingTextWriter : TextWriter
             _indent = value;
         }
     }
+
+    /// <summary>
+    /// Gets or sets a value which indicates whether a line after an empty line should have
+    /// indentation.
+    /// </summary>
+    /// <value>
+    /// <see langword="true"/> if a line after am empty line should be indented; otherwise,
+    /// <see langword="false"/>. The default value is <see langword="false"/>.
+    /// </value>
+    /// <remarks>
+    /// <para>
+    ///   By default, the <see cref="LineWrappingTextWriter"/> class will start lines that follow
+    ///   an empty line at the beginning of the line, regardless of the value of the
+    ///   <see cref="Indent"/> property. Set this property to <see langword="true"/> to apply
+    ///   indentation even to lines following an empty line.
+    /// </para>
+    /// </remarks>
+    public bool IndentAfterEmptyLine { get; set; }
 
     /// <summary>
     /// Gets or sets a value which indicates how to wrap lines at the maximum line length.

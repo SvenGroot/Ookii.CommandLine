@@ -232,4 +232,107 @@ Lorem
     6789012345678901234567890123456789012345678901234567890123456789012345678901
     234567890123456789012345678901234567890123456789".ReplaceLineEndings();
 
+    private static readonly string _expectedIndentAfterEmptyLine = @"
+Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
+    incididunt ut labore et dolore magna aliqua. Donec adipiscing tristique
+    risus nec feugiat in fermentum.
+
+Tincidunt vitae semper quis lectus nulla at volutpat diam ut. Vitae tempus
+    quam pellentesque nec
+    nam aliquam. Porta non pulvinar neque laoreet suspendisse interdum
+    consectetur.
+    Arcu risus quis varius quam. Cursus mattis molestie a iaculis at erat.
+    Malesuada fames ac turpis egestas maecenas pharetra. Fringilla est
+    ullamcorper eget nulla facilisi etiam dignissim diam. Condimentum vitae
+    sapien pellentesque habitant morbi tristique senectus et netus.
+    Augue neque gravida in
+    fermentum et sollicitudin ac orci. Aliquam malesuada bibendum arcu vitae
+    elementum curabitur.
+
+Lorem
+    0123456789012345678901234567890123456789012345678901234567890123456789012345
+    6789012345678901234567890123456789012345678901234567890123456789012345678901
+    234567890123456789012345678901234567890123456789
+
+    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
+    tempor incididunt ut labore et dolore magna aliqua. Donec adipiscing
+    tristique risus nec feugiat in fermentum.
+
+    Tincidunt vitae semper quis lectus nulla at volutpat diam ut. Vitae tempus
+    quam pellentesque nec
+    nam aliquam. Porta non pulvinar neque laoreet suspendisse interdum
+    consectetur.
+    Arcu risus quis varius quam. Cursus mattis molestie a iaculis at erat.
+    Malesuada fames ac turpis egestas maecenas pharetra. Fringilla est
+    ullamcorper eget nulla facilisi etiam dignissim diam. Condimentum vitae
+    sapien pellentesque habitant morbi tristique senectus et netus.
+    Augue neque gravida in
+    fermentum et sollicitudin ac orci. Aliquam malesuada bibendum arcu vitae
+    elementum curabitur.
+
+    Lorem
+    0123456789012345678901234567890123456789012345678901234567890123456789012345
+    6789012345678901234567890123456789012345678901234567890123456789012345678901
+    234567890123456789012345678901234567890123456789
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
+    incididunt ut labore et dolore magna aliqua. Donec adipiscing tristique
+    risus nec feugiat in fermentum.
+
+Tincidunt vitae semper quis lectus nulla at volutpat diam ut. Vitae tempus
+    quam pellentesque nec
+    nam aliquam. Porta non pulvinar neque laoreet suspendisse interdum
+    consectetur.
+    Arcu risus quis varius quam. Cursus mattis molestie a iaculis at erat.
+    Malesuada fames ac turpis egestas maecenas pharetra. Fringilla est
+    ullamcorper eget nulla facilisi etiam dignissim diam. Condimentum vitae
+    sapien pellentesque habitant morbi tristique senectus et netus.
+    Augue neque gravida in
+    fermentum et sollicitudin ac orci. Aliquam malesuada bibendum arcu vitae
+    elementum curabitur.
+
+Lorem
+    0123456789012345678901234567890123456789012345678901234567890123456789012345
+    6789012345678901234567890123456789012345678901234567890123456789012345678901
+    234567890123456789012345678901234567890123456789
+".ReplaceLineEndings();
+
+    private static readonly string _expectedIndentAfterEmptyLineNoLimit = @"
+Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Donec adipiscing tristique risus nec feugiat in fermentum.
+
+Tincidunt vitae semper quis lectus nulla at volutpat diam ut. Vitae tempus
+    quam pellentesque nec
+    nam aliquam. Porta non pulvinar neque laoreet suspendisse interdum consectetur.
+    Arcu risus quis varius quam. Cursus mattis molestie a iaculis at erat. Malesuada fames ac turpis egestas maecenas pharetra. Fringilla est
+    ullamcorper eget nulla facilisi etiam dignissim diam. Condimentum vitae sapien pellentesque habitant morbi tristique senectus et netus.
+    Augue neque gravida in
+    fermentum et sollicitudin ac orci. Aliquam malesuada bibendum arcu vitae elementum curabitur.
+
+Lorem 01234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789
+
+    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Donec adipiscing tristique risus nec feugiat in fermentum.
+
+    Tincidunt vitae semper quis lectus nulla at volutpat diam ut. Vitae tempus
+    quam pellentesque nec
+    nam aliquam. Porta non pulvinar neque laoreet suspendisse interdum consectetur.
+    Arcu risus quis varius quam. Cursus mattis molestie a iaculis at erat. Malesuada fames ac turpis egestas maecenas pharetra. Fringilla est
+    ullamcorper eget nulla facilisi etiam dignissim diam. Condimentum vitae sapien pellentesque habitant morbi tristique senectus et netus.
+    Augue neque gravida in
+    fermentum et sollicitudin ac orci. Aliquam malesuada bibendum arcu vitae elementum curabitur.
+
+    Lorem 01234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Donec adipiscing tristique risus nec feugiat in fermentum.
+
+Tincidunt vitae semper quis lectus nulla at volutpat diam ut. Vitae tempus
+    quam pellentesque nec
+    nam aliquam. Porta non pulvinar neque laoreet suspendisse interdum consectetur.
+    Arcu risus quis varius quam. Cursus mattis molestie a iaculis at erat. Malesuada fames ac turpis egestas maecenas pharetra. Fringilla est
+    ullamcorper eget nulla facilisi etiam dignissim diam. Condimentum vitae sapien pellentesque habitant morbi tristique senectus et netus.
+    Augue neque gravida in
+    fermentum et sollicitudin ac orci. Aliquam malesuada bibendum arcu vitae elementum curabitur.
+
+Lorem 01234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789
+".ReplaceLineEndings();
+
 }

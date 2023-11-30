@@ -408,8 +408,8 @@ public partial class LineWrappingTextWriterTest
     [TestMethod]
     public void TestWrappingMode()
     {
+        using (var writer = LineWrappingTextWriter.ForStringWriter(80))
         {
-            using var writer = LineWrappingTextWriter.ForStringWriter(80);
             writer.Indent = 4;
             writer.WriteLine(_inputWrappingMode);
             writer.Wrapping = WrappingMode.Disabled;
@@ -420,8 +420,8 @@ public partial class LineWrappingTextWriterTest
         }
 
         // Make sure the buffer is cleared if not empty.
+        using (var writer = LineWrappingTextWriter.ForStringWriter(80))
         {
-            using var writer = LineWrappingTextWriter.ForStringWriter(80);
             writer.Indent = 4;
             writer.Write(_inputWrappingMode);
             writer.Wrapping = WrappingMode.Disabled;
@@ -432,8 +432,8 @@ public partial class LineWrappingTextWriterTest
         }
 
         // Test EnabledNoForce
+        using (var writer = LineWrappingTextWriter.ForStringWriter(80))
         {
-            using var writer = LineWrappingTextWriter.ForStringWriter(80);
             writer.Indent = 4;
             writer.Wrapping = WrappingMode.EnabledNoForce;
             writer.Write(_inputWrappingMode);
@@ -443,13 +443,39 @@ public partial class LineWrappingTextWriterTest
             Assert.AreEqual(_expectedWrappingModeNoForce, writer.ToString());
         }
 
-        // Should be false and unchangeable if no maximum length.
+        // Should be disabled and unchangeable if no maximum length.
+        using (var writer = LineWrappingTextWriter.ForStringWriter())
         {
-            using var writer = LineWrappingTextWriter.ForStringWriter();
             Assert.AreEqual(WrappingMode.Disabled, writer.Wrapping);
             writer.Wrapping = WrappingMode.Enabled;
             Assert.AreEqual(WrappingMode.Disabled, writer.Wrapping);
         }
+    }
+
+    [TestMethod]
+    public void TestIndentAfterEmptyLine()
+    {
+        using var writer = LineWrappingTextWriter.ForStringWriter(80);
+        writer.Indent = 4;
+        writer.WriteLine(_input);
+        writer.IndentAfterEmptyLine = true;
+        writer.WriteLine(_input);
+        writer.IndentAfterEmptyLine = false;
+        writer.WriteLine(_input);
+        Assert.AreEqual(_expectedIndentAfterEmptyLine, writer.ToString());
+    }
+
+    [TestMethod]
+    public void TestIndentAfterEmptyLineNoLimit()
+    {
+        using var writer = LineWrappingTextWriter.ForStringWriter();
+        writer.Indent = 4;
+        writer.WriteLine(_input);
+        writer.IndentAfterEmptyLine = true;
+        writer.WriteLine(_input);
+        writer.IndentAfterEmptyLine = false;
+        writer.WriteLine(_input);
+        Assert.AreEqual(_expectedIndentAfterEmptyLineNoLimit, writer.ToString());
     }
 
     [TestMethod]

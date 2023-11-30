@@ -254,7 +254,7 @@ public partial class LineWrappingTextWriter
     private async Task WriteLineBreakDirectAsync(CancellationToken cancellationToken)
     {
         await WriteBlankLineAsync(_baseWriter, cancellationToken);
-        _noWrappingState.IndentNextWrite = _noWrappingState.CurrentLineLength != 0;
+        _noWrappingState.IndentNextWrite = IndentAfterEmptyLine || _noWrappingState.CurrentLineLength != 0;
         _noWrappingState.CurrentLineLength = 0;
     }
 
