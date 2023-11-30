@@ -209,7 +209,8 @@ public static class VirtualTerminal
             throw new ArgumentException(Properties.Resources.InvalidStandardStream, nameof(stream));
         }
 
-        var handle = GetStandardHandle(stream);
+        // Dispose should not close the handle here, but use it anyway.
+        using var handle = GetStandardHandle(stream);
         if (handle.IsInvalid)
         {
             return (false, false);
