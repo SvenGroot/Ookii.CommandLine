@@ -412,6 +412,15 @@ namespace Ookii.CommandLine.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Invalid StandardStream value..
+        /// </summary>
+        internal static string InvalidStandardStreamError {
+            get {
+                return ResourceManager.GetString("InvalidStandardStreamError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Invalid value for the StringComparison enumeration..
         /// </summary>
         internal static string InvalidStringComparison {

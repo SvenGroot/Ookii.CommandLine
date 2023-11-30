@@ -408,4 +408,7 @@
   <data name="TypeIsNotEnumFormat" xml:space="preserve">
     <value>The type '{0}' is not an enumeration type.</value>
   </data>
+  <data name="InvalidStandardStreamError" xml:space="preserve">
+    <value>Invalid StandardStream value.</value>
+  </data>
 </root>
