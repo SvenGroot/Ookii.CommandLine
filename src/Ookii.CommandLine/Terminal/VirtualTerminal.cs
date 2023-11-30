@@ -1,6 +1,7 @@
 ﻿using Microsoft.Win32.SafeHandles;
 using System;
 using System.Diagnostics;
+using System.IO;
 using System.Runtime.InteropServices;
 using Windows.Win32;
 using Windows.Win32.System.Console;
@@ -115,6 +116,57 @@ public static class VirtualTerminal
         return EnableVirtualTerminalSequences(stream);
     }
 
+    /// <summary>
+    /// Writes a line to the standard output stream which, if virtual terminal sequences are
+    /// supported, will use the specified formatting.
+    /// </summary>
+    /// <param name="text">The text to write.</param>
+    /// <param name="textFormat">The formatting that should be applied to the text.</param>
+    /// <param name="reset">
+    /// The VT sequence that should be used to undo the formatting, or <see langword="null"/> to
+    /// use <see cref="TextFormat.Default" qualifyHint="true"/>.
+    /// </param>
+    /// <remarks>
+    /// <para>
+    ///   This method takes care of checking whether VT sequences are supported by using the
+    ///   <see cref="EnableColor"/> method, and on Windows, will reset the console mode afterwards
+    ///   if needed.
+    /// </para>
+    /// <para>
+    ///   The <paramref name="textFormat"/> and <paramref name="reset"/> parameters will be ignored
+    ///   if the 
+    /// </para>
+    /// </remarks>
+    public static void WriteLineFormatted(string text, TextFormat textFormat, TextFormat? reset = null)
+        => WriteLineFormatted(StandardStream.Output, Console.Out, text, textFormat, reset ?? TextFormat.Default);
+
+    /// <summary>
+    /// Writes a line to the standard error stream which, if virtual terminal sequences are
+    /// supported, will use the specified formatting.
+    /// </summary>
+    /// <param name="text">The text to write.</param>
+    /// <param name="textFormat">
+    /// The formatting that should be applied to the text, or <see langword="null"/> to use
+    /// <see cref="TextFormat.ForegroundRed" qualifyHint="true"/>.
+    /// </param>
+    /// <param name="reset">
+    /// The VT sequence that should be used to undo the formatting, or <see langword="null"/> to
+    /// use <see cref="TextFormat.Default" qualifyHint="true"/>.
+    /// </param>
+    /// <remarks>
+    /// <para>
+    ///   This method takes care of checking whether VT sequences are supported by using the
+    ///   <see cref="EnableColor"/> method, and on Windows, will reset the console mode afterwards
+    ///   if needed.
+    /// </para>
+    /// <para>
+    ///   The <paramref name="textFormat"/> and <paramref name="reset"/> parameters will be ignored
+    ///   if the 
+    /// </para>
+    /// </remarks>
+    public static void WriteLineErrorFormatted(string text, TextFormat? textFormat = null, TextFormat? reset = null)
+        => WriteLineFormatted(StandardStream.Error, Console.Error, text, textFormat ?? TextFormat.ForegroundRed, reset ?? TextFormat.Default);
+
     // Returns the index of the character after the end of the sequence.
     internal static int FindSequenceEnd(ReadOnlySpan<char> value, ref StringSegmentType type)
     {
@@ -138,6 +190,23 @@ public static class VirtualTerminal
             StringSegmentType.PartialFormattingOsc or StringSegmentType.PartialFormattingOscWithEscape => FindOscEndPartial(value, ref type),
             _ => throw new ArgumentException("Invalid type for this operation.", nameof(type)),
         };
+    }
+
+    private static void WriteLineFormatted(StandardStream stream, TextWriter writer, string text, TextFormat textFormat, TextFormat reset)
+    {
+        using var support = EnableColor(stream);
+        if (support.IsSupported)
+        {
+            writer.Write(textFormat);
+        }
+
+        writer.Write(text);
+        if (support.IsSupported)
+        {
+            writer.Write(reset);
+        }
+
+        writer.WriteLine();
     }
 
     private static int FindCsiEnd(ReadOnlySpan<char> value, ref StringSegmentType type)

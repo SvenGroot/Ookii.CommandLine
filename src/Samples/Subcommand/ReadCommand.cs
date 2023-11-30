@@ -1,6 +1,7 @@
 ﻿using Ookii.CommandLine;
 using Ookii.CommandLine.Commands;
 using Ookii.CommandLine.Conversion;
+using Ookii.CommandLine.Terminal;
 using System.ComponentModel;
 using System.Text;
 
@@ -58,12 +59,12 @@ partial class ReadCommand : AsyncCommandBase
         }
         catch (IOException ex)
         {
-            Program.WriteErrorMessage(ex.Message);
+            VirtualTerminal.WriteLineErrorFormatted(ex.Message);
             return (int)ExitCode.ReadWriteFailure;
         }
         catch (UnauthorizedAccessException ex)
         {
-            Program.WriteErrorMessage(ex.Message);
+            VirtualTerminal.WriteLineErrorFormatted(ex.Message);
             return (int)ExitCode.ReadWriteFailure;
         }
     }
