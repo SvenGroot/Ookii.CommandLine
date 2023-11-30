@@ -106,6 +106,25 @@ public static class StandardStreamExtensions
     }
 
     /// <summary>
+    /// Gets a value that indicates whether the specified standard stream is redirected.
+    /// </summary>
+    /// <param name="stream">The <see cref="StandardStream"/> value.</param>
+    /// <returns>
+    /// <see langword="true"/> if the standard stream indicated by <paramref name="stream"/> is
+    /// redirected; otherwise, <see langword="false"/>.
+    /// </returns>
+    public static bool IsRedirected(this StandardStream stream)
+    {
+        return stream switch
+        {
+            StandardStream.Output => Console.IsOutputRedirected,
+            StandardStream.Error => Console.IsErrorRedirected,
+            StandardStream.Input => Console.IsInputRedirected,
+            _ => false,
+        };
+    }
+
+    /// <summary>
     /// Gets the <see cref="StandardStream"/> associated with a <see cref="TextReader"/> if that
     /// reader is for the standard input stream.
     /// </summary>

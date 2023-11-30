@@ -53,13 +53,7 @@ public static class VirtualTerminal
     /// </remarks>
     public static VirtualTerminalSupport EnableVirtualTerminalSequences(StandardStream stream)
     {
-        bool supported = stream switch
-        {
-            StandardStream.Output => !Console.IsOutputRedirected,
-            StandardStream.Error => !Console.IsErrorRedirected,
-            _ => false,
-        };
-
+        bool supported = stream != StandardStream.Input && !stream.IsRedirected();
         if (!supported)
         {
             return new VirtualTerminalSupport(false);
