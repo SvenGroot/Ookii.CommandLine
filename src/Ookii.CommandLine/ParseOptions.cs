@@ -811,22 +811,22 @@ public class ParseOptions
 
     internal VirtualTerminalSupport EnableErrorColor()
     {
+        // If colors are forced on or off; don't change terminal mode but return the explicit
+        // support value.
         if (UseErrorColor is bool useErrorColor)
         {
-            // Colors are forced on or off; don't change terminal mode but return the explicit
-            // support value.
             return new VirtualTerminalSupport(useErrorColor);
         }
 
+        // Enable for stderr if no custom error writer.
         if (Error == null)
         {
-            // Enable for stderr if no custom error writer.
             return VirtualTerminal.EnableColor(StandardStream.Error);
         }
 
-        if (Error?.GetStandardStream() is StandardStream stream)
+        // Try to enable it for the std stream associated with the custom writer.
+        if (Error.GetStandardStream() is StandardStream stream)
         {
-            // Try to enable it for the std stream associated with the custom writer.
             return new VirtualTerminalSupport(stream);
         }
 
