@@ -292,6 +292,7 @@ public abstract class CommandLineArgument
         public bool IsRequiredProperty { get; set; }
         public object? DefaultValue { get; set; }
         public bool IncludeDefaultValueInHelp { get; set; }
+        public string? DefaultValueFormat { get; set; }
         public string? Description { get; set; }
         public string? ValueDescription { get; set; }
         public bool AllowNull { get; set; }
@@ -385,6 +386,7 @@ public abstract class CommandLineArgument
         _converter = info.Converter;
         _defaultValue = ConvertToArgumentTypeInvariant(info.DefaultValue);
         IncludeDefaultInUsageHelp = info.IncludeDefaultValueInHelp;
+        DefaultValueFormat = info.DefaultValueFormat;
         _valueDescription = info.ValueDescription;
         _allowNull = info.AllowNull;
         DictionaryInfo = info.DictionaryInfo;
@@ -686,6 +688,19 @@ public abstract class CommandLineArgument
     {
         get { return _defaultValue; }
     }
+
+    /// <summary>
+    /// Gets the compound formatting string that is used to format the default value for display in
+    /// the usage help.
+    /// </summary>
+    /// <value>
+    /// A compound formatting string, or <see langword="null"/> if the default format is used.
+    /// </value>
+    /// <seealso cref="CommandLineArgumentAttribute.DefaultValueFormat"/>
+#if NET7_0_OR_GREATER
+    [StringSyntax(StringSyntaxAttribute.CompositeFormat)]
+#endif
+    public string? DefaultValueFormat { get; }
 
     /// <summary>
     /// Gets a value that indicates whether the default value should be included in the argument's
@@ -1165,6 +1180,7 @@ public abstract class CommandLineArgument
             ShortAliases = GetShortAliases(shortAliasAttributes, argumentName),
             DefaultValue = attribute.DefaultValue,
             IncludeDefaultValueInHelp = attribute.IncludeDefaultInUsageHelp,
+            DefaultValueFormat = attribute.DefaultValueFormat,
             IsRequired = attribute.IsRequired || requiredProperty,
             IsRequiredProperty = requiredProperty,
             MemberName = memberName,

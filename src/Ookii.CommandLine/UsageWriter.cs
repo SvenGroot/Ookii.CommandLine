@@ -1462,7 +1462,15 @@ public class UsageWriter
 
         if (IncludeDefaultValueInDescription && argument.IncludeDefaultInUsageHelp && argument.DefaultValue != null)
         {
-            WriteDefaultValue(argument.DefaultValue);
+            var defaultValue = argument.DefaultValue;
+            if (argument.DefaultValueFormat != null)
+            {
+                // Use the parser's culture so the format matches the format the user should use
+                // for values.
+                defaultValue = string.Format(argument.Parser.Culture, argument.DefaultValueFormat, defaultValue);
+            }
+
+            WriteDefaultValue(defaultValue);
         }
 
         WriteLine();
@@ -1659,9 +1667,22 @@ public class UsageWriter
     ///   <see langword="true"/> and the <see cref="CommandLineArgument.DefaultValue" qualifyHint="true"/> property
     ///   is not <see langword="null"/>.
     /// </para>
+    /// <para>
+    ///   If the <see cref="CommandLineArgumentAttribute.DefaultValueFormat" qualifyHint="true"/>
+    ///   property for the argument is not <see langword="null"/>, then the base implementation of
+    ///   the <see cref="WriteArgumentDescriptionBody"/> method will use the formatted string,
+    ///   rather than the original default value, for the <paramref name="defaultValue"/>
+    ///   parameter.
+    /// </para>
+    /// <para>
+    ///   The default implementation formats the argument using the culture specified by the
+    ///   <see cref="CommandLineParser.Culture" qualifyHint="true"/> property, rather than the
+    ///   culture used by the output <see cref="Writer"/>, so that the displayed format will match
+    ///   the format the user should use for argument values.
+    /// </para>
     /// </remarks>
     protected virtual void WriteDefaultValue(object defaultValue)
-        => Write(Resources.DefaultDefaultValueFormat, defaultValue);
+        => Write(string.Format(Parser.Culture, Resources.DefaultDefaultValueFormat, defaultValue));
 
     /// <summary>
     /// Writes a message telling to user how to get more detailed help.

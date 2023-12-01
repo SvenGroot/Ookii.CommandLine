@@ -699,4 +699,36 @@ a blank line.
 
 ".ReplaceLineEndings();
 
+    private static readonly string _expectedDefaultValueFormatUsage = @"Usage: test [-Argument <Double>] [-Argument2 <Double>] [-Help] [-Version]
+
+    -Argument <Double>
+        An argument. Default value: (1.50).
+
+    -Argument2 <Double>
+        Another argument. Default value: 3.5.
+
+    -Help [<Boolean>] (-?, -h)
+        Displays this help message.
+
+    -Version [<Boolean>]
+        Displays version information.
+
+".ReplaceLineEndings();
+
+    private static readonly string _expectedDefaultValueFormatCultureUsage = @"Usage: test [-Argument <Double>] [-Argument2 <Double>] [-Help] [-Version]
+
+    -Argument <Double>
+        An argument. Default value: (1,50).
+
+    -Argument2 <Double>
+        Another argument. Default value: 3,5.
+
+    -Help [<Boolean>] (-?, -h)
+        Displays this help message.
+
+    -Version [<Boolean>]
+        Displays version information.
+
+".ReplaceLineEndings();
+
 }

@@ -697,3 +697,15 @@ partial class EmptyLineDescriptionArguments
     [Description("A description with\n\na blank line.")]
     public string Argument { get; set; }
 }
+
+[GeneratedParser]
+partial class DefaultValueFormatArguments
+{
+    [CommandLineArgument(DefaultValue = 1.5, DefaultValueFormat = "({0:0.00})")]
+    [Description("An argument.")]
+    public double Argument { get; set; }
+
+    [CommandLineArgument(DefaultValue = 3.5)]
+    [Description("Another argument.")]
+    public double Argument2 { get; set; }
+}

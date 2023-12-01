@@ -482,6 +482,28 @@ public partial class CommandLineParserTest
 
     [TestMethod]
     [DynamicData(nameof(ProviderKinds), DynamicDataDisplayName = nameof(GetCustomDynamicDataDisplayName))]
+    public void TestWriteUsageDefaultValueFormat(ProviderKind kind)
+    {
+        var options = new ParseOptions()
+        {
+            UsageWriter = new UsageWriter()
+            {
+                ExecutableName = _executableName,
+            }
+        };
+
+        var parser = CreateParser<DefaultValueFormatArguments>(kind, options);
+        string actual = parser.GetUsage();
+        Assert.AreEqual(_expectedDefaultValueFormatUsage, actual);
+
+        // Stream culture should be ignored for the default value in favor of the parser culture.
+        options.Culture = CultureInfo.GetCultureInfo("nl-NL");
+        actual = parser.GetUsage();
+        Assert.AreEqual(_expectedDefaultValueFormatCultureUsage, actual);
+    }
+
+    [TestMethod]
+    [DynamicData(nameof(ProviderKinds), DynamicDataDisplayName = nameof(GetCustomDynamicDataDisplayName))]
     public void TestStaticParse(ProviderKind kind)
     {
         using var output = new StringWriter();
