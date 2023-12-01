@@ -256,13 +256,13 @@
     <value>The 'minimum' and 'maximum' parameters cannot both be null.</value>
   </data>
   <data name="ValidateCountBothFormat" xml:space="preserve">
-    <value>The argument '{0}' must have between {1} and {2} items.</value>
+    <value>The argument '{0}' must have between {1} and {2} values.</value>
   </data>
-  <data name="ValidateCountMaxFormat" xml:space="preserve">
-    <value>The argument '{0}' must have at most {1} item(s).</value>
+  <data name="ValidateCountMaxPluralFormat" xml:space="preserve">
+    <value>The argument '{0}' must have at most {1} values.</value>
   </data>
-  <data name="ValidateCountMinFormat" xml:space="preserve">
-    <value>The argument '{0}' must have at least {1} item(s).</value>
+  <data name="ValidateCountMinPluralFormat" xml:space="preserve">
+    <value>The argument '{0}' must have at least {1} values.</value>
   </data>
   <data name="ValidateNotEmptyFailedFormat" xml:space="preserve">
     <value>The argument '{0}' must not be empty.</value>
@@ -410,5 +410,11 @@
   </data>
   <data name="InvalidStandardStreamError" xml:space="preserve">
     <value>Invalid StandardStream value.</value>
+  </data>
+  <data name="ValidateCountMaxSingularFormat" xml:space="preserve">
+    <value>The argument '{0}' must have at most {1} value.</value>
+  </data>
+  <data name="ValidateCountMinSingularFormat" xml:space="preserve">
+    <value>The argument '{0}' must have at least {1} value.</value>
   </data>
 </root>

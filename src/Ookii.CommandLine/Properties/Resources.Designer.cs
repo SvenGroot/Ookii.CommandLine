@@ -655,7 +655,7 @@ namespace Ookii.CommandLine.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The argument &apos;{0}&apos; must have between {1} and {2} items..
+        ///   Looks up a localized string similar to The argument &apos;{0}&apos; must have between {1} and {2} values..
         /// </summary>
         internal static string ValidateCountBothFormat {
             get {
@@ -664,20 +664,38 @@ namespace Ookii.CommandLine.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The argument &apos;{0}&apos; must have at most {1} item(s)..
+        ///   Looks up a localized string similar to The argument &apos;{0}&apos; must have at most {1} values..
         /// </summary>
-        internal static string ValidateCountMaxFormat {
+        internal static string ValidateCountMaxPluralFormat {
             get {
-                return ResourceManager.GetString("ValidateCountMaxFormat", resourceCulture);
+                return ResourceManager.GetString("ValidateCountMaxPluralFormat", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The argument &apos;{0}&apos; must have at least {1} item(s)..
+        ///   Looks up a localized string similar to The argument &apos;{0}&apos; must have at most {1} value..
         /// </summary>
-        internal static string ValidateCountMinFormat {
+        internal static string ValidateCountMaxSingularFormat {
             get {
-                return ResourceManager.GetString("ValidateCountMinFormat", resourceCulture);
+                return ResourceManager.GetString("ValidateCountMaxSingularFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The argument &apos;{0}&apos; must have at least {1} values..
+        /// </summary>
+        internal static string ValidateCountMinPluralFormat {
+            get {
+                return ResourceManager.GetString("ValidateCountMinPluralFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The argument &apos;{0}&apos; must have at least {1} value..
+        /// </summary>
+        internal static string ValidateCountMinSingularFormat {
+            get {
+                return ResourceManager.GetString("ValidateCountMinSingularFormat", resourceCulture);
             }
         }
         
