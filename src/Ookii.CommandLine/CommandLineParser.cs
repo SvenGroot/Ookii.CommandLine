@@ -1292,33 +1292,22 @@ public class CommandLineParser
     internal static void WriteError(ParseOptions options, string message, TextFormat color, bool blankLine = false)
     {
         using var errorVtSupport = options.EnableErrorColor();
-        try
+        using var error = DisposableWrapper.Create(options.Error, LineWrappingTextWriter.ForConsoleError);
+        if (errorVtSupport.IsSupported)
         {
-            using var error = DisposableWrapper.Create(options.Error, LineWrappingTextWriter.ForConsoleError);
-            if (options.UseErrorColor ?? false)
-            {
-                error.Inner.Write(color);
-            }
-
-            error.Inner.Write(message);
-            if (options.UseErrorColor ?? false)
-            {
-                error.Inner.Write(options.UsageWriter.ColorReset);
-            }
-
-            error.Inner.WriteLine();
-            if (blankLine)
-            {
-                error.Inner.WriteLine();
-            }
+            error.Inner.Write(color);
         }
-        finally
+
+        error.Inner.Write(message);
+        if (errorVtSupport.IsSupported)
         {
-            // Reset UseErrorColor if it was changed.
-            if (errorVtSupport != null)
-            {
-                options.UseErrorColor = null;
-            }
+            error.Inner.Write(options.UsageWriter.ColorReset);
+        }
+
+        error.Inner.WriteLine();
+        if (blankLine)
+        {
+            error.Inner.WriteLine();
         }
     }
 

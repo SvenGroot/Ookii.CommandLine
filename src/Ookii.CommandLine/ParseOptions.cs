@@ -809,15 +809,28 @@ public class ParseOptions
         ValueDescriptionTransform ??= attribute.ValueDescriptionTransform;
     }
 
-    internal VirtualTerminalSupport? EnableErrorColor()
+    internal VirtualTerminalSupport EnableErrorColor()
     {
-        if (Error == null && UseErrorColor == null)
+        if (UseErrorColor is bool useErrorColor)
         {
-            var support = VirtualTerminal.EnableColor(StandardStream.Error);
-            UseErrorColor = support.IsSupported;
-            return support;
+            // Colors are forced on or off; don't change terminal mode but return the explicit
+            // support value.
+            return new VirtualTerminalSupport(useErrorColor);
         }
 
-        return null;
+        if (Error == null)
+        {
+            // Enable for stderr if no custom error writer.
+            return VirtualTerminal.EnableColor(StandardStream.Error);
+        }
+
+        if (Error?.GetStandardStream() is StandardStream stream)
+        {
+            // Try to enable it for the std stream associated with the custom writer.
+            return new VirtualTerminalSupport(stream);
+        }
+
+        // No std stream, no automatic color.
+        return new VirtualTerminalSupport(false);
     }
 }

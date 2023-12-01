@@ -96,8 +96,10 @@ public class UsageWriter
     private const char OptionalStart = '[';
     private const char OptionalEnd = ']';
 
+    private readonly LineWrappingTextWriter? _customWriter;
     private LineWrappingTextWriter? _writer;
-    private bool? _useColor;
+    private readonly bool? _useColor;
+    private bool _autoColor;
     private CommandLineParser? _parser;
     private CommandManager? _commandManager;
     private string? _executableName;
@@ -127,7 +129,7 @@ public class UsageWriter
     /// </remarks>
     public UsageWriter(LineWrappingTextWriter? writer = null, bool? useColor = null)
     {
-        _writer = writer;
+        _customWriter = writer;
         _useColor = useColor;
     }
 
@@ -510,7 +512,7 @@ public class UsageWriter
     /// <value>
     ///   <see langword="true"/> to enable color output; otherwise, <see langword="false"/>.
     /// </value>
-    protected bool UseColor => _useColor ?? false;
+    protected bool UseColor => _useColor ?? _autoColor;
 
     /// <summary>
     /// Gets or sets the color applied by the base implementation of the <see cref="WriteCommandDescription(CommandInfo)"/>
@@ -2138,7 +2140,7 @@ public class UsageWriter
         if (_useColor == null && _writer == null)
         {
             var support = VirtualTerminal.EnableColor(StandardStream.Output);
-            _useColor = support.IsSupported;
+            _autoColor = support.IsSupported;
             return support;
         }
 
@@ -2172,46 +2174,21 @@ public class UsageWriter
 
     private void WriteUsageInternal(UsageHelpRequest request = UsageHelpRequest.Full)
     {
-        bool restoreColor = _useColor == null;
-        bool restoreWriter = _writer == null;
-        try
-        {
-            using var support = EnableColor();
-            using var writer = DisposableWrapper.Create(_writer, LineWrappingTextWriter.ForConsoleOut);
-            _writer = writer.Inner;
-            Writer.ResetIndent();
-            Writer.Indent = 0;
-            RunOperation(request);
-        }
-        finally
-        {
-            if (restoreColor)
-            {
-                _useColor = null;
-            }
-
-            if (restoreWriter)
-            {
-                _writer = null;
-            }
-        }
+        using var support = EnableColor();
+        using var writer = DisposableWrapper.Create(_customWriter, LineWrappingTextWriter.ForConsoleOut);
+        _writer = writer.Inner;
+        Writer.ResetIndent();
+        Writer.Indent = 0;
+        RunOperation(request);
     }
 
     private string GetUsageInternal(int maximumLineLength = 0, UsageHelpRequest request = UsageHelpRequest.Full)
     {
-        var originalWriter = _writer;
-        try
-        {
-            using var writer = LineWrappingTextWriter.ForStringWriter(maximumLineLength);
-            _writer = writer;
-            RunOperation(request);
-            writer.Flush();
-            return writer.BaseWriter.ToString()!;
-        }
-        finally
-        {
-            _writer = originalWriter;
-        }
+        using var writer = LineWrappingTextWriter.ForStringWriter(maximumLineLength);
+        _writer = writer;
+        RunOperation(request);
+        writer.Flush();
+        return writer.BaseWriter.ToString()!;
     }
 
     private void RunOperation(UsageHelpRequest request)
@@ -2232,6 +2209,8 @@ public class UsageWriter
         {
             _parser = null;
             _commandManager = null;
+            _writer = null;
+            _autoColor = false;
         }
     }
 
