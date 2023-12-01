@@ -2137,10 +2137,19 @@ public class UsageWriter
 
     private VirtualTerminalSupport? EnableColor()
     {
-        if (_useColor == null && _writer == null)
+        if (_useColor == null)
         {
-            var support = VirtualTerminal.EnableColor(StandardStream.Output);
-            _autoColor = support.IsSupported;
+            VirtualTerminalSupport? support = null;
+            if (_customWriter == null)
+            {
+                support = VirtualTerminal.EnableColor(StandardStream.Output);
+            }
+            else if (_customWriter.GetStandardStream() is StandardStream stream)
+            {
+                support = VirtualTerminal.EnableColor(stream);
+            }
+
+            _autoColor = support?.IsSupported ?? false;
             return support;
         }
 
