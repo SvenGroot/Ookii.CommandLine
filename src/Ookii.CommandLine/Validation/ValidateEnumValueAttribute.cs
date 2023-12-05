@@ -39,21 +39,28 @@ namespace Ookii.CommandLine.Validation;
 /// <threadsafety static="true" instance="true"/>
 public class ValidateEnumValueAttribute : ArgumentValidationWithHelpAttribute
 {
-    /// <inheritdoc/>
-    /// <summary>Determines if the argument's value is defined.</summary>
-    /// <exception cref="NotSupportedException">
-    /// <paramref name="argument"/> is not an argument with an enumeration type.
-    /// </exception>
-    public override bool IsValid(CommandLineArgument argument, object? value)
-    {
-        if (!argument.ElementType.IsEnum)
-        {
-            throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture,
-                Properties.Resources.ArgumentNotEnumFormat, argument.ArgumentName));
-        }
-
-        return value == null || argument.ElementType.IsEnumDefined(value);
-    }
+    /// <summary>
+    /// Gets or sets a value that indicates whether values that do not match one of the
+    /// enumeration's defined values are allowed.
+    /// </summary>
+    /// <value>
+    /// <see langword="true"/> if values that are not defined by the enumeration are allowed;
+    /// otherwise, <see langword="false"/>. The default value is <see langword="false"/>.
+    /// </value>
+    /// <remarks>
+    /// <para>
+    ///   Non-defined values can be provided using the underlying numeric type of the enumeration.
+    ///   If this property is <see langword="true"/>, this validator will not check whether a value
+    ///   provided in such a way actually is actually one of the enumeration's defined values.
+    /// </para>
+    /// <para>
+    ///   Setting this to <see langword="true"/> essentially makes this validator do nothing. It
+    ///   is useful if you want to use it solely to list defined values in the usage help, or if
+    ///   you want to use one of the other properties that affect the <see cref="EnumConverter"/>
+    ///   without also checking for defined values.
+    /// </para>
+    /// </remarks>
+    public bool AllowNonDefinedValues { get; set; }
 
     /// <summary>
     /// Gets or sets a value that indicates whether the possible values of the enumeration
@@ -71,6 +78,44 @@ public class ValidateEnumValueAttribute : ArgumentValidationWithHelpAttribute
     /// </para>
     /// </remarks>
     public bool IncludeValuesInErrorMessage { get; set; } = true;
+
+    /// <summary>
+    /// Gets or sets a value that indicates whether enumeration value conversion is case sensitive.
+    /// </summary>
+    /// <value>
+    /// <see langword="true"/> if conversion is case sensitive; otherwise, <see langword="false"/>.
+    /// The default value is <see langword="false"/>.
+    /// </value>
+    /// <remarks>
+    /// <para>
+    ///   This property is not used by the <see cref="ValidateEnumValueAttribute"/> class itself,
+    ///   but by the <see cref="EnumConverter"/> class. Therefore, this property may not work if
+    ///   a custom argument converter is used, unless that custom converter also checks this
+    ///   property.
+    /// </para>
+    /// </remarks>
+    public bool CaseSensitive { get; set; }
+
+    /// <inheritdoc/>
+    /// <summary>Determines if the argument's value is defined.</summary>
+    /// <exception cref="NotSupportedException">
+    /// <paramref name="argument"/> is not an argument with an enumeration type.
+    /// </exception>
+    public override bool IsValid(CommandLineArgument argument, object? value)
+    {
+        if (!argument.ElementType.IsEnum)
+        {
+            throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture,
+                Properties.Resources.ArgumentNotEnumFormat, argument.ArgumentName));
+        }
+
+        if (AllowNonDefinedValues)
+        {
+            return true;
+        }
+
+        return value == null || argument.ElementType.IsEnumDefined(value);
+    }
 
     /// <inheritdoc/>
     /// <remarks>

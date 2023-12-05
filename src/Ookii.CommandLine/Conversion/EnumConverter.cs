@@ -80,22 +80,9 @@ public class EnumConverter : ArgumentConverter
     ///   The value was not valid for the enumeration type.
     /// </exception>
     public override object? Convert(string value, CultureInfo culture, CommandLineArgument argument)
-    {
-        try
-        {
-            return Enum.Parse(EnumType, value, true);
-        }
-        catch (ArgumentException ex)
-        {
-            throw CreateException(value, ex, argument);
-        }
-        catch (OverflowException ex)
-        {
-            throw CreateException(value, ex, argument);
-        }
-    }
-
 #if NET6_0_OR_GREATER
+        => Convert(value.AsSpan(), culture, argument);
+
     /// <summary>
     /// Converts a string span to the enumeration type.
     /// </summary>
@@ -115,25 +102,26 @@ public class EnumConverter : ArgumentConverter
     ///   The value was not valid for the enumeration type.
     /// </exception>
     public override object? Convert(ReadOnlySpan<char> value, CultureInfo culture, CommandLineArgument argument)
+#endif
     {
+        var attribute = argument.Validators.OfType<ValidateEnumValueAttribute>().FirstOrDefault();
         try
         {
-            return Enum.Parse(EnumType, value, true);
+            return Enum.Parse(EnumType, value, !attribute?.CaseSensitive ?? true);
         }
         catch (ArgumentException ex)
         {
-            throw CreateException(value.ToString(), ex, argument);
+            throw CreateException(value.ToString(), ex, argument, attribute);
         }
         catch (OverflowException ex)
         {
-            throw CreateException(value.ToString(), ex, argument);
+            throw CreateException(value.ToString(), ex, argument, attribute);
         }
     }
-#endif
 
-    private CommandLineArgumentException CreateException(string value, Exception inner, CommandLineArgument argument)
+    private CommandLineArgumentException CreateException(string value, Exception inner, CommandLineArgument argument,
+        ValidateEnumValueAttribute? attribute)
     {
-        var attribute = argument.Validators.OfType<ValidateEnumValueAttribute>().FirstOrDefault();
         var includeValues = attribute?.IncludeValuesInErrorMessage ?? true;
         var message = argument.Parser.StringProvider.ValidateEnumValueFailed(argument.ArgumentName, EnumType, value, includeValues);
         return new(message, argument.ArgumentName,CommandLineArgumentErrorCategory.ArgumentValueConversion, inner);
