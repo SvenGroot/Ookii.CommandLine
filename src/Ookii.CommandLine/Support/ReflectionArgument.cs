@@ -37,6 +37,8 @@ internal class ReflectionArgument : CommandLineArgument
         _method = method;
     }
 
+    public override MemberInfo? Member => (MemberInfo?)_property ?? _method?.Method;
+
     protected override bool CanSetProperty => _property?.GetSetMethod() != null;
 
     protected override void SetProperty(object target, object? value)

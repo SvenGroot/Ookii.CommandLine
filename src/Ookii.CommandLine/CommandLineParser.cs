@@ -451,6 +451,9 @@ public class CommandLineParser
     /// <value>
     /// The <see cref="Type"/> that was used to define the arguments.
     /// </value>
+#if NET6_0_OR_GREATER
+    [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicMethods)]
+#endif
     public Type ArgumentsType => _provider.ArgumentsType;
 
     /// <summary>

@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
 namespace Ookii.CommandLine.Support;
@@ -36,7 +37,11 @@ public abstract class GeneratedArgumentProvider : ArgumentProvider
     /// The <see cref="DescriptionAttribute"/> for the arguments type, or <see langword="null"/> if
     /// there is none.
     /// </param>
-    protected GeneratedArgumentProvider(Type argumentsType,
+    protected GeneratedArgumentProvider(
+#if NET6_0_OR_GREATER
+                                        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicMethods)]
+#endif
+                                        Type argumentsType,
                                         ParseOptionsAttribute? options = null,
                                         IEnumerable<ClassValidationAttribute>? validators = null,
                                         ApplicationFriendlyNameAttribute? friendlyName = null,

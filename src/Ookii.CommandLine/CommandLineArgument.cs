@@ -185,6 +185,8 @@ public abstract class CommandLineArgument
         {
         }
 
+        public override MemberInfo? Member => null;
+
         protected override bool CanSetProperty => false;
 
         private static ArgumentInfo CreateInfo(CommandLineParser parser, string argumentName, char shortName, char shortAlias)
@@ -241,6 +243,8 @@ public abstract class CommandLineArgument
             : base(CreateInfo(parser, argumentName))
         {
         }
+
+        public override MemberInfo? Member => null;
 
         protected override bool CanSetProperty => false;
 
@@ -317,7 +321,6 @@ public abstract class CommandLineArgument
     private readonly Type _elementTypeWithNullable;
     private readonly string? _description;
     private readonly bool _isRequired;
-    private readonly string _memberName;
     private readonly object? _defaultValue;
     private readonly ArgumentKind _argumentKind;
     private readonly bool _allowNull;
@@ -332,7 +335,7 @@ public abstract class CommandLineArgument
     {
         // If this method throws anything other than a NotSupportedException, it constitutes a bug in the Ookii.CommandLine library.
         _parser = info.Parser;
-        _memberName = info.MemberName;
+        MemberName = info.MemberName;
         _argumentName = info.ArgumentName;
         if (_parser.Mode == ParsingMode.LongShort)
         {
@@ -411,10 +414,16 @@ public abstract class CommandLineArgument
     /// <value>
     /// The name of the property or method that defined this command line argument.
     /// </value>
-    public string MemberName
-    {
-        get { return _memberName; }
-    }
+    public string MemberName { get; }
+
+    /// <summary>
+    /// Gets the <see cref="MemberInfo"/> for the member that defined this argument.
+    /// </summary>
+    /// <value>
+    /// An instance of the <see cref="MethodInfo"/> or <see cref="PropertyInfo"/> class, or
+    /// <see langword="null"/> if this is the automatic version or help argument.
+    /// </value>
+    public abstract MemberInfo? Member { get; }
 
     /// <summary>
     /// Gets the name of this argument.

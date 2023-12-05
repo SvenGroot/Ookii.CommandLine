@@ -1390,6 +1390,7 @@ public partial class CommandLineParserTest
             Name = name;
             Type = type;
             Kind = kind;
+
         }
 
         public string Name { get; set; }
@@ -1433,6 +1434,15 @@ public partial class CommandLineParserTest
         Assert.IsFalse(argument.HasValue);
         CollectionAssert.AreEqual(expected.Aliases ?? Array.Empty<string>(), argument.Aliases);
         CollectionAssert.AreEqual(expected.ShortAliases ?? Array.Empty<char>(), argument.ShortAliases);
+        if (argument.MemberName.StartsWith("Automatic"))
+        {
+            Assert.IsNull(argument.Member);
+        }
+        else
+        {
+            Assert.IsNotNull(argument.Member);
+            Assert.AreSame(argument.Parser.ArgumentsType.GetMember(argument.MemberName)[0], argument.Member);
+        }
     }
 
     private static void VerifyArguments(IEnumerable<CommandLineArgument> arguments, ExpectedArgument[] expected)
