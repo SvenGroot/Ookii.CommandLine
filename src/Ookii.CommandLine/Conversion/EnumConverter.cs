@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Ookii.CommandLine.Validation;
+using System;
 using System.Globalization;
+using System.Linq;
 
 namespace Ookii.CommandLine.Conversion;
 
@@ -19,8 +21,11 @@ namespace Ookii.CommandLine.Conversion;
 ///   attribute.
 /// </para>
 /// <para>
-///   If conversion fails, this converter will provide an error message that includes all the
-///   allowed values for the enumeration.
+///   If conversion fails, the error message will check the
+///   <see cref="ValidateEnumValueAttribute.IncludeValuesInErrorMessage" qualifyHint="true"/>
+///   property to see whether or not the enumeration's defined values should be listed in the
+///   error message. If the argument does not have the <see cref="ValidateEnumValueAttribute"/>
+///   attribute applied, the values will be listed.
 /// </para>
 /// </remarks>
 /// <threadsafety static="true" instance="true"/>
@@ -126,9 +131,11 @@ public class EnumConverter : ArgumentConverter
     }
 #endif
 
-    private Exception CreateException(string value, Exception inner, CommandLineArgument argument)
+    private CommandLineArgumentException CreateException(string value, Exception inner, CommandLineArgument argument)
     {
-        var message = argument.Parser.StringProvider.ValidateEnumValueFailed(argument.ArgumentName, EnumType, value, true);
-        return new CommandLineArgumentException(message, argument.ArgumentName, CommandLineArgumentErrorCategory.ArgumentValueConversion, inner);
+        var attribute = argument.Validators.OfType<ValidateEnumValueAttribute>().FirstOrDefault();
+        var includeValues = attribute?.IncludeValuesInErrorMessage ?? true;
+        var message = argument.Parser.StringProvider.ValidateEnumValueFailed(argument.ArgumentName, EnumType, value, includeValues);
+        return new(message, argument.ArgumentName,CommandLineArgumentErrorCategory.ArgumentValueConversion, inner);
     }
 }

@@ -60,17 +60,17 @@ public class ValidateEnumValueAttribute : ArgumentValidationWithHelpAttribute
     /// should be included in the error message if validation fails.
     /// </summary>
     /// <value>
-    /// <see langword="true"/> to include the values; otherwise, <see langword="false"/>.
+    /// <see langword="true"/> to include the values; otherwise, <see langword="false"/>. The
+    /// default value is <see langword="true"/>.
     /// </value>
     /// <remarks>
     /// <para>
-    ///   This property is only used if the validation fails, which only the case for
-    ///   undefined numerical values. Other strings that don't match the name of one of the
-    ///   defined constants use the error message from the converter, which in the case of
-    ///   the <see cref="EnumConverter"/> always shows the possible values.
+    ///   This property is used when validation fails, and is also checked by the
+    ///   <see cref="EnumConverter"/> class, which is the default converter for enumeration types,
+    ///   when conversion fails due to an invalid string value.
     /// </para>
     /// </remarks>
-    public bool IncludeValuesInErrorMessage { get; set; }
+    public bool IncludeValuesInErrorMessage { get; set; } = true;
 
     /// <inheritdoc/>
     /// <remarks>

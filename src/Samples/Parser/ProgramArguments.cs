@@ -140,6 +140,9 @@ partial class ProgramArguments
     // though DayOfWeek has no member with the value 9. The ValidateEnumValueAttribute makes sure
     // that only defined enum values are allowed. As a bonus, it also adds all the possible values
     // to the usage help.
+    //
+    // If conversion fails, the error message also lists all the possible values. If you don't want
+    // that, you can use [ValidateEnumValue(IncludeValuesInErrorMessage = false)]
     [CommandLineArgument]
     [Description("This is an argument using an enumeration type.")]
     [ValidateEnumValue]
