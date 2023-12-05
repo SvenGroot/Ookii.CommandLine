@@ -927,6 +927,7 @@ public class UsageWriter
 
             WriteArgumentDescriptions();
             Writer.Indent = 0;
+            WriteParserUsageFooter();
         }
         else
         {
@@ -1737,6 +1738,24 @@ public class UsageWriter
     }
 
     /// <summary>
+    /// Writes a footer under the usage help.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    ///   This method is called by the base implementation of <see cref="WriteParserUsageCore"/>
+    ///   only if the requested help is <see cref="UsageHelpRequest.Full" qualifyHint="true"/>.
+    /// </para>
+    /// <para>
+    ///   The base implementation does nothing; this function exists to allow derived classes to
+    ///   easily add a footer to the help.
+    /// </para>
+    /// </remarks>
+    protected virtual void WriteParserUsageFooter()
+    {
+        // Nothing
+    }
+
+    /// <summary>
     /// Gets the parser's arguments filtered according to the <see cref="ArgumentDescriptionListFilter"/>
     /// property and sorted according to the <see cref="ArgumentDescriptionListOrder"/> property.
     /// </summary>
@@ -1786,8 +1805,9 @@ public class UsageWriter
     /// </para>
     /// <para>
     ///   The base implementation writes the application description, followed by the list
-    ///   of commands, followed by a message indicating how to get help on a command. Which
-    ///   elements are included exactly can be influenced by the properties of this class.
+    ///   of commands, followed by a footer, which may include a message indicating how to get help
+    ///   on a command. Which elements are included exactly can be influenced by the properties of
+    ///   this class.
     /// </para>
     /// </remarks>
     protected virtual void WriteCommandListUsageCore()
@@ -1808,25 +1828,8 @@ public class UsageWriter
         WriteAvailableCommandsHeader();
 
         WriteCommandDescriptions();
-
-        if (CheckShowCommandHelpInstruction())
-        {
-            var prefix = CommandManager.Options.Mode == ParsingMode.LongShort
-                ? (CommandManager.Options.LongArgumentNamePrefixOrDefault)
-                : (CommandManager.Options.ArgumentNamePrefixes?.FirstOrDefault() ?? CommandLineParser.GetDefaultArgumentNamePrefixes()[0]);
-
-            var transform = CommandManager.Options.ArgumentNameTransformOrDefault;
-            var argumentName = transform.Apply(CommandManager.Options.StringProvider.AutomaticHelpName());
-
-            Writer.Indent = 0;
-            var name = ExecutableName;
-            if (CommandName != null)
-            {
-                name += " " + CommandName;
-            }
-
-            WriteCommandHelpInstruction(name, prefix, argumentName);
-        }
+        Writer.Indent = 0;
+        WriteCommandListUsageFooter();
     }
 
     /// <summary>
@@ -2023,6 +2026,39 @@ public class UsageWriter
         => Write(description);
 
     /// <summary>
+    /// Writes a footer underneath the command list usage.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    ///   The base implementation calls <see cref="WriteCommandHelpInstruction"/> if the help
+    ///   instruction is explicitly or automatically enabled.
+    /// </para>
+    /// <para>
+    ///   This method is called by the base implementation of the <see cref="WriteCommandListUsageCore"/>
+    ///   method.
+    /// </para>
+    /// </remarks>
+    protected virtual void WriteCommandListUsageFooter()
+    {
+        if (CheckShowCommandHelpInstruction())
+        {
+            var prefix = CommandManager.Options.Mode == ParsingMode.LongShort
+                ? (CommandManager.Options.LongArgumentNamePrefixOrDefault)
+                : (CommandManager.Options.ArgumentNamePrefixes?.FirstOrDefault() ?? CommandLineParser.GetDefaultArgumentNamePrefixes()[0]);
+
+            var transform = CommandManager.Options.ArgumentNameTransformOrDefault;
+            var argumentName = transform.Apply(CommandManager.Options.StringProvider.AutomaticHelpName());
+            var name = ExecutableName;
+            if (CommandName != null)
+            {
+                name += " " + CommandName;
+            }
+
+            WriteCommandHelpInstruction(name, prefix, argumentName);
+        }
+    }
+
+    /// <summary>
     /// Writes an instruction on how to get help on a command.
     /// </summary>
     /// <param name="name">The application and command name.</param>
@@ -2034,7 +2070,7 @@ public class UsageWriter
     ///   information on a command."
     /// </para>
     /// <para>
-    ///   This method is called by the base implementation of the <see cref="WriteCommandListUsageCore"/>
+    ///   This method is called by the base implementation of the <see cref="WriteCommandListUsageFooter"/>
     ///   method if the <see cref="IncludeCommandHelpInstruction"/> property is <see langword="true"/>,
     ///   or if it is <see langword="null"/> and all commands meet the requirements.
     /// </para>
@@ -2100,6 +2136,15 @@ public class UsageWriter
     /// </remarks>
     protected virtual void WriteLine() => Writer.WriteLine();
 
+    /// <summary>
+    /// Writes a string to the <see cref="Writer"/>, followed by a line break.
+    /// </summary>
+    /// <param name="value">The string to write.</param>
+    protected void WriteLine(string? value)
+    {
+        Write(value);
+        WriteLine();
+    }
 
     /// <summary>
     /// Writes a string with virtual terminal sequences only if color is enabled.
@@ -2161,20 +2206,6 @@ public class UsageWriter
         writer.Flush();
         return writer.BaseWriter.ToString()!;
     }
-
-    private void WriteLine(string? value)
-    {
-        Write(value);
-        WriteLine();
-    }
-
-    private void Write(string format, object? arg0) => Write(string.Format(Writer.FormatProvider, format, arg0));
-
-    private void WriteLine(string format, object? arg0, object? arg1)
-        => WriteLine(string.Format(Writer.FormatProvider, format, arg0, arg1));
-
-    private void WriteLine(string format, object? arg0, object? arg1, object? arg2)
-        => WriteLine(string.Format(Writer.FormatProvider, format, arg0, arg1, arg2));
 
     private VirtualTerminalSupport? EnableColor()
     {

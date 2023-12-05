@@ -731,4 +731,43 @@ a blank line.
 
 ".ReplaceLineEndings();
 
+    private static readonly string _expectedFooterUsage = @"Test arguments description.
+
+Usage: test [-arg1] <String> [[-other] <Number>] [[-notSwitch] <Boolean>] [[-Arg5] <Single>] [[-other2] <Number>] [[-Arg8] <DayOfWeek>...] -Arg6 <String> [-Arg10...] [-Arg11] [-Arg12 <Int32>...] [-Arg13 <String=Int32>...] [-Arg14 <String=Int32>...] [-Arg15 <KeyValuePair<String, Int32>>] [-Arg3 <String>] [-Arg7] [-Arg9 <Int32>] [-Help] [-Version]
+
+    -arg1 <String>
+        Arg1 description.
+
+    -other <Number>
+        Arg2 description. Default value: 42.
+
+    -notSwitch <Boolean>
+         Default value: False.
+
+    -Arg5 <Single>
+        Arg5 description.
+
+    -other2 <Number>
+        Arg4 description. Default value: 47.
+
+    -Arg6 <String> (-Alias1, -Alias2)
+        Arg6 description.
+
+    -Arg12 <Int32>
+         Default value: 42.
+
+    -Arg7 [<Boolean>] (-Alias3)
+
+
+    -Arg9 <Int32>
+         Must be between 0 and 100.
+
+    -Help [<Boolean>] (-?, -h)
+        Displays this help message.
+
+    -Version [<Boolean>]
+        Displays version information.
+
+This is a custom footer.
+".ReplaceLineEndings();
 }

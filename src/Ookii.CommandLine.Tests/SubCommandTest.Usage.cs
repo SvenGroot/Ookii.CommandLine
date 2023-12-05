@@ -152,4 +152,22 @@ Usage: test TestParentCommand NestedParentCommand NestedParentChildCommand [-Hel
         Displays this help message.
 
 ".ReplaceLineEndings();
+
+    public static readonly string _expectedUsageFooter = @"Usage: test <command> [arguments]
+
+The following commands are available:
+
+    AnotherSimpleCommand, alias
+
+    custom
+        Custom parsing command.
+
+    test
+        Test command description.
+
+    version
+        Displays version information.
+
+This is the command list footer.
+".ReplaceLineEndings();
 }

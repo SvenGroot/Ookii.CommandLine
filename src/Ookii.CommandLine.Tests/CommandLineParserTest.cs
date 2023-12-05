@@ -504,6 +504,23 @@ public partial class CommandLineParserTest
 
     [TestMethod]
     [DynamicData(nameof(ProviderKinds), DynamicDataDisplayName = nameof(GetCustomDynamicDataDisplayName))]
+    public void TestWriteUsageFooter(ProviderKind kind)
+    {
+        var options = new ParseOptions()
+        {
+            UsageWriter = new CustomUsageWriter()
+            {
+                ExecutableName = _executableName
+            },
+        };
+
+        var target = CreateParser<TestArguments>(kind, options);
+        string actual = target.GetUsage();
+        Assert.AreEqual(_expectedFooterUsage, actual);
+    }
+
+    [TestMethod]
+    [DynamicData(nameof(ProviderKinds), DynamicDataDisplayName = nameof(GetCustomDynamicDataDisplayName))]
     public void TestStaticParse(ProviderKind kind)
     {
         using var output = new StringWriter();

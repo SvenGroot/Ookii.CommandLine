@@ -253,6 +253,25 @@ public partial class SubCommandTest
 
     [TestMethod]
     [DynamicData(nameof(ProviderKinds), DynamicDataDisplayName = nameof(GetCustomDynamicDataDisplayName))]
+    public void TestWriteUsageFooter(ProviderKind kind)
+    {
+        using var writer = LineWrappingTextWriter.ForStringWriter(0);
+        var options = new CommandOptions()
+        {
+            Error = writer,
+            UsageWriter = new CustomUsageWriter(writer)
+            {
+                ExecutableName = _executableName,
+            }
+        };
+
+        var manager = CreateManager(kind, options);
+        manager.WriteUsage();
+        Assert.AreEqual(_expectedUsageFooter, writer.BaseWriter.ToString());
+    }
+
+    [TestMethod]
+    [DynamicData(nameof(ProviderKinds), DynamicDataDisplayName = nameof(GetCustomDynamicDataDisplayName))]
     public void TestCommandUsage(ProviderKind kind)
     {
         using var writer = LineWrappingTextWriter.ForStringWriter(0);
