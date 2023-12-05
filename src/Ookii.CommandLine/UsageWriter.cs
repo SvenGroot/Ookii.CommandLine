@@ -674,6 +674,9 @@ public class UsageWriter
     /// <summary>
     /// Gets the <see cref="CommandLineParser"/> that usage is being written for.
     /// </summary>
+    /// <value>
+    /// An instance of the <see cref="CommandLineParser"/> class.
+    /// </value>
     /// <exception cref="InvalidOperationException">
     /// A <see cref="WriteParserUsage"/> operation is not in progress.
     /// </exception>
@@ -681,13 +684,30 @@ public class UsageWriter
         => _parser ?? throw new InvalidOperationException(Resources.UsageWriterPropertyNotAvailable);
 
     /// <summary>
-    /// Gets the <see cref="CommandManager"/> that usage is being written for.
+    /// Gets the <see cref="Commands.CommandManager"/> that usage is being written for.
     /// </summary>
+    /// <value>
+    /// An instance of the <see cref="Commands.CommandManager"/> class.
+    /// </value>
     /// <exception cref="InvalidOperationException">
     /// A <see cref="WriteCommandListUsage"/> operation is not in progress.
     /// </exception>
     protected CommandManager CommandManager
         => _commandManager ?? throw new InvalidOperationException(Resources.UsageWriterPropertyNotAvailable);
+
+    /// <summary>
+    /// Gets the <see cref="LocalizedStringProvider"/> implementation used to get strings for
+    /// error messages and usage help.
+    /// </summary>
+    /// <value>
+    /// An instance of a class inheriting from the <see cref="LocalizedStringProvider"/> class.
+    /// </value>
+    /// <exception cref="InvalidOperationException">
+    /// A <see cref="WriteCommandListUsage"/> operation is not in progress.
+    /// </exception>
+    protected LocalizedStringProvider StringProvider
+        => _parser?.StringProvider ?? _commandManager?.Options.StringProvider 
+            ?? throw new InvalidOperationException(Resources.UsageWriterPropertyNotAvailable);
 
     /// <summary>
     /// Indicates what operation is currently in progress.
@@ -1020,7 +1040,7 @@ public class UsageWriter
     protected virtual void WriteUsageSyntaxPrefix()
     {
         WriteColor(UsagePrefixColor);
-        Write(Resources.DefaultUsagePrefix);
+        Write(StringProvider.UsageSyntaxPrefix());
         ResetColor();
         Write(' ');
         Write(ExecutableName);
@@ -1048,7 +1068,7 @@ public class UsageWriter
     {
         if (OperationInProgress == Operation.CommandListUsage)
         {
-            WriteLine(Resources.DefaultCommandUsageSuffix);
+            WriteLine(StringProvider.CommandUsageSuffix());
         }
     }
 
@@ -1220,7 +1240,7 @@ public class UsageWriter
     /// </para>
     /// </remarks>
     protected virtual void WriteAbbreviatedRemainingArguments()
-        => Write(Resources.DefaultAbbreviatedRemainingArguments);
+        => Write(StringProvider.UsageAbbreviatedRemainingArguments());
 
     /// <summary>
     /// Writes a suffix that indicates an argument is a multi-value argument.
@@ -1682,7 +1702,7 @@ public class UsageWriter
     /// </para>
     /// </remarks>
     protected virtual void WriteDefaultValue(object defaultValue)
-        => Write(string.Format(Parser.Culture, Resources.DefaultDefaultValueFormat, defaultValue));
+        => Write(StringProvider.UsageDefaultValue(defaultValue, Parser.Culture));
 
     /// <summary>
     /// Writes a message telling to user how to get more detailed help.
@@ -1712,7 +1732,7 @@ public class UsageWriter
                 name += " " + CommandName;
             }
 
-            WriteLine(Resources.MoreInfoOnErrorFormat, name, arg.ArgumentNameWithPrefix);
+            WriteLine(StringProvider.UsageMoreInfoMessage(name, arg.ArgumentNameWithPrefix));
         }
     }
 
@@ -1843,7 +1863,7 @@ public class UsageWriter
     /// </remarks>
     protected virtual void WriteAvailableCommandsHeader()
     {
-        WriteLine(Resources.DefaultAvailableCommandsHeader);
+        WriteLine(StringProvider.UsageAvailableCommandsHeader());
         WriteLine();
     }
 
@@ -2021,7 +2041,7 @@ public class UsageWriter
     /// </remarks>
     protected virtual void WriteCommandHelpInstruction(string name, string argumentNamePrefix, string argumentName)
     {
-        WriteLine(Resources.CommandHelpInstructionFormat, name, argumentNamePrefix, argumentName);
+        WriteLine(StringProvider.UsageCommandHelpInstruction(name, argumentNamePrefix, argumentName));
     }
 
     #endregion
