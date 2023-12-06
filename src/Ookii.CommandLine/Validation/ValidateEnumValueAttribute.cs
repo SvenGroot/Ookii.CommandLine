@@ -6,7 +6,7 @@ namespace Ookii.CommandLine.Validation;
 
 /// <summary>
 /// Validates whether the value of an enumeration type is one of the defined values for that
-/// type.
+/// type, and provides additional conversion options for enumeration types.
 /// </summary>
 /// <remarks>
 /// <para>
@@ -25,11 +25,18 @@ namespace Ookii.CommandLine.Validation;
 ///   enumeration, by using the <see cref="Enum.IsDefined(Type, object)" qualifyHint="true"/> method.
 /// </para>
 /// <para>
+///   This validator can also alter the behavior of the <see cref="EnumConverter"/> class, through
+///   the <see cref="CaseSensitive"/>, <see cref="AllowNumericValues"/>, and
+///   <see cref="AllowCommaSeparatedValues"/> properties. These properties are only effective if
+///   the default <see cref="EnumConverter"/> class is used, or a custom converter that also checks
+///   them.
+/// </para>
+/// <para>
 ///   In addition, this validator provides usage help listing all the possible values. If the
 ///   enumeration has a lot of values, you may wish to turn this off by setting the
-///   <see cref="ArgumentValidationWithHelpAttribute.IncludeInUsageHelp" qualifyHint="true"/> property to
-///   <see langword="false"/>. Similarly, you can avoid listing all the values in the error
-///   message by setting the <see cref="IncludeValuesInErrorMessage"/> property to
+///   <see cref="ArgumentValidationWithHelpAttribute.IncludeInUsageHelp" qualifyHint="true"/>
+///   property to <see langword="false"/>. Similarly, you can avoid listing all the values in the
+///   error message by setting the <see cref="IncludeValuesInErrorMessage"/> property to
 ///   <see langword="false"/>.
 /// </para>
 /// <para>
@@ -96,6 +103,42 @@ public class ValidateEnumValueAttribute : ArgumentValidationWithHelpAttribute
     /// </remarks>
     public bool CaseSensitive { get; set; }
 
+    /// <summary>
+    /// Gets or sets a value that indicates whether the value provided by the user can use commas
+    /// to provide multiple values that will be combined with bitwise-or.
+    /// </summary>
+    /// <value>
+    /// <see langword="true"/> if comma-separated values are allowed; otherwise,
+    /// <see langword="false"/>. The default value is <see langword="true"/>.
+    /// </value>
+    /// <remarks>
+    /// <para>
+    ///   This property is not used by the <see cref="ValidateEnumValueAttribute"/> class itself,
+    ///   but by the <see cref="EnumConverter"/> class. Therefore, this property may not work if
+    ///   a custom argument converter is used, unless that custom converter also checks this
+    ///   property.
+    /// </para>
+    /// </remarks>
+    public bool AllowCommaSeparatedValues { get; set; } = true;
+
+    /// <summary>
+    /// Gets or sets a value that indicates whether the value provided by the user can the
+    /// underlying numeric type of the enumeration.
+    /// </summary>
+    /// <value>
+    /// <see langword="true"/> if numeric values are allowed; otherwise, <see langword="false"/> to
+    /// allow only value names. The default value is <see langword="true"/>.
+    /// </value>
+    /// <remarks>
+    /// <para>
+    ///   This property is not used by the <see cref="ValidateEnumValueAttribute"/> class itself,
+    ///   but by the <see cref="EnumConverter"/> class. Therefore, this property may not work if
+    ///   a custom argument converter is used, unless that custom converter also checks this
+    ///   property.
+    /// </para>
+    /// </remarks>
+    public bool AllowNumericValues { get; set; } = true;
+
     /// <inheritdoc/>
     /// <summary>Determines if the argument's value is defined.</summary>
     /// <exception cref="NotSupportedException">
@@ -109,12 +152,7 @@ public class ValidateEnumValueAttribute : ArgumentValidationWithHelpAttribute
                 Properties.Resources.ArgumentNotEnumFormat, argument.ArgumentName));
         }
 
-        if (AllowNonDefinedValues)
-        {
-            return true;
-        }
-
-        return value == null || argument.ElementType.IsEnumDefined(value);
+        return AllowNonDefinedValues || value == null || argument.ElementType.IsEnumDefined(value);
     }
 
     /// <inheritdoc/>
@@ -139,4 +177,40 @@ public class ValidateEnumValueAttribute : ArgumentValidationWithHelpAttribute
     public override string GetErrorMessage(CommandLineArgument argument, object? value)
         => argument.Parser.StringProvider.ValidateEnumValueFailed(argument.ArgumentName, argument.ElementType, value,
                 IncludeValuesInErrorMessage);
+
+    internal bool ValidateBeforeConversion(CommandLineArgument argument, ReadOnlySpan<char> value)
+    {
+        if (!AllowCommaSeparatedValues && value.IndexOf(',') >= 0)
+        {
+            return false;
+        }
+
+        if (!AllowNumericValues)
+        {
+            var current = value;
+            while (current.Length > 0)
+            {
+                if (char.IsDigit(current[0]) || current.StartsWith(argument.Parser.Culture.NumberFormat.NegativeSign.AsSpan()))
+                {
+                    return false;
+                }
+
+                if (!AllowCommaSeparatedValues)
+                {
+                    // There can't be any commas, checked above.
+                    break;
+                }
+
+                var index = current.IndexOf(',');
+                if (index < 0)
+                {
+                    break;
+                }
+
+                current = current.Slice(index + 1);
+            }
+        }
+
+        return true;
+    }
 }

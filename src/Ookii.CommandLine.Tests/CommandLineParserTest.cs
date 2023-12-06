@@ -1075,6 +1075,15 @@ public partial class CommandLineParserTest
         CheckSuccess(parser, ["-Day2", "Tuesday"]);
         CheckThrows(parser, ["-Day2", "tuesday"], CommandLineArgumentErrorCategory.ArgumentValueConversion, "Day2", typeof(ArgumentException), remainingArgumentCount: 2);
 
+        // Disallow commas.
+        result = CheckSuccess(parser, ["-Day3", "Monday,Tuesday"]);
+        Assert.AreEqual(DayOfWeek.Wednesday, result.Day3);
+        CheckThrows(parser, ["-Day2", "Monday,Tuesday"], CommandLineArgumentErrorCategory.ArgumentValueConversion, "Day2", remainingArgumentCount: 2);
+
+        // Disallow numbers.
+        CheckThrows(parser, ["-Day3", "5"], CommandLineArgumentErrorCategory.ArgumentValueConversion, "Day3", remainingArgumentCount: 2);
+        CheckThrows(parser, ["-Day3", "Tuesday,5"], CommandLineArgumentErrorCategory.ArgumentValueConversion, "Day3", remainingArgumentCount: 2);
+
         // NotNull validator with Nullable<T>.
         CheckThrows(parser, ["-NotNull", ""], CommandLineArgumentErrorCategory.ValidationFailed, "NotNull", remainingArgumentCount: 2);
     }

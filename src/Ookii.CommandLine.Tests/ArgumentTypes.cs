@@ -451,8 +451,13 @@ partial class ValidationArguments
 
     [CommandLineArgument]
     [Description("Day2 description.")]
-    [ValidateEnumValue(CaseSensitive = true, AllowNonDefinedValues = true)]
+    [ValidateEnumValue(CaseSensitive = true, AllowNonDefinedValues = true, AllowCommaSeparatedValues = false)]
     public DayOfWeek? Day2 { get; set; }
+
+    [CommandLineArgument(IsHidden = true)]
+    [Description("Day3 description.")]
+    [ValidateEnumValue(AllowNumericValues = false)]
+    public DayOfWeek Day3 { get; set; }
 
     [CommandLineArgument]
     [Description("NotNull description.")]
