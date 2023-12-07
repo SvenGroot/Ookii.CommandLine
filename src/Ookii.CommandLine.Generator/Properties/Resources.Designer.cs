@@ -313,6 +313,15 @@ namespace Ookii.CommandLine.Generator.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Add GeneratedParserAttribute.
+        /// </summary>
+        internal static string GeneratedParserCodeFixTitle {
+            get {
+                return ResourceManager.GetString("GeneratedParserCodeFixTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The {0} attribute is ignored for the dictionary argument defined by {1} that has the ArgumentConverterAttribute attribute..
         /// </summary>
         internal static string IgnoredAttributeForDictionaryWithConverterMessageFormat {
@@ -669,6 +678,24 @@ namespace Ookii.CommandLine.Generator.Properties {
         internal static string ParentCommandStringNotSupportedTitle {
             get {
                 return ResourceManager.GetString("ParentCommandStringNotSupportedTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The command line arguments class &apos;{0}&apos; should use the GeneratedParserAttribute..
+        /// </summary>
+        internal static string ParserShouldBeGeneratedMessageFormat {
+            get {
+                return ResourceManager.GetString("ParserShouldBeGeneratedMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The command line arguments class should use the GeneratedParserAttribute..
+        /// </summary>
+        internal static string ParserShouldBeGeneratedTitle {
+            get {
+                return ResourceManager.GetString("ParserShouldBeGeneratedTitle", resourceCulture);
             }
         }
         

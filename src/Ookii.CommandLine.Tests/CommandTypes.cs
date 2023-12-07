@@ -4,7 +4,7 @@ using System.ComponentModel;
 using System.Threading;
 using System.Threading.Tasks;
 
-#pragma warning disable OCL0033,OCL0034
+#pragma warning disable OCL0033,OCL0034,OCL0040
 
 namespace Ookii.CommandLine.Tests;
 
@@ -78,7 +78,7 @@ partial class HiddenCommand : ICommand
 // Not generated to test registration of plain commands without generation.
 [Command(IsHidden = true)]
 [Description("Async command description.")]
-partial class AsyncCommand : IAsyncCommand
+class AsyncCommand : IAsyncCommand
 {
     [CommandLineArgument(Position = 0)]
     [Description("Argument description.")]
@@ -99,7 +99,7 @@ partial class AsyncCommand : IAsyncCommand
 
 [Command(IsHidden = true)]
 [Description("Async command description.")]
-partial class AsyncCancelableCommand : AsyncCancelableCommandBase
+class AsyncCancelableCommand : AsyncCancelableCommandBase
 {
     [CommandLineArgument(Position = 0)]
     [Description("Argument description.")]

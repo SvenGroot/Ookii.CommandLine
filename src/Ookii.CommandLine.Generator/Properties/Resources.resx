@@ -201,6 +201,9 @@
   <data name="GeneratedCustomParsingCommandTitle" xml:space="preserve">
     <value>The GeneratedParserAttribute cannot be used with a class that implements the ICommandWithCustomParsing interface.</value>
   </data>
+  <data name="GeneratedParserCodeFixTitle" xml:space="preserve">
+    <value>Add GeneratedParserAttribute</value>
+  </data>
   <data name="IgnoredAttributeForDictionaryWithConverterMessageFormat" xml:space="preserve">
     <value>The {0} attribute is ignored for the dictionary argument defined by {1} that has the ArgumentConverterAttribute attribute.</value>
   </data>
@@ -320,6 +323,12 @@
   </data>
   <data name="ParentCommandStringNotSupportedTitle" xml:space="preserve">
     <value>The ParentCommandAttribute must use the typeof keyword.</value>
+  </data>
+  <data name="ParserShouldBeGeneratedMessageFormat" xml:space="preserve">
+    <value>The command line arguments class '{0}' should use the GeneratedParserAttribute.</value>
+  </data>
+  <data name="ParserShouldBeGeneratedTitle" xml:space="preserve">
+    <value>The command line arguments class should use the GeneratedParserAttribute.</value>
   </data>
   <data name="PositionalArgumentAfterMultiValueMessageFormat" xml:space="preserve">
     <value>The positional argument defined by {0} comes after {1}, which is a multi-value argument and must come last.</value>
