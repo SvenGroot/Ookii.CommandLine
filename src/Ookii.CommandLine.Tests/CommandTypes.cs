@@ -99,15 +99,15 @@ class AsyncCommand : IAsyncCommand
 
 [Command(IsHidden = true)]
 [Description("Async command description.")]
-class AsyncCancelableCommand : AsyncCancelableCommandBase
+class AsyncCancelableCommand : AsyncCommandBase
 {
     [CommandLineArgument(Position = 0)]
     [Description("Argument description.")]
     public int Value { get; set; }
 
-    public override async Task<int> RunAsync(CancellationToken cancellationToken)
+    public override async Task<int> RunAsync()
     {
-        await Task.Delay(Value, cancellationToken);
+        await Task.Delay(Value, CancellationToken);
         return Value;
     }
 }
