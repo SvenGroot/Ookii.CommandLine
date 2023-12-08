@@ -124,16 +124,6 @@ public partial class LocalizedStringProvider
     public virtual string? ApplicationCopyright(Assembly assembly)
         => assembly.GetCustomAttribute<AssemblyCopyrightAttribute>()?.Copyright;
 
-    /// <summary>
-    /// Gets an instruction on how to get help on a command, used by the <see cref="UsageWriter"/>
-    /// class.
-    /// </summary>
-    /// <param name="name">The application and command name.</param>
-    /// <param name="argumentNamePrefix">The argument name prefix for the help argument.</param>
-    /// <param name="argumentName">The help argument name.</param>
-    public virtual string UsageCommandHelpInstruction(string name, string argumentNamePrefix, string argumentName)
-        => Format(Resources.CommandHelpInstructionFormat, name, argumentNamePrefix, argumentName);
-
     private static string Format(string format, object? arg0)
         => string.Format(CultureInfo.CurrentCulture, format, arg0);
 

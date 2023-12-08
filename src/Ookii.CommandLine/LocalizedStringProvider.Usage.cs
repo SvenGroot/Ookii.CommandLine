@@ -61,4 +61,16 @@ partial class LocalizedStringProvider
     /// <returns>The string.</returns>
     public virtual string UsageMoreInfoMessage(string executableName, string helpArgumentName)
         => Format(Resources.MoreInfoOnErrorFormat, executableName, helpArgumentName);
+
+    /// <summary>
+    /// Gets an instruction on how to get help on a command, used by the <see cref="UsageWriter"/>
+    /// class.
+    /// </summary>
+    /// <param name="name">The application and command name.</param>
+    /// <param name="argumentNamePrefix">The argument name prefix for the help argument.</param>
+    /// <param name="argumentName">The help argument name.</param>
+    /// <returns>The string.</returns>
+    public virtual string UsageCommandHelpInstruction(string name, string argumentNamePrefix, string argumentName)
+        => Format(Resources.CommandHelpInstructionFormat, name, argumentNamePrefix, argumentName);
+
 }
