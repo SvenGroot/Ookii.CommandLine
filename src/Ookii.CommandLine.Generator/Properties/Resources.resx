@@ -378,4 +378,16 @@
   <data name="UnsupportedLanguageVersionTitle" xml:space="preserve">
     <value>Ookii.CommandLine source generation requires at least C# 8.0.</value>
   </data>
+  <data name="ValidateEnumInvalidTypeMessageFormat" xml:space="preserve">
+    <value>The argument defined by '{0}' uses the ValidateEnumValueAttribute, but its type '{1}' is not an enumeration.</value>
+  </data>
+  <data name="ValidateEnumInvalidTypeTitle" xml:space="preserve">
+    <value>The ValidateEnumValueAttribute can only be used on arguments with an enum type.</value>
+  </data>
+  <data name="ValidateEnumWithCustomConverterMessageFormat" xml:space="preserve">
+    <value>The argument defined by '{0}' has the ArgumentConverterAttribute, and uses ValidateEnumValueAttribute properties that may not work with a custom ArgumentConverter.</value>
+  </data>
+  <data name="ValidateEnumWithCustomConverterTitle" xml:space="preserve">
+    <value>The argument uses ValidateEnumValueAttribute properties that may not work with a custom ArgumentConverter.</value>
+  </data>
 </root>

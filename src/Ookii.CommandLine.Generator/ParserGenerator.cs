@@ -697,6 +697,21 @@ internal class ParserGenerator
             _context.ReportDiagnostic(Diagnostics.IsShortIgnored(member, attributes.CommandLineArgument));
         }
 
+        if (attributes.ValidateEnumValue != null)
+        { 
+            if (elementType.TypeKind != TypeKind.Enum)
+            {
+                _context.ReportDiagnostic(Diagnostics.ValidateEnumInvalidType(member, elementType));
+            }
+            else if (attributes.Converter != null &&
+                (attributes.ValidateEnumValue.GetNamedArgument("CaseSensitive") != null ||
+                 attributes.ValidateEnumValue.GetNamedArgument("AllowCommaSeparatedValues") != null ||
+                 attributes.ValidateEnumValue.GetNamedArgument("AllowNumericValues") != null))
+            {
+                _context.ReportDiagnostic(Diagnostics.ValidateEnumWithCustomConverter(member));
+            }
+        }
+
         return true;
     }
 

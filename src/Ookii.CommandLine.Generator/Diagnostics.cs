@@ -378,6 +378,23 @@ internal static class Diagnostics
             symbol.Locations.FirstOrDefault(), 
             symbol.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat));
 
+    public static Diagnostic ValidateEnumInvalidType(ISymbol symbol, ITypeSymbol elementType) => CreateDiagnostic(
+        "OCL0041",
+        nameof(Resources.ValidateEnumInvalidTypeTitle),
+        nameof(Resources.ValidateEnumInvalidTypeMessageFormat),
+        DiagnosticSeverity.Warning,
+        symbol.Locations.FirstOrDefault(),
+        symbol.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat),
+        elementType.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat));
+
+    public static Diagnostic ValidateEnumWithCustomConverter(ISymbol symbol) => CreateDiagnostic(
+        "OCL0042",
+        nameof(Resources.ValidateEnumWithCustomConverterTitle),
+        nameof(Resources.ValidateEnumWithCustomConverterMessageFormat),
+        DiagnosticSeverity.Warning,
+        symbol.Locations.FirstOrDefault(),
+        symbol.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat));
+
     private static Diagnostic CreateDiagnostic(string id, string titleResource, string messageResource, DiagnosticSeverity severity, Location? location, params object?[]? messageArgs)
         => Diagnostic.Create(
             CreateDiagnosticDescriptor(id, titleResource, messageResource, severity),

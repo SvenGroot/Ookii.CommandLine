@@ -71,6 +71,8 @@ internal class TypeHelper
 
     public INamedTypeSymbol? ClassValidationAttribute => _compilation.GetTypeByMetadataName(NamespacePrefix + "Validation.ClassValidationAttribute");
 
+    public INamedTypeSymbol? ValidateEnumValueAttribute => _compilation.GetTypeByMetadataName(NamespacePrefix + "Validation.ValidateEnumValueAttribute");
+
     public INamedTypeSymbol? KeyValueSeparatorAttribute => _compilation.GetTypeByMetadataName(NamespacePrefix + "Conversion.KeyValueSeparatorAttribute");
 
     public INamedTypeSymbol? ArgumentConverterAttribute => _compilation.GetTypeByMetadataName(NamespacePrefix + "Conversion.ArgumentConverterAttribute"

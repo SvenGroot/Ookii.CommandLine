@@ -842,5 +842,41 @@ namespace Ookii.CommandLine.Generator.Properties {
                 return ResourceManager.GetString("UnsupportedLanguageVersionTitle", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The argument defined by &apos;{0}&apos; uses the ValidateEnumValueAttribute, but its type &apos;{1}&apos; is not an enumeration..
+        /// </summary>
+        internal static string ValidateEnumInvalidTypeMessageFormat {
+            get {
+                return ResourceManager.GetString("ValidateEnumInvalidTypeMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The ValidateEnumValueAttribute can only be used on arguments with an enum type..
+        /// </summary>
+        internal static string ValidateEnumInvalidTypeTitle {
+            get {
+                return ResourceManager.GetString("ValidateEnumInvalidTypeTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The argument defined by &apos;{0}&apos; has the ArgumentConverterAttribute, and uses ValidateEnumValueAttribute properties that may not work with a custom ArgumentConverter..
+        /// </summary>
+        internal static string ValidateEnumWithCustomConverterMessageFormat {
+            get {
+                return ResourceManager.GetString("ValidateEnumWithCustomConverterMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The argument uses ValidateEnumValueAttribute properties that may not work with a custom ArgumentConverter..
+        /// </summary>
+        internal static string ValidateEnumWithCustomConverterTitle {
+            get {
+                return ResourceManager.GetString("ValidateEnumWithCustomConverterTitle", resourceCulture);
+            }
+        }
     }
 }
