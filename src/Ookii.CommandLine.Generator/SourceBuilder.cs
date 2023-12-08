@@ -1,4 +1,5 @@
 ﻿using Microsoft.CodeAnalysis;
+using System.Reflection;
 using System.Text;
 
 namespace Ookii.CommandLine.Generator;
@@ -9,6 +10,8 @@ internal class SourceBuilder
     private int _indentLevel;
     private bool _startOfLine = true;
     private bool _needArgumentSeparator;
+    private string? _toolName;
+    private string? _toolVersion;
 
     public SourceBuilder(INamespaceSymbol ns)
         : this(ns.IsGlobalNamespace ? null : ns.ToDisplayString())
@@ -83,6 +86,18 @@ internal class SourceBuilder
     {
         --_indentLevel;
         AppendLine("}");
+    }
+
+    public void AppendGeneratedCodeAttribute()
+    {
+        if (_toolName == null)
+        {
+            var assembly = Assembly.GetExecutingAssembly();
+            _toolName = assembly.GetName().Name;
+            _toolVersion = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion ?? assembly.GetName().Version.ToString();
+        }
+
+        AppendLine($"[System.CodeDom.Compiler.GeneratedCode(\"{_toolName}\", \"{_toolVersion}\")]");
     }
 
     public string GetSource()

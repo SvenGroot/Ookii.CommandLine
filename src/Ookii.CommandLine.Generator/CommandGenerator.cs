@@ -100,6 +100,7 @@ internal class CommandGenerator
         var builder = new SourceBuilder(manager.ContainingNamespace);
         builder.AppendLine($"partial class {manager.Name} : Ookii.CommandLine.Commands.CommandManager");
         builder.OpenBlock();
+        builder.AppendGeneratedCodeAttribute();
         builder.AppendLine("private class GeneratedProvider : Ookii.CommandLine.Support.CommandProvider");
         builder.OpenBlock();
         builder.AppendLine("public override Ookii.CommandLine.Support.ProviderKind Kind => Ookii.CommandLine.Support.ProviderKind.Generated;");
@@ -156,6 +157,7 @@ internal class CommandGenerator
         builder.CloseBlock(); // GetCommandsUnsorted
         builder.CloseBlock(); // provider class
         builder.AppendLine();
+        builder.AppendGeneratedCodeAttribute();
         builder.AppendLine($"public {manager.Name}(Ookii.CommandLine.Commands.CommandOptions? options = null)");
         builder.AppendLine($"    : base(new GeneratedProvider(), options)");
         builder.OpenBlock();
