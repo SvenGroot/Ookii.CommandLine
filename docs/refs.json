@@ -1,11 +1,13 @@
 {
   "#apiPrefix": "https://learn.microsoft.com/dotnet/api/",
-  "#prefix": "https://www.ookii.org/docs/commandline-4.0/html/",
+  "#prefix": "https://www.ookii.org/docs/commandline-4.1/html/",
   "#suffix": ".htm",
   "AddCommand": null,
   "AliasAttribute": "T_Ookii_CommandLine_AliasAttribute",
+  "AllowCommaSeparatedValues": "P_Ookii_CommandLine_Validation_ValidateEnumValueAttribute_AllowCommaSeparatedValues",
   "AllowDuplicateDictionaryKeys": "P_Ookii_CommandLine_CommandLineArgument_AllowDuplicateDictionaryKeys",
   "AllowDuplicateDictionaryKeysAttribute": "T_Ookii_CommandLine_AllowDuplicateDictionaryKeysAttribute",
+  "AllowNumericValues": "P_Ookii_CommandLine_Validation_ValidateEnumValueAttribute_AllowNumericValues",
   "ApplicationFriendlyNameAttribute": "T_Ookii_CommandLine_ApplicationFriendlyNameAttribute",
   "Arg1": null,
   "Arg2": null,
@@ -39,7 +41,10 @@
     "P_Ookii_CommandLine_CommandLineArgument_CancelParsing",
     "P_Ookii_CommandLine_CommandLineArgumentAttribute_CancelParsing"
   ],
-  "CaseSensitive": "P_Ookii_CommandLine_ParseOptionsAttribute_CaseSensitive",
+  "CaseSensitive": [
+    "P_Ookii_CommandLine_ParseOptionsAttribute_CaseSensitive",
+    "P_Ookii_CommandLine_Validation_ValidateEnumValueAttribute_CaseSensitive"
+  ],
   "Category": "P_Ookii_CommandLine_CommandLineArgumentException_Category",
   "ClassValidationAttribute": "T_Ookii_CommandLine_Validation_ClassValidationAttribute",
   "CommandAttribute": "T_Ookii_CommandLine_Commands_CommandAttribute",

@@ -83,4 +83,4 @@ Usage:  TopLevelArguments [global arguments] write [[--lines] <string>...] [--he
             When this option is specified, the file will be overwritten if it already exists.
 ```
 
-[`CancelMode.Success`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_CancelMode.htm
+[`CancelMode.Success`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_CancelMode.htm

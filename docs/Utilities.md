@@ -163,20 +163,20 @@ public int Run()
 ```
 
 [`Console.WindowWidth`]: https://learn.microsoft.com/dotnet/api/system.console.windowwidth
-[`EnableColor()`]: https://www.ookii.org/docs/commandline-4.0/html/M_Ookii_CommandLine_Terminal_VirtualTerminal_EnableColor.htm
-[`EnableVirtualTerminalSequences()`]: https://www.ookii.org/docs/commandline-4.0/html/M_Ookii_CommandLine_Terminal_VirtualTerminal_EnableVirtualTerminalSequences.htm
-[`Indent`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_LineWrappingTextWriter_Indent.htm
-[`LineWrappingTextWriter.ForConsoleError()`]: https://www.ookii.org/docs/commandline-4.0/html/M_Ookii_CommandLine_LineWrappingTextWriter_ForConsoleError.htm
-[`LineWrappingTextWriter.ForConsoleOut()`]: https://www.ookii.org/docs/commandline-4.0/html/M_Ookii_CommandLine_LineWrappingTextWriter_ForConsoleOut.htm
-[`LineWrappingTextWriter.Indent`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_LineWrappingTextWriter_Indent.htm
-[`LineWrappingTextWriter.ResetIndent()`]: https://www.ookii.org/docs/commandline-4.0/html/M_Ookii_CommandLine_LineWrappingTextWriter_ResetIndent.htm
-[`LineWrappingTextWriter`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_LineWrappingTextWriter.htm
-[`Ookii.CommandLine.Terminal`]: https://www.ookii.org/docs/commandline-4.0/html/N_Ookii_CommandLine_Terminal.htm
-[`ResetIndent()`]: https://www.ookii.org/docs/commandline-4.0/html/M_Ookii_CommandLine_LineWrappingTextWriter_ResetIndent.htm
-[`TextFormat`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Terminal_TextFormat.htm
+[`EnableColor()`]: https://www.ookii.org/docs/commandline-4.1/html/M_Ookii_CommandLine_Terminal_VirtualTerminal_EnableColor.htm
+[`EnableVirtualTerminalSequences()`]: https://www.ookii.org/docs/commandline-4.1/html/M_Ookii_CommandLine_Terminal_VirtualTerminal_EnableVirtualTerminalSequences.htm
+[`Indent`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_LineWrappingTextWriter_Indent.htm
+[`LineWrappingTextWriter.ForConsoleError()`]: https://www.ookii.org/docs/commandline-4.1/html/M_Ookii_CommandLine_LineWrappingTextWriter_ForConsoleError.htm
+[`LineWrappingTextWriter.ForConsoleOut()`]: https://www.ookii.org/docs/commandline-4.1/html/M_Ookii_CommandLine_LineWrappingTextWriter_ForConsoleOut.htm
+[`LineWrappingTextWriter.Indent`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_LineWrappingTextWriter_Indent.htm
+[`LineWrappingTextWriter.ResetIndent()`]: https://www.ookii.org/docs/commandline-4.1/html/M_Ookii_CommandLine_LineWrappingTextWriter_ResetIndent.htm
+[`LineWrappingTextWriter`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_LineWrappingTextWriter.htm
+[`Ookii.CommandLine.Terminal`]: https://www.ookii.org/docs/commandline-4.1/html/N_Ookii_CommandLine_Terminal.htm
+[`ResetIndent()`]: https://www.ookii.org/docs/commandline-4.1/html/M_Ookii_CommandLine_LineWrappingTextWriter_ResetIndent.htm
+[`TextFormat`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_Terminal_TextFormat.htm
 [`TextWriter`]: https://learn.microsoft.com/dotnet/api/system.io.textwriter
-[`UsageWriter`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_UsageWriter.htm
-[`VirtualTerminal`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Terminal_VirtualTerminal.htm
-[`LineWrappingTextWriter.Wrapping`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_LineWrappingTextWriter_Wrapping.htm
-[`WrappingMode.Disabled`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_WrappingMode.htm
-[`WrappingMode.EnabledNoForce`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_WrappingMode.htm
+[`UsageWriter`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_UsageWriter.htm
+[`VirtualTerminal`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_Terminal_VirtualTerminal.htm
+[`LineWrappingTextWriter.Wrapping`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_LineWrappingTextWriter_Wrapping.htm
+[`WrappingMode.Disabled`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_WrappingMode.htm
+[`WrappingMode.EnabledNoForce`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_WrappingMode.htm
