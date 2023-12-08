@@ -714,3 +714,19 @@ partial class DefaultValueFormatArguments
     [Description("Another argument.")]
     public double Argument2 { get; set; }
 }
+
+[GeneratedParser]
+partial class PrefixTerminationArguments
+{
+    [CommandLineArgument(Position = 0)]
+    public string Arg1 { get; set; }
+
+    [CommandLineArgument(Position = 1)]
+    public string Arg2 { get; set; }
+
+    [CommandLineArgument(Position = 2)]
+    public string Arg3 { get; set; }
+
+    [CommandLineArgument(Position = 3)]
+    public string Arg4 { get; set; }
+}

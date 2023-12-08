@@ -222,9 +222,11 @@ public class ParseOptions
     /// </value>
     /// <remarks>
     /// <para>
-    ///   This property is only used if the if the parsing mode is set to <see cref="ParsingMode.LongShort" qualifyHint="true"/>,
-    ///   either using the <see cref="Mode"/> property or the <see cref="ParseOptionsAttribute"/>
-    ///   attribute
+    ///   This property is only used if the <see cref="Mode"/> property or the
+    ///   <see cref="ParseOptionsAttribute.Mode" qualifyHint="true"/> is 
+    ///   <see cref="ParsingMode.LongShort" qualifyHint="true"/>, or if the <see cref="PrefixTermination"/>
+    ///   or <see cref="ParseOptionsAttribute.PrefixTermination" qualifyHint="true"/> property is not
+    ///   <see cref="PrefixTerminationMode.None" qualifyHint="true"/>.
     /// </para>
     /// <para>
     ///   Use the <see cref="ArgumentNamePrefixes"/> to specify the prefixes for short argument
@@ -731,6 +733,47 @@ public class ParseOptions
     public NameTransform ValueDescriptionTransformOrDefault => ValueDescriptionTransform ?? NameTransform.None;
 
     /// <summary>
+    /// Gets or sets the behavior when an argument is encountered that consists of only the long
+    /// argument prefix ("--" by default) by itself, not followed by a name.
+    /// </summary>
+    /// <value>
+    /// One of the values of the <see cref="PrefixTerminationMode"/> enumeration, or
+    /// <see langword="null"/> to use the value from the <see cref="ParseOptionsAttribute"/>
+    /// attribute, or if that is not present, <see cref="PrefixTerminationMode.None" qualifyHint="true"/>.
+    /// The default value is <see langword="null"/>.
+    /// </value>
+    /// <remarks>
+    /// <para>
+    ///   Use this property to allow the use of the long argument prefix by itself to either treat
+    ///   all remaining values as positional argument values, even when they start with an argument
+    ///   prefix, or to cancel parsing with <see cref="CancelMode.Success" qualifyHint="true"/> so
+    ///   the remaining values can be inspected using the
+    ///   <see cref="ParseResult.RemainingArguments" qualifyHint="true"/> property. This follows
+    ///   typical POSIX argument parsing conventions.
+    /// </para>
+    /// <para>
+    ///   The value of the <see cref="LongArgumentNamePrefix"/> property is used to identify this
+    ///   special argument, even if the parsing mode is not
+    ///   <see cref="ParsingMode.LongShort" qualifyHint="true"/>.
+    /// </para>
+    /// <para>
+    ///   If not <see langword="null"/>, this property overrides the
+    ///   <see cref="ParseOptionsAttribute.PrefixTermination" qualifyHint="true"/> property.
+    /// </para>
+    /// </remarks>
+    public PrefixTerminationMode? PrefixTermination {  get; set; }
+
+    /// <summary>
+    /// Gets the behavior when an argument is encountered that consists of only the long argument
+    /// prefix ("--" by default) by itself, not followed by a name.
+    /// </summary>
+    /// <value>
+    /// The value of the <see cref="PrefixTermination"/> property, or <see cref="PrefixTerminationMode.None" qualifyHint="true"/>
+    /// if that property is <see langword="null"/>.
+    /// </value>
+    public PrefixTerminationMode PrefixTerminationOrDefault => PrefixTermination ?? PrefixTerminationMode.None;
+
+    /// <summary>
     /// Gets or sets a value that indicates whether the <see cref="CommandLineParser"/> class
     /// will use reflection even if the command line arguments type has the
     /// <see cref="GeneratedParserAttribute"/>.
@@ -807,6 +850,7 @@ public class ParseOptions
         AutoVersionArgument ??= attribute.AutoVersionArgument;
         AutoPrefixAliases ??= attribute.AutoPrefixAliases;
         ValueDescriptionTransform ??= attribute.ValueDescriptionTransform;
+        PrefixTermination ??= attribute.PrefixTermination;
     }
 
     internal VirtualTerminalSupport EnableErrorColor()

@@ -877,6 +877,59 @@ public partial class CommandLineParserTest
 
     [TestMethod]
     [DynamicData(nameof(ProviderKinds), DynamicDataDisplayName = nameof(GetCustomDynamicDataDisplayName))]
+    public void TestPrefixTermination(ProviderKind kind)
+    {
+        var options = new ParseOptions()
+        {
+            PrefixTermination = PrefixTerminationMode.PositionalOnly
+        };
+
+        var parser = CreateParser<PrefixTerminationArguments>(kind, options);
+        Assert.AreEqual("--", parser.LongArgumentNamePrefix);
+        Assert.AreEqual(ParsingMode.Default, parser.Mode);
+        var result = CheckSuccess(parser, ["Foo", "--", "-Arg4", "Bar"]);
+        Assert.AreEqual("Foo", result.Arg1);
+        Assert.AreEqual("-Arg4", result.Arg2);
+        Assert.AreEqual("Bar", result.Arg3);
+        Assert.IsNull(result.Arg4);
+        options.PrefixTermination = PrefixTerminationMode.CancelWithSuccess;
+        result = CheckSuccess(parser, ["Foo", "--", "-Arg4", "Bar"], "--", 2);
+        Assert.AreEqual("Foo", result.Arg1);
+        Assert.IsNull(result.Arg2);
+        Assert.IsNull(result.Arg3);
+        Assert.IsNull(result.Arg4);
+        options.PrefixTermination = PrefixTerminationMode.CancelWithSuccess;
+    }
+
+    [TestMethod]
+    [DynamicData(nameof(ProviderKinds), DynamicDataDisplayName = nameof(GetCustomDynamicDataDisplayName))]
+    public void TestPrefixTerminationLongShort(ProviderKind kind)
+    {
+        var options = new ParseOptions()
+        {
+            IsPosix = true,
+            PrefixTermination = PrefixTerminationMode.PositionalOnly
+        };
+
+        var parser = CreateParser<PrefixTerminationArguments>(kind, options);
+        Assert.AreEqual("--", parser.LongArgumentNamePrefix);
+        Assert.AreEqual(ParsingMode.LongShort, parser.Mode);
+        var result = CheckSuccess(parser, ["--arg4", "Foo", "--", "--arg1", "Bar"]);
+        Assert.AreEqual("Foo", result.Arg4);
+        Assert.AreEqual("--arg1", result.Arg1);
+        Assert.AreEqual("Bar", result.Arg2);
+        Assert.IsNull(result.Arg3);
+        options.PrefixTermination = PrefixTerminationMode.CancelWithSuccess;
+        result = CheckSuccess(parser, ["Foo", "--", "--arg4", "Bar"], "--", 2);
+        Assert.AreEqual("Foo", result.Arg1);
+        Assert.IsNull(result.Arg2);
+        Assert.IsNull(result.Arg3);
+        Assert.IsNull(result.Arg4);
+        options.PrefixTermination = PrefixTerminationMode.CancelWithSuccess;
+    }
+
+    [TestMethod]
+    [DynamicData(nameof(ProviderKinds), DynamicDataDisplayName = nameof(GetCustomDynamicDataDisplayName))]
     public void TestAutomaticArgumentConflict(ProviderKind kind)
     {
         CommandLineParser parser = CreateParser<AutomaticConflictingNameArguments>(kind);

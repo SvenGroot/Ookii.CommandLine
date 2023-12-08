@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
@@ -360,7 +361,7 @@ public class CommandLineParser
         _argumentNamePrefixes = DetermineArgumentNamePrefixes(_parseOptions);
         _nameValueSeparators = DetermineNameValueSeparators(_parseOptions);
         var prefixInfos = _argumentNamePrefixes.Select(p => new PrefixInfo { Prefix = p, Short = true });
-        if (_mode == ParsingMode.LongShort)
+        if (_mode == ParsingMode.LongShort || _parseOptions.PrefixTerminationOrDefault != PrefixTerminationMode.None)
         {
             _longArgumentNamePrefix = _parseOptions.LongArgumentNamePrefixOrDefault;
             if (string.IsNullOrWhiteSpace(_longArgumentNamePrefix))
@@ -368,9 +369,12 @@ public class CommandLineParser
                 throw new ArgumentException(Properties.Resources.EmptyArgumentNamePrefix, nameof(options));
             }
 
-            var longInfo = new PrefixInfo { Prefix = _longArgumentNamePrefix, Short = false };
-            prefixInfos = prefixInfos.Append(longInfo);
-            _argumentsByShortName = new(new CharComparer(comparison));
+            if (_mode == ParsingMode.LongShort)
+            {
+                var longInfo = new PrefixInfo { Prefix = _longArgumentNamePrefix, Short = false };
+                prefixInfos = prefixInfos.Append(longInfo);
+                _argumentsByShortName = new(new CharComparer(comparison));
+            }
         }
 
         _sortedPrefixes = prefixInfos.OrderByDescending(info => info.Prefix.Length).ToArray();
@@ -431,14 +435,18 @@ public class CommandLineParser
     /// </summary>
     /// <value>
     /// The prefix for long argument names, or <see langword="null"/> if the <see cref="Mode"/>
-    /// property is not <see cref="ParsingMode.LongShort" qualifyHint="true"/>.
+    /// property is not <see cref="ParsingMode.LongShort" qualifyHint="true"/> and the
+    /// <see cref="ParseOptions.PrefixTermination" qualifyHint="true"/> property is
+    /// <see cref="PrefixTerminationMode.None" qualifyHint="true"/>.
     /// </value>
     /// <remarks>
     /// <para>
     ///   The long argument prefix is only used if the <see cref="Mode"/> property is
-    ///   <see cref="ParsingMode.LongShort" qualifyHint="true"/>. See <see cref="ArgumentNamePrefixes"/> to
-    ///   get the prefixes for short argument names, or for argument names if the <see cref="Mode"/>
-    ///   property is <see cref="ParsingMode.Default" qualifyHint="true"/>.
+    ///   <see cref="ParsingMode.LongShort" qualifyHint="true"/>, or if the
+    ///   <see cref="ParseOptions.PrefixTermination" qualifyHint="true"/> property is not
+    ///   <see cref="PrefixTerminationMode.None" qualifyHint="true"/>. See <see cref="ArgumentNamePrefixes"/> to
+    ///   get the prefixes for short argument names, or for all argument names if the
+    ///   <see cref="Mode"/> property is <see cref="ParsingMode.Default" qualifyHint="true"/>.
     /// </para>
     /// </remarks>
     /// <seealso cref="ParseOptionsAttribute.LongArgumentNamePrefix" qualifyHint="true"/>
@@ -1479,12 +1487,30 @@ public class CommandLineParser
         HelpRequested = false;
         int positionalArgumentIndex = 0;
 
+        bool optionalOnly = false;
         var cancelParsing = CancelMode.None;
         CommandLineArgument? lastArgument = null;
         for (x = 0; x < args.Length; ++x)
         {
             string arg = args.Span[x];
-            var argumentNamePrefix = CheckArgumentNamePrefix(arg);
+            if (!optionalOnly &&
+                _parseOptions.PrefixTerminationOrDefault != PrefixTerminationMode.None &&
+                arg == _longArgumentNamePrefix)
+            {
+                if (_parseOptions.PrefixTerminationOrDefault == PrefixTerminationMode.PositionalOnly)
+                {
+                    optionalOnly = true;
+                    continue;
+                }
+                else if (_parseOptions.PrefixTerminationOrDefault == PrefixTerminationMode.CancelWithSuccess)
+                {
+                    cancelParsing = CancelMode.Success;
+                    lastArgument = null;
+                    break;
+                }
+            }
+
+            var argumentNamePrefix = optionalOnly ? null : CheckArgumentNamePrefix(arg);
             if (argumentNamePrefix != null)
             {
                 // If white space was the value separator, this function returns the index of argument containing the value for the named argument.
@@ -1568,7 +1594,7 @@ public class CommandLineParser
 
         ParseResult = cancelParsing == CancelMode.None
             ? ParseResult.FromSuccess()
-            : ParseResult.FromSuccess(lastArgument!.ArgumentName, args.Slice(x + 1));
+            : ParseResult.FromSuccess(lastArgument?.ArgumentName ?? LongArgumentNamePrefix, args.Slice(x + 1));
 
         // Reset to false in case it was set by a method argument that didn't cancel parsing.
         HelpRequested = false;
