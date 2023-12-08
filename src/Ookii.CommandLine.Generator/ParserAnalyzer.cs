@@ -25,7 +25,8 @@ public class ParserAnalyzer : DiagnosticAnalyzer
         if (languageVersion < LanguageVersion.CSharp8 || 
             symbol.IsAbstract || 
             symbol.ContainingType != null || 
-            symbol.IsGenericType)
+            symbol.IsGenericType ||
+            !symbol.IsReferenceType)
         {
             // Unsupported.
             return;
