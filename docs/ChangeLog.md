@@ -1,5 +1,36 @@
 # What’s new in Ookii.CommandLine
 
+## Ookii.CommandLine 4.1 (TBD)
+
+- Support for using a `--` argument to escape argument names for the remaining arguments, or to
+  cancel parsing. This can be enabled using [`ParseOptions.PrefixTermination`][] or
+  [`ParseOptionsAttribute.PrefixTermination`][].
+- The [`ValidateEnumValueAttribute`][] has additional properties to control how enumeration values
+  are parsed: [`CaseSensitive`][CaseSensitive_1], [`AllowNumericValues`][], and
+  [`AllowCommaSeparatedValues`][].
+  - The [`EnumConverter`][] now also checks the
+    [`ValidateEnumValueAttribute.IncludeValuesInErrorMessage`][] property, if the attribute is
+    present on the argument, so that error message from the converter and validator are consistent.
+- Support for passing a cancellation token to the [`CommandManager.RunCommandAsync()`][] method.
+  Tasks can access this token by implementing the [`IAsyncCancelableCommand`][] interface. The
+  [`AsyncCommandBase`][] class provides support as well.
+- Usage help improvements:
+  - Support for custom default value formatting, using
+    [`CommandLineArgumentAttribute.DefaultValueFormat`][].
+  - Add [`LineWrappingTextWriter.IndentAfterEmptyLine`][] and [`UsageWriter.IndentAfterEmptyLine`][]
+    properties, which allow for proper formatting of argument descriptions with blank lines using
+    the default usage help format.
+  - Add support for easily adding a footer to the usage help.
+  - Some localizable text that could previously only be customized by deriving from the
+    [`UsageWriter`][] class can now also be customized with the [`LocalizedStringProvider`][] class,
+    so you only need to derive from [`LocalizedStringProvider`][] to customize all user-facing
+    strings.
+- Provide helper methods in the [`VirtualTerminal`][] class for writing text with VT formatting to
+  the standard output or error streams.
+- Provide extension methods for [`StandardStream`][] in the [`StandardStreamExtensions`][] class.
+- Emit a warning if a class isn't using the [`GeneratedParserAttribute`][] when it could, with an
+  automatic code fix to easily apply it.
+
 ## Ookii.CommandLine 4.0.1 (2023-09-19)
 
 - Fix an issue where arguments defined by methods could not have aliases.
@@ -218,34 +249,53 @@ and usage.
 Upgrading an existing project that is using Ookii.CommandLine 1.0 to Ookii.CommandLine 2.0 or newer
 may require substantial code changes and may change how command lines are parsed.
 
+[`AllowCommaSeparatedValues`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_Validation_ValidateEnumValueAttribute_AllowCommaSeparatedValues.htm
+[`AllowNumericValues`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_Validation_ValidateEnumValueAttribute_AllowNumericValues.htm
 [`ApplicationFriendlyNameAttribute`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_ApplicationFriendlyNameAttribute.htm
 [`ArgumentConverter`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_Conversion_ArgumentConverter.htm
 [`AssemblyTitleAttribute`]: https://learn.microsoft.com/dotnet/api/system.reflection.assemblytitleattribute
+[`AsyncCommandBase`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_Commands_AsyncCommandBase.htm
+[`CommandLineArgumentAttribute.DefaultValueFormat`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_DefaultValueFormat.htm
 [`CommandLineArgumentAttribute.IncludeDefaultInUsageHelp`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_IncludeDefaultInUsageHelp.htm
 [`CommandLineParser.ParseResult`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_CommandLineParser_ParseResult.htm
 [`CommandLineParser`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_CommandLineParser.htm
 [`CommandLineParser<T>.ParseWithErrorHandling()`]: https://www.ookii.org/docs/commandline-4.1/html/M_Ookii_CommandLine_CommandLineParser_1_ParseWithErrorHandling.htm
 [`CommandLineParser<T>`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_CommandLineParser_1.htm
 [`CommandManager.ParseResult`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_Commands_CommandManager_ParseResult.htm
+[`CommandManager.RunCommandAsync()`]: https://www.ookii.org/docs/commandline-4.1/html/Overload_Ookii_CommandLine_Commands_CommandManager_RunCommandAsync.htm
 [`CommandOptions.IsPosix`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_Commands_CommandOptions_IsPosix.htm
 [`CultureInfo.InvariantCulture`]: https://learn.microsoft.com/dotnet/api/system.globalization.cultureinfo.invariantculture
+[`EnumConverter`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_Conversion_EnumConverter.htm
 [`Environment.GetCommandLineArgs()`]: https://learn.microsoft.com/dotnet/api/system.environment.getcommandlineargs
 [`GeneratedCommandManagerAttribute`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_Commands_GeneratedCommandManagerAttribute.htm
 [`GeneratedParserAttribute`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_GeneratedParserAttribute.htm
+[`IAsyncCancelableCommand`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_Commands_IAsyncCancelableCommand.htm
 [`IParsable<TSelf>`]: https://learn.microsoft.com/dotnet/api/system.iparsable-1
 [`ISpanParsable<TSelf>`]: https://learn.microsoft.com/dotnet/api/system.ispanparsable-1
+[`LineWrappingTextWriter.IndentAfterEmptyLine`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_LineWrappingTextWriter_IndentAfterEmptyLine.htm
 [`LineWrappingTextWriter.ToString()`]: https://www.ookii.org/docs/commandline-4.1/html/M_Ookii_CommandLine_LineWrappingTextWriter_ToString.htm
 [`LineWrappingTextWriter`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_LineWrappingTextWriter.htm
+[`LocalizedStringProvider`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_LocalizedStringProvider.htm
 [`ParseOptions.IsPosix`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_ParseOptions_IsPosix.htm
+[`ParseOptions.PrefixTermination`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_ParseOptions_PrefixTermination.htm
 [`ParseOptions`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_ParseOptions.htm
 [`ParseOptionsAttribute.IsPosix`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_ParseOptionsAttribute_IsPosix.htm
+[`ParseOptionsAttribute.PrefixTermination`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_ParseOptionsAttribute_PrefixTermination.htm
 [`ParseOptionsAttribute`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_ParseOptionsAttribute.htm
 [`ReadOnlySpan<char>`]: https://learn.microsoft.com/dotnet/api/system.readonlyspan-1
 [`ResetIndentAsync()`]: https://www.ookii.org/docs/commandline-4.1/html/M_Ookii_CommandLine_LineWrappingTextWriter_ResetIndentAsync.htm
+[`StandardStream`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_Terminal_StandardStream.htm
+[`StandardStreamExtensions`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_Terminal_StandardStreamExtensions.htm
 [`StringWriter`]: https://learn.microsoft.com/dotnet/api/system.io.stringwriter
 [`TypeConverter`]: https://learn.microsoft.com/dotnet/api/system.componentmodel.typeconverter
+[`UsageWriter.IndentAfterEmptyLine`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_UsageWriter_IndentAfterEmptyLine.htm
+[`UsageWriter`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_UsageWriter.htm
+[`ValidateEnumValueAttribute.IncludeValuesInErrorMessage`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_Validation_ValidateEnumValueAttribute_IncludeValuesInErrorMessage.htm
+[`ValidateEnumValueAttribute`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_Validation_ValidateEnumValueAttribute.htm
 [`ValueDescriptionAttribute`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_ValueDescriptionAttribute.htm
+[`VirtualTerminal`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_Terminal_VirtualTerminal.htm
 [`Wrapping`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_LineWrappingTextWriter_Wrapping.htm
+[CaseSensitive_1]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_Validation_ValidateEnumValueAttribute_CaseSensitive.htm
 [Flush()_0]: https://www.ookii.org/docs/commandline-4.1/html/M_Ookii_CommandLine_LineWrappingTextWriter_Flush_1.htm
 [Parse()_6]: https://www.ookii.org/docs/commandline-4.1/html/M_Ookii_CommandLine_CommandLineParser_Parse.htm
 [Parse<T>()_1]: https://www.ookii.org/docs/commandline-4.1/html/M_Ookii_CommandLine_CommandLineParser_Parse__1.htm
