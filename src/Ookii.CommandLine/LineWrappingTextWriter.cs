@@ -399,9 +399,14 @@ public partial class LineWrappingTextWriter : TextWriter
     /// </value>
     /// <remarks>
     /// <para>
-    ///   Whenever a line break is encountered (either because of wrapping or because a line break was written to the
-    ///   <see cref="LineWrappingTextWriter"/>), the next line is indented by the number of characters specified
-    ///   by this property, unless the previous line was blank.
+    ///   Whenever a line break is encountered (either because of wrapping or because a line break
+    ///   was written to the <see cref="LineWrappingTextWriter"/>), the next line is indented by the
+    ///   number of characters specified by this property, unless the <see
+    ///   cref="IndentAfterEmptyLine"/> property is <see langword="false"/> and the previous line
+    ///   was blank.
+    /// </para>
+    /// <para>
+    ///   Changes to this property will not 
     /// </para>
     /// <para>
     ///   The output position can be reset to the start of the line after a line break by calling
