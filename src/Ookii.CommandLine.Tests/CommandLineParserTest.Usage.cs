@@ -682,6 +682,8 @@ a blank line.
     -Version [<Boolean>]
         Displays version information.
 
+Some usage footer.
+
 ".ReplaceLineEndings();
 
     private static readonly string _expectedEmptyLineIndentAfterBlankLineUsage = @"Usage: test [-Argument <String>] [-Help] [-Version]
@@ -696,6 +698,8 @@ a blank line.
 
     -Version [<Boolean>]
         Displays version information.
+
+Some usage footer.
 
 ".ReplaceLineEndings();
 

@@ -6,6 +6,7 @@ internal readonly struct ArgumentsClassAttributes
 {
     private readonly AttributeData? _parseOptions;
     private readonly AttributeData? _description;
+    private readonly AttributeData? _usageFooter;
     private readonly AttributeData? _applicationFriendlyName;
     private readonly AttributeData? _command;
     private readonly AttributeData? _generatedParser;
@@ -22,6 +23,7 @@ internal readonly struct ArgumentsClassAttributes
             {
                 var _ = attribute.CheckType(typeHelper.ParseOptionsAttribute, ref _parseOptions) ||
                     attribute.CheckType(typeHelper.DescriptionAttribute, ref _description) ||
+                    attribute.CheckType(typeHelper.UsageFooterAttribute, ref _usageFooter) ||
                     attribute.CheckType(typeHelper.ApplicationFriendlyNameAttribute, ref _applicationFriendlyName) ||
                     attribute.CheckType(typeHelper.CommandAttribute, ref _command) ||
                     attribute.CheckType(typeHelper.ClassValidationAttribute, ref _classValidators) ||
@@ -34,6 +36,7 @@ internal readonly struct ArgumentsClassAttributes
 
     public AttributeData? ParseOptions => _parseOptions;
     public AttributeData? Description => _description;
+    public AttributeData? UsageFooter => _usageFooter;
     public AttributeData? ApplicationFriendlyName => _applicationFriendlyName;
     public AttributeData? Command => _command;
     public AttributeData? GeneratedParser => _generatedParser;

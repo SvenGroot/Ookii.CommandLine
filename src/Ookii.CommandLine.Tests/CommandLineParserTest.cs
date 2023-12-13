@@ -472,12 +472,27 @@ public partial class CommandLineParserTest
         };
 
         var target = CreateParser<EmptyLineDescriptionArguments>(kind, options);
-        string actual = target.GetUsage(options.UsageWriter);
+        string actual = target.GetUsage();
         Assert.AreEqual(_expectedEmptyLineDefaultUsage, actual);
 
         options.UsageWriter.IndentAfterEmptyLine = true;
-        actual = target.GetUsage(options.UsageWriter);
+        actual = target.GetUsage();
         Assert.AreEqual(_expectedEmptyLineIndentAfterBlankLineUsage, actual);
+
+        // Test again with a max length to make sure indents are properly reset where expected.
+        using var writer = LineWrappingTextWriter.ForStringWriter(80);
+        var usageWriter = new UsageWriter(writer)
+        {
+            ExecutableName = _executableName,
+        };
+
+        target.WriteUsage(usageWriter);
+        Assert.AreEqual(_expectedEmptyLineDefaultUsage, writer.ToString());
+
+        //((StringWriter)writer.BaseWriter).GetStringBuilder().Clear();
+        //usageWriter.IndentAfterEmptyLine = true;
+        //target.WriteUsage(usageWriter);
+        //Assert.AreEqual(_expectedEmptyLineIndentAfterBlankLineUsage, writer.ToString());
     }
 
     [TestMethod]

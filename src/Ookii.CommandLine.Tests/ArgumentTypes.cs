@@ -696,6 +696,7 @@ partial class AutoPositionArguments : AutoPositionArgumentsBase
 }
 
 [GeneratedParser]
+[UsageFooter("Some usage footer.")]
 partial class EmptyLineDescriptionArguments
 {
     [CommandLineArgument]

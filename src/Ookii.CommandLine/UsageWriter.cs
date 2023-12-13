@@ -1746,13 +1746,18 @@ public class UsageWriter
     ///   only if the requested help is <see cref="UsageHelpRequest.Full" qualifyHint="true"/>.
     /// </para>
     /// <para>
-    ///   The base implementation does nothing; this function exists to allow derived classes to
-    ///   easily add a footer to the help.
+    ///   The base implementation writes the value of the <see cref="CommandLineParser.UsageFooter" qualifyHint="true"/>
+    ///   property, if it is not an empty string. This value can be set using the
+    ///   <see cref="UsageFooterAttribute"/> attribute.
     /// </para>
     /// </remarks>
     protected virtual void WriteParserUsageFooter()
     {
-        // Nothing
+        if (!string.IsNullOrEmpty(Parser.UsageFooter))
+        {
+            WriteLine(Parser.UsageFooter);
+            WriteLine();
+        }
     }
 
     /// <summary>

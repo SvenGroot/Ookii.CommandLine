@@ -488,16 +488,31 @@ public class CommandLineParser
     /// Gets a description that is used when generating usage information.
     /// </summary>
     /// <value>
-    /// The description of the command line application. The default value is an empty string ("").
+    /// The description of the command line application.
     /// </value>
     /// <remarks>
     /// <para>
-    ///   If not empty, this description will be added to the usage returned by the <see cref="WriteUsage"/>
-    ///   method. This description can be set by applying the <see cref="DescriptionAttribute"/> to
-    ///   the command line arguments type.
+    ///   If not empty, this description will be added at the top of the usage help returned by the
+    ///   <see cref="WriteUsage"/> method. This description can be set by applying the
+    ///   <see cref="DescriptionAttribute"/> attribute to the command line arguments class.
     /// </para>
     /// </remarks>
     public string Description => _provider.Description;
+
+    /// <summary>
+    /// Gets footer text that is used when generating usage information.
+    /// </summary>
+    /// <value>
+    /// The footer text.
+    /// </value>
+    /// <remarks>
+    /// <para>
+    ///   If not empty, this footer will be added at the bottom of the usage help returned by the
+    ///   <see cref="WriteUsage"/> method. This footer can be set by applying the
+    ///   <see cref="UsageFooterAttribute"/> attribute to the command line arguments class.
+    /// </para>
+    /// </remarks>
+    public string UsageFooter => _provider.UsageFooter;
 
     /// <summary>
     /// Gets the options used by this instance.

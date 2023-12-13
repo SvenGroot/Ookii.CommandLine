@@ -35,6 +35,8 @@ internal class ReflectionArgumentProvider : ArgumentProvider
 
     public override string Description => ArgumentsType.GetCustomAttribute<DescriptionAttribute>()?.Description ?? string.Empty;
 
+    public override string UsageFooter => ArgumentsType.GetCustomAttribute<UsageFooterAttribute>()?.Footer ?? string.Empty;
+
     public override bool IsCommand => CommandInfo.IsCommand(ArgumentsType);
 
     public override object CreateInstance(CommandLineParser parser, object?[]? requiredPropertyValues)
