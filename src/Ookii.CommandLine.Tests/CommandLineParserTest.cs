@@ -489,10 +489,11 @@ public partial class CommandLineParserTest
         target.WriteUsage(usageWriter);
         Assert.AreEqual(_expectedEmptyLineDefaultUsage, writer.ToString());
 
-        //((StringWriter)writer.BaseWriter).GetStringBuilder().Clear();
-        //usageWriter.IndentAfterEmptyLine = true;
-        //target.WriteUsage(usageWriter);
-        //Assert.AreEqual(_expectedEmptyLineIndentAfterBlankLineUsage, writer.ToString());
+        ((StringWriter)writer.BaseWriter).GetStringBuilder().Clear();
+        writer.ResetIndent();
+        usageWriter.IndentAfterEmptyLine = true;
+        target.WriteUsage(usageWriter);
+        Assert.AreEqual(_expectedEmptyLineIndentAfterBlankLineUsage, writer.ToString());
     }
 
     [TestMethod]

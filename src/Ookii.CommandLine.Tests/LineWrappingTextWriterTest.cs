@@ -138,6 +138,24 @@ public partial class LineWrappingTextWriterTest
     }
 
     [TestMethod()]
+    public void TestIndentChangesNoMaximum()
+    {
+        using var writer = LineWrappingTextWriter.ForStringWriter();
+        writer.Indent = 4;
+        writer.WriteLine(_input);
+        writer.Indent = 8;
+        writer.Write(_input.Trim());
+        // Should add a new line.
+        writer.ResetIndent();
+        writer.WriteLine(_input.Trim());
+        // Should not add a new line.
+        writer.ResetIndent();
+        writer.Flush();
+
+        Assert.AreEqual(_expectedIndentChangesNoMaximum, writer.BaseWriter.ToString());
+    }
+
+    [TestMethod()]
     public async Task TestIndentChangesAsync()
     {
         using var writer = LineWrappingTextWriter.ForStringWriter(80);
