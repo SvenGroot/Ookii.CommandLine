@@ -240,18 +240,19 @@ You can use the [`ParseOptions.ShowUsageOnError`][] property to customize this b
 
 An argument's default value will be included in the usage help if the
 [`UsageWriter.IncludeDefaultValueInDescription`][] property is true and the
-[`CommandLineArgumentAttribute.IncludeDefaultInUsageHelp`][] property is true. Both of these are true
-by default, but they can be set to false to disable including the default value either globally or
-for a specific argument.
+[`CommandLineArgumentAttribute.IncludeDefaultInUsageHelp`][] property is true. Both of these are
+true by default, but they can be set to false to disable including the default value either globally
+or for a specific argument.
 
-If you use [source generation](SourceGeneration.md) with the [`GeneratedParserAttribute`][] attribute,
-you can use a property initializer to set a default value which will be shown in the description.
-Without source generation, only default values set using the [`CommandLineArgumentAttribute.DefaultValue`][]
-property can be shown.
+If you use [source generation](SourceGeneration.md) with the [`GeneratedParserAttribute`][]
+attribute, you can use a property initializer to set a default value which will be shown in the
+description. Without source generation, only default values set using the
+[`CommandLineArgumentAttribute.DefaultValue`][] property can be shown.
 
-You can customize how an argument's default value is formatted in the usagehelp by using the [`CommandLineArgumentAttribute.DefaultValueFormat`][] property. This property
-takes a compound formatting string with a single placeholder. For example, the following argument
-displays its default value in hexadecimal, as `0xff`:
+You can customize how an argument's default value is formatted in the usage help by using the
+[`CommandLineArgumentAttribute.DefaultValueFormat`][] property. This property takes a compound
+formatting string with a single placeholder. For example, the following argument displays its
+default value in hexadecimal, as `0xff`:
 
 ```csharp
 [GeneratedParser]
@@ -263,6 +264,36 @@ partial class MyArguments
 ```
 
 Without the custom format, the value would've been formatted as `255`.
+
+### Descriptions with blank lines
+
+Sometimes, you may want to make your argument description more legible by including blank lines.
+Unfortunately, this does not work well with the default usage help format, because the descriptions
+are indented, but indentation is reset after a blank line. This means your usage help can end up
+looking like this:
+
+```text
+    -SomeArgument <String>
+        First line of the description.
+
+And another line, after a blank line.
+
+    -OtherArgument <Int32>
+        Other description.
+```
+
+To avoid this, set the [`UsageWriter.IndentAfterEmptyLine`][] property to true. Now, the same usage
+help will look like this:
+
+```text
+    -SomeArgument <String>
+        First line of the description.
+
+        And another line, after a blank line.
+
+    -OtherArgument <Int32>
+        Other description.
+```
 
 ## Hidden arguments
 
@@ -399,6 +430,7 @@ Next, we'll take a look at [argument validation and dependencies](Validation.md)
 [`UsageWriter.ArgumentDescriptionListOrder`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_UsageWriter_ArgumentDescriptionListOrder.htm
 [`UsageWriter.IncludeApplicationDescription`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_UsageWriter_IncludeApplicationDescription.htm
 [`UsageWriter.IncludeDefaultValueInDescription`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_UsageWriter_IncludeDefaultValueInDescription.htm
+[`UsageWriter.IndentAfterEmptyLine`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_UsageWriter_IndentAfterEmptyLine.htm
 [`UsageWriter.UseAbbreviatedSyntax`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_UsageWriter_UseAbbreviatedSyntax.htm
 [`UsageWriter.UseColor`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_UsageWriter_UseColor.htm
 [`UsageWriter.UseShortNamesForSyntax`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_UsageWriter_UseShortNamesForSyntax.htm

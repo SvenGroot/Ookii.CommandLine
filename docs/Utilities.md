@@ -42,9 +42,10 @@ The [`LineWrappingTextWriter`][] class uses hanging indents, also called negativ
 lines except the first one are indented. The indentation level can be set using the
 [`LineWrappingTextWriter.Indent`][] property, which indicates the number of spaces to indent by.
 
-When this property is set, it will apply to the next line that needs to be indented. The first line
-of text, and any line after a blank line, is not indented. Indentation is applied both to lines that
-were wrapped, and lines created by explicit new lines in the text.
+When this property is set, it will apply to the next line that needs to be indented. Indentation is
+applied both to lines that were wrapped, and lines created by explicit new lines in the text. The
+first line of text is not indented. Lines after a blank line are not indented either, unless you set
+the [`LineWrappingTextWriter.IndentAfterEmptyLine`][] property to true.
 
 You can change the [`Indent`][] property at any time to change the size of the indentation to use.
 
@@ -169,7 +170,9 @@ public int Run()
 [`LineWrappingTextWriter.ForConsoleError()`]: https://www.ookii.org/docs/commandline-4.1/html/M_Ookii_CommandLine_LineWrappingTextWriter_ForConsoleError.htm
 [`LineWrappingTextWriter.ForConsoleOut()`]: https://www.ookii.org/docs/commandline-4.1/html/M_Ookii_CommandLine_LineWrappingTextWriter_ForConsoleOut.htm
 [`LineWrappingTextWriter.Indent`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_LineWrappingTextWriter_Indent.htm
+[`LineWrappingTextWriter.IndentAfterEmptyLine`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_LineWrappingTextWriter_IndentAfterEmptyLine.htm
 [`LineWrappingTextWriter.ResetIndent()`]: https://www.ookii.org/docs/commandline-4.1/html/M_Ookii_CommandLine_LineWrappingTextWriter_ResetIndent.htm
+[`LineWrappingTextWriter.Wrapping`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_LineWrappingTextWriter_Wrapping.htm
 [`LineWrappingTextWriter`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_LineWrappingTextWriter.htm
 [`Ookii.CommandLine.Terminal`]: https://www.ookii.org/docs/commandline-4.1/html/N_Ookii_CommandLine_Terminal.htm
 [`ResetIndent()`]: https://www.ookii.org/docs/commandline-4.1/html/M_Ookii_CommandLine_LineWrappingTextWriter_ResetIndent.htm
@@ -177,6 +180,5 @@ public int Run()
 [`TextWriter`]: https://learn.microsoft.com/dotnet/api/system.io.textwriter
 [`UsageWriter`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_UsageWriter.htm
 [`VirtualTerminal`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_Terminal_VirtualTerminal.htm
-[`LineWrappingTextWriter.Wrapping`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_LineWrappingTextWriter_Wrapping.htm
 [`WrappingMode.Disabled`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_WrappingMode.htm
 [`WrappingMode.EnabledNoForce`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_WrappingMode.htm

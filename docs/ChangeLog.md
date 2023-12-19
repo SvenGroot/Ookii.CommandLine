@@ -19,8 +19,8 @@
   - Support for [custom default value formatting](UsageHelp.md#default-values), using
     [`CommandLineArgumentAttribute.DefaultValueFormat`][].
   - Add [`LineWrappingTextWriter.IndentAfterEmptyLine`][] and [`UsageWriter.IndentAfterEmptyLine`][]
-    properties, which allow for proper formatting of argument descriptions with blank lines using
-    the default usage help format.
+    properties, which allow for proper formatting of [argument descriptions with blank lines](UsageHelp.md#descriptions-with-blank-lines)
+    using the default usage help format.
   - Add support for easily adding a footer to the usage help.
   - Some localizable text that could previously only be customized by deriving from the
     [`UsageWriter`][] class can now also be customized with the [`LocalizedStringProvider`][] class,
