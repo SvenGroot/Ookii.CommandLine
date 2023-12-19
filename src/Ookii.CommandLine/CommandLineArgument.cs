@@ -841,7 +841,7 @@ public abstract class CommandLineArgument
     /// </value>
     /// <remarks>
     /// <para>
-    ///   For dictionary arguments, this property only returns the information that apples to both
+    ///   For dictionary arguments, this property only returns the information that applies to both
     ///   dictionary and multi-value arguments. For information that applies to dictionary
     ///   arguments, but not other types of multi-value arguments, use the <see cref="DictionaryInfo"/>
     ///   property.
