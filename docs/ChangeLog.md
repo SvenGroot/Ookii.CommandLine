@@ -2,15 +2,15 @@
 
 ## Ookii.CommandLine 4.1 (TBD)
 
-- Support for using a `--` argument to escape argument names for the remaining arguments, or to
-  cancel parsing. This can be enabled using [`ParseOptions.PrefixTermination`][] or
-  [`ParseOptionsAttribute.PrefixTermination`][].
-- The [`ValidateEnumValueAttribute`][] has additional properties to control how enumeration values
-  are parsed: [`CaseSensitive`][CaseSensitive_1], [`AllowNumericValues`][], and
-  [`AllowCommaSeparatedValues`][].
+- Support for [using a `--` argument](Arguments.md#the----argument) to escape argument names for the
+  remaining arguments, or to cancel parsing. This can be enabled using
+  [`ParseOptions.PrefixTermination`][] or [`ParseOptionsAttribute.PrefixTermination`][].
+- The [`ValidateEnumValueAttribute`][] has additional properties to control how
+  [enumeration values are parsed](Arguments.md#enumeration-conversion):
+  [`CaseSensitive`][CaseSensitive_1], [`AllowNumericValues`][], and [`AllowCommaSeparatedValues`][].
   - The [`EnumConverter`][] now also checks the
     [`ValidateEnumValueAttribute.IncludeValuesInErrorMessage`][] property, if the attribute is
-    present on the argument, so that error message from the converter and validator are consistent.
+    present on the argument, so that error messages from the converter and validator are consistent.
 - Support for passing a cancellation token to the [`CommandManager.RunCommandAsync()`][] method.
   Tasks can access this token by implementing the [`IAsyncCancelableCommand`][] interface. The
   [`AsyncCommandBase`][] class provides support as well.

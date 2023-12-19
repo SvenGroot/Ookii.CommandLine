@@ -309,33 +309,32 @@ upgrade code that relied on a [`TypeConverter`][].
 
 ### Enumeration conversion
 
-The [`EnumConverter`][] used for enumeration types relies on the [`Enum.Parse()`][] method. It uses case
-insensitive conversion, and allows both the names and underlying value of the enumeration to be
-used. This means that e.g. for the [`DayOfWeek`][] enumeration, "Monday", "monday", and "1" can all
-be used to indicate [`DayOfWeek.Monday`][].
+The [`EnumConverter`][] used for enumeration types relies on the [`Enum.Parse()`][] method. Its
+default behavior is to use case insensitive conversion, and to allow both the names and underlying
+value of the enumeration to be used. This means that e.g. for the [`DayOfWeek`][] enumeration,
+"Monday", "monday", and "1" can all be used to indicate [`DayOfWeek.Monday`][].
 
 In the case of a numeric value, the converter does not check if the resulting value is valid for the
 enumeration type, so again for [`DayOfWeek`][], a value of "9" would be converted to `(DayOfWeek)9`
 even though there is no such value in the enumeration.
 
 To ensure the result is constrained to only the defined values of the enumeration, use the
-[`ValidateEnumValueAttribute` validator](Validation.md).
+[`ValidateEnumValueAttribute` validator](Validation.md). This validator can also be used to alter
+the conversion behavior. You can enable case sensitivity with the
+[`ValidateEnumValueAttribute.CaseSensitive`][] property, and disallow numeric values with the
+[`ValidateEnumValueAttribute.AllowNumericValues`][] property.
 
-The converter allows the use of comma-separated values, which will be combined using a bitwise or
-operation. This is allowed regardless of whether or not the [`FlagsAttribute`][] attribute is present on
-the enumeration, which can have unexpected results. Using the [`DayOfWeek`][] example again,
-"Monday,Tuesday" would result in the value `DayOfWeek.Monday | DayOfWeek.Tuesday`, which is actually
-equivalent to [`DayOfWeek.Wednesday`][].
+By default, the converter allows the use of comma-separated values, which will be combined using a
+bitwise or operation. This is allowed regardless of whether or not the [`FlagsAttribute`][]
+attribute is present on the enumeration, which can have unexpected results. Using the
+[`DayOfWeek`][] example again, "Monday,Tuesday" would result in the value
+`DayOfWeek.Monday | DayOfWeek.Tuesday`, which is actually equivalent to [`DayOfWeek.Wednesday`][].
 
-One way to avoid this is to use the following pattern validator, which ensures that the
-string value before conversion does not contain a comma:
+Comma-separated values can be disabled by using the
+[`ValidateEnumValueAttribute.AllowCommaSeparatedValues`][] property.
 
-```csharp
-[ValidatePattern("^[^,]*$")]
-```
-
-You can also use a pattern like `"^[a-zA-Z]"` to ensure the value starts with a letter, to disallow
-the use of numeric values entirely.
+These properties of the [`ValidateEnumValueAttribute`][] attribute only work if the default
+[`EnumConverter`][] is used; a custom converter may or may not check them.
 
 ### Multi-value and dictionary value conversion
 
@@ -461,5 +460,9 @@ Next, let's take a look at how to [define arguments](DefiningArguments.md).
 [`String`]: https://learn.microsoft.com/dotnet/api/system.string
 [`TypeConverter`]: https://learn.microsoft.com/dotnet/api/system.componentmodel.typeconverter
 [`Uri`]: https://learn.microsoft.com/dotnet/api/system.uri
+[`ValidateEnumValueAttribute.AllowCommaSeparatedValues`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_Validation_ValidateEnumValueAttribute_AllowCommaSeparatedValues.htm
+[`ValidateEnumValueAttribute.AllowNumericValues`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_Validation_ValidateEnumValueAttribute_AllowNumericValues.htm
+[`ValidateEnumValueAttribute.CaseSensitive`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_Validation_ValidateEnumValueAttribute_CaseSensitive.htm
+[`ValidateEnumValueAttribute`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_Validation_ValidateEnumValueAttribute.htm
 [`ValueConverterAttribute`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_Conversion_ValueConverterAttribute.htm
 [NullArgumentValue_0]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_CommandLineArgumentErrorCategory.htm
