@@ -84,6 +84,7 @@
   "CommandLineParser.Parse<T>()": "M_Ookii_CommandLine_CommandLineParser_Parse__1",
   "CommandLineParser.ParseResult": "P_Ookii_CommandLine_CommandLineParser_ParseResult",
   "CommandLineParser.ParseWithErrorHandling()": "Overload_Ookii_CommandLine_CommandLineParser_ParseWithErrorHandling",
+  "CommandLineParser.UnknownArgument": "E_Ookii_CommandLine_CommandLineParser_UnknownArgument",
   "CommandLineParser.WriteUsage()": "M_Ookii_CommandLine_CommandLineParser_WriteUsage",
   "CommandLineParser<T>": "T_Ookii_CommandLine_CommandLineParser_1",
   "CommandLineParser<T>.Parse()": "Overload_Ookii_CommandLine_CommandLineParser_1_Parse",

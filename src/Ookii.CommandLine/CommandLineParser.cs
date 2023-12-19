@@ -294,12 +294,34 @@ public class CommandLineParser
     ///   arguments.
     /// </para>
     /// <para>
-    ///   This even is only raised when the <see cref="AllowDuplicateArguments"/> property is
+    ///   This event is only raised when the <see cref="AllowDuplicateArguments"/> property is
     ///   <see langword="true"/>.
     /// </para>
     /// </remarks>
     public event EventHandler<DuplicateArgumentEventArgs>? DuplicateArgument;
 
+    /// <summary>
+    /// Event raised when an unknown argument name or a positional value with no matching argument
+    /// is used.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    ///   Specifying an argument with an unknown name, or too many positional arguments, is normally
+    ///   an error. By handling this event and setting the
+    ///   <see cref="UnknownArgumentEventArgs.Ignore" qualifyHint="true"/> property to
+    ///   <see langword="true"/>, you can instead continue parsing the remainder of the command
+    ///   line, ignoring the unknown argument.
+    /// </para>
+    /// <para>
+    ///   You can also cancel parsing instead using the
+    ///   <see cref="UnknownArgumentEventArgs.CancelParsing" qualifyHint="true"/> property.
+    /// </para>
+    /// <para>
+    ///   If an unknown argument name is encountered and is followed by a value separated by
+    ///   whitespace, that value will be treated as the next positional argument value. It is not
+    ///   considered to be a value for the unknown argument.
+    /// </para>
+    /// </remarks>
     public event EventHandler<UnknownArgumentEventArgs>? UnknownArgument;
 
     internal const string UnreferencedCodeHelpUrl = "https://www.ookii.org/Link/CommandLineSourceGeneration";
@@ -1602,7 +1624,9 @@ public class CommandLineParser
 
         ParseResult = state.CancelParsing == CancelMode.None
             ? ParseResult.FromSuccess()
-            : ParseResult.FromSuccess(state.Argument?.ArgumentName ?? LongArgumentNamePrefix, state.RemainingArguments);
+            : ParseResult.FromSuccess(state.Argument?.ArgumentName ?? 
+                (state.ArgumentName.Length == 0 ? LongArgumentNamePrefix : state.ArgumentName.ToString()),
+                state.RemainingArguments);
 
         // Reset to false in case it was set by a method argument that didn't cancel parsing.
         HelpRequested = false;
@@ -1897,16 +1921,6 @@ public class CommandLineParser
 
             throw StringProvider.CreateException(CommandLineArgumentErrorCategory.TooManyArguments);
         }
-    }
-
-    private CommandLineArgument GetShortArgumentOrThrow(char shortName)
-    {
-        if (_argumentsByShortName!.TryGetValue(shortName, out CommandLineArgument? argument))
-        {
-            return argument;
-        }
-
-        throw StringProvider.CreateException(CommandLineArgumentErrorCategory.UnknownArgument, shortName.ToString());
     }
 
     private PrefixInfo? CheckArgumentNamePrefix(string argument)

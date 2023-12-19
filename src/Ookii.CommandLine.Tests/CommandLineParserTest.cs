@@ -621,7 +621,7 @@ public partial class CommandLineParserTest
         Assert.IsTrue(parser.HelpRequested);
         Assert.AreEqual(ParseStatus.Canceled, parser.ParseResult.Status);
         Assert.IsNull(parser.ParseResult.LastException);
-        AssertSpanEqual(new[] { "-Argument2", "bar" }.AsSpan(), parser.ParseResult.RemainingArguments.Span);
+        AssertSpanEqual(["-Argument2", "bar"], parser.ParseResult.RemainingArguments.Span);
         Assert.AreEqual("DoesCancel", parser.ParseResult.ArgumentName);
         Assert.IsTrue(parser.GetArgument("Argument1")!.HasValue);
         Assert.AreEqual("foo", (string?)parser.GetArgument("Argument1")!.Value);
@@ -1464,6 +1464,97 @@ public partial class CommandLineParserTest
         catch (NotSupportedException)
         {
         }
+    }
+
+    [TestMethod]
+    [DynamicData(nameof(ProviderKinds), DynamicDataDisplayName = nameof(GetCustomDynamicDataDisplayName))]
+    public void TestUnknownArgument(ProviderKind kind)
+    {
+        var parser = CreateParser<LongShortArguments>(kind);
+        ReadOnlyMemory<char> expectedName = default;
+        ReadOnlyMemory<char> expectedValue = default;
+        var expectedToken = "";
+        var ignore = false;
+        var cancel = CancelMode.None;
+        var eventRaised = false;
+        parser.UnknownArgument += (_, e) =>
+        {
+            AssertMemoryEqual(expectedName, e.Name);
+            AssertMemoryEqual(expectedValue, e.Value);
+            Assert.AreEqual(expectedToken, e.Token);
+            e.CancelParsing = cancel;
+            e.Ignore = ignore;
+            eventRaised = true;
+        };
+
+        expectedName = "Unknown".AsMemory();
+        expectedToken = "--Unknown";
+        CheckThrows(parser, ["--arg1", "5", "--Unknown", "foo"], CommandLineArgumentErrorCategory.UnknownArgument, "Unknown", remainingArgumentCount: 2);
+        Assert.IsTrue(eventRaised);
+
+        eventRaised = false;
+        ignore = true;
+        var result = CheckSuccess(parser, ["--arg1", "5", "--Unknown", "1"]);
+        Assert.AreEqual(1, result.Foo);
+        Assert.AreEqual(5, result.Arg1);
+        Assert.IsTrue(eventRaised);
+
+        eventRaised = false;
+        cancel = CancelMode.Success;
+        result = CheckSuccess(parser, ["--arg1", "5", "--Unknown", "1"], "Unknown", 1);
+        Assert.AreEqual(0, result.Foo);
+        Assert.AreEqual(5, result.Arg1);
+        Assert.IsTrue(eventRaised);
+
+        eventRaised = false;
+        cancel = CancelMode.Abort;
+        CheckCanceled(parser, ["--arg1", "5", "--Unknown", "1"], "Unknown", false, 1);
+        Assert.IsTrue(eventRaised);
+
+        // With a value.
+        expectedValue = "foo".AsMemory();
+        expectedToken = "--Unknown:foo";
+        CheckCanceled(parser, ["--arg1", "5", "--Unknown:foo", "1"], "Unknown", false, 1);
+        Assert.IsTrue(eventRaised);
+
+        // Now with a short name.
+        eventRaised = false;
+        expectedName = "z".AsMemory();
+        expectedValue = default;
+        expectedToken = "-z";
+        cancel = CancelMode.None;
+        result = CheckSuccess(parser, ["--arg1", "5", "-z", "1"]);
+        Assert.AreEqual(1, result.Foo);
+        Assert.AreEqual(5, result.Arg1);
+        Assert.IsTrue(eventRaised);
+
+        // One in a combined short name.
+        eventRaised = false;
+        expectedToken = "-szu";
+        cancel = CancelMode.None;
+        result = CheckSuccess(parser, ["--arg1", "5", "-szu", "1"]);
+        Assert.AreEqual(1, result.Foo);
+        Assert.AreEqual(5, result.Arg1);
+        Assert.IsTrue(result.Switch1);
+        Assert.IsTrue(result.Switch3);
+        Assert.IsTrue(eventRaised);
+
+        // Positional
+        eventRaised = false;
+        expectedName = default;
+        expectedValue = "4".AsMemory();
+        expectedToken = "4";
+        result = CheckSuccess(parser, ["1", "2", "3", "4", "--arg1", "5"]);
+        Assert.AreEqual(1, result.Foo);
+        Assert.AreEqual(2, result.Bar);
+        Assert.AreEqual(3, result.Arg2);
+        Assert.AreEqual(5, result.Arg1);
+        Assert.IsTrue(eventRaised);
+
+        eventRaised = false;
+        ignore = false;
+        CheckThrows(parser, ["1", "2", "3", "4", "--arg1", "5"], CommandLineArgumentErrorCategory.TooManyArguments, remainingArgumentCount: 3);
+        Assert.IsTrue(eventRaised);
     }
 
     private class ExpectedArgument

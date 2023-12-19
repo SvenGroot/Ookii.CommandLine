@@ -106,9 +106,10 @@ and create your own error message.
 
 The generated [`Parse()`][Parse()_7] methods and the static [`Parse<T>()`][Parse<T>()_1] method and
 their overloads will likely be sufficient for most use cases. However, sometimes you may want even
-more fine-grained control. This includes the ability to handle the [`ArgumentParsed`][] and
-[`DuplicateArgument`][DuplicateArgument_0] events, and to get additional information about the
-arguments using the [`Arguments`][Arguments_0] property or the [`GetArgument`][] function.
+more fine-grained control. This includes the ability to handle the [`ArgumentParsed`][],
+`UnknownArgument` and [`DuplicateArgument`][DuplicateArgument_0] events, and to get additional
+information about the arguments using the [`Arguments`][Arguments_0] property or the
+[`GetArgument`][] function.
 
 In this case, you can manually create an instance of the [`CommandLineParser<T>`][] class. Then, call
 the instance [`ParseWithErrorHandling()`][ParseWithErrorHandling()_1] or [`Parse()`][Parse()_5] method.
@@ -135,6 +136,27 @@ var arguments = parser.ParseWithErrorHandling();
 if (arguments == null)
 {
     return parser.ParseResult.Status == ParseStatus.Canceled ? 0 : 1;
+}
+```
+
+Or, you could use this to handle the `UnknownArgument` event to collect a list of unrecognized
+arguments:
+
+```csharp
+var unknownArguments = new List<string>();
+var parser = MyArguments.CreateParser();
+parser.UnknownArgument += (_, e) =>
+{
+    // Note: in long/short mode, this may not have the desired effect for a combined switch argument
+    // where one of the switches is unknown.
+    unknownArguments.Add(e.Token);
+    e.Ignore = true;
+};
+
+var arguments = parser.ParseWithErrorHandling();
+if (arguments == null)
+{
+    return 1;
 }
 ```
 

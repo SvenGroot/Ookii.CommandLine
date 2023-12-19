@@ -5,6 +5,7 @@
 - Support for [using a `--` argument](Arguments.md#the----argument) to escape argument names for the
   remaining arguments, or to cancel parsing. This can be enabled using
   [`ParseOptions.PrefixTermination`][] or [`ParseOptionsAttribute.PrefixTermination`][].
+- Ignore unknown arguments by using the new [`CommandLineParser.UnknownArgument`][] event.
 - The [`ValidateEnumValueAttribute`][] has additional properties to control how
   [enumeration values are parsed](Arguments.md#enumeration-conversion):
   [`CaseSensitive`][CaseSensitive_1], [`AllowNumericValues`][], and [`AllowCommaSeparatedValues`][].
@@ -258,6 +259,7 @@ may require substantial code changes and may change how command lines are parsed
 [`CommandLineArgumentAttribute.DefaultValueFormat`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_DefaultValueFormat.htm
 [`CommandLineArgumentAttribute.IncludeDefaultInUsageHelp`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_IncludeDefaultInUsageHelp.htm
 [`CommandLineParser.ParseResult`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_CommandLineParser_ParseResult.htm
+[`CommandLineParser.UnknownArgument`]: https://www.ookii.org/docs/commandline-4.1/html/E_Ookii_CommandLine_CommandLineParser_UnknownArgument.htm
 [`CommandLineParser`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_CommandLineParser.htm
 [`CommandLineParser<T>.ParseWithErrorHandling()`]: https://www.ookii.org/docs/commandline-4.1/html/M_Ookii_CommandLine_CommandLineParser_1_ParseWithErrorHandling.htm
 [`CommandLineParser<T>`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_CommandLineParser_1.htm

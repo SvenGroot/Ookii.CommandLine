@@ -2,8 +2,20 @@
 
 namespace Ookii.CommandLine;
 
+/// <summary>
+/// Provides data for the <see cref="CommandLineParser.UnknownArgument" qualifyHint="true"/> event.
+/// </summary>
 public class UnknownArgumentEventArgs : EventArgs
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="UnknownArgumentEventArgs"/> class.
+    /// </summary>
+    /// <param name="token">The argument token that contains the unknown argument.</param>
+    /// <param name="name">The argument name.</param>
+    /// <param name="value">The argument value.</param>
+    /// <exception cref="ArgumentNullException">
+    /// <paramref name="token"/> is <see langword="null"/>.
+    /// </exception>
     public UnknownArgumentEventArgs(string token, ReadOnlyMemory<char> name, ReadOnlyMemory<char> value)
     {
         Token = token ?? throw new ArgumentNullException(nameof(token));
@@ -11,12 +23,71 @@ public class UnknownArgumentEventArgs : EventArgs
         Value = value;
     }
 
+    /// <summary>
+    /// Gets the token for the unknown argument.
+    /// </summary>
+    /// <value>
+    /// The raw token value.
+    /// </value>
+    /// <remarks>
+    /// <para>
+    ///   For an unknown named argument, the token includes the prefix, and the value if one was
+    ///   present using a non-whitespace separator. For example, "-Name:Value" or "--name".
+    /// </para>
+    /// <para>
+    ///   If the unknown argument was part of a combined short switch argument when using
+    ///   <see cref="ParsingMode.LongShort" qualifyHint="true"/>, the <see cref="Token"/> property
+    ///   will contain all the switch names, while the <see cref="Name"/> property only contains the
+    ///   name of the unknown switch.  For example, the token could be "-xyz" while the name is
+    ///   "y".
+    /// </para>
+    /// <para>
+    ///   For an unknown positional argument value, the <see cref="Token"/> property is equal to
+    ///   the <see cref="Value"/> property.
+    /// </para>
+    /// </remarks>
     public string Token { get; }
 
+    /// <summary>
+    /// Gets the name of the unknown argument.
+    /// </summary>
+    /// <value>
+    /// The argument name, or an empty span if this was an unknown positional argument value.
+    /// </value>
+    /// <remarks>
+    /// <para>
+    ///   If the unknown argument was part of a combined short switch argument when using
+    ///   <see cref="ParsingMode.LongShort" qualifyHint="true"/>, the <see cref="Token"/> property
+    ///   will contain all the switch names, while the <see cref="Name"/> property only contains the
+    ///   name of the unknown switch.  For example, the token could be "-xyz" while the name is
+    ///   "y".
+    /// </para>
+    /// </remarks>
     public ReadOnlyMemory<char> Name { get; }
 
+    /// <summary>
+    /// Gets the value of the unknown argument.
+    /// </summary>
+    /// <value>
+    /// The argument value, or an empty span if this was a named argument that did not contain a
+    /// value using a non-whitespace separator.
+    /// </value>
     public ReadOnlyMemory<char> Value { get; }
 
+    /// <summary>
+    /// Gets or sets a value that indicates whether the unknown argument will be ignored.
+    /// </summary>
+    /// <value>
+    /// <see langword="true"/> to ignore the unknown argument and continue parsing with the
+    /// remaining arguments; <see langword="false"/> for the default behavior where parsing fails.
+    /// The default value is <see langword="false"/>
+    /// </value>
+    /// <remarks>
+    /// <para>
+    ///   This property is not used if the <see cref="CancelParsing"/> property is set to a value
+    ///   other than <see cref="CancelMode.None" qualifyHint="true"/>.
+    /// </para>
+    /// </remarks>
     public bool Ignore { get; set; }
 
     /// <summary>
@@ -39,5 +110,4 @@ public class UnknownArgumentEventArgs : EventArgs
     /// </para>
     /// </remarks>
     public CancelMode CancelParsing { get; set; }
-
 }
