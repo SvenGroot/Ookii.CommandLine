@@ -107,7 +107,7 @@ and create your own error message.
 The generated [`Parse()`][Parse()_7] methods and the static [`Parse<T>()`][Parse<T>()_1] method and
 their overloads will likely be sufficient for most use cases. However, sometimes you may want even
 more fine-grained control. This includes the ability to handle the [`ArgumentParsed`][],
-`UnknownArgument` and [`DuplicateArgument`][DuplicateArgument_0] events, and to get additional
+[`UnknownArgument`][] and [`DuplicateArgument`][DuplicateArgument_0] events, and to get additional
 information about the arguments using the [`Arguments`][Arguments_0] property or the
 [`GetArgument`][] function.
 
@@ -139,7 +139,7 @@ if (arguments == null)
 }
 ```
 
-Or, you could use this to handle the `UnknownArgument` event to collect a list of unrecognized
+Or, you could use this to handle the [`UnknownArgument`][] event to collect a list of unrecognized
 arguments:
 
 ```csharp
@@ -257,6 +257,7 @@ Next, we'll take a look at [generating usage help](UsageHelp.md).
 [`ParseStatus.Canceled`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_ParseStatus.htm
 [`ParseStatus.Error`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_ParseStatus.htm
 [`ParseStatus.Success`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_ParseStatus.htm
+[`UnknownArgument`]: https://www.ookii.org/docs/commandline-4.1/html/E_Ookii_CommandLine_CommandLineParser_UnknownArgument.htm
 [`UsageWriter`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_UsageWriter.htm
 [Arguments_0]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_CommandLineParser_Arguments.htm
 [CreateParser()_1]: https://www.ookii.org/docs/commandline-4.1/html/M_Ookii_CommandLine_IParserProvider_1_CreateParser.htm

@@ -365,6 +365,7 @@
   "TypeConverter": "#system.componentmodel.typeconverter",
   "TypeConverterAttribute": "#system.componentmodel.typeconverterattribute",
   "TypeDescriptor.GetConverter()": "#system.componentmodel.typedescriptor.getconverter",
+  "UnknownArgument": "E_Ookii_CommandLine_CommandLineParser_UnknownArgument",
   "Uri": "#system.uri",
   "UsageHelpRequest.SyntaxOnly": "T_Ookii_CommandLine_UsageHelpRequest",
   "UsageWriter": "T_Ookii_CommandLine_UsageWriter",
