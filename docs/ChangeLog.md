@@ -16,7 +16,7 @@
   Tasks can access this token by implementing the [`IAsyncCancelableCommand`][] interface. The
   [`AsyncCommandBase`][] class provides support as well.
 - Usage help improvements:
-  - Support for custom default value formatting, using
+  - Support for [custom default value formatting](UsageHelp.md#default-values), using
     [`CommandLineArgumentAttribute.DefaultValueFormat`][].
   - Add [`LineWrappingTextWriter.IndentAfterEmptyLine`][] and [`UsageWriter.IndentAfterEmptyLine`][]
     properties, which allow for proper formatting of argument descriptions with blank lines using
