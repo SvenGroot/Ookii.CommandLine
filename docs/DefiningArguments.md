@@ -379,10 +379,11 @@ public bool Help { get; set; }
 Note that this property will never be set to true by the [`CommandLineParser`][], since no instance
 will be created if the argument is supplied.
 
-If you set the [`CancelParsing`][CancelParsing_1] property to [`CancelMode.Success`][], parsing is stopped, and the rest
-of the command line is not process, but parsing will complete successfully. If all the required
-arguments have been specified before that point, the [`CommandLineParser<T>.Parse()`][] method and
-various helper methods will return an instance of the arguments type.
+If you set the [`CancelParsing`][CancelParsing_1] property to [`CancelMode.Success`][], parsing is
+stopped, and the rest of the command line is not processed, but parsing will complete successfully.
+If all the required arguments have been specified before that point, the
+[`CommandLineParser<T>.Parse()`][] method and various helper methods will return an instance of the
+arguments type.
 
 The remaining arguments that were not parsed are available in the [`ParseResult.RemainingArguments`][]
 property. These are available for [`CancelMode.Abort`][], [`CancelMode.Success`][], and if parsing
@@ -391,6 +392,10 @@ encountered an error.
 [`CancelMode.Success`][] can be used if you wish to pass the remaining arguments to another command
 line processor, for example a child application, or a subcommand. See for example the
 [top-level arguments sample](../src/Samples/TopLevelArguments).
+
+The `--` argument can also be used to cancel parsing and return success, by setting the
+[`ParseOptionsAttribute.PrefixTermination`][] or [`ParseOptions.PrefixTermination`][] property to
+[`PrefixTerminationMode.CancelWithSuccess`][].
 
 ## Using methods
 
@@ -654,10 +659,13 @@ Next, we'll take a look at how to [parse the arguments we've defined](ParsingArg
 [`LocalizedStringProvider`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_LocalizedStringProvider.htm
 [`ParseOptions.ArgumentNameTransform`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_ParseOptions_ArgumentNameTransform.htm
 [`ParseOptions.AutoPrefixAliases`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_ParseOptions_AutoPrefixAliases.htm
+[`ParseOptions.PrefixTermination`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_ParseOptions_PrefixTermination.htm
 [`ParseOptions`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_ParseOptions.htm
 [`ParseOptionsAttribute.AutoPrefixAliases`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_ParseOptionsAttribute_AutoPrefixAliases.htm
+[`ParseOptionsAttribute.PrefixTermination`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_ParseOptionsAttribute_PrefixTermination.htm
 [`ParseOptionsAttribute`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_ParseOptionsAttribute.htm
 [`ParseResult.RemainingArguments`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_ParseResult_RemainingArguments.htm
+[`PrefixTerminationMode.CancelWithSuccess`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_PrefixTerminationMode.htm
 [`ReadOnlySpan<char>`]: https://learn.microsoft.com/dotnet/api/system.readonlyspan-1
 [`ShortAliasAttribute`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_ShortAliasAttribute.htm
 [`String`]: https://learn.microsoft.com/dotnet/api/system.string
@@ -665,8 +673,8 @@ Next, we'll take a look at how to [parse the arguments we've defined](ParsingArg
 [`TypeConverter`]: https://learn.microsoft.com/dotnet/api/system.componentmodel.typeconverter
 [`TypeDescriptor.GetConverter()`]: https://learn.microsoft.com/dotnet/api/system.componentmodel.typedescriptor.getconverter
 [`ValueDescriptionAttribute`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_ValueDescriptionAttribute.htm
-[`WrappedTypeConverter<T>`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_Conversion_WrappedTypeConverter_1.htm
 [`WrappedDefaultTypeConverter<T>`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_Conversion_WrappedDefaultTypeConverter_1.htm
+[`WrappedTypeConverter<T>`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_Conversion_WrappedTypeConverter_1.htm
 [CancelParsing_1]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_CancelParsing.htm
 [DefaultValue_1]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_DefaultValue.htm
 [IsPosix_2]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_ParseOptionsAttribute_IsPosix.htm

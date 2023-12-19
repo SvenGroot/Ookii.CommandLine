@@ -131,6 +131,26 @@ value1 -Positional1 value2
 This is because `-Positional1` is assigned to twice; first by position, and then by name. Duplicate
 arguments cause an error by default, though this can be changed.
 
+## The `--` argument
+
+Optionally, when an argument is encountered that consists only of `--` without a name following it,
+this indicates that all following values must be treated as positional values, even if they begin
+with an argument name prefix.
+
+For example, take the following command line:
+
+```text
+value1 -- --value2
+```
+
+In this example, the second positional argument would be set to the value "--value2". If there is
+an argument named "value2", it would not be set.
+
+This behavior is disabled by default, but can be enabled using the
+[`ParseOptionsAttribute.PrefixTermination`][] or [`ParseOptions.PrefixTermination`][] property. It can be
+used with both the default parsing mode and long/short mode. Alternatively, you can also have the
+`--` argument [cancel parsing](DefiningArguments.md#arguments-that-cancel-parsing).
+
 ## Required arguments
 
 A command line argument that is required must be supplied on all invocations of the application. If
@@ -431,10 +451,12 @@ Next, let's take a look at how to [define arguments](DefiningArguments.md).
 [`ParseOptions.ArgumentNameComparison`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_ParseOptions_ArgumentNameComparison.htm
 [`ParseOptions.Culture`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_ParseOptions_Culture.htm
 [`ParseOptions.NameValueSeparators`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_ParseOptions_NameValueSeparators.htm
+[`ParseOptions.PrefixTermination`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_ParseOptions_PrefixTermination.htm
 [`ParseOptions`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_ParseOptions.htm
 [`ParseOptionsAttribute.AllowWhiteSpaceValueSeparator`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_ParseOptionsAttribute_AllowWhiteSpaceValueSeparator.htm
 [`ParseOptionsAttribute.CaseSensitive`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_ParseOptionsAttribute_CaseSensitive.htm
 [`ParseOptionsAttribute.NameValueSeparators`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_ParseOptionsAttribute_NameValueSeparators.htm
+[`ParseOptionsAttribute.PrefixTermination`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_ParseOptionsAttribute_PrefixTermination.htm
 [`ParseOptionsAttribute`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_ParseOptionsAttribute.htm
 [`String`]: https://learn.microsoft.com/dotnet/api/system.string
 [`TypeConverter`]: https://learn.microsoft.com/dotnet/api/system.componentmodel.typeconverter

@@ -313,6 +313,7 @@
     "P_Ookii_CommandLine_CommandLineArgument_Position",
     "P_Ookii_CommandLine_CommandLineArgumentAttribute_Position"
   ],
+  "PrefixTerminationMode.CancelWithSuccess": "T_Ookii_CommandLine_PrefixTerminationMode",
   "ProhibitsAttribute": "T_Ookii_CommandLine_Validation_ProhibitsAttribute",
   "ReadCommand": null,
   "ReadDirectoryCommand": null,
