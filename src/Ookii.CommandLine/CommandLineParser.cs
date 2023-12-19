@@ -1879,7 +1879,7 @@ public class CommandLineParser
             if (argument == null)
             {
                 state.ArgumentName = ch.ToString().AsMemory();
-                HandleUnknownArgument(ref state);
+                HandleUnknownArgument(ref state, true);
                 continue;
             }
 
@@ -1898,10 +1898,10 @@ public class CommandLineParser
         }
     }
 
-    private void HandleUnknownArgument(ref ParseState state)
+    private void HandleUnknownArgument(ref ParseState state, bool isCombined = false)
     {
         var eventArgs = new UnknownArgumentEventArgs(state.Arguments.Span[state.Index], state.ArgumentName,
-            state.ArgumentValue ?? default);
+            state.ArgumentValue ?? default, isCombined);
 
         OnUnknownArgument(eventArgs);
         if (eventArgs.CancelParsing != CancelMode.None)

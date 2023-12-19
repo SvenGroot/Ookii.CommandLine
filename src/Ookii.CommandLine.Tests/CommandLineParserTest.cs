@@ -1474,6 +1474,7 @@ public partial class CommandLineParserTest
         ReadOnlyMemory<char> expectedName = default;
         ReadOnlyMemory<char> expectedValue = default;
         var expectedToken = "";
+        var expectedCombined = false;
         var ignore = false;
         var cancel = CancelMode.None;
         var eventRaised = false;
@@ -1482,6 +1483,7 @@ public partial class CommandLineParserTest
             AssertMemoryEqual(expectedName, e.Name);
             AssertMemoryEqual(expectedValue, e.Value);
             Assert.AreEqual(expectedToken, e.Token);
+            Assert.AreEqual(expectedCombined, e.IsCombinedSwitchToken);
             e.CancelParsing = cancel;
             e.Ignore = ignore;
             eventRaised = true;
@@ -1531,6 +1533,7 @@ public partial class CommandLineParserTest
         // One in a combined short name.
         eventRaised = false;
         expectedToken = "-szu";
+        expectedCombined = true;
         cancel = CancelMode.None;
         result = CheckSuccess(parser, ["--arg1", "5", "-szu", "1"]);
         Assert.AreEqual(1, result.Foo);
@@ -1544,6 +1547,7 @@ public partial class CommandLineParserTest
         expectedName = default;
         expectedValue = "4".AsMemory();
         expectedToken = "4";
+        expectedCombined = false;
         result = CheckSuccess(parser, ["1", "2", "3", "4", "--arg1", "5"]);
         Assert.AreEqual(1, result.Foo);
         Assert.AreEqual(2, result.Bar);

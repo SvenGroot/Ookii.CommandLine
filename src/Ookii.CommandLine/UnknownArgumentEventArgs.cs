@@ -13,14 +13,18 @@ public class UnknownArgumentEventArgs : EventArgs
     /// <param name="token">The argument token that contains the unknown argument.</param>
     /// <param name="name">The argument name.</param>
     /// <param name="value">The argument value.</param>
+    /// <param name="isCombinedSwithToken">
+    /// Indicates whether the argument is part of a combined short switch argument.
+    /// </param>
     /// <exception cref="ArgumentNullException">
     /// <paramref name="token"/> is <see langword="null"/>.
     /// </exception>
-    public UnknownArgumentEventArgs(string token, ReadOnlyMemory<char> name, ReadOnlyMemory<char> value)
+    public UnknownArgumentEventArgs(string token, ReadOnlyMemory<char> name, ReadOnlyMemory<char> value, bool isCombinedSwithToken)
     {
         Token = token ?? throw new ArgumentNullException(nameof(token));
         Name = name;
         Value = value;
+        IsCombinedSwitchToken = isCombinedSwithToken;
     }
 
     /// <summary>
@@ -38,7 +42,7 @@ public class UnknownArgumentEventArgs : EventArgs
     ///   If the unknown argument was part of a combined short switch argument when using
     ///   <see cref="ParsingMode.LongShort" qualifyHint="true"/>, the <see cref="Token"/> property
     ///   will contain all the switch names, while the <see cref="Name"/> property only contains the
-    ///   name of the unknown switch.  For example, the token could be "-xyz" while the name is
+    ///   name of the unknown switch. For example, the token could be "-xyz" while the name is
     ///   "y".
     /// </para>
     /// <para>
@@ -59,7 +63,7 @@ public class UnknownArgumentEventArgs : EventArgs
     ///   If the unknown argument was part of a combined short switch argument when using
     ///   <see cref="ParsingMode.LongShort" qualifyHint="true"/>, the <see cref="Token"/> property
     ///   will contain all the switch names, while the <see cref="Name"/> property only contains the
-    ///   name of the unknown switch.  For example, the token could be "-xyz" while the name is
+    ///   name of the unknown switch. For example, the token could be "-xyz" while the name is
     ///   "y".
     /// </para>
     /// </remarks>
@@ -73,6 +77,26 @@ public class UnknownArgumentEventArgs : EventArgs
     /// value using a non-whitespace separator.
     /// </value>
     public ReadOnlyMemory<char> Value { get; }
+
+    /// <summary>
+    /// Gets a value that indicates whether this argument is one among a token containing several
+    /// combined short name switches.
+    /// </summary>
+    /// <value>
+    /// <see langword="true"/> if the unknown argument is part of a combined switch argument when
+    /// using <see cref="ParsingMode.LongShort" qualifyHint="true"/>; otherwise,
+    /// <see langword="false"/>.
+    /// </value>
+    /// <remarks>
+    /// <para>
+    ///   If the unknown argument was part of a combined short switch argument when using
+    ///   <see cref="ParsingMode.LongShort" qualifyHint="true"/>, the <see cref="Token"/> property
+    ///   will contain all the switch names, while the <see cref="Name"/> property only contains the
+    ///   name of the unknown switch. For example, the token could be "-xyz" while the name is
+    ///   "y".
+    /// </para>
+    /// </remarks>
+    public bool IsCombinedSwitchToken { get; }
 
     /// <summary>
     /// Gets or sets a value that indicates whether the unknown argument will be ignored.
