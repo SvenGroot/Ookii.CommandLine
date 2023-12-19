@@ -164,6 +164,11 @@ partial class AsyncSleepCommand : AsyncCommandBase
 }
 ```
 
+To support cancellation, you can pass a [`CancellationToken`][] to the
+[`CommandManager.RunCommandAsync()`][] method. This token can be accessed by a command if it
+implements the [`IAsyncCancelableCommand`][] interface. If you use the [`AsyncCommandBase`][] class,
+the token is available using the [`AsyncCommandBase.CancellationToken`][] property.
+
 ### Multiple commands with common arguments
 
 You may have multiple commands that have one or more arguments in common. For example, you may have
@@ -665,7 +670,9 @@ detail.
 
 [`AliasAttribute`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_AliasAttribute.htm
 [`ApplicationFriendlyNameAttribute`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_ApplicationFriendlyNameAttribute.htm
+[`AsyncCommandBase.CancellationToken`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_Commands_AsyncCommandBase_CancellationToken.htm
 [`AsyncCommandBase`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_Commands_AsyncCommandBase.htm
+[`CancellationToken`]: https://learn.microsoft.com/dotnet/api/system.threading.cancellationtoken
 [`CancelMode.Success`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_CancelMode.htm
 [`CommandAttribute`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_Commands_CommandAttribute.htm
 [`CommandLineArgumentAttribute.CancelParsing`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_CancelParsing.htm
@@ -689,6 +696,7 @@ detail.
 [`Environment.GetCommandLineArgs()`]: https://learn.microsoft.com/dotnet/api/system.environment.getcommandlineargs
 [`GeneratedCommandManagerAttribute`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_Commands_GeneratedCommandManagerAttribute.htm
 [`GeneratedParserAttribute`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_GeneratedParserAttribute.htm
+[`IAsyncCancelableCommand`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_Commands_IAsyncCancelableCommand.htm
 [`IAsyncCommand.RunAsync()`]: https://www.ookii.org/docs/commandline-4.1/html/M_Ookii_CommandLine_Commands_IAsyncCommand_RunAsync.htm
 [`IAsyncCommand`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_Commands_IAsyncCommand.htm
 [`ICommand.Run()`]: https://www.ookii.org/docs/commandline-4.1/html/M_Ookii_CommandLine_Commands_ICommand_Run.htm
