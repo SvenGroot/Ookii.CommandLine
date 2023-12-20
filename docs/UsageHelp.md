@@ -64,8 +64,8 @@ Usage: Parser [-Source] <String> [-Destination] <String> [[-OperationIndex] <Int
         Displays version information.
 ```
 
-The usage help consists of three main components: the application description, the argument syntax,
-and the argument descriptions.
+The usage help consists of four main components: the application description, the argument syntax,
+the argument descriptions, and an optional footer.
 
 ## Application description
 
@@ -311,6 +311,24 @@ public int Argument { get; set; }
 
 Note that positional and required arguments cannot be hidden.
 
+## Usage help footer
+
+The application description is shown at the top of the usage help, but sometimes you may want to
+add additional information at the bottom, for example to direct the user how to get additional
+help.
+
+To add additional text below the argument descriptions, you can use the [`UsageFooterAttribute`][]
+attribute. Apply this attribute to your command line arguments class to set a footer.
+
+```csharp
+[GeneratedParser]
+[Description("This is the application description.")]
+[UsageFooter("For more information, see https://www.example.com")]
+partial class Arguments
+{
+}
+```
+
 ## Color output
 
 When possible, Ookii.CommandLine will use color when writing usage help. This is controlled by the
@@ -426,6 +444,7 @@ Next, we'll take a look at [argument validation and dependencies](Validation.md)
 [`String`]: https://learn.microsoft.com/dotnet/api/system.string
 [`System.ComponentModel.DescriptionAttribute`]: https://learn.microsoft.com/dotnet/api/system.componentmodel.descriptionattribute
 [`TextFormat`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_Terminal_TextFormat.htm
+[`UsageFooterAttribute`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_UsageFooterAttribute.htm
 [`UsageWriter.ArgumentDescriptionListFilter`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_UsageWriter_ArgumentDescriptionListFilter.htm
 [`UsageWriter.ArgumentDescriptionListOrder`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_UsageWriter_ArgumentDescriptionListOrder.htm
 [`UsageWriter.IncludeApplicationDescription`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_UsageWriter_IncludeApplicationDescription.htm

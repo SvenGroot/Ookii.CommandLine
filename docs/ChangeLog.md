@@ -21,7 +21,8 @@
   - Add [`LineWrappingTextWriter.IndentAfterEmptyLine`][] and [`UsageWriter.IndentAfterEmptyLine`][]
     properties, which allow for proper formatting of [argument descriptions with blank lines](UsageHelp.md#descriptions-with-blank-lines)
     using the default usage help format.
-  - Add support for easily adding a footer to the usage help.
+  - [Add a footer](UsageHelp.md#usage-help-footer) to the usage help with the
+    [`UsageFooterAttribute`][] attribute.
   - Some localizable text that could previously only be customized by deriving from the
     [`UsageWriter`][] class can now also be customized with the [`LocalizedStringProvider`][] class,
     so you only need to derive from [`LocalizedStringProvider`][] to customize all user-facing
@@ -290,6 +291,7 @@ may require substantial code changes and may change how command lines are parsed
 [`StandardStreamExtensions`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_Terminal_StandardStreamExtensions.htm
 [`StringWriter`]: https://learn.microsoft.com/dotnet/api/system.io.stringwriter
 [`TypeConverter`]: https://learn.microsoft.com/dotnet/api/system.componentmodel.typeconverter
+[`UsageFooterAttribute`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_UsageFooterAttribute.htm
 [`UsageWriter.IndentAfterEmptyLine`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_UsageWriter_IndentAfterEmptyLine.htm
 [`UsageWriter`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_UsageWriter.htm
 [`ValidateEnumValueAttribute.IncludeValuesInErrorMessage`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_Validation_ValidateEnumValueAttribute_IncludeValuesInErrorMessage.htm

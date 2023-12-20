@@ -368,6 +368,7 @@
   "TypeDescriptor.GetConverter()": "#system.componentmodel.typedescriptor.getconverter",
   "UnknownArgument": "E_Ookii_CommandLine_CommandLineParser_UnknownArgument",
   "Uri": "#system.uri",
+  "UsageFooterAttribute": "T_Ookii_CommandLine_UsageFooterAttribute",
   "UsageHelpRequest.SyntaxOnly": "T_Ookii_CommandLine_UsageHelpRequest",
   "UsageWriter": "T_Ookii_CommandLine_UsageWriter",
   "UsageWriter.ArgumentDescriptionListFilter": "P_Ookii_CommandLine_UsageWriter_ArgumentDescriptionListFilter",
