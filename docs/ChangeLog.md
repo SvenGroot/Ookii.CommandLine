@@ -27,8 +27,8 @@
     [`UsageWriter`][] class can now also be customized with the [`LocalizedStringProvider`][] class,
     so you only need to derive from [`LocalizedStringProvider`][] to customize all user-facing
     strings.
-- Provide helper methods in the [`VirtualTerminal`][] class for writing text with VT formatting to
-  the standard output or error streams.
+- Provide [helper methods](Utilities.md#virtual-terminal-support) in the [`VirtualTerminal`][] class
+  for writing text with VT formatting to the standard output or error streams.
 - Provide extension methods for [`StandardStream`][] in the [`StandardStreamExtensions`][] class.
 - Emit a warning if a class isn't using the [`GeneratedParserAttribute`][] when it could, with an
   automatic code fix to easily apply it.

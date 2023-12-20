@@ -402,6 +402,8 @@
   "ValueConverterAttribute": "T_Ookii_CommandLine_Conversion_ValueConverterAttribute",
   "ValueDescriptionAttribute": "T_Ookii_CommandLine_ValueDescriptionAttribute",
   "VirtualTerminal": "T_Ookii_CommandLine_Terminal_VirtualTerminal",
+  "VirtualTerminal.WriteLineErrorFormatted()": "M_Ookii_CommandLine_Terminal_VirtualTerminal_WriteLineErrorFormatted",
+  "VirtualTerminal.WriteLineFormatted()": "M_Ookii_CommandLine_Terminal_VirtualTerminal_WriteLineFormatted",
   "Wrapping": "P_Ookii_CommandLine_LineWrappingTextWriter_Wrapping",
   "WrappingMode.Disabled": "T_Ookii_CommandLine_WrappingMode",
   "WrappingMode.EnabledNoForce": "T_Ookii_CommandLine_WrappingMode",

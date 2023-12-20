@@ -129,6 +129,18 @@ and they return a disposable type that will revert the console mode when dispose
 collected. On other platforms, it only checks for support and disposing the returned instance does
 nothing.
 
+To simplify writing messages to the console that use a single format for the whole message, two
+helper methods are provided: [`VirtualTerminal.WriteLineFormatted()`][] and
+[`VirtualTerminal.WriteLineErrorFormatted()`][]. These methods call [`EnableColor()`][], write the message
+to either the standard output or standard error stream respectively, using the specified formatting,
+and then reset the format to the default.
+
+The below example is identical to the one above:
+
+```csharp
+VirtualTerminal.WriteLineFormatted("This text is green and underlined.", TextFormat.ForegroundGreen + TextFormat.Underline);
+```
+
 In the [tutorial](Tutorial.md), we created an application with an `--inverted` argument, that
 actually just set the console to use a white background and a black foreground, instead of truly
 inverting the console colors. With virtual terminal support, we can update the `read` command to use
@@ -179,6 +191,8 @@ public int Run()
 [`TextFormat`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_Terminal_TextFormat.htm
 [`TextWriter`]: https://learn.microsoft.com/dotnet/api/system.io.textwriter
 [`UsageWriter`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_UsageWriter.htm
+[`VirtualTerminal.WriteLineErrorFormatted()`]: https://www.ookii.org/docs/commandline-4.1/html/M_Ookii_CommandLine_Terminal_VirtualTerminal_WriteLineErrorFormatted.htm
+[`VirtualTerminal.WriteLineFormatted()`]: https://www.ookii.org/docs/commandline-4.1/html/M_Ookii_CommandLine_Terminal_VirtualTerminal_WriteLineFormatted.htm
 [`VirtualTerminal`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_Terminal_VirtualTerminal.htm
 [`WrappingMode.Disabled`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_WrappingMode.htm
 [`WrappingMode.EnabledNoForce`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_WrappingMode.htm
