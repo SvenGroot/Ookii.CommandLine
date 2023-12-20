@@ -5,7 +5,7 @@ than using a base class with the common arguments, which makes the common argume
 command (as shown in the [nested commands sample](../NestedCommands)), this sample defines several
 top-level arguments that are not part of any command.
 
-The commands themselves are based on the regular [subcommand sample](../SubCommand), so see that for
+The commands themselves are based on the regular [subcommand sample](../Subcommand), so see that for
 more detailed descriptions. This sample uses POSIX conventions, for variation, but this isn't
 required.
 

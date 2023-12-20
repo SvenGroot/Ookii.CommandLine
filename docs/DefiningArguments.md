@@ -475,13 +475,21 @@ partial class Arguments
 
 ### Long/short mode
 
-To enable [long/short mode](Arguments.md#longshort-mode), you typically want to set three options
+To enable [long/short mode](Arguments.md#longshort-mode), you typically want to set several options
 if you want to mimic typical POSIX conventions: the mode itself, case sensitive argument names,
 and dash-case [name transformation](#name-transformation). This can be done with either the
 [`ParseOptionsAttribute`][] attribute or the [`ParseOptions`][] class.
 
-A convenient [`IsPosix`][IsPosix_2] property is provided on either class, that sets all relevant options when
-set to true.
+A convenient [`IsPosix`][IsPosix_2] property is provided on either class, that sets all relevant
+options when set to true. Using `[ParseOptions(IsPosix = true)]` is equivalent to manually setting
+the following properties.
+
+```csharp
+[ParseOptions(Mode = ParsingMode.LongShort,
+    CaseSensitive = true,
+    ArgumentNameTransform = NameTransform.DashCase,
+    ValueDescriptionNameTransform = NameTransform.DashCase)]
+```
 
 When using long/short mode, the name derived from the member name, or the explicit name set by the
 [`CommandLineArgumentAttribute`][] attribute is the long name.
@@ -507,15 +515,6 @@ partial class MyArguments
     [CommandLineArgument(IsShort = true, IsLong = false)]
     public bool Bar { get; set; }
 }
-```
-
-Using `[ParseOptions(IsPosix = true)]` is equivalent to manually setting the following properties.
-
-```csharp
-[ParseOptions(Mode = ParsingMode.LongShort,
-    CaseSensitive = true,
-    ArgumentNameTransform = NameTransform.DashCase,
-    ValueDescriptionNameTransform = NameTransform.DashCase)]
 ```
 
 In this example, the `FileName` property defines a required positional argument with the long name

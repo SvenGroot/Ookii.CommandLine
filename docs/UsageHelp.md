@@ -102,7 +102,7 @@ multiple values.
 The order of the arguments in the usage syntax is as follows:
 
 1. The positional arguments, in their defined order.
-2. Required positional arguments, in alphabetical order.
+2. Required non-positional arguments, in alphabetical order.
 3. The remaining arguments, in alphabetical order.
 
 The syntax for a single argument has the following default format:
