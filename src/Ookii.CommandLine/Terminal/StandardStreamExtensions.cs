@@ -24,7 +24,8 @@ public static class StandardStreamExtensions
     /// </exception>
     /// <remarks>
     /// <para>
-    ///   The returned <see cref="TextWriter"/> should <em>not</em> be disposed by the caller.
+    ///   The returned <see cref="TextWriter"/> instance should <em>not</em> be disposed by the
+    ///   caller.
     /// </para>
     /// </remarks>
     public static TextWriter GetWriter(this StandardStream stream)
@@ -38,18 +39,22 @@ public static class StandardStreamExtensions
     }
 
     /// <summary>
-    /// Gets the <see cref="TextWriter"/> for either <see cref="StandardStream.Output" qualifyHint="true"/>
-    /// or <see cref="StandardStream.Error" qualifyHint="true"/>.
+    /// Creates a <see cref="Stream"/> for a <see cref="StandardStream"/>.
     /// </summary>
     /// <param name="stream">A <see cref="StandardStream"/> value.</param>
     /// <returns>
-    /// The value of either <see cref="Console.Out" qualifyHint="true"/> or
-    /// <see cref="Console.Error" qualifyHint="true"/>.
+    /// The return value of either <see cref="Console.OpenStandardOutput()" qualifyHint="true"/>,
+    /// <see cref="Console.OpenStandardError()" qualifyHint="true"/>, or
+    /// <see cref="Console.OpenStandardInput()" qualifyHint="true"/>.
     /// </returns>
     /// <exception cref="ArgumentException">
-    /// <paramref name="stream"/> was a value other than <see cref="StandardStream.Output" qualifyHint="true"/>
-    /// or <see cref="StandardStream.Error" qualifyHint="true"/>.
+    /// <paramref name="stream"/> was not a valid <see cref="StandardStream"/> value.
     /// </exception>
+    /// <remarks>
+    /// <para>
+    ///   The returned <see cref="Stream"/> instance should be disposed by the caller.
+    /// </para>
+    /// </remarks>
     public static Stream OpenStream(this StandardStream stream)
     {
         return stream switch
