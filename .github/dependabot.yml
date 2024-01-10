@@ -11,8 +11,10 @@ updates:
           patterns:
              - "*"
     ignore:
-        # 4.3 is the latest version that can work with the .Net 6.0 SDK.
+        # 4.3.x is the latest version that can work with the .Net 6.0 SDK for both of these.
       - dependency-name: "Microsoft.CodeAnalysis.CSharp"
+        update-types: ["version-update:semver-major", "version-update:semver-minor"]
+      - dependency-name: "Microsoft.CodeAnalysis.Workspaces"
         update-types: ["version-update:semver-major", "version-update:semver-minor"]
   - package-ecosystem: "github-actions"
     directory: "/"
