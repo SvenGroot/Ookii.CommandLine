@@ -41,6 +41,15 @@ A few restrictions apply to projects that use Ookii.CommandLine's source generat
 
 Generally, it's recommended to use source generation unless you cannot meet these requirements.
 
+To encourage the use of source generation, Ookii.CommandLine also includes an analyzer that will
+emit [a warning](SourceGenerationDiagnostics.md#ocl0040) if a class is found that contains any
+public property or method with the [`CommandLineArgumentAttribute`][] attribute and meets the
+requirements listed above, but does not have the [`GeneratedParserAttribute`][]. A code fix,
+accessible with lightbulb UI in Visual Studio, that applies the attribute and makes the class
+partial if necessary, is available in this case.
+
+If you don't want to or cannot use source generation, you can simply disable this warning.
+
 ## Generating a parser
 
 To use source generation to determine the command line arguments defined by a class, apply the

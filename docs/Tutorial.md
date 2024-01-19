@@ -12,7 +12,7 @@ Create a directory called "tutorial" for the project, and run the following comm
 directory:
 
 ```bash
-dotnet new console --framework net7.0
+dotnet new console --framework net8.0
 ```
 
 Next, we will add a reference to Ookii.CommandLine's NuGet package:
@@ -96,7 +96,7 @@ But wait, we didn't pass any arguments to this method? Actually, the method will
 explicit `string[]` array with the arguments, if you want to pass them manually.
 
 So, let's run our application. Build the application using `dotnet build`, and then, from the
-`bin/Debug/net7.0` directory, run the following:
+`bin/Debug/net8.0` directory, run the following:
 
 ```bash
 ./tutorial ../../../tutorial.csproj
@@ -109,7 +109,7 @@ Which will give print the contents of the tutorial.csproj file:
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net7.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>

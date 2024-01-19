@@ -147,9 +147,9 @@ In this example, the second positional argument would be set to the value "--val
 an argument named "value2", it would not be set.
 
 This behavior is disabled by default, but can be enabled using the
-[`ParseOptionsAttribute.PrefixTermination`][] or [`ParseOptions.PrefixTermination`][] property. It can be
-used with both the default parsing mode and long/short mode. Alternatively, you can also have the
-`--` argument [cancel parsing](DefiningArguments.md#arguments-that-cancel-parsing).
+[`ParseOptionsAttribute.PrefixTermination`][] or [`ParseOptions.PrefixTermination`][] property. It
+can be used with both the default parsing mode and long/short mode. Alternatively, you can also set
+it so that the `--` argument will [cancel parsing](DefiningArguments.md#arguments-that-cancel-parsing).
 
 ## Required arguments
 

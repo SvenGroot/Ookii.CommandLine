@@ -131,9 +131,9 @@ nothing.
 
 To simplify writing messages to the console that use a single format for the whole message, two
 helper methods are provided: [`VirtualTerminal.WriteLineFormatted()`][] and
-[`VirtualTerminal.WriteLineErrorFormatted()`][]. These methods call [`EnableColor()`][], write the message
-to either the standard output or standard error stream respectively, using the specified formatting,
-and then reset the format to the default.
+[`VirtualTerminal.WriteLineErrorFormatted()`][]. These methods call [`EnableColor()`][], write the
+message to either the standard output or standard error stream respectively, using the specified
+formatting, and then reset the format to the default.
 
 The below example is identical to the one above:
 

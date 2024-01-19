@@ -475,10 +475,10 @@ partial class Arguments
 
 ### Long/short mode
 
-To enable [long/short mode](Arguments.md#longshort-mode), you typically want to set several options
-if you want to mimic typical POSIX conventions: the mode itself, case sensitive argument names,
-and dash-case [name transformation](#name-transformation). This can be done with either the
-[`ParseOptionsAttribute`][] attribute or the [`ParseOptions`][] class.
+When enabling [long/short mode](Arguments.md#longshort-mode), you may want to also set several
+related options if you want to mimic typical POSIX conventions: long/short mode itself, case
+sensitive argument names, and dash-case [name transformation](#name-transformation). This can be
+done with either the [`ParseOptionsAttribute`][] attribute or the [`ParseOptions`][] class.
 
 A convenient [`IsPosix`][IsPosix_2] property is provided on either class, that sets all relevant
 options when set to true. Using `[ParseOptions(IsPosix = true)]` is equivalent to manually setting
