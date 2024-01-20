@@ -557,7 +557,7 @@ public class CommandLineParser
     /// </value>
     /// <remarks>
     /// <para>
-    ///   If not empty, this description will be added at the top of the usage help returned by the
+    ///   If not empty, this description will be added at the top of the usage help created by the
     ///   <see cref="WriteUsage"/> method. This description can be set by applying the
     ///   <see cref="DescriptionAttribute"/> attribute to the command line arguments class.
     /// </para>
@@ -572,7 +572,7 @@ public class CommandLineParser
     /// </value>
     /// <remarks>
     /// <para>
-    ///   If not empty, this footer will be added at the bottom of the usage help returned by the
+    ///   If not empty, this footer will be added at the bottom of the usage help created by the
     ///   <see cref="WriteUsage"/> method. This footer can be set by applying the
     ///   <see cref="UsageFooterAttribute"/> attribute to the command line arguments class.
     /// </para>

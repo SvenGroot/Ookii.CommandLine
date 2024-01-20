@@ -39,7 +39,7 @@ public static class StandardStreamExtensions
     }
 
     /// <summary>
-    /// Creates a <see cref="Stream"/> for a <see cref="StandardStream"/>.
+    /// Creates a <see cref="Stream"/> instance for a <see cref="StandardStream"/>.
     /// </summary>
     /// <param name="stream">A <see cref="StandardStream"/> value.</param>
     /// <returns>
@@ -67,8 +67,8 @@ public static class StandardStreamExtensions
     }
 
     /// <summary>
-    /// Gets the <see cref="StandardStream"/> associated with a <see cref="TextWriter"/> if that
-    /// writer is for either the standard output or error stream.
+    /// Gets the <see cref="StandardStream"/> associated with a <see cref="TextWriter"/> instance,
+    /// if that instance is for either the standard output or error stream.
     /// </summary>
     /// <param name="writer">The <see cref="TextWriter"/>.</param>
     /// <returns>
@@ -82,8 +82,8 @@ public static class StandardStreamExtensions
     /// <remarks>
     /// <para>
     ///   If <paramref name="writer"/> is an instance of the <see cref="LineWrappingTextWriter"/>
-    ///   class, the <see cref="LineWrappingTextWriter.BaseWriter" qualifyHint="true"/> will be
-    ///   checked.
+    ///   class, the value of the <see cref="LineWrappingTextWriter.BaseWriter" qualifyHint="true"/>
+    ///   property will be checked.
     /// </para>
     /// </remarks>
     public static StandardStream? GetStandardStream(this TextWriter writer)
@@ -130,13 +130,13 @@ public static class StandardStreamExtensions
     }
 
     /// <summary>
-    /// Gets the <see cref="StandardStream"/> associated with a <see cref="TextReader"/> if that
-    /// reader is for the standard input stream.
+    /// Gets the <see cref="StandardStream"/> associated with a <see cref="TextReader"/> instance,
+    /// if that instance is for the standard input stream.
     /// </summary>
     /// <param name="reader">The <see cref="TextReader"/>.</param>
     /// <returns>
-    /// The <see cref="StandardStream"/> that <paramref name="reader"/> is reader from, or
-    /// <see langword="null"/> if it's not reader from the standard input stream.
+    /// The <see cref="StandardStream"/> that <paramref name="reader"/> is reading from, or
+    /// <see langword="null"/> if it's not reading from the standard input stream.
     /// </returns>
     /// <exception cref="ArgumentNullException">
     /// <paramref name="reader"/> is <see langword="null"/>.

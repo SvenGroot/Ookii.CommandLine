@@ -10,20 +10,20 @@ namespace Ookii.CommandLine;
 partial class LocalizedStringProvider
 {
     /// <summary>
-    /// Gets the default prefix for usage syntax, used by the <see cref="UsageWriter"/> class.
+    /// Gets the default prefix for the usage syntax, used by the <see cref="UsageWriter"/> class.
     /// </summary>
     /// <returns>The string.</returns>
     public virtual string UsageSyntaxPrefix() => Resources.DefaultUsagePrefix;
 
     /// <summary>
-    /// Gets the default suffix for usage syntax when creating command list usage help, used by the
-    /// <see cref="UsageWriter"/> class.
+    /// Gets the default suffix for the usage syntax when creating command list usage help, used by
+    /// the <see cref="UsageWriter"/> class.
     /// </summary>
     /// <returns>The string.</returns>
     public virtual string CommandUsageSuffix() => Resources.DefaultCommandUsageSuffix;
 
     /// <summary>
-    /// Gets the default suffix for usage syntax to indicate more arguments are available if the
+    /// Gets the default suffix for the usage syntax to indicate more arguments are available if the
     /// syntax is abbreviated, used by the <see cref="UsageWriter"/> class.
     /// </summary>
     /// <returns>The string.</returns>

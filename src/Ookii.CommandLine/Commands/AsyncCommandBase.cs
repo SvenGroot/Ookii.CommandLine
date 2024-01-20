@@ -27,6 +27,4 @@ public abstract class AsyncCommandBase : IAsyncCancelableCommand
 
     /// <inheritdoc/>
     public abstract Task<int> RunAsync();
-
-    
 }

@@ -155,8 +155,8 @@ public class ParseOptionsAttribute : Attribute
     /// </summary>
     /// <remarks>
     /// <para>
-    ///   This property is only used if the <see cref="Mode"/> property or the
-    ///   <see cref="ParseOptions.Mode" qualifyHint="true"/> is 
+    ///   This property is only used if the <see cref="Mode"/> or
+    ///   <see cref="ParseOptions.Mode" qualifyHint="true"/> property is 
     ///   <see cref="ParsingMode.LongShort" qualifyHint="true"/>, or if the <see cref="PrefixTermination"/>
     ///   or <see cref="ParseOptions.PrefixTermination" qualifyHint="true"/> property is not
     ///   <see cref="PrefixTerminationMode.None" qualifyHint="true"/>.

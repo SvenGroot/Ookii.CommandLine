@@ -18,7 +18,7 @@ namespace Ookii.CommandLine.Commands;
 /// <para>
 ///   If you want to use the cancellation token passed to the
 ///   <see cref="CommandManager.RunCommandAsync(System.Threading.CancellationToken)" qualifyHint="true"/>
-///   method, you should instead implement the <see cref="IAsyncCancelableCommand"/> interface or
+///   method, you should instead implement the <see cref="IAsyncCancelableCommand"/> interface, or
 ///   derive from the <see cref="AsyncCommandBase"/> class.
 /// </para>
 /// </remarks>

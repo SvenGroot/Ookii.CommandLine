@@ -5,6 +5,7 @@ namespace Ookii.CommandLine;
 /// <summary>
 /// Provides data for the <see cref="CommandLineParser.UnknownArgument" qualifyHint="true"/> event.
 /// </summary>
+/// <threadsafety static="true" instance="false"/>
 public class UnknownArgumentEventArgs : EventArgs
 {
     /// <summary>
@@ -115,8 +116,8 @@ public class UnknownArgumentEventArgs : EventArgs
     public bool Ignore { get; set; }
 
     /// <summary>
-    /// Gets a value that indicates whether parsing should be canceled when the event handler
-    /// returns.
+    /// Gets or sets a value that indicates whether parsing should be canceled when the event
+    /// handler returns.
     /// </summary>
     /// <value>
     /// One of the values of the <see cref="CancelMode"/> enumeration. The default value is

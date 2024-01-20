@@ -37,8 +37,8 @@ namespace Ookii.CommandLine.Commands;
 ///   <see cref="ICommandWithCustomParsing"/> interface.
 /// </para>
 /// <para>
-///   Subcommands can be asynchronous by implementing the <see cref="IAsyncCommand"/> or
-///   <see cref="IAsyncCancelableCommand"/> interface.
+///   Subcommands can support asynchronous execution by implementing the <see cref="IAsyncCommand"/>
+///   or <see cref="IAsyncCancelableCommand"/> interface.
 /// </para>
 /// <para>
 ///   Commands can be defined in a single assembly, or in multiple assemblies.

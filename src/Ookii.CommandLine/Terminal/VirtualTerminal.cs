@@ -128,7 +128,8 @@ public static class VirtualTerminal
     /// </para>
     /// <para>
     ///   The <paramref name="textFormat"/> and <paramref name="reset"/> parameters will be ignored
-    ///   if the 
+    ///   if the standard output stream does not support VT sequences. In that case, the value of
+    ///   <paramref name="text"/> will be written without formatting.
     /// </para>
     /// </remarks>
     public static void WriteLineFormatted(string text, TextFormat textFormat, TextFormat? reset = null)
@@ -155,7 +156,8 @@ public static class VirtualTerminal
     /// </para>
     /// <para>
     ///   The <paramref name="textFormat"/> and <paramref name="reset"/> parameters will be ignored
-    ///   if the 
+    ///   if the standard error stream does not support VT sequences. In that case, the value of
+    ///   <paramref name="text"/> will be written without formatting.
     /// </para>
     /// </remarks>
     public static void WriteLineErrorFormatted(string text, TextFormat? textFormat = null, TextFormat? reset = null)

@@ -21,6 +21,7 @@ namespace Ookii.CommandLine;
 ///   resource table that can be localized.
 /// </para>
 /// </remarks>
+/// <threadsafety static="true" instance="false"/>
 [AttributeUsage(AttributeTargets.Class)]
 public class UsageFooterAttribute : Attribute
 {

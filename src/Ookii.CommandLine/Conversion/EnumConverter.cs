@@ -12,13 +12,13 @@ namespace Ookii.CommandLine.Conversion;
 /// <para>
 ///   This converter performs a case insensitive conversion, and accepts the name of an enumeration
 ///   value or a number representing the underlying type of the enumeration. Comma-separated values
-///   that will be combined using bitwise-or are also excepted, regardless of whether the
+///   that will be combined using bitwise-or are also accepted, regardless of whether the
 ///   enumeration uses the <see cref="FlagsAttribute"/> attribute. When using a numeric value, the
 ///   value does not need to be one of the defined values of the enumeration.
 /// </para>
 /// <para>
 ///   Use the <see cref="ValidateEnumValueAttribute"/> attribute to alter these behaviors. Applying
-///   that attribute will ensure that only defined values are allowed. The
+///   that attribute will ensure that only values defined by the enumeration are allowed. The
 ///   <see cref="ValidateEnumValueAttribute.AllowCommaSeparatedValues" qualifyHint="true"/>
 ///   property can be used to control the use of multiple values, and the 
 ///   <see cref="ValidateEnumValueAttribute.AllowNumericValues" qualifyHint="true"/> property
@@ -27,11 +27,11 @@ namespace Ookii.CommandLine.Conversion;
 ///   <see langword="true"/> to enable case sensitive conversion.
 /// </para>
 /// <para>
-///   If conversion fails, the error message will check the
+///   If conversion fails, the converter will check the
 ///   <see cref="ValidateEnumValueAttribute.IncludeValuesInErrorMessage" qualifyHint="true"/>
 ///   property to see whether or not the enumeration's defined values should be listed in the
 ///   error message. If the argument does not have the <see cref="ValidateEnumValueAttribute"/>
-///   attribute applied, the values will be listed.
+///   attribute applied, the enumeration's values will be listed in the message.
 /// </para>
 /// </remarks>
 /// <threadsafety static="true" instance="true"/>

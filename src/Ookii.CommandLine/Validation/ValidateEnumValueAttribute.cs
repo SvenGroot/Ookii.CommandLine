@@ -6,7 +6,8 @@ namespace Ookii.CommandLine.Validation;
 
 /// <summary>
 /// Validates whether the value of an enumeration type is one of the defined values for that
-/// type, and provides additional conversion options for enumeration types.
+/// type, and provides additional conversion options for enumeration types converted using the
+/// <see cref="EnumConverter"/> class.
 /// </summary>
 /// <remarks>
 /// <para>
@@ -64,7 +65,7 @@ public class ValidateEnumValueAttribute : ArgumentValidationWithHelpAttribute
     ///   Setting this to <see langword="true"/> essentially makes this validator do nothing. It
     ///   is useful if you want to use it solely to list defined values in the usage help, or if
     ///   you want to use one of the other properties that affect the <see cref="EnumConverter"/>
-    ///   without also checking for defined values.
+    ///   class without also checking for defined values.
     /// </para>
     /// </remarks>
     public bool AllowNonDefinedValues { get; set; }
@@ -80,8 +81,7 @@ public class ValidateEnumValueAttribute : ArgumentValidationWithHelpAttribute
     /// <remarks>
     /// <para>
     ///   This property is used when validation fails, and is also checked by the
-    ///   <see cref="EnumConverter"/> class, which is the default converter for enumeration types,
-    ///   when conversion fails due to an invalid string value.
+    ///   <see cref="EnumConverter"/> class when conversion fails due to an invalid string value.
     /// </para>
     /// </remarks>
     public bool IncludeValuesInErrorMessage { get; set; } = true;

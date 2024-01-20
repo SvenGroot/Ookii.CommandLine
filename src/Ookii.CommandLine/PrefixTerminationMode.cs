@@ -9,12 +9,13 @@
 public enum PrefixTerminationMode
 {
     /// <summary>
-    /// This argument has no special meaning.
+    /// There is no special behavior for the argument.
     /// </summary>
     None,
     /// <summary>
-    /// The argument terminates the used of named arguments. Any following arguments are interpreted
-    /// as values for positional arguments, even if they begin with an argument name separator.
+    /// The argument terminates the use of named arguments. Any following arguments are interpreted
+    /// as values for positional arguments, even if they begin with a long or short argument name
+    /// prefix.
     /// </summary>
     PositionalOnly,
     /// <summary>

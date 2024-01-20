@@ -444,7 +444,7 @@ public partial class LineWrappingTextWriter : TextWriter
     /// indentation.
     /// </summary>
     /// <value>
-    /// <see langword="true"/> if a line after am empty line should be indented; otherwise,
+    /// <see langword="true"/> if a line after an empty line should be indented; otherwise,
     /// <see langword="false"/>. The default value is <see langword="false"/>.
     /// </value>
     /// <remarks>

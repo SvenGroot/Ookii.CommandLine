@@ -488,7 +488,7 @@ public class UsageWriter
     /// indentation.
     /// </summary>
     /// <value>
-    /// <see langword="true"/> if a line after am empty line should be indented; otherwise,
+    /// <see langword="true"/> if a line after an empty line should be indented; otherwise,
     /// <see langword="false"/>. The default value is <see langword="false"/>.
     /// </value>
     /// <remarks>
@@ -2035,8 +2035,8 @@ public class UsageWriter
     /// </summary>
     /// <remarks>
     /// <para>
-    ///   The base implementation calls <see cref="WriteCommandHelpInstruction"/> if the help
-    ///   instruction is explicitly or automatically enabled.
+    ///   The base implementation calls the <see cref="WriteCommandHelpInstruction"/> method if the
+    ///   help instruction is explicitly or automatically enabled.
     /// </para>
     /// <para>
     ///   This method is called by the base implementation of the <see cref="WriteCommandListUsageCore"/>
