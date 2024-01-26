@@ -41,6 +41,15 @@ A few restrictions apply to projects that use Ookii.CommandLine's source generat
 
 Generally, it's recommended to use source generation unless you cannot meet these requirements.
 
+To encourage the use of source generation, Ookii.CommandLine also includes an analyzer that will
+emit [a warning](SourceGenerationDiagnostics.md#ocl0040) if a class is found that contains any
+public property or method with the [`CommandLineArgumentAttribute`][] attribute and meets the
+requirements listed above, but does not have the [`GeneratedParserAttribute`][]. A code fix,
+accessible with lightbulb UI in Visual Studio, that applies the attribute and makes the class
+partial if necessary, is available in this case.
+
+If you don't want to or cannot use source generation, you can simply disable this warning.
+
 ## Generating a parser
 
 To use source generation to determine the command line arguments defined by a class, apply the
@@ -278,23 +287,23 @@ return manager.RunCommand() ?? 1;
 Next, we will take a look at several [utility classes](Utilities.md) provided, and used, by
 Ookii.CommandLine.
 
-[`ArgumentConverter`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Conversion_ArgumentConverter.htm
-[`ArgumentConverterAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Conversion_ArgumentConverterAttribute.htm
-[`CommandLineArgumentAttribute.IsPositional`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_IsPositional.htm
-[`CommandLineArgumentAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_CommandLineArgumentAttribute.htm
-[`CommandLineParser.Parse<T>()`]: https://www.ookii.org/docs/commandline-4.0/html/M_Ookii_CommandLine_CommandLineParser_Parse__1.htm
-[`CommandLineParser`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_CommandLineParser.htm
-[`CommandLineParser<T>`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_CommandLineParser_1.htm
-[`CommandManager`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Commands_CommandManager.htm
-[`GeneratedCommandManagerAttribute.AssemblyNames`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_Commands_GeneratedCommandManagerAttribute_AssemblyNames.htm
-[`GeneratedCommandManagerAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Commands_GeneratedCommandManagerAttribute.htm
-[`GeneratedConverterNamespaceAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Conversion_GeneratedConverterNamespaceAttribute.htm
-[`GeneratedParserAttribute.GenerateParseMethods`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_GeneratedParserAttribute_GenerateParseMethods.htm
-[`GeneratedParserAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_GeneratedParserAttribute.htm
-[`IParser<TSelf>`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_IParser_1.htm
-[`IParserProvider<TSelf>`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_IParserProvider_1.htm
-[`ParentCommandAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Commands_ParentCommandAttribute.htm
+[`ArgumentConverter`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_Conversion_ArgumentConverter.htm
+[`ArgumentConverterAttribute`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_Conversion_ArgumentConverterAttribute.htm
+[`CommandLineArgumentAttribute.IsPositional`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_IsPositional.htm
+[`CommandLineArgumentAttribute`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_CommandLineArgumentAttribute.htm
+[`CommandLineParser.Parse<T>()`]: https://www.ookii.org/docs/commandline-4.1/html/M_Ookii_CommandLine_CommandLineParser_Parse__1.htm
+[`CommandLineParser`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_CommandLineParser.htm
+[`CommandLineParser<T>`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_CommandLineParser_1.htm
+[`CommandManager`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_Commands_CommandManager.htm
+[`GeneratedCommandManagerAttribute.AssemblyNames`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_Commands_GeneratedCommandManagerAttribute_AssemblyNames.htm
+[`GeneratedCommandManagerAttribute`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_Commands_GeneratedCommandManagerAttribute.htm
+[`GeneratedConverterNamespaceAttribute`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_Conversion_GeneratedConverterNamespaceAttribute.htm
+[`GeneratedParserAttribute.GenerateParseMethods`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_GeneratedParserAttribute_GenerateParseMethods.htm
+[`GeneratedParserAttribute`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_GeneratedParserAttribute.htm
+[`IParser<TSelf>`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_IParser_1.htm
+[`IParserProvider<TSelf>`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_IParserProvider_1.htm
+[`ParentCommandAttribute`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_Commands_ParentCommandAttribute.htm
 [`Type`]: https://learn.microsoft.com/dotnet/api/system.type
-[CreateParser()_1]: https://www.ookii.org/docs/commandline-4.0/html/M_Ookii_CommandLine_IParserProvider_1_CreateParser.htm
-[DefaultValue_1]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_DefaultValue.htm
-[Parse()_7]: https://www.ookii.org/docs/commandline-4.0/html/Overload_Ookii_CommandLine_IParser_1_Parse.htm
+[CreateParser()_1]: https://www.ookii.org/docs/commandline-4.1/html/M_Ookii_CommandLine_IParserProvider_1_CreateParser.htm
+[DefaultValue_1]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_DefaultValue.htm
+[Parse()_7]: https://www.ookii.org/docs/commandline-4.1/html/Overload_Ookii_CommandLine_IParser_1_Parse.htm

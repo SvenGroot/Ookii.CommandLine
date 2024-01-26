@@ -14,6 +14,7 @@ internal class ArgumentAttributes
     private readonly AttributeData? _converterAttribute;
     private readonly AttributeData? _keyConverterAttribute;
     private readonly AttributeData? _valueConverterAttribute;
+    private readonly AttributeData? _validateEnumValue;
     private readonly List<AttributeData>? _aliases;
     private readonly List<AttributeData>? _shortAliases;
     private readonly List<AttributeData>? _validators;
@@ -23,7 +24,7 @@ internal class ArgumentAttributes
         AttributeData? typeConverterAttribute = null;
         foreach (var attribute in member.GetAttributes())
         {
-            var _ = attribute.CheckType(typeHelper.CommandLineArgumentAttribute, ref _commandLineArgumentAttribute) ||
+            _ = attribute.CheckType(typeHelper.CommandLineArgumentAttribute, ref _commandLineArgumentAttribute) ||
                 attribute.CheckType(typeHelper.MultiValueSeparatorAttribute, ref _multiValueSeparator) ||
                 attribute.CheckType(typeHelper.DescriptionAttribute, ref _description) ||
                 attribute.CheckType(typeHelper.ValueDescriptionAttribute, ref _valueDescription) ||
@@ -34,11 +35,19 @@ internal class ArgumentAttributes
                 attribute.CheckType(typeHelper.ValueConverterAttribute, ref _valueConverterAttribute) ||
                 attribute.CheckType(typeHelper.AliasAttribute, ref _aliases) ||
                 attribute.CheckType(typeHelper.ShortAliasAttribute, ref _shortAliases) ||
-                attribute.CheckType(typeHelper.ArgumentValidationAttribute, ref _validators);
+                attribute.CheckType(typeHelper.ValidateEnumValueAttribute, ref _validateEnumValue) ||
+                attribute.CheckType(typeHelper.ArgumentValidationAttribute, ref _validators) ||
                 attribute.CheckType(typeHelper.TypeConverterAttribute, ref typeConverterAttribute);
         }
 
-        // Only warn if the TypeConverterAttribute is present.
+        // Since it was checked for separately, it won't be in the list.
+        if (_validateEnumValue != null)
+        {
+            _validators ??= [];
+            _validators.Add(_validateEnumValue);
+        }
+
+        // Warn if the TypeConverterAttribute is present.
         if (CommandLineArgument != null && typeConverterAttribute != null)
         {
             context.ReportDiagnostic(Diagnostics.IgnoredTypeConverterAttribute(member, typeConverterAttribute));
@@ -57,5 +66,6 @@ internal class ArgumentAttributes
     public List<AttributeData>? Aliases => _aliases;
     public List<AttributeData>? ShortAliases => _shortAliases;
     public List<AttributeData>? Validators => _validators;
+    public AttributeData? ValidateEnumValue => _validateEnumValue;
 
 }

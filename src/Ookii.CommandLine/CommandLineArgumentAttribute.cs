@@ -1,5 +1,6 @@
 ﻿using Ookii.CommandLine.Commands;
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Ookii.CommandLine;
 
@@ -314,6 +315,24 @@ public sealed class CommandLineArgumentAttribute : Attribute
     /// </para>
     /// </remarks>
     public bool IncludeDefaultInUsageHelp { get; set; } = true;
+
+    /// <summary>
+    /// Gets or sets a compound formatting string that is used to format the default value for
+    /// display in the usage help.
+    /// </summary>
+    /// <value>
+    /// A compound formatting string, or <see langword="null"/> to use the default format.
+    /// </value>
+    /// <remarks>
+    /// <para>
+    ///   This value must be a compound formatting string containing exactly one placeholder,
+    ///   e.g "0x{0:x}".
+    /// </para>
+    /// </remarks>
+#if NET7_0_OR_GREATER
+    [StringSyntax(StringSyntaxAttribute.CompositeFormat)]
+#endif
+    public string? DefaultValueFormat { get; set; }
 
     /// <summary>
     /// Gets or sets a value that indicates whether argument parsing should be canceled if

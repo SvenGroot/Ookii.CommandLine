@@ -5,7 +5,7 @@ than using a base class with the common arguments, which makes the common argume
 command (as shown in the [nested commands sample](../NestedCommands)), this sample defines several
 top-level arguments that are not part of any command.
 
-The commands themselves are based on the regular [subcommand sample](../SubCommand), so see that for
+The commands themselves are based on the regular [subcommand sample](../Subcommand), so see that for
 more detailed descriptions. This sample uses POSIX conventions, for variation, but this isn't
 required.
 
@@ -83,4 +83,4 @@ Usage:  TopLevelArguments [global arguments] write [[--lines] <string>...] [--he
             When this option is specified, the file will be overwritten if it already exists.
 ```
 
-[`CancelMode.Success`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_CancelMode.htm
+[`CancelMode.Success`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_CancelMode.htm

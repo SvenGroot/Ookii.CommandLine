@@ -1,6 +1,7 @@
 ﻿using Ookii.CommandLine;
 using Ookii.CommandLine.Commands;
 using Ookii.CommandLine.Conversion;
+using Ookii.CommandLine.Terminal;
 using Ookii.CommandLine.Validation;
 using System.ComponentModel;
 using System.Text;
@@ -66,7 +67,7 @@ partial class WriteCommand : AsyncCommandBase
                 // The Main method will return the exit status to the operating system. The numbers
                 // are made up for the sample, they don't mean anything. Usually, 0 means success,
                 // and any other value indicates an error.
-                Program.WriteErrorMessage("File already exists.");
+                VirtualTerminal.WriteLineErrorFormatted("File already exists.");
                 return (int)ExitCode.FileExists;
             }
 
@@ -93,12 +94,12 @@ partial class WriteCommand : AsyncCommandBase
         }
         catch (IOException ex)
         {
-            Program.WriteErrorMessage(ex.Message);
+            VirtualTerminal.WriteLineErrorFormatted(ex.Message);
             return (int)ExitCode.ReadWriteFailure;
         }
         catch (UnauthorizedAccessException ex)
         {
-            Program.WriteErrorMessage(ex.Message);
+            VirtualTerminal.WriteLineErrorFormatted(ex.Message);
             return (int)ExitCode.ReadWriteFailure;
         }
     }

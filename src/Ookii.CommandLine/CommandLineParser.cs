@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
@@ -183,6 +184,47 @@ public class CommandLineParser
         public bool Short { get; set; }
     }
 
+    private struct ParseState
+    {
+        public CommandLineParser Parser;
+
+        public ReadOnlyMemory<string> Arguments;
+
+        public int Index;
+
+        public int PositionalArgumentIndex;
+
+        public bool PositionalOnly;
+
+        public CancelMode CancelParsing;
+
+        public CommandLineArgument? Argument;
+
+        public ReadOnlyMemory<char> ArgumentName;
+
+        public ReadOnlyMemory<char>? ArgumentValue;
+
+        public bool IsUnknown;
+
+        public bool IsSpecifiedByPosition;
+
+        public readonly CommandLineArgument? PositionalArgument
+            => PositionalArgumentIndex < Parser._positionalArgumentCount ? Parser.Arguments[PositionalArgumentIndex] : null;
+
+        public readonly string RealArgumentName => Argument?.ArgumentName ?? ArgumentName.ToString();
+
+        public readonly ReadOnlyMemory<string> RemainingArguments => Arguments.Slice(Index + 1);
+
+        public void ResetForNextArgument()
+        {
+            Argument = null;
+            ArgumentName = default;
+            ArgumentValue = null;
+            IsUnknown = false;
+            IsSpecifiedByPosition = false;
+        }
+    }
+
     #endregion
 
     private readonly ArgumentProvider _provider;
@@ -252,11 +294,35 @@ public class CommandLineParser
     ///   arguments.
     /// </para>
     /// <para>
-    ///   This even is only raised when the <see cref="AllowDuplicateArguments"/> property is
+    ///   This event is only raised when the <see cref="AllowDuplicateArguments"/> property is
     ///   <see langword="true"/>.
     /// </para>
     /// </remarks>
     public event EventHandler<DuplicateArgumentEventArgs>? DuplicateArgument;
+
+    /// <summary>
+    /// Event raised when an unknown argument name or a positional value with no matching argument
+    /// is used.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    ///   Specifying an argument with an unknown name, or too many positional arguments, is normally
+    ///   an error. By handling this event and setting the
+    ///   <see cref="UnknownArgumentEventArgs.Ignore" qualifyHint="true"/> property to
+    ///   <see langword="true"/>, you can instead continue parsing the remainder of the command
+    ///   line, ignoring the unknown argument.
+    /// </para>
+    /// <para>
+    ///   You can also cancel parsing instead using the
+    ///   <see cref="UnknownArgumentEventArgs.CancelParsing" qualifyHint="true"/> property.
+    /// </para>
+    /// <para>
+    ///   If an unknown argument name is encountered and is followed by a value separated by
+    ///   whitespace, that value will be treated as the next positional argument value. It is not
+    ///   considered to be a value for the unknown argument.
+    /// </para>
+    /// </remarks>
+    public event EventHandler<UnknownArgumentEventArgs>? UnknownArgument;
 
     internal const string UnreferencedCodeHelpUrl = "https://www.ookii.org/Link/CommandLineSourceGeneration";
 
@@ -360,7 +426,7 @@ public class CommandLineParser
         _argumentNamePrefixes = DetermineArgumentNamePrefixes(_parseOptions);
         _nameValueSeparators = DetermineNameValueSeparators(_parseOptions);
         var prefixInfos = _argumentNamePrefixes.Select(p => new PrefixInfo { Prefix = p, Short = true });
-        if (_mode == ParsingMode.LongShort)
+        if (_mode == ParsingMode.LongShort || _parseOptions.PrefixTerminationOrDefault != PrefixTerminationMode.None)
         {
             _longArgumentNamePrefix = _parseOptions.LongArgumentNamePrefixOrDefault;
             if (string.IsNullOrWhiteSpace(_longArgumentNamePrefix))
@@ -368,9 +434,12 @@ public class CommandLineParser
                 throw new ArgumentException(Properties.Resources.EmptyArgumentNamePrefix, nameof(options));
             }
 
-            var longInfo = new PrefixInfo { Prefix = _longArgumentNamePrefix, Short = false };
-            prefixInfos = prefixInfos.Append(longInfo);
-            _argumentsByShortName = new(new CharComparer(comparison));
+            if (_mode == ParsingMode.LongShort)
+            {
+                var longInfo = new PrefixInfo { Prefix = _longArgumentNamePrefix, Short = false };
+                prefixInfos = prefixInfos.Append(longInfo);
+                _argumentsByShortName = new(new CharComparer(comparison));
+            }
         }
 
         _sortedPrefixes = prefixInfos.OrderByDescending(info => info.Prefix.Length).ToArray();
@@ -431,14 +500,18 @@ public class CommandLineParser
     /// </summary>
     /// <value>
     /// The prefix for long argument names, or <see langword="null"/> if the <see cref="Mode"/>
-    /// property is not <see cref="ParsingMode.LongShort" qualifyHint="true"/>.
+    /// property is not <see cref="ParsingMode.LongShort" qualifyHint="true"/> and the
+    /// <see cref="ParseOptions.PrefixTermination" qualifyHint="true"/> property is
+    /// <see cref="PrefixTerminationMode.None" qualifyHint="true"/>.
     /// </value>
     /// <remarks>
     /// <para>
     ///   The long argument prefix is only used if the <see cref="Mode"/> property is
-    ///   <see cref="ParsingMode.LongShort" qualifyHint="true"/>. See <see cref="ArgumentNamePrefixes"/> to
-    ///   get the prefixes for short argument names, or for argument names if the <see cref="Mode"/>
-    ///   property is <see cref="ParsingMode.Default" qualifyHint="true"/>.
+    ///   <see cref="ParsingMode.LongShort" qualifyHint="true"/>, or if the
+    ///   <see cref="ParseOptions.PrefixTermination" qualifyHint="true"/> property is not
+    ///   <see cref="PrefixTerminationMode.None" qualifyHint="true"/>. See <see cref="ArgumentNamePrefixes"/> to
+    ///   get the prefixes for short argument names, or for all argument names if the
+    ///   <see cref="Mode"/> property is <see cref="ParsingMode.Default" qualifyHint="true"/>.
     /// </para>
     /// </remarks>
     /// <seealso cref="ParseOptionsAttribute.LongArgumentNamePrefix" qualifyHint="true"/>
@@ -451,6 +524,9 @@ public class CommandLineParser
     /// <value>
     /// The <see cref="Type"/> that was used to define the arguments.
     /// </value>
+#if NET6_0_OR_GREATER
+    [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicMethods)]
+#endif
     public Type ArgumentsType => _provider.ArgumentsType;
 
     /// <summary>
@@ -477,16 +553,31 @@ public class CommandLineParser
     /// Gets a description that is used when generating usage information.
     /// </summary>
     /// <value>
-    /// The description of the command line application. The default value is an empty string ("").
+    /// The description of the command line application.
     /// </value>
     /// <remarks>
     /// <para>
-    ///   If not empty, this description will be added to the usage returned by the <see cref="WriteUsage"/>
-    ///   method. This description can be set by applying the <see cref="DescriptionAttribute"/> to
-    ///   the command line arguments type.
+    ///   If not empty, this description will be added at the top of the usage help created by the
+    ///   <see cref="WriteUsage"/> method. This description can be set by applying the
+    ///   <see cref="DescriptionAttribute"/> attribute to the command line arguments class.
     /// </para>
     /// </remarks>
     public string Description => _provider.Description;
+
+    /// <summary>
+    /// Gets footer text that is used when generating usage information.
+    /// </summary>
+    /// <value>
+    /// The footer text.
+    /// </value>
+    /// <remarks>
+    /// <para>
+    ///   If not empty, this footer will be added at the bottom of the usage help created by the
+    ///   <see cref="WriteUsage"/> method. This footer can be set by applying the
+    ///   <see cref="UsageFooterAttribute"/> attribute to the command line arguments class.
+    /// </para>
+    /// </remarks>
+    public string UsageFooter => _provider.UsageFooter;
 
     /// <summary>
     /// Gets the options used by this instance.
@@ -912,16 +1003,21 @@ public class CommandLineParser
     /// <param name="args">The command line arguments.</param>
     public object? Parse(ReadOnlyMemory<string> args)
     {
-        int index = -1;
+        var state = new ParseState() 
+        { 
+            Parser = this,
+            Arguments = args,
+        };
+
         try
         {
             HelpRequested = false;
-            return ParseCore(args, ref index);
+            return ParseCore(ref state);
         }
         catch (CommandLineArgumentException ex)
         {
             HelpRequested = true;
-            ParseResult = ParseResult.FromException(ex, args.Slice(index));
+            ParseResult = ParseResult.FromException(ex, args.Slice(state.Index));
             throw;
         }
     }
@@ -1270,55 +1366,41 @@ public class CommandLineParser
     /// Raises the <see cref="ArgumentParsed"/> event.
     /// </summary>
     /// <param name="e">The data for the event.</param>
-    protected virtual void OnArgumentParsed(ArgumentParsedEventArgs e)
-    {
-        ArgumentParsed?.Invoke(this, e);
-    }
+    protected virtual void OnArgumentParsed(ArgumentParsedEventArgs e) => ArgumentParsed?.Invoke(this, e);
 
     /// <summary>
     /// Raises the <see cref="DuplicateArgument"/> event.
     /// </summary>
     /// <param name="e">The data for the event.</param>
-    protected virtual void OnDuplicateArgument(DuplicateArgumentEventArgs e)
-    {
-        DuplicateArgument?.Invoke(this, e);
-    }
+    protected virtual void OnDuplicateArgument(DuplicateArgumentEventArgs e) => DuplicateArgument?.Invoke(this, e);
 
-    internal static bool ShouldIndent(LineWrappingTextWriter writer)
-    {
-        return writer.MaximumLineLength is 0 or >= 30;
-    }
+    /// <summary>
+    /// Raises the <see cref="UnknownArgument"/> event.
+    /// </summary>
+    /// <param name="e">The data for the event.</param>
+    protected virtual void OnUnknownArgument(UnknownArgumentEventArgs e) => UnknownArgument?.Invoke(this, e);
+
+    internal static bool ShouldIndent(LineWrappingTextWriter writer) => writer.MaximumLineLength is 0 or >= 30;
 
     internal static void WriteError(ParseOptions options, string message, TextFormat color, bool blankLine = false)
     {
         using var errorVtSupport = options.EnableErrorColor();
-        try
+        using var error = DisposableWrapper.Create(options.Error, LineWrappingTextWriter.ForConsoleError);
+        if (errorVtSupport.IsSupported)
         {
-            using var error = DisposableWrapper.Create(options.Error, LineWrappingTextWriter.ForConsoleError);
-            if (options.UseErrorColor ?? false)
-            {
-                error.Inner.Write(color);
-            }
-
-            error.Inner.Write(message);
-            if (options.UseErrorColor ?? false)
-            {
-                error.Inner.Write(options.UsageWriter.ColorReset);
-            }
-
-            error.Inner.WriteLine();
-            if (blankLine)
-            {
-                error.Inner.WriteLine();
-            }
+            error.Inner.Write(color);
         }
-        finally
+
+        error.Inner.Write(message);
+        if (errorVtSupport.IsSupported)
         {
-            // Reset UseErrorColor if it was changed.
-            if (errorVtSupport != null)
-            {
-                options.UseErrorColor = null;
-            }
+            error.Inner.Write(options.UsageWriter.ColorReset);
+        }
+
+        error.Inner.WriteLine();
+        if (blankLine)
+        {
+            error.Inner.WriteLine();
         }
     }
 
@@ -1476,62 +1558,56 @@ public class CommandLineParser
         }
     }
 
-    private object? ParseCore(ReadOnlyMemory<string> args, ref int x)
+    private object? ParseCore(ref ParseState state)
     {
-        // Reset all arguments to their default value.
-        foreach (CommandLineArgument argument in _arguments)
+        Reset();
+        for (; state.Index < state.Arguments.Length; ++state.Index)
         {
-            argument.Reset();
-        }
-
-        HelpRequested = false;
-        int positionalArgumentIndex = 0;
-
-        var cancelParsing = CancelMode.None;
-        CommandLineArgument? lastArgument = null;
-        for (x = 0; x < args.Length; ++x)
-        {
-            string arg = args.Span[x];
-            var argumentNamePrefix = CheckArgumentNamePrefix(arg);
-            if (argumentNamePrefix != null)
+            var token = state.Arguments.Span[state.Index];
+            state.ResetForNextArgument();
+            if (!state.PositionalOnly && token == _longArgumentNamePrefix)
             {
-                // If white space was the value separator, this function returns the index of argument containing the value for the named argument.
-                // It returns -1 if parsing was canceled by the ArgumentParsed event handler or the CancelParsing property.
-                (cancelParsing, x, lastArgument) = ParseNamedArgument(args.Span, x, argumentNamePrefix.Value);
-                if (cancelParsing != CancelMode.None)
+                if (_parseOptions.PrefixTerminationOrDefault == PrefixTerminationMode.PositionalOnly)
                 {
+                    state.PositionalOnly = true;
+                    continue;
+                }
+                else if (_parseOptions.PrefixTerminationOrDefault == PrefixTerminationMode.CancelWithSuccess)
+                {
+                    state.CancelParsing = CancelMode.Success;
+                    state.ArgumentName = default;
                     break;
                 }
             }
-            else
+
+            if (state.PositionalOnly || !FindNamedArgument(token, ref state))
             {
-                // If this is a multi-value argument is must be the last argument.
-                if (positionalArgumentIndex < _positionalArgumentCount && _arguments[positionalArgumentIndex].MultiValueInfo == null)
-                {
-                    // Skip named positional arguments that have already been specified by name.
-                    while (positionalArgumentIndex < _positionalArgumentCount && _arguments[positionalArgumentIndex].MultiValueInfo == null && _arguments[positionalArgumentIndex].HasValue)
-                    {
-                        ++positionalArgumentIndex;
-                    }
-                }
+                state.IsSpecifiedByPosition = true;
+                state.ArgumentValue = token.AsMemory();
+                FindPositionalArgument(ref state);
+            }
 
-                if (positionalArgumentIndex >= _positionalArgumentCount)
-                {
-                    throw StringProvider.CreateException(CommandLineArgumentErrorCategory.TooManyArguments);
-                }
+            if (state.IsUnknown)
+            {
+                HandleUnknownArgument(ref state);
+            }
 
-                lastArgument = _arguments[positionalArgumentIndex];
-                cancelParsing = ParseArgumentValue(lastArgument, arg, arg.AsMemory());
-                if (cancelParsing != CancelMode.None)
-                {
-                    break;
-                }
+            // Argument can be null without IsUnknown set if the token was a combined short switch
+            // argument.
+            if (state.Argument != null)
+            {
+                ParseArgumentValue(ref state);
+            }
+
+            if (state.CancelParsing != CancelMode.None)
+            {
+                break;
             }
         }
 
-        if (cancelParsing == CancelMode.Abort)
+        if (state.CancelParsing == CancelMode.Abort)
         {
-            ParseResult = ParseResult.FromCanceled(lastArgument!.ArgumentName, args.Slice(x + 1));
+            ParseResult = ParseResult.FromCanceled(state.RealArgumentName, state.RemainingArguments);
             return null;
         }
 
@@ -1544,6 +1620,21 @@ public class CommandLineParser
         // Run class validators.
         _provider.RunValidators(this);
 
+        var result = CreateResultInstance();
+
+        ParseResult = state.CancelParsing == CancelMode.None
+            ? ParseResult.FromSuccess()
+            : ParseResult.FromSuccess(state.Argument?.ArgumentName ?? 
+                (state.ArgumentName.Length == 0 ? LongArgumentNamePrefix : state.ArgumentName.ToString()),
+                state.RemainingArguments);
+
+        // Reset to false in case it was set by a method argument that didn't cancel parsing.
+        HelpRequested = false;
+        return result;
+    }
+
+    private object CreateResultInstance()
+    {
         object commandLineArguments;
         try
         {
@@ -1574,13 +1665,61 @@ public class CommandLineParser
             argument.ApplyPropertyValue(commandLineArguments);
         }
 
-        ParseResult = cancelParsing == CancelMode.None
-            ? ParseResult.FromSuccess()
-            : ParseResult.FromSuccess(lastArgument!.ArgumentName, args.Slice(x + 1));
-
-        // Reset to false in case it was set by a method argument that didn't cancel parsing.
-        HelpRequested = false;
         return commandLineArguments;
+    }
+
+    private void Reset()
+    {
+        HelpRequested = false;
+
+        // Reset all arguments to their default value, and mark them as unassigned.
+        foreach (var argument in _arguments)
+        {
+            argument.Reset();
+        }
+    }
+
+    private void ParseArgumentValue(ref ParseState state)
+    {
+        Debug.Assert(state.Argument != null);
+
+        var argument = state.Argument!;
+        bool parsedValue = false;
+        if (state.ArgumentValue == null && !argument.IsSwitch && AllowWhiteSpaceValueSeparator)
+        {
+            // No value separator was present in the token, but a value is required and white space is
+            // allowed. We take the next token as the value. For multi-value arguments that can consume
+            // multiple tokens, we keep going until we hit another argument name.
+            var allowMultiToken = argument.MultiValueInfo is MultiValueArgumentInfo info
+                && (info.AllowWhiteSpaceSeparator || state.IsSpecifiedByPosition);
+
+            int index;
+            for (index = state.Index + 1; index < state.Arguments.Length; ++index)
+            {
+                var stringValue = state.Arguments.Span[index];
+                if (CheckArgumentNamePrefix(stringValue) != null)
+                {
+                    --index;
+                    break;
+                }
+
+                parsedValue = true;
+                state.CancelParsing = ParseArgumentValue(argument, stringValue, stringValue.AsMemory());
+                if (state.CancelParsing != CancelMode.None || !allowMultiToken)
+                {
+                    break;
+                }
+            }
+
+            state.Index = index;
+        }
+
+        // If the value was not parsed above, parse it now. In case there is no value and it's
+        // not a switch, CommandLineArgument.SetValue will throw an exception.
+        if (!parsedValue)
+        {
+            state.CancelParsing = ParseArgumentValue(argument, null, state.ArgumentValue);
+        }
     }
 
     private CancelMode ParseArgumentValue(CommandLineArgument argument, string? stringValue, ReadOnlyMemory<char>? memoryValue)
@@ -1629,74 +1768,67 @@ public class CommandLineParser
         return e.CancelParsing;
     }
 
-    private (CancelMode, int, CommandLineArgument?) ParseNamedArgument(ReadOnlySpan<string> args, int index, PrefixInfo prefix)
+    private static void FindPositionalArgument(ref ParseState state)
     {
-        var (argumentName, argumentValue) = args[index].AsMemory(prefix.Prefix.Length).SplitFirstOfAny(_nameValueSeparators.AsSpan());
+        // Skip named positional arguments that have already been specified by name, unless it's
+        // a multi-value argument which must be the last positional argument.
+        while (state.PositionalArgument is CommandLineArgument current && current.MultiValueInfo == null && current.HasValue)
+        {
+            ++state.PositionalArgumentIndex;
+        }
 
-        CancelMode cancelParsing;
-        CommandLineArgument? argument = null;
+        state.Argument = state.PositionalArgument;
+        if (state.Argument == null)
+        {
+            state.IsUnknown = true;
+            return;
+        }
+
+        state.ArgumentName = state.Argument.ArgumentName.AsMemory();
+    }
+
+    private bool FindNamedArgument(string token, ref ParseState state)
+    {
+        if (CheckArgumentNamePrefix(token) is not PrefixInfo prefix)
+        {
+            return false;
+        }
+
+        (state.ArgumentName, state.ArgumentValue) = 
+            token.AsMemory(prefix.Prefix.Length).SplitFirstOfAny(_nameValueSeparators.AsSpan());
+
         if (_argumentsByShortName != null && prefix.Short)
         {
-            if (argumentName.Length == 1)
+            if (state.ArgumentName.Length == 1)
             {
-                argument = GetShortArgumentOrThrow(argumentName.Span[0]);
+                state.Argument = GetShortArgument(state.ArgumentName.Span[0]);
+                state.IsUnknown = state.Argument == null;
+                return true;
             }
             else
             {
-                CommandLineArgument? lastArgument;
-                (cancelParsing, lastArgument) = ParseShortArgument(argumentName.Span, argumentValue);
-                return (cancelParsing, index, lastArgument);
+                ParseCombinedShortArgument(ref state);
+                return true;
             }
         }
 
-        if (argument == null && !_argumentsByName.TryGetValue(argumentName, out argument))
+        if (state.Argument == null && !_argumentsByName.TryGetValue(state.ArgumentName, out state.Argument))
         {
             if (Options.AutoPrefixAliasesOrDefault)
             {
-                argument = GetArgumentByNamePrefix(argumentName.Span);
+                state.Argument = GetArgumentByNamePrefix(state.ArgumentName.Span);
             }
 
-            if (argument == null)
+            if (state.Argument == null)
             {
-                throw StringProvider.CreateException(CommandLineArgumentErrorCategory.UnknownArgument, argumentName.ToString());
+                state.IsUnknown = true;
+                return true;
             }
         }
 
-        argument.SetUsedArgumentName(argumentName);
-        if (!argumentValue.HasValue && !argument.IsSwitch && AllowWhiteSpaceValueSeparator)
-        {
-            string? argumentValueString = null;
-
-            // No separator was present but a value is required. We take the next argument as
-            // its value. For multi-value arguments that can consume multiple values, we keep
-            // going until we hit another argument name.
-            while (index + 1 < args.Length && CheckArgumentNamePrefix(args[index + 1]) == null)
-            {
-                ++index;
-                argumentValueString = args[index];
-
-                cancelParsing = ParseArgumentValue(argument, argumentValueString, argumentValueString.AsMemory());
-                if (cancelParsing != CancelMode.None)
-                {
-                    return (cancelParsing, index, argument);
-                }
-
-                if (argument.MultiValueInfo is not MultiValueArgumentInfo { AllowWhiteSpaceSeparator: true })
-                {
-                    break;
-                }
-            }
-
-            if (argumentValueString != null)
-            {
-                return (CancelMode.None, index, argument);
-            }
-        }
-
-        // ParseArgumentValue returns true if parsing was canceled by the ArgumentParsed event handler
-        // or the CancelParsing property.
-        cancelParsing = ParseArgumentValue(argument, null, argumentValue);
-        return (cancelParsing, index, argument);
+        state.Argument.SetUsedArgumentName(state.ArgumentName);
+        state.ArgumentName = state.Argument.ArgumentName.AsMemory();
+        return true;
     }
 
     private CommandLineArgument? GetArgumentByNamePrefix(ReadOnlySpan<char> prefix)
@@ -1738,40 +1870,63 @@ public class CommandLineParser
         return foundArgument;
     }
 
-    private (CancelMode, CommandLineArgument?) ParseShortArgument(ReadOnlySpan<char> name, ReadOnlyMemory<char>? value)
+    private void ParseCombinedShortArgument(ref ParseState state)
     {
-        CommandLineArgument? arg = null;
-        foreach (var ch in name)
+        var combinedName = state.ArgumentName.Span;
+        foreach (var ch in combinedName)
         {
-            arg = GetShortArgumentOrThrow(ch);
-            if (!arg.IsSwitch)
+            var argument = GetShortArgument(ch);
+            if (argument == null)
             {
-                throw StringProvider.CreateException(CommandLineArgumentErrorCategory.CombinedShortNameNonSwitch, name.ToString());
+                state.ArgumentName = ch.ToString().AsMemory();
+                HandleUnknownArgument(ref state, true);
+                continue;
             }
 
-            var cancelParsing = ParseArgumentValue(arg, null, value);
-            if (cancelParsing != CancelMode.None)
+            if (!argument.IsSwitch)
             {
-                return (cancelParsing, arg);
+                throw StringProvider.CreateException(CommandLineArgumentErrorCategory.CombinedShortNameNonSwitch,
+                    combinedName.ToString());
+            }
+
+            state.ArgumentName = argument.ArgumentName.AsMemory();
+            state.CancelParsing = ParseArgumentValue(argument, null, state.ArgumentValue);
+            if (state.CancelParsing != CancelMode.None)
+            {
+                break;
             }
         }
-
-        return (CancelMode.None, arg);
     }
 
-    private CommandLineArgument GetShortArgumentOrThrow(char shortName)
+    private void HandleUnknownArgument(ref ParseState state, bool isCombined = false)
     {
-        if (_argumentsByShortName!.TryGetValue(shortName, out CommandLineArgument? argument))
+        var eventArgs = new UnknownArgumentEventArgs(state.Arguments.Span[state.Index], state.ArgumentName,
+            state.ArgumentValue ?? default, isCombined);
+
+        OnUnknownArgument(eventArgs);
+        if (eventArgs.CancelParsing != CancelMode.None)
         {
-            return argument;
+            state.CancelParsing = eventArgs.CancelParsing;
+            return;
         }
 
-        throw StringProvider.CreateException(CommandLineArgumentErrorCategory.UnknownArgument, shortName.ToString());
+        if (!eventArgs.Ignore)
+        {
+            if (state.ArgumentName.Length > 0)
+            {
+                throw StringProvider.CreateException(CommandLineArgumentErrorCategory.UnknownArgument,
+                    state.ArgumentName.ToString());
+            }
+
+
+            throw StringProvider.CreateException(CommandLineArgumentErrorCategory.TooManyArguments);
+        }
     }
 
     private PrefixInfo? CheckArgumentNamePrefix(string argument)
     {
-        // Even if '-' is the argument name prefix, we consider an argument starting with dash followed by a digit as a value, because it could be a negative number.
+        // Even if '-' is the argument name prefix, we consider an argument starting with dash
+        // followed by a digit as a value, because it could be a negative number.
         if (argument.Length >= 2 && argument[0] == '-' && char.IsDigit(argument, 1))
         {
             return null;

@@ -14,7 +14,7 @@ using System.Net;
 #nullable disable
 
 // We deliberately have some properties and methods that cause warnings, so disable those.
-#pragma warning disable OCL0017,OCL0018,OCL0020,OCL0023,OCL0029,OCL0033,OCL0038,OCL0039
+#pragma warning disable OCL0017,OCL0018,OCL0020,OCL0023,OCL0029,OCL0033,OCL0038,OCL0039,OCL0040
 
 namespace Ookii.CommandLine.Tests;
 
@@ -451,8 +451,13 @@ partial class ValidationArguments
 
     [CommandLineArgument]
     [Description("Day2 description.")]
-    [ValidateEnumValue]
+    [ValidateEnumValue(CaseSensitive = true, AllowNonDefinedValues = true, AllowCommaSeparatedValues = false)]
     public DayOfWeek? Day2 { get; set; }
+
+    [CommandLineArgument(IsHidden = true)]
+    [Description("Day3 description.")]
+    [ValidateEnumValue(AllowNumericValues = false)]
+    public DayOfWeek Day3 { get; set; }
 
     [CommandLineArgument]
     [Description("NotNull description.")]
@@ -688,4 +693,41 @@ partial class AutoPositionArguments : AutoPositionArgumentsBase
 
     [CommandLineArgument]
     public int Arg3 { get; set; }
+}
+
+[GeneratedParser]
+[UsageFooter("Some usage footer.")]
+partial class EmptyLineDescriptionArguments
+{
+    [CommandLineArgument]
+    [Description("A description with\n\na blank line.")]
+    public string Argument { get; set; }
+}
+
+[GeneratedParser]
+partial class DefaultValueFormatArguments
+{
+    [CommandLineArgument(DefaultValue = 1.5, DefaultValueFormat = "({0:0.00})")]
+    [Description("An argument.")]
+    public double Argument { get; set; }
+
+    [CommandLineArgument(DefaultValue = 3.5)]
+    [Description("Another argument.")]
+    public double Argument2 { get; set; }
+}
+
+[GeneratedParser]
+partial class PrefixTerminationArguments
+{
+    [CommandLineArgument(Position = 0)]
+    public string Arg1 { get; set; }
+
+    [CommandLineArgument(Position = 1)]
+    public string Arg2 { get; set; }
+
+    [CommandLineArgument(Position = 2)]
+    public string Arg3 { get; set; }
+
+    [CommandLineArgument(Position = 3)]
+    public string Arg4 { get; set; }
 }

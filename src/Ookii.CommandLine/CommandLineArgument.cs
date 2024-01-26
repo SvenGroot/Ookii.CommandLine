@@ -185,6 +185,8 @@ public abstract class CommandLineArgument
         {
         }
 
+        public override MemberInfo? Member => null;
+
         protected override bool CanSetProperty => false;
 
         private static ArgumentInfo CreateInfo(CommandLineParser parser, string argumentName, char shortName, char shortAlias)
@@ -242,6 +244,8 @@ public abstract class CommandLineArgument
         {
         }
 
+        public override MemberInfo? Member => null;
+
         protected override bool CanSetProperty => false;
 
         private static ArgumentInfo CreateInfo(CommandLineParser parser, string argumentName)
@@ -292,6 +296,7 @@ public abstract class CommandLineArgument
         public bool IsRequiredProperty { get; set; }
         public object? DefaultValue { get; set; }
         public bool IncludeDefaultValueInHelp { get; set; }
+        public string? DefaultValueFormat { get; set; }
         public string? Description { get; set; }
         public string? ValueDescription { get; set; }
         public bool AllowNull { get; set; }
@@ -316,7 +321,6 @@ public abstract class CommandLineArgument
     private readonly Type _elementTypeWithNullable;
     private readonly string? _description;
     private readonly bool _isRequired;
-    private readonly string _memberName;
     private readonly object? _defaultValue;
     private readonly ArgumentKind _argumentKind;
     private readonly bool _allowNull;
@@ -331,7 +335,7 @@ public abstract class CommandLineArgument
     {
         // If this method throws anything other than a NotSupportedException, it constitutes a bug in the Ookii.CommandLine library.
         _parser = info.Parser;
-        _memberName = info.MemberName;
+        MemberName = info.MemberName;
         _argumentName = info.ArgumentName;
         if (_parser.Mode == ParsingMode.LongShort)
         {
@@ -385,6 +389,7 @@ public abstract class CommandLineArgument
         _converter = info.Converter;
         _defaultValue = ConvertToArgumentTypeInvariant(info.DefaultValue);
         IncludeDefaultInUsageHelp = info.IncludeDefaultValueInHelp;
+        DefaultValueFormat = info.DefaultValueFormat;
         _valueDescription = info.ValueDescription;
         _allowNull = info.AllowNull;
         DictionaryInfo = info.DictionaryInfo;
@@ -409,10 +414,16 @@ public abstract class CommandLineArgument
     /// <value>
     /// The name of the property or method that defined this command line argument.
     /// </value>
-    public string MemberName
-    {
-        get { return _memberName; }
-    }
+    public string MemberName { get; }
+
+    /// <summary>
+    /// Gets the <see cref="MemberInfo"/> for the member that defined this argument.
+    /// </summary>
+    /// <value>
+    /// An instance of the <see cref="MethodInfo"/> or <see cref="PropertyInfo"/> class, or
+    /// <see langword="null"/> if this is the automatic version or help argument.
+    /// </value>
+    public abstract MemberInfo? Member { get; }
 
     /// <summary>
     /// Gets the name of this argument.
@@ -688,6 +699,19 @@ public abstract class CommandLineArgument
     }
 
     /// <summary>
+    /// Gets the compound formatting string that is used to format the default value for display in
+    /// the usage help.
+    /// </summary>
+    /// <value>
+    /// A compound formatting string, or <see langword="null"/> if the default format is used.
+    /// </value>
+    /// <seealso cref="CommandLineArgumentAttribute.DefaultValueFormat"/>
+#if NET7_0_OR_GREATER
+    [StringSyntax(StringSyntaxAttribute.CompositeFormat)]
+#endif
+    public string? DefaultValueFormat { get; }
+
+    /// <summary>
     /// Gets a value that indicates whether the default value should be included in the argument's
     /// description in the usage help.
     /// </summary>
@@ -817,7 +841,7 @@ public abstract class CommandLineArgument
     /// </value>
     /// <remarks>
     /// <para>
-    ///   For dictionary arguments, this property only returns the information that apples to both
+    ///   For dictionary arguments, this property only returns the information that applies to both
     ///   dictionary and multi-value arguments. For information that applies to dictionary
     ///   arguments, but not other types of multi-value arguments, use the <see cref="DictionaryInfo"/>
     ///   property.
@@ -1165,6 +1189,7 @@ public abstract class CommandLineArgument
             ShortAliases = GetShortAliases(shortAliasAttributes, argumentName),
             DefaultValue = attribute.DefaultValue,
             IncludeDefaultValueInHelp = attribute.IncludeDefaultInUsageHelp,
+            DefaultValueFormat = attribute.DefaultValueFormat,
             IsRequired = attribute.IsRequired || requiredProperty,
             IsRequiredProperty = requiredProperty,
             MemberName = memberName,

@@ -64,8 +64,8 @@ Usage: Parser [-Source] <String> [-Destination] <String> [[-OperationIndex] <Int
         Displays version information.
 ```
 
-The usage help consists of three main components: the application description, the argument syntax,
-and the argument descriptions.
+The usage help consists of four main components: the application description, the argument syntax,
+the argument descriptions, and an optional footer.
 
 ## Application description
 
@@ -102,7 +102,7 @@ multiple values.
 The order of the arguments in the usage syntax is as follows:
 
 1. The positional arguments, in their defined order.
-2. Required positional arguments, in alphabetical order.
+2. Required non-positional arguments, in alphabetical order.
 3. The remaining arguments, in alphabetical order.
 
 The syntax for a single argument has the following default format:
@@ -236,6 +236,65 @@ arguments.
 
 You can use the [`ParseOptions.ShowUsageOnError`][] property to customize this behavior.
 
+### Default values
+
+An argument's default value will be included in the usage help if the
+[`UsageWriter.IncludeDefaultValueInDescription`][] property is true and the
+[`CommandLineArgumentAttribute.IncludeDefaultInUsageHelp`][] property is true. Both of these are
+true by default, but they can be set to false to disable including the default value either globally
+or for a specific argument.
+
+If you use [source generation](SourceGeneration.md) with the [`GeneratedParserAttribute`][]
+attribute, you can use a property initializer to set a default value which will be shown in the
+description. Without source generation, only default values set using the
+[`CommandLineArgumentAttribute.DefaultValue`][] property can be shown.
+
+You can customize how an argument's default value is formatted in the usage help by using the
+[`CommandLineArgumentAttribute.DefaultValueFormat`][] property. This property takes a compound
+formatting string with a single placeholder. For example, the following argument displays its
+default value in hexadecimal, as `0xff`:
+
+```csharp
+[GeneratedParser]
+partial class MyArguments
+{
+    [CommandLineArgument(DefaultValueFormat = "0x{0:x}")]
+    public int Argument { get; set; } = 0xff;
+}
+```
+
+Without the custom format, the value would've been formatted as `255`.
+
+### Descriptions with blank lines
+
+Sometimes, you may want to make your argument description more legible by including blank lines.
+Unfortunately, this does not work well with the default usage help format, because the descriptions
+are indented, but indentation is reset after a blank line. This means your usage help can end up
+looking like this:
+
+```text
+    -SomeArgument <String>
+        First line of the description.
+
+And another line, after a blank line.
+
+    -OtherArgument <Int32>
+        Other description.
+```
+
+To avoid this, set the [`UsageWriter.IndentAfterEmptyLine`][] property to true. Now, the same usage
+help will look like this:
+
+```text
+    -SomeArgument <String>
+        First line of the description.
+
+        And another line, after a blank line.
+
+    -OtherArgument <Int32>
+        Other description.
+```
+
 ## Hidden arguments
 
 Sometimes, you may want an argument to be available, but not easily discoverable. For example, if
@@ -251,6 +310,24 @@ public int Argument { get; set; }
 ```
 
 Note that positional and required arguments cannot be hidden.
+
+## Usage help footer
+
+The application description is shown at the top of the usage help, but sometimes you may want to
+add additional information at the bottom, for example to direct the user how to get additional
+help.
+
+To add additional text below the argument descriptions, you can use the [`UsageFooterAttribute`][]
+attribute. Apply this attribute to your command line arguments class to set a footer.
+
+```csharp
+[GeneratedParser]
+[Description("This is the application description.")]
+[UsageFooter("For more information, see https://www.example.com")]
+partial class Arguments
+{
+}
+```
 
 ## Color output
 
@@ -344,39 +421,46 @@ Please see the [subcommand documentation](Subcommands.md) for information about 
 
 Next, we'll take a look at [argument validation and dependencies](Validation.md).
 
-[`CommandLineArgumentAttribute.IsHidden`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_IsHidden.htm
-[`CommandLineParser.GetUsage()`]: https://www.ookii.org/docs/commandline-4.0/html/M_Ookii_CommandLine_CommandLineParser_GetUsage.htm
-[`CommandLineParser.Parse<T>()`]: https://www.ookii.org/docs/commandline-4.0/html/M_Ookii_CommandLine_CommandLineParser_Parse__1.htm
-[`CommandLineParser.WriteUsage()`]: https://www.ookii.org/docs/commandline-4.0/html/M_Ookii_CommandLine_CommandLineParser_WriteUsage.htm
-[`CommandLineParser<T>.ParseWithErrorHandling()`]: https://www.ookii.org/docs/commandline-4.0/html/M_Ookii_CommandLine_CommandLineParser_1_ParseWithErrorHandling.htm
+[`CommandLineArgumentAttribute.DefaultValue`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_DefaultValue.htm
+[`CommandLineArgumentAttribute.DefaultValueFormat`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_DefaultValueFormat.htm
+[`CommandLineArgumentAttribute.IncludeDefaultInUsageHelp`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_IncludeDefaultInUsageHelp.htm
+[`CommandLineArgumentAttribute.IsHidden`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_IsHidden.htm
+[`CommandLineParser.GetUsage()`]: https://www.ookii.org/docs/commandline-4.1/html/M_Ookii_CommandLine_CommandLineParser_GetUsage.htm
+[`CommandLineParser.Parse<T>()`]: https://www.ookii.org/docs/commandline-4.1/html/M_Ookii_CommandLine_CommandLineParser_Parse__1.htm
+[`CommandLineParser.WriteUsage()`]: https://www.ookii.org/docs/commandline-4.1/html/M_Ookii_CommandLine_CommandLineParser_WriteUsage.htm
+[`CommandLineParser<T>.ParseWithErrorHandling()`]: https://www.ookii.org/docs/commandline-4.1/html/M_Ookii_CommandLine_CommandLineParser_1_ParseWithErrorHandling.htm
 [`DescriptionAttribute`]: https://learn.microsoft.com/dotnet/api/system.componentmodel.descriptionattribute
-[`DescriptionListFilterMode.Information`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_DescriptionListFilterMode.htm
-[`GetExtendedColor()`]: https://www.ookii.org/docs/commandline-4.0/html/M_Ookii_CommandLine_Terminal_TextFormat_GetExtendedColor.htm
+[`DescriptionListFilterMode.Information`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_DescriptionListFilterMode.htm
+[`GeneratedParserAttribute`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_GeneratedParserAttribute.htm
+[`GetExtendedColor()`]: https://www.ookii.org/docs/commandline-4.1/html/M_Ookii_CommandLine_Terminal_TextFormat_GetExtendedColor.htm
 [`Int32`]: https://learn.microsoft.com/dotnet/api/system.int32
-[`LineWrappingTextWriter`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_LineWrappingTextWriter.htm
-[`LocalizedStringProvider`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_LocalizedStringProvider.htm
+[`LineWrappingTextWriter`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_LineWrappingTextWriter.htm
+[`LocalizedStringProvider`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_LocalizedStringProvider.htm
 [`Nullable<T>`]: https://learn.microsoft.com/dotnet/api/system.nullable-1
-[`ParseOptions.DefaultValueDescriptions`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_ParseOptions_DefaultValueDescriptions.htm
-[`ParseOptions.ShowUsageOnError`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_ParseOptions_ShowUsageOnError.htm
-[`ParseOptions.UsageWriter`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_ParseOptions_UsageWriter.htm
+[`ParseOptions.DefaultValueDescriptions`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_ParseOptions_DefaultValueDescriptions.htm
+[`ParseOptions.ShowUsageOnError`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_ParseOptions_ShowUsageOnError.htm
+[`ParseOptions.UsageWriter`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_ParseOptions_UsageWriter.htm
 [`SetConsoleMode`]: https://learn.microsoft.com/windows/console/setconsolemode
 [`String`]: https://learn.microsoft.com/dotnet/api/system.string
 [`System.ComponentModel.DescriptionAttribute`]: https://learn.microsoft.com/dotnet/api/system.componentmodel.descriptionattribute
-[`TextFormat`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Terminal_TextFormat.htm
-[`UsageWriter.ArgumentDescriptionListFilter`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_UsageWriter_ArgumentDescriptionListFilter.htm
-[`UsageWriter.ArgumentDescriptionListOrder`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_UsageWriter_ArgumentDescriptionListOrder.htm
-[`UsageWriter.IncludeApplicationDescription`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_UsageWriter_IncludeApplicationDescription.htm
-[`UsageWriter.UseAbbreviatedSyntax`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_UsageWriter_UseAbbreviatedSyntax.htm
-[`UsageWriter.UseColor`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_UsageWriter_UseColor.htm
-[`UsageWriter.UseShortNamesForSyntax`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_UsageWriter_UseShortNamesForSyntax.htm
-[`UsageWriter`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_UsageWriter.htm
-[`ValueDescriptionAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_ValueDescriptionAttribute.htm
-[`WriteArgumentDescriptions()`]: https://www.ookii.org/docs/commandline-4.0/html/M_Ookii_CommandLine_UsageWriter_WriteArgumentDescriptions.htm
-[`WriteArgumentName()`]: https://www.ookii.org/docs/commandline-4.0/html/M_Ookii_CommandLine_UsageWriter_WriteArgumentName.htm
-[`WriteArgumentSyntax()`]: https://www.ookii.org/docs/commandline-4.0/html/M_Ookii_CommandLine_UsageWriter_WriteArgumentSyntax.htm
-[`WriteParserUsageCore()`]: https://www.ookii.org/docs/commandline-4.0/html/M_Ookii_CommandLine_UsageWriter_WriteParserUsageCore.htm
-[`WriteParserUsageSyntax()`]: https://www.ookii.org/docs/commandline-4.0/html/M_Ookii_CommandLine_UsageWriter_WriteParserUsageSyntax.htm
-[`WriteValueDescription()`]: https://www.ookii.org/docs/commandline-4.0/html/M_Ookii_CommandLine_UsageWriter_WriteValueDescription.htm
-[`WriteValueDescriptionForDescription()`]: https://www.ookii.org/docs/commandline-4.0/html/M_Ookii_CommandLine_UsageWriter_WriteValueDescriptionForDescription.htm
-[Parse()_7]: https://www.ookii.org/docs/commandline-4.0/html/Overload_Ookii_CommandLine_IParser_1_Parse.htm
-[WriteArgumentDescription()_1]: https://www.ookii.org/docs/commandline-4.0/html/M_Ookii_CommandLine_UsageWriter_WriteArgumentDescription.htm
+[`TextFormat`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_Terminal_TextFormat.htm
+[`UsageFooterAttribute`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_UsageFooterAttribute.htm
+[`UsageWriter.ArgumentDescriptionListFilter`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_UsageWriter_ArgumentDescriptionListFilter.htm
+[`UsageWriter.ArgumentDescriptionListOrder`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_UsageWriter_ArgumentDescriptionListOrder.htm
+[`UsageWriter.IncludeApplicationDescription`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_UsageWriter_IncludeApplicationDescription.htm
+[`UsageWriter.IncludeDefaultValueInDescription`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_UsageWriter_IncludeDefaultValueInDescription.htm
+[`UsageWriter.IndentAfterEmptyLine`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_UsageWriter_IndentAfterEmptyLine.htm
+[`UsageWriter.UseAbbreviatedSyntax`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_UsageWriter_UseAbbreviatedSyntax.htm
+[`UsageWriter.UseColor`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_UsageWriter_UseColor.htm
+[`UsageWriter.UseShortNamesForSyntax`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_UsageWriter_UseShortNamesForSyntax.htm
+[`UsageWriter`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_UsageWriter.htm
+[`ValueDescriptionAttribute`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_ValueDescriptionAttribute.htm
+[`WriteArgumentDescriptions()`]: https://www.ookii.org/docs/commandline-4.1/html/M_Ookii_CommandLine_UsageWriter_WriteArgumentDescriptions.htm
+[`WriteArgumentName()`]: https://www.ookii.org/docs/commandline-4.1/html/M_Ookii_CommandLine_UsageWriter_WriteArgumentName.htm
+[`WriteArgumentSyntax()`]: https://www.ookii.org/docs/commandline-4.1/html/M_Ookii_CommandLine_UsageWriter_WriteArgumentSyntax.htm
+[`WriteParserUsageCore()`]: https://www.ookii.org/docs/commandline-4.1/html/M_Ookii_CommandLine_UsageWriter_WriteParserUsageCore.htm
+[`WriteParserUsageSyntax()`]: https://www.ookii.org/docs/commandline-4.1/html/M_Ookii_CommandLine_UsageWriter_WriteParserUsageSyntax.htm
+[`WriteValueDescription()`]: https://www.ookii.org/docs/commandline-4.1/html/M_Ookii_CommandLine_UsageWriter_WriteValueDescription.htm
+[`WriteValueDescriptionForDescription()`]: https://www.ookii.org/docs/commandline-4.1/html/M_Ookii_CommandLine_UsageWriter_WriteValueDescriptionForDescription.htm
+[Parse()_7]: https://www.ookii.org/docs/commandline-4.1/html/Overload_Ookii_CommandLine_IParser_1_Parse.htm
+[WriteArgumentDescription()_1]: https://www.ookii.org/docs/commandline-4.1/html/M_Ookii_CommandLine_UsageWriter_WriteArgumentDescription.htm

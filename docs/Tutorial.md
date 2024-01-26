@@ -12,7 +12,7 @@ Create a directory called "tutorial" for the project, and run the following comm
 directory:
 
 ```bash
-dotnet new console --framework net7.0
+dotnet new console --framework net8.0
 ```
 
 Next, we will add a reference to Ookii.CommandLine's NuGet package:
@@ -96,7 +96,7 @@ But wait, we didn't pass any arguments to this method? Actually, the method will
 explicit `string[]` array with the arguments, if you want to pass them manually.
 
 So, let's run our application. Build the application using `dotnet build`, and then, from the
-`bin/Debug/net7.0` directory, run the following:
+`bin/Debug/net8.0` directory, run the following:
 
 ```bash
 ./tutorial ../../../tutorial.csproj
@@ -109,7 +109,7 @@ Which will give print the contents of the tutorial.csproj file:
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net7.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
@@ -974,52 +974,52 @@ following resources:
 - [Class library documentation](https://www.ookii.org/Link/CommandLineDoc)
 - [Sample applications](../src/Samples)
 
-[`AliasAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_AliasAttribute.htm
-[`ApplicationFriendlyNameAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_ApplicationFriendlyNameAttribute.htm
-[`Arguments.Parse()`]: https://www.ookii.org/docs/commandline-4.0/html/M_Ookii_CommandLine_IParser_1_Parse.htm
+[`AliasAttribute`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_AliasAttribute.htm
+[`ApplicationFriendlyNameAttribute`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_ApplicationFriendlyNameAttribute.htm
+[`Arguments.Parse()`]: https://www.ookii.org/docs/commandline-4.1/html/M_Ookii_CommandLine_IParser_1_Parse.htm
 [`AssemblyTitleAttribute`]: https://learn.microsoft.com/dotnet/api/system.reflection.assemblytitleattribute
-[`AsyncCommandBase.Run()`]: https://www.ookii.org/docs/commandline-4.0/html/M_Ookii_CommandLine_Commands_AsyncCommandBase_Run.htm
-[`AsyncCommandBase`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Commands_AsyncCommandBase.htm
-[`CaseSensitive`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_ParseOptionsAttribute_CaseSensitive.htm
-[`CommandAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Commands_CommandAttribute.htm
-[`CommandLineArgumentAttribute.DefaultValue`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_DefaultValue.htm
-[`CommandLineArgumentAttribute.IsLong`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_IsLong.htm
-[`CommandLineArgumentAttribute.ShortName`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_ShortName.htm
-[`CommandLineArgumentAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_CommandLineArgumentAttribute.htm
-[`CommandLineParser`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_CommandLineParser.htm
-[`CommandManager.RunCommandAsync()`]: https://www.ookii.org/docs/commandline-4.0/html/Overload_Ookii_CommandLine_Commands_CommandManager_RunCommandAsync.htm
-[`CommandManager`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Commands_CommandManager.htm
-[`CommandOptions.StripCommandNameSuffix`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_Commands_CommandOptions_StripCommandNameSuffix.htm
-[`CommandOptions`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Commands_CommandOptions.htm
-[`CreateCommand()`]: https://www.ookii.org/docs/commandline-4.0/html/Overload_Ookii_CommandLine_Commands_CommandManager_CreateCommand.htm
+[`AsyncCommandBase.Run()`]: https://www.ookii.org/docs/commandline-4.1/html/M_Ookii_CommandLine_Commands_AsyncCommandBase_Run.htm
+[`AsyncCommandBase`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_Commands_AsyncCommandBase.htm
+[`CaseSensitive`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_ParseOptionsAttribute_CaseSensitive.htm
+[`CommandAttribute`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_Commands_CommandAttribute.htm
+[`CommandLineArgumentAttribute.DefaultValue`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_DefaultValue.htm
+[`CommandLineArgumentAttribute.IsLong`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_IsLong.htm
+[`CommandLineArgumentAttribute.ShortName`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_ShortName.htm
+[`CommandLineArgumentAttribute`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_CommandLineArgumentAttribute.htm
+[`CommandLineParser`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_CommandLineParser.htm
+[`CommandManager.RunCommandAsync()`]: https://www.ookii.org/docs/commandline-4.1/html/Overload_Ookii_CommandLine_Commands_CommandManager_RunCommandAsync.htm
+[`CommandManager`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_Commands_CommandManager.htm
+[`CommandOptions.StripCommandNameSuffix`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_Commands_CommandOptions_StripCommandNameSuffix.htm
+[`CommandOptions`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_Commands_CommandOptions.htm
+[`CreateCommand()`]: https://www.ookii.org/docs/commandline-4.1/html/Overload_Ookii_CommandLine_Commands_CommandManager_CreateCommand.htm
 [`DescriptionAttribute`]: https://learn.microsoft.com/dotnet/api/system.componentmodel.descriptionattribute
 [`Environment.GetCommandLineArgs()`]: https://learn.microsoft.com/dotnet/api/system.environment.getcommandlineargs
 [`File.ReadLinesAsync()`]: https://learn.microsoft.com/dotnet/api/system.io.file.readlinesasync
 [`FileInfo`]: https://learn.microsoft.com/dotnet/api/system.io.fileinfo
-[`GeneratedCommandManagerAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Commands_GeneratedCommandManagerAttribute.htm
-[`GeneratedParserAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_GeneratedParserAttribute.htm
-[`GetCommand()`]: https://www.ookii.org/docs/commandline-4.0/html/M_Ookii_CommandLine_Commands_CommandManager_GetCommand.htm
-[`IAsyncCommand`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Commands_IAsyncCommand.htm
+[`GeneratedCommandManagerAttribute`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_Commands_GeneratedCommandManagerAttribute.htm
+[`GeneratedParserAttribute`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_GeneratedParserAttribute.htm
+[`GetCommand()`]: https://www.ookii.org/docs/commandline-4.1/html/M_Ookii_CommandLine_Commands_CommandManager_GetCommand.htm
+[`IAsyncCommand`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_Commands_IAsyncCommand.htm
 [`IAsyncEnumerable<T>`]: https://learn.microsoft.com/dotnet/api/system.collections.generic.iasyncenumerable-1
-[`ICommand.Run()`]: https://www.ookii.org/docs/commandline-4.0/html/M_Ookii_CommandLine_Commands_ICommand_Run.htm
-[`ICommand`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Commands_ICommand.htm
-[`IncludeApplicationDescriptionBeforeCommandList`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_UsageWriter_IncludeApplicationDescriptionBeforeCommandList.htm
+[`ICommand.Run()`]: https://www.ookii.org/docs/commandline-4.1/html/M_Ookii_CommandLine_Commands_ICommand_Run.htm
+[`ICommand`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_Commands_ICommand.htm
+[`IncludeApplicationDescriptionBeforeCommandList`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_UsageWriter_IncludeApplicationDescriptionBeforeCommandList.htm
 [`Nullable<int>`]: https://learn.microsoft.com/dotnet/api/system.nullable-1
-[`ParseOptions`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_ParseOptions.htm
-[`ParseOptionsAttribute.AutoPrefixAliases`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_ParseOptionsAttribute_AutoPrefixAliases.htm
-[`ParseOptionsAttribute.IsPosix`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_ParseOptionsAttribute_IsPosix.htm
-[`ParseOptionsAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_ParseOptionsAttribute.htm
-[`ParsingMode.LongShort`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_ParsingMode.htm
-[`RunCommand()`]: https://www.ookii.org/docs/commandline-4.0/html/Overload_Ookii_CommandLine_Commands_CommandManager_RunCommand.htm
-[`RunCommandAsync()`]: https://www.ookii.org/docs/commandline-4.0/html/Overload_Ookii_CommandLine_Commands_CommandManager_RunCommandAsync.htm
+[`ParseOptions`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_ParseOptions.htm
+[`ParseOptionsAttribute.AutoPrefixAliases`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_ParseOptionsAttribute_AutoPrefixAliases.htm
+[`ParseOptionsAttribute.IsPosix`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_ParseOptionsAttribute_IsPosix.htm
+[`ParseOptionsAttribute`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_ParseOptionsAttribute.htm
+[`ParsingMode.LongShort`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_ParsingMode.htm
+[`RunCommand()`]: https://www.ookii.org/docs/commandline-4.1/html/Overload_Ookii_CommandLine_Commands_CommandManager_RunCommand.htm
+[`RunCommandAsync()`]: https://www.ookii.org/docs/commandline-4.1/html/Overload_Ookii_CommandLine_Commands_CommandManager_RunCommandAsync.htm
 [`StringComparison`]: https://learn.microsoft.com/dotnet/api/system.stringcomparison
 [`Take()`]: https://learn.microsoft.com/dotnet/api/system.linq.enumerable.take
 [`Uri`]: https://learn.microsoft.com/dotnet/api/system.uri
-[`ValidateRangeAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Validation_ValidateRangeAttribute.htm
-[`ValueDescriptionAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_ValueDescriptionAttribute.htm
-[IsPosix_0]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_Commands_CommandOptions_IsPosix.htm
-[Mode_2]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_ParseOptionsAttribute_Mode.htm
-[Parse<T>()_1]: https://www.ookii.org/docs/commandline-4.0/html/M_Ookii_CommandLine_CommandLineParser_Parse__1.htm
-[Run()_0]: https://www.ookii.org/docs/commandline-4.0/html/M_Ookii_CommandLine_Commands_AsyncCommandBase_Run.htm
-[Run()_1]: https://www.ookii.org/docs/commandline-4.0/html/M_Ookii_CommandLine_Commands_ICommand_Run.htm
-[RunAsync()_1]: https://www.ookii.org/docs/commandline-4.0/html/M_Ookii_CommandLine_Commands_IAsyncCommand_RunAsync.htm
+[`ValidateRangeAttribute`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_Validation_ValidateRangeAttribute.htm
+[`ValueDescriptionAttribute`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_ValueDescriptionAttribute.htm
+[IsPosix_0]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_Commands_CommandOptions_IsPosix.htm
+[Mode_2]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_ParseOptionsAttribute_Mode.htm
+[Parse<T>()_1]: https://www.ookii.org/docs/commandline-4.1/html/M_Ookii_CommandLine_CommandLineParser_Parse__1.htm
+[Run()_0]: https://www.ookii.org/docs/commandline-4.1/html/M_Ookii_CommandLine_Commands_AsyncCommandBase_Run.htm
+[Run()_1]: https://www.ookii.org/docs/commandline-4.1/html/M_Ookii_CommandLine_Commands_ICommand_Run.htm
+[RunAsync()_1]: https://www.ookii.org/docs/commandline-4.1/html/M_Ookii_CommandLine_Commands_IAsyncCommand_RunAsync.htm

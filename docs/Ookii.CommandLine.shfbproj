@@ -45,7 +45,7 @@
     </NamespaceSummaries>
     <CopyrightHref>https://github.com/SvenGroot/Ookii.CommandLine</CopyrightHref>
     <CopyrightText>Copyright &amp;#169%3b Sven Groot %28Ookii.org%29</CopyrightText>
-    <HelpTitle>Ookii.CommandLine 4.0 documentation</HelpTitle>
+    <HelpTitle>Ookii.CommandLine 4.1 documentation</HelpTitle>
     <NamingMethod>MemberName</NamingMethod>
     <PresentationStyle>Default2022</PresentationStyle>
     <SyntaxFilters>C#, Visual Basic, Visual Basic Usage, Managed C++</SyntaxFilters>

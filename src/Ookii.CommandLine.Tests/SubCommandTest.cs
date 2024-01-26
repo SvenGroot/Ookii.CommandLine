@@ -253,6 +253,25 @@ public partial class SubCommandTest
 
     [TestMethod]
     [DynamicData(nameof(ProviderKinds), DynamicDataDisplayName = nameof(GetCustomDynamicDataDisplayName))]
+    public void TestWriteUsageFooter(ProviderKind kind)
+    {
+        using var writer = LineWrappingTextWriter.ForStringWriter(0);
+        var options = new CommandOptions()
+        {
+            Error = writer,
+            UsageWriter = new CustomUsageWriter(writer)
+            {
+                ExecutableName = _executableName,
+            }
+        };
+
+        var manager = CreateManager(kind, options);
+        manager.WriteUsage();
+        Assert.AreEqual(_expectedUsageFooter, writer.BaseWriter.ToString());
+    }
+
+    [TestMethod]
+    [DynamicData(nameof(ProviderKinds), DynamicDataDisplayName = nameof(GetCustomDynamicDataDisplayName))]
     public void TestCommandUsage(ProviderKind kind)
     {
         using var writer = LineWrappingTextWriter.ForStringWriter(0);
@@ -355,9 +374,13 @@ public partial class SubCommandTest
             async () => await manager.RunCommandAsync(["AsyncCancelableCommand", "10000"], source.Token));
 
         // Command works if not passed a token.
-        Assert.AreEqual(10, await manager.RunCommandAsync(["AsyncCancelableCommand", "10"]));
-    }
+        var result = await manager.RunCommandAsync(["AsyncCancelableCommand", "10"]);
+        Assert.AreEqual(10, result);
 
+        // RunCommand works but calls Run.
+        result = manager.RunCommand(["AsyncCancelableCommand", "5"]);
+        Assert.AreEqual(5, result);
+    }
 
     [TestMethod]
     public async Task TestAsyncCommandBase()

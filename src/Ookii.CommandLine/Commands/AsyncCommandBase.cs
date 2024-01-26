@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Threading;
+using System.Threading.Tasks;
 
 namespace Ookii.CommandLine.Commands;
 
@@ -11,16 +12,13 @@ namespace Ookii.CommandLine.Commands;
 ///   This class is provided for convenience for creating asynchronous commands without having to
 ///   implement the <see cref="ICommand.Run" qualifyHint="true"/> method.
 /// </para>
-/// <para>
-///   If you want to use the cancellation token passed to the
-///   <see cref="CommandManager.RunCommandAsync(System.Threading.CancellationToken)" qualifyHint="true"/>
-///   method, you should instead implement the <see cref="IAsyncCancelableCommand"/> interface or
-///   derive from the <see cref="AsyncCancelableCommandBase"/> class.
-/// </para>
 /// </remarks>
 /// <threadsafety static="true" instance="false"/>
-public abstract class AsyncCommandBase : IAsyncCommand
+public abstract class AsyncCommandBase : IAsyncCancelableCommand
 {
+    /// <inheritdoc/>
+    public CancellationToken CancellationToken { get; set; }
+
     /// <summary>
     /// Calls the <see cref="RunAsync"/> method and waits synchronously for it to complete.
     /// </summary>

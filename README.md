@@ -150,6 +150,9 @@ when [source generation](docs/SourceGeneration.md) is used.
 The .Net 7.0 version has additional support for `required` properties, and can utilize
 `ISpanParsable<TSelf>` and `IParsable<TSelf>` for argument value conversions.
 
+An assembly built for .Net 8.0 is also provided; this has no additional functionality over the
+.Net 7.0 version, but is provided to ensure optimal compatibility and performance.
+
 ## Building and testing
 
 To build Ookii.CommandLine, make sure you have the following installed:

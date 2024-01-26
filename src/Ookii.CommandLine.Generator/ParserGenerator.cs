@@ -165,6 +165,7 @@ internal class ParserGenerator
         _builder.AppendLine("/// <returns>");
         _builder.AppendLine($"/// An instance of the <see cref=\"Ookii.CommandLine.CommandLineParser{{T}}\"/> class for the <see cref=\"{_argumentsClass.ToQualifiedName()}\"/> class.");
         _builder.AppendLine("/// </returns>");
+        _builder.AppendGeneratedCodeAttribute();
         _builder.AppendLine($"public static Ookii.CommandLine.CommandLineParser<{_argumentsClass.ToQualifiedName()}> CreateParser(Ookii.CommandLine.ParseOptions? options = null) => new Ookii.CommandLine.CommandLineParser<{_argumentsClass.ToQualifiedName()}>(new OokiiCommandLineArgumentProvider(), options);");
         _builder.AppendLine();
         var nullableType = _argumentsClass.WithNullableAnnotation(NullableAnnotation.Annotated);
@@ -185,6 +186,7 @@ internal class ParserGenerator
             _builder.AppendLine($"///   An instance of the <see cref=\"{_argumentsClass.ToQualifiedName()}\"/> class, or <see langword=\"null\"/> if an");
             _builder.AppendLine("///   error occurred or argument parsing was canceled.");
             _builder.AppendLine("/// </returns>");
+            _builder.AppendGeneratedCodeAttribute();
             _builder.AppendLine($"public static {nullableType.ToQualifiedName()} Parse(Ookii.CommandLine.ParseOptions? options = null) => CreateParser(options).ParseWithErrorHandling();");
             _builder.AppendLine();
             _builder.AppendLine("/// <summary>");
@@ -199,6 +201,7 @@ internal class ParserGenerator
             _builder.AppendLine($"///   An instance of the <see cref=\"{_argumentsClass.ToQualifiedName()}\"/> class, or <see langword=\"null\"/> if an");
             _builder.AppendLine("///   error occurred or argument parsing was canceled.");
             _builder.AppendLine("/// </returns>");
+            _builder.AppendGeneratedCodeAttribute();
             _builder.AppendLine($"public static {nullableType.ToQualifiedName()} Parse(string[] args, Ookii.CommandLine.ParseOptions? options = null) => CreateParser(options).ParseWithErrorHandling(args);");
             _builder.AppendLine();
             _builder.AppendLine("/// <summary>");
@@ -213,6 +216,7 @@ internal class ParserGenerator
             _builder.AppendLine($"///   An instance of the <see cref=\"{_argumentsClass.ToQualifiedName()}\"/> class, or <see langword=\"null\"/> if an");
             _builder.AppendLine("///   error occurred or argument parsing was canceled.");
             _builder.AppendLine("/// </returns>");
+            _builder.AppendGeneratedCodeAttribute();
             _builder.AppendLine($"public static {nullableType.ToQualifiedName()} Parse(System.ReadOnlyMemory<string> args, Ookii.CommandLine.ParseOptions? options = null) => CreateParser(options).ParseWithErrorHandling(args);");
             _builder.CloseBlock(); // class
         }
@@ -222,8 +226,15 @@ internal class ParserGenerator
 
     private bool GenerateProvider(ArgumentsClassAttributes attributes, bool isCommand)
     {
+        _builder.AppendGeneratedCodeAttribute();
         _builder.AppendLine("private class OokiiCommandLineArgumentProvider : Ookii.CommandLine.Support.GeneratedArgumentProvider");
         _builder.OpenBlock();
+        if (attributes.UsageFooter != null)
+        {
+            _builder.AppendLine($"private readonly Ookii.CommandLine.UsageFooterAttribute _usageFooter = {attributes.UsageFooter.CreateInstantiation()};");
+            _builder.AppendLine();
+        }
+
         _builder.AppendLine("public OokiiCommandLineArgumentProvider()");
         _builder.IncreaseIndent();
         _builder.AppendLine(": base(");
@@ -239,6 +250,12 @@ internal class ParserGenerator
         _builder.AppendLine();
         _builder.AppendLine($"public override bool IsCommand => {isCommand.ToCSharpString()};");
         _builder.AppendLine();
+        if (attributes.UsageFooter != null)
+        {
+            _builder.AppendLine("public override string UsageFooter => _usageFooter.Footer;");
+            _builder.AppendLine();
+        }
+
         _builder.AppendLine("public override System.Collections.Generic.IEnumerable<Ookii.CommandLine.CommandLineArgument> GetArguments(Ookii.CommandLine.CommandLineParser parser)");
         _builder.OpenBlock();
 
@@ -695,6 +712,21 @@ internal class ParserGenerator
         if (argumentInfo.ShortName != '\0' && argumentInfo.ExplicitIsShort == false)
         {
             _context.ReportDiagnostic(Diagnostics.IsShortIgnored(member, attributes.CommandLineArgument));
+        }
+
+        if (attributes.ValidateEnumValue != null)
+        { 
+            if (elementType.TypeKind != TypeKind.Enum)
+            {
+                _context.ReportDiagnostic(Diagnostics.ValidateEnumInvalidType(member, elementType));
+            }
+            else if (attributes.Converter != null &&
+                (attributes.ValidateEnumValue.GetNamedArgument("CaseSensitive") != null ||
+                 attributes.ValidateEnumValue.GetNamedArgument("AllowCommaSeparatedValues") != null ||
+                 attributes.ValidateEnumValue.GetNamedArgument("AllowNumericValues") != null))
+            {
+                _context.ReportDiagnostic(Diagnostics.ValidateEnumWithCustomConverter(member));
+            }
         }
 
         return true;

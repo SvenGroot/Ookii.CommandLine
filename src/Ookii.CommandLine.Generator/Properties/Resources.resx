@@ -201,6 +201,9 @@
   <data name="GeneratedCustomParsingCommandTitle" xml:space="preserve">
     <value>The GeneratedParserAttribute cannot be used with a class that implements the ICommandWithCustomParsing interface.</value>
   </data>
+  <data name="GeneratedParserCodeFixTitle" xml:space="preserve">
+    <value>Add GeneratedParserAttribute</value>
+  </data>
   <data name="IgnoredAttributeForDictionaryWithConverterMessageFormat" xml:space="preserve">
     <value>The {0} attribute is ignored for the dictionary argument defined by {1} that has the ArgumentConverterAttribute attribute.</value>
   </data>
@@ -321,6 +324,12 @@
   <data name="ParentCommandStringNotSupportedTitle" xml:space="preserve">
     <value>The ParentCommandAttribute must use the typeof keyword.</value>
   </data>
+  <data name="ParserShouldBeGeneratedMessageFormat" xml:space="preserve">
+    <value>The command line arguments class '{0}' should use the GeneratedParserAttribute.</value>
+  </data>
+  <data name="ParserShouldBeGeneratedTitle" xml:space="preserve">
+    <value>The command line arguments class should use the GeneratedParserAttribute.</value>
+  </data>
   <data name="PositionalArgumentAfterMultiValueMessageFormat" xml:space="preserve">
     <value>The positional argument defined by {0} comes after {1}, which is a multi-value argument and must come last.</value>
   </data>
@@ -368,5 +377,17 @@
   </data>
   <data name="UnsupportedLanguageVersionTitle" xml:space="preserve">
     <value>Ookii.CommandLine source generation requires at least C# 8.0.</value>
+  </data>
+  <data name="ValidateEnumInvalidTypeMessageFormat" xml:space="preserve">
+    <value>The argument defined by '{0}' uses the ValidateEnumValueAttribute, but its type '{1}' is not an enumeration.</value>
+  </data>
+  <data name="ValidateEnumInvalidTypeTitle" xml:space="preserve">
+    <value>The ValidateEnumValueAttribute can only be used on arguments with an enum type.</value>
+  </data>
+  <data name="ValidateEnumWithCustomConverterMessageFormat" xml:space="preserve">
+    <value>The argument defined by '{0}' has the ArgumentConverterAttribute, and uses ValidateEnumValueAttribute properties that may not work with a custom ArgumentConverter.</value>
+  </data>
+  <data name="ValidateEnumWithCustomConverterTitle" xml:space="preserve">
+    <value>The argument uses ValidateEnumValueAttribute properties that may not work with a custom ArgumentConverter.</value>
   </data>
 </root>

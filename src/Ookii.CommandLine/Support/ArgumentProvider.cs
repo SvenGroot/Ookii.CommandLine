@@ -1,6 +1,7 @@
 ﻿using Ookii.CommandLine.Validation;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace Ookii.CommandLine.Support;
@@ -26,7 +27,11 @@ public abstract class ArgumentProvider
     /// if there is none.
     /// </param>
     /// <param name="validators">The class validators for the arguments type.</param>
-    protected ArgumentProvider(Type argumentsType, ParseOptionsAttribute? options, IEnumerable<ClassValidationAttribute>? validators)
+    protected ArgumentProvider(
+#if NET6_0_OR_GREATER
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicMethods)]
+#endif
+        Type argumentsType, ParseOptionsAttribute? options, IEnumerable<ClassValidationAttribute>? validators)
     {
         ArgumentsType = argumentsType ?? throw new ArgumentNullException(nameof(argumentsType));
         OptionsAttribute = options;
@@ -47,6 +52,9 @@ public abstract class ArgumentProvider
     /// <value>
     /// The <see cref="Type"/> of the class that will hold the argument values.
     /// </value>
+#if NET6_0_OR_GREATER
+    [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicMethods)]
+#endif
     public Type ArgumentsType { get; }
 
     /// <summary>
@@ -64,6 +72,15 @@ public abstract class ArgumentProvider
     /// The description of the command line application.
     /// </value>
     public abstract string Description { get; }
+
+    /// <summary>
+    /// Gets footer text that is used when generating usage information.
+    /// </summary>
+    /// <value>
+    /// The footer text.
+    /// </value>
+    // N.B. This is virtual, not abstract, for binary compatibility with v4.0.
+    public virtual string UsageFooter => string.Empty;
 
     /// <summary>
     /// Gets the <see cref="ParseOptionsAttribute"/> that was applied to the arguments type.

@@ -184,6 +184,7 @@ internal class ConverterGenerator
 
     private static void CreateConverter(SourceBuilder builder, ITypeSymbol type, ConverterInfo info)
     {
+        builder.AppendGeneratedCodeAttribute();
         builder.AppendLine($"internal class {info.Name} : Ookii.CommandLine.Conversion.ArgumentConverter");
         builder.OpenBlock();
         string inputType = info.UseSpan ? "System.ReadOnlySpan<char>" : "string";

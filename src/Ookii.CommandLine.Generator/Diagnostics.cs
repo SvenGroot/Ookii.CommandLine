@@ -366,15 +366,47 @@ internal static class Diagnostics
         location,
         symbol.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat));
 
+    public static readonly DiagnosticDescriptor ParserShouldBeGeneratedDescriptor = CreateDiagnosticDescriptor(
+        "OCL0040",
+        nameof(Resources.ParserShouldBeGeneratedTitle),
+        nameof(Resources.ParserShouldBeGeneratedMessageFormat),
+        DiagnosticSeverity.Warning);
+
+    public static Diagnostic ParserShouldBeGenerated(ISymbol symbol)
+        => Diagnostic.Create(
+            ParserShouldBeGeneratedDescriptor,
+            symbol.Locations.FirstOrDefault(), 
+            symbol.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat));
+
+    public static Diagnostic ValidateEnumInvalidType(ISymbol symbol, ITypeSymbol elementType) => CreateDiagnostic(
+        "OCL0041",
+        nameof(Resources.ValidateEnumInvalidTypeTitle),
+        nameof(Resources.ValidateEnumInvalidTypeMessageFormat),
+        DiagnosticSeverity.Warning,
+        symbol.Locations.FirstOrDefault(),
+        symbol.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat),
+        elementType.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat));
+
+    public static Diagnostic ValidateEnumWithCustomConverter(ISymbol symbol) => CreateDiagnostic(
+        "OCL0042",
+        nameof(Resources.ValidateEnumWithCustomConverterTitle),
+        nameof(Resources.ValidateEnumWithCustomConverterMessageFormat),
+        DiagnosticSeverity.Warning,
+        symbol.Locations.FirstOrDefault(),
+        symbol.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat));
+
     private static Diagnostic CreateDiagnostic(string id, string titleResource, string messageResource, DiagnosticSeverity severity, Location? location, params object?[]? messageArgs)
         => Diagnostic.Create(
-            new DiagnosticDescriptor(
-                id,
-                new LocalizableResourceString(titleResource, Resources.ResourceManager, typeof(Resources)),
-                new LocalizableResourceString(messageResource, Resources.ResourceManager, typeof(Resources)),
-                Category,
-                severity,
-                isEnabledByDefault: true,
-                helpLinkUri: $"https://www.ookii.org/Link/CommandLineGeneratorError#{id.ToLowerInvariant()}"),
+            CreateDiagnosticDescriptor(id, titleResource, messageResource, severity),
             location, messageArgs);
+
+    private static DiagnosticDescriptor CreateDiagnosticDescriptor(string id, string titleResource, string messageResource, DiagnosticSeverity severity)
+        => new(
+            id,
+            new LocalizableResourceString(titleResource, Resources.ResourceManager, typeof(Resources)),
+            new LocalizableResourceString(messageResource, Resources.ResourceManager, typeof(Resources)),
+            Category,
+            severity,
+            isEnabledByDefault: true,
+            helpLinkUri: $"https://www.ookii.org/Link/CommandLineGeneratorError#{id.ToLowerInvariant()}");
 }

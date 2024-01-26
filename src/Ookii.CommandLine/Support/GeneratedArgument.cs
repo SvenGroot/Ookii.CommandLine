@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Reflection;
 
 namespace Ookii.CommandLine.Support;
 
@@ -22,6 +23,7 @@ public class GeneratedArgument : CommandLineArgument
     private readonly Func<object?, CommandLineParser, CancelMode>? _callMethod;
     private readonly string _defaultValueDescription;
     private readonly string? _defaultKeyDescription;
+    private MemberInfo? _member;
 
     private GeneratedArgument(ArgumentInfo info, Action<object, object?>? setProperty, Func<object, object?>? getProperty,
         Func<object?, CommandLineParser, CancelMode>? callMethod, string defaultValueDescription, string? defaultKeyDescription) : base(info)
@@ -136,6 +138,10 @@ public class GeneratedArgument : CommandLineArgument
 
         return new GeneratedArgument(info, setProperty, getProperty, callMethod, defaultValueDescription, defaultKeyDescription);
     }
+
+    /// <inheritdoc/>
+    public override MemberInfo? Member => _member ??= (MemberInfo?)Parser.ArgumentsType.GetProperty(MemberName)
+        ?? Parser.ArgumentsType.GetMethod(MemberName, BindingFlags.Public | BindingFlags.Static);
 
     /// <inheritdoc/>
     protected override bool CanSetProperty => _setProperty != null;

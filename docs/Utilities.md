@@ -42,9 +42,10 @@ The [`LineWrappingTextWriter`][] class uses hanging indents, also called negativ
 lines except the first one are indented. The indentation level can be set using the
 [`LineWrappingTextWriter.Indent`][] property, which indicates the number of spaces to indent by.
 
-When this property is set, it will apply to the next line that needs to be indented. The first line
-of text, and any line after a blank line, is not indented. Indentation is applied both to lines that
-were wrapped, and lines created by explicit new lines in the text.
+When this property is set, it will apply to the next line that needs to be indented. Indentation is
+applied both to lines that were wrapped, and lines created by explicit new lines in the text. The
+first line of text is not indented. Lines after a blank line are not indented either, unless you set
+the [`LineWrappingTextWriter.IndentAfterEmptyLine`][] property to true.
 
 You can change the [`Indent`][] property at any time to change the size of the indentation to use.
 
@@ -128,6 +129,18 @@ and they return a disposable type that will revert the console mode when dispose
 collected. On other platforms, it only checks for support and disposing the returned instance does
 nothing.
 
+To simplify writing messages to the console that use a single format for the whole message, two
+helper methods are provided: [`VirtualTerminal.WriteLineFormatted()`][] and
+[`VirtualTerminal.WriteLineErrorFormatted()`][]. These methods call [`EnableColor()`][], write the
+message to either the standard output or standard error stream respectively, using the specified
+formatting, and then reset the format to the default.
+
+The below example is identical to the one above:
+
+```csharp
+VirtualTerminal.WriteLineFormatted("This text is green and underlined.", TextFormat.ForegroundGreen + TextFormat.Underline);
+```
+
 In the [tutorial](Tutorial.md), we created an application with an `--inverted` argument, that
 actually just set the console to use a white background and a black foreground, instead of truly
 inverting the console colors. With virtual terminal support, we can update the `read` command to use
@@ -163,20 +176,23 @@ public int Run()
 ```
 
 [`Console.WindowWidth`]: https://learn.microsoft.com/dotnet/api/system.console.windowwidth
-[`EnableColor()`]: https://www.ookii.org/docs/commandline-4.0/html/M_Ookii_CommandLine_Terminal_VirtualTerminal_EnableColor.htm
-[`EnableVirtualTerminalSequences()`]: https://www.ookii.org/docs/commandline-4.0/html/M_Ookii_CommandLine_Terminal_VirtualTerminal_EnableVirtualTerminalSequences.htm
-[`Indent`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_LineWrappingTextWriter_Indent.htm
-[`LineWrappingTextWriter.ForConsoleError()`]: https://www.ookii.org/docs/commandline-4.0/html/M_Ookii_CommandLine_LineWrappingTextWriter_ForConsoleError.htm
-[`LineWrappingTextWriter.ForConsoleOut()`]: https://www.ookii.org/docs/commandline-4.0/html/M_Ookii_CommandLine_LineWrappingTextWriter_ForConsoleOut.htm
-[`LineWrappingTextWriter.Indent`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_LineWrappingTextWriter_Indent.htm
-[`LineWrappingTextWriter.ResetIndent()`]: https://www.ookii.org/docs/commandline-4.0/html/M_Ookii_CommandLine_LineWrappingTextWriter_ResetIndent.htm
-[`LineWrappingTextWriter`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_LineWrappingTextWriter.htm
-[`Ookii.CommandLine.Terminal`]: https://www.ookii.org/docs/commandline-4.0/html/N_Ookii_CommandLine_Terminal.htm
-[`ResetIndent()`]: https://www.ookii.org/docs/commandline-4.0/html/M_Ookii_CommandLine_LineWrappingTextWriter_ResetIndent.htm
-[`TextFormat`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Terminal_TextFormat.htm
+[`EnableColor()`]: https://www.ookii.org/docs/commandline-4.1/html/M_Ookii_CommandLine_Terminal_VirtualTerminal_EnableColor.htm
+[`EnableVirtualTerminalSequences()`]: https://www.ookii.org/docs/commandline-4.1/html/M_Ookii_CommandLine_Terminal_VirtualTerminal_EnableVirtualTerminalSequences.htm
+[`Indent`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_LineWrappingTextWriter_Indent.htm
+[`LineWrappingTextWriter.ForConsoleError()`]: https://www.ookii.org/docs/commandline-4.1/html/M_Ookii_CommandLine_LineWrappingTextWriter_ForConsoleError.htm
+[`LineWrappingTextWriter.ForConsoleOut()`]: https://www.ookii.org/docs/commandline-4.1/html/M_Ookii_CommandLine_LineWrappingTextWriter_ForConsoleOut.htm
+[`LineWrappingTextWriter.Indent`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_LineWrappingTextWriter_Indent.htm
+[`LineWrappingTextWriter.IndentAfterEmptyLine`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_LineWrappingTextWriter_IndentAfterEmptyLine.htm
+[`LineWrappingTextWriter.ResetIndent()`]: https://www.ookii.org/docs/commandline-4.1/html/M_Ookii_CommandLine_LineWrappingTextWriter_ResetIndent.htm
+[`LineWrappingTextWriter.Wrapping`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_LineWrappingTextWriter_Wrapping.htm
+[`LineWrappingTextWriter`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_LineWrappingTextWriter.htm
+[`Ookii.CommandLine.Terminal`]: https://www.ookii.org/docs/commandline-4.1/html/N_Ookii_CommandLine_Terminal.htm
+[`ResetIndent()`]: https://www.ookii.org/docs/commandline-4.1/html/M_Ookii_CommandLine_LineWrappingTextWriter_ResetIndent.htm
+[`TextFormat`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_Terminal_TextFormat.htm
 [`TextWriter`]: https://learn.microsoft.com/dotnet/api/system.io.textwriter
-[`UsageWriter`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_UsageWriter.htm
-[`VirtualTerminal`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Terminal_VirtualTerminal.htm
-[`LineWrappingTextWriter.Wrapping`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_LineWrappingTextWriter_Wrapping.htm
-[`WrappingMode.Disabled`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_WrappingMode.htm
-[`WrappingMode.EnabledNoForce`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_WrappingMode.htm
+[`UsageWriter`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_UsageWriter.htm
+[`VirtualTerminal.WriteLineErrorFormatted()`]: https://www.ookii.org/docs/commandline-4.1/html/M_Ookii_CommandLine_Terminal_VirtualTerminal_WriteLineErrorFormatted.htm
+[`VirtualTerminal.WriteLineFormatted()`]: https://www.ookii.org/docs/commandline-4.1/html/M_Ookii_CommandLine_Terminal_VirtualTerminal_WriteLineFormatted.htm
+[`VirtualTerminal`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_Terminal_VirtualTerminal.htm
+[`WrappingMode.Disabled`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_WrappingMode.htm
+[`WrappingMode.EnabledNoForce`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_WrappingMode.htm

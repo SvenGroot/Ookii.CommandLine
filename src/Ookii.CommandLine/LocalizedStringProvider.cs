@@ -1,5 +1,6 @@
 ﻿using Ookii.CommandLine.Commands;
 using Ookii.CommandLine.Properties;
+using System;
 using System.Globalization;
 using System.Reflection;
 

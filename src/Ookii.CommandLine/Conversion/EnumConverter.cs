@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Ookii.CommandLine.Validation;
+using System;
 using System.Globalization;
+using System.Linq;
 
 namespace Ookii.CommandLine.Conversion;
 
@@ -9,18 +11,27 @@ namespace Ookii.CommandLine.Conversion;
 /// <remarks>
 /// <para>
 ///   This converter performs a case insensitive conversion, and accepts the name of an enumeration
-///   value, or its underlying value. In the latter case, the value does not need to be one of the
-///   defined values of the enumeration; use the <see cref="Validation.ValidateEnumValueAttribute"/>
-///   attribute to ensure only defined enumeration values can be used.
+///   value or a number representing the underlying type of the enumeration. Comma-separated values
+///   that will be combined using bitwise-or are also accepted, regardless of whether the
+///   enumeration uses the <see cref="FlagsAttribute"/> attribute. When using a numeric value, the
+///   value does not need to be one of the defined values of the enumeration.
 /// </para>
 /// <para>
-///   A comma-separated list of values is also accepted, which will be combined using a bitwise-or
-///   operation. This is accepted regardless of whether the enumeration uses the <see cref="FlagsAttribute"/>
-///   attribute.
+///   Use the <see cref="ValidateEnumValueAttribute"/> attribute to alter these behaviors. Applying
+///   that attribute will ensure that only values defined by the enumeration are allowed. The
+///   <see cref="ValidateEnumValueAttribute.AllowCommaSeparatedValues" qualifyHint="true"/>
+///   property can be used to control the use of multiple values, and the 
+///   <see cref="ValidateEnumValueAttribute.AllowNumericValues" qualifyHint="true"/> property
+///   controls the use of numbers instead of names. Set the
+///   <see cref="ValidateEnumValueAttribute.CaseSensitive" qualifyHint="true"/> property to
+///   <see langword="true"/> to enable case sensitive conversion.
 /// </para>
 /// <para>
-///   If conversion fails, this converter will provide an error message that includes all the
-///   allowed values for the enumeration.
+///   If conversion fails, the converter will check the
+///   <see cref="ValidateEnumValueAttribute.IncludeValuesInErrorMessage" qualifyHint="true"/>
+///   property to see whether or not the enumeration's defined values should be listed in the
+///   error message. If the argument does not have the <see cref="ValidateEnumValueAttribute"/>
+///   attribute applied, the enumeration's values will be listed in the message.
 /// </para>
 /// </remarks>
 /// <threadsafety static="true" instance="true"/>
@@ -75,22 +86,9 @@ public class EnumConverter : ArgumentConverter
     ///   The value was not valid for the enumeration type.
     /// </exception>
     public override object? Convert(string value, CultureInfo culture, CommandLineArgument argument)
-    {
-        try
-        {
-            return Enum.Parse(EnumType, value, true);
-        }
-        catch (ArgumentException ex)
-        {
-            throw CreateException(value, ex, argument);
-        }
-        catch (OverflowException ex)
-        {
-            throw CreateException(value, ex, argument);
-        }
-    }
-
 #if NET6_0_OR_GREATER
+        => Convert(value.AsSpan(), culture, argument);
+
     /// <summary>
     /// Converts a string span to the enumeration type.
     /// </summary>
@@ -110,25 +108,38 @@ public class EnumConverter : ArgumentConverter
     ///   The value was not valid for the enumeration type.
     /// </exception>
     public override object? Convert(ReadOnlySpan<char> value, CultureInfo culture, CommandLineArgument argument)
+#endif
     {
+        var attribute = argument.Validators.OfType<ValidateEnumValueAttribute>().FirstOrDefault();
+#if NET6_0_OR_GREATER
+        if (attribute != null && !attribute.ValidateBeforeConversion(argument, value))
+#else
+        if (attribute != null && !attribute.ValidateBeforeConversion(argument, value.AsSpan()))
+#endif
+        {
+            throw CreateException(value.ToString(), null, argument, attribute);
+        }
+
         try
         {
-            return Enum.Parse(EnumType, value, true);
+            return Enum.Parse(EnumType, value, !attribute?.CaseSensitive ?? true);
         }
         catch (ArgumentException ex)
         {
-            throw CreateException(value.ToString(), ex, argument);
+            throw CreateException(value.ToString(), ex, argument, attribute);
         }
         catch (OverflowException ex)
         {
-            throw CreateException(value.ToString(), ex, argument);
+            throw CreateException(value.ToString(), ex, argument, attribute);
         }
     }
-#endif
 
-    private Exception CreateException(string value, Exception inner, CommandLineArgument argument)
+    private CommandLineArgumentException CreateException(string value, Exception? inner, CommandLineArgument argument,
+        ValidateEnumValueAttribute? attribute)
     {
-        var message = argument.Parser.StringProvider.ValidateEnumValueFailed(argument.ArgumentName, EnumType, value, true);
-        return new CommandLineArgumentException(message, argument.ArgumentName, CommandLineArgumentErrorCategory.ArgumentValueConversion, inner);
+        string message = attribute?.GetErrorMessage(argument, value)
+            ?? argument.Parser.StringProvider.ValidateEnumValueFailed(argument.ArgumentName, EnumType, value, true);
+
+        return new(message, argument.ArgumentName, CommandLineArgumentErrorCategory.ArgumentValueConversion, inner);
     }
 }

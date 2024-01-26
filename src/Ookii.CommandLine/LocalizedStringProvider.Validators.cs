@@ -251,11 +251,19 @@ public partial class LocalizedStringProvider
     {
         if (attribute.Maximum == int.MaxValue)
         {
-            return Format(Resources.ValidateCountMinFormat, argumentName, attribute.Minimum);
+            var format = attribute.Minimum == 1 
+                ? Resources.ValidateCountMinSingularFormat 
+                : Resources.ValidateCountMinPluralFormat;
+
+            return Format(format, argumentName, attribute.Minimum);
         }
         else if (attribute.Minimum <= 0)
         {
-            return Format(Resources.ValidateCountMaxFormat, argumentName, attribute.Maximum);
+            var format = attribute.Maximum == 1
+                ? Resources.ValidateCountMaxSingularFormat
+                : Resources.ValidateCountMaxPluralFormat;
+
+            return Format(format, argumentName, attribute.Maximum);
         }
         else
         {

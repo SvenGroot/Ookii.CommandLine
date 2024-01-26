@@ -106,12 +106,14 @@ public partial class LineWrappingTextWriter : TextWriter
 
     private partial class LineBuffer
     {
+        private readonly LineWrappingTextWriter _writer;
         private readonly RingBuffer _buffer;
         private readonly List<Segment> _segments = new();
         private bool _hasOverflow;
 
-        public LineBuffer(int capacity)
+        public LineBuffer(LineWrappingTextWriter writer, int capacity)
         {
+            _writer = writer;
             _buffer = new(capacity);
         }
 
@@ -121,9 +123,13 @@ public partial class LineWrappingTextWriter : TextWriter
 
         public bool IsEmpty => _segments.Count == 0;
 
-        public int Indentation { get; set; }
+        private int? Indentation { get; set; }
 
-        public int LineLength => ContentLength + Indentation;
+        public int LineLength => ContentLength + (Indentation ?? 0);
+
+        public Segment? LastSegment => _segments.Count > 0 ? _segments[_segments.Count - 1] : null;
+
+        public bool HasPartialFormatting => LastSegment is Segment last && last.Type >= StringSegmentType.PartialFormattingUnknown;
 
         public void Append(ReadOnlySpan<char> span, StringSegmentType type)
         {
@@ -166,17 +172,17 @@ public partial class LineWrappingTextWriter : TextWriter
             ContentLength += contentLength;
         }
 
-        public Segment? LastSegment => _segments.Count > 0 ? _segments[_segments.Count - 1] : null;
-
-        public bool HasPartialFormatting => LastSegment is Segment last && last.Type >= StringSegmentType.PartialFormattingUnknown;
-
-        public partial void FlushTo(TextWriter writer, int indent, bool insertNewLine);
+        public partial void FlushTo(TextWriter writer, int? indent, bool insertNewLine);
 
         public partial void WriteLineTo(TextWriter writer, int indent);
 
         public void Peek(TextWriter writer)
         {
-            WriteIndent(writer, Indentation);
+            if (Indentation is int indentation)
+            {
+                WriteIndent(writer, indentation);
+            }
+
             int offset = 0;
             foreach (var segment in _segments)
             {
@@ -216,7 +222,7 @@ public partial class LineWrappingTextWriter : TextWriter
             return newSegment.Slice(FindPartialFormattingEndCore(newSegment.Span));
         }
 
-        private partial void WriteTo(TextWriter writer, int indent, bool insertNewLine);
+        private partial void WriteTo(TextWriter writer, int? indent, bool insertNewLine);
 
         private int FindPartialFormattingEndCore(ReadOnlySpan<char> newSegment)
         {
@@ -253,23 +259,33 @@ public partial class LineWrappingTextWriter : TextWriter
 
         private partial BreakLineResult BreakLine(TextWriter writer, ReadOnlySpan<char> newSegment, int maxLength, int indent, BreakLineMode mode);
 
-        public void ClearCurrentLine(int indent, bool clearSegments = true)
+        public void ClearCurrentLine(int? indent, bool clearSegments = true)
         {
             if (clearSegments)
             {
                 _segments.Clear();
             }
 
-            if (!IsContentEmpty)
+            if (_writer.IndentAfterEmptyLine || !IsContentEmpty)
             {
                 Indentation = indent;
             }
             else
             {
-                Indentation = 0;
+                Indentation = null;
             }
 
             ContentLength = 0;
+        }
+
+        public void UpdateIndent(int indent)
+        {
+            // We can apply the new indent immediately if the current line has indentation and is
+            // blank.
+            if (IsContentEmpty && Indentation != null)
+            {
+                Indentation = indent;
+            }
         }
     }
 
@@ -337,7 +353,7 @@ public partial class LineWrappingTextWriter : TextWriter
         if (_maximumLineLength > 0)
         {
             // Add some slack for formatting characters.
-            _lineBuffer = new(countFormatting ? _maximumLineLength : _maximumLineLength * 2);
+            _lineBuffer = new(this, countFormatting ? _maximumLineLength : _maximumLineLength * 2);
         }
     }
 
@@ -348,10 +364,7 @@ public partial class LineWrappingTextWriter : TextWriter
     /// <value>
     /// The <see cref="TextWriter"/> that this <see cref="LineWrappingTextWriter"/> is writing to.
     /// </value>
-    public TextWriter BaseWriter
-    {
-        get { return _baseWriter; }
-    }
+    public TextWriter BaseWriter => _baseWriter;
 
     /// <summary>
     /// Gets the character encoding in which the output is written.
@@ -384,10 +397,7 @@ public partial class LineWrappingTextWriter : TextWriter
     /// <value>
     /// The maximum length of a line, or zero if the line length is not limited.
     /// </value>
-    public int MaximumLineLength
-    {
-        get { return _maximumLineLength; }
-    }
+    public int MaximumLineLength => _maximumLineLength;
 
     /// <summary>
     /// Gets or sets the amount of characters to indent all but the first line.
@@ -397,18 +407,26 @@ public partial class LineWrappingTextWriter : TextWriter
     /// </value>
     /// <remarks>
     /// <para>
-    ///   Whenever a line break is encountered (either because of wrapping or because a line break was written to the
-    ///   <see cref="LineWrappingTextWriter"/>), the next line is indented by the number of characters specified
-    ///   by this property, unless the previous line was blank.
+    ///   Whenever a line break is encountered (either because of wrapping or because a line break
+    ///   was written to the <see cref="LineWrappingTextWriter"/>), the next line is indented by the
+    ///   number of characters specified by this property, unless the <see
+    ///   cref="IndentAfterEmptyLine"/> property is <see langword="false"/> and the previous line
+    ///   was blank.
+    /// </para>
+    /// <para>
+    ///   Changes to this property will not 
     /// </para>
     /// <para>
     ///   The output position can be reset to the start of the line after a line break by calling
     ///   the <see cref="ResetIndent"/> method.
     /// </para>
     /// </remarks>
+    /// <exception cref="ArgumentOutOfRangeException">
+    /// The property was set to a value less than zero or greater than the maximum line length.
+    /// </exception>
     public int Indent
     {
-        get { return _indent; }
+        get => _indent;
         set
         {
             if (value < 0 || (_maximumLineLength > 0 && value >= _maximumLineLength))
@@ -417,8 +435,27 @@ public partial class LineWrappingTextWriter : TextWriter
             }
 
             _indent = value;
+            _lineBuffer?.UpdateIndent(value);
         }
     }
+
+    /// <summary>
+    /// Gets or sets a value which indicates whether a line after an empty line should have
+    /// indentation.
+    /// </summary>
+    /// <value>
+    /// <see langword="true"/> if a line after an empty line should be indented; otherwise,
+    /// <see langword="false"/>. The default value is <see langword="false"/>.
+    /// </value>
+    /// <remarks>
+    /// <para>
+    ///   By default, the <see cref="LineWrappingTextWriter"/> class will start lines that follow
+    ///   an empty line at the beginning of the line, regardless of the value of the
+    ///   <see cref="Indent"/> property. Set this property to <see langword="true"/> to apply
+    ///   indentation even to lines following an empty line.
+    /// </para>
+    /// </remarks>
+    public bool IndentAfterEmptyLine { get; set; }
 
     /// <summary>
     /// Gets or sets a value which indicates how to wrap lines at the maximum line length.
@@ -456,8 +493,8 @@ public partial class LineWrappingTextWriter : TextWriter
                 {
                     // Flush the buffer but not the base writer, and make sure indent is reset
                     // even if the buffer was empty (for consistency).
-                    _lineBuffer.FlushTo(_baseWriter, 0, false);
-                    _lineBuffer.ClearCurrentLine(0);
+                    _lineBuffer.FlushTo(_baseWriter, null, false);
+                    _lineBuffer.ClearCurrentLine(null);
 
                     // Ensure no state is carried over from the last time this was changed.
                     _noWrappingState = default;
@@ -476,10 +513,7 @@ public partial class LineWrappingTextWriter : TextWriter
     /// A <see cref="LineWrappingTextWriter"/> that writes to <see cref="Console.Out" qualifyHint="true"/>,
     /// the standard output stream.
     /// </returns>
-    public static LineWrappingTextWriter ForConsoleOut()
-    {
-        return new LineWrappingTextWriter(Console.Out, GetLineLengthForConsole(), false);
-    }
+    public static LineWrappingTextWriter ForConsoleOut() => new(Console.Out, GetLineLengthForConsole(), false);
 
     /// <summary>
     /// Gets a <see cref="LineWrappingTextWriter"/> that writes to the standard error stream,
@@ -489,10 +523,7 @@ public partial class LineWrappingTextWriter : TextWriter
     /// A <see cref="LineWrappingTextWriter"/> that writes to <see cref="Console.Error" qualifyHint="true"/>,
     /// the standard error stream.
     /// </returns>
-    public static LineWrappingTextWriter ForConsoleError()
-    {
-        return new LineWrappingTextWriter(Console.Error, GetLineLengthForConsole(), false);
-    }
+    public static LineWrappingTextWriter ForConsoleError() => new(Console.Error, GetLineLengthForConsole(), false);
 
     /// <summary>
     /// Gets a <see cref="LineWrappingTextWriter"/> that writes to a <see cref="StringWriter"/>.
@@ -511,10 +542,9 @@ public partial class LineWrappingTextWriter : TextWriter
     ///   To retrieve the resulting string, call the <see cref="ToString()"/> method. The result
     ///   will include any unflushed text without flushing that text to the <see cref="BaseWriter"/>.
     /// </remarks>
-    public static LineWrappingTextWriter ForStringWriter(int maximumLineLength = 0, IFormatProvider? formatProvider = null, bool countFormatting = false)
-    {
-        return new LineWrappingTextWriter(new StringWriter(formatProvider), maximumLineLength, true, countFormatting);
-    }
+    public static LineWrappingTextWriter ForStringWriter(int maximumLineLength = 0, IFormatProvider? formatProvider = null,
+            bool countFormatting = false)
+        => new(new StringWriter(formatProvider), maximumLineLength, true, countFormatting);
 
     /// <inheritdoc/>
     public override void Write(char value)

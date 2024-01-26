@@ -96,8 +96,10 @@ public class UsageWriter
     private const char OptionalStart = '[';
     private const char OptionalEnd = ']';
 
+    private readonly LineWrappingTextWriter? _customWriter;
     private LineWrappingTextWriter? _writer;
-    private bool? _useColor;
+    private readonly bool? _useColor;
+    private bool _autoColor;
     private CommandLineParser? _parser;
     private CommandManager? _commandManager;
     private string? _executableName;
@@ -127,7 +129,7 @@ public class UsageWriter
     /// </remarks>
     public UsageWriter(LineWrappingTextWriter? writer = null, bool? useColor = null)
     {
-        _writer = writer;
+        _customWriter = writer;
         _useColor = useColor;
     }
 
@@ -482,12 +484,35 @@ public class UsageWriter
     public string? CommandName { get; set; }
 
     /// <summary>
+    /// Gets or sets a value which indicates whether a line after an empty line should have
+    /// indentation.
+    /// </summary>
+    /// <value>
+    /// <see langword="true"/> if a line after an empty line should be indented; otherwise,
+    /// <see langword="false"/>. The default value is <see langword="false"/>.
+    /// </value>
+    /// <remarks>
+    /// <para>
+    ///   By default, the <see cref="UsageWriter"/> class will start lines that follow an empty line
+    ///   at the beginning of the line, regardless of the value of the <see cref="SyntaxIndent"/>,
+    ///   <see cref="ArgumentDescriptionIndent"/>, or <see cref="CommandDescriptionIndent"/>
+    ///   property. Set this property to <see langword="true"/> to apply indentation even to lines
+    ///   following an empty line.
+    /// </para>
+    /// <para>
+    ///   This can be useful if you have argument descriptions that contain blank lines when
+    ///   argument descriptions are indented, such as in the default format.
+    /// </para>
+    /// </remarks>
+    public bool IndentAfterEmptyLine { get; set; }
+
+    /// <summary>
     /// Gets or sets a value that indicates whether the usage help should use color.
     /// </summary>
     /// <value>
     ///   <see langword="true"/> to enable color output; otherwise, <see langword="false"/>.
     /// </value>
-    protected bool UseColor => _useColor ?? false;
+    protected bool UseColor => _useColor ?? _autoColor;
 
     /// <summary>
     /// Gets or sets the color applied by the base implementation of the <see cref="WriteCommandDescription(CommandInfo)"/>
@@ -649,6 +674,9 @@ public class UsageWriter
     /// <summary>
     /// Gets the <see cref="CommandLineParser"/> that usage is being written for.
     /// </summary>
+    /// <value>
+    /// An instance of the <see cref="CommandLineParser"/> class.
+    /// </value>
     /// <exception cref="InvalidOperationException">
     /// A <see cref="WriteParserUsage"/> operation is not in progress.
     /// </exception>
@@ -656,13 +684,30 @@ public class UsageWriter
         => _parser ?? throw new InvalidOperationException(Resources.UsageWriterPropertyNotAvailable);
 
     /// <summary>
-    /// Gets the <see cref="CommandManager"/> that usage is being written for.
+    /// Gets the <see cref="Commands.CommandManager"/> that usage is being written for.
     /// </summary>
+    /// <value>
+    /// An instance of the <see cref="Commands.CommandManager"/> class.
+    /// </value>
     /// <exception cref="InvalidOperationException">
     /// A <see cref="WriteCommandListUsage"/> operation is not in progress.
     /// </exception>
     protected CommandManager CommandManager
         => _commandManager ?? throw new InvalidOperationException(Resources.UsageWriterPropertyNotAvailable);
+
+    /// <summary>
+    /// Gets the <see cref="LocalizedStringProvider"/> implementation used to get strings for
+    /// error messages and usage help.
+    /// </summary>
+    /// <value>
+    /// An instance of a class inheriting from the <see cref="LocalizedStringProvider"/> class.
+    /// </value>
+    /// <exception cref="InvalidOperationException">
+    /// A <see cref="WriteCommandListUsage"/> operation is not in progress.
+    /// </exception>
+    protected LocalizedStringProvider StringProvider
+        => _parser?.StringProvider ?? _commandManager?.Options.StringProvider 
+            ?? throw new InvalidOperationException(Resources.UsageWriterPropertyNotAvailable);
 
     /// <summary>
     /// Indicates what operation is currently in progress.
@@ -882,6 +927,7 @@ public class UsageWriter
 
             WriteArgumentDescriptions();
             Writer.Indent = 0;
+            WriteParserUsageFooter();
         }
         else
         {
@@ -995,7 +1041,7 @@ public class UsageWriter
     protected virtual void WriteUsageSyntaxPrefix()
     {
         WriteColor(UsagePrefixColor);
-        Write(Resources.DefaultUsagePrefix);
+        Write(StringProvider.UsageSyntaxPrefix());
         ResetColor();
         Write(' ');
         Write(ExecutableName);
@@ -1023,7 +1069,7 @@ public class UsageWriter
     {
         if (OperationInProgress == Operation.CommandListUsage)
         {
-            WriteLine(Resources.DefaultCommandUsageSuffix);
+            WriteLine(StringProvider.CommandUsageSuffix());
         }
     }
 
@@ -1195,7 +1241,7 @@ public class UsageWriter
     /// </para>
     /// </remarks>
     protected virtual void WriteAbbreviatedRemainingArguments()
-        => Write(Resources.DefaultAbbreviatedRemainingArguments);
+        => Write(StringProvider.UsageAbbreviatedRemainingArguments());
 
     /// <summary>
     /// Writes a suffix that indicates an argument is a multi-value argument.
@@ -1437,7 +1483,15 @@ public class UsageWriter
 
         if (IncludeDefaultValueInDescription && argument.IncludeDefaultInUsageHelp && argument.DefaultValue != null)
         {
-            WriteDefaultValue(argument.DefaultValue);
+            var defaultValue = argument.DefaultValue;
+            if (argument.DefaultValueFormat != null)
+            {
+                // Use the parser's culture so the format matches the format the user should use
+                // for values.
+                defaultValue = string.Format(argument.Parser.Culture, argument.DefaultValueFormat, defaultValue);
+            }
+
+            WriteDefaultValue(defaultValue);
         }
 
         WriteLine();
@@ -1634,9 +1688,22 @@ public class UsageWriter
     ///   <see langword="true"/> and the <see cref="CommandLineArgument.DefaultValue" qualifyHint="true"/> property
     ///   is not <see langword="null"/>.
     /// </para>
+    /// <para>
+    ///   If the <see cref="CommandLineArgumentAttribute.DefaultValueFormat" qualifyHint="true"/>
+    ///   property for the argument is not <see langword="null"/>, then the base implementation of
+    ///   the <see cref="WriteArgumentDescriptionBody"/> method will use the formatted string,
+    ///   rather than the original default value, for the <paramref name="defaultValue"/>
+    ///   parameter.
+    /// </para>
+    /// <para>
+    ///   The default implementation formats the argument using the culture specified by the
+    ///   <see cref="CommandLineParser.Culture" qualifyHint="true"/> property, rather than the
+    ///   culture used by the output <see cref="Writer"/>, so that the displayed format will match
+    ///   the format the user should use for argument values.
+    /// </para>
     /// </remarks>
     protected virtual void WriteDefaultValue(object defaultValue)
-        => Write(Resources.DefaultDefaultValueFormat, defaultValue);
+        => Write(StringProvider.UsageDefaultValue(defaultValue, Parser.Culture));
 
     /// <summary>
     /// Writes a message telling to user how to get more detailed help.
@@ -1666,7 +1733,30 @@ public class UsageWriter
                 name += " " + CommandName;
             }
 
-            WriteLine(Resources.MoreInfoOnErrorFormat, name, arg.ArgumentNameWithPrefix);
+            WriteLine(StringProvider.UsageMoreInfoMessage(name, arg.ArgumentNameWithPrefix));
+        }
+    }
+
+    /// <summary>
+    /// Writes a footer under the usage help.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    ///   This method is called by the base implementation of <see cref="WriteParserUsageCore"/>
+    ///   only if the requested help is <see cref="UsageHelpRequest.Full" qualifyHint="true"/>.
+    /// </para>
+    /// <para>
+    ///   The base implementation writes the value of the <see cref="CommandLineParser.UsageFooter" qualifyHint="true"/>
+    ///   property, if it is not an empty string. This value can be set using the
+    ///   <see cref="UsageFooterAttribute"/> attribute.
+    /// </para>
+    /// </remarks>
+    protected virtual void WriteParserUsageFooter()
+    {
+        if (!string.IsNullOrEmpty(Parser.UsageFooter))
+        {
+            WriteLine(Parser.UsageFooter);
+            WriteLine();
         }
     }
 
@@ -1720,8 +1810,9 @@ public class UsageWriter
     /// </para>
     /// <para>
     ///   The base implementation writes the application description, followed by the list
-    ///   of commands, followed by a message indicating how to get help on a command. Which
-    ///   elements are included exactly can be influenced by the properties of this class.
+    ///   of commands, followed by a footer, which may include a message indicating how to get help
+    ///   on a command. Which elements are included exactly can be influenced by the properties of
+    ///   this class.
     /// </para>
     /// </remarks>
     protected virtual void WriteCommandListUsageCore()
@@ -1742,25 +1833,8 @@ public class UsageWriter
         WriteAvailableCommandsHeader();
 
         WriteCommandDescriptions();
-
-        if (CheckShowCommandHelpInstruction())
-        {
-            var prefix = CommandManager.Options.Mode == ParsingMode.LongShort
-                ? (CommandManager.Options.LongArgumentNamePrefixOrDefault)
-                : (CommandManager.Options.ArgumentNamePrefixes?.FirstOrDefault() ?? CommandLineParser.GetDefaultArgumentNamePrefixes()[0]);
-
-            var transform = CommandManager.Options.ArgumentNameTransformOrDefault;
-            var argumentName = transform.Apply(CommandManager.Options.StringProvider.AutomaticHelpName());
-
-            Writer.Indent = 0;
-            var name = ExecutableName;
-            if (CommandName != null)
-            {
-                name += " " + CommandName;
-            }
-
-            WriteCommandHelpInstruction(name, prefix, argumentName);
-        }
+        Writer.Indent = 0;
+        WriteCommandListUsageFooter();
     }
 
     /// <summary>
@@ -1797,7 +1871,7 @@ public class UsageWriter
     /// </remarks>
     protected virtual void WriteAvailableCommandsHeader()
     {
-        WriteLine(Resources.DefaultAvailableCommandsHeader);
+        WriteLine(StringProvider.UsageAvailableCommandsHeader());
         WriteLine();
     }
 
@@ -1957,6 +2031,39 @@ public class UsageWriter
         => Write(description);
 
     /// <summary>
+    /// Writes a footer underneath the command list usage.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    ///   The base implementation calls the <see cref="WriteCommandHelpInstruction"/> method if the
+    ///   help instruction is explicitly or automatically enabled.
+    /// </para>
+    /// <para>
+    ///   This method is called by the base implementation of the <see cref="WriteCommandListUsageCore"/>
+    ///   method.
+    /// </para>
+    /// </remarks>
+    protected virtual void WriteCommandListUsageFooter()
+    {
+        if (CheckShowCommandHelpInstruction())
+        {
+            var prefix = CommandManager.Options.Mode == ParsingMode.LongShort
+                ? (CommandManager.Options.LongArgumentNamePrefixOrDefault)
+                : (CommandManager.Options.ArgumentNamePrefixes?.FirstOrDefault() ?? CommandLineParser.GetDefaultArgumentNamePrefixes()[0]);
+
+            var transform = CommandManager.Options.ArgumentNameTransformOrDefault;
+            var argumentName = transform.Apply(CommandManager.Options.StringProvider.AutomaticHelpName());
+            var name = ExecutableName;
+            if (CommandName != null)
+            {
+                name += " " + CommandName;
+            }
+
+            WriteCommandHelpInstruction(name, prefix, argumentName);
+        }
+    }
+
+    /// <summary>
     /// Writes an instruction on how to get help on a command.
     /// </summary>
     /// <param name="name">The application and command name.</param>
@@ -1968,14 +2075,14 @@ public class UsageWriter
     ///   information on a command."
     /// </para>
     /// <para>
-    ///   This method is called by the base implementation of the <see cref="WriteCommandListUsageCore"/>
+    ///   This method is called by the base implementation of the <see cref="WriteCommandListUsageFooter"/>
     ///   method if the <see cref="IncludeCommandHelpInstruction"/> property is <see langword="true"/>,
     ///   or if it is <see langword="null"/> and all commands meet the requirements.
     /// </para>
     /// </remarks>
     protected virtual void WriteCommandHelpInstruction(string name, string argumentNamePrefix, string argumentName)
     {
-        WriteLine(Resources.CommandHelpInstructionFormat, name, argumentNamePrefix, argumentName);
+        WriteLine(StringProvider.UsageCommandHelpInstruction(name, argumentNamePrefix, argumentName));
     }
 
     #endregion
@@ -2034,6 +2141,15 @@ public class UsageWriter
     /// </remarks>
     protected virtual void WriteLine() => Writer.WriteLine();
 
+    /// <summary>
+    /// Writes a string to the <see cref="Writer"/>, followed by a line break.
+    /// </summary>
+    /// <param name="value">The string to write.</param>
+    protected void WriteLine(string? value)
+    {
+        Write(value);
+        WriteLine();
+    }
 
     /// <summary>
     /// Writes a string with virtual terminal sequences only if color is enabled.
@@ -2096,26 +2212,21 @@ public class UsageWriter
         return writer.BaseWriter.ToString()!;
     }
 
-    private void WriteLine(string? value)
-    {
-        Write(value);
-        WriteLine();
-    }
-
-    private void Write(string format, object? arg0) => Write(string.Format(Writer.FormatProvider, format, arg0));
-
-    private void WriteLine(string format, object? arg0, object? arg1)
-        => WriteLine(string.Format(Writer.FormatProvider, format, arg0, arg1));
-
-    private void WriteLine(string format, object? arg0, object? arg1, object? arg2)
-        => WriteLine(string.Format(Writer.FormatProvider, format, arg0, arg1, arg2));
-
     private VirtualTerminalSupport? EnableColor()
     {
-        if (_useColor == null && _writer == null)
+        if (_useColor == null)
         {
-            var support = VirtualTerminal.EnableColor(StandardStream.Output);
-            _useColor = support.IsSupported;
+            VirtualTerminalSupport? support = null;
+            if (_customWriter == null)
+            {
+                support = VirtualTerminal.EnableColor(StandardStream.Output);
+            }
+            else if (_customWriter.GetStandardStream() is StandardStream stream)
+            {
+                support = VirtualTerminal.EnableColor(stream);
+            }
+
+            _autoColor = support?.IsSupported ?? false;
             return support;
         }
 
@@ -2149,52 +2260,28 @@ public class UsageWriter
 
     private void WriteUsageInternal(UsageHelpRequest request = UsageHelpRequest.Full)
     {
-        bool restoreColor = _useColor == null;
-        bool restoreWriter = _writer == null;
-        try
-        {
-            using var support = EnableColor();
-            using var writer = DisposableWrapper.Create(_writer, LineWrappingTextWriter.ForConsoleOut);
-            _writer = writer.Inner;
-            Writer.ResetIndent();
-            Writer.Indent = 0;
-            RunOperation(request);
-        }
-        finally
-        {
-            if (restoreColor)
-            {
-                _useColor = null;
-            }
-
-            if (restoreWriter)
-            {
-                _writer = null;
-            }
-        }
+        using var support = EnableColor();
+        using var writer = DisposableWrapper.Create(_customWriter, LineWrappingTextWriter.ForConsoleOut);
+        _writer = writer.Inner;
+        Writer.ResetIndent();
+        Writer.Indent = 0;
+        RunOperation(request);
     }
 
     private string GetUsageInternal(int maximumLineLength = 0, UsageHelpRequest request = UsageHelpRequest.Full)
     {
-        var originalWriter = _writer;
-        try
-        {
-            using var writer = LineWrappingTextWriter.ForStringWriter(maximumLineLength);
-            _writer = writer;
-            RunOperation(request);
-            writer.Flush();
-            return writer.BaseWriter.ToString()!;
-        }
-        finally
-        {
-            _writer = originalWriter;
-        }
+        using var writer = LineWrappingTextWriter.ForStringWriter(maximumLineLength);
+        _writer = writer;
+        RunOperation(request);
+        writer.Flush();
+        return writer.BaseWriter.ToString()!;
     }
 
     private void RunOperation(UsageHelpRequest request)
     {
         try
         {
+            Writer.IndentAfterEmptyLine = IndentAfterEmptyLine;
             if (_parser == null)
             {
                 WriteCommandListUsageCore();
@@ -2208,6 +2295,8 @@ public class UsageWriter
         {
             _parser = null;
             _commandManager = null;
+            _writer = null;
+            _autoColor = false;
         }
     }
 

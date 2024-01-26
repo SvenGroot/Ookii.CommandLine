@@ -34,7 +34,7 @@ For example, the following code triggers this error:
 [GeneratedParser]
 partial struct Arguments // ERROR: The type must be a class.
 {
-    [CommandLineAttribute]
+    [CommandLineArgument]
     public string? Argument { get; set; }
 }
 ```
@@ -52,7 +52,7 @@ For example, the following code triggers this error:
 [GeneratedParser]
 class Arguments // ERROR: The class must be partial
 {
-    [CommandLineAttribute]
+    [CommandLineArgument]
     public string? Argument { get; set; }
 }
 ```
@@ -70,7 +70,7 @@ For example, the following code triggers this error:
 [GeneratedParser]
 partial class Arguments<T> // ERROR: The class must not be generic
 {
-    [CommandLineAttribute]
+    [CommandLineArgument]
     public T? Argument { get; set; }
 }
 ```
@@ -90,7 +90,7 @@ class SomeClass
     [GeneratedParser]
     public partial class Arguments<T> // ERROR: The class must not be nested
     {
-        [CommandLineAttribute]
+        [CommandLineArgument]
         public T? Argument { get; set; }
     }
 }
@@ -108,7 +108,7 @@ For example, the following code triggers this error:
 partial class Arguments
 {
      // ERROR: Argument using an array rank other than one.
-    [CommandLineAttribute]
+    [CommandLineArgument]
     public string[,]? Argument { get; set; }
 }
 ```
@@ -128,7 +128,7 @@ For example, the following code triggers this error:
 partial class Arguments
 {
      // ERROR: Property must use a public set accessor.
-    [CommandLineAttribute]
+    [CommandLineArgument]
     public string? Argument { get; private set; }
 }
 ```
@@ -151,7 +151,7 @@ For example, the following code triggers this error:
 partial class Arguments
 {
      // ERROR: Argument type must have a converter
-    [CommandLineAttribute]
+    [CommandLineArgument]
     public Socket? Argument { get; set; }
 }
 ```
@@ -171,7 +171,7 @@ For example, the following code triggers this error:
 partial class Arguments
 {
      // ERROR: the method has an unrecognized parameter
-    [CommandLineAttribute]
+    [CommandLineArgument]
     public static void Argument(string value, int value2);
 }
 ```
@@ -191,7 +191,7 @@ For example, the following code triggers this error:
 partial class Arguments
 {
      // ERROR: The property uses init but is not required
-    [CommandLineAttribute(IsRequired = true)]
+    [CommandLineArgument(IsRequired = true)]
     public string? Argument { get; init; }
 }
 ```
@@ -203,7 +203,7 @@ To fix this error, either use a regular `set` accessor, or if using .Net 7.0 or 
 [GeneratedParser]
 partial class Arguments
 {
-    [CommandLineAttribute]
+    [CommandLineArgument]
     public required string Argument { get; init; }
 }
 ```
@@ -248,11 +248,11 @@ For example, the following code triggers this error:
 [GeneratedParser]
 partial class Arguments
 {
-    [CommandLineAttribute(IsPositional = true)]
+    [CommandLineArgument(IsPositional = true)]
     public string[]? Argument1 { get; set; }
 
      // ERROR: Argument2 comes after Argument1, which is multi-value.
-    [CommandLineAttribute(IsPositional = true]
+    [CommandLineArgument(IsPositional = true]
     public string? Argument2 { get; set; }
 }
 ```
@@ -269,11 +269,11 @@ For example, the following code triggers this error:
 [GeneratedParser]
 partial class Arguments
 {
-    [CommandLineAttribute(IsPositional = true)]
+    [CommandLineArgument(IsPositional = true)]
     public string? Argument1 { get; set; }
 
      // ERROR: Required argument Argument2 comes after Argument1, which is optional.
-    [CommandLineAttribute(IsPositional = true)]
+    [CommandLineArgument(IsPositional = true)]
     public required string Argument2 { get; set; }
 }
 ```
@@ -325,7 +325,7 @@ For example, the following code triggers this error:
 [GeneratedParser]
 partial class Arguments
 {
-    [CommandLineAttribute]
+    [CommandLineArgument]
     [ArgumentConverter("MyNamespace.MyConverter")] // ERROR: Can't use a string type name.
     public CustomType? Argument { get; set; }
 }
@@ -351,7 +351,7 @@ For example, the following code triggers this error:
 partial class Arguments
 {
     // ERROR: No long or short name (IsShort is false by default).
-    [CommandLineAttribute(IsLong = false)]
+    [CommandLineArgument(IsLong = false)]
     public string? Argument { get; set; }
 }
 ```
@@ -391,10 +391,10 @@ For example, the following code triggers this error:
 [GeneratedParser]
 partial class Arguments
 {
-    [CommandLineAttribute(IsPositional = true)]
+    [CommandLineArgument(IsPositional = true)]
     public string? Argument1 { get; set; }
 
-    [CommandLineAttribute(Position = 0)]
+    [CommandLineArgument(Position = 0)]
     public string? Argument2 { get; set; }
 }
 ```
@@ -420,7 +420,7 @@ For example, the following code triggers this warning:
 [GeneratedParser]
 partial class Arguments
 {
-    [CommandLineAttribute]
+    [CommandLineArgument]
     [TypeConverter(typeof(MyNamespace.MyConverter)] // WARNING: TypeConverterAttribute is not used
     public CustomType? Argument { get; set; }
 }
@@ -433,7 +433,7 @@ existing [`TypeConverter`][], you can use the [`WrappedTypeConverter<T>`][] clas
 [GeneratedParser]
 partial class Arguments
 {
-    [CommandLineAttribute]
+    [CommandLineArgument]
     [ArgumentConverter(typeof(WrappedTypeConverter<MyNamespace.MyConverter>)]
     public CustomType? Argument { get; set; }
 }
@@ -453,7 +453,7 @@ For example, the following code triggers this warning:
 partial class Arguments
 {
      // WARNING: the method must be public
-    [CommandLineAttribute]
+    [CommandLineArgument]
     private static void Argument(string value, int value2);
 }
 ```
@@ -472,7 +472,7 @@ For example, the following code triggers this warning:
 partial class Arguments
 {
      // WARNING: the property must be public
-    [CommandLineAttribute]
+    [CommandLineArgument]
     private string? Argument { get; set; }
 }
 ```
@@ -493,7 +493,7 @@ For example, the following code triggers this warning:
 [Command]
 partial class MyCommand // WARNING: The class doesn't implement ICommand
 {
-    [CommandLineAttribute]
+    [CommandLineArgument]
     public string? Argument { get; set; }
 }
 ```
@@ -520,7 +520,7 @@ For example, the following code triggers this warning:
 partial class Arguments
 {
     // WARNING: Default value is unused on a required argument.
-    [CommandLineAttribute(DefaultValue = "foo")]
+    [CommandLineArgument(DefaultValue = "foo")]
     public required string Argument { get; set; }
 }
 ```
@@ -541,7 +541,7 @@ For example, the following code triggers this warning:
 partial class Arguments
 {
     // WARNING: the argument will be required regardless of the value of IsRequired.
-    [CommandLineAttribute(IsRequired = false)]
+    [CommandLineArgument(IsRequired = false)]
     public required string Argument { get; set; }
 }
 ```
@@ -558,11 +558,11 @@ of the arguments, which should be avoided.
 [GeneratedParser]
 partial class Arguments
 {
-    [CommandLineAttribute(Position = 0)]
+    [CommandLineArgument(Position = 0)]
     public string? Argument1 { get; set; }
 
     // WARNING: Argument2 has the same position as Argument1.
-    [CommandLineAttribute(Position = 0)]
+    [CommandLineArgument(Position = 0)]
     public string? Argument2 { get; set; }
 }
 ```
@@ -590,7 +590,7 @@ For example, the following code triggers this warning:
 partial class Arguments
 {
     // WARNING: The short alias is not used since the argument has no short name.
-    [CommandLineAttribute]
+    [CommandLineArgument]
     [ShortAlias('a')]
     public string? Argument { get; set; }
 }
@@ -613,7 +613,7 @@ For example, the following code triggers this warning:
 partial class Arguments
 {
     // WARNING: The long alias is not used since the argument has no long name.
-    [CommandLineAttribute(IsLong = false, IsShort = true)]
+    [CommandLineArgument(IsLong = false, IsShort = true)]
     [Alias("arg")]
     public string? Argument { get; set; }
 }
@@ -638,7 +638,7 @@ For example, the following code triggers this warning:
 partial class Arguments
 {
     // WARNING: The argument is not hidden because it's positional.
-    [CommandLineAttribute(IsPositional = true, IsHidden = true)]
+    [CommandLineArgument(IsPositional = true, IsHidden = true)]
     public string? Argument { get; set; }
 }
 ```
@@ -667,7 +667,7 @@ For example, the following code triggers this warning:
 [GeneratedParser]
 partial class Arguments
 {
-    [CommandLineAttribute]
+    [CommandLineArgument]
     [AllowDuplicateDictionaryKeys] // WARNING: Ignored on non-dictionary arguments
     public string? Argument { get; set; }
 }
@@ -685,7 +685,7 @@ For example, the following code triggers this warning:
 [GeneratedParser]
 partial class Arguments
 {
-    [CommandLineAttribute]
+    [CommandLineArgument]
     [ArgumentConverter(typeof(CustomKeyValuePairConverter))]
     [KeyValueSeparator(":")] // WARNING: Ignored on dictionary arguments with an explicit converter.
     public Dictionary<string, int>? Argument { get; set; }
@@ -703,7 +703,7 @@ For example, the following code triggers this warning:
 [GeneratedParser]
 partial class Arguments
 {
-    [CommandLineAttribute]
+    [CommandLineArgument]
     [MultiValueSeparator(",")] // WARNING: Ignored on non-multi-value arguments
     public string? Argument { get; set; }
 }
@@ -725,7 +725,7 @@ For example, the following code triggers this warning:
 partial class Arguments
 {
     // WARNING: Name starts with a number.
-    [CommandLineAttribute("1Arg")]
+    [CommandLineArgument("1Arg")]
     public string? Argument { get; set; }
 }
 ```
@@ -751,7 +751,7 @@ For example, the following code triggers this warning:
 partial class Arguments
 {
     // WARNING: Argument has a short name so IsShort is ignored.
-    [CommandLineAttribute(ShortName = 'a', IsShort = false)]
+    [CommandLineArgument(ShortName = 'a', IsShort = false)]
     public string? Argument { get; set; }
 }
 ```
@@ -772,7 +772,7 @@ For example, the following code triggers this warning:
 partial class Arguments
 {
     // WARNING: No DescriptionAttribute on this member.
-    [CommandLineAttribute]
+    [CommandLineArgument]
     public string? Argument { get; set; }
 }
 ```
@@ -784,7 +784,7 @@ To fix this, write a concise description explaining the argument's purpose and u
 [GeneratedParser]
 partial class Arguments
 {
-    [CommandLineAttribute]
+    [CommandLineArgument]
     [Description("A description of the argument.")]
     public string? Argument { get; set; }
 }
@@ -806,7 +806,7 @@ For example, the following code triggers this warning:
 [Command]
 partial class MyCommand : ICommand
 {
-    [CommandLineAttribute]
+    [CommandLineArgument]
     [Description("A description of the argument.")]
     public string? Argument { get; set; }
 }
@@ -821,7 +821,7 @@ To fix this, write a concise description explaining the command's purpose, and a
 [Command]
 partial class MyCommand : ICommand
 {
-    [CommandLineAttribute]
+    [CommandLineArgument]
     [Description("A description of the argument.")]
     public string? Argument { get; set; }
 }
@@ -843,7 +843,7 @@ For example, the following code triggers this warning:
 [ParentCommand(typeof(SomeCommand))]
 partial class MyCommand
 {
-    [CommandLineAttribute]
+    [CommandLineArgument]
     [Description("A description of the argument.")]
     public string? Argument { get; set; }
 }
@@ -865,7 +865,7 @@ For example, the following code triggers this warning:
 [Command]
 partial class MyCommand : ICommand
 {
-    [CommandLineAttribute]
+    [CommandLineArgument]
     [Description("A description of the argument.")]
     public string? Argument { get; set; }
 }
@@ -897,7 +897,7 @@ For example, the following code triggers this warning:
 partial class Arguments
 {
     // WARNING: Method call for property initializer is not supported for the usage help.
-    [CommandLineAttribute]
+    [CommandLineArgument]
     public string? Argument { get; set; } = GetDefaultValue();
 
     private static int GetDefaultValue()
@@ -908,9 +908,9 @@ partial class Arguments
 ```
 
 This will not affect the actual value of the argument, since the property will not be set by the
-[`CommandLineParser`][] if the [`CommandLineArgumentAttribute.DefaultValue`][] property is null. Therefore,
-you can safely suppress this warning and include the relevant explanation of the default value in
-the property's description manually, if desired.
+[`CommandLineParser`][] if the [`CommandLineArgumentAttribute.DefaultValue`][] property is null.
+Therefore, you can safely suppress this warning and include the relevant explanation of the default
+value in the property's description manually, if desired.
 
 To avoid this warning, use one of the supported expression types, or use the
 [`CommandLineArgumentAttribute.DefaultValue`][] property. This warning will not be emitted if the
@@ -922,52 +922,138 @@ Note that default values set by property initializers are only shown in the usag
 [`GeneratedParserAttribute`][] is used. When reflection is used, only
 [`CommandLineArgumentAttribute.DefaultValue`][] is supported.
 
-[`AliasAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_AliasAttribute.htm
-[`AllowDuplicateDictionaryKeysAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_AllowDuplicateDictionaryKeysAttribute.htm
-[`ApplicationFriendlyNameAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_ApplicationFriendlyNameAttribute.htm
-[`ArgumentConverter`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Conversion_ArgumentConverter.htm
-[`ArgumentConverterAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Conversion_ArgumentConverterAttribute.htm
-[`CommandAttribute.IsHidden`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_Commands_CommandAttribute_IsHidden.htm
-[`CommandAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Commands_CommandAttribute.htm
-[`CommandLineArgumentAttribute.DefaultValue`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_DefaultValue.htm
-[`CommandLineArgumentAttribute.IncludeDefaultInUsageHelp`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_IncludeDefaultInUsageHelp.htm
-[`CommandLineArgumentAttribute.IsHidden`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_IsHidden.htm
-[`CommandLineArgumentAttribute.IsLong`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_IsLong.htm
-[`CommandLineArgumentAttribute.IsPositional`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_IsPositional.htm
-[`CommandLineArgumentAttribute.IsRequired`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_IsRequired.htm
-[`CommandLineArgumentAttribute.IsShort`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_IsShort.htm
-[`CommandLineArgumentAttribute.Position`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_Position.htm
-[`CommandLineArgumentAttribute.ShortName`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_ShortName.htm
-[`CommandLineArgumentAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_CommandLineArgumentAttribute.htm
-[`CommandLineParser.Parse<T>()`]: https://www.ookii.org/docs/commandline-4.0/html/M_Ookii_CommandLine_CommandLineParser_Parse__1.htm
-[`CommandLineParser`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_CommandLineParser.htm
-[`CommandLineParser<T>`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_CommandLineParser_1.htm
-[`CommandManager`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Commands_CommandManager.htm
+### OCL0040
+
+Command line arguments classes should use source generation.
+
+This warning is emitted for any class that contains members with the
+[`CommandLineArgumentAttribute`][], but which does not have the [`GeneratedParserAttribute`][]
+applied. Using [source generation](SourceGeneration.md) is recommended in all cases, unless you
+cannot meet the requirements.
+
+This warning is not emitted if the project does not use C# 8 or later, or the class is abstract,
+nested in another type, or has generic type arguments.
+
+For example, the following code triggers this warning:
+
+```csharp
+// WARNING: The "Argument" property has the CommandLineArgumentAttribute, but the class does not
+// have the GeneratedParserAttribute.
+class Arguments
+{
+    [CommandLineArgument]
+    public string? Argument { get; set; }
+}
+```
+
+A code fix is provided that lets you use the lightbulb UI in Visual Studio to quickly add the
+[`GeneratedParserAttribute`][] to the class. This will also make the class `partial` if it isn't
+already.
+
+If you cannot use source generation for some reason, you should disable this warning.
+
+### OCL0041
+
+The [`ValidateEnumValueAttribute`][] attribute was applied to an argument whose type is not an
+enumeration type, a nullable enumeration type, or an array or collection containing an enumeration
+type.
+
+The [`ValidateEnumValueAttribute`][] attribute only supports enumeration types, and will throw an
+exception at runtime if used to validate an argument whose type is not an enumeration.
+
+For example, the following code triggers this warning:
+
+```csharp
+class Arguments
+{
+    // WARNING: String isn't an enumeration type.
+    [CommandLineArgument]
+    [ValidateEnumValue]
+    public string? Argument { get; set; }
+}
+```
+
+To fix this warning, either remove the [`ValidateEnumValueAttribute`][] attribute or change the type
+of the argument to an enumeration type.
+
+### OCL0042
+
+An argument has the [`ArgumentConverterAttribute`][] set, and uses properties of the
+[`ValidateEnumValueAttribute`][] that may not be supported by a custom converter.
+
+The [`CaseSensitive`][CaseSensitive_1], [`AllowCommaSeparatedValues`][], and
+[`AllowNumericValues`][] properties of the [`ValidateEnumValueAttribute`][] attribute are not used
+by the [`ValidateEnumValueAttribute`][] attribute itself, but instead alter the behavior of the
+[`EnumConverter`][] class. If an argument uses a custom converter rather than the
+[`EnumConverter`][], it is not guaranteed that these properties will have any effect.
+
+For example, the following code triggers this warning:
+
+```csharp
+class Arguments
+{
+    // WARNING: ValidateEnumValueAttribute.CaseSensitive used with a custom argument converter.
+    [CommandLineArgument]
+    [ArgumentConverter(typeof(MyConverter))]
+    [ValidateEnumValue(CaseSensitive = true)]
+    public DayOfWeek Argument { get; set; }
+}
+```
+
+To fix this warning, either use the default [`EnumConverter`][], or remove the properties. If the
+custom converter does check the value of those properties, you can disable this warning.
+
+[`AliasAttribute`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_AliasAttribute.htm
+[`AllowCommaSeparatedValues`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_Validation_ValidateEnumValueAttribute_AllowCommaSeparatedValues.htm
+[`AllowDuplicateDictionaryKeysAttribute`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_AllowDuplicateDictionaryKeysAttribute.htm
+[`AllowNumericValues`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_Validation_ValidateEnumValueAttribute_AllowNumericValues.htm
+[`ApplicationFriendlyNameAttribute`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_ApplicationFriendlyNameAttribute.htm
+[`ArgumentConverter`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_Conversion_ArgumentConverter.htm
+[`ArgumentConverterAttribute`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_Conversion_ArgumentConverterAttribute.htm
+[`CommandAttribute.IsHidden`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_Commands_CommandAttribute_IsHidden.htm
+[`CommandAttribute`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_Commands_CommandAttribute.htm
+[`CommandLineArgumentAttribute.DefaultValue`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_DefaultValue.htm
+[`CommandLineArgumentAttribute.IncludeDefaultInUsageHelp`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_IncludeDefaultInUsageHelp.htm
+[`CommandLineArgumentAttribute.IsHidden`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_IsHidden.htm
+[`CommandLineArgumentAttribute.IsLong`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_IsLong.htm
+[`CommandLineArgumentAttribute.IsPositional`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_IsPositional.htm
+[`CommandLineArgumentAttribute.IsRequired`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_IsRequired.htm
+[`CommandLineArgumentAttribute.IsShort`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_IsShort.htm
+[`CommandLineArgumentAttribute.Position`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_Position.htm
+[`CommandLineArgumentAttribute.ShortName`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_ShortName.htm
+[`CommandLineArgumentAttribute`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_CommandLineArgumentAttribute.htm
+[`CommandLineParser.Parse<T>()`]: https://www.ookii.org/docs/commandline-4.1/html/M_Ookii_CommandLine_CommandLineParser_Parse__1.htm
+[`CommandLineParser`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_CommandLineParser.htm
+[`CommandLineParser<T>`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_CommandLineParser_1.htm
+[`CommandManager`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_Commands_CommandManager.htm
 [`DescriptionAttribute`]: https://learn.microsoft.com/dotnet/api/system.componentmodel.descriptionattribute
-[`GeneratedCommandManagerAttribute.AssemblyNames`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_Commands_GeneratedCommandManagerAttribute_AssemblyNames.htm
-[`GeneratedCommandManagerAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Commands_GeneratedCommandManagerAttribute.htm
-[`GeneratedConverterNamespaceAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Conversion_GeneratedConverterNamespaceAttribute.htm
-[`GeneratedParserAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_GeneratedParserAttribute.htm
-[`ICommand`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Commands_ICommand.htm
-[`ICommandWithCustomParsing`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Commands_ICommandWithCustomParsing.htm
-[`IsShort`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_IsShort.htm
-[`KeyConverterAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Conversion_KeyConverterAttribute.htm
-[`KeyValuePairConverter<TKey, TValue>`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Conversion_KeyValuePairConverter_2.htm
-[`KeyValueSeparatorAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Conversion_KeyValueSeparatorAttribute.htm
-[`MultiValueSeparatorAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_MultiValueSeparatorAttribute.htm
-[`ParentCommandAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Commands_ParentCommandAttribute.htm
-[`ParseOptions.ArgumentNameComparison`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_ParseOptions_ArgumentNameComparison.htm
-[`ParseOptions.ArgumentNamePrefixes`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_ParseOptions_ArgumentNamePrefixes.htm
-[`ParseOptions.ArgumentNameTransform`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_ParseOptions_ArgumentNameTransform.htm
-[`ParseOptions.Mode`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_ParseOptions_Mode.htm
-[`ParseOptionsAttribute.ArgumentNamePrefixes`]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_ParseOptionsAttribute_ArgumentNamePrefixes.htm
-[`ParsingMode.LongShort`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_ParsingMode.htm
-[`ShortAliasAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_ShortAliasAttribute.htm
+[`EnumConverter`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_Conversion_EnumConverter.htm
+[`GeneratedCommandManagerAttribute.AssemblyNames`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_Commands_GeneratedCommandManagerAttribute_AssemblyNames.htm
+[`GeneratedCommandManagerAttribute`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_Commands_GeneratedCommandManagerAttribute.htm
+[`GeneratedConverterNamespaceAttribute`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_Conversion_GeneratedConverterNamespaceAttribute.htm
+[`GeneratedParserAttribute`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_GeneratedParserAttribute.htm
+[`ICommand`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_Commands_ICommand.htm
+[`ICommandWithCustomParsing`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_Commands_ICommandWithCustomParsing.htm
+[`IsShort`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_IsShort.htm
+[`KeyConverterAttribute`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_Conversion_KeyConverterAttribute.htm
+[`KeyValuePairConverter<TKey, TValue>`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_Conversion_KeyValuePairConverter_2.htm
+[`KeyValueSeparatorAttribute`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_Conversion_KeyValueSeparatorAttribute.htm
+[`MultiValueSeparatorAttribute`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_MultiValueSeparatorAttribute.htm
+[`ParentCommandAttribute`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_Commands_ParentCommandAttribute.htm
+[`ParseOptions.ArgumentNameComparison`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_ParseOptions_ArgumentNameComparison.htm
+[`ParseOptions.ArgumentNamePrefixes`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_ParseOptions_ArgumentNamePrefixes.htm
+[`ParseOptions.ArgumentNameTransform`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_ParseOptions_ArgumentNameTransform.htm
+[`ParseOptions.Mode`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_ParseOptions_Mode.htm
+[`ParseOptionsAttribute.ArgumentNamePrefixes`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_ParseOptionsAttribute_ArgumentNamePrefixes.htm
+[`ParsingMode.LongShort`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_ParsingMode.htm
+[`ShortAliasAttribute`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_ShortAliasAttribute.htm
 [`Type`]: https://learn.microsoft.com/dotnet/api/system.type
 [`TypeConverter`]: https://learn.microsoft.com/dotnet/api/system.componentmodel.typeconverter
-[`WrappedTypeConverter<T>`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Conversion_WrappedTypeConverter_1.htm
 [`TypeConverterAttribute`]: https://learn.microsoft.com/dotnet/api/system.componentmodel.typeconverterattribute
-[`ValueConverterAttribute`]: https://www.ookii.org/docs/commandline-4.0/html/T_Ookii_CommandLine_Conversion_ValueConverterAttribute.htm
-[IsHidden_1]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_IsHidden.htm
-[IsRequired_1]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_IsRequired.htm
-[ShortName_1]: https://www.ookii.org/docs/commandline-4.0/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_ShortName.htm
+[`ValidateEnumValueAttribute`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_Validation_ValidateEnumValueAttribute.htm
+[`ValueConverterAttribute`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_Conversion_ValueConverterAttribute.htm
+[`WrappedTypeConverter<T>`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_Conversion_WrappedTypeConverter_1.htm
+[CaseSensitive_1]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_Validation_ValidateEnumValueAttribute_CaseSensitive.htm
+[IsHidden_1]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_IsHidden.htm
+[IsRequired_1]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_IsRequired.htm
+[ShortName_1]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_ShortName.htm

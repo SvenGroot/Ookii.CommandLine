@@ -67,9 +67,13 @@ internal class TypeHelper
 
     public INamedTypeSymbol? CancelMode => _compilation.GetTypeByMetadataName(NamespacePrefix + "CancelMode");
 
+    public INamedTypeSymbol? UsageFooterAttribute => _compilation.GetTypeByMetadataName(NamespacePrefix + "UsageFooterAttribute");
+
     public INamedTypeSymbol? ArgumentValidationAttribute => _compilation.GetTypeByMetadataName(NamespacePrefix + "Validation.ArgumentValidationAttribute");
 
     public INamedTypeSymbol? ClassValidationAttribute => _compilation.GetTypeByMetadataName(NamespacePrefix + "Validation.ClassValidationAttribute");
+
+    public INamedTypeSymbol? ValidateEnumValueAttribute => _compilation.GetTypeByMetadataName(NamespacePrefix + "Validation.ValidateEnumValueAttribute");
 
     public INamedTypeSymbol? KeyValueSeparatorAttribute => _compilation.GetTypeByMetadataName(NamespacePrefix + "Conversion.KeyValueSeparatorAttribute");
 

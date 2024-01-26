@@ -155,9 +155,11 @@ public class ParseOptionsAttribute : Attribute
     /// </summary>
     /// <remarks>
     /// <para>
-    ///   This property is only used if the <see cref="Mode"/> property is 
-    ///   <see cref="ParsingMode.LongShort" qualifyHint="true"/>, or if the parsing mode is set to
-    ///   <see cref="ParsingMode.LongShort" qualifyHint="true"/> elsewhere.
+    ///   This property is only used if the <see cref="Mode"/> or
+    ///   <see cref="ParseOptions.Mode" qualifyHint="true"/> property is 
+    ///   <see cref="ParsingMode.LongShort" qualifyHint="true"/>, or if the <see cref="PrefixTermination"/>
+    ///   or <see cref="ParseOptions.PrefixTermination" qualifyHint="true"/> property is not
+    ///   <see cref="PrefixTerminationMode.None" qualifyHint="true"/>.
     /// </para>
     /// <para>
     ///   Use the <see cref="ArgumentNamePrefixes"/> to specify the prefixes for short argument
@@ -407,6 +409,35 @@ public class ParseOptionsAttribute : Attribute
     /// </remarks>
     /// <seealso cref="CommandLineArgument.ValueDescription" qualifyHint="true"/>
     public NameTransform ValueDescriptionTransform { get; set; }
+
+    /// <summary>
+    /// Gets or sets the behavior when an argument is encountered that consists of only the long
+    /// argument prefix ("--" by default) by itself, not followed by a name.
+    /// </summary>
+    /// <value>
+    /// One of the values of the <see cref="PrefixTerminationMode"/> enumeration. The default value
+    /// is <see cref="PrefixTerminationMode.None" qualifyHint="true"/>.
+    /// </value>
+    /// <remarks>
+    /// <para>
+    ///   Use this property to allow the use of the long argument prefix by itself to either treat
+    ///   all remaining values as positional argument values, even when they start with an argument
+    ///   prefix, or to cancel parsing with <see cref="CancelMode.Success" qualifyHint="true"/> so
+    ///   the remaining values can be inspected using the
+    ///   <see cref="ParseResult.RemainingArguments" qualifyHint="true"/> property. This follows
+    ///   typical POSIX argument parsing conventions.
+    /// </para>
+    /// <para>
+    ///   The value of the <see cref="LongArgumentNamePrefix"/> property is used to identify this
+    ///   special argument, even if the parsing mode is not
+    ///   <see cref="ParsingMode.LongShort" qualifyHint="true"/>.
+    /// </para>
+    /// <para>
+    ///   This value can be overridden by the <see cref="ParseOptions.PrefixTermination" qualifyHint="true"/>
+    ///   property.
+    /// </para>
+    /// </remarks>
+    public PrefixTerminationMode PrefixTermination { get; set; }
 
     internal StringComparison GetStringComparison()
     {

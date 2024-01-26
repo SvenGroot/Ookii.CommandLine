@@ -313,6 +313,15 @@ namespace Ookii.CommandLine.Generator.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Add GeneratedParserAttribute.
+        /// </summary>
+        internal static string GeneratedParserCodeFixTitle {
+            get {
+                return ResourceManager.GetString("GeneratedParserCodeFixTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The {0} attribute is ignored for the dictionary argument defined by {1} that has the ArgumentConverterAttribute attribute..
         /// </summary>
         internal static string IgnoredAttributeForDictionaryWithConverterMessageFormat {
@@ -673,6 +682,24 @@ namespace Ookii.CommandLine.Generator.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The command line arguments class &apos;{0}&apos; should use the GeneratedParserAttribute..
+        /// </summary>
+        internal static string ParserShouldBeGeneratedMessageFormat {
+            get {
+                return ResourceManager.GetString("ParserShouldBeGeneratedMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The command line arguments class should use the GeneratedParserAttribute..
+        /// </summary>
+        internal static string ParserShouldBeGeneratedTitle {
+            get {
+                return ResourceManager.GetString("ParserShouldBeGeneratedTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The positional argument defined by {0} comes after {1}, which is a multi-value argument and must come last..
         /// </summary>
         internal static string PositionalArgumentAfterMultiValueMessageFormat {
@@ -813,6 +840,42 @@ namespace Ookii.CommandLine.Generator.Properties {
         internal static string UnsupportedLanguageVersionTitle {
             get {
                 return ResourceManager.GetString("UnsupportedLanguageVersionTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The argument defined by &apos;{0}&apos; uses the ValidateEnumValueAttribute, but its type &apos;{1}&apos; is not an enumeration..
+        /// </summary>
+        internal static string ValidateEnumInvalidTypeMessageFormat {
+            get {
+                return ResourceManager.GetString("ValidateEnumInvalidTypeMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The ValidateEnumValueAttribute can only be used on arguments with an enum type..
+        /// </summary>
+        internal static string ValidateEnumInvalidTypeTitle {
+            get {
+                return ResourceManager.GetString("ValidateEnumInvalidTypeTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The argument defined by &apos;{0}&apos; has the ArgumentConverterAttribute, and uses ValidateEnumValueAttribute properties that may not work with a custom ArgumentConverter..
+        /// </summary>
+        internal static string ValidateEnumWithCustomConverterMessageFormat {
+            get {
+                return ResourceManager.GetString("ValidateEnumWithCustomConverterMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The argument uses ValidateEnumValueAttribute properties that may not work with a custom ArgumentConverter..
+        /// </summary>
+        internal static string ValidateEnumWithCustomConverterTitle {
+            get {
+                return ResourceManager.GetString("ValidateEnumWithCustomConverterTitle", resourceCulture);
             }
         }
     }

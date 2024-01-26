@@ -14,7 +14,7 @@ public partial class LineWrappingTextWriter
 {
     private partial class LineBuffer
     {
-        public async Task FlushToAsync(TextWriter writer, int indent, bool insertNewLine, CancellationToken cancellationToken)
+        public async Task FlushToAsync(TextWriter writer, int? indent, bool insertNewLine, CancellationToken cancellationToken)
         {
             // Don't use IsContentEmpty because we also want to write if there's only VT sequences.
             if (_segments.Count != 0)
@@ -28,7 +28,7 @@ public partial class LineWrappingTextWriter
             await WriteToAsync(writer, indent, true, cancellationToken);
         }
 
-        private async Task WriteToAsync(TextWriter writer, int indent, bool insertNewLine, CancellationToken cancellationToken)
+        private async Task WriteToAsync(TextWriter writer, int? indent, bool insertNewLine, CancellationToken cancellationToken)
         {
             // Don't use IsContentEmpty because we also want to write if there's only VT sequences.
             if (_segments.Count != 0)
@@ -46,7 +46,11 @@ public partial class LineWrappingTextWriter
 
         private async Task WriteSegmentsAsync(TextWriter writer, IEnumerable<Segment> segments, CancellationToken cancellationToken)
         {
-            await WriteIndentAsync(writer, Indentation);
+            if (Indentation is int indentation)
+            {
+                await WriteIndentAsync(writer, indentation);
+            }
+
             foreach (var segment in segments)
             {
                 switch (segment.Type)
@@ -109,7 +113,7 @@ public partial class LineWrappingTextWriter
             }
 
             int offset = 0;
-            int contentOffset = Indentation;
+            int contentOffset = Indentation ?? 0;
             foreach (var segment in _segments)
             {
                 offset += segment.Length;
@@ -168,7 +172,7 @@ public partial class LineWrappingTextWriter
         ThrowIfWriteInProgress();
         if (_lineBuffer != null)
         {
-            await _lineBuffer.FlushToAsync(_baseWriter, insertNewLine ? _indent : 0, insertNewLine, cancellationToken);
+            await _lineBuffer.FlushToAsync(_baseWriter, insertNewLine ? _indent : null, insertNewLine, cancellationToken);
         }
 
         await _baseWriter.FlushAsync();
@@ -180,12 +184,12 @@ public partial class LineWrappingTextWriter
         {
             if (!_lineBuffer.IsContentEmpty)
             {
-                await _lineBuffer.FlushToAsync(_baseWriter, 0, true, cancellationToken);
+                await _lineBuffer.FlushToAsync(_baseWriter, null, true, cancellationToken);
             }
             else
             {
                 // Leave non-content segments in the buffer.
-                _lineBuffer.ClearCurrentLine(0, false);
+                _lineBuffer.ClearCurrentLine(null, false);
             }
         }
         else
@@ -254,7 +258,7 @@ public partial class LineWrappingTextWriter
     private async Task WriteLineBreakDirectAsync(CancellationToken cancellationToken)
     {
         await WriteBlankLineAsync(_baseWriter, cancellationToken);
-        _noWrappingState.IndentNextWrite = _noWrappingState.CurrentLineLength != 0;
+        _noWrappingState.IndentNextWrite = IndentAfterEmptyLine || _noWrappingState.CurrentLineLength != 0;
         _noWrappingState.CurrentLineLength = 0;
     }
 

@@ -24,35 +24,16 @@ internal abstract class BaseCommand : AsyncCommandBase
         }
         catch (IOException ex)
         {
-            WriteErrorMessage(ex.Message);
+            VirtualTerminal.WriteLineErrorFormatted(ex.Message);
             return (int)ExitCode.IOError;
         }
         catch (UnauthorizedAccessException ex)
         {
-            WriteErrorMessage(ex.Message);
+            VirtualTerminal.WriteLineErrorFormatted(ex.Message);
             return (int)ExitCode.IOError;
         }
     }
 
     // Derived classes will implement this instead of the normal RunAsync.
     protected abstract Task<int> RunAsync(Database db);
-
-    // Helper method to print error messages.
-    private static void WriteErrorMessage(string message)
-    {
-        using var support = VirtualTerminal.EnableColor(StandardStream.Error);
-        using var writer = LineWrappingTextWriter.ForConsoleError();
-
-        // Add some color if we can.
-        if (support.IsSupported)
-        {
-            writer.Write(TextFormat.ForegroundRed);
-        }
-
-        writer.WriteLine(message);
-        if (support.IsSupported)
-        {
-            writer.Write(TextFormat.Default);
-        }
-    }
 }
