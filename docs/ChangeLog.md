@@ -1,6 +1,6 @@
 # What’s new in Ookii.CommandLine
 
-## Ookii.CommandLine 4.1 (TBD)
+## Ookii.CommandLine 4.1 (2024-01-26)
 
 - Support for [using a `--` argument](Arguments.md#the----argument) to escape argument names for the
   remaining arguments, or to cancel parsing. This can be enabled using
