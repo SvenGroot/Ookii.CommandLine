@@ -36,7 +36,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ookii.CommandLine.Generator
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ookii.CommandLine.Tests.Commands", "Ookii.CommandLine.Tests.Commands\Ookii.CommandLine.Tests.Commands.csproj", "{05AEDC31-D784-4DCA-A431-4A55323DEAFA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TopLevelArguments", "Samples\TopLevelArguments\TopLevelArguments.csproj", "{1FF02963-CECD-4C90-8C44-68F1B1CF5988}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TopLevelArguments", "Samples\TopLevelArguments\TopLevelArguments.csproj", "{1FF02963-CECD-4C90-8C44-68F1B1CF5988}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
