@@ -37,8 +37,8 @@ library for .Net applications.
 
   <PropertyGroup>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <!-- Turn off unknown reference warning for older frameworks, since we reference some .Net 7.0 types -->
-    <NoWarn Condition="'$(TargetFramework)'!='net7.0'">CS1574</NoWarn>
+    <!-- Turn off unknown reference warning for older frameworks, since we reference some newer types -->
+    <NoWarn Condition="'$(TargetFramework)'!='net8.0'">CS1574</NoWarn>
   </PropertyGroup>
 
   <!-- Deterministic build; to build with this manually, use dotnet build /p:ContinuousIntegrationBuild=true -->
