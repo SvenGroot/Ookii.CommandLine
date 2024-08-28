@@ -1,5 +1,14 @@
 # What’s new in Ookii.CommandLine
 
+## Ookii.CommandLine 4.2 (TBD)
+
+- The [helper methods](Utilities.md#virtual-terminal-support) in the [`VirtualTerminal`][] class now
+  use the [`LineWrappingTextWriter`][] class to properly white-space their output.
+- Added the `LineWrappingTextWriter.ForStandardStream()` method.
+- When using the [`GeneratedParserAttribute`] on a class that has a base class that also uses the
+  [`GeneratedParserAttribute`], the source generator will now emit the `new` keyword on generated
+  methods as appropriate, to avoid compiler warnings about hidden base class members.
+
 ## Ookii.CommandLine 4.1 (2024-01-26)
 
 - Support for [using a `--` argument](Arguments.md#the----argument) to escape argument names for the
