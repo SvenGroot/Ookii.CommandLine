@@ -89,6 +89,6 @@ The `-Version` argument shows the value of the [`ApplicationFriendlyNameAttribut
 assembly title or name, if there isn't one), the assembly's informational version, and the
 assembly's copyright text.
 
-[`ApplicationFriendlyNameAttribute`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_ApplicationFriendlyNameAttribute.htm
-[`ParseOptions.ShowUsageOnError`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_ParseOptions_ShowUsageOnError.htm
-[`ValidateRangeAttribute`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_Validation_ValidateRangeAttribute.htm
+[`ApplicationFriendlyNameAttribute`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_ApplicationFriendlyNameAttribute.htm
+[`ParseOptions.ShowUsageOnError`]: https://www.ookii.org/docs/commandline-4.2/html/P_Ookii_CommandLine_ParseOptions_ShowUsageOnError.htm
+[`ValidateRangeAttribute`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_Validation_ValidateRangeAttribute.htm

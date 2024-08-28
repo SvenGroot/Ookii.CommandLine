@@ -106,9 +106,9 @@ Usage: NestedCommands student add [-FirstName] <String> [-LastName] <String> [[-
 
 The usage syntax shows both command names before the arguments.
 
-[`CommandLineParser`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_CommandLineParser.htm
-[`CommandManager`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_Commands_CommandManager.htm
-[`CommandOptions.ParentCommand`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_Commands_CommandOptions_ParentCommand.htm
-[`ICommandWithCustomParsing`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_Commands_ICommandWithCustomParsing.htm
-[`ParentCommand`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_Commands_ParentCommand.htm
-[`ParentCommandAttribute`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_Commands_ParentCommandAttribute.htm
+[`CommandLineParser`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_CommandLineParser.htm
+[`CommandManager`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_Commands_CommandManager.htm
+[`CommandOptions.ParentCommand`]: https://www.ookii.org/docs/commandline-4.2/html/P_Ookii_CommandLine_Commands_CommandOptions_ParentCommand.htm
+[`ICommandWithCustomParsing`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_Commands_ICommandWithCustomParsing.htm
+[`ParentCommand`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_Commands_ParentCommand.htm
+[`ParentCommandAttribute`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_Commands_ParentCommandAttribute.htm

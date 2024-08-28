@@ -47,9 +47,9 @@ validators like [`ValidateRangeAttribute`][]), and all the included validators c
 case-by-case basis with the [`IncludeInUsageHelp`][IncludeInUsageHelp_0] property on each validator
 attribute.
 
-[`ProhibitsAttribute`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_Validation_ProhibitsAttribute.htm
-[`RequiresAnyAttribute`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_Validation_RequiresAnyAttribute.htm
-[`RequiresAttribute`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_Validation_RequiresAttribute.htm
-[`UsageWriter.IncludeValidatorsInDescription`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_UsageWriter_IncludeValidatorsInDescription.htm
-[`ValidateRangeAttribute`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_Validation_ValidateRangeAttribute.htm
-[IncludeInUsageHelp_0]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_Validation_ArgumentValidationWithHelpAttribute_IncludeInUsageHelp.htm
+[`ProhibitsAttribute`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_Validation_ProhibitsAttribute.htm
+[`RequiresAnyAttribute`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_Validation_RequiresAnyAttribute.htm
+[`RequiresAttribute`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_Validation_RequiresAttribute.htm
+[`UsageWriter.IncludeValidatorsInDescription`]: https://www.ookii.org/docs/commandline-4.2/html/P_Ookii_CommandLine_UsageWriter_IncludeValidatorsInDescription.htm
+[`ValidateRangeAttribute`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_Validation_ValidateRangeAttribute.htm
+[IncludeInUsageHelp_0]: https://www.ookii.org/docs/commandline-4.2/html/P_Ookii_CommandLine_Validation_ArgumentValidationWithHelpAttribute_IncludeInUsageHelp.htm

@@ -4,7 +4,7 @@
 
 - The [helper methods](Utilities.md#virtual-terminal-support) in the [`VirtualTerminal`][] class now
   use the [`LineWrappingTextWriter`][] class to properly white-space their output.
-- Added the `LineWrappingTextWriter.ForStandardStream()` method.
+- Added the [`LineWrappingTextWriter.ForStandardStream()`][] method.
 - When using the [`GeneratedParserAttribute`] on a class that has a base class that also uses the
   [`GeneratedParserAttribute`], the source generator will now emit the `new` keyword on generated
   methods as appropriate, to avoid compiler warnings about hidden base class members.
@@ -260,59 +260,60 @@ and usage.
 Upgrading an existing project that is using Ookii.CommandLine 1.0 to Ookii.CommandLine 2.0 or newer
 may require substantial code changes and may change how command lines are parsed.
 
-[`AllowCommaSeparatedValues`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_Validation_ValidateEnumValueAttribute_AllowCommaSeparatedValues.htm
-[`AllowNumericValues`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_Validation_ValidateEnumValueAttribute_AllowNumericValues.htm
-[`ApplicationFriendlyNameAttribute`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_ApplicationFriendlyNameAttribute.htm
-[`ArgumentConverter`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_Conversion_ArgumentConverter.htm
+[`AllowCommaSeparatedValues`]: https://www.ookii.org/docs/commandline-4.2/html/P_Ookii_CommandLine_Validation_ValidateEnumValueAttribute_AllowCommaSeparatedValues.htm
+[`AllowNumericValues`]: https://www.ookii.org/docs/commandline-4.2/html/P_Ookii_CommandLine_Validation_ValidateEnumValueAttribute_AllowNumericValues.htm
+[`ApplicationFriendlyNameAttribute`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_ApplicationFriendlyNameAttribute.htm
+[`ArgumentConverter`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_Conversion_ArgumentConverter.htm
 [`AssemblyTitleAttribute`]: https://learn.microsoft.com/dotnet/api/system.reflection.assemblytitleattribute
-[`AsyncCommandBase`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_Commands_AsyncCommandBase.htm
-[`CommandLineArgumentAttribute.DefaultValueFormat`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_DefaultValueFormat.htm
-[`CommandLineArgumentAttribute.IncludeDefaultInUsageHelp`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_IncludeDefaultInUsageHelp.htm
-[`CommandLineParser.ParseResult`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_CommandLineParser_ParseResult.htm
-[`CommandLineParser.UnknownArgument`]: https://www.ookii.org/docs/commandline-4.1/html/E_Ookii_CommandLine_CommandLineParser_UnknownArgument.htm
-[`CommandLineParser`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_CommandLineParser.htm
-[`CommandLineParser<T>.ParseWithErrorHandling()`]: https://www.ookii.org/docs/commandline-4.1/html/M_Ookii_CommandLine_CommandLineParser_1_ParseWithErrorHandling.htm
-[`CommandLineParser<T>`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_CommandLineParser_1.htm
-[`CommandManager.ParseResult`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_Commands_CommandManager_ParseResult.htm
-[`CommandManager.RunCommandAsync()`]: https://www.ookii.org/docs/commandline-4.1/html/Overload_Ookii_CommandLine_Commands_CommandManager_RunCommandAsync.htm
-[`CommandOptions.IsPosix`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_Commands_CommandOptions_IsPosix.htm
+[`AsyncCommandBase`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_Commands_AsyncCommandBase.htm
+[`CommandLineArgumentAttribute.DefaultValueFormat`]: https://www.ookii.org/docs/commandline-4.2/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_DefaultValueFormat.htm
+[`CommandLineArgumentAttribute.IncludeDefaultInUsageHelp`]: https://www.ookii.org/docs/commandline-4.2/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_IncludeDefaultInUsageHelp.htm
+[`CommandLineParser.ParseResult`]: https://www.ookii.org/docs/commandline-4.2/html/P_Ookii_CommandLine_CommandLineParser_ParseResult.htm
+[`CommandLineParser.UnknownArgument`]: https://www.ookii.org/docs/commandline-4.2/html/E_Ookii_CommandLine_CommandLineParser_UnknownArgument.htm
+[`CommandLineParser`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_CommandLineParser.htm
+[`CommandLineParser<T>.ParseWithErrorHandling()`]: https://www.ookii.org/docs/commandline-4.2/html/M_Ookii_CommandLine_CommandLineParser_1_ParseWithErrorHandling.htm
+[`CommandLineParser<T>`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_CommandLineParser_1.htm
+[`CommandManager.ParseResult`]: https://www.ookii.org/docs/commandline-4.2/html/P_Ookii_CommandLine_Commands_CommandManager_ParseResult.htm
+[`CommandManager.RunCommandAsync()`]: https://www.ookii.org/docs/commandline-4.2/html/Overload_Ookii_CommandLine_Commands_CommandManager_RunCommandAsync.htm
+[`CommandOptions.IsPosix`]: https://www.ookii.org/docs/commandline-4.2/html/P_Ookii_CommandLine_Commands_CommandOptions_IsPosix.htm
 [`CultureInfo.InvariantCulture`]: https://learn.microsoft.com/dotnet/api/system.globalization.cultureinfo.invariantculture
-[`EnumConverter`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_Conversion_EnumConverter.htm
+[`EnumConverter`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_Conversion_EnumConverter.htm
 [`Environment.GetCommandLineArgs()`]: https://learn.microsoft.com/dotnet/api/system.environment.getcommandlineargs
-[`GeneratedCommandManagerAttribute`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_Commands_GeneratedCommandManagerAttribute.htm
-[`GeneratedParserAttribute`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_GeneratedParserAttribute.htm
-[`IAsyncCancelableCommand`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_Commands_IAsyncCancelableCommand.htm
+[`GeneratedCommandManagerAttribute`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_Commands_GeneratedCommandManagerAttribute.htm
+[`GeneratedParserAttribute`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_GeneratedParserAttribute.htm
+[`IAsyncCancelableCommand`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_Commands_IAsyncCancelableCommand.htm
 [`IParsable<TSelf>`]: https://learn.microsoft.com/dotnet/api/system.iparsable-1
 [`ISpanParsable<TSelf>`]: https://learn.microsoft.com/dotnet/api/system.ispanparsable-1
-[`LineWrappingTextWriter.IndentAfterEmptyLine`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_LineWrappingTextWriter_IndentAfterEmptyLine.htm
-[`LineWrappingTextWriter.ToString()`]: https://www.ookii.org/docs/commandline-4.1/html/M_Ookii_CommandLine_LineWrappingTextWriter_ToString.htm
-[`LineWrappingTextWriter`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_LineWrappingTextWriter.htm
-[`LocalizedStringProvider`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_LocalizedStringProvider.htm
-[`ParseOptions.IsPosix`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_ParseOptions_IsPosix.htm
-[`ParseOptions.PrefixTermination`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_ParseOptions_PrefixTermination.htm
-[`ParseOptions`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_ParseOptions.htm
-[`ParseOptionsAttribute.IsPosix`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_ParseOptionsAttribute_IsPosix.htm
-[`ParseOptionsAttribute.PrefixTermination`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_ParseOptionsAttribute_PrefixTermination.htm
-[`ParseOptionsAttribute`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_ParseOptionsAttribute.htm
+[`LineWrappingTextWriter.ForStandardStream()`]: https://www.ookii.org/docs/commandline-4.2/html/M_Ookii_CommandLine_LineWrappingTextWriter_ForStandardStream.htm
+[`LineWrappingTextWriter.IndentAfterEmptyLine`]: https://www.ookii.org/docs/commandline-4.2/html/P_Ookii_CommandLine_LineWrappingTextWriter_IndentAfterEmptyLine.htm
+[`LineWrappingTextWriter.ToString()`]: https://www.ookii.org/docs/commandline-4.2/html/M_Ookii_CommandLine_LineWrappingTextWriter_ToString.htm
+[`LineWrappingTextWriter`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_LineWrappingTextWriter.htm
+[`LocalizedStringProvider`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_LocalizedStringProvider.htm
+[`ParseOptions.IsPosix`]: https://www.ookii.org/docs/commandline-4.2/html/P_Ookii_CommandLine_ParseOptions_IsPosix.htm
+[`ParseOptions.PrefixTermination`]: https://www.ookii.org/docs/commandline-4.2/html/P_Ookii_CommandLine_ParseOptions_PrefixTermination.htm
+[`ParseOptions`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_ParseOptions.htm
+[`ParseOptionsAttribute.IsPosix`]: https://www.ookii.org/docs/commandline-4.2/html/P_Ookii_CommandLine_ParseOptionsAttribute_IsPosix.htm
+[`ParseOptionsAttribute.PrefixTermination`]: https://www.ookii.org/docs/commandline-4.2/html/P_Ookii_CommandLine_ParseOptionsAttribute_PrefixTermination.htm
+[`ParseOptionsAttribute`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_ParseOptionsAttribute.htm
 [`ReadOnlySpan<char>`]: https://learn.microsoft.com/dotnet/api/system.readonlyspan-1
-[`ResetIndentAsync()`]: https://www.ookii.org/docs/commandline-4.1/html/M_Ookii_CommandLine_LineWrappingTextWriter_ResetIndentAsync.htm
-[`StandardStream`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_Terminal_StandardStream.htm
-[`StandardStreamExtensions`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_Terminal_StandardStreamExtensions.htm
+[`ResetIndentAsync()`]: https://www.ookii.org/docs/commandline-4.2/html/M_Ookii_CommandLine_LineWrappingTextWriter_ResetIndentAsync.htm
+[`StandardStream`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_Terminal_StandardStream.htm
+[`StandardStreamExtensions`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_Terminal_StandardStreamExtensions.htm
 [`StringWriter`]: https://learn.microsoft.com/dotnet/api/system.io.stringwriter
 [`TypeConverter`]: https://learn.microsoft.com/dotnet/api/system.componentmodel.typeconverter
-[`UsageFooterAttribute`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_UsageFooterAttribute.htm
-[`UsageWriter.IndentAfterEmptyLine`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_UsageWriter_IndentAfterEmptyLine.htm
-[`UsageWriter`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_UsageWriter.htm
-[`ValidateEnumValueAttribute.IncludeValuesInErrorMessage`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_Validation_ValidateEnumValueAttribute_IncludeValuesInErrorMessage.htm
-[`ValidateEnumValueAttribute`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_Validation_ValidateEnumValueAttribute.htm
-[`ValueDescriptionAttribute`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_ValueDescriptionAttribute.htm
-[`VirtualTerminal`]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_Terminal_VirtualTerminal.htm
-[`Wrapping`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_LineWrappingTextWriter_Wrapping.htm
-[CaseSensitive_1]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_Validation_ValidateEnumValueAttribute_CaseSensitive.htm
-[Flush()_0]: https://www.ookii.org/docs/commandline-4.1/html/M_Ookii_CommandLine_LineWrappingTextWriter_Flush_1.htm
-[Parse()_6]: https://www.ookii.org/docs/commandline-4.1/html/M_Ookii_CommandLine_CommandLineParser_Parse.htm
-[Parse<T>()_1]: https://www.ookii.org/docs/commandline-4.1/html/M_Ookii_CommandLine_CommandLineParser_Parse__1.htm
-[ParseWithErrorHandling()_1]: https://www.ookii.org/docs/commandline-4.1/html/M_Ookii_CommandLine_CommandLineParser_1_ParseWithErrorHandling.htm
-[UsageWriter_1]: https://www.ookii.org/docs/commandline-4.1/html/T_Ookii_CommandLine_UsageWriter.htm
-[WriteAsync()_4]: https://www.ookii.org/docs/commandline-4.1/html/Overload_Ookii_CommandLine_LineWrappingTextWriter_WriteAsync.htm
-[WriteLineAsync()_5]: https://www.ookii.org/docs/commandline-4.1/html/Overload_Ookii_CommandLine_LineWrappingTextWriter_WriteLineAsync.htm
+[`UsageFooterAttribute`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_UsageFooterAttribute.htm
+[`UsageWriter.IndentAfterEmptyLine`]: https://www.ookii.org/docs/commandline-4.2/html/P_Ookii_CommandLine_UsageWriter_IndentAfterEmptyLine.htm
+[`UsageWriter`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_UsageWriter.htm
+[`ValidateEnumValueAttribute.IncludeValuesInErrorMessage`]: https://www.ookii.org/docs/commandline-4.2/html/P_Ookii_CommandLine_Validation_ValidateEnumValueAttribute_IncludeValuesInErrorMessage.htm
+[`ValidateEnumValueAttribute`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_Validation_ValidateEnumValueAttribute.htm
+[`ValueDescriptionAttribute`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_ValueDescriptionAttribute.htm
+[`VirtualTerminal`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_Terminal_VirtualTerminal.htm
+[`Wrapping`]: https://www.ookii.org/docs/commandline-4.2/html/P_Ookii_CommandLine_LineWrappingTextWriter_Wrapping.htm
+[CaseSensitive_1]: https://www.ookii.org/docs/commandline-4.2/html/P_Ookii_CommandLine_Validation_ValidateEnumValueAttribute_CaseSensitive.htm
+[Flush()_0]: https://www.ookii.org/docs/commandline-4.2/html/M_Ookii_CommandLine_LineWrappingTextWriter_Flush_1.htm
+[Parse()_6]: https://www.ookii.org/docs/commandline-4.2/html/M_Ookii_CommandLine_CommandLineParser_Parse.htm
+[Parse<T>()_1]: https://www.ookii.org/docs/commandline-4.2/html/M_Ookii_CommandLine_CommandLineParser_Parse__1.htm
+[ParseWithErrorHandling()_1]: https://www.ookii.org/docs/commandline-4.2/html/M_Ookii_CommandLine_CommandLineParser_1_ParseWithErrorHandling.htm
+[UsageWriter_1]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_UsageWriter.htm
+[WriteAsync()_4]: https://www.ookii.org/docs/commandline-4.2/html/Overload_Ookii_CommandLine_LineWrappingTextWriter_WriteAsync.htm
+[WriteLineAsync()_5]: https://www.ookii.org/docs/commandline-4.2/html/Overload_Ookii_CommandLine_LineWrappingTextWriter_WriteLineAsync.htm

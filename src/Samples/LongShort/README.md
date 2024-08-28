@@ -75,4 +75,4 @@ argument names.
 Long/short mode allows you to combine switches with short names, so running `LongShort -vp` sets
 both `--verbose` and `--process` to true.
 
-[`ParseOptionsAttribute.IsPosix`]: https://www.ookii.org/docs/commandline-4.1/html/P_Ookii_CommandLine_ParseOptionsAttribute_IsPosix.htm
+[`ParseOptionsAttribute.IsPosix`]: https://www.ookii.org/docs/commandline-4.2/html/P_Ookii_CommandLine_ParseOptionsAttribute_IsPosix.htm

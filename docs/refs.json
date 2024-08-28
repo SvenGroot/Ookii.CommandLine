@@ -1,6 +1,6 @@
 {
   "#apiPrefix": "https://learn.microsoft.com/dotnet/api/",
-  "#prefix": "https://www.ookii.org/docs/commandline-4.1/html/",
+  "#prefix": "https://www.ookii.org/docs/commandline-4.2/html/",
   "#suffix": ".htm",
   "AddCommand": null,
   "AliasAttribute": "T_Ookii_CommandLine_AliasAttribute",
@@ -219,6 +219,7 @@
   "LineWrappingTextWriter": "T_Ookii_CommandLine_LineWrappingTextWriter",
   "LineWrappingTextWriter.ForConsoleError()": "M_Ookii_CommandLine_LineWrappingTextWriter_ForConsoleError",
   "LineWrappingTextWriter.ForConsoleOut()": "M_Ookii_CommandLine_LineWrappingTextWriter_ForConsoleOut",
+  "LineWrappingTextWriter.ForStandardStream()": "M_Ookii_CommandLine_LineWrappingTextWriter_ForStandardStream",
   "LineWrappingTextWriter.Indent": "P_Ookii_CommandLine_LineWrappingTextWriter_Indent",
   "LineWrappingTextWriter.IndentAfterEmptyLine": "P_Ookii_CommandLine_LineWrappingTextWriter_IndentAfterEmptyLine",
   "LineWrappingTextWriter.ResetIndent()": "M_Ookii_CommandLine_LineWrappingTextWriter_ResetIndent",
