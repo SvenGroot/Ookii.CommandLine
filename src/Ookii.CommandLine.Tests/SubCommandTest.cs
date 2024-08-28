@@ -36,6 +36,7 @@ public partial class SubCommandTest
             new("AsyncCancelableCommand", typeof(AsyncCancelableCommand)),
             new("AsyncCommand", typeof(AsyncCommand)),
             new("custom", typeof(CustomParsingCommand), true),
+            new("DerivedArguments4", typeof(DerivedArguments4)),
             new("HiddenCommand", typeof(HiddenCommand)),
             new("test", typeof(TestCommand)),
             new("TestParentCommand", typeof(TestParentCommand), true),
@@ -403,7 +404,7 @@ public partial class SubCommandTest
             // Using the calling assembly explicitly loads all the commands, including internal,
             // same as the default constructor.
             var mgr = new CommandManager(_commandAssembly);
-            Assert.AreEqual(8, mgr.GetCommands().Count());
+            Assert.AreEqual(9, mgr.GetCommands().Count());
         }
 
         // Explicitly specify the external assembly, which loads only public commands.
@@ -430,6 +431,7 @@ public partial class SubCommandTest
             new("AsyncCancelableCommand", typeof(AsyncCancelableCommand)),
             new("AsyncCommand", typeof(AsyncCommand)),
             new("custom", typeof(CustomParsingCommand), true),
+            new("DerivedArguments4", typeof(DerivedArguments4)),
             new("external", typeof(ExternalCommand)),
             new("HiddenCommand", typeof(HiddenCommand)),
             new("OtherExternalCommand", typeof(OtherExternalCommand)),

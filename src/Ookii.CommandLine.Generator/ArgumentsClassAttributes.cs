@@ -1,4 +1,5 @@
 ﻿using Microsoft.CodeAnalysis;
+using System.Diagnostics;
 
 namespace Ookii.CommandLine.Generator;
 
@@ -21,15 +22,42 @@ internal readonly struct ArgumentsClassAttributes
         {
             foreach (var attribute in current.GetAttributes())
             {
-                var _ = attribute.CheckType(typeHelper.ParseOptionsAttribute, ref _parseOptions) ||
+                AttributeData? generatedParser = null;
+                if (attribute.CheckType(typeHelper.GeneratedParserAttribute, ref generatedParser))
+                {
+                    if (_generatedParser == null)
+                    {
+                        Debug.Assert(current.SymbolEquals(symbol));
+                        _generatedParser = generatedParser;
+                    }
+                    // If we previously found a base class with generated Parse methods, we don't need to check again.
+                    else if (!HasGeneratedBaseWithParseMethods)
+                    {
+                        HasGeneratedBase = true;
+                        var hasParseMethods = generatedParser!.GetNamedArgument("GenerateParseMethods")?.Value as bool?;
+                        if (hasParseMethods is bool value)
+                        {
+                            HasGeneratedBaseWithParseMethods = value;
+                        }
+                        else
+                        {
+                            // Default to true if it's not a command.
+                            HasGeneratedBaseWithParseMethods = current.GetAttribute(typeHelper.CommandAttribute!) == null
+                                || !current.ImplementsInterface(typeHelper.ICommand!);
+                        }
+                    }
+
+                    continue;
+                }
+
+                _ = attribute.CheckType(typeHelper.ParseOptionsAttribute, ref _parseOptions) ||
                     attribute.CheckType(typeHelper.DescriptionAttribute, ref _description) ||
                     attribute.CheckType(typeHelper.UsageFooterAttribute, ref _usageFooter) ||
                     attribute.CheckType(typeHelper.ApplicationFriendlyNameAttribute, ref _applicationFriendlyName) ||
                     attribute.CheckType(typeHelper.CommandAttribute, ref _command) ||
                     attribute.CheckType(typeHelper.ClassValidationAttribute, ref _classValidators) ||
                     attribute.CheckType(typeHelper.ParentCommandAttribute, ref _parentCommand) ||
-                    attribute.CheckType(typeHelper.AliasAttribute, ref _aliases) ||
-                    attribute.CheckType(typeHelper.GeneratedParserAttribute, ref _generatedParser);
+                    attribute.CheckType(typeHelper.AliasAttribute, ref _aliases);
             }
         }
     }
@@ -43,4 +71,6 @@ internal readonly struct ArgumentsClassAttributes
     public AttributeData? ParentCommand => _parentCommand;
     public List<AttributeData>? ClassValidators => _classValidators;
     public List<AttributeData>? Aliases => _aliases;
+    public bool HasGeneratedBase { get; }
+    public bool HasGeneratedBaseWithParseMethods { get; }
 }

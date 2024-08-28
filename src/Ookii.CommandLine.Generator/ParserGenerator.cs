@@ -94,19 +94,14 @@ internal class ParserGenerator
         else if (_argumentsClass.ImplementsInterface(_typeHelper.ICommand))
         {
             // Although this is a common pattern for base classes, it makes no sense to apply the
-            // GeneratedParserAttribute to a base class.
+            // GeneratedParserAttribute to a base class that isn't also used stand-alone.
             _context.ReportDiagnostic(Diagnostics.CommandInterfaceWithoutAttribute(_argumentsClass));
         }
 
         // Don't generate the parse methods for commands unless explicitly asked for.
-        var generateParseMethods = !isCommand;
-        foreach (var arg in attributes.GeneratedParser!.NamedArguments)
+        if (attributes.GeneratedParser!.GetNamedArgument("GenerateParseMethods")?.Value is not bool generateParseMethods)
         {
-            if (arg.Key == "GenerateParseMethods")
-            {
-                generateParseMethods = (bool)arg.Value.Value!;
-                break;
-            }
+            generateParseMethods = !isCommand;
         }
 
         _builder.AppendLine($"partial class {_argumentsClass.Name}");
@@ -154,6 +149,7 @@ internal class ParserGenerator
             }
         }
 
+        string newKeyword = attributes.HasGeneratedBase ? "new " : string.Empty;
         _builder.AppendLine();
         _builder.AppendLine("/// <summary>");
         _builder.AppendLine("/// Creates a <see cref=\"Ookii.CommandLine.CommandLineParser{T}\"/> instance using the specified options.");
@@ -166,12 +162,14 @@ internal class ParserGenerator
         _builder.AppendLine($"/// An instance of the <see cref=\"Ookii.CommandLine.CommandLineParser{{T}}\"/> class for the <see cref=\"{_argumentsClass.ToQualifiedName()}\"/> class.");
         _builder.AppendLine("/// </returns>");
         _builder.AppendGeneratedCodeAttribute();
-        _builder.AppendLine($"public static Ookii.CommandLine.CommandLineParser<{_argumentsClass.ToQualifiedName()}> CreateParser(Ookii.CommandLine.ParseOptions? options = null) => new Ookii.CommandLine.CommandLineParser<{_argumentsClass.ToQualifiedName()}>(new OokiiCommandLineArgumentProvider(), options);");
+        _builder.AppendLine($"public static {newKeyword}Ookii.CommandLine.CommandLineParser<{_argumentsClass.ToQualifiedName()}> CreateParser(Ookii.CommandLine.ParseOptions? options = null) => new Ookii.CommandLine.CommandLineParser<{_argumentsClass.ToQualifiedName()}>(new OokiiCommandLineArgumentProvider(), options);");
         _builder.AppendLine();
         var nullableType = _argumentsClass.WithNullableAnnotation(NullableAnnotation.Annotated);
 
         if (generateParseMethods)
         {
+            newKeyword = attributes.HasGeneratedBaseWithParseMethods ? "new " : string.Empty;
+
             // We cannot rely on default interface implementations, because that makes the methods
             // uncallable without a generic type argument.
             _builder.AppendLine("/// <summary>");
@@ -187,7 +185,7 @@ internal class ParserGenerator
             _builder.AppendLine("///   error occurred or argument parsing was canceled.");
             _builder.AppendLine("/// </returns>");
             _builder.AppendGeneratedCodeAttribute();
-            _builder.AppendLine($"public static {nullableType.ToQualifiedName()} Parse(Ookii.CommandLine.ParseOptions? options = null) => CreateParser(options).ParseWithErrorHandling();");
+            _builder.AppendLine($"public static {newKeyword}{nullableType.ToQualifiedName()} Parse(Ookii.CommandLine.ParseOptions? options = null) => CreateParser(options).ParseWithErrorHandling();");
             _builder.AppendLine();
             _builder.AppendLine("/// <summary>");
             _builder.AppendLine("/// Parses the specified command line arguments, handling errors and showing usage help as required.");
@@ -202,7 +200,7 @@ internal class ParserGenerator
             _builder.AppendLine("///   error occurred or argument parsing was canceled.");
             _builder.AppendLine("/// </returns>");
             _builder.AppendGeneratedCodeAttribute();
-            _builder.AppendLine($"public static {nullableType.ToQualifiedName()} Parse(string[] args, Ookii.CommandLine.ParseOptions? options = null) => CreateParser(options).ParseWithErrorHandling(args);");
+            _builder.AppendLine($"public static {newKeyword}{nullableType.ToQualifiedName()} Parse(string[] args, Ookii.CommandLine.ParseOptions? options = null) => CreateParser(options).ParseWithErrorHandling(args);");
             _builder.AppendLine();
             _builder.AppendLine("/// <summary>");
             _builder.AppendLine("/// Parses the specified command line arguments, handling errors and showing usage help as required.");
@@ -217,7 +215,7 @@ internal class ParserGenerator
             _builder.AppendLine("///   error occurred or argument parsing was canceled.");
             _builder.AppendLine("/// </returns>");
             _builder.AppendGeneratedCodeAttribute();
-            _builder.AppendLine($"public static {nullableType.ToQualifiedName()} Parse(System.ReadOnlyMemory<string> args, Ookii.CommandLine.ParseOptions? options = null) => CreateParser(options).ParseWithErrorHandling(args);");
+            _builder.AppendLine($"public static {newKeyword}{nullableType.ToQualifiedName()} Parse(System.ReadOnlyMemory<string> args, Ookii.CommandLine.ParseOptions? options = null) => CreateParser(options).ParseWithErrorHandling(args);");
             _builder.CloseBlock(); // class
         }
 
