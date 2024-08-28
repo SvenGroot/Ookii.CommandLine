@@ -526,6 +526,26 @@ public partial class LineWrappingTextWriter : TextWriter
     public static LineWrappingTextWriter ForConsoleError() => new(Console.Error, GetLineLengthForConsole(), false);
 
     /// <summary>
+    /// Gets a <see cref="LineWrappingTextWriter"/> that writes to the specified standard stream.
+    /// </summary>
+    /// <param name="stream">The <see cref="StandardStream"/> to write to.</param>
+    /// <returns>
+    /// A <see cref="LineWrappingTextWriter"/> that writes to either <see cref="Console.Out" qualifyHint="true"/>
+    /// or <see cref="Console.Error" qualifyHint="true"/>.
+    /// </returns>
+    /// <exception cref="ArgumentException">
+    /// <paramref name="stream"/> was a value other than <see cref="StandardStream.Output" qualifyHint="true"/>
+    /// or <see cref="StandardStream.Error" qualifyHint="true"/>.
+    /// </exception>
+    public static LineWrappingTextWriter ForStandardStream(StandardStream stream)
+        => stream switch
+        {
+            StandardStream.Output => ForConsoleOut(),
+            StandardStream.Error => ForConsoleError(),
+            _ => throw new ArgumentException(Properties.Resources.InvalidStandardStreamError, nameof(stream)),
+        };
+
+    /// <summary>
     /// Gets a <see cref="LineWrappingTextWriter"/> that writes to a <see cref="StringWriter"/>.
     /// </summary>
     /// <param name="maximumLineLength">
