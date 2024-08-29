@@ -879,7 +879,8 @@ public class CommandLineParser
             nameWithoutExtension = null;
         }
 #endif
-        path ??= Environment.GetCommandLineArgs().FirstOrDefault() ?? Assembly.GetEntryAssembly()?.Location;
+        // The GetCommandLineArgs method should always return at least one item, but just in case.
+        path ??= Environment.GetCommandLineArgs().FirstOrDefault() ?? string.Empty;
         if (path == null)
         {
             path = string.Empty;
