@@ -86,6 +86,9 @@ public class CommandManager
 #if NET6_0_OR_GREATER
     [RequiresUnreferencedCode("Command information cannot be statically determined using reflection. Consider using the GeneratedParserAttribute and GeneratedCommandManagerAttribute.", Url = CommandLineParser.UnreferencedCodeHelpUrl)]
 #endif
+#if NET7_0_OR_GREATER
+    [RequiresDynamicCode("Consider using the GeneratedParserAttribute.")]
+#endif
     public CommandManager(CommandOptions? options = null)
         : this(new ReflectionCommandProvider(Assembly.GetCallingAssembly(), Assembly.GetCallingAssembly()), options)
     {
@@ -160,6 +163,9 @@ public class CommandManager
 #if NET6_0_OR_GREATER
     [RequiresUnreferencedCode("Command information cannot be statically determined using reflection. Consider using the GeneratedParserAttribute and GeneratedCommandManagerAttribute.", Url = CommandLineParser.UnreferencedCodeHelpUrl)]
 #endif
+#if NET7_0_OR_GREATER
+    [RequiresDynamicCode("Consider using the GeneratedParserAttribute.")]
+#endif
     public CommandManager(Assembly assembly, CommandOptions? options = null)
         : this(new ReflectionCommandProvider(assembly ?? throw new ArgumentNullException(nameof(assembly)), Assembly.GetCallingAssembly()), options)
     {
@@ -202,6 +208,9 @@ public class CommandManager
     /// </remarks>
 #if NET6_0_OR_GREATER
     [RequiresUnreferencedCode("Command information cannot be statically determined using reflection. Consider using the GeneratedParserAttribute and GeneratedCommandManagerAttribute.", Url = CommandLineParser.UnreferencedCodeHelpUrl)]
+#endif
+#if NET7_0_OR_GREATER
+    [RequiresDynamicCode("Consider using the GeneratedParserAttribute.")]
 #endif
     public CommandManager(IEnumerable<Assembly> assemblies, CommandOptions? options = null)
         : this(new ReflectionCommandProvider(assemblies ?? throw new ArgumentNullException(nameof(assemblies)), Assembly.GetCallingAssembly()), options)

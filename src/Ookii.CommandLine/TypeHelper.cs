@@ -76,6 +76,9 @@ static class TypeHelper
 #if NET6_0_OR_GREATER
     [RequiresUnreferencedCode("Argument information cannot be statically determined using reflection. Consider using the GeneratedParserAttribute.", Url = CommandLineParser.UnreferencedCodeHelpUrl)]
 #endif
+#if NET7_0_OR_GREATER
+    [RequiresDynamicCode("Consider using the GeneratedParserAttribute.")]
+#endif
     public static ArgumentConverter GetStringConverter(this Type type, Type? converterType)
     {
         if (type == null)
@@ -112,6 +115,9 @@ static class TypeHelper
     public static Type GetUnderlyingType(this Type type)
         => type.IsNullableValueType() ? type.GetGenericArguments()[0] : type;
 
+#if NET7_0_OR_GREATER
+    [RequiresDynamicCode("Consider using the GeneratedParserAttribute.")]
+#endif
     private static ArgumentConverter? GetDefaultConverter(
 #if NET7_0_OR_GREATER
         [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicMethods | DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.Interfaces)]

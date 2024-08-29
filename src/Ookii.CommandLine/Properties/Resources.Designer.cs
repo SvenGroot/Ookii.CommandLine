@@ -547,7 +547,7 @@ namespace Ookii.CommandLine.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The property defining the argument &apos;{0}&apos; does not have a public set accessor..
+        ///   Looks up a localized string similar to The property &apos;{0}&apos; does not have a public set accessor..
         /// </summary>
         internal static string PropertyIsReadOnlyFormat {
             get {

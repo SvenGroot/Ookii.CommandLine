@@ -369,6 +369,9 @@ public class CommandLineParser
 #if NET6_0_OR_GREATER
     [RequiresUnreferencedCode("Argument information cannot be statically determined using reflection. Consider using the GeneratedParserAttribute.", Url = UnreferencedCodeHelpUrl)]
 #endif
+#if NET7_0_OR_GREATER
+    [RequiresDynamicCode("Consider using the GeneratedParserAttribute.")]
+#endif
     public CommandLineParser(Type argumentsType, ParseOptions? options = null)
         : this(GetArgumentProvider(argumentsType ?? throw new ArgumentNullException(nameof(argumentsType)), options), options)
     {
@@ -879,7 +882,9 @@ public class CommandLineParser
             nameWithoutExtension = null;
         }
 #endif
-        // The GetCommandLineArgs method should always return at least one item, but just in case.
+
+        // The array returned by GetCommandLineArgs should always contain at least one element, but
+        // just in case.
         path ??= Environment.GetCommandLineArgs().FirstOrDefault() ?? string.Empty;
         if (path == null)
         {
@@ -1181,6 +1186,9 @@ public class CommandLineParser
 #if NET6_0_OR_GREATER
     [RequiresUnreferencedCode("Argument information cannot be statically determined using reflection. Consider using the GeneratedParserAttribute.", Url = UnreferencedCodeHelpUrl)]
 #endif
+#if NET7_0_OR_GREATER
+    [RequiresDynamicCode("Consider using the GeneratedParserAttribute.")]
+#endif
     public static T? Parse<T>(ParseOptions? options = null)
         where T : class
     {
@@ -1208,6 +1216,9 @@ public class CommandLineParser
     /// </remarks>
 #if NET6_0_OR_GREATER
     [RequiresUnreferencedCode("Argument information cannot be statically determined using reflection. Consider using the GeneratedParserAttribute.", Url = UnreferencedCodeHelpUrl)]
+#endif
+#if NET7_0_OR_GREATER
+    [RequiresDynamicCode("Consider using the GeneratedParserAttribute.")]
 #endif
     public static T? Parse<T>(ReadOnlyMemory<string> args, ParseOptions? options = null)
         where T : class
@@ -1243,6 +1254,9 @@ public class CommandLineParser
     /// </remarks>
 #if NET6_0_OR_GREATER
     [RequiresUnreferencedCode("Argument information cannot be statically determined using reflection. Consider using the GeneratedParserAttribute.", Url = UnreferencedCodeHelpUrl)]
+#endif
+#if NET7_0_OR_GREATER
+    [RequiresDynamicCode("Consider using the GeneratedParserAttribute.")]
 #endif
     public static T? Parse<T>(string[] args, ParseOptions? options = null)
         where T : class
@@ -1946,6 +1960,9 @@ public class CommandLineParser
 
 #if NET6_0_OR_GREATER
     [RequiresUnreferencedCode("Argument information cannot be statically determined using reflection. Consider using the GeneratedParserAttribute.", Url = UnreferencedCodeHelpUrl)]
+#endif
+#if NET7_0_OR_GREATER
+    [RequiresDynamicCode("Consider using the GeneratedParserAttribute.")]
 #endif
     private static ArgumentProvider GetArgumentProvider(Type type, ParseOptions? options)
     {

@@ -14,6 +14,9 @@ namespace Ookii.CommandLine.Support;
 #if NET6_0_OR_GREATER
 [RequiresUnreferencedCode("Command information cannot be statically determined using reflection. Consider using the GeneratedParserAttribute and GeneratedCommandManagerAttribute.", Url = CommandLineParser.UnreferencedCodeHelpUrl)]
 #endif
+#if NET7_0_OR_GREATER
+[RequiresDynamicCode("Consider using the GeneratedParserAttribute.")]
+#endif
 internal class ReflectionCommandInfo : CommandInfo
 {
     private string? _description;

@@ -24,7 +24,7 @@ public abstract class CommandLineArgument
 {
     #region Nested types
 
-    private interface IValueHelper
+    private protected interface IValueHelper
     {
         object? Value { get; }
         CancelMode SetValue(CommandLineArgument argument, object? value);
@@ -52,7 +52,7 @@ public abstract class CommandLineArgument
         }
     }
 
-    private class MultiValueHelper<T> : IValueHelper
+    private protected class MultiValueHelper<T> : IValueHelper
     {
         // The actual element type may not be nullable. This is handled by the allow null check
         // when parsing the value. Here, we always treat the values as if they're nullable.
@@ -85,7 +85,7 @@ public abstract class CommandLineArgument
         }
     }
 
-    private class DictionaryValueHelper<TKey, TValue> : IValueHelper
+    private protected class DictionaryValueHelper<TKey, TValue> : IValueHelper
         where TKey : notnull
     {
         // The actual value type may not be nullable. This is handled by the allow null check.
@@ -235,6 +235,10 @@ public abstract class CommandLineArgument
 
         protected override void SetProperty(object target, object? value)
             => throw new InvalidOperationException(Properties.Resources.InvalidPropertyAccess);
+
+        private protected override IValueHelper CreateDictionaryValueHelper() => throw new NotImplementedException();
+
+        private protected override IValueHelper CreateMultiValueHelper() => throw new NotImplementedException();
     }
 
     private class VersionArgument : CommandLineArgument
@@ -274,10 +278,61 @@ public abstract class CommandLineArgument
         protected override void SetProperty(object target, object? value)
             => throw new InvalidOperationException(Properties.Resources.InvalidPropertyAccess);
 
+        private protected override IValueHelper CreateDictionaryValueHelper() => throw new NotImplementedException();
+
+        private protected override IValueHelper CreateMultiValueHelper() => throw new NotImplementedException();
     }
 
-    internal struct ArgumentInfo
+    private protected struct ArgumentInfo
     {
+        public ArgumentInfo(in ArgumentCreationInfo info)
+        {
+            ArgumentName = DetermineArgumentName(info.Attribute.ArgumentName, info.MemberName, info.Parser.Options.ArgumentNameTransformOrDefault);
+            Parser = info.Parser;
+            Long = info.Attribute.IsLong;
+            Short = info.Attribute.IsShort;
+            ShortName = info.Attribute.ShortName;
+            ArgumentType = info.ArgumentType;
+            ElementType = info.ElementType;
+            Converter = info.Converter;
+            ElementTypeWithNullable = info.ElementTypeWithNullable;
+            Description = info.DescriptionAttribute?.Description;
+            ValueDescription = info.ValueDescriptionAttribute?.ValueDescription;
+            if (info.Position is int pos)
+            {
+                Debug.Assert(info.Attribute.IsPositional && info.Attribute.Position < 0);
+                info.Attribute.Position = pos;
+                Position = pos;
+            }
+            else
+            {
+                Position = info.Attribute.Position < 0 ? null : info.Attribute.Position;
+            }
+
+            Aliases = GetAliases(info.AliasAttributes, ArgumentName);
+            ShortAliases = GetShortAliases(info.ShortAliasAttributes, ArgumentName);
+            DefaultValue = info.Attribute.DefaultValue ?? info.AlternateDefaultValue;
+            IncludeDefaultValueInHelp = info.Attribute.IncludeDefaultInUsageHelp;
+            DefaultValueFormat = info.Attribute.DefaultValueFormat;
+            IsRequired = info.Attribute.IsRequired || info.RequiredProperty;
+            IsRequiredProperty = info.RequiredProperty;
+            MemberName = info.MemberName;
+            AllowNull = info.AllowsNull;
+            CancelParsing = info.Attribute.CancelParsing;
+            IsHidden = info.Attribute.IsHidden;
+            Validators = info.ValidationAttributes ?? [];
+            Kind = info.Kind;
+            if (info.Kind is ArgumentKind.MultiValue or ArgumentKind.Dictionary)
+            {
+                MultiValueInfo = GetMultiValueInfo(info.MultiValueSeparatorAttribute);
+                if (info.Kind == ArgumentKind.Dictionary)
+                {
+                    DictionaryInfo = new(info.AllowDuplicateDictionaryKeys, info.KeyType!, info.ValueType!,
+                        info.KeyValueSeparatorAttribute?.Separator ?? KeyValuePairConverter.DefaultSeparator);
+                }
+            }
+        }
+
         public CommandLineParser Parser { get; set; }
         public string MemberName { get; set; }
         public string ArgumentName { get; set; }
@@ -331,7 +386,7 @@ public abstract class CommandLineArgument
     private IValueHelper? _valueHelper;
     private ReadOnlyMemory<char> _usedArgumentName;
 
-    internal CommandLineArgument(ArgumentInfo info)
+    private protected CommandLineArgument(in ArgumentInfo info)
     {
         // If this method throws anything other than a NotSupportedException, it constitutes a bug in the Ookii.CommandLine library.
         _parser = info.Parser;
@@ -1040,6 +1095,8 @@ public abstract class CommandLineArgument
     /// </value>
     protected abstract bool CanSetProperty { get; }
 
+    private protected Type ElementTypeWithNullable => _elementTypeWithNullable;
+
     /// <summary>
     /// Converts the specified string to the <see cref="ElementType"/>.
     /// </summary>
@@ -1160,46 +1217,6 @@ public abstract class CommandLineArgument
     /// <returns>The value description.</returns>
     protected virtual string DetermineValueDescriptionForType(Type type) => GetFriendlyTypeName(type);
 
-    internal static ArgumentInfo CreateArgumentInfo(CommandLineParser parser,
-                                                    Type argumentType,
-                                                    bool allowsNull,
-                                                    bool requiredProperty,
-                                                    string memberName,
-                                                    CommandLineArgumentAttribute attribute,
-                                                    DescriptionAttribute? descriptionAttribute,
-                                                    ValueDescriptionAttribute? valueDescriptionAttribute,
-                                                    IEnumerable<AliasAttribute>? aliasAttributes,
-                                                    IEnumerable<ShortAliasAttribute>? shortAliasAttributes,
-                                                    IEnumerable<ArgumentValidationAttribute>? validationAttributes)
-    {
-        var argumentName = DetermineArgumentName(attribute.ArgumentName, memberName, parser.Options.ArgumentNameTransformOrDefault);
-        return new ArgumentInfo()
-        {
-            Parser = parser,
-            ArgumentName = argumentName,
-            Long = attribute.IsLong,
-            Short = attribute.IsShort,
-            ShortName = attribute.ShortName,
-            ArgumentType = argumentType,
-            ElementTypeWithNullable = argumentType,
-            Description = descriptionAttribute?.Description,
-            ValueDescription = valueDescriptionAttribute?.ValueDescription,
-            Position = attribute.Position < 0 ? null : attribute.Position,
-            Aliases = GetAliases(aliasAttributes, argumentName),
-            ShortAliases = GetShortAliases(shortAliasAttributes, argumentName),
-            DefaultValue = attribute.DefaultValue,
-            IncludeDefaultValueInHelp = attribute.IncludeDefaultInUsageHelp,
-            DefaultValueFormat = attribute.DefaultValueFormat,
-            IsRequired = attribute.IsRequired || requiredProperty,
-            IsRequiredProperty = requiredProperty,
-            MemberName = memberName,
-            AllowNull = allowsNull,
-            CancelParsing = attribute.CancelParsing,
-            IsHidden = attribute.IsHidden,
-            Validators = validationAttributes ?? Enumerable.Empty<ArgumentValidationAttribute>(),
-        };
-    }
-
     private string DetermineValueDescription(Type? type = null)
     {
         var result = GetDefaultValueDescription(type);
@@ -1252,7 +1269,7 @@ public abstract class CommandLineArgument
         }
     }
 
-    internal object? ConvertToArgumentType(CultureInfo culture, bool hasValue, string? stringValue, ReadOnlySpan<char> spanValue)
+    private object? ConvertToArgumentType(CultureInfo culture, bool hasValue, string? stringValue, ReadOnlySpan<char> spanValue)
     {
         if (culture == null)
         {
@@ -1485,16 +1502,13 @@ public abstract class CommandLineArgument
     private IValueHelper CreateValueHelper()
     {
         Debug.Assert(_valueHelper == null);
-        Type type;
         switch (_argumentKind)
         {
         case ArgumentKind.Dictionary:
-            type = typeof(DictionaryValueHelper<,>).MakeGenericType(_elementType.GetGenericArguments());
-            return (IValueHelper)Activator.CreateInstance(type, DictionaryInfo!.AllowDuplicateKeys, _allowNull)!;
+            return CreateDictionaryValueHelper();
 
         case ArgumentKind.MultiValue:
-            type = typeof(MultiValueHelper<>).MakeGenericType(_elementTypeWithNullable);
-            return (IValueHelper)Activator.CreateInstance(type)!;
+            return CreateMultiValueHelper();
 
         case ArgumentKind.Method:
             return new MethodValueHelper();
@@ -1505,7 +1519,11 @@ public abstract class CommandLineArgument
         }
     }
 
-    internal static IEnumerable<string>? GetAliases(IEnumerable<AliasAttribute>? aliasAttributes, string argumentName)
+    private protected abstract IValueHelper CreateDictionaryValueHelper();
+
+    private protected abstract IValueHelper CreateMultiValueHelper();
+
+    private static IEnumerable<string>? GetAliases(IEnumerable<AliasAttribute>? aliasAttributes, string argumentName)
     {
         if (aliasAttributes == null || !aliasAttributes.Any())
         {
@@ -1523,7 +1541,7 @@ public abstract class CommandLineArgument
         });
     }
 
-    internal static IEnumerable<char>? GetShortAliases(IEnumerable<ShortAliasAttribute>? aliasAttributes, string argumentName)
+    private static IEnumerable<char>? GetShortAliases(IEnumerable<ShortAliasAttribute>? aliasAttributes, string argumentName)
     {
         if (aliasAttributes == null || !aliasAttributes.Any())
         {
@@ -1549,7 +1567,7 @@ public abstract class CommandLineArgument
         return CancelMode.Abort;
     }
 
-    internal static string DetermineArgumentName(string? explicitName, string memberName, NameTransform transform)
+    private static string DetermineArgumentName(string? explicitName, string memberName, NameTransform transform)
     {
         if (explicitName != null)
         {
@@ -1604,7 +1622,7 @@ public abstract class CommandLineArgument
         }
     }
 
-    internal static MultiValueArgumentInfo GetMultiValueInfo(MultiValueSeparatorAttribute? attribute)
+    private static MultiValueArgumentInfo GetMultiValueInfo(MultiValueSeparatorAttribute? attribute)
     {
         var separator = attribute?.Separator;
         return new(

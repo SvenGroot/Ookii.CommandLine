@@ -12,6 +12,9 @@ namespace Ookii.CommandLine.Support;
 #if NET6_0_OR_GREATER
 [RequiresUnreferencedCode("Argument information cannot be statically determined using reflection. Consider using the GeneratedParserAttribute.", Url = CommandLineParser.UnreferencedCodeHelpUrl)]
 #endif
+#if NET7_0_OR_GREATER
+[RequiresDynamicCode("Consider using the GeneratedParserAttribute.")]
+#endif
 internal class ReflectionArgumentProvider : ArgumentProvider
 {
     public ReflectionArgumentProvider(Type type)
