@@ -33,7 +33,7 @@ internal class ReflectionArgument : CommandLineArgument
     private readonly PropertyInfo? _property;
     private readonly MethodArgumentInfo? _method;
 
-    private ReflectionArgument(ArgumentInfo info, PropertyInfo? property, MethodArgumentInfo? method)
+    private ReflectionArgument(in ArgumentInfo info, PropertyInfo? property, MethodArgumentInfo? method)
         : base(info)
     {
         _property = property;
@@ -93,6 +93,18 @@ internal class ReflectionArgument : CommandLineArgument
         };
     }
 
+    private protected override IValueHelper CreateDictionaryValueHelper()
+    {
+        var type = typeof(DictionaryValueHelper<,>).MakeGenericType(ElementType.GetGenericArguments());
+        return (IValueHelper)Activator.CreateInstance(type, DictionaryInfo!.AllowDuplicateKeys, AllowNull)!;
+    }
+
+    private protected override IValueHelper CreateMultiValueHelper()
+    {
+        var type = typeof(MultiValueHelper<>).MakeGenericType(ElementTypeWithNullable);
+        return (IValueHelper)Activator.CreateInstance(type)!;
+    }
+
     internal static CommandLineArgument Create(CommandLineParser parser, PropertyInfo property)
     {
         if (parser == null)
@@ -138,32 +150,33 @@ internal class ReflectionArgument : CommandLineArgument
             throw new NotSupportedException(Properties.Resources.AutoPositionNotSupportedFormat);
         }
 
-        var multiValueSeparatorAttribute = member.GetCustomAttribute<MultiValueSeparatorAttribute>();
-        var descriptionAttribute = member.GetCustomAttribute<DescriptionAttribute>();
-        var valueDescriptionAttribute = member.GetCustomAttribute<ValueDescriptionAttribute>();
-        var allowDuplicateDictionaryKeys = Attribute.IsDefined(member, typeof(AllowDuplicateDictionaryKeysAttribute));
-        var keyValueSeparatorAttribute = member.GetCustomAttribute<KeyValueSeparatorAttribute>();
-        var aliasAttributes = member.GetCustomAttributes<AliasAttribute>();
-        var shortAliasAttributes = member.GetCustomAttributes<ShortAliasAttribute>();
-        var validationAttributes = member.GetCustomAttributes<ArgumentValidationAttribute>();
+        var creationInfo = new ArgumentCreationInfo()
+        {
+            Parser = parser,
+            Attribute = attribute,
+            MemberName = member.Name,
+            ArgumentType = argumentType,
+            ElementType = argumentType,
+            ElementTypeWithNullable = argumentType,
+            AllowsNull = allowsNull,
+            MultiValueSeparatorAttribute = member.GetCustomAttribute<MultiValueSeparatorAttribute>(),
+            DescriptionAttribute = member.GetCustomAttribute<DescriptionAttribute>(),
+            ValueDescriptionAttribute = member.GetCustomAttribute<ValueDescriptionAttribute>(),
+            AllowDuplicateDictionaryKeys = Attribute.IsDefined(member, typeof(AllowDuplicateDictionaryKeysAttribute)),
+            KeyValueSeparatorAttribute = member.GetCustomAttribute<KeyValueSeparatorAttribute>(),
+            AliasAttributes = member.GetCustomAttributes<AliasAttribute>(),
+            ShortAliasAttributes = member.GetCustomAttributes<ShortAliasAttribute>(),
+            ValidationAttributes = member.GetCustomAttributes<ArgumentValidationAttribute>(),
 #if NET7_0_OR_GREATER
-        var requiredProperty = Attribute.IsDefined(member, typeof(RequiredMemberAttribute));
-#else
-        var requiredProperty = false;
+            RequiredProperty = Attribute.IsDefined(member, typeof(RequiredMemberAttribute)),
 #endif
+        };
 
-        ArgumentInfo info = CreateArgumentInfo(parser, argumentType, allowsNull, requiredProperty, member.Name, attribute,
-            descriptionAttribute, valueDescriptionAttribute, aliasAttributes, shortAliasAttributes, validationAttributes);
-
-        DetermineAdditionalInfo(ref info, member, multiValueSeparatorAttribute, keyValueSeparatorAttribute,
-            allowDuplicateDictionaryKeys);
-
-        return new ReflectionArgument(info, property, method);
+        DetermineArgumentKind(ref creationInfo, member);
+        return new ReflectionArgument(new ArgumentInfo(creationInfo), property, method);
     }
 
-    private static void DetermineAdditionalInfo(ref ArgumentInfo info, MemberInfo member,
-        MultiValueSeparatorAttribute? multiValueSeparatorAttribute, KeyValueSeparatorAttribute? keyValueSeparatorAttribute,
-        bool allowDuplicateDictionaryKeys)
+    private static void DetermineArgumentKind(ref ArgumentCreationInfo info, MemberInfo member)
     {
         var converterAttribute = member.GetCustomAttribute<ArgumentConverterAttribute>();
         var keyArgumentConverterAttribute = member.GetCustomAttribute<KeyConverterAttribute>();
@@ -172,36 +185,31 @@ internal class ReflectionArgument : CommandLineArgument
 
         if (member is PropertyInfo property)
         {
-            var (collectionType, dictionaryType, elementType) =
-                DetermineMultiValueType(info.ArgumentName, info.ArgumentType, property);
-
+            var (collectionType, dictionaryType, elementType) = DetermineMultiValueType(info.ArgumentType, property);
             if (dictionaryType != null)
             {
                 Debug.Assert(elementType != null);
                 info.Kind = ArgumentKind.Dictionary;
-                info.MultiValueInfo = GetMultiValueInfo(multiValueSeparatorAttribute);
                 info.ElementTypeWithNullable = elementType!;
-                info.AllowNull = DetermineDictionaryValueTypeAllowsNull(dictionaryType, property);
+                info.AllowsNull = DetermineDictionaryValueTypeAllowsNull(dictionaryType, property);
                 var genericArguments = dictionaryType.GetGenericArguments();
-                info.DictionaryInfo = new(allowDuplicateDictionaryKeys, genericArguments[0], genericArguments[1],
-                    keyValueSeparatorAttribute?.Separator ?? KeyValuePairConverter.DefaultSeparator);
-
+                info.KeyType = genericArguments[0];
+                info.ValueType = genericArguments[1];
                 if (converterType == null)
                 {
                     converterType = typeof(KeyValuePairConverter<,>).MakeGenericType(genericArguments);
-                    var keyConverter = info.DictionaryInfo.KeyType.GetStringConverter(keyArgumentConverterAttribute?.GetConverterType());
-                    var valueConverter = info.DictionaryInfo.ValueType.GetStringConverter(valueArgumentConverterAttribute?.GetConverterType());
+                    var keyConverter = info.KeyType.GetStringConverter(keyArgumentConverterAttribute?.GetConverterType());
+                    var valueConverter = info.ValueType.GetStringConverter(valueArgumentConverterAttribute?.GetConverterType());
                     info.Converter = (ArgumentConverter)Activator.CreateInstance(converterType, keyConverter, valueConverter,
-                        info.DictionaryInfo.KeyValueSeparator, info.AllowNull)!;
+                        info.KeyValueSeparatorAttribute?.Separator, info.AllowsNull)!;
                 }
             }
             else if (collectionType != null)
             {
                 Debug.Assert(elementType != null);
                 info.Kind = ArgumentKind.MultiValue;
-                info.MultiValueInfo = GetMultiValueInfo(multiValueSeparatorAttribute);
                 info.ElementTypeWithNullable = elementType!;
-                info.AllowNull = DetermineCollectionElementTypeAllowsNull(collectionType, property);
+                info.AllowsNull = DetermineCollectionElementTypeAllowsNull(collectionType, property);
             }
         }
         else
@@ -217,7 +225,7 @@ internal class ReflectionArgument : CommandLineArgument
     }
 
     // Returns a tuple of (collectionType, dictionaryType, elementType)
-    private static (Type?, Type?, Type?) DetermineMultiValueType(string argumentName, Type argumentType, PropertyInfo property)
+    private static (Type?, Type?, Type?) DetermineMultiValueType(Type argumentType, PropertyInfo property)
     {
         // If the type is Dictionary<TKey, TValue> it doesn't matter if the property is
         // read-only or not.
@@ -236,7 +244,7 @@ internal class ReflectionArgument : CommandLineArgument
 
             if (property.GetSetMethod() == null)
             {
-                throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.PropertyIsReadOnlyFormat, argumentName));
+                throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.PropertyIsReadOnlyFormat, property.Name));
             }
 
             var elementType = argumentType.GetElementType()!;
@@ -267,7 +275,7 @@ internal class ReflectionArgument : CommandLineArgument
         }
 
         // This is a read-only property with an unsupported type.
-        throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.PropertyIsReadOnlyFormat, argumentName));
+        throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.PropertyIsReadOnlyFormat, property.Name));
     }
 
     private static bool DetermineDictionaryValueTypeAllowsNull(Type type, PropertyInfo property)

@@ -181,7 +181,7 @@
     <value>The value must be zero or larger.</value>
   </data>
   <data name="PropertyIsReadOnlyFormat" xml:space="preserve">
-    <value>The property defining the argument '{0}' does not have a public set accessor.</value>
+    <value>The property '{0}' does not have a public set accessor.</value>
   </data>
   <data name="TypeNotGenericDefinition" xml:space="preserve">
     <value>The type must be a generic type definition.</value>

@@ -1,6 +1,7 @@
 ﻿using Microsoft.CodeAnalysis;
 using System.Reflection;
 using System.Text;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Ookii.CommandLine.Generator;
 
@@ -75,6 +76,7 @@ internal class SourceBuilder
         --_indentLevel;
         _needArgumentSeparator = false;
     }
+
 
     public void OpenBlock()
     {
