@@ -24,7 +24,7 @@ public abstract class CommandLineArgument
 {
     #region Nested types
 
-    internal interface IValueHelper
+    private protected interface IValueHelper
     {
         object? Value { get; }
         CancelMode SetValue(CommandLineArgument argument, object? value);
@@ -52,7 +52,7 @@ public abstract class CommandLineArgument
         }
     }
 
-    internal class MultiValueHelper<T> : IValueHelper
+    private protected class MultiValueHelper<T> : IValueHelper
     {
         // The actual element type may not be nullable. This is handled by the allow null check
         // when parsing the value. Here, we always treat the values as if they're nullable.
@@ -85,7 +85,7 @@ public abstract class CommandLineArgument
         }
     }
 
-    internal class DictionaryValueHelper<TKey, TValue> : IValueHelper
+    private protected class DictionaryValueHelper<TKey, TValue> : IValueHelper
         where TKey : notnull
     {
         // The actual value type may not be nullable. This is handled by the allow null check.
@@ -1095,7 +1095,7 @@ public abstract class CommandLineArgument
     /// </value>
     protected abstract bool CanSetProperty { get; }
 
-    internal Type ElementTypeWithNullable => _elementTypeWithNullable;
+    private protected Type ElementTypeWithNullable => _elementTypeWithNullable;
 
     /// <summary>
     /// Converts the specified string to the <see cref="ElementType"/>.
@@ -1622,7 +1622,7 @@ public abstract class CommandLineArgument
         }
     }
 
-    internal static MultiValueArgumentInfo GetMultiValueInfo(MultiValueSeparatorAttribute? attribute)
+    private static MultiValueArgumentInfo GetMultiValueInfo(MultiValueSeparatorAttribute? attribute)
     {
         var separator = attribute?.Separator;
         return new(
