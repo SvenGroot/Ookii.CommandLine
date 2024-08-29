@@ -25,7 +25,7 @@ library for .Net applications.
 - Create applications with multiple subcommands.
 - Generate fully customizable usage help.
 - Supports PowerShell-like and POSIX-like parsing rules.
-- Trim-friendly</Description>
+- Compatible with trimming and native AOT.</Description>
     <PackageTags>command line arguments parsing parser parse argument args console</PackageTags>
     <PackageReleaseNotes>This version contains breaking changes compared to version 2.x and 3.x. For details, please view: https://www.ookii.org/Link/CommandLineVersionHistory</PackageReleaseNotes>
     <IncludeSymbols>true</IncludeSymbols>
