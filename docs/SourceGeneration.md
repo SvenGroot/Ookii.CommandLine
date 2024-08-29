@@ -24,7 +24,7 @@ Using source generation has several benefits:
   [trimmed](https://learn.microsoft.com/dotnet/core/deploying/trimming/trimming-options). It's not
   possible to statically determine what types are needed to determine arguments using reflection,
   so trimming is not possible at all with reflection.
-- Allow your application use [native AOT](https://learn.microsoft.com/dotnet/core/deploying/native-aot),
+- Allow your application to use [native AOT](https://learn.microsoft.com/dotnet/core/deploying/native-aot),
   which is similarly incompatible with reflection.
 - Improved performance; benchmarks show that instantiating a [`CommandLineParser<T>`][] using a
   generated parser is up to thirty times faster than using reflection.
