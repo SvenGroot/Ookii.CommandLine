@@ -7,7 +7,7 @@ library for .Net applications.
 - Create applications with multiple subcommands.
 - Generate fully customizable usage help.
 - Supports PowerShell-like and POSIX-like parsing rules.
-- Trim-friendly
+- Compatible with trimming and native AOT.
 
 Ookii.CommandLine is [provided in versions](#requirements) for .Net Standard 2.0, .Net Standard 2.1,
 .Net 6.0, and .Net 7.0 and later.

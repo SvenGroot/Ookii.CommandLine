@@ -7,7 +7,7 @@ library for .Net applications.
 - Create applications with multiple subcommands.
 - Generate fully customizable usage help.
 - Supports PowerShell-like and POSIX-like parsing rules.
-- Trim-friendly
+- Compatible with trimming and native AOT.
 
 Two styles of command line parsing rules are supported: the default mode uses rules similar to those
 used by PowerShell, and the alternative long/short mode uses a style influenced by POSIX

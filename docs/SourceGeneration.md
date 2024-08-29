@@ -24,13 +24,15 @@ Using source generation has several benefits:
   [trimmed](https://learn.microsoft.com/dotnet/core/deploying/trimming/trimming-options). It's not
   possible to statically determine what types are needed to determine arguments using reflection,
   so trimming is not possible at all with reflection.
+- Allow you application use [native AOT](https://learn.microsoft.com/dotnet/core/deploying/native-aot),
+  which is similarly incompatible with reflection.
 - Improved performance; benchmarks show that instantiating a [`CommandLineParser<T>`][] using a
   generated parser is up to thirty times faster than using reflection.
 
 A few restrictions apply to projects that use Ookii.CommandLine's source generation:
 
-- The project must be a C# project, using C# version 8 or later. Other languages or older C#
-  versions are not supported.
+- The project must be a C# project, using C# language version 8 or later. Other languages or older
+  C# versions are not supported.
 - The project must be built using using the .Net 6.0 SDK or a later version.
   - You can still target older runtimes supported by Ookii.CommandLine, down to .Net Framework 4.6,
     but you must build the project using the .Net 6.0 SDK or newer.

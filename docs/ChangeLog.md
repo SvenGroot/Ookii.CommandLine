@@ -8,6 +8,8 @@
 - When using the [`GeneratedParserAttribute`] on a class that has a base class that also uses the
   [`GeneratedParserAttribute`], the source generator will now emit the `new` keyword on generated
   methods as appropriate, to avoid compiler warnings about hidden base class members.
+- The library is now fully compatible with native AOT (ahead-of-time) compilation, when
+  [source generation](SourceGeneration.md) is used.
 
 ## Ookii.CommandLine 4.1 (2024-01-26)
 
