@@ -7,6 +7,7 @@
     <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     <IsTrimmable>True</IsTrimmable>
+    <IsAotCompatible>True</IsAotCompatible>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/SvenGroot/Ookii.CommandLine</PackageProjectUrl>
     <RepositoryUrl>https://github.com/SvenGroot/Ookii.CommandLine</RepositoryUrl>

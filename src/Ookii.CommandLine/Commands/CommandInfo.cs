@@ -326,6 +326,9 @@ public abstract class CommandInfo
 #if NET6_0_OR_GREATER
     [RequiresUnreferencedCode("Command information cannot be statically determined using reflection. Consider using the GeneratedParserAttribute and GeneratedCommandManagerAttribute.", Url = CommandLineParser.UnreferencedCodeHelpUrl)]
 #endif
+#if NET7_0_OR_GREATER
+    [RequiresDynamicCode("Consider using the GeneratedParserAttribute.")]
+#endif
     public static CommandInfo? TryCreate(Type commandType, CommandManager manager)
         => ReflectionCommandInfo.TryCreate(commandType, manager);
 
@@ -349,6 +352,9 @@ public abstract class CommandInfo
     /// </returns>
 #if NET6_0_OR_GREATER
     [RequiresUnreferencedCode("Command information cannot be statically determined using reflection. Consider using the GeneratedParserAttribute and GeneratedCommandManagerAttribute.", Url = CommandLineParser.UnreferencedCodeHelpUrl)]
+#endif
+#if NET7_0_OR_GREATER
+    [RequiresDynamicCode("Consider using the GeneratedParserAttribute.")]
 #endif
     public static CommandInfo Create(Type commandType, CommandManager manager)
         => new ReflectionCommandInfo(commandType, null, manager);

@@ -14,6 +14,9 @@ namespace Ookii.CommandLine.Support;
 #if NET6_0_OR_GREATER
 [RequiresUnreferencedCode("Argument information cannot be statically determined using reflection. Consider using the GeneratedParserAttribute.", Url = CommandLineParser.UnreferencedCodeHelpUrl)]
 #endif
+#if NET7_0_OR_GREATER
+[RequiresDynamicCode("Argument information cannot be statically determined using reflection. Consider using the GeneratedParserAttribute.", Url = CommandLineParser.UnreferencedCodeHelpUrl)]
+#endif
 internal class ReflectionArgument : CommandLineArgument
 {
     #region Nested types

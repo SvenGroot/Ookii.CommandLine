@@ -76,6 +76,9 @@ public class KeyValuePairConverter<TKey, TValue> : ArgumentConverter
 #if NET6_0_OR_GREATER
     [RequiresUnreferencedCode("Key and value converters cannot be statically determined.")]
 #endif
+#if NET7_0_OR_GREATER
+    [RequiresDynamicCode("Creating key and value converters may require dynamic code.")]
+#endif
     public KeyValuePairConverter()
         : this(typeof(TKey).GetStringConverter(null), typeof(TValue).GetStringConverter(null), null,
               !typeof(TValue).IsValueType || typeof(TValue).IsNullableValueType())
