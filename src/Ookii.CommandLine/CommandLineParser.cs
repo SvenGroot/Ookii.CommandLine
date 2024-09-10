@@ -1727,6 +1727,13 @@ public class CommandLineParser
             }
 
             state.Index = index;
+
+            // The caller will increment again, so if we reached the end, decrement to avoid the
+            // index going out of range for determining remaining arguments if there's an exception.
+            if (state.Index == state.Arguments.Length)
+            {
+                state.Index = state.Arguments.Length - 1;
+            }
         }
 
         // If the value was not parsed above, parse it now. In case there is no value and it's

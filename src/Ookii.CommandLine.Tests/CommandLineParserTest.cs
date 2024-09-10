@@ -1177,6 +1177,8 @@ public partial class CommandLineParserTest
         Assert.AreEqual(IPAddress.Loopback, result.Address);
         Assert.AreEqual(10, result.Throughput);
         Assert.AreEqual(1, result.Protocol);
+
+        CheckThrows(parser, ["-Value", "foo", "bar"], CommandLineArgumentErrorCategory.DependencyFailed, "Value");
     }
 
     [TestMethod]

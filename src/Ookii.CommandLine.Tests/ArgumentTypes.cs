@@ -493,6 +493,13 @@ partial class DependencyArguments
     [Description("The path.")]
     [Prohibits("Address")]
     public FileInfo Path { get; set; }
+
+    // Multi-value argument that allows white-space separator and has a dependency.
+    // This makes sure the index isn't out of range after the argument is parsed.
+    [CommandLineArgument("Value", IsHidden = true)]
+    [Requires(nameof(Path))]
+    [MultiValueSeparator]
+    public string[] Values { get; set; }
 }
 
 [GeneratedParser]
