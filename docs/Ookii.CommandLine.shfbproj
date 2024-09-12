@@ -51,7 +51,7 @@
     <SyntaxFilters>C#, Visual Basic, Visual Basic Usage, Managed C++</SyntaxFilters>
     <SdkLinkTarget>Blank</SdkLinkTarget>
     <RootNamespaceContainer>True</RootNamespaceContainer>
-    <Preliminary>True</Preliminary>
+    <Preliminary>False</Preliminary>
     <ContentPlacement>AboveNamespaces</ContentPlacement>
     <CleanIntermediates>True</CleanIntermediates>
     <KeepLogFile>True</KeepLogFile>

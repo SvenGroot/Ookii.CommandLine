@@ -1,6 +1,6 @@
 # What’s new in Ookii.CommandLine
 
-## Ookii.CommandLine 4.2 (TBD)
+## Ookii.CommandLine 4.2 (2024-09-12)
 
 - The [helper methods](Utilities.md#virtual-terminal-support) in the [`VirtualTerminal`][] class now
   use the [`LineWrappingTextWriter`][] class to properly white-space their output.
@@ -10,6 +10,7 @@
   methods as appropriate, to avoid compiler warnings about hidden base class members.
 - The library is now fully compatible with native AOT (ahead-of-time) compilation, when
   [source generation](SourceGeneration.md) is used.
+- Bug fixes.
 
 ## Ookii.CommandLine 4.1 (2024-01-26)
 
