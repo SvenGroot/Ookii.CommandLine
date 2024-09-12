@@ -17,7 +17,8 @@ public class GeneratedDictionaryArgument<TKey, TValue> : GeneratedArgumentBase
     where TKey : notnull
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="GeneratedArgument{TElementWithNullable}"/> class.
+    /// Initializes a new instance of the <see cref="GeneratedDictionaryArgument{TKey, TValue}"/>
+    /// class.
     /// </summary>
     /// <param name="info">The argument creation information.</param>
     public GeneratedDictionaryArgument(in ArgumentCreationInfo info) : base(info)
