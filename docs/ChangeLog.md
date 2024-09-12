@@ -3,7 +3,7 @@
 ## Ookii.CommandLine 4.2 (2024-09-12)
 
 - The [helper methods](Utilities.md#virtual-terminal-support) in the [`VirtualTerminal`][] class now
-  use the [`LineWrappingTextWriter`][] class to properly white-space their output.
+  use the [`LineWrappingTextWriter`][] class to properly white-space wrap their output.
 - Added the [`LineWrappingTextWriter.ForStandardStream()`][] method.
 - When using the [`GeneratedParserAttribute`] on a class that has a base class that also uses the
   [`GeneratedParserAttribute`], the source generator will now emit the `new` keyword on generated
