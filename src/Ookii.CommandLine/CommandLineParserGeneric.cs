@@ -56,6 +56,9 @@ public class CommandLineParser<T> : CommandLineParser
 #if NET6_0_OR_GREATER
     [RequiresUnreferencedCode("Argument information cannot be statically determined using reflection. Consider using the GeneratedParserAttribute.", Url = UnreferencedCodeHelpUrl)]
 #endif
+#if NET7_0_OR_GREATER
+    [RequiresDynamicCode("Consider using the GeneratedParserAttribute.")]
+#endif
     public CommandLineParser(ParseOptions? options = null)
         : base(typeof(T), options)
     {

@@ -19,9 +19,9 @@ namespace Ookii.CommandLine;
 ///   same methods are added, but they will not implement the static interfaces.
 /// </para>
 /// <para>
-///   Using these generted methods allows trimming your application without warnings, as they avoid the
-///   regular constructors of the <see cref="CommandLineParser"/> and <see cref="CommandLineParser{T}"/>
-///   class.
+///   Using these generated methods allows the use of trimming and native AOT for your application,
+///   as they avoid the regular constructors of the <see cref="CommandLineParser"/> and
+///   <see cref="CommandLineParser{T}"/> class, which are incompatible with these options.
 /// </para>
 /// <para>
 ///   When using source generation with subcommands, you should also use a class with the

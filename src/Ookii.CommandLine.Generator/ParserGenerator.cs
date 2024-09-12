@@ -94,19 +94,14 @@ internal class ParserGenerator
         else if (_argumentsClass.ImplementsInterface(_typeHelper.ICommand))
         {
             // Although this is a common pattern for base classes, it makes no sense to apply the
-            // GeneratedParserAttribute to a base class.
+            // GeneratedParserAttribute to a base class that isn't also used stand-alone.
             _context.ReportDiagnostic(Diagnostics.CommandInterfaceWithoutAttribute(_argumentsClass));
         }
 
         // Don't generate the parse methods for commands unless explicitly asked for.
-        var generateParseMethods = !isCommand;
-        foreach (var arg in attributes.GeneratedParser!.NamedArguments)
+        if (attributes.GeneratedParser!.GetNamedArgument("GenerateParseMethods")?.Value is not bool generateParseMethods)
         {
-            if (arg.Key == "GenerateParseMethods")
-            {
-                generateParseMethods = (bool)arg.Value.Value!;
-                break;
-            }
+            generateParseMethods = !isCommand;
         }
 
         _builder.AppendLine($"partial class {_argumentsClass.Name}");
@@ -154,6 +149,7 @@ internal class ParserGenerator
             }
         }
 
+        string newKeyword = attributes.HasGeneratedBase ? "new " : string.Empty;
         _builder.AppendLine();
         _builder.AppendLine("/// <summary>");
         _builder.AppendLine("/// Creates a <see cref=\"Ookii.CommandLine.CommandLineParser{T}\"/> instance using the specified options.");
@@ -166,12 +162,14 @@ internal class ParserGenerator
         _builder.AppendLine($"/// An instance of the <see cref=\"Ookii.CommandLine.CommandLineParser{{T}}\"/> class for the <see cref=\"{_argumentsClass.ToQualifiedName()}\"/> class.");
         _builder.AppendLine("/// </returns>");
         _builder.AppendGeneratedCodeAttribute();
-        _builder.AppendLine($"public static Ookii.CommandLine.CommandLineParser<{_argumentsClass.ToQualifiedName()}> CreateParser(Ookii.CommandLine.ParseOptions? options = null) => new Ookii.CommandLine.CommandLineParser<{_argumentsClass.ToQualifiedName()}>(new OokiiCommandLineArgumentProvider(), options);");
+        _builder.AppendLine($"public static {newKeyword}Ookii.CommandLine.CommandLineParser<{_argumentsClass.ToQualifiedName()}> CreateParser(Ookii.CommandLine.ParseOptions? options = null) => new Ookii.CommandLine.CommandLineParser<{_argumentsClass.ToQualifiedName()}>(new OokiiCommandLineArgumentProvider(), options);");
         _builder.AppendLine();
         var nullableType = _argumentsClass.WithNullableAnnotation(NullableAnnotation.Annotated);
 
         if (generateParseMethods)
         {
+            newKeyword = attributes.HasGeneratedBaseWithParseMethods ? "new " : string.Empty;
+
             // We cannot rely on default interface implementations, because that makes the methods
             // uncallable without a generic type argument.
             _builder.AppendLine("/// <summary>");
@@ -187,7 +185,7 @@ internal class ParserGenerator
             _builder.AppendLine("///   error occurred or argument parsing was canceled.");
             _builder.AppendLine("/// </returns>");
             _builder.AppendGeneratedCodeAttribute();
-            _builder.AppendLine($"public static {nullableType.ToQualifiedName()} Parse(Ookii.CommandLine.ParseOptions? options = null) => CreateParser(options).ParseWithErrorHandling();");
+            _builder.AppendLine($"public static {newKeyword}{nullableType.ToQualifiedName()} Parse(Ookii.CommandLine.ParseOptions? options = null) => CreateParser(options).ParseWithErrorHandling();");
             _builder.AppendLine();
             _builder.AppendLine("/// <summary>");
             _builder.AppendLine("/// Parses the specified command line arguments, handling errors and showing usage help as required.");
@@ -202,7 +200,7 @@ internal class ParserGenerator
             _builder.AppendLine("///   error occurred or argument parsing was canceled.");
             _builder.AppendLine("/// </returns>");
             _builder.AppendGeneratedCodeAttribute();
-            _builder.AppendLine($"public static {nullableType.ToQualifiedName()} Parse(string[] args, Ookii.CommandLine.ParseOptions? options = null) => CreateParser(options).ParseWithErrorHandling(args);");
+            _builder.AppendLine($"public static {newKeyword}{nullableType.ToQualifiedName()} Parse(string[] args, Ookii.CommandLine.ParseOptions? options = null) => CreateParser(options).ParseWithErrorHandling(args);");
             _builder.AppendLine();
             _builder.AppendLine("/// <summary>");
             _builder.AppendLine("/// Parses the specified command line arguments, handling errors and showing usage help as required.");
@@ -217,7 +215,7 @@ internal class ParserGenerator
             _builder.AppendLine("///   error occurred or argument parsing was canceled.");
             _builder.AppendLine("/// </returns>");
             _builder.AppendGeneratedCodeAttribute();
-            _builder.AppendLine($"public static {nullableType.ToQualifiedName()} Parse(System.ReadOnlyMemory<string> args, Ookii.CommandLine.ParseOptions? options = null) => CreateParser(options).ParseWithErrorHandling(args);");
+            _builder.AppendLine($"public static {newKeyword}{nullableType.ToQualifiedName()} Parse(System.ReadOnlyMemory<string> args, Ookii.CommandLine.ParseOptions? options = null) => CreateParser(options).ParseWithErrorHandling(args);");
             _builder.CloseBlock(); // class
         }
 
@@ -240,10 +238,10 @@ internal class ParserGenerator
         _builder.AppendLine(": base(");
         _builder.IncreaseIndent();
         _builder.AppendArgument($"typeof({_argumentsClass.Name})");
-        AppendOptionalAttribute(attributes.ParseOptions, "options");
-        AppendOptionalAttribute(attributes.ClassValidators, "validators", "Ookii.CommandLine.Validation.ClassValidationAttribute");
-        AppendOptionalAttribute(attributes.ApplicationFriendlyName, "friendlyName");
-        AppendOptionalAttribute(attributes.Description, "description");
+        AppendOptionalAttributeArgument(attributes.ParseOptions, "options");
+        AppendOptionalAttributeArgument(attributes.ClassValidators, "validators", "Ookii.CommandLine.Validation.ClassValidationAttribute");
+        AppendOptionalAttributeArgument(attributes.ApplicationFriendlyName, "friendlyName");
+        AppendOptionalAttributeArgument(attributes.Description, "description");
         _builder.CloseArgumentList(false);
         _builder.DecreaseIndent();
         _builder.AppendLine("{}");
@@ -498,60 +496,69 @@ internal class ParserGenerator
             return false;
         }
 
-        // The leading commas are not a formatting I like but it does make things easier here.
-        _builder.AppendLine($"yield return Ookii.CommandLine.Support.GeneratedArgument.Create(");
+        if (isDictionary)
+        {
+            _builder.AppendLine($"yield return new Ookii.CommandLine.Support.GeneratedDictionaryArgument<{keyType!.ToQualifiedName()}, {valueType!.ToQualifiedName()}>(");
+        }
+        else
+        {
+            _builder.AppendLine($"yield return new Ookii.CommandLine.Support.GeneratedArgument<{elementTypeWithNullable.ToQualifiedName()}>(");
+        }
+
         _builder.IncreaseIndent();
-        _builder.AppendArgument("parser");
-        _builder.AppendArgument($"argumentType: typeof({argumentType.ToQualifiedName()})");
-        _builder.AppendArgument($"elementTypeWithNullable: typeof({elementTypeWithNullable.ToQualifiedName()})");
-        _builder.AppendArgument($"elementType: typeof({elementType.ToQualifiedName()})");
-        _builder.AppendArgument($"memberName: \"{member.Name}\"");
-        _builder.AppendArgument($"kind: {kind}");
-        _builder.AppendArgument($"attribute: {attributes.CommandLineArgument.CreateInstantiation()}");
-        _builder.AppendArgument($"converter: {converter}");
-        _builder.AppendArgument($"allowsNull: {(allowsNull.ToCSharpString())}");
+        _builder.AppendLine("new Ookii.CommandLine.Support.ArgumentCreationInfo");
+        _builder.OpenBlock();
+        _builder.AppendLine("Parser = parser,");
+        _builder.AppendLine($"ArgumentType = typeof({argumentType.ToQualifiedName()}),");
+        _builder.AppendLine($"ElementTypeWithNullable = typeof({elementTypeWithNullable.ToQualifiedName()}),");
+        _builder.AppendLine($"ElementType = typeof({elementType.ToQualifiedName()}),");
+        _builder.AppendLine($"MemberName = \"{member.Name}\",");
+        _builder.AppendLine($"Kind = {kind},");
+        _builder.AppendLine($"Attribute = {attributes.CommandLineArgument.CreateInstantiation()},");
+        _builder.AppendLine($"Converter = {converter},");
+        _builder.AppendLine($"AllowsNull = {allowsNull.ToCSharpString()},");
         var valueDescriptionFormat = new SymbolDisplayFormat(genericsOptions: SymbolDisplayGenericsOptions.IncludeTypeParameters);
         if (keyType != null)
         {
-            _builder.AppendArgument($"keyType: typeof({keyType.ToQualifiedName()})");
-            _builder.AppendArgument($"defaultKeyDescription: \"{keyType.ToDisplayString(valueDescriptionFormat)}\"");
+            _builder.AppendLine($"KeyType = typeof({keyType.ToQualifiedName()}),");
+            _builder.AppendLine($"DefaultKeyDescription = \"{keyType.ToDisplayString(valueDescriptionFormat)}\",");
         }
 
         if (valueType != null)
         {
-            _builder.AppendArgument($"valueType: typeof({valueType.ToQualifiedName()})");
-            _builder.AppendArgument($"defaultValueDescription: \"{valueType.ToDisplayString(valueDescriptionFormat)}\"");
+            _builder.AppendLine($"ValueType = typeof({valueType.ToQualifiedName()}),");
+            _builder.AppendLine($"DefaultValueDescription = \"{valueType.ToDisplayString(valueDescriptionFormat)}\",");
         }
         else
         {
-            _builder.AppendArgument($"defaultValueDescription: \"{elementType.ToDisplayString(valueDescriptionFormat)}\"");
+            _builder.AppendLine($"DefaultValueDescription = \"{elementType.ToDisplayString(valueDescriptionFormat)}\",");
         }
 
-        AppendOptionalAttribute(attributes.MultiValueSeparator, "multiValueSeparatorAttribute");
-        AppendOptionalAttribute(attributes.Description, "descriptionAttribute");
-        AppendOptionalAttribute(attributes.ValueDescription, "valueDescriptionAttribute");
+        AppendOptionalAttribute(attributes.MultiValueSeparator, "MultiValueSeparatorAttribute");
+        AppendOptionalAttribute(attributes.Description, "DescriptionAttribute");
+        AppendOptionalAttribute(attributes.ValueDescription, "ValueDescriptionAttribute");
         if (attributes.AllowDuplicateDictionaryKeys != null)
         {
-            _builder.AppendArgument("allowDuplicateDictionaryKeys: true");
+            _builder.AppendLine("AllowDuplicateDictionaryKeys = true,");
         }
 
         if (attributes.KeyValueSeparator != null)
         {
-            _builder.AppendArgument($"keyValueSeparatorAttribute: keyValueSeparatorAttribute{member.Name}");
+            _builder.AppendLine($"KeyValueSeparatorAttribute = keyValueSeparatorAttribute{member.Name},");
         }
 
-        AppendOptionalAttribute(attributes.Aliases, "aliasAttributes", "Ookii.CommandLine.AliasAttribute");
-        AppendOptionalAttribute(attributes.ShortAliases, "shortAliasAttributes", "Ookii.CommandLine.ShortAliasAttribute");
-        AppendOptionalAttribute(attributes.Validators, "validationAttributes", "Ookii.CommandLine.Validation.ArgumentValidationAttribute");
+        AppendOptionalAttribute(attributes.Aliases, "AliasAttributes", "Ookii.CommandLine.AliasAttribute");
+        AppendOptionalAttribute(attributes.ShortAliases, "ShortAliasAttributes", "Ookii.CommandLine.ShortAliasAttribute");
+        AppendOptionalAttribute(attributes.Validators, "ValidationAttributes", "Ookii.CommandLine.Validation.ArgumentValidationAttribute");
         if (property != null)
         {
             if (property.SetMethod != null && property.SetMethod.DeclaredAccessibility == Accessibility.Public && !property.SetMethod.IsInitOnly)
             {
-                _builder.AppendArgument($"setProperty: (target, value) => (({_argumentsClass.ToQualifiedName()})target).{member.Name} = ({originalArgumentType.ToQualifiedName()})value{notNullAnnotation}");
+                _builder.AppendLine($"SetProperty = (target, value) => (({_argumentsClass.ToQualifiedName()})target).{member.Name} = ({originalArgumentType.ToQualifiedName()})value{notNullAnnotation},");
             }
 
-            _builder.AppendArgument($"getProperty: (target) => (({_argumentsClass.ToQualifiedName()})target).{member.Name}");
-            _builder.AppendArgument($"requiredProperty: {property.IsRequired.ToCSharpString()}");
+            _builder.AppendLine($"GetProperty = (target) => (({_argumentsClass.ToQualifiedName()})target).{member.Name},");
+            _builder.AppendLine($"RequiredProperty = {property.IsRequired.ToCSharpString()},");
             if (argumentInfo.DefaultValue != null)
             {
                 if (isMultiValue)
@@ -575,7 +582,7 @@ internal class ParserGenerator
                 var alternateDefaultValue = GetInitializerValue(property);
                 if (alternateDefaultValue != null)
                 {
-                    _builder.AppendArgument($"alternateDefaultValue: {alternateDefaultValue}");
+                    _builder.AppendLine($"AlternateDefaultValue = {alternateDefaultValue},");
                 }
             }
         }
@@ -601,12 +608,12 @@ internal class ParserGenerator
 
             var methodCall = info.ReturnType switch
             {
-                ReturnType.CancelMode => $"callMethod: (value, parser) => {_argumentsClass.ToQualifiedName()}.{member.Name}({arguments})",
-                ReturnType.Boolean => $"callMethod: (value, parser) => {_argumentsClass.ToQualifiedName()}.{member.Name}({arguments}) ? Ookii.CommandLine.CancelMode.None : Ookii.CommandLine.CancelMode.Abort",
-                _ => $"callMethod: (value, parser) => {{ {_argumentsClass.ToQualifiedName()}.{member.Name}({arguments}); return Ookii.CommandLine.CancelMode.None; }}"
+                ReturnType.CancelMode => $"CallMethod = (value, parser) => {_argumentsClass.ToQualifiedName()}.{member.Name}({arguments}),",
+                ReturnType.Boolean => $"CallMethod = (value, parser) => {_argumentsClass.ToQualifiedName()}.{member.Name}({arguments}) ? Ookii.CommandLine.CancelMode.None : Ookii.CommandLine.CancelMode.Abort,",
+                _ => $"CallMethod = (value, parser) => {{ {_argumentsClass.ToQualifiedName()}.{member.Name}({arguments}); return Ookii.CommandLine.CancelMode.None; }},"
             };
 
-            _builder.AppendArgument(methodCall);
+            _builder.AppendLine(methodCall);
             if (argumentInfo.DefaultValue != null)
             {
                 _context.ReportDiagnostic(Diagnostics.DefaultValueWithMethod(member));
@@ -649,11 +656,13 @@ internal class ParserGenerator
             }
 
             _hasImplicitPositions = true;
-            _builder.AppendArgument($"position: {_nextImplicitPosition}");
+            _builder.AppendLine($"Position = {_nextImplicitPosition},");
             ++_nextImplicitPosition;
         }
 
-        _builder.CloseArgumentList();
+        _builder.DecreaseIndent();
+        _builder.AppendLine("});");
+        _builder.DecreaseIndent();
         _builder.AppendLine();
 
         // Can't check if long/short name is actually used, or whether the '-' prefix is used for
@@ -898,7 +907,7 @@ internal class ParserGenerator
         return info;
     }
 
-    private void AppendOptionalAttribute(AttributeData? attribute, string name)
+    private void AppendOptionalAttributeArgument(AttributeData? attribute, string name)
     {
         if (attribute != null)
         {
@@ -906,11 +915,27 @@ internal class ParserGenerator
         }
     }
 
-    private void AppendOptionalAttribute(List<AttributeData>? attributes, string name, string typeName)
+    private void AppendOptionalAttributeArgument(List<AttributeData>? attributes, string name, string typeName)
     {
         if (attributes != null)
         {
             _builder.AppendArgument($"{name}: new {typeName}[] {{ {string.Join(", ", attributes.Select(a => a.CreateInstantiation()))} }}");
+        }
+    }
+
+    private void AppendOptionalAttribute(AttributeData? attribute, string name)
+    {
+        if (attribute != null)
+        {
+            _builder.AppendLine($"{name} = {attribute.CreateInstantiation()},");
+        }
+    }
+
+    private void AppendOptionalAttribute(List<AttributeData>? attributes, string name, string typeName)
+    {
+        if (attributes != null)
+        {
+            _builder.AppendLine($"{name} = new {typeName}[] {{ {string.Join(", ", attributes.Select(a => a.CreateInstantiation()))} }},");
         }
     }
 

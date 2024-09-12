@@ -1,4 +1,5 @@
-﻿using Ookii.CommandLine.Conversion;
+﻿using Ookii.CommandLine.Commands;
+using Ookii.CommandLine.Conversion;
 using Ookii.CommandLine.Validation;
 using System;
 using System.Collections.Generic;
@@ -14,7 +15,7 @@ using System.Net;
 #nullable disable
 
 // We deliberately have some properties and methods that cause warnings, so disable those.
-#pragma warning disable OCL0017,OCL0018,OCL0020,OCL0023,OCL0029,OCL0033,OCL0038,OCL0039,OCL0040
+#pragma warning disable OCL0017,OCL0018,OCL0020,OCL0023,OCL0029,OCL0033,OCL0034,OCL0038,OCL0039,OCL0040
 
 namespace Ookii.CommandLine.Tests;
 
@@ -492,6 +493,13 @@ partial class DependencyArguments
     [Description("The path.")]
     [Prohibits("Address")]
     public FileInfo Path { get; set; }
+
+    // Multi-value argument that allows white-space separator and has a dependency.
+    // This makes sure the index isn't out of range after the argument is parsed.
+    [CommandLineArgument("Value", IsHidden = true)]
+    [Requires(nameof(Path))]
+    [MultiValueSeparator]
+    public string[] Values { get; set; }
 }
 
 [GeneratedParser]
@@ -602,7 +610,7 @@ partial class ConversionArguments
 }
 
 [Description("Base class attribute.")]
-class BaseArguments
+partial class BaseArguments
 {
     [CommandLineArgument]
     public string BaseArg { get; set; }
@@ -730,4 +738,62 @@ partial class PrefixTerminationArguments
 
     [CommandLineArgument(Position = 3)]
     public string Arg4 { get; set; }
+}
+
+// These aren't used in the tests, but they're testing that the generator properly emits the "new"
+// keyword for hidden members and that no warnings are generated.
+[GeneratedParser]
+partial class BaseArguments2
+{
+    [CommandLineArgument]
+    public string BaseArg { get; set; }
+}
+
+[GeneratedParser]
+partial class DerivedArguments2 : BaseArguments2
+{
+    [CommandLineArgument]
+    public int DerivedArg { get; set; }
+}
+
+[GeneratedParser(GenerateParseMethods = false)]
+partial class BaseArguments3
+{
+    [CommandLineArgument]
+    public string BaseArg { get; set; }
+}
+
+[GeneratedParser]
+partial class DerivedArguments3 : BaseArguments3
+{
+    [CommandLineArgument]
+    public int DerivedArg { get; set; }
+}
+
+[Command(IsHidden = true)]
+[GeneratedParser(GenerateParseMethods = true)]
+partial class DerivedArguments4 : TestCommand
+{
+    [CommandLineArgument]
+    public int DerivedArg { get; set; }
+}
+
+[GeneratedParser]
+partial class BaseArguments5
+{
+    [CommandLineArgument]
+    public string BaseArg { get; set; }
+}
+
+partial class DerivedArguments5 : BaseArguments5
+{
+    [CommandLineArgument]
+    public int DerivedArg { get; set; }
+}
+
+[GeneratedParser]
+partial class DerivedArguments6 : DerivedArguments5
+{
+    [CommandLineArgument]
+    public int DerivedArg2 { get; set; }
 }

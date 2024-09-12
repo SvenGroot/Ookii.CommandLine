@@ -131,9 +131,13 @@ public static class VirtualTerminal
     ///   if the standard output stream does not support VT sequences. In that case, the value of
     ///   <paramref name="text"/> will be written without formatting.
     /// </para>
+    /// <para>
+    ///   This method uses the <see cref="LineWrappingTextWriter"/> to ensure that the text is
+    ///   properly white-space wrapped at the console width.
+    /// </para>
     /// </remarks>
     public static void WriteLineFormatted(string text, TextFormat textFormat, TextFormat? reset = null)
-        => WriteLineFormatted(StandardStream.Output, Console.Out, text, textFormat, reset ?? TextFormat.Default);
+        => WriteLineFormatted(StandardStream.Output, text, textFormat, reset ?? TextFormat.Default);
 
     /// <summary>
     /// Writes a line to the standard error stream which, if virtual terminal sequences are
@@ -159,9 +163,13 @@ public static class VirtualTerminal
     ///   if the standard error stream does not support VT sequences. In that case, the value of
     ///   <paramref name="text"/> will be written without formatting.
     /// </para>
+    /// <para>
+    ///   This method uses the <see cref="LineWrappingTextWriter"/> to ensure that the text is
+    ///   properly white-space wrapped at the console width.
+    /// </para>
     /// </remarks>
     public static void WriteLineErrorFormatted(string text, TextFormat? textFormat = null, TextFormat? reset = null)
-        => WriteLineFormatted(StandardStream.Error, Console.Error, text, textFormat ?? TextFormat.ForegroundRed, reset ?? TextFormat.Default);
+        => WriteLineFormatted(StandardStream.Error, text, textFormat ?? TextFormat.ForegroundRed, reset ?? TextFormat.Default);
 
     // Returns the index of the character after the end of the sequence.
     internal static int FindSequenceEnd(ReadOnlySpan<char> value, ref StringSegmentType type)
@@ -188,8 +196,9 @@ public static class VirtualTerminal
         };
     }
 
-    private static void WriteLineFormatted(StandardStream stream, TextWriter writer, string text, TextFormat textFormat, TextFormat reset)
+    private static void WriteLineFormatted(StandardStream stream, string text, TextFormat textFormat, TextFormat reset)
     {
+        using var writer = LineWrappingTextWriter.ForStandardStream(stream);
         using var support = EnableColor(stream);
         if (support.IsSupported)
         {

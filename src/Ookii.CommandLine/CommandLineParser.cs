@@ -369,6 +369,9 @@ public class CommandLineParser
 #if NET6_0_OR_GREATER
     [RequiresUnreferencedCode("Argument information cannot be statically determined using reflection. Consider using the GeneratedParserAttribute.", Url = UnreferencedCodeHelpUrl)]
 #endif
+#if NET7_0_OR_GREATER
+    [RequiresDynamicCode("Consider using the GeneratedParserAttribute.")]
+#endif
     public CommandLineParser(Type argumentsType, ParseOptions? options = null)
         : this(GetArgumentProvider(argumentsType ?? throw new ArgumentNullException(nameof(argumentsType)), options), options)
     {
@@ -879,7 +882,10 @@ public class CommandLineParser
             nameWithoutExtension = null;
         }
 #endif
-        path ??= Environment.GetCommandLineArgs().FirstOrDefault() ?? Assembly.GetEntryAssembly()?.Location;
+
+        // The array returned by GetCommandLineArgs should always contain at least one element, but
+        // just in case.
+        path ??= Environment.GetCommandLineArgs().FirstOrDefault() ?? string.Empty;
         if (path == null)
         {
             path = string.Empty;
@@ -1180,6 +1186,9 @@ public class CommandLineParser
 #if NET6_0_OR_GREATER
     [RequiresUnreferencedCode("Argument information cannot be statically determined using reflection. Consider using the GeneratedParserAttribute.", Url = UnreferencedCodeHelpUrl)]
 #endif
+#if NET7_0_OR_GREATER
+    [RequiresDynamicCode("Consider using the GeneratedParserAttribute.")]
+#endif
     public static T? Parse<T>(ParseOptions? options = null)
         where T : class
     {
@@ -1207,6 +1216,9 @@ public class CommandLineParser
     /// </remarks>
 #if NET6_0_OR_GREATER
     [RequiresUnreferencedCode("Argument information cannot be statically determined using reflection. Consider using the GeneratedParserAttribute.", Url = UnreferencedCodeHelpUrl)]
+#endif
+#if NET7_0_OR_GREATER
+    [RequiresDynamicCode("Consider using the GeneratedParserAttribute.")]
 #endif
     public static T? Parse<T>(ReadOnlyMemory<string> args, ParseOptions? options = null)
         where T : class
@@ -1242,6 +1254,9 @@ public class CommandLineParser
     /// </remarks>
 #if NET6_0_OR_GREATER
     [RequiresUnreferencedCode("Argument information cannot be statically determined using reflection. Consider using the GeneratedParserAttribute.", Url = UnreferencedCodeHelpUrl)]
+#endif
+#if NET7_0_OR_GREATER
+    [RequiresDynamicCode("Consider using the GeneratedParserAttribute.")]
 #endif
     public static T? Parse<T>(string[] args, ParseOptions? options = null)
         where T : class
@@ -1712,6 +1727,13 @@ public class CommandLineParser
             }
 
             state.Index = index;
+
+            // The caller will increment again, so if we reached the end, decrement to avoid the
+            // index going out of range for determining remaining arguments if there's an exception.
+            if (state.Index == state.Arguments.Length)
+            {
+                state.Index = state.Arguments.Length - 1;
+            }
         }
 
         // If the value was not parsed above, parse it now. In case there is no value and it's
@@ -1945,6 +1967,9 @@ public class CommandLineParser
 
 #if NET6_0_OR_GREATER
     [RequiresUnreferencedCode("Argument information cannot be statically determined using reflection. Consider using the GeneratedParserAttribute.", Url = UnreferencedCodeHelpUrl)]
+#endif
+#if NET7_0_OR_GREATER
+    [RequiresDynamicCode("Consider using the GeneratedParserAttribute.")]
 #endif
     private static ArgumentProvider GetArgumentProvider(Type type, ParseOptions? options)
     {

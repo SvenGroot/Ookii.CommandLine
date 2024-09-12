@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
 namespace Ookii.CommandLine.Support;
@@ -16,6 +17,11 @@ namespace Ookii.CommandLine.Support;
 /// attribute. It should not normally be used by other code.
 /// </remarks>
 /// <threadsafety static="true" instance="false"/>
+// This class is here only for binary compatibility with previous versions of the library. It
+// should be removed for the next major version.
+#if NET7_0_OR_GREATER
+[RequiresDynamicCode("Recompile your project to use the updated generator.")]
+#endif
 public class GeneratedArgument : CommandLineArgument
 {
     private readonly Action<object, object?>? _setProperty;
@@ -25,14 +31,13 @@ public class GeneratedArgument : CommandLineArgument
     private readonly string? _defaultKeyDescription;
     private MemberInfo? _member;
 
-    private GeneratedArgument(ArgumentInfo info, Action<object, object?>? setProperty, Func<object, object?>? getProperty,
-        Func<object?, CommandLineParser, CancelMode>? callMethod, string defaultValueDescription, string? defaultKeyDescription) : base(info)
+    private GeneratedArgument(ArgumentCreationInfo info) : base(new ArgumentInfo(info))
     {
-        _setProperty = setProperty;
-        _getProperty = getProperty;
-        _callMethod = callMethod;
-        _defaultValueDescription = defaultValueDescription;
-        _defaultKeyDescription = defaultKeyDescription;
+        _setProperty = info.SetProperty;
+        _getProperty = info.GetProperty;
+        _callMethod = info.CallMethod;
+        _defaultValueDescription = info.DefaultValueDescription;
+        _defaultKeyDescription = info.DefaultKeyDescription;
     }
 
     /// <summary>
@@ -112,31 +117,38 @@ public class GeneratedArgument : CommandLineArgument
                                            Func<object, object?>? getProperty = null,
                                            Func<object?, CommandLineParser, CancelMode>? callMethod = null)
     {
-        if (position is int pos)
+        var creationInfo = new ArgumentCreationInfo()
         {
-            Debug.Assert(attribute.IsPositional && attribute.Position < 0);
-            attribute.Position = pos;
-        }
+            Parser = parser,
+            ArgumentType = argumentType,
+            ElementType = elementType,
+            ElementTypeWithNullable = elementTypeWithNullable,
+            MemberName = memberName,
+            Attribute = attribute,
+            Kind = kind,
+            Converter = converter,
+            AllowsNull = allowsNull,
+            DefaultValueDescription = defaultValueDescription,
+            Position = position,
+            DefaultKeyDescription = defaultKeyDescription,
+            RequiredProperty = requiredProperty,
+            AlternateDefaultValue = alternateDefaultValue,
+            KeyType = keyType,
+            ValueType = valueType,
+            MultiValueSeparatorAttribute = multiValueSeparatorAttribute,
+            DescriptionAttribute = descriptionAttribute,
+            ValueDescriptionAttribute = valueDescriptionAttribute,
+            AllowDuplicateDictionaryKeys = allowDuplicateDictionaryKeys,
+            KeyValueSeparatorAttribute = keyValueSeparatorAttribute,
+            AliasAttributes = aliasAttributes,
+            ShortAliasAttributes = shortAliasAttributes,
+            ValidationAttributes = validationAttributes,
+            SetProperty = setProperty,
+            GetProperty = getProperty,
+            CallMethod = callMethod
+        };
 
-        var info = CreateArgumentInfo(parser, argumentType, allowsNull, requiredProperty, memberName, attribute,
-            descriptionAttribute, valueDescriptionAttribute, aliasAttributes, shortAliasAttributes, validationAttributes);
-
-        info.ElementType = elementType;
-        info.ElementTypeWithNullable = elementTypeWithNullable;
-        info.Converter = converter;
-        info.Kind = kind;
-        info.DefaultValue ??= alternateDefaultValue;
-        if (info.Kind is ArgumentKind.MultiValue or ArgumentKind.Dictionary)
-        {
-            info.MultiValueInfo = GetMultiValueInfo(multiValueSeparatorAttribute);
-            if (info.Kind == ArgumentKind.Dictionary)
-            {
-                info.DictionaryInfo = new(allowDuplicateDictionaryKeys, keyType!, valueType!,
-                    keyValueSeparatorAttribute?.Separator ?? KeyValuePairConverter.DefaultSeparator);
-            }
-        }
-
-        return new GeneratedArgument(info, setProperty, getProperty, callMethod, defaultValueDescription, defaultKeyDescription);
+        return new GeneratedArgument(creationInfo);
     }
 
     /// <inheritdoc/>
@@ -189,5 +201,17 @@ public class GeneratedArgument : CommandLineArgument
         }
 
         return _defaultValueDescription;
+    }
+
+    private protected override IValueHelper CreateDictionaryValueHelper()
+    {
+        var type = typeof(DictionaryValueHelper<,>).MakeGenericType(ElementType.GetGenericArguments());
+        return (IValueHelper)Activator.CreateInstance(type, DictionaryInfo!.AllowDuplicateKeys, AllowNull)!;
+    }
+
+    private protected override IValueHelper CreateMultiValueHelper()
+    {
+        var type = typeof(MultiValueHelper<>).MakeGenericType(ElementTypeWithNullable);
+        return (IValueHelper)Activator.CreateInstance(type)!;
     }
 }
