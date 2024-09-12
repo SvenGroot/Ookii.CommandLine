@@ -369,6 +369,7 @@ for a section such as [`WriteParserUsageSyntax()`][] or [`WriteArgumentDescripti
 responsible for a single argument like [`WriteArgumentSyntax()`][] or [`WriteArgumentDescription()`][WriteArgumentDescription()_1], down
 to methods that write single piece of text like [`WriteArgumentName()`][] or [`WriteValueDescription()`][].
 
+> [!NOTE]
 > The [`UsageWriter`][] class has several properties and methods that apply only to
 > [subcommands](Subcommands.md#subcommand-usage-help), so setting or overriding these will have no
 > effect if you are not using subcommands.

@@ -23,6 +23,7 @@ Most of the time, you will probably want to use the [`LineWrappingTextWriter.For
 [`LineWrappingTextWriter.ForConsoleError()`][] methods to create a writer for the standard output or
 error streams, automatically wrapping at the console width.
 
+> [!NOTE]
 > Both methods actually use `Console.WindowWidth - 1` for their maximum line length, because using
 > [`Console.WindowWidth`][] exactly can lead to extra blank lines if a line is exactly the width of
 > the console.

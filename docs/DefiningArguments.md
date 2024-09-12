@@ -47,6 +47,7 @@ The below defines an argument with the name `-SomeArgument`. Its type is a
 public string? SomeArgument { get; set; }
 ```
 
+> [!NOTE]
 > All examples on this page assume you are using the default parsing mode (not long/short) and no
 > name transformation, unless specified otherwise. With the [right options](#longshort-mode), this
 > same property could also define an argument called `--some-argument`.
@@ -81,6 +82,7 @@ Here, `-SomeArgument` will be the first positional argument, and `-OtherArgument
 If not using source generation, you must instead set the [`CommandLineArgumentAttribute.Position`][]
 property to a non-negative number. The numbers determine the order.
 
+> [!NOTE]
 > Without source generation, reflection is used to determine the arguments, and reflection is not
 > guaranteed to return the members of a type in any particular order, which is why the
 > [`IsPositional`][] property is only supported when using source generation. The [`Position`][Position_1] property
@@ -259,6 +261,7 @@ argument's description in the [usage help](UsageHelp.md) as long as the value is
 constant, a property reference, or an enumeration value. Other types of initializers (such as a
 `new` expression or a method call), will not have their value shown in the usage help.
 
+> [!TIP]
 > You can disable showing default values in the usage help if you do not want it.
 
 Alternatively, you can specify the default value using the

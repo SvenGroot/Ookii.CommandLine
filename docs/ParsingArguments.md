@@ -114,6 +114,7 @@ information about the arguments using the [`Arguments`][Arguments_0] property or
 In this case, you can manually create an instance of the [`CommandLineParser<T>`][] class. Then, call
 the instance [`ParseWithErrorHandling()`][ParseWithErrorHandling()_1] or [`Parse()`][Parse()_5] method.
 
+> [!NOTE]
 > The [`CommandLineParser<T>`][] class is a helper class that derives from [`CommandLineParser`][]
 > and provides strongly-typed [`Parse()`][Parse()_5] and
 > [`ParseWithErrorHandling()`][ParseWithErrorHandling()_1] methods.

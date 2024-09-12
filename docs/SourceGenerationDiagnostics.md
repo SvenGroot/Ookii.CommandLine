@@ -531,8 +531,9 @@ The [`CommandLineArgumentAttribute.IsRequired`][] property is ignored for a prop
 `required` keyword. If the `required` keyword is present, the argument is required, even if you
 set the [`IsRequired`][IsRequired_1] property to false explicitly.
 
-> The `required` keyword is only available in .Net 7.0 and later; the [`IsRequired`][IsRequired_1] property should
-> be used to create required arguments in older versions of .Net.
+> [!NOTE]
+> The `required` keyword is only available in .Net 7.0 and later; the [`IsRequired`][IsRequired_1]
+> property should be used to create required arguments in older versions of .Net.
 
 For example, the following code triggers this warning:
 

@@ -65,6 +65,7 @@ partial class MyArguments
 
 Each argument has a different type that determines the kinds of values it can accept.
 
+> [!NOTE]
 > If you are using an older version of .Net where the `required` keyword is not available, you can
 > use `[CommandLineArgument(IsRequired = true)]` to create a required argument instead.
 

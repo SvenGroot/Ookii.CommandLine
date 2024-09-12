@@ -318,6 +318,7 @@ This code does the following:
       [`CommandLineParser.Parse<T>()`][] method, and return null.
 3. If [`RunCommand()`][] returned null, returns an error exit code.
 
+> [!NOTE]
 > Note: the [`CommandManager`][] does not check if command names and aliases are unique. If you have
 > multiple commands with the same names, the first matching one will be used, and there is no
 > guarantee on the order in which command classes are checked.
@@ -408,6 +409,7 @@ customize the parsing behavior. When using [`CommandManager`][], you use the [`C
 class to provide options. This class derives from [`ParseOptions`][], so all the same options are
 available, in addition to several options that apply only to subcommands.
 
+> [!TIP]
 > While you can use the [`ParseOptionsAttribute`][] to customize the behavior of a subcommand class,
 > this will only apply to the class using the attribute. For a consistent experience, it's preferred
 > to use [`CommandOptions`][].
@@ -638,6 +640,7 @@ class MyParentCommand : ParentCommand
 }
 ```
 
+> [!NOTE]
 > [`ParentCommand`][] uses [`ICommandWithCustomParsing`][], so it cannot use the [`GeneratedParserAttribute`][].
 
 Typically, this class can be empty, although [`ParentCommand`][] provides several protected methods you
