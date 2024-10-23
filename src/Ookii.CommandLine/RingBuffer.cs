@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Ookii.Common;
+using System;
 using System.Diagnostics;
 using System.IO;
 
@@ -98,7 +99,7 @@ internal partial class RingBuffer
         }
     }
 
-    public StringSpanTuple GetContents(int offset)
+    public ReadOnlySpanPair<char, char> GetContents(int offset)
     {
         if (offset < 0 || offset > Size)
         {

@@ -93,7 +93,7 @@ public partial class LineWrappingTextWriter
             // plus the indentation is more than the line length.
             if (LineLength <= maxLength &&
                 newSegment.Span.Length != 0 &&
-                newSegment.BreakLine(maxLength - LineLength, mode, out var splits))
+                newSegment.BreakLine(maxLength - LineLength, mode) is (ReadOnlyMemory<char>, ReadOnlyMemory<char>) splits)
             {
                 var (before, after) = splits;
                 await WriteSegmentsAsync(writer, _segments, cancellationToken);

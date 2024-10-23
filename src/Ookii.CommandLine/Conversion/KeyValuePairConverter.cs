@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Ookii.Common;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
@@ -175,14 +176,13 @@ public class KeyValuePairConverter<TKey, TValue> : ArgumentConverter
             throw new ArgumentNullException(nameof(argument));
         }
 
-        var (key, valueForKey) = value.SplitOnce(Separator.AsSpan(), out bool hasSeparator);
-        if (!hasSeparator)
+        if (!value.SplitOnce(Separator.AsSpan(), StringComparison.Ordinal).TryGetValue(out var splits))
         {
             throw new FormatException(argument.Parser.StringProvider.MissingKeyValuePairSeparator(Separator));
         }
 
-        var convertedKey = KeyConverter.Convert(key, culture, argument);
-        var convertedValue = ValueConverter.Convert(valueForKey, culture, argument);
+        var convertedKey = KeyConverter.Convert(splits.Item1, culture, argument);
+        var convertedValue = ValueConverter.Convert(splits.Item2, culture, argument);
         if (convertedKey == null || !AllowNullValues && convertedValue == null)
         {
             throw argument.Parser.StringProvider.CreateException(CommandLineArgumentErrorCategory.NullArgumentValue,
