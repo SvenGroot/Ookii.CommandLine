@@ -2,6 +2,7 @@
 using Ookii.CommandLine.Support;
 using Ookii.CommandLine.Terminal;
 using Ookii.CommandLine.Validation;
+using Ookii.Common;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -1816,8 +1817,11 @@ public class CommandLineParser
             return false;
         }
 
-        (state.ArgumentName, state.ArgumentValue) = 
-            token.AsMemory(prefix.Prefix.Length).SplitFirstOfAny(_nameValueSeparators.AsSpan());
+        state.ArgumentName = token.AsMemory(prefix.Prefix.Length);
+        if (state.ArgumentName.SplitOnceAny(_nameValueSeparators.AsSpan()) is (ReadOnlyMemory<char>, ReadOnlyMemory<char>) split)
+        {
+            (state.ArgumentName, state.ArgumentValue) = split;
+        }
 
         if (_argumentsByShortName != null && prefix.Short)
         {
@@ -1947,7 +1951,7 @@ public class CommandLineParser
 
     private PrefixInfo? CheckArgumentNamePrefix(string argument)
     {
-        // Even if '-' is the argument name prefix, we consider an argument starting with dash
+        // Even if '-' is an argument name prefix, we consider an argument starting with dash
         // followed by a digit as a value, because it could be a negative number.
         if (argument.Length >= 2 && argument[0] == '-' && char.IsDigit(argument, 1))
         {

@@ -1,10 +1,10 @@
 ﻿using Ookii.CommandLine.Conversion;
 using Ookii.CommandLine.Support;
 using Ookii.CommandLine.Validation;
+using Ookii.Common;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
@@ -1369,7 +1369,7 @@ public abstract class CommandLineArgument
         if (MultiValueInfo?.Separator != null)
         {
             cancelParsing = CancelMode.None;
-            spanValue.Split(MultiValueInfo.Separator.AsSpan(), separateValue =>
+            foreach (var separateValue in spanValue.Split(MultiValueInfo.Separator.AsSpan()))
             {
                 string? separateValueString = null;
                 PreValidate(ref separateValueString, separateValue);
@@ -1380,8 +1380,11 @@ public abstract class CommandLineArgument
                     Validate(converted, ValidationMode.AfterConversion);
                 }
 
-                return cancelParsing == CancelMode.None;
-            });
+                if (cancelParsing != CancelMode.None)
+                {
+                    break;
+                }
+            }
         }
         else
         {

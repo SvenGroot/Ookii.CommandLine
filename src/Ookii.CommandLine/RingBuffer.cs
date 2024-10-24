@@ -65,7 +65,7 @@ internal partial class RingBuffer
         var remaining = _buffer.Length - contentEnd;
         if (remaining < span.Length)
         {
-            var (first, second) = span.Split(remaining);
+            var (first, second) = span.SplitAt(remaining);
             first.CopyTo(_buffer, contentEnd);
             second.CopyTo(_buffer, 0);
             _bufferEnd = second.Length;

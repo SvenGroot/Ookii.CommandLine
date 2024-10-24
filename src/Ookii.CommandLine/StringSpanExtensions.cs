@@ -13,7 +13,6 @@ internal static partial class StringSpanExtensions
 {
     public delegate void Callback(StringSegmentType type, ReadOnlySpan<char> span);
     public delegate Task AsyncCallback(StringSegmentType type, ReadOnlyMemory<char> span);
-    public delegate bool SplitCallback(ReadOnlySpan<char> span);
 
     private static readonly char[] _segmentSeparators = { '\r', '\n', VirtualTerminal.Escape };
     private static readonly char[] _newLineSeparators = { '\r', '\n' };
@@ -27,11 +26,8 @@ internal static partial class StringSpanExtensions
             ? 2
             : 1;
 
-        return self.Split(split);
+        return self.SplitAt(split);
     }
-
-    public static ReadOnlySpanPair<char, char> Split(this ReadOnlySpan<char> self, int index)
-        => new(self.Slice(0, index), self.Slice(index));
 
     public static NullableReadOnlySpanPair<char, char> BreakLine(this ReadOnlySpan<char> self, int startIndex, BreakLineMode mode)
     {
@@ -50,11 +46,8 @@ internal static partial class StringSpanExtensions
             ? 2
             : 1;
 
-        return self.Split(split);
+        return self.SplitAt(split);
     }
-
-    public static (ReadOnlyMemory<char>, ReadOnlyMemory<char>) Split(this ReadOnlyMemory<char> self, int index)
-        => new(self.Slice(0, index), self.Slice(index));
 
     public static (ReadOnlyMemory<char>, ReadOnlyMemory<char>)? BreakLine(this ReadOnlyMemory<char> self, int startIndex, BreakLineMode mode)
     {
@@ -69,20 +62,6 @@ internal static partial class StringSpanExtensions
     public static void CopyTo(this ReadOnlySpan<char> self, char[] destination, int start)
     {
         self.CopyTo(destination.AsSpan(start));
-    }
-
-    public static void Split(this ReadOnlySpan<char> self, ReadOnlySpan<char> separator, SplitCallback callback)
-    {
-        while (!self.IsEmpty)
-        {
-            var (first, remaining) = self.SplitOnce(separator, StringComparison.Ordinal).GetValueOrDefault(new(self, default));
-            if (!callback(first))
-            {
-                break;
-            }
-
-            self = remaining;
-        }
     }
 
     public static partial void WriteTo(this ReadOnlySpan<char> self, TextWriter writer);
