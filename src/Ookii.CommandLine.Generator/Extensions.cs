@@ -120,9 +120,17 @@ internal static class Extensions
 
     public static string CreateInstantiation(this AttributeData attribute)
     {
-        var ctorArgs = attribute.ConstructorArguments.Select(c => c.ToFullCSharpString());
-        var namedArgs = attribute.NamedArguments.Select(n => $"{n.Key} = {n.Value.ToFullCSharpString()}");
-        return $"new {attribute.AttributeClass?.ToDisplayString()}({string.Join(", ", ctorArgs)}) {{ {string.Join(", ", namedArgs)} }}";
+        var ctorArgs = string.Join(", ", attribute.ConstructorArguments.Select(c => c.ToFullCSharpString()));
+
+        if (attribute.NamedArguments.IsEmpty)
+        {
+            return $"new {attribute.AttributeClass?.ToQualifiedName()}({ctorArgs})";
+        }
+        else
+        {
+            var namedArgs = attribute.NamedArguments.Select(n => $"{n.Key} = {n.Value.ToFullCSharpString()}");
+            return $"new {attribute.AttributeClass?.ToQualifiedName()}({ctorArgs}) {{ {string.Join(", ", namedArgs)} }}";
+        }
     }
 
     public static string ToCSharpString(this bool value)
@@ -134,7 +142,7 @@ internal static class Extensions
     {
         return constant.Kind switch
         {
-            TypedConstantKind.Array => $"new {constant.Type?.ToDisplayString()} {constant.ToCSharpString()}",
+            TypedConstantKind.Array => $"new {constant.Type?.ToQualifiedName()} {constant.ToCSharpString()}",
             _ => constant.ToCSharpString(),
         };
     }
