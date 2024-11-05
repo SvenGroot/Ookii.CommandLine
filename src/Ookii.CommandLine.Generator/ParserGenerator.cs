@@ -7,6 +7,9 @@ namespace Ookii.CommandLine.Generator;
 
 internal class ParserGenerator
 {
+
+    #region Nested types
+
     private enum ReturnType
     {
         Void,
@@ -30,6 +33,8 @@ internal class ParserGenerator
         public bool IsMultiValue { get; set; }
     }
 
+    #endregion
+
     private readonly TypeHelper _typeHelper;
     private readonly Compilation _compilation;
     private readonly SourceProductionContext _context;
@@ -42,6 +47,8 @@ internal class ParserGenerator
     private int _nextImplicitPosition;
     private Dictionary<int, string>? _positions;
     private List<PositionalArgumentInfo>? _positionalArguments;
+    private List<(string, string, string)>? _requiredProperties;
+    private ITypeSymbol? _categoryType;
 
     public ParserGenerator(SourceProductionContext context, INamedTypeSymbol argumentsClass, TypeHelper typeHelper,
         ConverterGenerator converterGenerator, CommandGenerator commandGenerator, LanguageVersion languageVersion)
@@ -246,7 +253,6 @@ internal class ParserGenerator
         _builder.AppendLine("public override System.Collections.Generic.IEnumerable<Ookii.CommandLine.CommandLineArgument> GetArguments(Ookii.CommandLine.CommandLineParser parser)");
         _builder.OpenBlock();
 
-        List<(string, string, string)>? requiredProperties = null;
         var hasError = false;
 
         // Build a stack with the base types because we have to consider them first to get the
@@ -259,12 +265,13 @@ internal class ParserGenerator
             argumentTypes.Push(current);
         }
 
-        ITypeSymbol? categoryType = null;
+        _requiredProperties = null;
+        _categoryType = null;
         foreach (var type in argumentTypes)
         {
             foreach (var member in type.GetMembers())
             {
-                if (!GenerateArgument(member, ref requiredProperties, ref categoryType))
+                if (!GenerateArgument(member))
                 {
                     hasError = true;
                 }
@@ -291,7 +298,7 @@ internal class ParserGenerator
             _builder.Append($"return new {_argumentsClass.Name}()");
         }
 
-        if (requiredProperties == null)
+        if (_requiredProperties == null)
         {
             _builder.AppendLine(";");
         }
@@ -299,11 +306,11 @@ internal class ParserGenerator
         {
             _builder.AppendLine();
             _builder.OpenBlock();
-            for (int i = 0; i < requiredProperties.Count; ++i)
+            for (int i = 0; i < _requiredProperties.Count; ++i)
             {
-                var property = requiredProperties[i];
+                var property = _requiredProperties[i];
                 _builder.Append($"{property.Item1} = ({property.Item2})requiredPropertyValues![{i}]{property.Item3}");
-                if (i < requiredProperties.Count - 1)
+                if (i < _requiredProperties.Count - 1)
                 {
                     _builder.Append(",");
                 }
@@ -316,17 +323,17 @@ internal class ParserGenerator
         }
 
         _builder.CloseBlock(); // CreateInstance()
-        if (categoryType != null)
+        if (_categoryType != null)
         {
             _builder.AppendLine();
-            GenerateGetCategoryDescription(categoryType);
+            GenerateGetCategoryDescription(_categoryType);
         }
 
         _builder.CloseBlock(); // OokiiCommandLineArgumentProvider class
         return !hasError;
     }
 
-    private bool GenerateArgument(ISymbol member, ref List<(string, string, string)>? requiredProperties, ref ITypeSymbol? categoryType)
+    private bool GenerateArgument(ISymbol member)
     {
         // This shouldn't happen because of attribute targets, but check anyway.
         if (member.Kind is not (SymbolKind.Method or SymbolKind.Property))
@@ -362,13 +369,13 @@ internal class ParserGenerator
                 return false;
             }
 
-            if (categoryType == null)
+            if (_categoryType == null)
             {
-                categoryType = argumentInfo.Category.Type;
+                _categoryType = argumentInfo.Category.Type;
             }
-            else if (!categoryType.SymbolEquals(argumentInfo.Category.Type))
+            else if (!_categoryType.SymbolEquals(argumentInfo.Category.Type))
             {
-                _context.ReportDiagnostic(Diagnostics.MismatchedCategoryType(member, argumentInfo.Category.Type!, categoryType));
+                _context.ReportDiagnostic(Diagnostics.MismatchedCategoryType(member, argumentInfo.Category.Type!, _categoryType));
                 return false;
             }
         }
@@ -499,8 +506,8 @@ internal class ParserGenerator
             if (property.IsRequired)
             {
                 isRequired = true;
-                requiredProperties ??= new();
-                requiredProperties.Add((member.Name, property.Type.ToQualifiedName(), notNullAnnotation));
+                _requiredProperties ??= new();
+                _requiredProperties.Add((member.Name, property.Type.ToQualifiedName(), notNullAnnotation));
             }
         }
         else
