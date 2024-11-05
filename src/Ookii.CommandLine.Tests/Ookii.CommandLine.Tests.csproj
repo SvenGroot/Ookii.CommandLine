@@ -26,6 +26,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Ookii.CommandLine.Tests.Commands\Ookii.CommandLine.Tests.Commands.csproj" />
     <ProjectReference Include="..\Ookii.CommandLine\Ookii.CommandLine.csproj" />
-    <ProjectReference Include="..\Ookii.CommandLine.Generator\Ookii.CommandLine.Generator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />    
+    <ProjectReference Include="..\Ookii.CommandLine.Generator\Ookii.CommandLine.Generator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\Ookii.CommandLine.CodeFix\Ookii.CommandLine.CodeFix.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
   </ItemGroup>
 </Project>

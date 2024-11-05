@@ -313,15 +313,6 @@ namespace Ookii.CommandLine.Generator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Add GeneratedParserAttribute.
-        /// </summary>
-        internal static string GeneratedParserCodeFixTitle {
-            get {
-                return ResourceManager.GetString("GeneratedParserCodeFixTitle", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to The {0} attribute is ignored for the dictionary argument defined by {1} that has the ArgumentConverterAttribute attribute..
         /// </summary>
         internal static string IgnoredAttributeForDictionaryWithConverterMessageFormat {

@@ -17,9 +17,8 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <!-- 4.3.x is the latest version that can be used with the .Net 6.0 SDK for both of these. -->
+    <!-- 4.11.x is the latest version that can be used with the .Net 8.0 SDK for both of these. -->
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.11.0" />
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.11.0" />
   </ItemGroup>
 
   <ItemGroup>

@@ -201,9 +201,6 @@
   <data name="GeneratedCustomParsingCommandTitle" xml:space="preserve">
     <value>The GeneratedParserAttribute cannot be used with a class that implements the ICommandWithCustomParsing interface.</value>
   </data>
-  <data name="GeneratedParserCodeFixTitle" xml:space="preserve">
-    <value>Add GeneratedParserAttribute</value>
-  </data>
   <data name="IgnoredAttributeForDictionaryWithConverterMessageFormat" xml:space="preserve">
     <value>The {0} attribute is ignored for the dictionary argument defined by {1} that has the ArgumentConverterAttribute attribute.</value>
   </data>

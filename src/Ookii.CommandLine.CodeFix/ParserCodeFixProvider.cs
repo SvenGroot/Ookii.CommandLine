@@ -7,11 +7,12 @@ using Microsoft.CodeAnalysis.Formatting;
 using System.Collections.Immutable;
 using System.Composition;
 
-namespace Ookii.CommandLine.Generator;
+namespace Ookii.CommandLine.CodeFix;
+
 [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(ParserCodeFixProvider)), Shared]
 public class ParserCodeFixProvider : CodeFixProvider
 {
-    public sealed override ImmutableArray<string> FixableDiagnosticIds => ImmutableArray.Create(Diagnostics.ParserShouldBeGeneratedDescriptor.Id);
+    public sealed override ImmutableArray<string> FixableDiagnosticIds => ["OCL0040"];
 
     public sealed override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;
 

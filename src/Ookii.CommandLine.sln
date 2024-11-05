@@ -38,6 +38,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ookii.CommandLine.Tests.Com
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TopLevelArguments", "Samples\TopLevelArguments\TopLevelArguments.csproj", "{1FF02963-CECD-4C90-8C44-68F1B1CF5988}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ookii.CommandLine.CodeFix", "Ookii.CommandLine.CodeFix\Ookii.CommandLine.CodeFix.csproj", "{09EC2A10-723C-4A80-B930-1DDDD22034C9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -92,6 +94,10 @@ Global
 		{1FF02963-CECD-4C90-8C44-68F1B1CF5988}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1FF02963-CECD-4C90-8C44-68F1B1CF5988}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1FF02963-CECD-4C90-8C44-68F1B1CF5988}.Release|Any CPU.Build.0 = Release|Any CPU
+		{09EC2A10-723C-4A80-B930-1DDDD22034C9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{09EC2A10-723C-4A80-B930-1DDDD22034C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{09EC2A10-723C-4A80-B930-1DDDD22034C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{09EC2A10-723C-4A80-B930-1DDDD22034C9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -50,12 +50,14 @@ library for .Net applications.
   <ItemGroup>
     <!-- This is just here to ensure this is built before this project -->
     <ProjectReference Include="../Ookii.CommandLine.Generator/Ookii.CommandLine.Generator.csproj" ReferenceOutputAssembly="false" />
+    <ProjectReference Include="../Ookii.CommandLine.CodeFix/Ookii.CommandLine.CodeFix.csproj" ReferenceOutputAssembly="false" />
   </ItemGroup>
 
   <ItemGroup>
     <None Include="icon.png" Pack="True" PackagePath="" />
     <None Include="PackageReadme.md" Pack="True" PackagePath="" />
     <None Include="../Ookii.CommandLine.Generator/$(OutputPath)/netstandard2.0/**/*.dll" Pack="True" PackagePath="analyzers/dotnet/cs" />
+    <None Include="../Ookii.CommandLine.CodeFix/$(OutputPath)/netstandard2.0/**/*.dll" Pack="True" PackagePath="analyzers/dotnet/cs" />
   </ItemGroup>
 
   <ItemGroup>
