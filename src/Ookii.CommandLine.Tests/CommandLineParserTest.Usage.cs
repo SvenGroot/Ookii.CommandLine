@@ -802,4 +802,24 @@ This is a custom footer.
         Category3Arg description.
 
 ".ReplaceLineEndings();
+
+    private static readonly string _expectedDefaultCategoryUsage = @"Usage: test [-Baz <String>] [-Foo <String>] [-Help] [-Version]
+
+The first category.
+
+    -Foo <String>
+        Foo description.
+
+The second category.
+
+    -Baz <String>
+        Baz description.
+
+    -Help [<Boolean>] (-?, -h)
+        Displays this help message.
+
+    -Version [<Boolean>]
+        Displays version information.
+
+".ReplaceLineEndings();
 }

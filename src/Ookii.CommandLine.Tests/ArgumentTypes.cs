@@ -801,6 +801,7 @@ partial class DerivedArguments6 : DerivedArguments5
 [GeneratedParser]
 partial class CategoryArguments
 {
+    // Indirect reference to enum value.
     public const ArgumentCategory Test = ArgumentCategory.Category1;
 
     [CommandLineArgument(Category = Test)]
@@ -821,4 +822,17 @@ partial class CategoryArguments
     [CommandLineArgument(Category = ArgumentCategory.Category1)]
     [Description("Bar description.")]
     public string Bar { get; set; }
+}
+
+[GeneratedParser]
+[ParseOptions(DefaultArgumentCategory = ArgumentCategory.Category2)]
+partial class DefaultCategoryArguments
+{
+    [CommandLineArgument(Category = ArgumentCategory.Category1)]
+    [Description("Foo description.")]
+    public string Foo { get; set; }
+
+    [CommandLineArgument]
+    [Description("Baz description.")]
+    public string Baz { get; set; }
 }

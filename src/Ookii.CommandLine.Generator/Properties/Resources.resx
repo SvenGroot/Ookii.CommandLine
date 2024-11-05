@@ -399,4 +399,7 @@
   <data name="MismatchedCategoryTypeMessageFormat" xml:space="preserve">
     <value>The '{0}' property uses the type '{1}' for its category, which does not match the type '{2}' which was established earlier.</value>
   </data>
+  <data name="DefaultCategoryNotEnumMessageFormat" xml:space="preserve">
+    <value>The default category value for the arguments type '{0}' does not have an enumeration type.</value>
+  </data>
 </root>

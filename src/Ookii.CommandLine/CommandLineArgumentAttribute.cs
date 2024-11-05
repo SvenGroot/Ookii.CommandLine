@@ -393,12 +393,16 @@ public sealed class CommandLineArgumentAttribute : Attribute
     public bool IsHidden { get; set; }
 
     /// <summary>
-    /// Gets the category that the argument belongs to.
+    /// Gets or sets the category that the argument belongs to.
     /// </summary>
     /// <value>
-    /// An enumeration value that defines the category, or <see langword="null"/> if the argument
-    /// has no category. The default value is <see langword="null"/>.
+    /// An enumeration value that defines the category, or <see langword="null"/> to use the
+    /// default category, or no category if there is no default category. The default value is
+    /// <see langword="null"/>.
     /// </value>
+    /// <exception cref="NotSupportedException">
+    /// When setting the property, the type of the value is not an enumeration type.
+    /// </exception>
     /// <remarks>
     /// <para>
     ///   The category must be an <see cref="Enum"/> value, and all arguments defined by a class
@@ -406,13 +410,15 @@ public sealed class CommandLineArgumentAttribute : Attribute
     ///   <see cref="CommandLineParser"/> class will throw an exception if this is not the case.
     /// </para>
     /// <para>
+    ///   If this property is <see langword="null"/>, the argument will use the default category
+    ///   specified by the <see cref="ParseOptionsAttribute.DefaultArgumentCategory" qualifyHint="true"/>
+    ///   property, if any.
+    /// </para>
+    /// <para>
     ///   Argument categories are used to group argument in the usage help. They are not used when
     ///   parsing.
     /// </para>
     /// </remarks>
-    /// <exception cref="NotSupportedException">
-    /// When setting the property, the type of the value is not an enumeration type.
-    /// </exception>
     public object? Category
     {
         get => CategoryValue;

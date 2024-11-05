@@ -457,6 +457,15 @@ namespace Ookii.CommandLine.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The argument &apos;{0}&apos; uses the type &apos;{1}&apos; for its category, which does not match the type &apos;{2}&apos; which was established earlier..
+        /// </summary>
+        internal static string MismatchedCategoryTypesFormat {
+            get {
+                return ResourceManager.GetString("MismatchedCategoryTypesFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The specified property or method is not a command line argument..
         /// </summary>
         internal static string MissingArgumentAttribute {
@@ -489,15 +498,6 @@ namespace Ookii.CommandLine.Properties {
         internal static string MoreInfoOnErrorFormat {
             get {
                 return ResourceManager.GetString("MoreInfoOnErrorFormat", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The arguments &apos;{0}&apos; and &apos;{1}&apos; do not use the same enumeration type for their Category..
-        /// </summary>
-        internal static string MultipleCategoryTypesFormat {
-            get {
-                return ResourceManager.GetString("MultipleCategoryTypesFormat", resourceCulture);
             }
         }
         

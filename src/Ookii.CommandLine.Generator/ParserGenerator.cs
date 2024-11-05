@@ -253,6 +253,19 @@ internal class ParserGenerator
         _builder.AppendLine("public override System.Collections.Generic.IEnumerable<Ookii.CommandLine.CommandLineArgument> GetArguments(Ookii.CommandLine.CommandLineParser parser)");
         _builder.OpenBlock();
 
+        // No need to emit an error if it's not an enum, as ParserAnalyzer checks that even if the
+        // GeneratedParserAttribute is present.
+        var defaultCategory = attributes.ParseOptions?.GetNamedArgument("DefaultArgumentCategory");
+        if (defaultCategory is TypedConstant category && !category.IsNull && category.Kind == TypedConstantKind.Enum)
+        {
+            _categoryType = category.Type;
+        }
+        else
+        {
+            _categoryType = null;
+        }
+
+        _requiredProperties = null;
         var hasError = false;
 
         // Build a stack with the base types because we have to consider them first to get the
@@ -265,8 +278,6 @@ internal class ParserGenerator
             argumentTypes.Push(current);
         }
 
-        _requiredProperties = null;
-        _categoryType = null;
         foreach (var type in argumentTypes)
         {
             foreach (var member in type.GetMembers())

@@ -259,6 +259,15 @@ namespace Ookii.CommandLine.Generator.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The default category value for the arguments type &apos;{0}&apos; does not have an enumeration type..
+        /// </summary>
+        internal static string DefaultCategoryNotEnumMessageFormat {
+            get {
+                return ResourceManager.GetString("DefaultCategoryNotEnumMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The default value is ignored if the argument is required, multi-value, or a method argument..
         /// </summary>
         internal static string DefaultValueIgnoredTitle {

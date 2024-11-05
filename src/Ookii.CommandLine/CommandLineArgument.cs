@@ -205,15 +205,15 @@ public abstract class CommandLineArgument
                 Description = parser.StringProvider.AutomaticHelpDescription(),
                 MemberName = "AutomaticHelp",
                 CancelParsing = CancelMode.Abort,
-                Validators = Enumerable.Empty<ArgumentValidationAttribute>(),
-                Converter = Conversion.BooleanConverter.Instance,
+                Validators = [],
+                Converter = BooleanConverter.Instance,
             };
 
             if (parser.Mode == ParsingMode.LongShort)
             {
                 if (parser.ShortArgumentNameComparer!.Compare(shortAlias, shortName) != 0)
                 {
-                    info.ShortAliases = new[] { shortAlias };
+                    info.ShortAliases = [shortAlias];
                 }
             }
             else
@@ -221,8 +221,8 @@ public abstract class CommandLineArgument
                 var shortNameString = shortName.ToString();
                 var shortAliasString = shortAlias.ToString();
                 info.Aliases = string.Compare(shortAliasString, shortNameString, parser.ArgumentNameComparison) == 0
-                    ? new[] { shortNameString }
-                    : new[] { shortNameString, shortAliasString };
+                    ? [shortNameString]
+                    : [shortNameString, shortAliasString];
             }
 
             return info;
@@ -457,7 +457,7 @@ public abstract class CommandLineArgument
             MultiValueInfo.AllowWhiteSpaceSeparator = false;
         }
 
-        Category = info.Category;
+        Category = info.Category ?? info.Parser.DefaultArgumentCategory;
     }
 
     /// <summary>
@@ -1104,6 +1104,7 @@ public abstract class CommandLineArgument
     /// </para>
     /// </remarks>
     /// <seealso cref="CommandLineArgumentAttribute.Category"/>
+    /// <seealso cref="ParseOptionsAttribute.DefaultArgumentCategory"/>
     public Enum? Category { get; }
 
     /// <summary>

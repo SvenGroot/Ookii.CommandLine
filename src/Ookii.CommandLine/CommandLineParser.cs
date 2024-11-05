@@ -841,6 +841,7 @@ public class CommandLineParser
 
     internal IComparer<char>? ShortArgumentNameComparer => _argumentsByShortName?.Comparer;
 
+    internal Enum? DefaultArgumentCategory => _provider.OptionsAttribute?.DefaultArgumentCategoryValue;
 
     /// <summary>
     /// Gets the name of the executable used to invoke the application.
@@ -1466,8 +1467,7 @@ public class CommandLineParser
     private int DetermineMemberArguments(ImmutableArray<CommandLineArgument>.Builder builder)
     {
         int positionalArgumentCount = 0;
-        Type? categoryType = null;
-        CommandLineArgument? categoryArgument = null;
+        Type? categoryType = DefaultArgumentCategory?.GetType();
         foreach (var argument in _provider.GetArguments(this))
         {
             AddNamedArgument(argument, builder);
@@ -1483,12 +1483,11 @@ public class CommandLineParser
                 if (categoryType == null)
                 {
                     categoryType = category.GetType();
-                    categoryArgument = argument;
                 }
                 else if (categoryType != category.GetType())
                 {
                     throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture,
-                        Properties.Resources.MultipleCategoryTypesFormat, argument.ArgumentName, categoryArgument!.ArgumentName));
+                        Properties.Resources.MismatchedCategoryTypesFormat, argument.ArgumentName, category.GetType(), categoryType));
                 }
             }
         }

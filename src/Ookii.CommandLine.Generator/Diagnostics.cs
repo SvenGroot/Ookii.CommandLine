@@ -408,6 +408,19 @@ internal static class Diagnostics
             symbol.Locations.FirstOrDefault(),
             symbol.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat));
 
+    public static readonly DiagnosticDescriptor DefaultCategoryNotEnumDescriptor = CreateDiagnosticDescriptor(
+        "OCL0043", // Deliberately the same as above.
+        nameof(Resources.CategoryNotEnumTitle),
+        nameof(Resources.DefaultCategoryNotEnumMessageFormat),
+        DiagnosticSeverity.Error);
+
+    public static Diagnostic DefaultCategoryNotEnum(INamedTypeSymbol symbol, AttributeData optionsAttribute)
+        => Diagnostic.Create(
+            DefaultCategoryNotEnumDescriptor,
+            optionsAttribute.GetLocation(),
+            symbol.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat));
+
+
     public static readonly DiagnosticDescriptor MismatchedCategoryTypeDescriptor = CreateDiagnosticDescriptor(
         "OCL0044",
         nameof(Resources.MismatchedCategoryTypeTitle),

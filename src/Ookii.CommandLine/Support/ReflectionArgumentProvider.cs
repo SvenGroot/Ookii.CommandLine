@@ -44,7 +44,7 @@ internal class ReflectionArgumentProvider : ArgumentProvider
 
     public override object CreateInstance(CommandLineParser parser, object?[]? requiredPropertyValues)
     {
-        var inject = ArgumentsType.GetConstructor(new[] { typeof(CommandLineParser) }) != null;
+        var inject = ArgumentsType.GetConstructor([typeof(CommandLineParser)]) != null;
         if (inject)
         {
             return Activator.CreateInstance(ArgumentsType, parser)!;
