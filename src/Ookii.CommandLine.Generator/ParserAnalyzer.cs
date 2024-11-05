@@ -2,13 +2,17 @@
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Diagnostics;
 using System.Collections.Immutable;
+using System.Diagnostics;
 
 namespace Ookii.CommandLine.Generator;
 
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public class ParserAnalyzer : DiagnosticAnalyzer
 {
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Diagnostics.ParserShouldBeGeneratedDescriptor);
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [
+        Diagnostics.ParserShouldBeGeneratedDescriptor,
+        Diagnostics.CategoryNotEnumDescriptor,
+    ];
 
     public override void Initialize(AnalysisContext context)
     {
@@ -46,17 +50,33 @@ public class ParserAnalyzer : DiagnosticAnalyzer
         }
 
         var argumentAttribute = typeHelper.CommandLineArgumentAttribute;
+        bool reportMissingGeneratedAttribute = true;
         foreach (var member in symbol.GetMembers())
         {
             if (member.DeclaredAccessibility == Accessibility.Public &&
                 member.Kind is SymbolKind.Property or SymbolKind.Method)
             {
-                if (member.GetAttribute(argumentAttribute) != null)
+                var attribute = member.GetAttribute(argumentAttribute);
+                if (attribute == null)
                 {
-                    // Found a member with the CommandLineArgumentAttribute on a type that doesn't
-                    // have the GeneratedParserAttribute.
+                    continue;
+                }
+
+                // Found a member with the CommandLineArgumentAttribute on a type that doesn't
+                // have the GeneratedParserAttribute.
+                if (reportMissingGeneratedAttribute)
+                {
                     context.ReportDiagnostic(Diagnostics.ParserShouldBeGenerated(symbol));
-                    break;
+                    reportMissingGeneratedAttribute = false;
+                }
+
+                // Check for non-enum category.
+                // Matching types is only checked by the generator, as that would require checking
+                // the base types too.
+                var info = new CommandLineArgumentAttributeInfo(attribute);
+                if (!info.Category.IsNull && info.Category.Kind is not (TypedConstantKind.Enum or TypedConstantKind.Error))
+                {
+                    context.ReportDiagnostic(Diagnostics.CategoryNotEnum(member));
                 }
             }
         }

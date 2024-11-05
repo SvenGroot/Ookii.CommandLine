@@ -133,6 +133,24 @@ namespace Ookii.CommandLine.Generator.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The category value for the property &apos;{0}&apos; does not have an enumeration type..
+        /// </summary>
+        internal static string CategoryNotEnumMessageFormat {
+            get {
+                return ResourceManager.GetString("CategoryNotEnumMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The value of the Category property must be an enumeration type..
+        /// </summary>
+        internal static string CategoryNotEnumTitle {
+            get {
+                return ResourceManager.GetString("CategoryNotEnumTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The class {0} may not be a generic class when the {1} attribute is used..
         /// </summary>
         internal static string ClassIsGenericMessageFormat {
@@ -543,6 +561,24 @@ namespace Ookii.CommandLine.Generator.Properties {
         internal static string IsShortIgnoredTitle {
             get {
                 return ResourceManager.GetString("IsShortIgnoredTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The &apos;{0}&apos; property uses the type &apos;{1}&apos; for its category, which does not match the type &apos;{2}&apos; which was established earlier..
+        /// </summary>
+        internal static string MismatchedCategoryTypeMessageFormat {
+            get {
+                return ResourceManager.GetString("MismatchedCategoryTypeMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The property uses a different category type than already established..
+        /// </summary>
+        internal static string MismatchedCategoryTypeTitle {
+            get {
+                return ResourceManager.GetString("MismatchedCategoryTypeTitle", resourceCulture);
             }
         }
         

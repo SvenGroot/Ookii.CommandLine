@@ -209,7 +209,7 @@ internal static class Extensions
     {
         foreach (var attribute in symbol.GetAttributes())
         {
-            if (type.SymbolEquals(attribute.AttributeClass))
+            if (type.DerivesFrom(attribute.AttributeClass))
             {
                 return attribute;
             }

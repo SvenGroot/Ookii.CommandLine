@@ -801,7 +801,9 @@ partial class DerivedArguments6 : DerivedArguments5
 [GeneratedParser]
 partial class CategoryArguments
 {
-    [CommandLineArgument(Category = ArgumentCategory.Category1)]
+    public const ArgumentCategory Test = ArgumentCategory.Category1;
+
+    [CommandLineArgument(Category = Test)]
     [Description("Foo description.")]
     public string Foo { get; set; }
 

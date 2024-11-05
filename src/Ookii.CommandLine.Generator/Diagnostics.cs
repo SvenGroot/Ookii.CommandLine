@@ -395,6 +395,33 @@ internal static class Diagnostics
         symbol.Locations.FirstOrDefault(),
         symbol.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat));
 
+
+    public static readonly DiagnosticDescriptor CategoryNotEnumDescriptor = CreateDiagnosticDescriptor(
+        "OCL0043",
+        nameof(Resources.CategoryNotEnumTitle),
+        nameof(Resources.CategoryNotEnumMessageFormat),
+        DiagnosticSeverity.Error);
+
+    public static Diagnostic CategoryNotEnum(ISymbol symbol)
+        => Diagnostic.Create(
+            CategoryNotEnumDescriptor,
+            symbol.Locations.FirstOrDefault(),
+            symbol.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat));
+
+    public static readonly DiagnosticDescriptor MismatchedCategoryTypeDescriptor = CreateDiagnosticDescriptor(
+        "OCL0044",
+        nameof(Resources.MismatchedCategoryTypeTitle),
+        nameof(Resources.MismatchedCategoryTypeMessageFormat),
+        DiagnosticSeverity.Error);
+
+    public static Diagnostic MismatchedCategoryType(ISymbol symbol, ITypeSymbol actualType, ITypeSymbol expectedType)
+        => Diagnostic.Create(
+            MismatchedCategoryTypeDescriptor,
+            symbol.Locations.FirstOrDefault(),
+            symbol.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat),
+            actualType.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat),
+            expectedType.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat));
+
     private static Diagnostic CreateDiagnostic(string id, string titleResource, string messageResource, DiagnosticSeverity severity, Location? location, params object?[]? messageArgs)
         => Diagnostic.Create(
             CreateDiagnosticDescriptor(id, titleResource, messageResource, severity),

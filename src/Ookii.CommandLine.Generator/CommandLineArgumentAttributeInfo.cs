@@ -60,6 +60,10 @@ internal class CommandLineArgumentAttributeInfo
             case nameof(IncludeDefaultInUsageHelp):
                 IncludeDefaultInUsageHelp = (bool)named.Value.Value!;
                 break;
+
+            case nameof(Category):
+                Category = named.Value;
+                break;
             }
         }
     }
@@ -87,4 +91,6 @@ internal class CommandLineArgumentAttributeInfo
     public bool IsHidden { get; }
 
     public bool IncludeDefaultInUsageHelp { get; set; } = true;
+
+    public TypedConstant Category { get; set; }
 }

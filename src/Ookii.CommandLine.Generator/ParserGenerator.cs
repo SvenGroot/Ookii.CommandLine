@@ -259,11 +259,12 @@ internal class ParserGenerator
             argumentTypes.Push(current);
         }
 
+        ITypeSymbol? categoryType = null;
         foreach (var type in argumentTypes)
         {
             foreach (var member in type.GetMembers())
             {
-                if (!GenerateArgument(member, ref requiredProperties))
+                if (!GenerateArgument(member, ref requiredProperties, ref categoryType))
                 {
                     hasError = true;
                 }
@@ -315,11 +316,17 @@ internal class ParserGenerator
         }
 
         _builder.CloseBlock(); // CreateInstance()
+        if (categoryType != null)
+        {
+            _builder.AppendLine();
+            GenerateGetCategoryDescription(categoryType);
+        }
+
         _builder.CloseBlock(); // OokiiCommandLineArgumentProvider class
         return !hasError;
     }
 
-    private bool GenerateArgument(ISymbol member, ref List<(string, string, string)>? requiredProperties)
+    private bool GenerateArgument(ISymbol member, ref List<(string, string, string)>? requiredProperties, ref ITypeSymbol? categoryType)
     {
         // This shouldn't happen because of attribute targets, but check anyway.
         if (member.Kind is not (SymbolKind.Method or SymbolKind.Property))
@@ -340,6 +347,30 @@ internal class ParserGenerator
         {
             _context.ReportDiagnostic(Diagnostics.NoLongOrShortName(member, attributes.CommandLineArgument));
             return false;
+        }
+
+        if (!argumentInfo.Category.IsNull)
+        {
+            if (argumentInfo.Category.Kind == TypedConstantKind.Error)
+            {
+                return false;
+            }
+
+            if (argumentInfo.Category.Kind != TypedConstantKind.Enum)
+            {
+                _context.ReportDiagnostic(Diagnostics.CategoryNotEnum(member));
+                return false;
+            }
+
+            if (categoryType == null)
+            {
+                categoryType = argumentInfo.Category.Type;
+            }
+            else if (!categoryType.SymbolEquals(argumentInfo.Category.Type))
+            {
+                _context.ReportDiagnostic(Diagnostics.MismatchedCategoryType(member, argumentInfo.Category.Type!, categoryType));
+                return false;
+            }
         }
 
         ITypeSymbol originalArgumentType;
@@ -728,6 +759,41 @@ internal class ParserGenerator
         }
 
         return true;
+    }
+
+    private void GenerateGetCategoryDescription(ITypeSymbol categoryType)
+    {
+        _builder.AppendLine("public override string GetCategoryDescription(System.Enum category)");
+        _builder.OpenBlock();
+        _builder.AppendLine($"return ({categoryType.ToQualifiedName()})category switch");
+        _builder.OpenBlock();
+        foreach (var member in categoryType.GetMembers())
+        {
+            if (member.DeclaredAccessibility != Accessibility.Public || member.Kind != SymbolKind.Field)
+            {
+                continue;
+            }
+
+            var field = (IFieldSymbol)member;
+            _builder.Append($"{categoryType.ToQualifiedName()}.{field.Name} => ");
+            var descriptionAttribute = field.GetAttribute(_typeHelper.DescriptionAttribute!);
+            if (descriptionAttribute == null)
+            {
+                _builder.AppendLine($"\"{field.Name}\",");
+            }
+            else
+            {
+                // There is no point trying to optimize this to cache values or anything, as
+                // typically this will be called only once per category (and displaying usage help
+                // is not performance-critical anyway).
+                _builder.AppendLine($"({descriptionAttribute.CreateInstantiation()}).Description,");
+            }
+        }
+
+        _builder.AppendLine("_ => base.GetCategoryDescription(category),");
+        _builder.DecreaseIndent();
+        _builder.AppendLine("};");
+        _builder.CloseBlock(); // GetCategoryDescription()
     }
 
     private (ITypeSymbol?, INamedTypeSymbol?, ITypeSymbol?)? DetermineMultiValueType(IPropertySymbol property, ITypeSymbol argumentType)
