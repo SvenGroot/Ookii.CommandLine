@@ -22,6 +22,8 @@ internal class AutomaticVersionCommand : ICommand
 
         public override string Description => _stringProvider.AutomaticVersionCommandDescription();
 
+        public override string UsageFooter => string.Empty;
+
         public override object CreateInstance(CommandLineParser parser, object?[]? requiredPropertyValues) => new AutomaticVersionCommand(parser);
 
         public override IEnumerable<CommandLineArgument> GetArguments(CommandLineParser parser)

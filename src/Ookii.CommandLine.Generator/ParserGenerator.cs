@@ -227,12 +227,6 @@ internal class ParserGenerator
         _builder.AppendGeneratedCodeAttribute();
         _builder.AppendLine("private class OokiiCommandLineArgumentProvider : Ookii.CommandLine.Support.GeneratedArgumentProvider");
         _builder.OpenBlock();
-        if (attributes.UsageFooter != null)
-        {
-            _builder.AppendLine($"private readonly Ookii.CommandLine.UsageFooterAttribute _usageFooter = {attributes.UsageFooter.CreateInstantiation()};");
-            _builder.AppendLine();
-        }
-
         _builder.AppendLine("public OokiiCommandLineArgumentProvider()");
         _builder.IncreaseIndent();
         _builder.AppendLine(": base(");
@@ -242,18 +236,13 @@ internal class ParserGenerator
         AppendOptionalAttributeArgument(attributes.ClassValidators, "validators", "Ookii.CommandLine.Validation.ClassValidationAttribute");
         AppendOptionalAttributeArgument(attributes.ApplicationFriendlyName, "friendlyName");
         AppendOptionalAttributeArgument(attributes.Description, "description");
+        AppendOptionalAttributeArgument(attributes.UsageFooter, "usageFooter");
         _builder.CloseArgumentList(false);
         _builder.DecreaseIndent();
         _builder.AppendLine("{}");
         _builder.AppendLine();
         _builder.AppendLine($"public override bool IsCommand => {isCommand.ToCSharpString()};");
         _builder.AppendLine();
-        if (attributes.UsageFooter != null)
-        {
-            _builder.AppendLine("public override string UsageFooter => _usageFooter.Footer;");
-            _builder.AppendLine();
-        }
-
         _builder.AppendLine("public override System.Collections.Generic.IEnumerable<Ookii.CommandLine.CommandLineArgument> GetArguments(Ookii.CommandLine.CommandLineParser parser)");
         _builder.OpenBlock();
 

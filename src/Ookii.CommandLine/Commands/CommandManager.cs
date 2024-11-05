@@ -728,10 +728,6 @@ public class CommandManager
         return RunCommand(Environment.GetCommandLineArgs().AsMemory(1));
     }
 
-    /// <inheritdoc cref="RunCommandAsync(string?, ReadOnlyMemory{string}, CancellationToken)"/>
-    public async Task<int?> RunCommandAsync(string? commandName, ReadOnlyMemory<string> args)
-        => await RunCommandAsync(commandName, args, CancellationToken.None);
-
     /// <summary>
     /// Finds and instantiates the subcommand with the specified name, and if it succeeds,
     /// runs it asynchronously. If it fails, writes error and usage information.
@@ -776,13 +772,9 @@ public class CommandManager
     ///   whether the version command is included.
     /// </para>
     /// </remarks>
-    public async Task<int?> RunCommandAsync(string? commandName, ReadOnlyMemory<string> args, CancellationToken cancellationToken)
-        // These functions must be overloads (not using default params) for binary compatibility with v4.0.
+    public async Task<int?> RunCommandAsync(string? commandName, ReadOnlyMemory<string> args,
+        CancellationToken cancellationToken = default)
         => await RunCommandAsync(CreateCommand(commandName, args), cancellationToken);
-
-    /// <inheritdoc cref="RunCommandAsync(string?, string[], CancellationToken)"/>
-    public async Task<int?> RunCommandAsync(string? commandName, string[] args)
-        => await RunCommandAsync(commandName, args, CancellationToken.None);
 
     /// <summary>
     /// Finds and instantiates the subcommand with the specified name, and if it succeeds,
@@ -828,13 +820,8 @@ public class CommandManager
     ///   whether the version command is included.
     /// </para>
     /// </remarks>
-    public async Task<int?> RunCommandAsync(string? commandName, string[] args, CancellationToken cancellationToken)
-        // These functions must be overloads (not using default params) for binary compatibility with v4.0.
+    public async Task<int?> RunCommandAsync(string? commandName, string[] args, CancellationToken cancellationToken = default)
         => await RunCommandAsync(CreateCommand(commandName, args), cancellationToken);
-
-    /// <inheritdoc cref="RunCommandAsync(ReadOnlyMemory{string}, CancellationToken)"/>
-    public async Task<int?> RunCommandAsync(ReadOnlyMemory<string> args)
-        => await RunCommandAsync(args, CancellationToken.None);
 
     /// <summary>
     /// Finds and instantiates the subcommand with the name from the first argument, and if it
@@ -882,13 +869,8 @@ public class CommandManager
     ///   whether the version command is included.
     /// </para>
     /// </remarks>
-    public async Task<int?> RunCommandAsync(ReadOnlyMemory<string> args, CancellationToken cancellationToken)
-        // These functions must be overloads (not using default params) for binary compatibility with v4.0.
+    public async Task<int?> RunCommandAsync(ReadOnlyMemory<string> args, CancellationToken cancellationToken = default)
         => await RunCommandAsync(CreateCommand(args), cancellationToken);
-
-    /// <inheritdoc cref="RunCommandAsync(string[], CancellationToken)"/>
-    public async Task<int?> RunCommandAsync(string[] args)
-        => await RunCommandAsync(args, CancellationToken.None);
 
     /// <summary>
     /// Finds and instantiates the subcommand with the name from the first argument, and if it
@@ -936,13 +918,8 @@ public class CommandManager
     ///   whether the version command is included.
     /// </para>
     /// </remarks>
-    public async Task<int?> RunCommandAsync(string[] args, CancellationToken cancellationToken)
-        // These functions must be overloads (not using default params) for binary compatibility with v4.0.
+    public async Task<int?> RunCommandAsync(string[] args, CancellationToken cancellationToken = default)
         => await RunCommandAsync(CreateCommand(args), cancellationToken);
-
-    /// <inheritdoc cref="RunCommandAsync(CancellationToken)"/>
-    public async Task<int?> RunCommandAsync()
-        => await RunCommandAsync(CancellationToken.None);
 
     /// <summary>
     /// Finds and instantiates the subcommand using the arguments from the <see cref="Environment.GetCommandLineArgs" qualifyHint="true"/>
@@ -954,7 +931,7 @@ public class CommandManager
     /// interface, this token will be forwarded to it.
     /// </param>
     /// <returns>
-    /// <inheritdoc cref="RunCommandAsync(string?, string[])"/>
+    /// <inheritdoc cref="RunCommandAsync(string?, string[], CancellationToken)"/>
     /// </returns>
     /// <remarks>
     /// <para>
@@ -984,8 +961,7 @@ public class CommandManager
     ///   whether the version command is included.
     /// </para>
     /// </remarks>
-    public async Task<int?> RunCommandAsync(CancellationToken cancellationToken)
-        // These functions must be overloads (not using default params) for binary compatibility with v4.0.
+    public async Task<int?> RunCommandAsync(CancellationToken cancellationToken = default)
         => await RunCommandAsync(CreateCommand(), cancellationToken);
 
     /// <summary>

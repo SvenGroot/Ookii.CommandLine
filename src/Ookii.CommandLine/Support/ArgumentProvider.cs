@@ -77,10 +77,9 @@ public abstract class ArgumentProvider
     /// Gets footer text that is used when generating usage information.
     /// </summary>
     /// <value>
-    /// The footer text.
+    /// The footer text, or <see langword="null"/> if there is no footer.
     /// </value>
-    // N.B. This is virtual, not abstract, for binary compatibility with v4.0.
-    public virtual string UsageFooter => string.Empty;
+    public abstract string UsageFooter { get; }
 
     /// <summary>
     /// Gets the <see cref="ParseOptionsAttribute"/> that was applied to the arguments type.
