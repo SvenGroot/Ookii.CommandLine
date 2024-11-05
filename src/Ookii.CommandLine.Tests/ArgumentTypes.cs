@@ -797,3 +797,26 @@ partial class DerivedArguments6 : DerivedArguments5
     [CommandLineArgument]
     public int DerivedArg2 { get; set; }
 }
+
+[GeneratedParser]
+partial class CategoryArguments
+{
+    [CommandLineArgument(Category = ArgumentCategory.Category1)]
+    [Description("Foo description.")]
+    public string Foo { get; set; }
+
+    [CommandLineArgument(Category = ArgumentCategory.Category2)]
+    [Description("Baz description.")]
+    public string Baz { get; set; }
+
+    [CommandLineArgument(Category = ArgumentCategory.Category3)]
+    [Description("Category3Arg description.")]
+    public string Category3Arg { get; set; }
+
+    [CommandLineArgument]
+    public string ArgWithoutCategory { get; set; }
+
+    [CommandLineArgument(Category = ArgumentCategory.Category1)]
+    [Description("Bar description.")]
+    public string Bar { get; set; }
+}

@@ -169,6 +169,15 @@ namespace Ookii.CommandLine.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The category value must use an enumeration type..
+        /// </summary>
+        internal static string CategoryNotEnum {
+            get {
+                return ResourceManager.GetString("CategoryNotEnum", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The arguments are not valid..
         /// </summary>
         internal static string ClassValidationFailed {
@@ -480,6 +489,15 @@ namespace Ookii.CommandLine.Properties {
         internal static string MoreInfoOnErrorFormat {
             get {
                 return ResourceManager.GetString("MoreInfoOnErrorFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The arguments &apos;{0}&apos; and &apos;{1}&apos; do not use the same enumeration type for their Category..
+        /// </summary>
+        internal static string MultipleCategoryTypesFormat {
+            get {
+                return ResourceManager.GetString("MultipleCategoryTypesFormat", resourceCulture);
             }
         }
         

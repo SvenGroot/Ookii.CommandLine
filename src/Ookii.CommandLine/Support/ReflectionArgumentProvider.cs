@@ -67,4 +67,10 @@ internal class ReflectionArgumentProvider : ArgumentProvider
 
         return properties.Concat(methods);
     }
+
+    public override string GetCategoryDescription(Enum category)
+    {
+        var field = category.ToString();
+        return category.GetType().GetField(field)?.GetCustomAttribute<DescriptionAttribute>()?.Description ?? field;
+    }
 }

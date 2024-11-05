@@ -417,4 +417,10 @@
   <data name="ValidateCountMinSingularFormat" xml:space="preserve">
     <value>The argument '{0}' must have at least {1} value.</value>
   </data>
+  <data name="MultipleCategoryTypesFormat" xml:space="preserve">
+    <value>The arguments '{0}' and '{1}' do not use the same enumeration type for their Category.</value>
+  </data>
+  <data name="CategoryNotEnum" xml:space="preserve">
+    <value>The category value must use an enumeration type.</value>
+  </data>
 </root>

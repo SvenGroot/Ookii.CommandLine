@@ -136,4 +136,11 @@ public abstract class ArgumentProvider
     /// </param>
     /// <returns>An instance of the type indicated by the <see cref="ArgumentsType"/> property.</returns>
     public abstract object CreateInstance(CommandLineParser parser, object?[]? requiredPropertyValues);
+
+    /// <summary>
+    /// Gets the description for an argument category.
+    /// </summary>
+    /// <param name="category">The argument category.</param>
+    /// <returns>The description of the category.</returns>
+    public virtual string GetCategoryDescription(Enum category) => category.ToString();
 }

@@ -358,6 +358,26 @@ public class UsageWriter
     public TextFormat ArgumentDescriptionColor { get; set; } = TextFormat.ForegroundGreen;
 
     /// <summary>
+    /// Gets or sets the color used for category headers by the
+    /// <see cref="WriteArgumentCategoryHeader"/> method.
+    /// </summary>
+    /// <value>
+    ///   The virtual terminal sequence for a color. The default value is
+    ///   <see cref="TextFormat.ForegroundCyan" qualifyHint="true"/>.
+    /// </value>
+    /// <remarks>
+    /// <para>
+    ///   The color will only be used if the <see cref="UseColor"/> property is
+    ///   <see langword="true"/>.
+    /// </para>
+    /// <para>
+    ///   The portion of the string that has color will end with the value of the 
+    ///   <see cref="ColorReset"/> property.
+    /// </para>
+    /// </remarks>
+    public TextFormat ArgumentCategoryColor { get; set; } = TextFormat.ForegroundCyan;
+
+    /// <summary>
     /// Gets or sets a value indicating whether white space, rather than the first element of the
     /// <see cref="CommandLineParser.NameValueSeparators" qualifyHint="true"/> property, is used to
     /// separate arguments and their values in the command line syntax.
@@ -1321,6 +1341,7 @@ public class UsageWriter
             }
         }
 
+        Enum? previousCategory = null;
         var arguments = GetArgumentsInDescriptionOrder();
         bool first = true;
         foreach (var argument in arguments)
@@ -1329,6 +1350,18 @@ public class UsageWriter
             {
                 WriteArgumentDescriptionListHeader();
                 first = false;
+            }
+
+            if (!object.Equals(argument.Category, previousCategory))
+            {
+                // The default implementation for GetArgumentsInDescriptionOrder should group all
+                // null categories together, but if overridden that might not be the case.
+                if (argument.Category is Enum category)
+                {
+                    WriteArgumentCategoryHeader(category);
+                }
+
+                previousCategory = argument.Category;
             }
 
             WriteArgumentDescription(argument);
@@ -1352,6 +1385,50 @@ public class UsageWriter
     {
         // Intentionally blank.
     }
+
+    /// <summary>
+    /// Writes a header for a category of arguments.
+    /// </summary>
+    /// <param name="category">The category.</param>
+    /// <remarks>
+    /// <para>
+    ///   The base implementation applies the <see cref="ArgumentCategoryColor"/>, and calls the
+    ///   <see cref="WriteArgumentCategory"/> method to write the category description.
+    /// </para>
+    /// <para>
+    ///   This method is called by the base implementation of the <see cref="WriteArgumentDescriptions"/>
+    ///   method once before the first argument in each category. It will not be called if none
+    ///   of the arguments have a category.
+    /// </para>
+    /// </remarks>
+    protected virtual void WriteArgumentCategoryHeader(Enum category)
+    {
+        Writer.ResetIndent();
+        WriteColor(ArgumentCategoryColor);
+        WriteArgumentCategory(category);
+        ResetColor();
+        WriteLine();
+        WriteLine();
+    }
+
+    /// <summary>
+    /// Writes the description of a category of arguments.
+    /// </summary>
+    /// <param name="category">The category.</param>
+    /// <remarks>
+    /// <para>
+    ///   This method is called by the base implementation of the <see cref="WriteArgumentCategoryHeader"/>
+    ///   method.
+    /// </para>
+    /// <para>
+    ///   You can override this method if you wish to change how the category description is
+    ///   determined for a category. If you want to change the formatting of the category header,
+    ///   override the <see cref="WriteArgumentCategoryHeader"/> method instead.
+    /// </para>
+    /// </remarks>
+    protected virtual void WriteArgumentCategory(Enum category)
+        => Writer.Write(Parser.GetCategoryDescription(category));
+
 
     /// <summary>
     /// Writes the description of a single argument.
@@ -1762,12 +1839,20 @@ public class UsageWriter
 
     /// <summary>
     /// Gets the parser's arguments filtered according to the <see cref="ArgumentDescriptionListFilter"/>
-    /// property and sorted according to the <see cref="ArgumentDescriptionListOrder"/> property.
+    /// property and sorted by category and according to the <see cref="ArgumentDescriptionListOrder"/>
+    /// property.
     /// </summary>
     /// <returns>A list of filtered and sorted arguments.</returns>
     /// <remarks>
     /// <para>
-    ///   Arguments that are hidden are excluded from the list.
+    ///   If any of the arguments use the <see cref="CommandLineArgumentAttribute.Category" qualifyHint="true"/>
+    ///   property, the arguments are alphabetically sorted by category, and sorted according to
+    ///   the <see cref="ArgumentDescriptionListOrder"/> property within each category. Arguments
+    ///   that have no category set are returned before any arguments that do have a category.
+    /// </para>
+    /// <para>
+    ///   Arguments that are hidden are excluded from the list, even if
+    ///   <see cref="DescriptionListFilterMode.All" qualifyHint="true"/> is used.
     /// </para>
     /// </remarks>
     protected virtual IEnumerable<CommandLineArgument> GetArgumentsInDescriptionOrder()
@@ -1778,18 +1863,18 @@ public class UsageWriter
             DescriptionListFilterMode.Description => !string.IsNullOrEmpty(argument.Description),
             DescriptionListFilterMode.All => true,
             _ => false,
-        });
+        }).OrderBy(argument => argument.Category);
 
         var comparer = Parser.ArgumentNameComparison.GetComparer();
 
         return ArgumentDescriptionListOrder switch
         {
-            DescriptionListSortMode.Alphabetical => arguments.OrderBy(arg => arg.ArgumentName, comparer),
-            DescriptionListSortMode.AlphabeticalDescending => arguments.OrderByDescending(arg => arg.ArgumentName, comparer),
+            DescriptionListSortMode.Alphabetical => arguments.ThenBy(arg => arg.ArgumentName, comparer),
+            DescriptionListSortMode.AlphabeticalDescending => arguments.ThenByDescending(arg => arg.ArgumentName, comparer),
             DescriptionListSortMode.AlphabeticalShortName =>
-                arguments.OrderBy(arg => arg.HasShortName ? arg.ShortName.ToString() : arg.ArgumentName, comparer),
+                arguments.ThenBy(arg => arg.HasShortName ? arg.ShortName.ToString() : arg.ArgumentName, comparer),
             DescriptionListSortMode.AlphabeticalShortNameDescending =>
-                arguments.OrderByDescending(arg => arg.HasShortName ? arg.ShortName.ToString() : arg.ArgumentName, comparer),
+                arguments.ThenByDescending(arg => arg.HasShortName ? arg.ShortName.ToString() : arg.ArgumentName, comparer),
             _ => arguments,
         };
     }

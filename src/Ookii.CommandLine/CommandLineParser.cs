@@ -1420,6 +1420,8 @@ public class CommandLineParser
         }
     }
 
+    internal string GetCategoryDescription(Enum category) => _provider.GetCategoryDescription(category);
+
     private static ImmutableArray<string> DetermineArgumentNamePrefixes(ParseOptions options)
     {
         if (options.ArgumentNamePrefixes == null)
@@ -1463,17 +1465,35 @@ public class CommandLineParser
 
     private int DetermineMemberArguments(ImmutableArray<CommandLineArgument>.Builder builder)
     {
-        int additionalPositionalArgumentCount = 0;
+        int positionalArgumentCount = 0;
+        Type? categoryType = null;
+        CommandLineArgument? categoryArgument = null;
         foreach (var argument in _provider.GetArguments(this))
         {
             AddNamedArgument(argument, builder);
             if (argument.Position != null)
             {
-                ++additionalPositionalArgumentCount;
+                ++positionalArgumentCount;
+            }
+
+            // Make sure all arguments use the same category. This is checked here to avoid
+            // unexpected exceptions when generating usage help.
+            if (argument.Category is Enum category)
+            {
+                if (categoryType == null)
+                {
+                    categoryType = category.GetType();
+                    categoryArgument = argument;
+                }
+                else if (categoryType != category.GetType())
+                {
+                    throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture,
+                        Properties.Resources.MultipleCategoryTypesFormat, argument.ArgumentName, categoryArgument!.ArgumentName));
+                }
             }
         }
 
-        return additionalPositionalArgumentCount;
+        return positionalArgumentCount;
     }
 
     private void DetermineAutomaticArguments(ImmutableArray<CommandLineArgument>.Builder builder)

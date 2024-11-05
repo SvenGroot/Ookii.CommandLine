@@ -774,4 +774,32 @@ Usage: test [-arg1] <String> [[-other] <Number>] [[-notSwitch] <Boolean>] [[-Arg
 
 This is a custom footer.
 ".ReplaceLineEndings();
+
+    private static readonly string _expectedCategoryUsage = @"[36mUsage:[0m test [-ArgWithoutCategory <String>] [-Bar <String>] [-Baz <String>] [-Category3Arg <String>] [-Foo <String>] [-Help] [-Version]
+
+    [32m-Help [<Boolean>] (-?, -h)[0m
+        Displays this help message.
+
+    [32m-Version [<Boolean>][0m
+        Displays version information.
+
+[36mThe first category.[0m
+
+    [32m-Bar <String>[0m
+        Bar description.
+
+    [32m-Foo <String>[0m
+        Foo description.
+
+[36mThe second category.[0m
+
+    [32m-Baz <String>[0m
+        Baz description.
+
+[36mCategory3[0m
+
+    [32m-Category3Arg <String>[0m
+        Category3Arg description.
+
+".ReplaceLineEndings();
 }

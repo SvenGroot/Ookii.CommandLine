@@ -331,6 +331,8 @@ public abstract class CommandLineArgument
                         info.KeyValueSeparatorAttribute?.Separator ?? KeyValuePairConverter.DefaultSeparator);
                 }
             }
+
+            Category = info.Attribute.CategoryValue;
         }
 
         public CommandLineParser Parser { get; set; }
@@ -360,6 +362,7 @@ public abstract class CommandLineArgument
         public IEnumerable<ArgumentValidationAttribute> Validators { get; set; }
         public MultiValueArgumentInfo? MultiValueInfo { get; set; }
         public DictionaryArgumentInfo? DictionaryInfo { get; set; }
+        public Enum? Category { get; set; }
     }
 
     #endregion
@@ -453,6 +456,8 @@ public abstract class CommandLineArgument
         {
             MultiValueInfo.AllowWhiteSpaceSeparator = false;
         }
+
+        Category = info.Category;
     }
 
     /// <summary>
@@ -1084,6 +1089,22 @@ public abstract class CommandLineArgument
     /// A list of objects deriving from the <see cref="ArgumentValidationAttribute"/> class.
     /// </value>
     public IEnumerable<ArgumentValidationAttribute> Validators => _validators;
+
+    /// <summary>
+    /// Gets the category that the argument belongs to.
+    /// </summary>
+    /// <value>
+    /// An enumeration value that defines the category, or <see langword="null"/> if the argument
+    /// has no category.
+    /// </value>
+    /// <remarks>
+    /// <para>
+    ///   Argument categories are used to group argument in the usage help. They are not used when
+    ///   parsing.
+    /// </para>
+    /// </remarks>
+    /// <seealso cref="CommandLineArgumentAttribute.Category"/>
+    public Enum? Category { get; }
 
     /// <summary>
     /// When implemented in a derived class, gets a value that indicates whether this argument
