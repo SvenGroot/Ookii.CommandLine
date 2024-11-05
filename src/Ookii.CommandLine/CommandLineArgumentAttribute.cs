@@ -415,8 +415,9 @@ public sealed class CommandLineArgumentAttribute : Attribute
     ///   property, if any.
     /// </para>
     /// <para>
-    ///   Argument categories are used to group argument in the usage help. They are not used when
-    ///   parsing.
+    ///   Argument categories are used to group argument in the usage help; they are not used when
+    ///   parsing. The default <see cref="UsageWriter"/> will sort the categories based on their
+    ///   underlying enumeration values,
     /// </para>
     /// </remarks>
     public object? Category

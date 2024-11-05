@@ -1846,9 +1846,10 @@ public class UsageWriter
     /// <remarks>
     /// <para>
     ///   If any of the arguments use the <see cref="CommandLineArgumentAttribute.Category" qualifyHint="true"/>
-    ///   property, the arguments are alphabetically sorted by category, and sorted according to
-    ///   the <see cref="ArgumentDescriptionListOrder"/> property within each category. Arguments
-    ///   that have no category set are returned before any arguments that do have a category.
+    ///   property, the arguments are sorted by category based on the category's enumeration values,
+    ///   and sorted according to the <see cref="ArgumentDescriptionListOrder"/> property within
+    ///   each category. Arguments that have no category set are returned before any arguments that
+    ///   do have a category.
     /// </para>
     /// <para>
     ///   Arguments that are hidden are excluded from the list, even if
