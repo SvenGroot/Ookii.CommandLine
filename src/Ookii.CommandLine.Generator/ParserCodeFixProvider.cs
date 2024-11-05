@@ -60,7 +60,7 @@ public class ParserCodeFixProvider : CodeFixProvider
         var newRoot = oldRoot.ReplaceNode(declaration, newDeclaration);
 
         // Add a using statement if needed.
-        if (!oldRoot.Usings.Any(u => u.Name.ToString() == "Ookii.CommandLine"))
+        if (!oldRoot.Usings.Any(u => u.Name?.ToString() == "Ookii.CommandLine"))
         {
             newRoot = newRoot.AddUsings(
                 SyntaxFactory.UsingDirective(
