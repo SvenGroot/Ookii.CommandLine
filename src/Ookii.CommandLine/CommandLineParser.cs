@@ -209,6 +209,8 @@ public class CommandLineParser
 
         public bool IsSpecifiedByPosition;
 
+        public ImmutableArray<string>.Builder? PossibleMatches;
+
         public readonly CommandLineArgument? PositionalArgument
             => PositionalArgumentIndex < Parser._positionalArgumentCount ? Parser.Arguments[PositionalArgumentIndex] : null;
 
@@ -223,6 +225,7 @@ public class CommandLineParser
             ArgumentValue = null;
             IsUnknown = false;
             IsSpecifiedByPosition = false;
+            PossibleMatches?.Clear();
         }
     }
 
@@ -452,18 +455,10 @@ public class CommandLineParser
         var builder = ImmutableArray.CreateBuilder<CommandLineArgument>();
         _positionalArgumentCount = DetermineMemberArguments(builder);
         DetermineAutomaticArguments(builder);
-        // Sort the member arguments in usage order (positional first, then required
-        // non-positional arguments, then the rest by name.
+        // Sort the member arguments in usage order (positional first, then required non-positional
+        // arguments, then the rest by name.
         builder.Sort(new CommandLineArgumentComparer(comparison));
-        if (builder.Count == builder.Capacity)
-        {
-            _arguments = builder.MoveToImmutable();
-        }
-        else
-        {
-            _arguments = builder.ToImmutable();
-        }
-
+        _arguments = builder.DrainToImmutable();
         VerifyPositionalArgumentRules();
     }
 
@@ -1861,7 +1856,7 @@ public class CommandLineParser
         {
             if (Options.AutoPrefixAliasesOrDefault)
             {
-                state.Argument = GetArgumentByNamePrefix(state.ArgumentName.Span);
+                GetArgumentByNamePrefix(ref state);
             }
 
             if (state.Argument == null)
@@ -1876,9 +1871,10 @@ public class CommandLineParser
         return true;
     }
 
-    private CommandLineArgument? GetArgumentByNamePrefix(ReadOnlySpan<char> prefix)
+    private void GetArgumentByNamePrefix(ref ParseState state)
     {
-        CommandLineArgument? foundArgument = null;
+        var prefix = state.ArgumentName.Span;
+        string? previousMatchedName = null;
         foreach (var argument in _arguments)
         {
             // Skip arguments without a long name.
@@ -1887,32 +1883,45 @@ public class CommandLineParser
                 continue;
             }
 
-            var matches = argument.ArgumentName.AsSpan().StartsWith(prefix, ArgumentNameComparison);
-            if (!matches)
+            string? matchedName = null;
+            if (argument.ArgumentName.AsSpan().StartsWith(prefix, ArgumentNameComparison))
+            {
+                matchedName = argument.ArgumentName;
+            }
+            else
             {
                 foreach (var alias in argument.Aliases)
                 {
                     if (alias.AsSpan().StartsWith(prefix, ArgumentNameComparison))
                     {
-                        matches = true;
+                        matchedName = alias;
                         break;
                     }
                 }
             }
 
-            if (matches)
+            if (matchedName != null)
             {
-                if (foundArgument != null)
+                if (previousMatchedName != null)
                 {
-                    // Prefix is not unique.
-                    return null;
+                    // Prefix is not unique, and this is the first ambiguous match we found.
+                    state.PossibleMatches ??= ImmutableArray.CreateBuilder<string>();
+                    state.PossibleMatches.Add(previousMatchedName);
+                    state.Argument = null;
+                    previousMatchedName = null;
                 }
-
-                foundArgument = argument;
+                
+                if (state.PossibleMatches?.Count > 0)
+                {
+                    state.PossibleMatches.Add(matchedName);
+                }
+                else
+                {
+                    state.Argument = argument;
+                    previousMatchedName = matchedName;
+                }
             }
         }
-
-        return foundArgument;
     }
 
     private void ParseCombinedShortArgument(ref ParseState state)
@@ -1945,8 +1954,19 @@ public class CommandLineParser
 
     private void HandleUnknownArgument(ref ParseState state, bool isCombined = false)
     {
+        ImmutableArray<string> possibleMatches;
+        if (state.PossibleMatches != null)
+        {
+            state.PossibleMatches.Sort(ArgumentNameComparison.GetComparer());
+            possibleMatches = state.PossibleMatches.DrainToImmutable();
+        }
+        else
+        {
+            possibleMatches = [];
+        }
+
         var eventArgs = new UnknownArgumentEventArgs(state.Arguments.Span[state.Index], state.ArgumentName,
-            state.ArgumentValue ?? default, isCombined);
+            state.ArgumentValue ?? default, isCombined, possibleMatches);
 
         OnUnknownArgument(eventArgs);
         if (eventArgs.CancelParsing != CancelMode.None)
@@ -1957,6 +1977,14 @@ public class CommandLineParser
 
         if (!eventArgs.Ignore)
         {
+            if (!possibleMatches.IsEmpty)
+            {
+                var name = state.ArgumentName.ToString();
+                var prefix = LongArgumentNamePrefix ?? ArgumentNamePrefixes[0];
+                var message = StringProvider.AmbiguousArgumentPrefix(name, prefix, possibleMatches);
+                throw new AmbiguousPrefixAliasException(message, name, possibleMatches);
+            }
+
             if (state.ArgumentName.Length > 0)
             {
                 throw StringProvider.CreateException(CommandLineArgumentErrorCategory.UnknownArgument,

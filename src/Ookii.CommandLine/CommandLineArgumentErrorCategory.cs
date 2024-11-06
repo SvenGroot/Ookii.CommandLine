@@ -65,4 +65,8 @@ public enum CommandLineArgumentErrorCategory
     /// or the <see cref="Validation.ProhibitsAttribute"/> class.
     /// </summary>
     DependencyFailed,
+    /// <summary>
+    /// The provided argument name was a prefix of more than one argument name or alias.
+    /// </summary>
+    AmbiguousPrefixAlias
 }

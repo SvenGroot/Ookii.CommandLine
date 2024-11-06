@@ -109,7 +109,12 @@ public partial class CommandLineParserTest
     [DynamicData(nameof(ProviderKinds), DynamicDataDisplayName = nameof(GetCustomDynamicDataDisplayName))]
     public void ParseTest(ProviderKind kind)
     {
-        var target = CreateParser<TestArguments>(kind);
+        var options = new ParseOptions()
+        {
+            AutoPrefixAliases = false
+        };
+
+        var target = CreateParser<TestArguments>(kind, options);
         // Only required arguments
         TestParse(target, "val1 2 -arg6 val6", "val1", 2, arg6: "val6");
         // Make sure negative numbers are accepted, and not considered an argument name.
@@ -863,7 +868,7 @@ public partial class CommandLineParserTest
         CheckThrows(parser, ["-sf"], CommandLineArgumentErrorCategory.CombinedShortNameNonSwitch, "sf", remainingArgumentCount: 1);
 
         // Can't use long argument prefix with short names.
-        CheckThrows(parser, ["--s"], CommandLineArgumentErrorCategory.UnknownArgument, "s", remainingArgumentCount: 1);
+        CheckThrows(parser, ["--s"], CommandLineArgumentErrorCategory.AmbiguousPrefixAlias, "s", remainingArgumentCount: 1, possibleMatches: ["Switch1", "Switch2"]);
 
         // And vice versa.
         CheckThrows(parser, ["-Switch1"], CommandLineArgumentErrorCategory.UnknownArgument, "w", remainingArgumentCount: 1);
@@ -1445,10 +1450,12 @@ public partial class CommandLineParserTest
         Assert.IsTrue(result.EnablePrefix);
 
         // Ambiguous prefix
-        CheckThrows(parser, ["-p", "foo"], CommandLineArgumentErrorCategory.UnknownArgument, "p", remainingArgumentCount: 2);
+        CheckThrows(parser, ["-p", "foo"], CommandLineArgumentErrorCategory.AmbiguousPrefixAlias, "p", remainingArgumentCount: 2,
+            possibleMatches: ["Port", "Prefix", "Protocol"]);
 
         // Ambiguous due to alias.
-        CheckThrows(parser, ["-pr", "foo"], CommandLineArgumentErrorCategory.UnknownArgument, "pr", remainingArgumentCount: 2);
+        CheckThrows(parser, ["-pr", "foo"], CommandLineArgumentErrorCategory.AmbiguousPrefixAlias, "pr", remainingArgumentCount: 2,
+            possibleMatches: ["Prefix", "Protocol"]);
 
         // Prefix of an alias.
         result = parser.Parse(["-pre"]);
@@ -1723,7 +1730,8 @@ public partial class CommandLineParserTest
         }
     }
 
-    private static void CheckThrows(CommandLineParser parser, string[] arguments, CommandLineArgumentErrorCategory category, string? argumentName = null, Type? innerExceptionType = null, int remainingArgumentCount = 0)
+    private static void CheckThrows(CommandLineParser parser, string[] arguments, CommandLineArgumentErrorCategory category,
+        string? argumentName = null, Type? innerExceptionType = null, int remainingArgumentCount = 0, string[]? possibleMatches = null)
     {
         try
         {
@@ -1749,6 +1757,16 @@ public partial class CommandLineParserTest
 
             var remaining = arguments.AsMemory(arguments.Length - remainingArgumentCount);
             AssertMemoryEqual(remaining, parser.ParseResult.RemainingArguments);
+
+            if (possibleMatches != null)
+            {
+                Assert.IsInstanceOfType(ex, typeof(AmbiguousPrefixAliasException));
+                CollectionAssert.AreEqual(possibleMatches, ((AmbiguousPrefixAliasException)ex).PossibleMatches);
+            }
+            else
+            {
+                Assert.IsNotInstanceOfType(ex, typeof(AmbiguousPrefixAliasException));
+            }
         }
     }
 

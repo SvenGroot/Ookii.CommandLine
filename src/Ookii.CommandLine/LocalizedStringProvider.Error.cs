@@ -1,7 +1,9 @@
 ﻿using Ookii.CommandLine.Conversion;
 using Ookii.CommandLine.Properties;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 
 namespace Ookii.CommandLine;
 
@@ -115,6 +117,11 @@ public partial class LocalizedStringProvider
     public virtual string CombinedShortNameNonSwitch(string argumentName)
         => Format(Resources.CombinedShortNameNonSwitchFormat, argumentName);
 
+    public virtual string AmbiguousArgumentPrefix(string argumentName, string prefix,
+        IEnumerable<string> possibleMatches)
+        => Format(Resources.AmbiguousPrefixFormat, argumentName,
+            string.Join(ArgumentSeparator, possibleMatches.Select(m => prefix + m)));
+
     /// <summary>
     /// Gets the error message used if the <see cref="KeyValuePairConverter{TKey, TValue}"/>
     /// is unable to find the key/value pair separator in the argument value.
@@ -140,6 +147,7 @@ public partial class LocalizedStringProvider
     {
         // These are not created using the helper, because there is not one standard message.
         Debug.Assert(category != CommandLineArgumentErrorCategory.ValidationFailed);
+        Debug.Assert(category != CommandLineArgumentErrorCategory.AmbiguousPrefixAlias);
 
         var message = category switch
         {

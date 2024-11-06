@@ -61,6 +61,15 @@ namespace Ookii.CommandLine.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The prefix alias &apos;{0}&apos; is ambiguous. It could refer to one of the following arguments: {1}..
+        /// </summary>
+        internal static string AmbiguousPrefixFormat {
+            get {
+                return ResourceManager.GetString("AmbiguousPrefixFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The value &apos;{0}&apos; provided for argument &apos;{1}&apos; could not be interpreted as a &apos;{2}&apos;..
         /// </summary>
         internal static string ArgumentConversionErrorFormat {

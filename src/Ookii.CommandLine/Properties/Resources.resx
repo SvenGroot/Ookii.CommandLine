@@ -423,4 +423,7 @@
   <data name="CategoryNotEnum" xml:space="preserve">
     <value>The category value must use an enumeration type.</value>
   </data>
+  <data name="AmbiguousPrefixFormat" xml:space="preserve">
+    <value>The prefix alias '{0}' is ambiguous. It could refer to one of the following arguments: {1}.</value>
+  </data>
 </root>
