@@ -117,6 +117,16 @@ public partial class LocalizedStringProvider
     public virtual string CombinedShortNameNonSwitch(string argumentName)
         => Format(Resources.CombinedShortNameNonSwitchFormat, argumentName);
 
+    /// <summary>
+    /// Gets the error message for <see cref="CommandLineArgumentErrorCategory.AmbiguousPrefixAlias" qualifyHint="true"/>.
+    /// </summary>
+    /// <param name="argumentName">The argument name that is the ambiguous prefix.</param>
+    /// <param name="prefix">
+    /// The argument name prefix to use with <paramref name="possibleMatches"/>. This is either the
+    /// long name prefix or the first regular prefix.
+    /// </param>
+    /// <param name="possibleMatches">A list of argument names and aliases that the prefix could match.</param>
+    /// <returns>The error message.</returns>
     public virtual string AmbiguousArgumentPrefix(string argumentName, string prefix,
         IEnumerable<string> possibleMatches)
         => Format(Resources.AmbiguousPrefixFormat, argumentName,
