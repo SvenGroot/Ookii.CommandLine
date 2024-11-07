@@ -39,6 +39,13 @@ public partial class LocalizedStringProvider
     public virtual string UnknownArgument(string argumentName) => Format(Resources.UnknownArgumentFormat, argumentName);
 
     /// <summary>
+    /// Gets the error message displayed when the user tries to invoke an unknown command.
+    /// </summary>
+    /// <param name="commandName">The name of the command.</param>
+    /// <returns>The error message.</returns>
+    public virtual string UnknownCommand(string commandName) => Format(Resources.UnknownCommandFormat, commandName);
+
+    /// <summary>
     /// Gets the error message for <see cref="CommandLineArgumentErrorCategory.MissingNamedArgumentValue" qualifyHint="true"/>.
     /// </summary>
     /// <param name="argumentName">The name of the argument.</param>

@@ -432,4 +432,7 @@
   <data name="AmbiguousArgumentPrefixErrorOnlyFormat" xml:space="preserve">
     <value>The provided argument name '{0}' is an ambiguous prefix alias.</value>
   </data>
+  <data name="UnknownCommandFormat" xml:space="preserve">
+    <value>Unknown command name '{0}'.</value>
+  </data>
 </root>

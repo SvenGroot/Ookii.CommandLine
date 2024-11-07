@@ -463,6 +463,11 @@ public class CommandManager
 
         if (commandInfo is not CommandInfo info)
         {
+            if (commandName != null)
+            {
+                CommandLineParser.WriteError(Options, Options.StringProvider.UnknownCommand(commandName), Options.ErrorColor, true);
+            }
+
             WriteUsage();
             return null;
         }

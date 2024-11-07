@@ -664,6 +664,15 @@ namespace Ookii.CommandLine.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Unknown command name &apos;{0}&apos;..
+        /// </summary>
+        internal static string UnknownCommandFormat {
+            get {
+                return ResourceManager.GetString("UnknownCommandFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to A {0} refers to an unknown argument &apos;{1}&apos;..
         /// </summary>
         internal static string UnknownDependencyFormat {
