@@ -88,6 +88,24 @@ namespace Ookii.CommandLine.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The provided command name &apos;{0}&apos; is an ambiguous prefix alias..
+        /// </summary>
+        internal static string AmbiguousCommandPrefixFormat {
+            get {
+                return ResourceManager.GetString("AmbiguousCommandPrefixFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The prefix could refer to one of the following commands:.
+        /// </summary>
+        internal static string AmbiguousCommandPrefixMatchesHeader {
+            get {
+                return ResourceManager.GetString("AmbiguousCommandPrefixMatchesHeader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The value &apos;{0}&apos; provided for argument &apos;{1}&apos; could not be interpreted as a &apos;{2}&apos;..
         /// </summary>
         internal static string ArgumentConversionErrorFormat {
@@ -516,6 +534,15 @@ namespace Ookii.CommandLine.Properties {
         internal static string MissingValueForNamedArgumentFormat {
             get {
                 return ResourceManager.GetString("MissingValueForNamedArgumentFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Run &apos;{0}&apos; without arguments for more information about available commands..
+        /// </summary>
+        internal static string MoreInfoOnCommandErrorFormat {
+            get {
+                return ResourceManager.GetString("MoreInfoOnCommandErrorFormat", resourceCulture);
             }
         }
         

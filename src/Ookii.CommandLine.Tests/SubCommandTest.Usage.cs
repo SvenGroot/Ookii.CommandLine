@@ -170,4 +170,12 @@ The following commands are available:
 
 This is the command list footer.
 ".ReplaceLineEndings();
+
+    public static readonly string _expectedUsageAmbiguousPrefix = @"The prefix could refer to one of the following commands:
+  [32mtest[0m
+  [32mTestAlias[0m
+  [32mTestParentCommand[0m
+
+Run 'test' without arguments for more information about available commands.
+".ReplaceLineEndings();
 }

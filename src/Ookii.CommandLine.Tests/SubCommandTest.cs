@@ -37,7 +37,7 @@ public partial class SubCommandTest
             new("AsyncCommand", typeof(AsyncCommand)),
             new("custom", typeof(CustomParsingCommand), true),
             new("DerivedArguments4", typeof(DerivedArguments4)),
-            new("HiddenCommand", typeof(HiddenCommand)),
+            new("HiddenCommand", typeof(HiddenCommand), false, "TestAlias"),
             new("test", typeof(TestCommand)),
             new("TestParentCommand", typeof(TestParentCommand), true),
             new("version", null)
@@ -96,9 +96,10 @@ public partial class SubCommandTest
     public void CreateCommandTest(ProviderKind kind)
     {
         using var writer = LineWrappingTextWriter.ForStringWriter(0);
+        using var errorWriter = new StringWriter();
         var options = new CommandOptions()
         {
-            Error = writer,
+            Error = errorWriter,
             UsageWriter = new UsageWriter(writer)
             {
                 ExecutableName = _executableName,
@@ -273,6 +274,28 @@ public partial class SubCommandTest
 
     [TestMethod]
     [DynamicData(nameof(ProviderKinds), DynamicDataDisplayName = nameof(GetCustomDynamicDataDisplayName))]
+    public void TestWriteUsageAmbiguousPrefixAlias(ProviderKind kind)
+    {
+        using var writer = LineWrappingTextWriter.ForStringWriter(0);
+        using var errorWriter = new StringWriter();
+        var options = new CommandOptions()
+        {
+            Error = errorWriter,
+            UsageWriter = new UsageWriter(writer, true)
+            {
+                ExecutableName = _executableName,
+            }
+        };
+
+        var expectedError = "The provided command name 'tes' is an ambiguous prefix alias.\n\n".ReplaceLineEndings();
+        var manager = CreateManager(kind, options);
+        Assert.IsNull(manager.CreateCommand(["tes"]));
+        Assert.AreEqual(expectedError, errorWriter.ToString());
+        Assert.AreEqual(_expectedUsageAmbiguousPrefix, writer.BaseWriter.ToString());
+    }
+
+    [TestMethod]
+    [DynamicData(nameof(ProviderKinds), DynamicDataDisplayName = nameof(GetCustomDynamicDataDisplayName))]
     public void TestCommandUsage(ProviderKind kind)
     {
         using var writer = LineWrappingTextWriter.ForStringWriter(0);
@@ -433,7 +456,7 @@ public partial class SubCommandTest
             new("custom", typeof(CustomParsingCommand), true),
             new("DerivedArguments4", typeof(DerivedArguments4)),
             new("external", typeof(ExternalCommand)),
-            new("HiddenCommand", typeof(HiddenCommand)),
+            new("HiddenCommand", typeof(HiddenCommand), false, "TestAlias"),
             new("OtherExternalCommand", typeof(OtherExternalCommand)),
             new("test", typeof(TestCommand)),
             new("TestParentCommand", typeof(TestParentCommand), true),

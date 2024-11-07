@@ -259,7 +259,7 @@ public abstract class CommandInfo
     /// <para>
     ///   Automatic prefix aliases are not considered by this method, regardless of the value of
     ///   the <see cref="CommandOptions.AutoCommandPrefixAliases"/> property. To check for a prefix,
-    ///   use the <see cref="MatchesPrefix"/> method.
+    ///   use the <see cref="MatchingPrefix"/> method.
     /// </para>
     /// </remarks>
     /// <exception cref="ArgumentNullException">
@@ -285,13 +285,12 @@ public abstract class CommandInfo
     /// </summary>
     /// <param name="prefix">The prefix to check for.</param>
     /// <returns>
-    /// <see langword="true"/> if <paramref name="prefix"/> is a prefix of the <see cref="Name"/>
-    /// property or any of the items in the <see cref="Aliases"/> property.
+    /// The name or alias that matched the prefix, or <see langword="null"/> if no match was found.
     /// </returns>
     /// <exception cref="ArgumentNullException">
     /// <paramref name="prefix"/> is <see langword="null"/>.
     /// </exception>
-    public bool MatchesPrefix(string prefix)
+    public string? MatchingPrefix(string prefix)
     {
         if (prefix == null)
         {
@@ -300,10 +299,10 @@ public abstract class CommandInfo
 
         if (Name.StartsWith(prefix, Manager.Options.CommandNameComparison))
         {
-            return true;
+            return Name;
         }
 
-        return Aliases.Any(alias => alias.StartsWith(prefix, Manager.Options.CommandNameComparison));
+        return Aliases.FirstOrDefault(alias => alias.StartsWith(prefix, Manager.Options.CommandNameComparison));
     }
 
     /// <summary>

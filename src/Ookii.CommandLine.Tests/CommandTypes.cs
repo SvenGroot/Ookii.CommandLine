@@ -66,6 +66,7 @@ partial class CustomParsingCommand : ICommandWithCustomParsing
 
 [GeneratedParser]
 [Command(IsHidden = true)]
+[Alias("TestAlias")]
 partial class HiddenCommand : ICommand
 {
     public int Run()

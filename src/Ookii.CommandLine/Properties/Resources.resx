@@ -435,4 +435,13 @@
   <data name="UnknownCommandFormat" xml:space="preserve">
     <value>Unknown command name '{0}'.</value>
   </data>
+  <data name="AmbiguousCommandPrefixFormat" xml:space="preserve">
+    <value>The provided command name '{0}' is an ambiguous prefix alias.</value>
+  </data>
+  <data name="AmbiguousCommandPrefixMatchesHeader" xml:space="preserve">
+    <value>The prefix could refer to one of the following commands:</value>
+  </data>
+  <data name="MoreInfoOnCommandErrorFormat" xml:space="preserve">
+    <value>Run '{0}' without arguments for more information about available commands.</value>
+  </data>
 </root>

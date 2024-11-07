@@ -870,6 +870,34 @@ public class UsageWriter
     }
 
     /// <summary>
+    /// Creates usage help for when the user used a command name that was a prefix alias for
+    /// multiple commands.
+    /// </summary>
+    /// <param name="manager">The <see cref="Commands.CommandManager" qualifyHint="true"/></param>
+    /// <param name="possibleMatches">The list of possible argument names or aliases.</param>
+    /// <exception cref="ArgumentNullException">
+    /// <paramref name="manager"/> or <paramref name="possibleMatches"/> is <see langword="null"/>.
+    /// </exception>
+    /// <remarks>
+    /// <para>
+    ///   If no writer was passed to the <see cref="UsageWriter(LineWrappingTextWriter?, bool?)"/>
+    ///   constructor, this method will create a <see cref="LineWrappingTextWriter"/> for the
+    ///   standard output stream. If color usage wasn't explicitly enabled, it will be enabled
+    ///   if the output supports it according to <see cref="VirtualTerminal.EnableColor" qualifyHint="true"/>.
+    /// </para>
+    /// <para>
+    ///   This method calls the <see cref="WriteCommandAmbiguousPrefixAliasUsageCore"/> method to
+    ///   create the usage help text.
+    /// </para>
+    /// </remarks>
+    public void WriteCommandAmbiguousPrefixAliasUsage(CommandManager manager, IEnumerable<string> possibleMatches)
+    {
+        _commandManager = manager ?? throw new ArgumentNullException(nameof(manager));
+        WriteUsageInternal(possibleMatches: possibleMatches ?? throw new ArgumentNullException(nameof(possibleMatches)));
+    }
+
+
+    /// <summary>
     /// Returns a string with usage help for the specified parser.
     /// </summary>
     /// <returns>A string containing the usage help.</returns>
@@ -1857,7 +1885,8 @@ public class UsageWriter
     /// </para>
     /// <para>
     ///   This method is called by the base implementation of the <see cref="WriteParserUsageCore"/>
-    ///   method if the requested help is not <see cref="UsageHelpRequest.Full" qualifyHint="true"/>.
+    ///   method if the requested help is not <see cref="UsageHelpRequest.Full" qualifyHint="true"/>,
+    ///   and by the <see cref="WriteParserAmbiguousPrefixAliasUsageCore"/> method.
     /// </para>
     /// </remarks>
     protected virtual void WriteMoreInfoMessage()
@@ -1913,7 +1942,7 @@ public class UsageWriter
     /// </remarks>
     protected virtual void WriteParserAmbiguousPrefixAliasUsageCore(IEnumerable<string> possibleMatches)
     {
-        Writer.WriteLine(StringProvider.AmbiguousPrefixAliasMatchesHeader());
+        Writer.WriteLine(StringProvider.AmbiguousArgumentPrefixAliasMatchesHeader());
         var prefix = Parser.LongArgumentNamePrefix ?? Parser.ArgumentNamePrefixes[0];
         SetIndent(2);
         foreach (var match in possibleMatches)
@@ -2162,7 +2191,7 @@ public class UsageWriter
     /// </para>
     /// <para>
     ///   This method is called by the base implementation of the <see cref="WriteCommandDescription(CommandInfo)"/>
-    ///   method.
+    ///   method and <see cref="WriteCommandAmbiguousPrefixAliasUsageCore"/> method.
     /// </para>
     /// </remarks>
     protected virtual void WriteCommandName(string commandName)
@@ -2260,6 +2289,58 @@ public class UsageWriter
     protected virtual void WriteCommandHelpInstruction(string name, string argumentNamePrefix, string argumentName)
     {
         WriteLine(StringProvider.UsageCommandHelpInstruction(name, argumentNamePrefix, argumentName));
+    }
+
+    /// <summary>
+    /// Writes a list of possible matches when the user used a command name that was a prefix
+    /// alias for multiple commands.
+    /// </summary>
+    /// <param name="possibleMatches">The list of possible command names or aliases.</param>
+    /// <remarks>
+    /// <para>
+    ///   The default implementation writes a list of possible matches, preceded by a header.
+    ///   The command names will be written using the <see cref="CommandDescriptionColor"/> and
+    ///   by calling the <see cref="WriteCommandName"/> method.
+    /// </para>
+    /// </remarks>
+    protected virtual void WriteCommandAmbiguousPrefixAliasUsageCore(IEnumerable<string> possibleMatches)
+    {
+        Writer.WriteLine(StringProvider.AmbiguousCommandPrefixAliasMatchesHeader());
+        SetIndent(2);
+        foreach (var match in possibleMatches)
+        {
+            WriteColor(CommandDescriptionColor);
+            WriteCommandName(match);
+            ResetColor();
+            WriteLine();
+        }
+
+        WriteLine();
+        WriteCommandMoreInfoMessage();
+    }
+
+    /// <summary>
+    /// Writes a message telling to user how to get more detailed help about available commands.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    ///   The default implementation writes a message like "Run 'executable' without arguments for
+    ///   more information."
+    /// </para>
+    /// <para>
+    ///   This method is called by the base implementation of the
+    ///   <see cref="WriteCommandAmbiguousPrefixAliasUsageCore"/>.
+    /// </para>
+    /// </remarks>
+    protected virtual void WriteCommandMoreInfoMessage()
+    {
+        var name = ExecutableName;
+        if (CommandName != null)
+        {
+            name += " " + CommandName;
+        }
+
+        WriteLine(StringProvider.UsageCommandMoreInfoMessage(name));
     }
 
     #endregion
@@ -2461,7 +2542,14 @@ public class UsageWriter
             Writer.IndentAfterEmptyLine = IndentAfterEmptyLine;
             if (_parser == null)
             {
-                WriteCommandListUsageCore();
+                if (possibleMatches == null)
+                {
+                    WriteCommandListUsageCore();
+                }
+                else
+                {
+                    WriteCommandAmbiguousPrefixAliasUsageCore(possibleMatches);
+                }
             }
             else
             {

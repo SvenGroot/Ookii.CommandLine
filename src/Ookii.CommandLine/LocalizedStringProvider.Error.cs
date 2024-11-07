@@ -147,6 +147,14 @@ public partial class LocalizedStringProvider
         => Format(Resources.AmbiguousArgumentPrefixErrorOnlyFormat, argumentName);
 
     /// <summary>
+    /// Gets the error message for an ambiguous prefix alias of a subcommand.
+    /// </summary>
+    /// <param name="argumentName">The command name that is the ambiguous prefix.</param>
+    /// <returns>The error message.</returns>
+    public virtual string AmbiguousCommandPrefixAlias(string argumentName)
+        => Format(Resources.AmbiguousCommandPrefixFormat, argumentName);
+
+    /// <summary>
     /// Gets the error message used if the <see cref="KeyValuePairConverter{TKey, TValue}"/>
     /// is unable to find the key/value pair separator in the argument value.
     /// </summary>
