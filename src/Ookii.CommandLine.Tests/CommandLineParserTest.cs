@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestPlatform.Utilities;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Ookii.CommandLine.Conversion;
 using Ookii.CommandLine.Support;
 using Ookii.CommandLine.Tests.Commands;
@@ -583,7 +584,7 @@ public partial class CommandLineParserTest
         using var error = new StringWriter();
         var options = new ParseOptions()
         {
-            ArgumentNamePrefixes = new[] { "/", "-" },
+            ArgumentNamePrefixes = ["/", "-"],
             Error = error,
             ShowUsageOnError = UsageHelpRequest.Full,
             UsageWriter = new UsageWriter(lineWriter)
@@ -611,6 +612,14 @@ public partial class CommandLineParserTest
         Assert.AreEqual(0, error.ToString().Length);
         Assert.AreEqual(_expectedDefaultUsage, output.ToString());
 
+        // With full help requested, no special handling of ambiguous usage prefixes.
+        output.GetStringBuilder().Clear();
+        error.GetStringBuilder().Clear();
+        result = StaticParse<TestArguments>(kind, ["-a"], options);
+        Assert.IsNull(result);
+        Assert.IsTrue(error.ToString().Length > 0);
+        Assert.AreEqual(_expectedDefaultUsage, output.ToString());
+
         options.ShowUsageOnError = UsageHelpRequest.SyntaxOnly;
         output.GetStringBuilder().Clear();
         error.GetStringBuilder().Clear();
@@ -634,6 +643,36 @@ public partial class CommandLineParserTest
         Assert.IsNull(result);
         Assert.AreEqual(0, error.ToString().Length);
         Assert.AreEqual(_expectedDefaultUsage, output.ToString());
+    }
+
+    [TestMethod]
+    [DynamicData(nameof(ProviderKinds), DynamicDataDisplayName = nameof(GetCustomDynamicDataDisplayName))]
+    public void TestStaticParseAutoPrefixUsage(ProviderKind kind)
+    {
+        using var output = new StringWriter();
+        using var lineWriter = new LineWrappingTextWriter(output, 0);
+        using var error = new StringWriter();
+        var options = new ParseOptions()
+        {
+            Error = error,
+            UsageWriter = new UsageWriter(lineWriter, true)
+            {
+                ExecutableName = _executableName,
+            }
+        };
+
+        var expectedError = "The provided argument name 'p' is an ambiguous prefix alias.\n\n".ReplaceLineEndings();
+        Assert.IsNull(StaticParse<AutoPrefixAliasesArguments>(kind, ["-p"], options));
+        Assert.AreEqual(expectedError, error.ToString());
+        Assert.AreEqual(_expectedAutoPrefixUsage, output.ToString());
+
+        options.IsPosix = true;
+        output.GetStringBuilder().Clear();
+        error.GetStringBuilder().Clear();
+        Assert.IsNull(StaticParse<AutoPrefixAliasesArguments>(kind, ["--p"], options));
+        Assert.AreEqual(expectedError, error.ToString());
+        // The alias doesn't match this time because it's not transformed and case sensitive.
+        Assert.AreEqual(_expectedAutoPrefixUsageLongShort, output.ToString());
     }
 
     [TestMethod]

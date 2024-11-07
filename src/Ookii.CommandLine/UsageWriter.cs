@@ -1915,15 +1915,15 @@ public class UsageWriter
     {
         Writer.WriteLine(StringProvider.AmbiguousPrefixAliasMatchesHeader());
         var prefix = Parser.LongArgumentNamePrefix ?? Parser.ArgumentNamePrefixes[0];
-        WriteColor(ArgumentDescriptionColor);
         SetIndent(2);
         foreach (var match in possibleMatches)
         {
+            WriteColor(ArgumentDescriptionColor);
             WriteArgumentNameForDescription(match, prefix);
+            ResetColor();
             WriteLine();
         }
 
-        ResetColor();
         WriteLine();
         WriteMoreInfoMessage();
     }

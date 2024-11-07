@@ -822,4 +822,19 @@ The second category.
         Displays version information.
 
 ".ReplaceLineEndings();
+
+    private static readonly string _expectedAutoPrefixUsage = @"The prefix could refer to one of the following arguments:
+  [32m-Port[0m
+  [32m-Prefix[0m
+  [32m-Protocol[0m
+
+Run 'test -Help' for more information.
+".ReplaceLineEndings();
+
+    private static readonly string _expectedAutoPrefixUsageLongShort = @"The prefix could refer to one of the following arguments:
+  [32m--port[0m
+  [32m--protocol[0m
+
+Run 'test --help' for more information.
+".ReplaceLineEndings();
 }

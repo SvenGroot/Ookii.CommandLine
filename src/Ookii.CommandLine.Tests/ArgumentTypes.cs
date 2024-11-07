@@ -676,6 +676,9 @@ partial class AutoPrefixAliasesArguments
     [CommandLineArgument(IsShort = true)]
     [Alias("Prefix")]
     public bool EnablePrefix { get; set; }
+
+    [CommandLineArgument]
+    public string SomeOtherName { get; set; }
 }
 
 class AutoPositionArgumentsBase

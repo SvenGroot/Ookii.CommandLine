@@ -1101,7 +1101,7 @@ public class CommandLineParser
         {
             result = Parse(args);
         }
-        catch (AmbiguousPrefixAliasException ex)
+        catch (AmbiguousPrefixAliasException ex) when (_parseOptions.ShowUsageOnError != UsageHelpRequest.Full)
         {
             WriteError(_parseOptions, StringProvider.AmbiguousArgumentPrefixAliasErrorOnly(ex.ArgumentName!),
                 _parseOptions.ErrorColor, true);
