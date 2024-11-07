@@ -73,4 +73,11 @@ partial class LocalizedStringProvider
     public virtual string UsageCommandHelpInstruction(string name, string argumentNamePrefix, string argumentName)
         => Format(Resources.CommandHelpInstructionFormat, name, argumentNamePrefix, argumentName);
 
+    /// <summary>
+    /// Gets the default header to print above the list of available commands, used by the
+    /// <see cref="UsageWriter.WriteParserAmbiguousPrefixAliasUsageCore" qualifyHint="true"/>
+    /// method.
+    /// </summary>
+    /// <returns>The string.</returns>
+    public virtual string AmbiguousPrefixAliasMatchesHeader() => Resources.AmbiguousArgumentPrefixMatchesHeader;
 }

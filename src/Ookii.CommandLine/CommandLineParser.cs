@@ -1101,6 +1101,14 @@ public class CommandLineParser
         {
             result = Parse(args);
         }
+        catch (AmbiguousPrefixAliasException ex)
+        {
+            WriteError(_parseOptions, StringProvider.AmbiguousArgumentPrefixAliasErrorOnly(ex.ArgumentName!),
+                _parseOptions.ErrorColor, true);
+
+            HelpRequested = false;
+            _parseOptions.UsageWriter.WriteParserAmbiguousPrefixAliasUsage(this, ex.PossibleMatches);
+        }
         catch (CommandLineArgumentException ex)
         {
             WriteError(_parseOptions, ex.Message, _parseOptions.ErrorColor, true);
@@ -1981,7 +1989,7 @@ public class CommandLineParser
             {
                 var name = state.ArgumentName.ToString();
                 var prefix = LongArgumentNamePrefix ?? ArgumentNamePrefixes[0];
-                var message = StringProvider.AmbiguousArgumentPrefix(name, prefix, possibleMatches);
+                var message = StringProvider.AmbiguousArgumentPrefixAlias(name, prefix, possibleMatches);
                 throw new AmbiguousPrefixAliasException(message, name, possibleMatches);
             }
 

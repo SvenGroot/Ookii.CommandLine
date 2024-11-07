@@ -815,6 +815,33 @@ public class UsageWriter
     }
 
     /// <summary>
+    /// Creates usage help for when the user used an argument name that was a prefix alias for
+    /// multiple arguments.
+    /// </summary>
+    /// <param name="parser">The <see cref="CommandLineParser"/>.</param>
+    /// <param name="possibleMatches">The list of possible argument names or aliases.</param>
+    /// <exception cref="ArgumentNullException">
+    /// <paramref name="parser"/> or <paramref name="possibleMatches"/> is <see langword="null"/>.
+    /// </exception>
+    /// <remarks>
+    /// <para>
+    ///   If no writer was passed to the <see cref="UsageWriter(LineWrappingTextWriter?, bool?)"/>
+    ///   constructor, this method will create a <see cref="LineWrappingTextWriter"/> for the
+    ///   standard output stream. If color usage wasn't explicitly enabled, it will be enabled
+    ///   if the output supports it according to <see cref="VirtualTerminal.EnableColor" qualifyHint="true"/>.
+    /// </para>
+    /// <para>
+    ///   This method calls the <see cref="WriteParserAmbiguousPrefixAliasUsageCore"/> method to
+    ///   create the usage help text.
+    /// </para>
+    /// </remarks>
+    public void WriteParserAmbiguousPrefixAliasUsage(CommandLineParser parser, IEnumerable<string> possibleMatches)
+    {
+        _parser = parser ?? throw new ArgumentNullException(nameof(parser));
+        WriteUsageInternal(possibleMatches: possibleMatches ?? throw new ArgumentNullException(nameof(possibleMatches)));
+    }
+
+    /// <summary>
     /// Creates usage help for the specified command manager.
     /// </summary>
     /// <param name="manager">The <see cref="Commands.CommandManager" qualifyHint="true"/></param>
@@ -871,6 +898,40 @@ public class UsageWriter
         _parser = parser ?? throw new ArgumentNullException(nameof(parser));
         return GetUsageInternal(maximumLineLength, request);
     }
+
+    /// <summary>
+    /// Returns a string with usage help for when the user used an argument name that was a prefix
+    /// alias for multiple arguments.
+    /// </summary>
+    /// <returns>A string containing the usage help.</returns>
+    /// <param name="parser">The <see cref="CommandLineParser"/>.</param>
+    /// <param name="possibleMatches">The list of possible argument names or aliases.</param>
+    /// <param name="maximumLineLength">
+    /// The length at which to white-space wrap lines in the output, or 0 to disable wrapping.
+    /// </param>
+    /// <exception cref="ArgumentNullException">
+    /// <paramref name="parser"/> or <paramref name="possibleMatches"/> is <see langword="null"/>.
+    /// </exception>
+    /// <remarks>
+    /// <para>
+    ///   If no writer was passed to the <see cref="UsageWriter(LineWrappingTextWriter?, bool?)"/>
+    ///   constructor, this method will create a <see cref="LineWrappingTextWriter"/> for the
+    ///   standard output stream. If color usage wasn't explicitly enabled, it will be enabled
+    ///   if the output supports it according to <see cref="VirtualTerminal.EnableColor" qualifyHint="true"/>.
+    /// </para>
+    /// <para>
+    ///   This method calls the <see cref="WriteParserAmbiguousPrefixAliasUsageCore"/> method to
+    ///   create the usage help text.
+    /// </para>
+    /// </remarks>
+    public string GetParserAmbiguousPrefixAliasUsage(CommandLineParser parser, IEnumerable<string> possibleMatches,
+        int maximumLineLength = 0)
+    {
+        _parser = parser ?? throw new ArgumentNullException(nameof(parser));
+        return GetUsageInternal(maximumLineLength,
+            possibleMatches: possibleMatches ?? throw new ArgumentNullException(nameof(possibleMatches)));
+    }
+
 
     /// <summary>
     /// Returns a string with usage help for the specified command manager.
@@ -1838,6 +1899,36 @@ public class UsageWriter
     }
 
     /// <summary>
+    /// Writes a list of possible matches when the user used an argument name that was a prefix
+    /// alias for multiple arguments.
+    /// </summary>
+    /// <param name="possibleMatches">The list of possible argument names or aliases.</param>
+    /// <remarks>
+    /// <para>
+    ///   The default implementation writes a list of possible matches, preceded by a header.
+    ///   The argument names will be written using the <see cref="ArgumentDescriptionColor"/> and
+    ///   by calling the <see cref="WriteArgumentNameForDescription"/> method. Finally, it calls
+    ///   the <see cref="WriteMoreInfoMessage"/> method.
+    /// </para>
+    /// </remarks>
+    protected virtual void WriteParserAmbiguousPrefixAliasUsageCore(IEnumerable<string> possibleMatches)
+    {
+        Writer.WriteLine(StringProvider.AmbiguousPrefixAliasMatchesHeader());
+        var prefix = Parser.LongArgumentNamePrefix ?? Parser.ArgumentNamePrefixes[0];
+        WriteColor(ArgumentDescriptionColor);
+        SetIndent(2);
+        foreach (var match in possibleMatches)
+        {
+            WriteArgumentNameForDescription(match, prefix);
+            WriteLine();
+        }
+
+        ResetColor();
+        WriteLine();
+        WriteMoreInfoMessage();
+    }
+
+    /// <summary>
     /// Gets the parser's arguments filtered according to the <see cref="ArgumentDescriptionListFilter"/>
     /// property and sorted by category and according to the <see cref="ArgumentDescriptionListOrder"/>
     /// property.
@@ -2344,26 +2435,26 @@ public class UsageWriter
         return count;
     }
 
-    private void WriteUsageInternal(UsageHelpRequest request = UsageHelpRequest.Full)
+    private void WriteUsageInternal(UsageHelpRequest request = UsageHelpRequest.Full, IEnumerable<string>? possibleMatches = null)
     {
         using var support = EnableColor();
         using var writer = DisposableWrapper.Create(_customWriter, LineWrappingTextWriter.ForConsoleOut);
         _writer = writer.Inner;
         Writer.ResetIndent();
         Writer.Indent = 0;
-        RunOperation(request);
+        RunOperation(request, possibleMatches);
     }
 
-    private string GetUsageInternal(int maximumLineLength = 0, UsageHelpRequest request = UsageHelpRequest.Full)
+    private string GetUsageInternal(int maximumLineLength = 0, UsageHelpRequest request = UsageHelpRequest.Full, IEnumerable<string>? possibleMatches = null)
     {
         using var writer = LineWrappingTextWriter.ForStringWriter(maximumLineLength);
         _writer = writer;
-        RunOperation(request);
+        RunOperation(request, possibleMatches);
         writer.Flush();
         return writer.BaseWriter.ToString()!;
     }
 
-    private void RunOperation(UsageHelpRequest request)
+    private void RunOperation(UsageHelpRequest request, IEnumerable<string>? possibleMatches)
     {
         try
         {
@@ -2374,7 +2465,14 @@ public class UsageWriter
             }
             else
             {
-                WriteParserUsageCore(request);
+                if (possibleMatches == null)
+                {
+                    WriteParserUsageCore(request);
+                }
+                else
+                {
+                    WriteParserAmbiguousPrefixAliasUsageCore(possibleMatches);
+                }
             }
         }
         finally

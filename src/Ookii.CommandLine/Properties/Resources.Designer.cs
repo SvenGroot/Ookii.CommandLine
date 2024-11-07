@@ -61,11 +61,29 @@ namespace Ookii.CommandLine.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The prefix alias &apos;{0}&apos; is ambiguous. It could refer to one of the following arguments: {1}..
+        ///   Looks up a localized string similar to The provided argument name &apos;{0}&apos; is an ambiguous prefix alias..
         /// </summary>
-        internal static string AmbiguousPrefixFormat {
+        internal static string AmbiguousArgumentPrefixErrorOnlyFormat {
             get {
-                return ResourceManager.GetString("AmbiguousPrefixFormat", resourceCulture);
+                return ResourceManager.GetString("AmbiguousArgumentPrefixErrorOnlyFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The argument name prefix alias &apos;{0}&apos; is ambiguous. It could refer to one of the following arguments: {1}..
+        /// </summary>
+        internal static string AmbiguousArgumentPrefixExceptionMessageFormat {
+            get {
+                return ResourceManager.GetString("AmbiguousArgumentPrefixExceptionMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The prefix could refer to one of the following arguments:.
+        /// </summary>
+        internal static string AmbiguousArgumentPrefixMatchesHeader {
+            get {
+                return ResourceManager.GetString("AmbiguousArgumentPrefixMatchesHeader", resourceCulture);
             }
         }
         

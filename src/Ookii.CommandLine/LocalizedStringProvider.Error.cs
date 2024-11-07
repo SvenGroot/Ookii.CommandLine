@@ -127,10 +127,17 @@ public partial class LocalizedStringProvider
     /// </param>
     /// <param name="possibleMatches">A list of argument names and aliases that the prefix could match.</param>
     /// <returns>The error message.</returns>
-    public virtual string AmbiguousArgumentPrefix(string argumentName, string prefix,
-        IEnumerable<string> possibleMatches)
-        => Format(Resources.AmbiguousPrefixFormat, argumentName,
+    public virtual string AmbiguousArgumentPrefixAlias(string argumentName, string prefix, IEnumerable<string> possibleMatches)
+        => Format(Resources.AmbiguousArgumentPrefixExceptionMessageFormat, argumentName,
             string.Join(ArgumentSeparator, possibleMatches.Select(m => prefix + m)));
+
+    /// <summary>
+    /// Gets the error message for an ambiguous prefix alias, without the possible matches.
+    /// </summary>
+    /// <param name="argumentName">The argument name that is the ambiguous prefix.</param>
+    /// <returns>The error message.</returns>
+    public virtual string AmbiguousArgumentPrefixAliasErrorOnly(string argumentName)
+        => Format(Resources.AmbiguousArgumentPrefixErrorOnlyFormat, argumentName);
 
     /// <summary>
     /// Gets the error message used if the <see cref="KeyValuePairConverter{TKey, TValue}"/>
