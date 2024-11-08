@@ -292,6 +292,15 @@ public partial class SubCommandTest
         Assert.IsNull(manager.CreateCommand(["tes"]));
         Assert.AreEqual(expectedError, errorWriter.ToString());
         Assert.AreEqual(_expectedUsageAmbiguousPrefix, writer.BaseWriter.ToString());
+
+        expectedError = "The provided command name 'test' is an ambiguous prefix alias.\n\n".ReplaceLineEndings();
+        ((StringWriter)writer.BaseWriter).GetStringBuilder().Clear();
+        errorWriter.GetStringBuilder().Clear();
+        var command = (ParentCommand?)manager.CreateCommand(["TestParentCommand", "test"]);
+        Assert.IsNotNull(command);
+        Assert.IsFalse(command.IsChildCommandCreated);
+        Assert.AreEqual(expectedError, errorWriter.ToString());
+        Assert.AreEqual(_expectedUsageAmbiguousPrefixNested, writer.BaseWriter.ToString());
     }
 
     [TestMethod]
@@ -478,7 +487,7 @@ public partial class SubCommandTest
         VerifyCommands(
             manager.GetCommands(),
             new("NestedParentCommand", typeof(NestedParentCommand), true) { ParentCommand = typeof(TestParentCommand) },
-            new("OtherTestChildCommand", typeof(OtherTestChildCommand)) { ParentCommand = typeof(TestParentCommand) },
+            new("OtherTestChildCommand", typeof(OtherTestChildCommand)) { ParentCommand = typeof(TestParentCommand), Aliases = ["TestChild2"] },
             new("TestChildCommand", typeof(TestChildCommand)) { ParentCommand = typeof(TestParentCommand) }
         );
 

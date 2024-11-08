@@ -126,7 +126,7 @@ The following commands are available:
     NestedParentCommand
         Other parent command description.
 
-    OtherTestChildCommand
+    OtherTestChildCommand, TestChild2
 
     TestChildCommand
 
@@ -177,5 +177,12 @@ This is the command list footer.
   [32mTestParentCommand[0m
 
 Run 'test' without arguments for more information about available commands.
+".ReplaceLineEndings();
+
+    public static readonly string _expectedUsageAmbiguousPrefixNested = @"The prefix could refer to one of the following commands:
+  [32mTestChildCommand[0m
+  [32mTestChild2[0m
+
+Run 'test TestParentCommand' without arguments for more information about available commands.
 ".ReplaceLineEndings();
 }

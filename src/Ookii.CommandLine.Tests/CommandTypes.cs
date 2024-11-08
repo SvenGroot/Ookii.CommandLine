@@ -153,6 +153,7 @@ partial class TestChildCommand : ICommand
 [GeneratedParser]
 [Command]
 [ParentCommand(typeof(TestParentCommand))]
+[Alias("TestChild2")]
 partial class OtherTestChildCommand : ICommand
 {
     public int Run() => throw new NotImplementedException();
