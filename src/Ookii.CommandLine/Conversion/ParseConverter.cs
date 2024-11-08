@@ -16,11 +16,11 @@ internal class ParseConverter : ArgumentConverter
         _hasCulture = hasCulture;
     }
 
-    public override object? Convert(string value, CultureInfo culture, CommandLineArgument argument)
+    public override object? Convert(ReadOnlyMemory<char> value, CultureInfo culture, CommandLineArgument argument)
     {
-        var parameters = _hasCulture
-            ? new object?[] { value, culture }
-            : new object?[] { value };
+        object[] parameters = _hasCulture
+            ? [value.ToString(), culture]
+            : [value.ToString()];
 
         try
         {

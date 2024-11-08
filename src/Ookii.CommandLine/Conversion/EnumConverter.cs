@@ -68,31 +68,9 @@ public class EnumConverter : ArgumentConverter
     public Type EnumType { get; }
 
     /// <summary>
-    /// Converts a string to the enumeration type.
+    /// Converts a string memory region to the enumeration type.
     /// </summary>
-    /// <param name="value">The string to convert.</param>
-    /// <param name="culture">The culture to use for the conversion.</param>
-    /// <param name="argument">
-    /// The <see cref="CommandLineArgument"/> that will use the converted value.
-    /// </param>
-    /// <returns>An object representing the converted value.</returns>
-    /// <remarks>
-    /// <para>
-    ///   This method performs the conversion using the <see cref="Enum.Parse(Type, string, bool)" qualifyHint="true"/>
-    ///   method.
-    /// </para>
-    /// </remarks>
-    /// <exception cref="CommandLineArgumentException">
-    ///   The value was not valid for the enumeration type.
-    /// </exception>
-    public override object? Convert(string value, CultureInfo culture, CommandLineArgument argument)
-#if NET6_0_OR_GREATER
-        => Convert(value.AsSpan(), culture, argument);
-
-    /// <summary>
-    /// Converts a string span to the enumeration type.
-    /// </summary>
-    /// <param name="value">The <see cref="ReadOnlySpan{T}"/> containing the string to convert.</param>
+    /// <param name="value">The <see cref="ReadOnlyMemory{T}"/> containing the string to convert.</param>
     /// <param name="culture">The culture to use for the conversion.</param>
     /// <param name="argument">
     /// The <see cref="CommandLineArgument"/> that will use the converted value.
@@ -104,25 +82,32 @@ public class EnumConverter : ArgumentConverter
     ///   method.
     /// </para>
     /// </remarks>
+    /// <exception cref="ArgumentNullException">
+    ///   <paramref name="argument"/> is <see langword="null"/>.
+    /// </exception>
     /// <exception cref="CommandLineArgumentException">
     ///   The value was not valid for the enumeration type.
     /// </exception>
-    public override object? Convert(ReadOnlySpan<char> value, CultureInfo culture, CommandLineArgument argument)
-#endif
+    public override object? Convert(ReadOnlyMemory<char> value, CultureInfo culture, CommandLineArgument argument)
     {
+        if (argument == null)
+        {
+            throw new ArgumentNullException(nameof(argument));
+        }
+
         var attribute = argument.Validators.OfType<ValidateEnumValueAttribute>().FirstOrDefault();
-#if NET6_0_OR_GREATER
-        if (attribute != null && !attribute.ValidateBeforeConversion(argument, value))
-#else
-        if (attribute != null && !attribute.ValidateBeforeConversion(argument, value.AsSpan()))
-#endif
+        if (attribute != null && !attribute.ValidateBeforeConversion(argument, value.Span))
         {
             throw CreateException(value.ToString(), null, argument, attribute);
         }
 
         try
         {
-            return Enum.Parse(EnumType, value, !attribute?.CaseSensitive ?? true);
+#if NET6_0_OR_GREATER
+            return Enum.Parse(EnumType, value.Span, !attribute?.CaseSensitive ?? true);
+#else
+            return Enum.Parse(EnumType, value.ToString(), !attribute?.CaseSensitive ?? true);
+#endif
         }
         catch (ArgumentException ex)
         {

@@ -47,6 +47,6 @@ public class WrappedTypeConverter : ArgumentConverter
     public TypeConverter Converter { get; }
 
     /// <inheritdoc/>
-    public override object? Convert(string value, CultureInfo culture, CommandLineArgument argument)
-        => Converter.ConvertFromString(null, culture, value);
+    public override object? Convert(ReadOnlyMemory<char> value, CultureInfo culture, CommandLineArgument argument)
+        => Converter.ConvertFromString(null, culture, value.ToString());
 }

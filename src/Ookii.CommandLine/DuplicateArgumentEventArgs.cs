@@ -8,42 +8,20 @@ namespace Ookii.CommandLine;
 /// <threadsafety static="true" instance="false"/>
 public class DuplicateArgumentEventArgs : EventArgs
 {
-    private readonly CommandLineArgument _argument;
-    private readonly ReadOnlyMemory<char> _memoryValue;
-    private readonly string? _stringValue;
-    private bool _hasValue;
-
     /// <summary>
     /// Initializes a new instance of the <see cref="DuplicateArgumentEventArgs"/> class.
     /// </summary>
     /// <param name="argument">The argument that was specified more than once.</param>
     /// <param name="newValue">
-    /// The raw new value of the argument, or <see langword="null"/> if the argument has no value.
+    /// The raw new value of the argument, or <see langword="null"/> if no value was given.
     /// </param>
     /// <exception cref="ArgumentNullException">
     /// <paramref name="argument"/> is <see langword="null"/>
     /// </exception>
-    public DuplicateArgumentEventArgs(CommandLineArgument argument, string? newValue)
+    public DuplicateArgumentEventArgs(CommandLineArgument argument, ReadOnlyMemory<char>? newValue)
     {
-        _argument = argument ?? throw new ArgumentNullException(nameof(argument));
-        _stringValue = newValue;
-        _hasValue = newValue != null;
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="DuplicateArgumentEventArgs"/> class.
-    /// </summary>
-    /// <param name="argument">The argument that was specified more than once.</param>
-    /// <param name="hasValue"><see langword="true"/> if the argument has a value; otherwise, <see langword="false"/>.</param>
-    /// <param name="newValue">The raw new value of the argument.</param>
-    /// <exception cref="ArgumentNullException">
-    /// <paramref name="argument"/> is <see langword="null"/>
-    /// </exception>
-    public DuplicateArgumentEventArgs(CommandLineArgument argument, bool hasValue, ReadOnlyMemory<char> newValue)
-    {
-        _argument = argument ?? throw new ArgumentNullException(nameof(argument));
-        _memoryValue = newValue;
-        _hasValue = hasValue;
+        Argument = argument ?? throw new ArgumentNullException(nameof(argument));
+        NewValue = newValue;
     }
 
     /// <summary>
@@ -52,7 +30,7 @@ public class DuplicateArgumentEventArgs : EventArgs
     /// <value>
     /// The <see cref="CommandLineArgument"/> that was specified more than once.
     /// </value>
-    public CommandLineArgument Argument => _argument;
+    public CommandLineArgument Argument { get; }
 
     /// <summary>
     /// Gets the new value that will be assigned to the argument.
@@ -61,7 +39,7 @@ public class DuplicateArgumentEventArgs : EventArgs
     /// The raw string value provided on the command line, before conversion, or <see langword="null"/>
     /// if the argument is a switch argument that was provided without an explicit value.
     /// </value>
-    public string? NewValue => _hasValue ? (_stringValue ?? _memoryValue.ToString()) : null;
+    public ReadOnlyMemory<char>? NewValue { get; }
 
     /// <summary>
     /// Gets or sets a value that indicates whether the value of the argument should stay

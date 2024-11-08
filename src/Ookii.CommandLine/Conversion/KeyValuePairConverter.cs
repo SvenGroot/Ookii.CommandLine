@@ -129,17 +129,16 @@ public class KeyValuePairConverter<TKey, TValue> : ArgumentConverter
     public bool AllowNullValues { get; }
 
     /// <summary>
-    /// Converts a string to a <see cref="KeyValuePair{TKey, TValue}"/>.
+    /// Converts a string memory region to a <see cref="KeyValuePair{TKey, TValue}"/>.
     /// </summary>
-    /// <param name="value">The string to convert.</param>
+    /// <param name="value">The <see cref="ReadOnlyMemory{T}"/> containing the string to convert.</param>
     /// <param name="culture">The culture to use for the conversion.</param>
     /// <param name="argument">
     /// The <see cref="CommandLineArgument"/> that will use the converted value.
     /// </param>
     /// <returns>An object representing the converted value.</returns>
     /// <exception cref="ArgumentNullException">
-    ///   <paramref name="value"/> or <paramref name="culture"/> or <paramref name="argument"/> is
-    ///   <see langword="null"/>.
+    ///   <paramref name="culture"/> or <paramref name="argument"/> is <see langword="null"/>.
     /// </exception>
     /// <exception cref="FormatException">
     ///   The value was not in a correct format for the target type.
@@ -147,36 +146,14 @@ public class KeyValuePairConverter<TKey, TValue> : ArgumentConverter
     /// <exception cref="CommandLineArgumentException">
     ///   The value was not in a correct format for the target type.
     /// </exception>
-    public override object? Convert(string value, CultureInfo culture, CommandLineArgument argument)
-        => Convert((value ?? throw new ArgumentNullException(nameof(value))).AsSpan(), culture, argument);
-
-    /// <summary>
-    /// Converts a string span to a <see cref="KeyValuePair{TKey, TValue}"/>.
-    /// </summary>
-    /// <param name="value">The <see cref="ReadOnlySpan{T}"/> containing the string to convert.</param>
-    /// <param name="culture">The culture to use for the conversion.</param>
-    /// <param name="argument">
-    /// The <see cref="CommandLineArgument"/> that will use the converted value.
-    /// </param>
-    /// <returns>An object representing the converted value.</returns>
-    /// <exception cref="ArgumentNullException">
-    ///   <paramref name="value"/> or <paramref name="culture"/> or <paramref name="argument"/> is
-    ///   <see langword="null"/>.
-    /// </exception>
-    /// <exception cref="FormatException">
-    ///   The value was not in a correct format for the target type.
-    /// </exception>
-    /// <exception cref="CommandLineArgumentException">
-    ///   The value was not in a correct format for the target type.
-    /// </exception>
-    public override object? Convert(ReadOnlySpan<char> value, CultureInfo culture, CommandLineArgument argument)
+    public override object? Convert(ReadOnlyMemory<char> value, CultureInfo culture, CommandLineArgument argument)
     {
         if (argument == null)
         {
             throw new ArgumentNullException(nameof(argument));
         }
 
-        if (!value.SplitOnce(Separator.AsSpan(), StringComparison.Ordinal).TryGetValue(out var splits))
+        if (value.SplitOnce(Separator.AsSpan(), StringComparison.Ordinal) is not (ReadOnlyMemory<char>, ReadOnlyMemory<char>) splits)
         {
             throw new FormatException(argument.Parser.StringProvider.MissingKeyValuePairSeparator(Separator));
         }

@@ -1024,7 +1024,7 @@ public abstract class CommandLineArgument
     ///   determine the nullability of <c>TValue</c> at runtime except if it's a value type.
     /// </para>
     /// <para>
-    ///   This property indicates what happens when the <see cref="ArgumentConverter.Convert(string, CultureInfo, CommandLineArgument)" qualifyHint="true"/>
+    ///   This property indicates what happens when the <see cref="ArgumentConverter.Convert" qualifyHint="true"/>
     ///   method used for this argument returns <see langword="null" />.
     /// </para>
     /// <para>
@@ -1142,7 +1142,7 @@ public abstract class CommandLineArgument
     ///   <see cref="ArgumentType"/> property.
     /// </exception>
     public object? ConvertToArgumentType(CultureInfo culture, string? argumentValue)
-        => ConvertToArgumentType(culture, argumentValue != null, argumentValue, argumentValue.AsSpan());
+        => ConvertToArgumentType(culture, argumentValue?.AsMemory());
 
     /// <summary>
     /// Converts any type to the argument's <see cref="ElementType"/>.
@@ -1174,13 +1174,18 @@ public abstract class CommandLineArgument
             return value;
         }
 
+        if (value is ReadOnlyMemory<char> memoryValue)
+        {
+            return _converter.Convert(memoryValue, CultureInfo.InvariantCulture, this);
+        }
+
         var stringValue = value.ToString();
         if (stringValue == null)
         {
             return null;
         }
 
-        return _converter.Convert(stringValue, CultureInfo.InvariantCulture, this);
+        return _converter.Convert(stringValue.AsMemory(), CultureInfo.InvariantCulture, this);
     }
 
     /// <summary>
@@ -1289,14 +1294,14 @@ public abstract class CommandLineArgument
         }
     }
 
-    private object? ConvertToArgumentType(CultureInfo culture, bool hasValue, string? stringValue, ReadOnlySpan<char> spanValue)
+    private object? ConvertToArgumentType(CultureInfo culture, ReadOnlyMemory<char>? optionalValue)
     {
         if (culture == null)
         {
             throw new ArgumentNullException(nameof(culture));
         }
 
-        if (!hasValue)
+        if (optionalValue is not ReadOnlyMemory<char> value)
         {
             if (IsSwitch)
             {
@@ -1310,10 +1315,7 @@ public abstract class CommandLineArgument
 
         try
         {
-            var converted = stringValue == null
-                ? _converter.Convert(spanValue, culture, this)
-                : _converter.Convert(stringValue, culture, this);
-
+            var converted = _converter.Convert(value, culture, this);
             if (converted == null && (!_allowNull || Kind == ArgumentKind.Dictionary))
             {
                 throw _parser.StringProvider.CreateException(CommandLineArgumentErrorCategory.NullArgumentValue, this);
@@ -1334,7 +1336,7 @@ public abstract class CommandLineArgument
         catch (Exception ex)
         {
             // Wrap any other exception in a CommandLineArgumentException.
-            throw _parser.StringProvider.CreateException(CommandLineArgumentErrorCategory.ArgumentValueConversion, ex, this, stringValue ?? spanValue.ToString());
+            throw _parser.StringProvider.CreateException(CommandLineArgumentErrorCategory.ArgumentValueConversion, ex, this, value.ToString());
         }
     }
 
@@ -1381,19 +1383,18 @@ public abstract class CommandLineArgument
         return false;
     }
 
-    internal CancelMode SetValue(CultureInfo culture, bool hasValue, string? stringValue, ReadOnlySpan<char> spanValue)
+    internal CancelMode SetValue(CultureInfo culture, ReadOnlyMemory<char>? optionalValue)
     {
         _valueHelper ??= CreateValueHelper();
 
         CancelMode cancelParsing;
-        if (MultiValueInfo?.Separator != null)
+        if (optionalValue is ReadOnlyMemory<char> multiValue && MultiValueInfo?.Separator != null)
         {
             cancelParsing = CancelMode.None;
-            foreach (var separateValue in spanValue.Split(MultiValueInfo.Separator.AsSpan()))
+            foreach (var value in multiValue.Split(MultiValueInfo.Separator.AsSpan()))
             {
-                string? separateValueString = null;
-                PreValidate(ref separateValueString, separateValue);
-                var converted = ConvertToArgumentType(culture, true, separateValueString, separateValue);
+                PreValidate(value);
+                var converted = ConvertToArgumentType(culture, value);
                 cancelParsing = _valueHelper.SetValue(this, converted);
                 if (cancelParsing != CancelMode.Abort)
                 {
@@ -1408,8 +1409,12 @@ public abstract class CommandLineArgument
         }
         else
         {
-            PreValidate(ref stringValue, spanValue);
-            var converted = ConvertToArgumentType(culture, hasValue, stringValue, spanValue);
+            if (optionalValue is ReadOnlyMemory<char> value)
+            {
+                PreValidate(value);
+            }
+
+            var converted = ConvertToArgumentType(culture, optionalValue);
             cancelParsing = _valueHelper.SetValue(this, converted);
             Validate(converted, ValidationMode.AfterConversion);
         }
@@ -1616,25 +1621,16 @@ public abstract class CommandLineArgument
         }
     }
 
-    private void PreValidate(ref string? stringValue, ReadOnlySpan<char> spanValue)
+    private void PreValidate(ReadOnlyMemory<char> value)
     {
         foreach (var validator in _validators)
         {
             if (validator.Mode == ValidationMode.BeforeConversion)
             {
-                if (stringValue == null)
+                if (!validator.ValidateSpan(this, value.Span))
                 {
-                    if (validator.ValidateSpan(this, spanValue))
-                    {
-                        continue;
-                    }
-                    else
-                    {
-                        stringValue = spanValue.ToString();
-                    }
+                    validator.Validate(this, value.ToString());
                 }
-
-                validator.Validate(this, stringValue);
             }
         }
     }

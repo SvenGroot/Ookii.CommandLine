@@ -2,6 +2,7 @@
 #nullable enable
 
 using Ookii.CommandLine.Conversion;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 
@@ -12,30 +13,30 @@ namespace Ookii.CommandLine.Tests;
 
 class NullReturningStringConverter : ArgumentConverter
 {
-    public override object? Convert(string value, CultureInfo culture, CommandLineArgument argument)
+    public override object? Convert(ReadOnlyMemory<char> value, CultureInfo culture, CommandLineArgument argument)
     {
-        if (value == "(null)")
+        if (value.Span.Equals("(null)".AsSpan(), StringComparison.Ordinal))
         {
             return null;
         }
         else
         {
-            return value;
+            return value.ToString();
         }
     }
 }
 
 class NullReturningIntConverter : ArgumentConverter
 {
-    public override object? Convert(string value, CultureInfo culture, CommandLineArgument argument)
+    public override object? Convert(ReadOnlyMemory<char> value, CultureInfo culture, CommandLineArgument argument)
     {
-        if (value == "(null)")
+        if (value.Span.Equals("(null)".AsSpan(), StringComparison.Ordinal))
         {
             return null;
         }
         else
         {
-            return int.Parse(value);
+            return int.Parse(value.ToString());
         }
     }
 }

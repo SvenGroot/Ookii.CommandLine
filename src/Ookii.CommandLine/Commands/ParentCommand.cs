@@ -248,7 +248,7 @@ public abstract class ParentCommand : ICommandWithCustomParsing, IAsyncCommand
     ///   interface.
     /// </para>
     /// </remarks>
-    protected virtual bool OnDuplicateArgumentWarning(CommandLineArgument argument, string? newValue)
+    protected virtual bool OnDuplicateArgumentWarning(CommandLineArgument argument, ReadOnlyMemory<char>? newValue)
     {
         var parser = argument.Parser;
         var warning = parser.StringProvider.DuplicateArgumentWarning(argument.ArgumentName);

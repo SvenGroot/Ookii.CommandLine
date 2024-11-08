@@ -1734,15 +1734,15 @@ public class CommandLineParser
             int index;
             for (index = state.Index + 1; index < state.Arguments.Length; ++index)
             {
-                var stringValue = state.Arguments.Span[index];
-                if (CheckArgumentNamePrefix(stringValue) != null)
+                var value = state.Arguments.Span[index];
+                if (CheckArgumentNamePrefix(value) != null)
                 {
                     --index;
                     break;
                 }
 
                 parsedValue = true;
-                state.CancelParsing = ParseArgumentValue(argument, stringValue, stringValue.AsMemory());
+                state.CancelParsing = ParseArgumentValue(argument, value.AsMemory());
                 if (state.CancelParsing != CancelMode.None || !allowMultiToken)
                 {
                     break;
@@ -1763,11 +1763,11 @@ public class CommandLineParser
         // not a switch, CommandLineArgument.SetValue will throw an exception.
         if (!parsedValue)
         {
-            state.CancelParsing = ParseArgumentValue(argument, null, state.ArgumentValue);
+            state.CancelParsing = ParseArgumentValue(argument, state.ArgumentValue);
         }
     }
 
-    private CancelMode ParseArgumentValue(CommandLineArgument argument, string? stringValue, ReadOnlyMemory<char>? memoryValue)
+    private CancelMode ParseArgumentValue(CommandLineArgument argument, ReadOnlyMemory<char>? optionalValue)
     {
         if (argument.HasValue && argument.MultiValueInfo == null)
         {
@@ -1776,10 +1776,7 @@ public class CommandLineParser
                 throw StringProvider.CreateException(CommandLineArgumentErrorCategory.DuplicateArgument, argument);
             }
 
-            var duplicateEventArgs = stringValue == null
-                ? new DuplicateArgumentEventArgs(argument, memoryValue.HasValue, memoryValue ?? default)
-                : new DuplicateArgumentEventArgs(argument, stringValue);
-
+            var duplicateEventArgs = new DuplicateArgumentEventArgs(argument, optionalValue);
             OnDuplicateArgument(duplicateEventArgs);
             if (duplicateEventArgs.KeepOldValue)
             {
@@ -1787,7 +1784,7 @@ public class CommandLineParser
             }
         }
 
-        var cancelParsing = argument.SetValue(Culture, memoryValue.HasValue, stringValue, (memoryValue ?? default).Span);
+        var cancelParsing = argument.SetValue(Culture, optionalValue);
         var e = new ArgumentParsedEventArgs(argument)
         {
             CancelParsing = cancelParsing
@@ -1952,7 +1949,7 @@ public class CommandLineParser
             }
 
             state.ArgumentName = argument.ArgumentName.AsMemory();
-            state.CancelParsing = ParseArgumentValue(argument, null, state.ArgumentValue);
+            state.CancelParsing = ParseArgumentValue(argument, state.ArgumentValue);
             if (state.CancelParsing != CancelMode.None)
             {
                 break;

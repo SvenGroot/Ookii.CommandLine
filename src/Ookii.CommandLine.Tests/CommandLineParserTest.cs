@@ -1370,7 +1370,7 @@ public partial class CommandLineParserTest
         {
             Assert.AreEqual("Argument1", e.Argument.ArgumentName);
             Assert.AreEqual("foo", e.Argument.Value);
-            Assert.AreEqual("bar", e.NewValue);
+            Assert.AreEqual("bar", e.NewValue!.Value.ToString());
             handlerCalled = true;
             if (keepOldValue)
             {

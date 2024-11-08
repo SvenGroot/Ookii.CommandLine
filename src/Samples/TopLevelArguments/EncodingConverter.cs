@@ -9,11 +9,11 @@ namespace TopLevelArguments;
 // Ookii.CommandLine.
 internal class EncodingConverter : ArgumentConverter
 {
-    public override object? Convert(string value, CultureInfo culture, CommandLineArgument argument)
+    public override object? Convert(ReadOnlyMemory<char> value, CultureInfo culture, CommandLineArgument argument)
     {
         try
         {
-            return Encoding.GetEncoding(value);
+            return Encoding.GetEncoding(value.ToString());
         }
         catch (ArgumentException ex)
         {
