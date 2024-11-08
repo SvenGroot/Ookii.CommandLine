@@ -22,14 +22,6 @@ namespace Ookii.CommandLine.Validation;
 public class ValidateNotWhiteSpaceAttribute : ArgumentValidationWithHelpAttribute
 {
     /// <summary>
-    /// Gets a value that indicates when validation will run.
-    /// </summary>
-    /// <value>
-    /// <see cref="ValidationMode.BeforeConversion" qualifyHint="true"/>.
-    /// </value>
-    public override ValidationMode Mode => ValidationMode.BeforeConversion;
-
-    /// <summary>
     /// Determines if the argument's value is not an empty string, or contains only white-space
     /// characters.
     /// </summary>
@@ -40,14 +32,8 @@ public class ValidateNotWhiteSpaceAttribute : ArgumentValidationWithHelpAttribut
     /// <returns>
     ///   <see langword="true"/> if the value is valid; otherwise, <see langword="false"/>.
     /// </returns>
-    public override bool IsValid(CommandLineArgument argument, object? value)
-    {
-        return !string.IsNullOrWhiteSpace(value as string);
-    }
-
-    /// <inheritdoc cref="IsValid(CommandLineArgument, object?)"/>
-    public override bool? IsSpanValid(CommandLineArgument argument, ReadOnlySpan<char> value)
-        => !value.IsWhiteSpace();
+    public override bool IsValidPreConversion(CommandLineArgument argument, ReadOnlyMemory<char> value)
+        => !value.Span.IsWhiteSpace();
 
     /// <summary>
     /// Gets the error message to display if validation failed.

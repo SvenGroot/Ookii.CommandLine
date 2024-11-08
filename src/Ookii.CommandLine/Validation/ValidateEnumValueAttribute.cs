@@ -144,7 +144,7 @@ public class ValidateEnumValueAttribute : ArgumentValidationWithHelpAttribute
     /// <exception cref="NotSupportedException">
     /// <paramref name="argument"/> is not an argument with an enumeration type.
     /// </exception>
-    public override bool IsValid(CommandLineArgument argument, object? value)
+    public override bool IsValidPostConversion(CommandLineArgument argument, object? value)
     {
         if (!argument.ElementType.IsEnum)
         {

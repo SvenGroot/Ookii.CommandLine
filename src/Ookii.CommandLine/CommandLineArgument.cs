@@ -1398,7 +1398,7 @@ public abstract class CommandLineArgument
                 cancelParsing = _valueHelper.SetValue(this, converted);
                 if (cancelParsing != CancelMode.Abort)
                 {
-                    Validate(converted, ValidationMode.AfterConversion);
+                    PostValidate(converted);
                 }
 
                 if (cancelParsing != CancelMode.None)
@@ -1416,7 +1416,7 @@ public abstract class CommandLineArgument
 
             var converted = ConvertToArgumentType(culture, optionalValue);
             cancelParsing = _valueHelper.SetValue(this, converted);
-            Validate(converted, ValidationMode.AfterConversion);
+            PostValidate(converted);
         }
 
         HasValue = true;
@@ -1512,13 +1512,15 @@ public abstract class CommandLineArgument
 
     internal void ValidateAfterParsing()
     {
-        if (HasValue)
-        {
-            Validate(null, ValidationMode.AfterParsing);
-        }
-        else if (IsRequired)
+        if (!HasValue && IsRequired)
         {
             throw _parser.StringProvider.CreateException(CommandLineArgumentErrorCategory.MissingRequiredArgument, ArgumentName);
+        }
+
+        // Done even if no value.
+        foreach (var validator in _validators)
+        {
+            validator.ValidatePostParsing(this);
         }
     }
 
@@ -1610,14 +1612,11 @@ public abstract class CommandLineArgument
         return value;
     }
 
-    private void Validate(object? value, ValidationMode mode)
+    private void PostValidate(object? value)
     {
         foreach (var validator in _validators)
         {
-            if (validator.Mode == mode)
-            {
-                validator.Validate(this, value);
-            }
+            validator.ValidatePostConversion(this, value);
         }
     }
 
@@ -1625,13 +1624,7 @@ public abstract class CommandLineArgument
     {
         foreach (var validator in _validators)
         {
-            if (validator.Mode == ValidationMode.BeforeConversion)
-            {
-                if (!validator.ValidateSpan(this, value.Span))
-                {
-                    validator.Validate(this, value.ToString());
-                }
-            }
+            validator.ValidatePreConversion(this, value);
         }
     }
 

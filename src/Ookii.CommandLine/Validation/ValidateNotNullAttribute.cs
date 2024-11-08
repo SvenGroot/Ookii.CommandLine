@@ -42,10 +42,8 @@ public class ValidateNotNullAttribute : ArgumentValidationAttribute
     /// <returns>
     ///   <see langword="true"/> if the value is valid; otherwise, <see langword="false"/>.
     /// </returns>
-    public override bool IsValid(CommandLineArgument argument, object? value)
-    {
-        return value != null;
-    }
+    public override bool IsValidPostConversion(CommandLineArgument argument, object? value)
+        => value != null;
 
     /// <summary>
     /// Gets the error message to display if validation failed.

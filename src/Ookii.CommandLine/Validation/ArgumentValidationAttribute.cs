@@ -8,7 +8,7 @@ namespace Ookii.CommandLine.Validation;
 /// </summary>
 /// <remarks>
 /// <para>
-///   Argument validators are executed before or after an argument's value is set, and allow
+///   Argument validators are executed before and after an argument's value is set, and allow
 ///   you to check whether an argument's value meets certain conditions.
 /// </para>
 /// <para>
@@ -30,15 +30,6 @@ namespace Ookii.CommandLine.Validation;
 public abstract class ArgumentValidationAttribute : Attribute
 {
     /// <summary>
-    /// Gets a value that indicates when validation will run.
-    /// </summary>
-    /// <value>
-    /// One of the values of the <see cref="ValidationMode"/> enumeration. If not overridden
-    /// in a derived class, the value is <see cref="ValidationMode.AfterConversion" qualifyHint="true"/>.
-    /// </value>
-    public virtual ValidationMode Mode => ValidationMode.AfterConversion;
-
-    /// <summary>
     /// Gets the error category used for the <see cref="CommandLineArgumentException"/> when
     /// validation fails.
     /// </summary>
@@ -49,145 +40,185 @@ public abstract class ArgumentValidationAttribute : Attribute
     public virtual CommandLineArgumentErrorCategory ErrorCategory => CommandLineArgumentErrorCategory.ValidationFailed;
 
     /// <summary>
-    /// Validates the argument value, and throws an exception if validation failed.
+    /// Validates the argument raw argument value, and throws an exception if validation failed.
     /// </summary>
     /// <param name="argument">The argument being validated.</param>
     /// <param name="value">
-    ///   The argument value. If not <see langword="null"/>, this must be a string or an instance of
-    ///   <see cref="CommandLineArgument.ArgumentType" qualifyHint="true"/>.
+    ///   A string memory region containing the raw argument value as it was provided on the
+    ///   command line.
     /// </param>
     /// <exception cref="CommandLineArgumentException">
     ///   The <paramref name="value"/> parameter is not a valid value. The <see cref="CommandLineArgumentException.Category" qualifyHint="true"/>
     ///   property will be the value of the <see cref="ErrorCategory"/> property.
     /// </exception>
-    public void Validate(CommandLineArgument argument, object? value)
-    {
-        if (argument == null)
-        {
-            throw new ArgumentNullException(nameof(argument));
-        }
-
-        if (!IsValid(argument, value))
-        {
-            throw new CommandLineArgumentException(GetErrorMessage(argument, value), argument.ArgumentName, ErrorCategory);
-        }
-    }
-
-    /// <summary>
-    /// Validates the argument value, and throws an exception if validation failed.
-    /// </summary>
-    /// <param name="argument">The argument being validated.</param>
-    /// <param name="value">
-    ///   The argument value. If not <see langword="null"/>, this must be an instance of
-    ///   <see cref="CommandLineArgument.ArgumentType" qualifyHint="true"/>.
-    /// </param>
-    /// <returns>
-    ///   <see langword="true"/> if validation was performed and successful; <see langword="false"/>
-    ///   if this validator doesn't support validating spans and the <see cref="Validate"/>
-    ///   method should be used instead.
-    /// </returns>
     /// <remarks>
     /// <para>
-    ///   The <see cref="CommandLineParser"/> class will only call this method if the
-    ///   <see cref="Mode"/> property is <see cref="ValidationMode.BeforeConversion" qualifyHint="true"/>.
+    ///   This method calls the <see cref="IsValidPreConversion"/> method to do the actual validation.
     /// </para>
     /// </remarks>
-    /// <exception cref="CommandLineArgumentException">
-    ///   The <paramref name="value"/> parameter is not a valid value. The <see cref="CommandLineArgumentException.Category" qualifyHint="true"/>
-    ///   property will be the value of the <see cref="ErrorCategory"/> property.
-    /// </exception>
-    public bool ValidateSpan(CommandLineArgument argument, ReadOnlySpan<char> value)
+    public void ValidatePreConversion(CommandLineArgument argument, ReadOnlyMemory<char> value)
     {
         if (argument == null)
         {
             throw new ArgumentNullException(nameof(argument));
         }
 
-        var result = IsSpanValid(argument, value);
-        if (result == false)
+        if (!IsValidPreConversion(argument, value))
         {
-            throw new CommandLineArgumentException(GetErrorMessage(argument, value.ToString()), argument.ArgumentName, ErrorCategory);
+            var message = GetErrorMessage(argument, value.ToString());
+            throw new CommandLineArgumentException(message, argument.ArgumentName, ErrorCategory);
         }
-
-        return result != null;
     }
 
-
     /// <summary>
-    /// When overridden in a derived class, determines if the argument is valid.
+    /// Validates the argument value after it was converted to the argument's type, and throws an
+    /// exception if validation failed.
     /// </summary>
     /// <param name="argument">The argument being validated.</param>
     /// <param name="value">
-    ///   The argument value. If not <see langword="null"/>, this must be a string or an
-    ///   instance of <see cref="CommandLineArgument.ArgumentType" qualifyHint="true"/>.
+    ///   The argument value. If not <see langword="null"/>, this must bean instance of
+    ///   <see cref="CommandLineArgument.ElementType" qualifyHint="true"/>.
+    /// </param>
+    /// <exception cref="CommandLineArgumentException">
+    ///   The <paramref name="value"/> parameter is not a valid value. The <see cref="CommandLineArgumentException.Category" qualifyHint="true"/>
+    ///   property will be the value of the <see cref="ErrorCategory"/> property.
+    /// </exception>
+    /// <remarks>
+    /// <para>
+    ///   This method calls the <see cref="IsValidPostConversion"/> method to do the actual
+    ///   validation.
+    /// </para>
+    /// </remarks>
+    public void ValidatePostConversion(CommandLineArgument argument, object? value)
+    {
+        if (argument == null)
+        {
+            throw new ArgumentNullException(nameof(argument));
+        }
+
+        if (!IsValidPostConversion(argument, value))
+        {
+            var message = GetErrorMessage(argument, value);
+            throw new CommandLineArgumentException(message, argument.ArgumentName, ErrorCategory);
+        }
+    }
+
+    /// <summary>
+    /// Validates the argument value after it was converted to the argument's type, and throws an
+    /// exception if validation failed.
+    /// </summary>
+    /// <param name="argument">The argument being validated.</param>
+    /// <exception cref="CommandLineArgumentException">
+    ///   The parameter's value is not a valid. The <see cref="CommandLineArgumentException.Category" qualifyHint="true"/>
+    ///   property will be the value of the <see cref="ErrorCategory"/> property.
+    /// </exception>
+    /// <remarks>
+    /// <para>
+    ///   This method calls the <see cref="IsValidPostParsing"/> method to do the actual
+    ///   validation.
+    /// </para>
+    /// </remarks>
+    public void ValidatePostParsing(CommandLineArgument argument)
+    {
+        if (argument == null)
+        {
+            throw new ArgumentNullException(nameof(argument));
+        }
+
+        if (!IsValidPostParsing(argument))
+        {
+            var message = GetErrorMessage(argument, null);
+            throw new CommandLineArgumentException(message, argument.ArgumentName, ErrorCategory);
+        }
+    }
+
+    /// <summary>
+    /// Determines if the argument's raw string value is valid.
+    /// </summary>
+    /// <param name="argument">The argument being validated.</param>
+    /// <param name="value">
+    ///   A string memory region containing the raw argument value as it was provided on the
+    ///   command line.
     /// </param>
     /// <returns>
     ///   <see langword="true"/> if the value is valid; otherwise, <see langword="false"/>.
     /// </returns>
     /// <remarks>
+    /// <note>
+    ///   Do not throw an exception from this method if validation fails. Instead, return
+    ///   <see langword="false"/> and provide an error message using the <see cref="GetErrorMessage"/>
+    ///   method.
+    /// </note>
     /// <para>
-    ///   If the <see cref="Mode"/> property is <see cref="ValidationMode.BeforeConversion" qualifyHint="true"/>,
-    ///   the <paramref name="value"/> parameter will be the raw string value provided by the
-    ///   user on the command line.
-    /// </para>
-    /// <para>
-    ///   If the <see cref="Mode"/> property is <see cref="ValidationMode.AfterConversion" qualifyHint="true"/>,
-    ///   for regular arguments, the <paramref name="value"/> parameter will be identical to
-    ///   the <see cref="CommandLineArgument.Value" qualifyHint="true"/> property. For multi-value or dictionary
-    ///   arguments, the <paramref name="value"/> parameter will be equal to the last value added
-    ///   to the collection or dictionary.
-    /// </para>
-    /// <para>
-    ///   If the <see cref="Mode"/> property is <see cref="ValidationMode.AfterParsing" qualifyHint="true"/>,
-    ///   <paramref name="value"/> will always be <see langword="null"/>. Use the
-    ///   <see cref="CommandLineArgument.Value" qualifyHint="true"/> property instead.
-    /// </para>
-    /// <para>
-    ///   If you need to check the type of the argument, use the <see cref="CommandLineArgument.ElementType" qualifyHint="true"/>
-    ///   property unless you want to get the collection type for a multi-value or dictionary
-    ///   argument.
+    ///   The default implementation always returns <see langword="true"/>.
     /// </para>
     /// </remarks>
-    public abstract bool IsValid(CommandLineArgument argument, object? value);
+    public virtual bool IsValidPreConversion(CommandLineArgument argument, ReadOnlyMemory<char> value) => true;
 
     /// <summary>
-    /// When overridden in a derived class, determines if the argument is valid.
+    /// Determines if the argument's value is valid after it was converted to the argument's type.
     /// </summary>
     /// <param name="argument">The argument being validated.</param>
     /// <param name="value">
-    ///   The raw string argument value provided by the user on the command line.
+    ///   The argument value. If not <see langword="null"/>, this must be an
+    ///   instance of <see cref="CommandLineArgument.ElementType" qualifyHint="true"/>.
     /// </param>
     /// <returns>
-    ///   <see langword="null"/> if this validator doesn't support validating spans, and the
-    ///   regular <see cref="IsValid"/> method should be called instead; <see langword="true"/>
-    ///   if the value is valid; otherwise, <see langword="false"/>.
+    ///   <see langword="true"/> if the value is valid; otherwise, <see langword="false"/>.
     /// </returns>
     /// <remarks>
+    /// <note>
+    ///   Do not throw an exception from this method if validation fails. Instead, return
+    ///   <see langword="false"/> and provide an error message using the <see cref="GetErrorMessage"/>
+    ///   method.
+    /// </note>
     /// <para>
-    ///   The <see cref="CommandLineParser"/> class will only call this method if the
-    ///   <see cref="Mode"/> property is <see cref="ValidationMode.BeforeConversion" qualifyHint="true"/>.
-    /// </para>
-    /// <para>
-    ///   If you need to check the type of the argument, use the <see cref="CommandLineArgument.ElementType" qualifyHint="true"/>
-    ///   property unless you want to get the collection type for a multi-value or dictionary
-    ///   argument.
-    /// </para>
-    /// <para>
-    ///   The base class implementation returns <see langword="null"/>.
+    ///   The default implementation always returns <see langword="true"/>.
     /// </para>
     /// </remarks>
-    public virtual bool? IsSpanValid(CommandLineArgument argument, ReadOnlySpan<char> value) => null;
+    public virtual bool IsValidPostConversion(CommandLineArgument argument, object? value) => true;
+
+    /// <summary>
+    /// Determines if the argument's value is valid after all arguments have been parsed.
+    /// </summary>
+    /// <param name="argument">The argument being validated.</param>
+    /// <returns>
+    ///   <see langword="true"/> if the value is valid; otherwise, <see langword="false"/>.
+    /// </returns>
+    /// <remarks>
+    /// <note>
+    ///   Do not throw an exception from this method if validation fails. Instead, return
+    ///   <see langword="false"/> and provide an error message using the <see cref="GetErrorMessage"/>
+    ///   method.
+    /// </note>
+    /// <para>
+    ///   This method is called even if the argument was not specified on the command line. Check
+    ///   the <see cref="CommandLineArgument.HasValue" qualifyHint="true"/> to see if a value was
+    ///   provided.
+    /// </para>
+    /// <para>
+    ///   The default implementation always returns <see langword="true"/>.
+    /// </para>
+    /// </remarks>
+    public virtual bool IsValidPostParsing(CommandLineArgument argument) => true;
 
     /// <summary>
     /// Gets the error message to display if validation failed.
     /// </summary>
     /// <param name="argument">The argument that was validated.</param>
     /// <param name="value">
-    ///   The argument value. If not <see langword="null"/>, this must be an instance of
-    ///   <see cref="CommandLineArgument.ArgumentType" qualifyHint="true"/>.
+    ///   The argument value. If not <see langword="null"/>, this must be a <see cref="string"/> or an
+    ///   instance of <see cref="CommandLineArgument.ElementType" qualifyHint="true"/>.
     /// </param>
     /// <returns>The error message.</returns>
     /// <remarks>
+    /// <para>
+    ///   The <paramref name="value"/> parameter is a <see cref="string"/> if the
+    ///   <see cref="IsValidPreConversion"/> method failed, and an instance of
+    ///   <see cref="CommandLineArgument.ElementType" qualifyHint="true"/> if the
+    ///   <see cref="IsValidPostConversion"/> method failed. If the <see cref="IsValidPostParsing"/>
+    ///   method failed, <paramref name="value"/> will be <see langword="null"/>.
+    /// </para>
     /// <para>
     ///   Override this method in a derived class to provide a custom error message. Otherwise,
     ///   it will return a generic error message.

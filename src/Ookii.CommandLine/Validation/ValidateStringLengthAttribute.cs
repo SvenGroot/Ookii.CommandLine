@@ -29,14 +29,6 @@ public class ValidateStringLengthAttribute : ArgumentValidationWithHelpAttribute
     }
 
     /// <summary>
-    /// Gets a value that indicates when validation will run.
-    /// </summary>
-    /// <value>
-    /// <see cref="ValidationMode.BeforeConversion" qualifyHint="true"/>.
-    /// </value>
-    public override ValidationMode Mode => ValidationMode.BeforeConversion;
-
-    /// <summary>
     /// Gets the inclusive lower bound on the string length.
     /// </summary>
     /// <value>
@@ -62,18 +54,8 @@ public class ValidateStringLengthAttribute : ArgumentValidationWithHelpAttribute
     /// <returns>
     ///   <see langword="true"/> if the value is valid; otherwise, <see langword="false"/>.
     /// </returns>
-    public override bool IsValid(CommandLineArgument argument, object? value)
-    {
-        var length = (value as string)?.Length ?? 0;
-        return length >= _minimum && length <= _maximum;
-    }
-
-    /// <inheritdoc cref="IsValid(CommandLineArgument, object?)"/>
-    public override bool? IsSpanValid(CommandLineArgument argument, ReadOnlySpan<char> value)
-    {
-        var length = value.Length;
-        return length >= _minimum && length <= _maximum;
-    }
+    public override bool IsValidPreConversion(CommandLineArgument argument, ReadOnlyMemory<char> value)
+        => value.Length >= _minimum && value.Length <= _maximum;
 
     /// <summary>
     /// Gets the error message to display if validation failed.

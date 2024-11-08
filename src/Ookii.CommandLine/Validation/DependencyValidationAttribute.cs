@@ -57,15 +57,7 @@ public abstract class DependencyValidationAttribute : ArgumentValidationWithHelp
     /// <value>
     /// An array of argument names.
     /// </value>
-    public string[] Arguments => _arguments ?? new[] { _argument! };
-
-    /// <summary>
-    /// Gets a value that indicates when validation will run.
-    /// </summary>
-    /// <value>
-    /// <see cref="ValidationMode.AfterParsing" qualifyHint="true"/>.
-    /// </value>
-    public override ValidationMode Mode => ValidationMode.AfterParsing;
+    public string[] Arguments => _arguments ?? [_argument!];
 
     /// <summary>
     /// Gets the error category used for the <see cref="CommandLineArgumentException"/> when
@@ -80,7 +72,6 @@ public abstract class DependencyValidationAttribute : ArgumentValidationWithHelp
     /// Determines if the dependencies are met.
     /// </summary>
     /// <param name="argument">The argument being validated.</param>
-    /// <param name="value">Not used</param>
     /// <returns>
     ///   <see langword="true"/> if the value is valid; otherwise, <see langword="false"/>.
     /// </returns>
@@ -88,8 +79,13 @@ public abstract class DependencyValidationAttribute : ArgumentValidationWithHelp
     ///   One of the argument names in the <see cref="Arguments"/> property refers to an
     ///   argument that doesn't exist.
     /// </exception>
-    public sealed override bool IsValid(CommandLineArgument argument, object? value)
+    public sealed override bool IsValidPostParsing(CommandLineArgument argument)
     {
+        if (!argument.HasValue)
+        {
+            return true;
+        }
+
         var args = GetArguments(argument.Parser);
         if (_requires)
         {

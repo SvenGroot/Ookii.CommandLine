@@ -48,15 +48,6 @@ public class ValidatePatternAttribute : ArgumentValidationAttribute
     }
 
     /// <summary>
-    /// Gets a value that indicates when validation will run.
-    /// </summary>
-    /// <value>
-    /// <see cref="ValidationMode.BeforeConversion" qualifyHint="true"/>.
-    /// </value>
-    public override ValidationMode Mode => ValidationMode.BeforeConversion;
-
-
-    /// <summary>
     /// Gets or sets a custom error message to use.
     /// </summary>
     /// <value>
@@ -104,32 +95,14 @@ public class ValidatePatternAttribute : ArgumentValidationAttribute
     /// <returns>
     ///   <see langword="true"/> if the value is valid; otherwise, <see langword="false"/>.
     /// </returns>
-    public override bool IsValid(CommandLineArgument argument, object? value)
+    public override bool IsValidPreConversion(CommandLineArgument argument, ReadOnlyMemory<char> value)
     {
-        if (value is not string stringValue)
-        {
-            return false;
-        }
-
-        return Pattern.IsMatch(stringValue);
-    }
-
 #if NET7_0_OR_GREATER
-
-    /// <summary>
-    /// Determines if the argument's value matches the pattern.
-    /// </summary>
-    /// <param name="argument">The argument being validated.</param>
-    /// <param name="value">
-    ///   The raw string argument value.
-    /// </param>
-    /// <returns>
-    ///   <see langword="true"/> if the value is valid; otherwise, <see langword="false"/>.
-    /// </returns>
-    public override bool? IsSpanValid(CommandLineArgument argument, ReadOnlySpan<char> value)
-        => Pattern.IsMatch(value);
-
+        return Pattern.IsMatch(value.Span);
+#else
+        return Pattern.IsMatch(value.ToString());
 #endif
+    }
 
     /// <summary>
     /// Gets the error message to display if validation failed.

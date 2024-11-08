@@ -72,8 +72,8 @@ public readonly struct ParseResult
     /// </para>
     /// <para>
     ///   For errors that occur after parsing is finished, such as validation errors from a
-    ///   validator that uses <see cref="Validation.ValidationMode.AfterParsing"/>, or an
-    ///   exception thrown by the target class, this collection will be empty.
+    ///   validator that uses <see cref="Validation.ArgumentValidationAttribute.IsValidPostConversion"/>,
+    ///   or an exception thrown by the target class, this collection will be empty.
     /// </para>
     /// </remarks>
     public ReadOnlyMemory<string> RemainingArguments { get; }
