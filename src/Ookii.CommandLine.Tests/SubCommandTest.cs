@@ -419,7 +419,7 @@ public partial class SubCommandTest
     public async Task TestAsyncCommandBase()
     {
         var command = new AsyncBaseCommand();
-        var actual = await command.RunAsync();
+        var actual = await command.RunAsync(default);
         Assert.AreEqual(42, actual);
 
         // Test Run invokes RunAsync.

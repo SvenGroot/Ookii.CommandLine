@@ -11,13 +11,13 @@ internal record class StudentCourse(int CourseId, float Grade);
 
 internal record class Database(Dictionary<int, Student> Students, Dictionary<int, Course> Courses)
 {
-    public static async Task<Database> Load(string path)
+    public static async Task<Database> Load(string path, CancellationToken cancellationToken)
     {
         Database? result = null;
         try
         {
             using var stream = File.OpenRead(path);
-            result = await JsonSerializer.DeserializeAsync<Database>(stream);
+            result = await JsonSerializer.DeserializeAsync<Database>(stream, cancellationToken: cancellationToken);
         }
         catch (FileNotFoundException)
         {
@@ -26,7 +26,7 @@ internal record class Database(Dictionary<int, Student> Students, Dictionary<int
         return result ?? new Database(new(), new());
     }
 
-    public async Task Save(string path)
+    public async Task Save(string path, CancellationToken cancellationToken)
     {
         using var stream = File.Create(path);
         var options = new JsonSerializerOptions()
@@ -34,6 +34,6 @@ internal record class Database(Dictionary<int, Student> Students, Dictionary<int
             WriteIndented = true,
         };
 
-        await JsonSerializer.SerializeAsync(stream, this, options);
+        await JsonSerializer.SerializeAsync(stream, this, options, cancellationToken);
     }
 }

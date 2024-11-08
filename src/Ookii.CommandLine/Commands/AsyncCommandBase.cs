@@ -14,17 +14,14 @@ namespace Ookii.CommandLine.Commands;
 /// </para>
 /// </remarks>
 /// <threadsafety static="true" instance="false"/>
-public abstract class AsyncCommandBase : IAsyncCancelableCommand
+public abstract class AsyncCommandBase : IAsyncCommand
 {
-    /// <inheritdoc/>
-    public CancellationToken CancellationToken { get; set; }
-
     /// <summary>
     /// Calls the <see cref="RunAsync"/> method and waits synchronously for it to complete.
     /// </summary>
     /// <returns>The exit code of the command.</returns>
-    public virtual int Run() => Task.Run(RunAsync).ConfigureAwait(false).GetAwaiter().GetResult();
+    public virtual int Run() => Task.Run(() => RunAsync(CancellationToken.None)).ConfigureAwait(false).GetAwaiter().GetResult();
 
     /// <inheritdoc/>
-    public abstract Task<int> RunAsync();
+    public abstract Task<int> RunAsync(CancellationToken cancellationToken = default);
 }

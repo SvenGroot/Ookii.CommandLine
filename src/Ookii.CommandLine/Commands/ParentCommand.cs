@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Immutable;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Ookii.CommandLine.Commands;
@@ -148,12 +149,13 @@ public abstract class ParentCommand : ICommandWithCustomParsing, IAsyncCommand
     /// <summary>
     /// Runs the child command that was instantiated by the <see cref="Parse"/> method asynchronously.
     /// </summary>
+    /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
     /// <returns>
     /// A task that represents the asynchronous run operation. The result of the task is the exit
     /// code of the child command, or the value of the <see cref="FailureExitCode"/> property if no
     /// child command was created.
     /// </returns>
-    public virtual async Task<int> RunAsync()
+    public virtual async Task<int> RunAsync(CancellationToken cancellationToken)
     {
         if (_childCommand == null)
         {
@@ -162,7 +164,7 @@ public abstract class ParentCommand : ICommandWithCustomParsing, IAsyncCommand
 
         if (_childCommand is IAsyncCommand asyncCommand)
         {
-            return await asyncCommand.RunAsync();
+            return await asyncCommand.RunAsync(cancellationToken);
         }
 
         return _childCommand.Run();

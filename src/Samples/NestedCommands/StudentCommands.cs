@@ -35,11 +35,11 @@ internal partial class AddStudentCommand : BaseCommand
     [Description("The student's major.")]
     public string? Major { get; set; }
 
-    protected override async Task<int> RunAsync(Database db)
+    protected override async Task<int> RunAsync(Database db, CancellationToken cancellationToken)
     {
         int id = db.Students.Keys.Any() ? db.Students.Keys.Max() + 1 : 1;
         db.Students.Add(id, new Student(FirstName, LastName, Major, new()));
-        await db.Save(Path);
+        await db.Save(Path, cancellationToken);
         Console.WriteLine($"Added a student with ID {id}.");
         return (int)ExitCode.Success;
     }
@@ -58,7 +58,7 @@ internal partial class RemoveStudentCommand : BaseCommand
     [Description("The ID of the student to remove.")]
     public required int Id { get; set; }
 
-    protected override async Task<int> RunAsync(Database db)
+    protected override async Task<int> RunAsync(Database db, CancellationToken cancellationToken)
     {
         if (!db.Students.Remove(Id))
         {
@@ -66,7 +66,7 @@ internal partial class RemoveStudentCommand : BaseCommand
             return (int)ExitCode.IdError;
         }
 
-        await db.Save(Path);
+        await db.Save(Path, cancellationToken);
         Console.WriteLine("Student removed.");
         return (int)ExitCode.Success;
     }
@@ -93,7 +93,7 @@ internal partial class AddStudentCourseCommand : BaseCommand
     [ValidateRange(1.0f, 10.0f)]
     public required float Grade { get; set; }
 
-    protected override async Task<int> RunAsync(Database db)
+    protected override async Task<int> RunAsync(Database db, CancellationToken cancellationToken)
     {
         if (!db.Students.TryGetValue(StudentId, out var student))
         {
@@ -110,7 +110,7 @@ internal partial class AddStudentCourseCommand : BaseCommand
         // You'd probably want to check for duplicates in a real application, but this is a sample,
         // not an actual database.
         student.Courses.Add(new(CourseId, Grade));
-        await db.Save(Path);
+        await db.Save(Path, cancellationToken);
         return (int)ExitCode.Success;
     }
 }

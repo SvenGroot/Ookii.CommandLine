@@ -31,11 +31,11 @@ internal partial class AddCourseCommand : BaseCommand
     [ValidateNotWhiteSpace]
     public required string Teacher { get; set; }
 
-    protected override async Task<int> RunAsync(Database db)
+    protected override async Task<int> RunAsync(Database db, CancellationToken cancellationToken)
     {
         int id = db.Courses.Any() ? db.Courses.Keys.Max() + 1 : 1;
         db.Courses.Add(id, new Course(Name, Teacher));
-        await db.Save(Path);
+        await db.Save(Path, cancellationToken);
         Console.WriteLine($"Added a course with ID {id}.");
         return (int)ExitCode.Success;
     }
@@ -54,7 +54,7 @@ internal partial class RemoveCourseCommand : BaseCommand
     [Description("The ID of the course to remove.")]
     public required int Id { get; set; }
 
-    protected override async Task<int> RunAsync(Database db)
+    protected override async Task<int> RunAsync(Database db, CancellationToken cancellationToken)
     {
         if (db.Students.Any(s => s.Value.Courses.Any(c => c.CourseId == Id)))
         {
@@ -68,7 +68,7 @@ internal partial class RemoveCourseCommand : BaseCommand
             return (int)ExitCode.IdError;
         }
 
-        await db.Save(Path);
+        await db.Save(Path, cancellationToken);
         Console.WriteLine("Course removed.");
         return (int)ExitCode.Success;
     }

@@ -11,7 +11,7 @@ namespace NestedCommands;
 [Description("Lists all students and courses.")]
 internal partial class ListCommand : BaseCommand
 {
-    protected override Task<int> RunAsync(Database db)
+    protected override Task<int> RunAsync(Database db, CancellationToken cancellationToken)
     {
         using var writer = LineWrappingTextWriter.ForConsoleOut();
         writer.WriteLine("Students:");

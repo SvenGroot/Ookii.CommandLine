@@ -16,11 +16,12 @@ internal abstract class BaseCommand : AsyncCommandBase
     public string Path { get; set; } = "data.json";
 
     // Implement the task's RunAsync method to load the database and handle some errors.
-    public override async Task<int> RunAsync()
+    public override async Task<int> RunAsync(CancellationToken cancellationToken)
     {
         try
         {
-            return await RunAsync(await Database.Load(Path));
+            var database = await Database.Load(Path, cancellationToken);
+            return await RunAsync(database, cancellationToken);
         }
         catch (IOException ex)
         {
@@ -35,5 +36,5 @@ internal abstract class BaseCommand : AsyncCommandBase
     }
 
     // Derived classes will implement this instead of the normal RunAsync.
-    protected abstract Task<int> RunAsync(Database db);
+    protected abstract Task<int> RunAsync(Database db, CancellationToken cancellationToken);
 }

@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Threading;
+using System.Threading.Tasks;
 
 namespace Ookii.CommandLine.Commands;
 
@@ -16,18 +17,16 @@ namespace Ookii.CommandLine.Commands;
 ///   Use the <see cref="AsyncCommandBase"/> class as a base class for your command to get a default
 ///   implementation of the <see cref="ICommand.Run" qualifyHint="true"/>
 /// </para>
-/// <para>
-///   If you want to use the cancellation token passed to the
-///   <see cref="CommandManager.RunCommandAsync(System.Threading.CancellationToken)" qualifyHint="true"/>
-///   method, you should instead implement the <see cref="IAsyncCancelableCommand"/> interface, or
-///   derive from the <see cref="AsyncCommandBase"/> class.
-/// </para>
 /// </remarks>
 public interface IAsyncCommand : ICommand
 {
     /// <summary>
     /// Runs the command asynchronously.
     /// </summary>
+    /// <param name="cancellationToken">
+    /// The token to monitor for cancellation requests. The default value is
+    /// <see cref="CancellationToken.None" qualifyHint="true"/>.
+    /// </param>
     /// <returns>
     /// A task that represents the asynchronous run operation. The result of the task is the
     /// exit code for the command.
@@ -45,6 +44,12 @@ public interface IAsyncCommand : ICommand
     ///   it. Use the <see cref="AsyncCommandBase"/> class for a default implementation that does
     ///   this.
     /// </para>
+    /// <para>
+    ///   If a <see cref="CancellationToken"/> was passed to the
+    ///   <see cref="CommandManager.RunCommandAsync(CancellationToken)" qualifyHint="true"/> method,
+    ///   the <paramref name="cancellationToken"/> parameter will be set to that token. Otherwise,
+    ///   the value will be <see cref="CancellationToken.None" qualifyHint="true"/>.
+    /// </para>
     /// </remarks>
-    Task<int> RunAsync();
+    Task<int> RunAsync(CancellationToken cancellationToken = default);
 }
