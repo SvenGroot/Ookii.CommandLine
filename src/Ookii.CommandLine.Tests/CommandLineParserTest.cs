@@ -9,6 +9,7 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Reflection;
 
@@ -74,8 +75,8 @@ public partial class CommandLineParserTest
             new ExpectedArgument("other", typeof(int)) { MemberName = "Arg2", Position = 1, DefaultValue = 42, Description = "Arg2 description.", ValueDescription = "Number" },
             new ExpectedArgument("notSwitch", typeof(bool)) { MemberName = "NotSwitch", Position = 2, DefaultValue = false },
             new ExpectedArgument("Arg5", typeof(float)) { Position = 3, Description = "Arg5 description.", DefaultValue = 1.0f },
-            new ExpectedArgument("other2", typeof(int)) { MemberName = "Arg4", Position = 4, DefaultValue = 47, Description = "Arg4 description.", ValueDescription = "Number" },
-            new ExpectedArgument("Arg8", typeof(DayOfWeek[]), ArgumentKind.MultiValue) { ElementType = typeof(DayOfWeek), Position = 5 },
+            new ExpectedArgument("other2", typeof(int)) { MemberName = "Arg4", Position = 4, DefaultValue = 47, Description = "Arg4 description.", ValueDescription = "Number", Aliases = ["HiddenAlias"] },
+            new ExpectedArgument("Arg8", typeof(DayOfWeek[]), ArgumentKind.MultiValue) { ElementType = typeof(DayOfWeek), Position = 5, Aliases = ["HiddenAliasOnArgNotIncludedInList"] },
             new ExpectedArgument("Arg6", typeof(string)) { Position = null, IsRequired = true, Description = "Arg6 description.", Aliases = ["Alias1", "Alias2"] },
             new ExpectedArgument("Arg10", typeof(bool[]), ArgumentKind.MultiValue) { ElementType = typeof(bool), Position = null, IsSwitch = true },
             new ExpectedArgument("Arg11", typeof(bool?)) { ElementType = typeof(bool), Position = null, ValueDescription = "Boolean", IsSwitch = true },
@@ -1692,8 +1693,8 @@ public partial class CommandLineParserTest
         Assert.IsFalse(argument.MultiValueInfo?.AllowWhiteSpaceSeparator ?? false);
         Assert.IsNull(argument.Value);
         Assert.IsFalse(argument.HasValue);
-        CollectionAssert.AreEqual(expected.Aliases ?? Array.Empty<string>(), argument.Aliases);
-        CollectionAssert.AreEqual(expected.ShortAliases ?? Array.Empty<char>(), argument.ShortAliases);
+        CollectionAssert.AreEqual(expected.Aliases ?? [], argument.Aliases.Select(a => a.Alias).ToArray());
+        CollectionAssert.AreEqual(expected.ShortAliases ?? [], argument.ShortAliases.Select(a => a.Alias).ToArray());
         if (argument.MemberName.StartsWith("Automatic"))
         {
             Assert.IsNull(argument.Member);

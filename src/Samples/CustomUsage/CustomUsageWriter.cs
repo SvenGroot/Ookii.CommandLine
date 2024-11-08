@@ -162,7 +162,7 @@ internal class CustomUsageWriter : UsageWriter
 
         var longPrefixLength = argument.Parser.LongArgumentNamePrefix!.Length;
         // Space for prefix, long name, separator.
-        length += argument.Aliases.Sum(alias => longPrefixLength + alias.Length + 1);
+        length += argument.Aliases.Sum(alias => longPrefixLength + alias.Alias.Length + 1);
 
         // There is one separator too many
         length -= 1;

@@ -1756,17 +1756,57 @@ public class UsageWriter
     ///   method if the <see cref="IncludeAliasInDescription"/> property is <see langword="true"/>.
     /// </para>
     /// </remarks>
-    protected virtual void WriteAliases(IEnumerable<string>? aliases, IEnumerable<char>? shortAliases, string prefix, string shortPrefix)
+    protected virtual void WriteAliases(IEnumerable<AliasAttribute>? aliases, IEnumerable<ShortAliasAttribute>? shortAliases,
+        string prefix, string shortPrefix)
     {
-        if (shortAliases == null && aliases == null)
+        var hasAlias = false;
+        if (shortAliases != null)
         {
-            return;
+            foreach (var alias in shortAliases)
+            {
+                if (alias.IsHidden)
+                {
+                    continue;
+                }
+
+                if (hasAlias)
+                {
+                    Write(NameSeparator);
+                }
+                else
+                {
+                    Write(" (");
+                    hasAlias = true;
+                }
+
+                WriteAlias(alias.Alias.ToString(), shortPrefix);
+            }
         }
 
-        var count = WriteAliasHelper(shortPrefix, shortAliases, 0);
-        count = WriteAliasHelper(prefix, aliases, count);
+        if (aliases != null)
+        {
+            foreach (var alias in aliases)
+            {
+                if (alias.IsHidden)
+                {
+                    continue;
+                }
 
-        if (count > 0)
+                if (hasAlias)
+                {
+                    Write(NameSeparator);
+                }
+                else
+                {
+                    Write(" (");
+                    hasAlias = true;
+                }
+
+                WriteAlias(alias.Alias, prefix);
+            }
+        }
+
+        if (hasAlias)
         {
             Write(")");
         }
@@ -2489,31 +2529,6 @@ public class UsageWriter
         }
 
         return null;
-    }
-
-    private int WriteAliasHelper<T>(string prefix, IEnumerable<T>? aliases, int count)
-    {
-        if (aliases == null)
-        {
-            return count;
-        }
-
-        foreach (var alias in aliases)
-        {
-            if (count == 0)
-            {
-                Write(" (");
-            }
-            else
-            {
-                Write(NameSeparator);
-            }
-
-            WriteAlias(alias!.ToString()!, prefix);
-            ++count;
-        }
-
-        return count;
     }
 
     private void WriteUsageInternal(UsageHelpRequest request = UsageHelpRequest.Full, IEnumerable<string>? possibleMatches = null)

@@ -213,7 +213,7 @@ public abstract class CommandLineArgument
             {
                 if (parser.ShortArgumentNameComparer!.Compare(shortAlias, shortName) != 0)
                 {
-                    info.ShortAliases = [shortAlias];
+                    info.ShortAliases = [new(shortAlias)];
                 }
             }
             else
@@ -221,8 +221,8 @@ public abstract class CommandLineArgument
                 var shortNameString = shortName.ToString();
                 var shortAliasString = shortAlias.ToString();
                 info.Aliases = string.Compare(shortAliasString, shortNameString, parser.ArgumentNameComparison) == 0
-                    ? [shortNameString]
-                    : [shortNameString, shortAliasString];
+                    ? [new(shortNameString)]
+                    : [new(shortNameString), new(shortAliasString)];
             }
 
             return info;
@@ -341,8 +341,8 @@ public abstract class CommandLineArgument
         public bool Long { get; set; }
         public bool Short { get; set; }
         public char ShortName { get; set; }
-        public IEnumerable<string>? Aliases { get; set; }
-        public IEnumerable<char>? ShortAliases { get; set; }
+        public IEnumerable<AliasAttribute>? Aliases { get; set; }
+        public IEnumerable<ShortAliasAttribute>? ShortAliases { get; set; }
         public Type ArgumentType { get; set; }
         public Type ElementType { get; set; }
         public Type ElementTypeWithNullable { get; set; }
@@ -372,8 +372,6 @@ public abstract class CommandLineArgument
     private readonly string _argumentName;
     private readonly bool _hasLongName = true;
     private readonly char _shortName;
-    private readonly ImmutableArray<string> _aliases = ImmutableArray<string>.Empty;
-    private readonly ImmutableArray<char> _shortAliases = ImmutableArray<char>.Empty;
     private readonly Type _argumentType;
     private readonly Type _elementType;
     private readonly Type _elementTypeWithNullable;
@@ -423,12 +421,12 @@ public abstract class CommandLineArgument
 
         if (HasLongName && info.Aliases != null)
         {
-            _aliases = info.Aliases.ToImmutableArray();
+            Aliases = info.Aliases.ToImmutableArray();
         }
 
         if (HasShortName && info.ShortAliases != null)
         {
-            _shortAliases = info.ShortAliases.ToImmutableArray();
+            ShortAliases = info.ShortAliases.ToImmutableArray();
         }
 
         _argumentType = info.ArgumentType;
@@ -634,7 +632,7 @@ public abstract class CommandLineArgument
     /// </para>
     /// </remarks>
     /// <seealso cref="AliasAttribute"/>
-    public ImmutableArray<string> Aliases => _aliases;
+    public ImmutableArray<AliasAttribute> Aliases { get; } = [];
 
     /// <summary>
     /// Gets the alternative short names for this command line argument.
@@ -651,7 +649,7 @@ public abstract class CommandLineArgument
     /// </para>
     /// </remarks>
     /// <seealso cref="ShortAliasAttribute"/>
-    public ImmutableArray<char> ShortAliases => _shortAliases;
+    public ImmutableArray<ShortAliasAttribute> ShortAliases { get; } = [];
 
     /// <summary>
     /// Gets the type of the argument's value.
@@ -1364,7 +1362,7 @@ public abstract class CommandLineArgument
             return true;
         }
 
-        if (writer.IncludeAliasInDescription && (Aliases.Length > 0 || ShortAliases.Length > 0))
+        if (writer.IncludeAliasInDescription && (Aliases.Any(a => !a.IsHidden) || ShortAliases.Any(a => !a.IsHidden)))
         {
             return true;
         }
@@ -1548,40 +1546,34 @@ public abstract class CommandLineArgument
 
     private protected abstract IValueHelper CreateMultiValueHelper();
 
-    private static IEnumerable<string>? GetAliases(IEnumerable<AliasAttribute>? aliasAttributes, string argumentName)
+    private static IEnumerable<AliasAttribute>? GetAliases(IEnumerable<AliasAttribute>? aliasAttributes, string argumentName)
     {
         if (aliasAttributes == null || !aliasAttributes.Any())
         {
             return null;
         }
 
-        return aliasAttributes.Select(alias =>
+        if (aliasAttributes.Any(alias => string.IsNullOrEmpty(alias.Alias)))
         {
-            if (string.IsNullOrEmpty(alias.Alias))
-            {
-                throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.EmptyAliasFormat, argumentName));
-            }
+            throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.EmptyAliasFormat, argumentName));
+        }
 
-            return alias.Alias;
-        });
+        return aliasAttributes;
     }
 
-    private static IEnumerable<char>? GetShortAliases(IEnumerable<ShortAliasAttribute>? aliasAttributes, string argumentName)
+    private static IEnumerable<ShortAliasAttribute>? GetShortAliases(IEnumerable<ShortAliasAttribute>? aliasAttributes, string argumentName)
     {
         if (aliasAttributes == null || !aliasAttributes.Any())
         {
             return null;
         }
 
-        return aliasAttributes.Select(alias =>
+        if (aliasAttributes.Any(alias => alias.Alias == '\0'))
         {
-            if (alias.Alias == '\0')
-            {
-                throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.EmptyAliasFormat, argumentName));
-            }
+            throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.EmptyAliasFormat, argumentName));
+        }
 
-            return alias.Alias;
-        });
+        return aliasAttributes;
     }
 
     private static CancelMode AutomaticVersion(CommandLineParser parser)

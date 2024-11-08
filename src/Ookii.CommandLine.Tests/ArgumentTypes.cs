@@ -52,6 +52,7 @@ partial class TestArguments
     [ValueDescription("Number")]
     [ValidateRange(0, 1000, IncludeInUsageHelp = false)]
     [ArgumentConverter(typeof(WrappedDefaultTypeConverter<int>))]
+    [Alias("HiddenAlias", IsHidden = true)]
     public int Arg4 { get; set; }
 
     // Short/long name stuff should be ignored if not using LongShort mode.
@@ -69,6 +70,7 @@ partial class TestArguments
     public bool Arg7 { get; set; }
 
     [CommandLineArgument(Position = 6)]
+    [Alias("HiddenAliasOnArgNotIncludedInList", IsHidden = true)]
     public DayOfWeek[] Arg8 { get; set; }
 
     [CommandLineArgument()]
@@ -230,7 +232,9 @@ partial class LongShortArguments
 {
     public static bool Switch2Value { get; set; }
 
-    [CommandLineArgument, ShortAlias('c')]
+    [CommandLineArgument]
+    [ShortAlias('c')]
+    [ShortAlias('h', IsHidden = true)]
     [Description("Arg1 description.")]
     public int Arg1 { get; set; }
 
