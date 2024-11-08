@@ -2251,12 +2251,15 @@ public class UsageWriter
     ///   method if the <see cref="IncludeCommandAliasInCommandList"/> property is <see langword="true"/>.
     /// </para>
     /// </remarks>
-    protected virtual void WriteCommandAliases(IEnumerable<string> aliases)
+    protected virtual void WriteCommandAliases(IEnumerable<AliasAttribute> aliases)
     {
         foreach (var alias in aliases)
         {
-            Write(NameSeparator);
-            Write(alias);
+            if (!alias.IsHidden)
+            {
+                Write(NameSeparator);
+                Write(alias.Alias);
+            }
         }
     }
 

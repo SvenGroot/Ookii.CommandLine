@@ -129,7 +129,7 @@ public abstract class CommandInfo
     ///   on a class implementing the <see cref="ICommand"/> interface.
     /// </para>
     /// </remarks>
-    public abstract IEnumerable<string> Aliases { get; }
+    public abstract IEnumerable<AliasAttribute> Aliases { get; }
 
     /// <summary>
     /// Gets the type of the command that is the parent of this command.
@@ -277,7 +277,7 @@ public abstract class CommandInfo
             return true;
         }
 
-        return Aliases.Any(alias => string.Equals(name, alias, Manager.Options.CommandNameComparison));
+        return Aliases.Any(alias => string.Equals(name, alias.Alias, Manager.Options.CommandNameComparison));
     }
 
     /// <summary>
@@ -302,7 +302,7 @@ public abstract class CommandInfo
             return Name;
         }
 
-        return Aliases.FirstOrDefault(alias => alias.StartsWith(prefix, Manager.Options.CommandNameComparison));
+        return Aliases.FirstOrDefault(alias => alias.Alias.StartsWith(prefix, Manager.Options.CommandNameComparison))?.Alias;
     }
 
     /// <summary>

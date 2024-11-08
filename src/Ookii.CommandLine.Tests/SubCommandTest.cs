@@ -32,7 +32,7 @@ public partial class SubCommandTest
         var manager = CreateManager(kind);
         VerifyCommands(
             manager.GetCommands(),
-            new("AnotherSimpleCommand", typeof(AnotherSimpleCommand), false, "alias"),
+            new("AnotherSimpleCommand", typeof(AnotherSimpleCommand), false, "alias", "hiddenAlias"),
             new("AsyncCancelableCommand", typeof(AsyncCancelableCommand)),
             new("AsyncCommand", typeof(AsyncCommand)),
             new("custom", typeof(CustomParsingCommand), true),
@@ -459,7 +459,7 @@ public partial class SubCommandTest
 
         VerifyCommands(
             manager.GetCommands(),
-            new("AnotherSimpleCommand", typeof(AnotherSimpleCommand), false, "alias"),
+            new("AnotherSimpleCommand", typeof(AnotherSimpleCommand), false, "alias", "hiddenAlias"),
             new("AsyncCancelableCommand", typeof(AsyncCancelableCommand)),
             new("AsyncCommand", typeof(AsyncCommand)),
             new("custom", typeof(CustomParsingCommand), true),
@@ -633,7 +633,7 @@ public partial class SubCommandTest
         }
 
         Assert.AreEqual(customParsing, command.UseCustomArgumentParsing);
-        CollectionAssert.AreEqual(aliases ?? Array.Empty<string>(), command.Aliases.ToArray());
+        CollectionAssert.AreEqual(aliases ?? Array.Empty<string>(), command.Aliases.Select(a => a.Alias).ToArray());
     }
 
     private static void VerifyCommands(IEnumerable<CommandInfo> actual, params ExpectedCommand[] expected)

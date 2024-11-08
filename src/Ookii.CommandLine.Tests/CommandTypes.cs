@@ -35,6 +35,7 @@ public partial class TestCommand : ICommand
 [GeneratedParser]
 [Command]
 [Alias("alias")]
+[Alias("hiddenAlias", IsHidden = true)]
 public partial class AnotherSimpleCommand : ICommand
 {
     [CommandLineArgument]
