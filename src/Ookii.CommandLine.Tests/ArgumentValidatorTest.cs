@@ -125,17 +125,54 @@ public class ArgumentValidatorTest
     {
         var parser = new CommandLineParser<ValidationArguments>();
         var validator = new ValidateEnumValueAttribute();
+        Assert.AreEqual(validator.AllowCommaSeparatedValues, TriState.Auto);
+        Assert.AreEqual(validator.AllowNonDefinedValues, TriState.Auto);
+        Assert.AreEqual(validator.AllowNumericValues, false);
+        Assert.AreEqual(validator.CaseSensitive, false);
+
         var argument = parser.GetArgument("Day")!;
         Assert.IsTrue(validator.IsValidPostConversion(argument, DayOfWeek.Sunday));
         Assert.IsTrue(validator.IsValidPostConversion(argument, DayOfWeek.Saturday));
         Assert.IsTrue(validator.IsValidPostConversion(argument, null));
         Assert.IsFalse(validator.IsValidPostConversion(argument, (DayOfWeek)9));
+        validator.AllowNonDefinedValues = TriState.True;
+        Assert.IsTrue(validator.IsValidPostConversion(argument, (DayOfWeek)9));
+        validator.AllowNonDefinedValues = TriState.False;
+        Assert.IsFalse(validator.IsValidPostConversion(argument, (DayOfWeek)9));
 
+        Assert.IsTrue(validator.IsValidPreConversion(argument, "Sunday".AsMemory()));
+        Assert.IsTrue(validator.IsValidPreConversion(argument, "".AsMemory()));
+        Assert.IsFalse(validator.IsValidPreConversion(argument, "Monday,Tuesday".AsMemory()));
+        Assert.IsFalse(validator.IsValidPreConversion(argument, "1".AsMemory()));
+        Assert.IsFalse(validator.IsValidPreConversion(argument, "-2".AsMemory()));
+        validator.AllowCommaSeparatedValues = TriState.True;
+        Assert.IsTrue(validator.IsValidPreConversion(argument, "Monday,Tuesday".AsMemory()));
+        Assert.IsFalse(validator.IsValidPreConversion(argument, "Monday,1,Tuesday".AsMemory()));
+        validator.AllowNumericValues = true;
+        Assert.IsTrue(validator.IsValidPreConversion(argument, "1".AsMemory()));
+        Assert.IsTrue(validator.IsValidPreConversion(argument, "-2".AsMemory()));
+        Assert.IsTrue(validator.IsValidPreConversion(argument, "Monday,1,Tuesday".AsMemory()));
+        validator.AllowCommaSeparatedValues = TriState.False;
+        Assert.IsFalse(validator.IsValidPreConversion(argument, "Monday,Tuesday".AsMemory()));
+
+        // Using a nullable type.
         argument = parser.GetArgument("Day2")!;
+        validator.AllowNonDefinedValues = TriState.Auto;
         Assert.IsTrue(validator.IsValidPostConversion(argument, (DayOfWeek?)DayOfWeek.Sunday));
         Assert.IsTrue(validator.IsValidPostConversion(argument, (DayOfWeek?)DayOfWeek.Saturday));
         Assert.IsTrue(validator.IsValidPostConversion(argument, null));
         Assert.IsFalse(validator.IsValidPostConversion(argument, (DayOfWeek?)9));
+
+        // Allow commas and non-defined values based on flags attribute.
+        argument = parser.GetArgument("Modifiers")!;
+        validator.AllowCommaSeparatedValues = TriState.Auto;
+        Assert.IsTrue(validator.IsValidPreConversion(argument, "Alt".AsMemory()));
+        Assert.IsTrue(validator.IsValidPreConversion(argument, "Alt,Control".AsMemory()));
+        Assert.IsTrue(validator.IsValidPostConversion(argument, ConsoleModifiers.Alt | ConsoleModifiers.Control));
+        validator.AllowCommaSeparatedValues = TriState.False;
+        Assert.IsFalse(validator.IsValidPreConversion(argument, "Alt,Control".AsMemory()));
+        validator.AllowNonDefinedValues = TriState.False;
+        Assert.IsFalse(validator.IsValidPostConversion(argument, ConsoleModifiers.Alt | ConsoleModifiers.Control));
     }
 
     private static CommandLineArgument GetArgument()

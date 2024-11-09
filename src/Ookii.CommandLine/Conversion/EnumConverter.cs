@@ -10,11 +10,9 @@ namespace Ookii.CommandLine.Conversion;
 /// </summary>
 /// <remarks>
 /// <para>
-///   This converter performs a case insensitive conversion, and accepts the name of an enumeration
-///   value or a number representing the underlying type of the enumeration. Comma-separated values
-///   that will be combined using bitwise-or are also accepted, regardless of whether the
-///   enumeration uses the <see cref="FlagsAttribute"/> attribute. When using a numeric value, the
-///   value does not need to be one of the defined values of the enumeration.
+///   By default, this converter accepts the names of enumeration members, performing a
+///   case-insensitive match. It does not accept numeric values, and comma-separated values are only
+///   accepted if the enumeration has the <see cref="FlagsAttribute"/> attribute.
 /// </para>
 /// <para>
 ///   Use the <see cref="ValidateEnumValueAttribute"/> attribute to alter these behaviors. Applying
@@ -96,9 +94,12 @@ public class EnumConverter : ArgumentConverter
         }
 
         var attribute = argument.Validators.OfType<ValidateEnumValueAttribute>().FirstOrDefault();
-        if (attribute != null && !attribute.ValidateBeforeConversion(argument, value.Span))
+
+        // If the attribute is defined, it has already been checked; if not, check against the
+        // defaults here.
+        if (attribute == null)
         {
-            throw CreateException(value.ToString(), null, argument, attribute);
+            ValidateEnumValueAttribute.Default.ValidatePreConversion(argument, value);
         }
 
         try
@@ -111,20 +112,19 @@ public class EnumConverter : ArgumentConverter
         }
         catch (ArgumentException ex)
         {
-            throw CreateException(value.ToString(), ex, argument, attribute);
+            throw CreateException(value, ex, argument, attribute);
         }
         catch (OverflowException ex)
         {
-            throw CreateException(value.ToString(), ex, argument, attribute);
+            throw CreateException(value, ex, argument, attribute);
         }
     }
 
-    private CommandLineArgumentException CreateException(string value, Exception? inner, CommandLineArgument argument,
+    private static CommandLineArgumentException CreateException(ReadOnlyMemory<char> value, Exception? inner, CommandLineArgument argument,
         ValidateEnumValueAttribute? attribute)
     {
-        string message = attribute?.GetErrorMessage(argument, value)
-            ?? argument.Parser.StringProvider.ValidateEnumValueFailed(argument.ArgumentName, EnumType, value, true);
-
+        attribute ??= ValidateEnumValueAttribute.Default;
+        string message = attribute.GetErrorMessage(argument, value.ToString());
         return new(message, argument.ArgumentName, CommandLineArgumentErrorCategory.ArgumentValueConversion, inner);
     }
 }

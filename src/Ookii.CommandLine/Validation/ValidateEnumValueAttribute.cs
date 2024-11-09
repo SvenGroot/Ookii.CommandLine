@@ -1,36 +1,35 @@
 ﻿using Ookii.CommandLine.Conversion;
+using Ookii.Common;
 using System;
 using System.Globalization;
+using System.Reflection;
 
 namespace Ookii.CommandLine.Validation;
 
 /// <summary>
-/// Validates whether the value of an enumeration type is one of the defined values for that
-/// type, and provides additional conversion options for enumeration types converted using the
-/// <see cref="EnumConverter"/> class.
+/// Controls validation rules for arguments with enumeration values.
 /// </summary>
 /// <remarks>
 /// <para>
-///   The <see cref="EnumConverter"/> used to convert values for arguments with enumeration types
-///   allows conversion using the string representation of the underlying value, as well as the
-///   name. While names are checked against the members, any underlying value can be converted to an
-///   enumeration, regardless of whether it's a defined value for the enumeration.
+///   Conversion from a string to an enumeration value can use either the name of the enumeration
+///   member, the numeric value of the member, or a comma-separated list of values. By default,
+///   however, the <see cref="EnumConverter"/> class only allows names of enumeration members,
+///   and comma-separated values are only allowed if the enumeration has the
+///   <see cref="FlagsAttribute"/> attribute.
 /// </para>
 /// <para>
-///   For example, using the <see cref="DayOfWeek"/> enumeration, converting a string value of
-///   "9" would result in a value of <c>(DayOfWeek)9</c>, even though there is no enumeration
-///   member with that value.
+///   Using the <see cref="ValidateEnumValueAttribute"/>, you can change these behaviors. You can
+///   allow numeric values with the <see cref="AllowNumericValues"/> property, and you can force
+///   whether comma-separated values are allowed with the <see cref="AllowCommaSeparatedValues"/>
+///   property.
 /// </para>
 /// <para>
-///   This validator makes sure that the result of conversion is a valid value for the
-///   enumeration, by using the <see cref="Enum.IsDefined(Type, object)" qualifyHint="true"/> method.
-/// </para>
-/// <para>
-///   This validator can also alter the behavior of the <see cref="EnumConverter"/> class, through
-///   the <see cref="CaseSensitive"/>, <see cref="AllowNumericValues"/>, and
-///   <see cref="AllowCommaSeparatedValues"/> properties. These properties are only effective if
-///   the default <see cref="EnumConverter"/> class is used, or a custom converter that also checks
-///   them.
+///   If numeric values are allowed, they are restricted to values that are defined in the
+///   enumeration, unless the enumeration has the <see cref="FlagsAttribute"/> applied or you set
+///   the <see cref="AllowNonDefinedValues"/> property to <see cref="TriState.True" qualifyHint="true"/>.
+///   In that case, for example using the <see cref="DayOfWeek"/> enumeration, converting a string
+///   value of "9" would result in a value of <c>(DayOfWeek)9</c>, even though there is no
+///   enumeration member with that value.
 /// </para>
 /// <para>
 ///   In addition, this validator provides usage help listing all the possible values. If the
@@ -41,34 +40,39 @@ namespace Ookii.CommandLine.Validation;
 ///   <see langword="false"/>.
 /// </para>
 /// <para>
-///   It is an error to use this validator on an argument whose type is not an enumeration.
+///   If this validator is used without changing any of its properties, its only effect is to
+///   list the values in the usage help, unless the argument doesn't use the default
+///   <see cref="EnumConverter"/> class, since that converter has the same behavior as the
+///   defaults of this validator.
 /// </para>
 /// </remarks>
 /// <threadsafety static="true" instance="true"/>
 public class ValidateEnumValueAttribute : ArgumentValidationWithHelpAttribute
 {
+    internal static readonly ValidateEnumValueAttribute Default = new();
+
     /// <summary>
     /// Gets or sets a value that indicates whether values that do not match one of the
     /// enumeration's defined values are allowed.
     /// </summary>
     /// <value>
-    /// <see langword="true"/> if values that are not defined by the enumeration are allowed;
-    /// otherwise, <see langword="false"/>. The default value is <see langword="false"/>.
+    /// <see cref="TriState.True" qualifyHint="true"/> if values that are not defined by the
+    /// enumeration are allowed; <see cref="TriState.False" qualifyHint="true"/> if they are not
+    /// allowed; <see cref="TriState.Auto" qualifyHint="true"/> to allow non-defined values only
+    /// when the enumeration has the <see cref="FlagsAttribute"/> attribute applied. The default
+    /// value is <see cref="TriState.Auto" qualifyHint="true"/>.
     /// </value>
     /// <remarks>
     /// <para>
-    ///   Non-defined values can be provided using the underlying numeric type of the enumeration.
-    ///   If this property is <see langword="true"/>, this validator will not check whether a value
-    ///   provided in such a way actually is actually one of the enumeration's defined values.
-    /// </para>
-    /// <para>
-    ///   Setting this to <see langword="true"/> essentially makes this validator do nothing. It
-    ///   is useful if you want to use it solely to list defined values in the usage help, or if
-    ///   you want to use one of the other properties that affect the <see cref="EnumConverter"/>
-    ///   class without also checking for defined values.
+    ///   Non-defined values can be provided using the underlying numeric type of the enumeration,
+    ///   or by using comma-separated values. If this property is <see cref="TriState.True"
+    ///   qualifyHint="true"/>, or <see cref="TriState.Auto" qualifyHint="true"/> and the
+    ///   enumeration has the <see cref="FlagsAttribute"/> attribute applied, this validator will
+    ///   not check whether a value provided in such a way actually is actually one of the
+    ///   enumeration's defined values.
     /// </para>
     /// </remarks>
-    public bool AllowNonDefinedValues { get; set; }
+    public TriState AllowNonDefinedValues { get; set; }
 
     /// <summary>
     /// Gets or sets a value that indicates whether the possible values of the enumeration
@@ -108,18 +112,13 @@ public class ValidateEnumValueAttribute : ArgumentValidationWithHelpAttribute
     /// to provide multiple values that will be combined with bitwise-or.
     /// </summary>
     /// <value>
-    /// <see langword="true"/> if comma-separated values are allowed; otherwise,
-    /// <see langword="false"/>. The default value is <see langword="true"/>.
+    /// <see cref="TriState.True" qualifyHint="true"/> if comma-separated values are allowed;
+    /// <see cref="TriState.False" qualifyHint="true"/> if they are not;
+    /// <see cref="TriState.Auto" qualifyHint="true"/> to allow comma-separated values only if the
+    /// enumeration has the <see cref="FlagsAttribute"/> applied. The default value is
+    /// <see cref="TriState.Auto" qualifyHint="true"/>.
     /// </value>
-    /// <remarks>
-    /// <para>
-    ///   This property is not used by the <see cref="ValidateEnumValueAttribute"/> class itself,
-    ///   but by the <see cref="EnumConverter"/> class. Therefore, this property may not work if
-    ///   a custom argument converter is used, unless that custom converter also checks this
-    ///   property.
-    /// </para>
-    /// </remarks>
-    public bool AllowCommaSeparatedValues { get; set; } = true;
+    public TriState AllowCommaSeparatedValues { get; set; }
 
     /// <summary>
     /// Gets or sets a value that indicates whether the value provided by the user can the
@@ -127,17 +126,9 @@ public class ValidateEnumValueAttribute : ArgumentValidationWithHelpAttribute
     /// </summary>
     /// <value>
     /// <see langword="true"/> if numeric values are allowed; otherwise, <see langword="false"/> to
-    /// allow only value names. The default value is <see langword="true"/>.
+    /// allow only value names. The default value is <see langword="false"/>.
     /// </value>
-    /// <remarks>
-    /// <para>
-    ///   This property is not used by the <see cref="ValidateEnumValueAttribute"/> class itself,
-    ///   but by the <see cref="EnumConverter"/> class. Therefore, this property may not work if
-    ///   a custom argument converter is used, unless that custom converter also checks this
-    ///   property.
-    /// </para>
-    /// </remarks>
-    public bool AllowNumericValues { get; set; } = true;
+    public bool AllowNumericValues { get; set; }
 
     /// <inheritdoc/>
     /// <summary>Determines if the argument's value is defined.</summary>
@@ -152,7 +143,14 @@ public class ValidateEnumValueAttribute : ArgumentValidationWithHelpAttribute
                 Properties.Resources.ArgumentNotEnumFormat, argument.ArgumentName));
         }
 
-        return AllowNonDefinedValues || value == null || argument.ElementType.IsEnumDefined(value);
+        var allowNonDefinedValues = AllowNonDefinedValues switch
+        {
+            TriState.True => true,
+            TriState.False => false,
+            _ => argument.ElementType.GetCustomAttribute<FlagsAttribute>() != null
+        };
+
+        return allowNonDefinedValues || value == null || argument.ElementType.IsEnumDefined(value);
     }
 
     /// <inheritdoc/>
@@ -178,36 +176,31 @@ public class ValidateEnumValueAttribute : ArgumentValidationWithHelpAttribute
         => argument.Parser.StringProvider.ValidateEnumValueFailed(argument.ArgumentName, argument.ElementType, value,
                 IncludeValuesInErrorMessage);
 
-    internal bool ValidateBeforeConversion(CommandLineArgument argument, ReadOnlySpan<char> value)
+    /// <inheritdoc/>
+    /// <summary>Determines if the argument's value contains commas or numbers if not allowed.</summary>
+    public override bool IsValidPreConversion(CommandLineArgument argument, ReadOnlyMemory<char> value)
     {
-        if (!AllowCommaSeparatedValues && value.IndexOf(',') >= 0)
+        var allowCommaSeparatedValues = AllowCommaSeparatedValues switch
+        {
+            TriState.True => true,
+            TriState.False => false,
+            _ => argument.ElementType.GetCustomAttribute<FlagsAttribute>() != null
+        };
+
+        if (!allowCommaSeparatedValues && value.Span.IndexOf(',') >= 0)
         {
             return false;
         }
 
         if (!AllowNumericValues)
         {
-            var current = value;
-            while (current.Length > 0)
+            foreach (var segment in value.Span.Split(",".AsSpan()))
             {
-                if (char.IsDigit(current[0]) || current.StartsWith(argument.Parser.Culture.NumberFormat.NegativeSign.AsSpan()))
+                if (segment.Length > 0 && char.IsDigit(segment[0]) || 
+                    segment.StartsWith(argument.Parser.Culture.NumberFormat.NegativeSign.AsSpan()))
                 {
                     return false;
                 }
-
-                if (!AllowCommaSeparatedValues)
-                {
-                    // There can't be any commas, checked above.
-                    break;
-                }
-
-                var index = current.IndexOf(',');
-                if (index < 0)
-                {
-                    break;
-                }
-
-                current = current.Slice(index + 1);
             }
         }
 

@@ -1209,12 +1209,12 @@ public partial class CommandLineParserTest
         CheckThrows(parser, ["-Day", "foo"], CommandLineArgumentErrorCategory.ArgumentValueConversion, "Day", typeof(ArgumentException), remainingArgumentCount: 2);
         CheckThrows(parser, ["-Day", "9"], CommandLineArgumentErrorCategory.ValidationFailed, "Day", remainingArgumentCount: 2);
         CheckThrows(parser, ["-Day", ""], CommandLineArgumentErrorCategory.ArgumentValueConversion, "Day", typeof(ArgumentException), remainingArgumentCount: 2);
-        result = CheckSuccess(parser, ["-Day", "1"]);
-        Assert.AreEqual(DayOfWeek.Monday, result.Day);
+        result = CheckSuccess(parser, ["-Day3", "1"]);
+        Assert.AreEqual(DayOfWeek.Monday, result.Day3);
         CheckThrows(parser, ["-Day2", "foo"], CommandLineArgumentErrorCategory.ArgumentValueConversion, "Day2", typeof(ArgumentException), remainingArgumentCount: 2);
-        CheckSuccess(parser, ["-Day2", "9"]); // This one allows it.
-        result = CheckSuccess(parser, ["-Day2", "1"]);
-        Assert.AreEqual(DayOfWeek.Monday, result.Day2);
+        result = CheckSuccess(parser, ["-Day3", "9"]); // This one allows it.
+        Assert.AreEqual((DayOfWeek)9, result.Day3);
+        CheckThrows(parser, ["-Day2", "1"], CommandLineArgumentErrorCategory.ValidationFailed, "Day2", null, remainingArgumentCount: 2);
         result = CheckSuccess(parser, ["-Day2", ""]);
         Assert.IsNull(result.Day2);
 
@@ -1224,13 +1224,20 @@ public partial class CommandLineParserTest
         CheckThrows(parser, ["-Day2", "tuesday"], CommandLineArgumentErrorCategory.ArgumentValueConversion, "Day2", typeof(ArgumentException), remainingArgumentCount: 2);
 
         // Disallow commas.
-        result = CheckSuccess(parser, ["-Day3", "Monday,Tuesday"]);
-        Assert.AreEqual(DayOfWeek.Wednesday, result.Day3);
-        CheckThrows(parser, ["-Day2", "Monday,Tuesday"], CommandLineArgumentErrorCategory.ArgumentValueConversion, "Day2", remainingArgumentCount: 2);
+        result = CheckSuccess(parser, ["-Day2", "Monday,Tuesday"]);
+        Assert.AreEqual(DayOfWeek.Wednesday, result.Day2);
+        CheckThrows(parser, ["-Day", "Monday,Tuesday"], CommandLineArgumentErrorCategory.ValidationFailed, "Day", remainingArgumentCount: 2);
 
         // Disallow numbers.
-        CheckThrows(parser, ["-Day3", "5"], CommandLineArgumentErrorCategory.ArgumentValueConversion, "Day3", remainingArgumentCount: 2);
-        CheckThrows(parser, ["-Day3", "Tuesday,5"], CommandLineArgumentErrorCategory.ArgumentValueConversion, "Day3", remainingArgumentCount: 2);
+        CheckThrows(parser, ["-Day2", "5"], CommandLineArgumentErrorCategory.ValidationFailed, "Day2", remainingArgumentCount: 2);
+        CheckThrows(parser, ["-Day2", "Tuesday,5"], CommandLineArgumentErrorCategory.ValidationFailed, "Day2", remainingArgumentCount: 2);
+
+        // Allow commas because of flags attribute.
+        result = CheckSuccess(parser, ["-Modifiers", "Control,Alt"]);
+        Assert.AreEqual(ConsoleModifiers.Control | ConsoleModifiers.Alt, result.Modifiers);
+
+        // Numbers still not allowed despite no attribute
+        CheckThrows(parser, ["-Modifiers", "0"], CommandLineArgumentErrorCategory.ValidationFailed, "Modifiers", remainingArgumentCount: 2);
 
         // NotNull validator with Nullable<T>.
         CheckThrows(parser, ["-NotNull", ""], CommandLineArgumentErrorCategory.ValidationFailed, "NotNull", remainingArgumentCount: 2);
