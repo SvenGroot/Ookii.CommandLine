@@ -9,7 +9,7 @@
 ///   indicates the value should be automatically determined based on some criteria.
 /// </value>
 /// </remarks>
-public enum TriState
+public enum TriState : byte
 {
     /// <summary>
     /// The value should be automatically determined to be either <see langword="true"/> or
