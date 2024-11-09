@@ -180,7 +180,7 @@ public partial class SubCommandTest
         var options = new CommandOptions()
         {
             Error = writer,
-            UsageWriter = new UsageWriter(writer, true)
+            UsageWriter = new UsageWriter(writer, TriState.True)
             {
                 ExecutableName = _executableName,
             }
@@ -202,7 +202,7 @@ public partial class SubCommandTest
             UsageWriter = new UsageWriter(writer)
             {
                 ExecutableName = _executableName,
-                IncludeCommandHelpInstruction = true,
+                IncludeCommandHelpInstruction = TriState.True,
             }
         };
 
@@ -224,7 +224,7 @@ public partial class SubCommandTest
             UsageWriter = new UsageWriter(writer)
             {
                 ExecutableName = _executableName,
-                IncludeCommandHelpInstruction = true,
+                IncludeCommandHelpInstruction = TriState.True,
             }
         };
 
@@ -281,7 +281,7 @@ public partial class SubCommandTest
         var options = new CommandOptions()
         {
             Error = errorWriter,
-            UsageWriter = new UsageWriter(writer, true)
+            UsageWriter = new UsageWriter(writer, TriState.True)
             {
                 ExecutableName = _executableName,
             }
@@ -517,7 +517,7 @@ public partial class SubCommandTest
             UsageWriter = new UsageWriter(writer)
             {
                 ExecutableName = _executableName,
-                IncludeCommandHelpInstruction = true,
+                IncludeCommandHelpInstruction = TriState.True,
                 IncludeApplicationDescriptionBeforeCommandList = true,
             }
         };

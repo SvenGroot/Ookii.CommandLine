@@ -373,7 +373,7 @@ public partial class CommandLineParserTest
         };
 
         CommandLineParser target = CreateParser<TestArguments>(kind, options);
-        var writer = new UsageWriter(useColor: true)
+        var writer = new UsageWriter(useColor: TriState.True)
         {
             ExecutableName = _executableName,
         };
@@ -548,7 +548,7 @@ public partial class CommandLineParserTest
     {
         var options = new ParseOptions()
         {
-            UsageWriter = new UsageWriter(useColor: true)
+            UsageWriter = new UsageWriter(useColor: TriState.True)
             {
                 ExecutableName = _executableName
             },
@@ -656,7 +656,7 @@ public partial class CommandLineParserTest
         var options = new ParseOptions()
         {
             Error = error,
-            UsageWriter = new UsageWriter(lineWriter, true)
+            UsageWriter = new UsageWriter(lineWriter, TriState.True)
             {
                 ExecutableName = _executableName,
             }

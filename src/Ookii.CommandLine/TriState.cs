@@ -25,3 +25,29 @@ public enum TriState
     /// </summary>
     False,
 }
+
+/// <summary>
+/// Provides extension methods for the <see cref="TriState"/> enumeration.
+/// </summary>
+/// <threadsafety static="true" instance="false"/>
+public static class TriStateExtensions
+{
+    /// <summary>
+    /// Converts the <see cref="TriState"/> value to a <see cref="bool"/> value.
+    /// </summary>
+    /// <param name="value">The <see cref="TriState"/> value to convert.</param>
+    /// <param name="autoValue">
+    /// The value to return if <paramref name="value"/> is <see cref="TriState.Auto" qualifyHint="true"/>.
+    /// </param>
+    /// <returns>
+    /// <see langword="true"/> if <paramref name="value"/> is <see cref="TriState.True" qualifyHint="true"/>;
+    /// <see langword="false"/> if <paramref name="value"/> is <see cref="TriState.False" qualifyHint="true"/>;
+    /// and <paramref name="autoValue"/> if <paramref name="value"/> is <see cref="TriState.Auto" qualifyHint="true"/>.
+    /// </returns>
+    public static bool ToBoolean(this TriState value, bool autoValue) => value switch
+    {
+        TriState.True => true,
+        TriState.False => false,
+        _ => autoValue,
+    };
+}

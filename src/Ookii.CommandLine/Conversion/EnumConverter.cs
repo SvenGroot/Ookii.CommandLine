@@ -96,7 +96,9 @@ public class EnumConverter : ArgumentConverter
         var attribute = argument.Validators.OfType<ValidateEnumValueAttribute>().FirstOrDefault();
 
         // If the attribute is defined, it has already been checked; if not, check against the
-        // defaults here.
+        // defaults here. Note that post-conversion validation is not necessary, as the default
+        // pre-validation rules make it impossible to get an undefined value unless the
+        // FlagsAttribute is present, in which case an undefined value is allowed.
         if (attribute == null)
         {
             ValidateEnumValueAttribute.Default.ValidatePreConversion(argument, value);

@@ -12,7 +12,7 @@ var options = new CommandOptions()
         // technically have a -Help argument. This prevents the instruction from being shown by
         // default. However, these commands will ignore -Help ignore it and print their child
         // command list anyway, so force the message to be shown.
-        IncludeCommandHelpInstruction = true,
+        IncludeCommandHelpInstruction = TriState.True,
     },
 };
 

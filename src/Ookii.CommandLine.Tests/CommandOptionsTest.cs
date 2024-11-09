@@ -41,7 +41,7 @@ public class CommandOptionsTest
         Assert.AreEqual(UsageHelpRequest.SyntaxOnly, options.ShowUsageOnError);
         Assert.IsNotNull(options.StringProvider);
         Assert.IsNotNull(options.UsageWriter);
-        Assert.IsNull(options.UseErrorColor);
+        Assert.AreEqual(TriState.Auto, options.UseErrorColor);
         Assert.IsNull(options.ValueDescriptionTransform);
         Assert.AreEqual(TextFormat.ForegroundYellow, options.WarningColor);
 

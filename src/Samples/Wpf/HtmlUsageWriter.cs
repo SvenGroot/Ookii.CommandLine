@@ -8,7 +8,7 @@ internal class HtmlUsageWriter : UsageWriter
 {
     // This is intended for use with GetUsage() only so no way to specify a writer.
     public HtmlUsageWriter()
-        : base(null, false)
+        : base(null, TriState.False)
     {
         // The indents and blank lines don't alter how the output looks (whitespace is ignored in
         // HTML after all), but they're not needed either.

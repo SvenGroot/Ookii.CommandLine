@@ -98,7 +98,7 @@ public class UsageWriter
 
     private readonly LineWrappingTextWriter? _customWriter;
     private LineWrappingTextWriter? _writer;
-    private readonly bool? _useColor;
+    private readonly TriState _useColor;
     private bool _autoColor;
     private CommandLineParser? _parser;
     private CommandManager? _commandManager;
@@ -114,9 +114,10 @@ public class UsageWriter
     /// to write to the standard output stream.
     /// </param>
     /// <param name="useColor">
-    /// <see langword="true"/> to enable color output using virtual terminal sequences;
-    /// <see langword="false"/> to disable it; or, <see langword="null"/> to automatically
-    /// enable it if <paramref name="writer"/> is <see langword="null"/> using the
+    /// <see cref="TriState.True" qualifyHint="true"/> to enable color output using virtual terminal
+    /// sequences; <see cref="TriState.False" qualifyHint="true"/> to disable it; or,
+    /// <see cref="TriState.Auto" qualifyHint="true"/> to automatically enable it if
+    /// <paramref name="writer"/> is <see langword="null"/> using the
     /// <see cref="VirtualTerminal.EnableColor" qualifyHint="true"/> method.
     /// </param>
     /// <remarks>
@@ -127,7 +128,7 @@ public class UsageWriter
     ///   be wrapped, depending on the value returned by <see cref="Console.WindowWidth" qualifyHint="true"/>.
     /// </para>
     /// </remarks>
-    public UsageWriter(LineWrappingTextWriter? writer = null, bool? useColor = null)
+    public UsageWriter(LineWrappingTextWriter? writer = null, TriState useColor = TriState.Auto)
     {
         _customWriter = writer;
         _useColor = useColor;
@@ -527,12 +528,12 @@ public class UsageWriter
     public bool IndentAfterEmptyLine { get; set; }
 
     /// <summary>
-    /// Gets or sets a value that indicates whether the usage help should use color.
+    /// Gets a value that indicates whether the usage help should use color.
     /// </summary>
     /// <value>
-    ///   <see langword="true"/> to enable color output; otherwise, <see langword="false"/>.
+    ///   <see langword="true"/> to use color output; otherwise, <see langword="false"/>.
     /// </value>
-    protected bool UseColor => _useColor ?? _autoColor;
+    protected bool UseColor => _useColor.ToBoolean(_autoColor);
 
     /// <summary>
     /// Gets or sets the color applied by the base implementation of the <see cref="WriteCommandDescription(CommandInfo)"/>
@@ -586,14 +587,15 @@ public class UsageWriter
     /// command list that instructs the user how to get help for individual commands.
     /// </summary>
     /// <value>
-    /// <see langword="null"/> to show the instruction if all commands have the default help
-    /// argument; <see langword="true"/> to always show the instruction; otherwise,
-    /// <see langword="false"/>. The default value is <see langword="null"/>.
+    /// <see cref="TriState.Auto" qualifyHint="true"/> to show the instruction if all commands have
+    /// the default help argument; <see cref="TriState.True" qualifyHint="true"/> to always show the
+    /// instruction; otherwise, <see cref="TriState.False" qualifyHint="true"/>. The default value
+    /// is <see cref="TriState.Auto" qualifyHint="true"/>.
     /// </value>
     /// <remarks>
     /// <para>
-    ///   If this property is <see langword="null"/>, the instruction will be shown under the
-    ///   following conditions:
+    ///   If this property is <see cref="TriState.Auto" qualifyHint="true"/>, the instruction will
+    ///   be shown under the following conditions:
     /// </para>
     /// <list type="bullet">
     ///   <item>
@@ -630,14 +632,16 @@ public class UsageWriter
     ///   </item>
     /// </list>
     /// <para>
-    ///   If set to <see langword="true"/>, the message is shown even if not all commands meet these
-    ///   restrictions.
+    ///   If set to <see cref="TriState.True" qualifyHint="true"/>, the message is shown even if not
+    ///   all commands meet these conditions. You can use this to show the message when you know
+    ///   it's valid despite this (e.g. you have a command using <see cref="ICommandWithCustomParsing"/>
+    ///   which implements its own help argument that matches the other commands).
     /// </para>
     /// <para>
     ///   To customize the message, override the <see cref="WriteCommandHelpInstruction"/> method.
     /// </para>
     /// </remarks>
-    public bool? IncludeCommandHelpInstruction { get; set; }
+    public TriState IncludeCommandHelpInstruction { get; set; }
 
     /// <summary>
     /// Gets or sets a value that indicates whether to show the application description before
@@ -679,7 +683,7 @@ public class UsageWriter
     /// Gets the <see cref="LineWrappingTextWriter"/> to which the usage should be written.
     /// </summary>
     /// <value>
-    /// The <see cref="LineWrappingTextWriter"/> passed to the <see cref="UsageWriter(LineWrappingTextWriter?, bool?)"/>
+    /// The <see cref="LineWrappingTextWriter"/> passed to the <see cref="UsageWriter(LineWrappingTextWriter?, TriState)"/>
     /// constructor, or an instance created by the <see cref="LineWrappingTextWriter.ForConsoleOut" qualifyHint="true"/>
     /// or <see cref="LineWrappingTextWriter.ForStringWriter(int, IFormatProvider?, bool)" qualifyHint="true"/>
     /// function.
@@ -798,7 +802,7 @@ public class UsageWriter
     /// </exception>
     /// <remarks>
     /// <para>
-    ///   If no writer was passed to the <see cref="UsageWriter(LineWrappingTextWriter?, bool?)"/>
+    ///   If no writer was passed to the <see cref="UsageWriter(LineWrappingTextWriter?, TriState)"/>
     ///   constructor, this method will create a <see cref="LineWrappingTextWriter"/> for the
     ///   standard output stream. If color usage wasn't explicitly enabled, it will be enabled
     ///   if the output supports it according to <see cref="VirtualTerminal.EnableColor" qualifyHint="true"/>.
@@ -825,7 +829,7 @@ public class UsageWriter
     /// </exception>
     /// <remarks>
     /// <para>
-    ///   If no writer was passed to the <see cref="UsageWriter(LineWrappingTextWriter?, bool?)"/>
+    ///   If no writer was passed to the <see cref="UsageWriter(LineWrappingTextWriter?, TriState)"/>
     ///   constructor, this method will create a <see cref="LineWrappingTextWriter"/> for the
     ///   standard output stream. If color usage wasn't explicitly enabled, it will be enabled
     ///   if the output supports it according to <see cref="VirtualTerminal.EnableColor" qualifyHint="true"/>.
@@ -853,7 +857,7 @@ public class UsageWriter
     ///   The usage help will contain a list of all available commands.
     /// </para>
     /// <para>
-    ///   If no writer was passed to the <see cref="UsageWriter(LineWrappingTextWriter?, bool?)"/>
+    ///   If no writer was passed to the <see cref="UsageWriter(LineWrappingTextWriter?, TriState)"/>
     ///   constructor, this method will create a <see cref="LineWrappingTextWriter"/> for the
     ///   standard output stream. If color usage wasn't explicitly enabled, it will be enabled
     ///   if the output supports it according to <see cref="VirtualTerminal.EnableColor" qualifyHint="true"/>.
@@ -880,7 +884,7 @@ public class UsageWriter
     /// </exception>
     /// <remarks>
     /// <para>
-    ///   If no writer was passed to the <see cref="UsageWriter(LineWrappingTextWriter?, bool?)"/>
+    ///   If no writer was passed to the <see cref="UsageWriter(LineWrappingTextWriter?, TriState)"/>
     ///   constructor, this method will create a <see cref="LineWrappingTextWriter"/> for the
     ///   standard output stream. If color usage wasn't explicitly enabled, it will be enabled
     ///   if the output supports it according to <see cref="VirtualTerminal.EnableColor" qualifyHint="true"/>.
@@ -911,7 +915,7 @@ public class UsageWriter
     /// </exception>
     /// <remarks>
     /// <para>
-    ///   This method ignores the writer passed to the <see cref="UsageWriter(LineWrappingTextWriter?, bool?)"/>
+    ///   This method ignores the writer passed to the <see cref="UsageWriter(LineWrappingTextWriter?, TriState)"/>
     ///   constructor, and will use the <see cref="LineWrappingTextWriter.ForStringWriter" qualifyHint="true"/>
     ///   method instead, and returns the resulting string. If color support was not explicitly
     ///   enabled, it will be disabled.
@@ -942,7 +946,7 @@ public class UsageWriter
     /// </exception>
     /// <remarks>
     /// <para>
-    ///   If no writer was passed to the <see cref="UsageWriter(LineWrappingTextWriter?, bool?)"/>
+    ///   If no writer was passed to the <see cref="UsageWriter(LineWrappingTextWriter?, TriState)"/>
     ///   constructor, this method will create a <see cref="LineWrappingTextWriter"/> for the
     ///   standard output stream. If color usage wasn't explicitly enabled, it will be enabled
     ///   if the output supports it according to <see cref="VirtualTerminal.EnableColor" qualifyHint="true"/>.
@@ -977,7 +981,7 @@ public class UsageWriter
     ///   The usage help will contain a list of all available commands.
     /// </para>
     /// <para>
-    ///   This method ignores the writer passed to the <see cref="UsageWriter(LineWrappingTextWriter?, bool?)"/>
+    ///   This method ignores the writer passed to the <see cref="UsageWriter(LineWrappingTextWriter?, TriState)"/>
     ///   constructor, and will use the <see cref="LineWrappingTextWriter.ForStringWriter" qualifyHint="true"/>
     ///   method instead, and returns the resulting string. If color support was not explicitly
     ///   enabled, it will be disabled.
@@ -2515,7 +2519,7 @@ public class UsageWriter
 
     private VirtualTerminalSupport? EnableColor()
     {
-        if (_useColor == null)
+        if (_useColor == TriState.Auto)
         {
             VirtualTerminalSupport? support = null;
             if (_customWriter == null)
@@ -2592,12 +2596,17 @@ public class UsageWriter
 
     private bool CheckShowCommandHelpInstruction()
     {
-        if (IncludeCommandHelpInstruction is bool include)
+        if (IncludeCommandHelpInstruction == TriState.True)
         {
-            return include;
+            return true;
         }
 
-        // If not automatically set, check requirements from all commands.
+        if (IncludeCommandHelpInstruction == TriState.False)
+        {
+            return false;
+        }
+
+        // If not forced disabled/enabled, check requirements.
         if (CommandManager.Options.AutoHelpArgument == false)
         {
             return false;
