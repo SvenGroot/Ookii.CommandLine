@@ -141,17 +141,23 @@ public class ArgumentValidatorTest
         Assert.IsFalse(validator.IsValidPostConversion(argument, (DayOfWeek)9));
 
         Assert.IsTrue(validator.IsValidPreConversion(argument, "Sunday".AsMemory()));
+        Assert.IsTrue(validator.IsValidPreConversion(argument, " Sunday ".AsMemory()));
         Assert.IsTrue(validator.IsValidPreConversion(argument, "".AsMemory()));
         Assert.IsFalse(validator.IsValidPreConversion(argument, "Monday,Tuesday".AsMemory()));
         Assert.IsFalse(validator.IsValidPreConversion(argument, "1".AsMemory()));
         Assert.IsFalse(validator.IsValidPreConversion(argument, "-2".AsMemory()));
+        Assert.IsFalse(validator.IsValidPreConversion(argument, " 3 ".AsMemory()));
+        Assert.IsFalse(validator.IsValidPreConversion(argument, " -4 ".AsMemory()));
         validator.AllowCommaSeparatedValues = TriState.True;
         Assert.IsTrue(validator.IsValidPreConversion(argument, "Monday,Tuesday".AsMemory()));
         Assert.IsFalse(validator.IsValidPreConversion(argument, "Monday,1,Tuesday".AsMemory()));
+        Assert.IsFalse(validator.IsValidPreConversion(argument, "Monday, 2 ,Tuesday".AsMemory()));
         validator.AllowNumericValues = true;
         Assert.IsTrue(validator.IsValidPreConversion(argument, "1".AsMemory()));
         Assert.IsTrue(validator.IsValidPreConversion(argument, "-2".AsMemory()));
+        Assert.IsTrue(validator.IsValidPreConversion(argument, " -2 ".AsMemory()));
         Assert.IsTrue(validator.IsValidPreConversion(argument, "Monday,1,Tuesday".AsMemory()));
+        Assert.IsTrue(validator.IsValidPreConversion(argument, "Monday, 2 ,Tuesday".AsMemory()));
         validator.AllowCommaSeparatedValues = TriState.False;
         Assert.IsFalse(validator.IsValidPreConversion(argument, "Monday,Tuesday".AsMemory()));
 
