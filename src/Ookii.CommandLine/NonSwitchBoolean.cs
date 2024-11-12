@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Ookii.CommandLine;
 
@@ -19,6 +20,9 @@ namespace Ookii.CommandLine;
 /// </remarks>
 [ValueDescription(nameof(Boolean), ApplyTransform = true)]
 public struct NonSwitchBoolean
+#if NET7_0_OR_GREATER
+    : ISpanParsable<NonSwitchBoolean>
+#endif
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="NonSwitchBoolean"/> structure.
@@ -34,8 +38,133 @@ public struct NonSwitchBoolean
     /// </value>
     public bool Value { get; set; }
 
-    // TODO: Use custom converter so we can use ReadOnlyMemory<char> instead of string
-    public static NonSwitchBoolean Parse(string value) => new NonSwitchBoolean(bool.Parse(value));
+    /// <summary>
+    /// Converts the specified string to a <see cref="NonSwitchBoolean"/> value.
+    /// </summary>
+    /// <param name="value">The string to convert.</param>
+    /// <returns>
+    /// <see langword="true"/> if <paramref name="value"/> is equivalent to <see cref="bool.TrueString"/>;
+    /// <see langword="false"/> if <paramref name="value"/> is equivalent to <see cref="bool.FalseString"/>.
+    /// </returns>
+    /// <exception cref="ArgumentNullException">
+    /// <paramref name="value"/> is <see langword="null"/>.
+    /// </exception>
+    /// <exception cref="FormatException">
+    /// <paramref name="value"/> is not a valid boolean value.
+    /// </exception>
+    /// <remarks>
+    /// <para>
+    ///   This method uses the <see cref="bool.Parse(string)" qualifyHint="true"/> method to perform
+    ///   the conversion.
+    /// </para>
+    /// </remarks>
+    public static NonSwitchBoolean Parse(string value) => new(bool.Parse(value));
+
+    /// <summary>
+    /// Tries to convert the specified string to a <see cref="NonSwitchBoolean"/> value.
+    /// </summary>
+    /// <param name="value">The string to convert.</param>
+    /// <param name="result">
+    /// If conversion was successful, receives <see langword="true"/> if <paramref name="value"/> is
+    /// equivalent to <see cref="bool.TrueString"/>; <see langword="false"/> if <paramref name="value"/>
+    /// is equivalent to <see cref="bool.FalseString"/>.
+    /// </param>
+    /// <returns>
+    /// <see langword="true"/> if the conversion was successful; otherwise, <see langword="false"/>.
+    /// </returns>
+    /// <remarks>
+    /// <para>
+    ///   This method uses the <see cref="bool.TryParse(string?, out bool)" qualifyHint="true"/>
+    ///   method to perform the conversion.
+    /// </para>
+    /// </remarks>
+    public static bool TryParse(
+#if NETSTANDARD2_1_OR_GREATER || NET6_0_OR_GREATER
+        [NotNullWhen(true)]
+#endif
+        string? value, out NonSwitchBoolean result)
+    {
+        if (bool.TryParse(value, out bool boolValue))
+        {
+            result = boolValue;
+            return true;
+        }
+
+        result = default;
+        return false;
+    }
+
+#if NET6_0_OR_GREATER
+
+    /// <summary>
+    /// Converts the specified string span to a <see cref="NonSwitchBoolean"/> value.
+    /// </summary>
+    /// <param name="value">The string span to convert.</param>
+    /// <returns>
+    /// <see langword="true"/> if <paramref name="value"/> is equivalent to <see cref="bool.TrueString"/>;
+    /// <see langword="false"/> if <paramref name="value"/> is equivalent to <see cref="bool.FalseString"/>.
+    /// </returns>
+    /// <exception cref="ArgumentNullException">
+    /// <paramref name="value"/> is <see langword="null"/>.
+    /// </exception>
+    /// <exception cref="FormatException">
+    /// <paramref name="value"/> is not a valid boolean value.
+    /// </exception>
+    /// <remarks>
+    /// <para>
+    ///   This method uses the <see cref="bool.Parse(ReadOnlySpan{char})" qualifyHint="true"/>
+    ///   method to perform the conversion.
+    /// </para>
+    /// </remarks>
+    public static NonSwitchBoolean Parse(ReadOnlySpan<char> value) => new(bool.Parse(value));
+
+    /// <summary>
+    /// Tries to convert the specified string span to a <see cref="NonSwitchBoolean"/> value.
+    /// </summary>
+    /// <param name="value">The string span to convert.</param>
+    /// <param name="result">
+    /// If conversion was successful, receives <see langword="true"/> if <paramref name="value"/> is
+    /// equivalent to <see cref="bool.TrueString"/>; <see langword="false"/> if <paramref name="value"/>
+    /// is equivalent to <see cref="bool.FalseString"/>.
+    /// </param>
+    /// <returns>
+    /// <see langword="true"/> if the conversion was successful; otherwise, <see langword="false"/>.
+    /// </returns>
+    /// <remarks>
+    /// <para>
+    ///   This method uses the <see cref="bool.TryParse(ReadOnlySpan{char}, out bool)" qualifyHint="true"/>
+    ///   method to perform the conversion.
+    /// </para>
+    /// </remarks>
+    public static bool TryParse(ReadOnlySpan<char> value, out NonSwitchBoolean result)
+    {
+        if (bool.TryParse(value, out bool boolValue))
+        {
+            result = boolValue;
+            return true;
+        }
+
+        result = default;
+        return false;
+    }
+
+#endif
+
+#if NET7_0_OR_GREATER
+
+    static NonSwitchBoolean ISpanParsable<NonSwitchBoolean>.Parse(ReadOnlySpan<char> s, IFormatProvider? provider)
+        => Parse(s);
+
+    static NonSwitchBoolean IParsable<NonSwitchBoolean>.Parse(string s, IFormatProvider? provider)
+        => Parse(s);
+
+    static bool ISpanParsable<NonSwitchBoolean>.TryParse(ReadOnlySpan<char> s, IFormatProvider? provider, out NonSwitchBoolean result)
+        => TryParse(s, out result);
+
+    static bool IParsable<NonSwitchBoolean>.TryParse([NotNullWhen(true)] string? s, IFormatProvider? provider, out NonSwitchBoolean result)
+        => TryParse(s, out result);
+
+#endif
 
     /// <summary>
     /// Converts a <see cref="NonSwitchBoolean"/> structure to a <see cref="Boolean"/>.
