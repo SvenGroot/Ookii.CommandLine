@@ -866,4 +866,8 @@ partial class TypeValueDescriptionArguments
 
     [CommandLineArgument]
     public CustomEnum Enum { get; set; }
+
+    [CommandLineArgument]
+    [ArgumentConverter(typeof(KeyValuePairConverter<string, int>))]
+    public KeyValuePair<NonSwitchBoolean, CustomEnum> Generic { get; set; }
 }

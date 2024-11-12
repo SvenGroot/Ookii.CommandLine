@@ -11,6 +11,7 @@ using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Xml.Linq;
 
 namespace Ookii.CommandLine;
 
@@ -1233,15 +1234,6 @@ public abstract class CommandLineArgument
     /// </exception>
     protected abstract CancelMode CallMethod(object? value);
 
-    /// <summary>
-    /// Determines the value description if one wasn't explicitly given.
-    /// </summary>
-    /// <param name="type">
-    /// The type to get the description for.
-    /// </param>
-    /// <returns>The value description, and optionally the attribute that defined it.</returns>
-    protected virtual (string, ValueDescriptionAttribute?) DetermineValueDescriptionForType(Type type) => GetFriendlyTypeName(type);
-
     private string DetermineValueDescription(Type? type = null)
     {
         var result = GetDefaultValueDescription(type);
@@ -1257,33 +1249,24 @@ public abstract class CommandLineArgument
             return $"{key}{DictionaryInfo.KeyValueSeparator}{value}";
         }
 
-        var (typeDescription, attribute) = DetermineValueDescriptionForType(type ?? ElementType);
-        if (attribute != null)
-        {
-            typeDescription = attribute.ValueDescription;
-        }
-
-        if (attribute == null || attribute.ApplyTransform)
-        {
-            typeDescription = Parser.Options.ValueDescriptionTransformOrDefault.Apply(typeDescription);
-        }
-
-        return typeDescription;
+        return GetFriendlyTypeName(type ?? ElementType);
     }
 
-    private (string, ValueDescriptionAttribute?) GetFriendlyTypeName(Type type)
+    private string GetFriendlyTypeName(Type type)
     {
         var attribute = type.GetCustomAttribute<ValueDescriptionAttribute>();
         if (attribute != null)
         {
-            return (attribute.ValueDescription, attribute);
+            return attribute.GetValueDescription(_parser.Options);
         }
 
-        // This is used to generate a value description from a type name if no custom value description was supplied.
+        // This is used to generate a value description from a type name if no custom value
+        // description was supplied.
+        var baseName = _parser.Options.ValueDescriptionTransformOrDefault.Apply(type.Name);
         if (type.IsGenericType)
         {
-            var name = new StringBuilder(type.FullName?.Length ?? 0);
-            name.Append(type.Name, 0, type.Name.IndexOf("`", StringComparison.Ordinal));
+            var name = new StringBuilder(type.FullName?.Length ?? type.Name.Length);
+            name.Append(baseName, 0, baseName.IndexOf('`'));
             name.Append('<');
             // AppendJoin is not supported in .Net Standard 2.0
             bool first = true;
@@ -1302,11 +1285,11 @@ public abstract class CommandLineArgument
             }
 
             name.Append('>');
-            return (name.ToString(), null);
+            return name.ToString();
         }
         else
         {
-            return (type.Name, null);
+            return baseName;
         }
     }
 

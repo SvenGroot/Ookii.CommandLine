@@ -557,17 +557,11 @@ internal class ParserGenerator
         if (keyType != null)
         {
             _builder.AppendLine($"KeyType = typeof({keyType.ToQualifiedName()}),");
-            _builder.AppendLine($"DefaultKeyDescription = {GetValueDescription(keyType)},");
         }
 
         if (valueType != null)
         {
             _builder.AppendLine($"ValueType = typeof({valueType.ToQualifiedName()}),");
-            _builder.AppendLine($"DefaultValueDescription = {GetValueDescription(valueType)},");
-        }
-        else
-        {
-            _builder.AppendLine($"DefaultValueDescription = {GetValueDescription(elementType)},");
         }
 
         AppendOptionalAttribute(attributes.MultiValueSeparator, "MultiValueSeparatorAttribute");
@@ -1102,17 +1096,5 @@ internal class ParserGenerator
         var model = _compilation.GetSemanticModel(syntax.SyntaxTree);
         var symbol = model.GetSymbolInfo(syntax);
         return symbol.Symbol?.ToQualifiedName();
-    }
-
-    private string GetValueDescription(ITypeSymbol type)
-    {
-        var attribute = type.GetAttribute(_typeHelper.ValueDescriptionAttribute!);
-        if (attribute != null)
-        {
-            return $"(string.Empty, ({attribute.CreateInstantiation()}))";
-        }
-
-        var valueDescriptionFormat = new SymbolDisplayFormat(genericsOptions: SymbolDisplayGenericsOptions.IncludeTypeParameters);
-        return $"(\"{type.ToDisplayString(valueDescriptionFormat)}\", null)";
     }
 }
