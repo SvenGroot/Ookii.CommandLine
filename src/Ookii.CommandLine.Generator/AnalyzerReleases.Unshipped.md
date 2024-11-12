@@ -5,7 +5,7 @@
 
 ### New Rules
 
-Rule ID | Category | Severity | Notes
---------|----------|----------|-------
-OCL0043 | Ookii.CommandLine | Error | CategoryNotEnum
-OCL0044 | Ookii.CommandLine | Error | MismatchedCategoryType
+Rule ID | Category          | Severity | Notes
+--------|-------------------|----------|-----------------------
+OCL0043 | Ookii.CommandLine | Error    | CategoryNotEnum
+OCL0044 | Ookii.CommandLine | Error    | MismatchedCategoryType
