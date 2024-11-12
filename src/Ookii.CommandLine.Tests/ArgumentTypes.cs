@@ -833,3 +833,33 @@ partial class DefaultCategoryArguments
     [Description("Baz description.")]
     public string Baz { get; set; }
 }
+
+[ValueDescription("MyEnum")]
+enum CustomEnum
+{
+    Value1,
+    Value2
+}
+
+[GeneratedParser]
+partial class TypeValueDescriptionArguments
+{
+    [CommandLineArgument]
+    public NonSwitchBoolean NonSwitch { get; set; }
+
+    [CommandLineArgument]
+    public NonSwitchBoolean? Nullable { get; set; }
+
+    [CommandLineArgument]
+    public NonSwitchBoolean[] Array { get; set; }
+
+    [CommandLineArgument]
+    public Dictionary<string, NonSwitchBoolean> Dict { get; set; }
+
+    [CommandLineArgument]
+    [ValueDescription("Other")]
+    public NonSwitchBoolean Overridden { get; set; }
+
+    [CommandLineArgument]
+    public CustomEnum Enum { get; set; }
+}

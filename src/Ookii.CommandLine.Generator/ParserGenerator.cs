@@ -533,7 +533,6 @@ internal class ParserGenerator
             return false;
         }
 
-        var typeValueDescription = elementType.GetAttribute(_typeHelper.ValueDescriptionAttribute!);
         if (isDictionary)
         {
             _builder.AppendLine($"yield return new Ookii.CommandLine.Support.GeneratedDictionaryArgument<{keyType!.ToQualifiedName()}, {valueType!.ToQualifiedName()}>(");
@@ -555,26 +554,25 @@ internal class ParserGenerator
         _builder.AppendLine($"Attribute = {attributes.CommandLineArgument.CreateInstantiation()},");
         _builder.AppendLine($"Converter = {converter},");
         _builder.AppendLine($"AllowsNull = {allowsNull.ToCSharpString()},");
-        var valueDescriptionFormat = new SymbolDisplayFormat(genericsOptions: SymbolDisplayGenericsOptions.IncludeTypeParameters);
         if (keyType != null)
         {
             _builder.AppendLine($"KeyType = typeof({keyType.ToQualifiedName()}),");
-            _builder.AppendLine($"DefaultKeyDescription = \"{keyType.ToDisplayString(valueDescriptionFormat)}\",");
+            _builder.AppendLine($"DefaultKeyDescription = {GetValueDescription(keyType)},");
         }
 
         if (valueType != null)
         {
             _builder.AppendLine($"ValueType = typeof({valueType.ToQualifiedName()}),");
-            _builder.AppendLine($"DefaultValueDescription = \"{valueType.ToDisplayString(valueDescriptionFormat)}\",");
+            _builder.AppendLine($"DefaultValueDescription = {GetValueDescription(valueType)},");
         }
         else
         {
-            _builder.AppendLine($"DefaultValueDescription = \"{elementType.ToDisplayString(valueDescriptionFormat)}\",");
+            _builder.AppendLine($"DefaultValueDescription = {GetValueDescription(elementType)},");
         }
 
         AppendOptionalAttribute(attributes.MultiValueSeparator, "MultiValueSeparatorAttribute");
         AppendOptionalAttribute(attributes.Description, "DescriptionAttribute");
-        AppendOptionalAttribute(attributes.ValueDescription ?? typeValueDescription, "ValueDescriptionAttribute");
+        AppendOptionalAttribute(attributes.ValueDescription, "ValueDescriptionAttribute");
         if (attributes.AllowDuplicateDictionaryKeys != null)
         {
             _builder.AppendLine("AllowDuplicateDictionaryKeys = true,");
@@ -1104,5 +1102,17 @@ internal class ParserGenerator
         var model = _compilation.GetSemanticModel(syntax.SyntaxTree);
         var symbol = model.GetSymbolInfo(syntax);
         return symbol.Symbol?.ToQualifiedName();
+    }
+
+    private string GetValueDescription(ITypeSymbol type)
+    {
+        var attribute = type.GetAttribute(_typeHelper.ValueDescriptionAttribute!);
+        if (attribute != null)
+        {
+            return $"({attribute.CreateInstantiation()}).ValueDescription";
+        }
+
+        var valueDescriptionFormat = new SymbolDisplayFormat(genericsOptions: SymbolDisplayGenericsOptions.IncludeTypeParameters);
+        return $"\"{type.ToDisplayString(valueDescriptionFormat)}\"";
     }
 }

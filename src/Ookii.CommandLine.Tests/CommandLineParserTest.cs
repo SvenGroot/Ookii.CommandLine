@@ -1646,6 +1646,22 @@ public partial class CommandLineParserTest
         Assert.IsTrue(eventRaised);
     }
 
+    [TestMethod]
+    [DynamicData(nameof(ProviderKinds), DynamicDataDisplayName = nameof(GetCustomDynamicDataDisplayName))]
+    public void TestTypeValueDescription(ProviderKind kind)
+    {
+        var parser = CreateParser<TypeValueDescriptionArguments>(kind);
+        VerifyArgument(parser.GetArgument("NonSwitch")!, new ExpectedArgument("NonSwitch", typeof(NonSwitchBoolean)) { ValueDescription = "Boolean" });
+        VerifyArgument(parser.GetArgument("Nullable")!, new ExpectedArgument("Nullable", typeof(NonSwitchBoolean?)) { ValueDescription = "Boolean", ElementType = typeof(NonSwitchBoolean) });
+        VerifyArgument(parser.GetArgument("Array")!, new ExpectedArgument("Array", typeof(NonSwitchBoolean[])) { ValueDescription = "Boolean", ElementType = typeof(NonSwitchBoolean), Kind = ArgumentKind.MultiValue });
+        VerifyArgument(parser.GetArgument("Dict")!, new ExpectedArgument("Dict", typeof(Dictionary<string, NonSwitchBoolean>)) { ValueDescription = "String=Boolean", ElementType = typeof(KeyValuePair<string, NonSwitchBoolean>), Kind = ArgumentKind.Dictionary });
+        VerifyArgument(parser.GetArgument("Overridden")!, new ExpectedArgument("Overridden", typeof(NonSwitchBoolean)) { ValueDescription = "Other" });
+        VerifyArgument(parser.GetArgument("Enum")!, new ExpectedArgument("Enum", typeof(CustomEnum)) { ValueDescription = "MyEnum" });
+
+        // TODO: Test name transform
+        // TODO: Test override with DefaultValueDescriptions in options
+    }
+
     private class ExpectedArgument
     {
         public ExpectedArgument(string name, Type type, ArgumentKind kind = ArgumentKind.SingleValue)

@@ -1263,6 +1263,12 @@ public abstract class CommandLineArgument
 
     private static string GetFriendlyTypeName(Type type)
     {
+        var attribute = type.GetCustomAttribute<ValueDescriptionAttribute>();
+        if (attribute != null)
+        {
+            return attribute.ValueDescription;
+        }
+
         // This is used to generate a value description from a type name if no custom value description was supplied.
         if (type.IsGenericType)
         {
