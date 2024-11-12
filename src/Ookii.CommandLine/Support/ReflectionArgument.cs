@@ -85,12 +85,7 @@ internal class ReflectionArgument : CommandLineArgument
             parameters[index] = Parser;
         }
 
-        return info.Method.Invoke(null, parameters) switch
-        {
-            CancelMode mode => mode,
-            false => CancelMode.Abort,
-            _ => CancelMode.None
-        };
+        return (CancelMode?)info.Method.Invoke(null, parameters) ?? CancelMode.None;
     }
 
     private protected override IValueHelper CreateDictionaryValueHelper()
@@ -389,7 +384,7 @@ internal class ReflectionArgument : CommandLineArgument
     {
         var parameters = method.GetParameters();
         if (!method.IsStatic ||
-            (method.ReturnType != typeof(bool) && method.ReturnType != typeof(void) && method.ReturnType != typeof(CancelMode)) ||
+            (method.ReturnType != typeof(void) && method.ReturnType != typeof(CancelMode)) ||
             parameters.Length > 2)
         {
             return null;

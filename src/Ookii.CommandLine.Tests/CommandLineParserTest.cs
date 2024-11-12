@@ -923,16 +923,10 @@ public partial class CommandLineParserTest
     {
         var parser = CreateParser<MethodArguments>(kind);
 
-        Assert.AreEqual(ArgumentKind.Method, parser.GetArgument("NoCancel")!.Kind);
+        Assert.AreEqual(ArgumentKind.Method, parser.GetArgument("CancelWithHelp")!.Kind);
         Assert.IsNull(parser.GetArgument("NotAnArgument"));
         Assert.IsNull(parser.GetArgument("NotStatic"));
         Assert.IsNull(parser.GetArgument("NotPublic"));
-
-        CheckSuccess(parser, ["-NoCancel"]);
-        Assert.AreEqual(nameof(MethodArguments.NoCancel), MethodArguments.CalledMethodName);
-
-        CheckCanceled(parser, ["-Cancel", "Foo"], "Cancel", false, 1);
-        Assert.AreEqual(nameof(MethodArguments.Cancel), MethodArguments.CalledMethodName);
 
         CheckCanceled(parser, ["-CancelWithHelp"], "CancelWithHelp", true, 0);
         Assert.AreEqual(nameof(MethodArguments.CancelWithHelp), MethodArguments.CalledMethodName);

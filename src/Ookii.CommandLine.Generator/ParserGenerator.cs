@@ -13,7 +13,6 @@ internal class ParserGenerator
     private enum ReturnType
     {
         Void,
-        Boolean,
         CancelMode
     }
 
@@ -647,7 +646,6 @@ internal class ParserGenerator
             var methodCall = info.ReturnType switch
             {
                 ReturnType.CancelMode => $"CallMethod = (value, parser) => {_argumentsClass.ToQualifiedName()}.{member.Name}({arguments}),",
-                ReturnType.Boolean => $"CallMethod = (value, parser) => {_argumentsClass.ToQualifiedName()}.{member.Name}({arguments}) ? Ookii.CommandLine.CancelMode.None : Ookii.CommandLine.CancelMode.Abort,",
                 _ => $"CallMethod = (value, parser) => {{ {_argumentsClass.ToQualifiedName()}.{member.Name}({arguments}); return Ookii.CommandLine.CancelMode.None; }},"
             };
 
@@ -938,10 +936,6 @@ internal class ParserGenerator
         if (method.ReturnType.SymbolEquals(_typeHelper.CancelMode))
         {
             info.ReturnType = ReturnType.CancelMode;
-        }
-        else if (method.ReturnType.SpecialType == SpecialType.System_Boolean)
-        {
-            info.ReturnType = ReturnType.Boolean;
         }
         else if (method.ReturnType.SpecialType != SpecialType.System_Void)
         {

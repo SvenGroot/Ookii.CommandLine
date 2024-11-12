@@ -277,20 +277,6 @@ partial class MethodArguments
     public static int Value;
 
     [CommandLineArgument]
-    public static bool NoCancel()
-    {
-        CalledMethodName = nameof(NoCancel);
-        return true;
-    }
-
-    [CommandLineArgument]
-    public static bool Cancel()
-    {
-        CalledMethodName = nameof(Cancel);
-        return false;
-    }
-
-    [CommandLineArgument]
     public static CancelMode CancelModeAbort()
     {
         CalledMethodName = nameof(CancelModeAbort);
@@ -319,11 +305,11 @@ partial class MethodArguments
     }
 
     [CommandLineArgument]
-    public static bool CancelWithValue(int value)
+    public static CancelMode CancelWithValue(int value)
     {
         CalledMethodName = nameof(CancelWithValue);
         Value = value;
-        return value > 0;
+        return value > 0 ? CancelMode.None : CancelMode.Abort;
     }
 
     [CommandLineArgument]

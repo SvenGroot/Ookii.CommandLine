@@ -923,7 +923,7 @@ public class CommandLineParser
     ///   <see langword="null"/> if argument parsing was canceled by the <see cref="ArgumentParsed"/>
     ///   event handler, the <see cref="CommandLineArgumentAttribute.CancelParsing" qualifyHint="true"/>
     ///   property, or a method argument that returned <see cref="CancelMode.Abort" qualifyHint="true"/>
-    ///   or <see langword="false"/>.
+    ///   or <see cref="CancelMode.AbortWithHelp" qualifyHint="true"/>.
     /// </returns>
     /// <remarks>
     /// <para>
@@ -992,8 +992,9 @@ public class CommandLineParser
     /// <returns>
     ///   An instance of the type specified by the <see cref="ArgumentsType"/> property, or
     ///   <see langword="null"/> if an error occurred, or argument parsing was canceled by the
-    ///   <see cref="CommandLineArgumentAttribute.CancelParsing" qualifyHint="true"/> property or a method argument
-    ///   that returned <see cref="CancelMode.Abort" qualifyHint="true"/> or <see langword="false"/>.
+    ///   <see cref="CommandLineArgumentAttribute.CancelParsing" qualifyHint="true"/> property or a
+    ///   method argument that returned <see cref="CancelMode.Abort" qualifyHint="true"/> or
+    ///   <see cref="CancelMode.AbortWithHelp" qualifyHint="true"/>.
     /// </returns>
     /// <remarks>
     /// <para>

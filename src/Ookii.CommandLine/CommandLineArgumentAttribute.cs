@@ -22,10 +22,10 @@ namespace Ookii.CommandLine;
 ///   signatures:
 /// </para>
 /// <code>
-/// public static (void|bool|CancelMode) Method(ArgumentType value, CommandLineParser parser);
-/// public static (void|bool|CancelMode) Method(ArgumentType value);
-/// public static (void|bool|CancelMode) Method(CommandLineParser parser);
-/// public static (void|bool|CancelMode) Method();
+/// public static (void|CancelMode) Method(ArgumentType value, CommandLineParser parser);
+/// public static (void|CancelMode) Method(ArgumentType value);
+/// public static (void|CancelMode) Method(CommandLineParser parser);
+/// public static (void|CancelMode) Method();
 /// </code>
 /// <para>
 ///   In this case, the <c>ArgumentType</c> type determines the type of values the argument accepts. If there
@@ -37,10 +37,8 @@ namespace Ookii.CommandLine;
 ///   command line is complete.
 /// </para>
 /// <para>
-///   The return type must be either <see cref="void"/>, <see cref="bool"/> or <see cref="CancelMode"/>.
-///   Using <see cref="void"/> is equivalent to returning <see cref="CancelMode.None" qualifyHint="true"/>,
-///   and when using <see cref="bool"/>, returning <see langword="false"/> is equivalent to
-///   returning <see cref="CancelMode.Abort" qualifyHint="true"/>.
+///   The return type must be either <see cref="void"/> or <see cref="CancelMode"/>. Using
+///   <see cref="void"/> is equivalent to returning <see cref="CancelMode.None" qualifyHint="true"/>.
 /// </para>
 /// </remarks>
 /// <threadsafety static="true" instance="false"/>
