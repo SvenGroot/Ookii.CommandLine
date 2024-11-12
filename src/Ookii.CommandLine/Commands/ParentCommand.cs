@@ -288,7 +288,7 @@ public abstract class ParentCommand : ICommandWithCustomParsing, IAsyncCommand
             helpMode = parser.Options.ShowUsageOnError;
         }
 
-        if (parser.HelpRequested)
+        if (parser.ParseResult.HelpRequested)
         {
             parser.Options.UsageWriter.WriteParserUsage(parser, helpMode);
         }

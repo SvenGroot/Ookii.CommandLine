@@ -204,7 +204,7 @@ public abstract class CommandLineArgument
                 ElementType = typeof(bool),
                 Description = parser.StringProvider.AutomaticHelpDescription(),
                 MemberName = "AutomaticHelp",
-                CancelParsing = CancelMode.Abort,
+                CancelParsing = CancelMode.AbortWithHelp,
                 Validators = [],
                 Converter = BooleanConverter.Instance,
             };
@@ -228,7 +228,7 @@ public abstract class CommandLineArgument
             return info;
         }
 
-        protected override CancelMode CallMethod(object? value) => CancelMode.Abort;
+        protected override CancelMode CallMethod(object? value) => CancelMode.AbortWithHelp;
 
         protected override object? GetProperty(object target)
             => throw new InvalidOperationException(Properties.Resources.InvalidPropertyAccess);
@@ -1396,7 +1396,7 @@ public abstract class CommandLineArgument
                 PreValidate(value);
                 var converted = ConvertToArgumentType(culture, value);
                 cancelParsing = _valueHelper.SetValue(this, converted);
-                if (cancelParsing != CancelMode.Abort)
+                if (!cancelParsing.IsAborted())
                 {
                     PostValidate(converted);
                 }

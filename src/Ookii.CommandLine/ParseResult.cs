@@ -11,12 +11,13 @@ namespace Ookii.CommandLine;
 public readonly struct ParseResult
 {
     private ParseResult(ParseStatus status, CommandLineArgumentException? exception = null, string? argumentName = null,
-        ReadOnlyMemory<string> remainingArguments = default)
+        ReadOnlyMemory<string> remainingArguments = default, bool helpRequested = false)
     {
         Status = status;
         LastException = exception;
         ArgumentName = argumentName;
         RemainingArguments = remainingArguments;
+        HelpRequested = helpRequested;
     }
 
     /// <summary>
@@ -27,6 +28,34 @@ public readonly struct ParseResult
     /// One of the values of the <see cref="ParseStatus"/> enumeration.
     /// </value>
     public ParseStatus Status { get; }
+
+    /// <summary>
+    /// Gets a value that indicates whether usage help should be displayed if the
+    /// <see cref="CommandLineParser.Parse(string[])" qualifyHint="true"/> method returned
+    /// <see langword="null"/>.
+    /// </summary>
+    /// <value>
+    /// <see langword="true"/> if usage help should be displayed; otherwise, <see langword="false"/>.
+    /// </value>
+    /// <remarks>
+    /// <para>
+    ///   Check this property after parsing the command line arguments to see if usage help should
+    ///   be displayed.
+    /// </para>
+    /// <para>
+    ///   This property will always be <see langword="false"/> if the <see cref="Status"/>
+    ///   property is <see cref="ParseStatus.Success" qualifyHint="true"/>.
+    /// </para>
+    /// <para>
+    ///   This property will always be <see langword="true"/> if the parsing command line arguments
+    ///   threw a <see cref="CommandLineArgumentException"/>, or if an argument used
+    ///   <see cref="CancelMode.AbortWithHelp" qualifyHint="true"/> with the
+    ///   <see cref="CommandLineArgumentAttribute.CancelParsing" qualifyHint="true"/> property,
+    ///   the <see cref="CommandLineParser.ArgumentParsed" qualifyHint="true"/> event, or as the
+    ///   return value of a method argument.
+    /// </para>
+    /// </remarks>
+    public bool HelpRequested { get; }
 
     /// <summary>
     /// Gets the exception that occurred during the last call to the
@@ -102,17 +131,20 @@ public readonly struct ParseResult
     /// <paramref name="exception"/> is <see langword="null"/>.
     /// </exception>
     public static ParseResult FromException(CommandLineArgumentException exception, ReadOnlyMemory<string> remainingArguments)
-        => new(ParseStatus.Error, exception ?? throw new ArgumentNullException(nameof(exception)), exception.ArgumentName, remainingArguments: remainingArguments);
+        => new(ParseStatus.Error, exception ?? throw new ArgumentNullException(nameof(exception)), exception.ArgumentName,
+                remainingArguments: remainingArguments, helpRequested: true);
 
     /// <summary>
     /// Creates a <see cref="ParseResult"/> instance that represents canceled parsing.
     /// </summary>
     /// <param name="argumentName">The name of the argument that canceled parsing.</param>
     /// <param name="remainingArguments">Any remaining arguments that were not parsed.</param>
+    /// <param name="helpRequested">Indicates whether usage help should be shown to the user.</param>
     /// <returns>An instance of the <see cref="ParseResult"/> structure.</returns>
     /// <exception cref="ArgumentNullException">
     /// <paramref name="argumentName"/> is <see langword="null"/>.
     /// </exception>
-    public static ParseResult FromCanceled(string argumentName, ReadOnlyMemory<string> remainingArguments)
-        => new(ParseStatus.Canceled, null, argumentName ?? throw new ArgumentNullException(nameof(argumentName)), remainingArguments);
+    public static ParseResult FromCanceled(string argumentName, ReadOnlyMemory<string> remainingArguments, bool helpRequested)
+        => new(ParseStatus.Canceled, null, argumentName ?? throw new ArgumentNullException(nameof(argumentName)),
+                remainingArguments, helpRequested);
 }

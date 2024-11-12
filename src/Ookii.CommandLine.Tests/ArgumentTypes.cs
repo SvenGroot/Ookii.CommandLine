@@ -196,7 +196,7 @@ partial class CancelArguments
     [CommandLineArgument]
     public bool DoesNotCancel { get; set; }
 
-    [CommandLineArgument(CancelParsing = CancelMode.Abort)]
+    [CommandLineArgument(CancelParsing = CancelMode.AbortWithHelp)]
     public bool DoesCancel { get; set; }
 
     [CommandLineArgument(CancelParsing = CancelMode.Success)]
@@ -312,11 +312,10 @@ partial class MethodArguments
     }
 
     [CommandLineArgument]
-    public static bool CancelWithHelp(CommandLineParser parser)
+    public static CancelMode CancelWithHelp(CommandLineParser parser)
     {
         CalledMethodName = nameof(CancelWithHelp);
-        parser.HelpRequested = true;
-        return false;
+        return CancelMode.AbortWithHelp;
     }
 
     [CommandLineArgument]
@@ -328,13 +327,11 @@ partial class MethodArguments
     }
 
     [CommandLineArgument]
-    public static bool CancelWithValueAndHelp(int value, CommandLineParser parser)
+    public static CancelMode CancelWithValueAndHelp(int value, CommandLineParser parser)
     {
         CalledMethodName = nameof(CancelWithValueAndHelp);
         Value = value;
-        // This should be reset to false if parsing continues.
-        parser.HelpRequested = true;
-        return value > 0;
+        return value > 0 ? CancelMode.None : CancelMode.AbortWithHelp;
     }
 
     [CommandLineArgument]

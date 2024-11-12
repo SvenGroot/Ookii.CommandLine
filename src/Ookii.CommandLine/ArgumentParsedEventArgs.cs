@@ -47,8 +47,8 @@ public class ArgumentParsedEventArgs : EventArgs
     ///   an instance of the arguments class according to the <see cref="CancelMode"/> value.
     /// </para>
     /// <para>
-    ///   If you want usage help to be displayed after canceling, set the <see cref="CommandLineParser.HelpRequested" qualifyHint="true"/>
-    ///   property to <see langword="true"/>.
+    ///   If you want usage help to be displayed after canceling, set the value to
+    ///   <see cref="CancelMode.AbortWithHelp" qualifyHint="true"/>
     /// </para>
     /// </remarks>
     /// <seealso cref="CommandLineArgument.CancelParsing" qualifyHint="true"/>

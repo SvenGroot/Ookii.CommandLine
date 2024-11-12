@@ -44,7 +44,7 @@ public partial class Arguments
         dialog.Show();
 
         // Indicate parsing should be canceled and the application should exit. Because we didn't
-        // set the CommandLineParser.HelpRequested property, usage help will not be shown.
+        // return CancelMode.AbortWithHelp, usage help will not be shown.
         return CancelMode.Abort;
     }
 

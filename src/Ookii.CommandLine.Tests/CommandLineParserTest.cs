@@ -685,7 +685,7 @@ public partial class CommandLineParserTest
         // Don't cancel if -DoesCancel not specified.
         var result = parser.Parse(["-Argument1", "foo", "-DoesNotCancel", "-Argument2", "bar"]);
         Assert.IsNotNull(result);
-        Assert.IsFalse(parser.HelpRequested);
+        Assert.IsFalse(parser.ParseResult.HelpRequested);
         Assert.IsTrue(result.DoesNotCancel);
         Assert.IsFalse(result.DoesCancel);
         Assert.AreEqual("foo", result.Argument1);
@@ -697,7 +697,7 @@ public partial class CommandLineParserTest
         // Cancel if -DoesCancel specified.
         result = parser.Parse(["-Argument1", "foo", "-DoesCancel", "-Argument2", "bar"]);
         Assert.IsNull(result);
-        Assert.IsTrue(parser.HelpRequested);
+        Assert.IsTrue(parser.ParseResult.HelpRequested);
         Assert.AreEqual(ParseStatus.Canceled, parser.ParseResult.Status);
         Assert.IsNull(parser.ParseResult.LastException);
         AssertSpanEqual(["-Argument2", "bar"], parser.ParseResult.RemainingArguments.Span);
@@ -727,7 +727,7 @@ public partial class CommandLineParserTest
         Assert.IsNull(parser.ParseResult.LastException);
         Assert.AreEqual("DoesNotCancel", parser.ParseResult.ArgumentName);
         AssertSpanEqual(new[] { "-Argument2", "bar" }.AsSpan(), parser.ParseResult.RemainingArguments.Span);
-        Assert.IsFalse(parser.HelpRequested);
+        Assert.IsFalse(parser.ParseResult.HelpRequested);
         Assert.IsTrue(parser.GetArgument("Argument1")!.HasValue);
         Assert.AreEqual("foo", (string?)parser.GetArgument("Argument1")!.Value);
         Assert.IsTrue(parser.GetArgument("DoesNotCancel")!.HasValue);
@@ -743,7 +743,7 @@ public partial class CommandLineParserTest
         {
             if (e.Argument.ArgumentName == "DoesCancel")
             {
-                Assert.AreEqual(CancelMode.Abort, e.CancelParsing);
+                Assert.AreEqual(CancelMode.AbortWithHelp, e.CancelParsing);
                 e.CancelParsing = CancelMode.None;
             }
         }
@@ -754,7 +754,7 @@ public partial class CommandLineParserTest
         Assert.IsNull(parser.ParseResult.ArgumentName);
         Assert.AreEqual(0, parser.ParseResult.RemainingArguments.Length);
         Assert.IsNotNull(result);
-        Assert.IsFalse(parser.HelpRequested);
+        Assert.IsFalse(parser.ParseResult.HelpRequested);
         Assert.IsFalse(result.DoesNotCancel);
         Assert.IsTrue(result.DoesCancel);
         Assert.AreEqual("foo", result.Argument1);
@@ -767,7 +767,7 @@ public partial class CommandLineParserTest
         Assert.AreEqual("Help", parser.ParseResult.ArgumentName);
         Assert.AreEqual(0, parser.ParseResult.RemainingArguments.Length);
         Assert.IsNull(result);
-        Assert.IsTrue(parser.HelpRequested);
+        Assert.IsTrue(parser.ParseResult.HelpRequested);
     }
 
     [TestMethod]
@@ -780,7 +780,7 @@ public partial class CommandLineParserTest
         Assert.AreEqual("DoesCancelWithSuccess", parser.ParseResult.ArgumentName);
         AssertSpanEqual(new[] { "-Argument2", "bar" }.AsSpan(), parser.ParseResult.RemainingArguments.Span);
         Assert.IsNotNull(result);
-        Assert.IsFalse(parser.HelpRequested);
+        Assert.IsFalse(parser.ParseResult.HelpRequested);
         Assert.IsFalse(result.DoesNotCancel);
         Assert.IsFalse(result.DoesCancel);
         Assert.IsTrue(result.DoesCancelWithSuccess);
@@ -793,7 +793,7 @@ public partial class CommandLineParserTest
         Assert.AreEqual("DoesCancelWithSuccess", parser.ParseResult.ArgumentName);
         Assert.AreEqual(0, parser.ParseResult.RemainingArguments.Length);
         Assert.IsNotNull(result);
-        Assert.IsFalse(parser.HelpRequested);
+        Assert.IsFalse(parser.ParseResult.HelpRequested);
         Assert.IsFalse(result.DoesNotCancel);
         Assert.IsFalse(result.DoesCancel);
         Assert.IsTrue(result.DoesCancelWithSuccess);
@@ -1735,7 +1735,7 @@ public partial class CommandLineParserTest
         Assert.IsNull(target.ParseResult.LastException);
         Assert.IsNull(target.ParseResult.ArgumentName);
         Assert.AreEqual(0, target.ParseResult.RemainingArguments.Length);
-        Assert.IsFalse(target.HelpRequested);
+        Assert.IsFalse(target.ParseResult.HelpRequested);
         Assert.AreEqual(arg1, result.Arg1);
         Assert.AreEqual(arg2, result.Arg2);
         Assert.AreEqual(arg3, result.Arg3);
@@ -1787,7 +1787,7 @@ public partial class CommandLineParserTest
         }
         catch (CommandLineArgumentException ex)
         {
-            Assert.IsTrue(parser.HelpRequested);
+            Assert.IsTrue(parser.ParseResult.HelpRequested);
             Assert.AreEqual(ParseStatus.Error, parser.ParseResult.Status);
             Assert.AreEqual(ex, parser.ParseResult.LastException);
             Assert.AreEqual(ex.ArgumentName, parser.ParseResult.LastException!.ArgumentName);
@@ -1822,7 +1822,7 @@ public partial class CommandLineParserTest
         Assert.IsNull(parser.Parse(arguments));
         Assert.AreEqual(ParseStatus.Canceled, parser.ParseResult.Status);
         Assert.AreEqual(argumentName, parser.ParseResult.ArgumentName);
-        Assert.AreEqual(helpRequested, parser.HelpRequested);
+        Assert.AreEqual(helpRequested, parser.ParseResult.HelpRequested);
         Assert.IsNull(parser.ParseResult.LastException);
         var remaining = arguments.AsMemory(arguments.Length - remainingArgumentCount);
         AssertMemoryEqual(remaining, parser.ParseResult.RemainingArguments);
@@ -1833,7 +1833,7 @@ public partial class CommandLineParserTest
     {
         var result = parser.Parse(arguments);
         Assert.IsNotNull(result);
-        Assert.IsFalse(parser.HelpRequested);
+        Assert.IsFalse(parser.ParseResult.HelpRequested);
         Assert.AreEqual(ParseStatus.Success, parser.ParseResult.Status);
         Assert.AreEqual(argumentName, parser.ParseResult.ArgumentName);
         Assert.IsNull(parser.ParseResult.LastException);

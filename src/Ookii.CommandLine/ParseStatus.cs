@@ -23,7 +23,8 @@ public enum ParseStatus
     /// </summary>
     Error,
     /// <summary>
-    /// Parsing was canceled by one of the arguments using <see cref="CancelMode.Abort" qualifyHint="true"/>.
+    /// Parsing was canceled by one of the arguments using <see cref="CancelMode.Abort" qualifyHint="true"/>
+    /// or <see cref="CancelMode.AbortWithHelp" qualifyHint="true"/>
     /// </summary>
     Canceled
 }

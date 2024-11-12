@@ -15,6 +15,7 @@ public partial class App : Application
         // manually handle errors. The GeneratedParserAttribute generates a CreateParser() method
         // for this purpose.
         var parser = Arguments.CreateParser();
+        bool showHelp = true;
         try
         {
             var args = parser.Parse(e.Args);
@@ -46,11 +47,11 @@ public partial class App : Application
             // Don't show help unless the help button was used.
             if (button != helpButton)
             {
-                parser.HelpRequested = false;
+                showHelp = false;
             }
         }
 
-        if (parser.HelpRequested)
+        if (parser.ParseResult.HelpRequested && showHelp)
         {
             var help = new UsageWindow(parser);
             help.Show();
