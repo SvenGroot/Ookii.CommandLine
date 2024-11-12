@@ -75,7 +75,8 @@ public struct ArgumentCreationInfo
     /// <summary>
     /// Gets or sets the default value description.
     /// </summary>
-    public string DefaultValueDescription { get; set; }
+    /// <value></value>
+    public (string, ValueDescriptionAttribute?) DefaultValueDescription { get; set; }
 
     /// <summary>
     /// Gets or sets the implicit position if <see cref="CommandLineArgumentAttribute.IsPositional" qualityHint="true"/>
@@ -88,7 +89,7 @@ public struct ArgumentCreationInfo
     /// Gets or sets the default value description for the key type.
     /// </summary>
     /// <value></value>
-    public string? DefaultKeyDescription { get; set; }
+    public (string, ValueDescriptionAttribute?)? DefaultKeyDescription { get; set; }
 
     /// <summary>
     /// Gets or sets a value that indicates whether the argument was defined by a C# 11 required

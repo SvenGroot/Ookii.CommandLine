@@ -297,7 +297,7 @@ public abstract class CommandLineArgument
             Converter = info.Converter;
             ElementTypeWithNullable = info.ElementTypeWithNullable;
             Description = info.DescriptionAttribute?.Description;
-            ValueDescription = info.ValueDescriptionAttribute?.ValueDescription;
+            ValueDescription = info.ValueDescriptionAttribute;
             if (info.Position is int pos)
             {
                 Debug.Assert(info.Attribute.IsPositional && info.Attribute.Position < 0);
@@ -355,7 +355,7 @@ public abstract class CommandLineArgument
         public bool IncludeDefaultValueInHelp { get; set; }
         public string? DefaultValueFormat { get; set; }
         public string? Description { get; set; }
-        public string? ValueDescription { get; set; }
+        public ValueDescriptionAttribute? ValueDescription { get; set; }
         public bool AllowNull { get; set; }
         public CancelMode CancelParsing { get; set; }
         public bool IsHidden { get; set; }
@@ -383,7 +383,7 @@ public abstract class CommandLineArgument
     private readonly CancelMode _cancelParsing;
     private readonly bool _isHidden;
     private readonly IEnumerable<ArgumentValidationAttribute> _validators;
-    private string? _valueDescription;
+    private ValueDescriptionAttribute? _valueDescription;
     private IValueHelper? _valueHelper;
     private ReadOnlyMemory<char> _usedArgumentName;
 
@@ -837,7 +837,7 @@ public abstract class CommandLineArgument
     /// </remarks>
     /// <seealso cref="ValueDescriptionAttribute"/>
     /// <seealso cref="ParseOptions.DefaultValueDescriptions" qualifyHint="true"/>
-    public string ValueDescription => _valueDescription ??= DetermineValueDescription();
+    public string ValueDescription=> _valueDescription?.GetValueDescription(_parser.Options) ?? DetermineValueDescription();
 
     /// <summary>
     /// Gets a value indicating whether this argument is a switch argument.
@@ -1239,8 +1239,8 @@ public abstract class CommandLineArgument
     /// <param name="type">
     /// The type to get the description for.
     /// </param>
-    /// <returns>The value description.</returns>
-    protected virtual string DetermineValueDescriptionForType(Type type) => GetFriendlyTypeName(type);
+    /// <returns>The value description, and optionally the attribute that defined it.</returns>
+    protected virtual (string, ValueDescriptionAttribute?) DetermineValueDescriptionForType(Type type) => GetFriendlyTypeName(type);
 
     private string DetermineValueDescription(Type? type = null)
     {
@@ -1257,16 +1257,26 @@ public abstract class CommandLineArgument
             return $"{key}{DictionaryInfo.KeyValueSeparator}{value}";
         }
 
-        var typeName = DetermineValueDescriptionForType(type ?? ElementType);
-        return Parser.Options.ValueDescriptionTransformOrDefault.Apply(typeName);
+        var (typeDescription, attribute) = DetermineValueDescriptionForType(type ?? ElementType);
+        if (attribute != null)
+        {
+            typeDescription = attribute.ValueDescription;
+        }
+
+        if (attribute == null || attribute.ApplyTransform)
+        {
+            typeDescription = Parser.Options.ValueDescriptionTransformOrDefault.Apply(typeDescription);
+        }
+
+        return typeDescription;
     }
 
-    private static string GetFriendlyTypeName(Type type)
+    private (string, ValueDescriptionAttribute?) GetFriendlyTypeName(Type type)
     {
         var attribute = type.GetCustomAttribute<ValueDescriptionAttribute>();
         if (attribute != null)
         {
-            return attribute.ValueDescription;
+            return (attribute.ValueDescription, attribute);
         }
 
         // This is used to generate a value description from a type name if no custom value description was supplied.
@@ -1288,15 +1298,15 @@ public abstract class CommandLineArgument
                     name.Append(", ");
                 }
 
-                name.Append(GetFriendlyTypeName(typeArgument));
+                name.Append(DetermineValueDescription(typeArgument));
             }
 
             name.Append('>');
-            return name.ToString();
+            return (name.ToString(), null);
         }
         else
         {
-            return type.Name;
+            return (type.Name, null);
         }
     }
 

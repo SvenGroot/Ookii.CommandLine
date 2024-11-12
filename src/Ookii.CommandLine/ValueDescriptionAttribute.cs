@@ -15,6 +15,10 @@ namespace Ookii.CommandLine;
 ///   The value description is used when generating usage help. For example, the usage for an
 ///   argument named Sample with a value description of String would look like "-Sample &lt;String&gt;".
 /// </para>
+/// <note>
+///   This is not the long description used to describe the purpose of the argument. That can be set
+///   using the <see cref="DescriptionAttribute"/> attribute.
+/// </note>
 /// <para>
 ///   You can apply this attribute to a property or method defining an argument to set the value
 ///   description for that argument. You can also apply it to a type to set a default value
@@ -27,9 +31,8 @@ namespace Ookii.CommandLine;
 ///   <see cref="ParseOptionsAttribute.ValueDescriptionTransform" qualifyHint="true"/> property.
 /// </para>
 /// <para>
-///   If this attribute is applied to a property or method, the name transformation is not applied
-///   to the value description given by the attribute. However, when it is applied to a type, the
-///   name transformation is applied.
+///   If a custom value description is set using this attribute, the name transformation is not
+///   applied unless the <see cref="ApplyTransform"/> property is <see langword="true"/>.
 /// </para>
 /// <para>
 ///   If you want to override the value description for all arguments of a specific type, and
@@ -40,10 +43,6 @@ namespace Ookii.CommandLine;
 ///   You can derive from this attribute to use an alternative source for the value description,
 ///   such as a resource table that can be localized.
 /// </para>
-/// <note>
-///   This is not the long description used to describe the purpose of the argument. That can be set
-///   using the <see cref="DescriptionAttribute"/> attribute.
-/// </note>
 /// </remarks>
 /// <seealso cref="CommandLineArgument.ValueDescription" qualifyHint="true"/>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Method | AttributeTargets.Class | AttributeTargets.Struct
@@ -71,6 +70,18 @@ public class ValueDescriptionAttribute : Attribute
     public virtual string ValueDescription => ValueDescriptionValue;
 
     /// <summary>
+    /// Gets or sets a value that indicates whether the custom value description should be
+    /// transformed according to the <see cref="ParseOptions.ValueDescriptionTransform" qualifyHint="true"/>
+    /// property.
+    /// </summary>
+    /// <value>
+    /// <see langword="true"/> if the value description should be transformed; otherwise,
+    /// <see langword="false"/> to use the value description as-is. The default value is
+    /// <see langword="false"/>.
+    /// </value>
+    public bool ApplyTransform { get; set; }
+
+    /// <summary>
     /// Gets the value description stored in this attribute.
     /// </summary>
     /// <value>
@@ -83,4 +94,14 @@ public class ValueDescriptionAttribute : Attribute
     /// </para>
     /// </remarks>
     protected string ValueDescriptionValue { get; }
+
+    internal string GetValueDescription(ParseOptions options)
+    {
+        if (ApplyTransform)
+        {
+            return options.ValueDescriptionTransformOrDefault.Apply(ValueDescription);
+        }
+
+        return ValueDescription;
+    }
 }

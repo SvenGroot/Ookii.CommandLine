@@ -1109,10 +1109,10 @@ internal class ParserGenerator
         var attribute = type.GetAttribute(_typeHelper.ValueDescriptionAttribute!);
         if (attribute != null)
         {
-            return $"({attribute.CreateInstantiation()}).ValueDescription";
+            return $"(string.Empty, ({attribute.CreateInstantiation()}))";
         }
 
         var valueDescriptionFormat = new SymbolDisplayFormat(genericsOptions: SymbolDisplayGenericsOptions.IncludeTypeParameters);
-        return $"\"{type.ToDisplayString(valueDescriptionFormat)}\"";
+        return $"(\"{type.ToDisplayString(valueDescriptionFormat)}\", null)";
     }
 }

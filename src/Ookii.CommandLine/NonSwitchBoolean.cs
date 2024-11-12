@@ -17,7 +17,7 @@ namespace Ookii.CommandLine;
 ///   <see cref="Boolean"/>.
 /// </para>
 /// </remarks>
-[ValueDescription(nameof(Boolean))]
+[ValueDescription(nameof(Boolean), ApplyTransform = true)]
 public struct NonSwitchBoolean
 {
     /// <summary>

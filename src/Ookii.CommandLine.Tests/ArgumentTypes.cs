@@ -861,5 +861,9 @@ partial class TypeValueDescriptionArguments
     public NonSwitchBoolean Overridden { get; set; }
 
     [CommandLineArgument]
+    [ValueDescription("Other", ApplyTransform = true)]
+    public NonSwitchBoolean OverriddenTransform { get; set; }
+
+    [CommandLineArgument]
     public CustomEnum Enum { get; set; }
 }
