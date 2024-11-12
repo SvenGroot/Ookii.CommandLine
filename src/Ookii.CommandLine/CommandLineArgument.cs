@@ -1271,22 +1271,7 @@ public abstract class CommandLineArgument
             var name = new StringBuilder(type.FullName?.Length ?? type.Name.Length);
             name.Append(baseName, 0, baseName.IndexOf('`'));
             name.Append('<');
-            // AppendJoin is not supported in .Net Standard 2.0
-            bool first = true;
-            foreach (Type typeArgument in type.GetGenericArguments())
-            {
-                if (first)
-                {
-                    first = false;
-                }
-                else
-                {
-                    name.Append(", ");
-                }
-
-                name.Append(DetermineValueDescription(typeArgument));
-            }
-
+            name.AppendJoin(", ", type.GetGenericArguments().Select(DetermineValueDescription));
             name.Append('>');
             return name.ToString();
         }
