@@ -1262,6 +1262,9 @@ public abstract class CommandLineArgument
 
         // This is used to generate a value description from a type name if no custom value
         // description was supplied.
+        //
+        // This is also used with a generated parser, because the generator cannot check the
+        // DefaultValueDescriptions collection for the type arguments.
         var baseName = _parser.Options.ValueDescriptionTransformOrDefault.Apply(type.Name);
         if (type.IsGenericType)
         {
