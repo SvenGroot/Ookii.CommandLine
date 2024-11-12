@@ -533,6 +533,7 @@ internal class ParserGenerator
             return false;
         }
 
+        var typeValueDescription = elementType.GetAttribute(_typeHelper.ValueDescriptionAttribute!);
         if (isDictionary)
         {
             _builder.AppendLine($"yield return new Ookii.CommandLine.Support.GeneratedDictionaryArgument<{keyType!.ToQualifiedName()}, {valueType!.ToQualifiedName()}>(");
@@ -573,7 +574,7 @@ internal class ParserGenerator
 
         AppendOptionalAttribute(attributes.MultiValueSeparator, "MultiValueSeparatorAttribute");
         AppendOptionalAttribute(attributes.Description, "DescriptionAttribute");
-        AppendOptionalAttribute(attributes.ValueDescription, "ValueDescriptionAttribute");
+        AppendOptionalAttribute(attributes.ValueDescription ?? typeValueDescription, "ValueDescriptionAttribute");
         if (attributes.AllowDuplicateDictionaryKeys != null)
         {
             _builder.AppendLine("AllowDuplicateDictionaryKeys = true,");

@@ -68,7 +68,7 @@ public partial class CommandLineParserTest
         Assert.AreEqual(argumentsType, target.ArgumentsType);
         Assert.AreEqual("Friendly name", target.ApplicationFriendlyName);
         Assert.AreEqual("Test arguments description.", target.Description);
-        Assert.AreEqual(18, target.Arguments.Length);
+        Assert.AreEqual(19, target.Arguments.Length);
         VerifyArguments(target.Arguments,
         [
             new ExpectedArgument("arg1", typeof(string)) { MemberName = "Arg1", Position = 0, IsRequired = true, Description = "Arg1 description." },
@@ -88,6 +88,7 @@ public partial class CommandLineParserTest
             new ExpectedArgument("Arg7", typeof(bool)) { Position = null, IsSwitch = true, Aliases = ["Alias3"] },
             new ExpectedArgument("Arg9", typeof(int?)) { ElementType = typeof(int), Position = null, ValueDescription = "Int32" },
             new ExpectedArgument("Help", typeof(bool), ArgumentKind.Method) { MemberName = "AutomaticHelp", Description = "Displays this help message.", IsSwitch = true, Aliases = ["?", "h"] },
+            new ExpectedArgument("NotSwitch2", typeof(NonSwitchBoolean)) { ValueDescription = "Boolean", Description = "NotSwitch2 description." },
             new ExpectedArgument("Version", typeof(bool), ArgumentKind.Method) { MemberName = "AutomaticVersion", Description = "Displays version information.", IsSwitch = true },
         ]);
     }

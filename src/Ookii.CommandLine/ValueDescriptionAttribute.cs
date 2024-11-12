@@ -37,7 +37,8 @@ namespace Ookii.CommandLine;
 /// </note>
 /// </remarks>
 /// <seealso cref="CommandLineArgument.ValueDescription" qualifyHint="true"/>
-[AttributeUsage(AttributeTargets.Property | AttributeTargets.Method)]
+[AttributeUsage(AttributeTargets.Property | AttributeTargets.Method | AttributeTargets.Class | AttributeTargets.Struct
+    | AttributeTargets.Enum)]
 public class ValueDescriptionAttribute : Attribute
 {
     /// <summary>

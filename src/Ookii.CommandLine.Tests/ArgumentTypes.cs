@@ -101,6 +101,10 @@ partial class TestArguments
     [CommandLineArgument, ArgumentConverter(typeof(KeyValuePairConverter<string, int>))]
     public KeyValuePair<string, int> Arg15 { get; set; }
 
+    [CommandLineArgument]
+    [Description("NotSwitch2 description.")]
+    public NonSwitchBoolean NotSwitch2 { get; set; }
+
     public string NotAnArg { get; set; }
 
     [CommandLineArgument()]
