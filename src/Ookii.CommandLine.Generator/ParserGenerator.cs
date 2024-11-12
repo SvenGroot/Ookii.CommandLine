@@ -753,7 +753,7 @@ internal class ParserGenerator
         }
 
         if (attributes.ValidateEnumValue != null)
-        { 
+        {
             if (elementType.TypeKind != TypeKind.Enum)
             {
                 _context.ReportDiagnostic(Diagnostics.ValidateEnumInvalidType(member, elementType));

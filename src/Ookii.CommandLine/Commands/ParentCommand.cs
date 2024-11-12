@@ -71,7 +71,7 @@ public abstract class ParentCommand : ICommandWithCustomParsing, IAsyncCommand
         try
         {
             var childCommandName = args.Length == 0 ? null : args.Span[0];
-            (info, var possibleMatches) = childCommandName == null 
+            (info, var possibleMatches) = childCommandName == null
                 ? default
                 : manager.GetCommandOrPossibleMatches(childCommandName);
 

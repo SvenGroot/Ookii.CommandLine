@@ -307,7 +307,7 @@ public partial class CommandLineParserTest
         var target = CreateParser<TestArguments>(kind, options);
         var writer = new UsageWriter()
         {
-            ExecutableName = _executableName
+            ExecutableName = ExecutableName
         };
 
         string actual = target.GetUsage(writer);
@@ -321,7 +321,7 @@ public partial class CommandLineParserTest
         var target = CreateParser<LongShortArguments>(kind);
         var options = new UsageWriter()
         {
-            ExecutableName = _executableName
+            ExecutableName = ExecutableName
         };
 
         string actual = target.GetUsage(options);
@@ -333,7 +333,7 @@ public partial class CommandLineParserTest
 
         options = new UsageWriter()
         {
-            ExecutableName = _executableName,
+            ExecutableName = ExecutableName,
             UseAbbreviatedSyntax = true,
         };
 
@@ -348,7 +348,7 @@ public partial class CommandLineParserTest
         var target = CreateParser<TestArguments>(kind);
         var options = new UsageWriter()
         {
-            ExecutableName = _executableName,
+            ExecutableName = ExecutableName,
             ArgumentDescriptionListFilter = DescriptionListFilterMode.Description
         };
 
@@ -376,7 +376,7 @@ public partial class CommandLineParserTest
         CommandLineParser target = CreateParser<TestArguments>(kind, options);
         var writer = new UsageWriter(useColor: TriState.True)
         {
-            ExecutableName = _executableName,
+            ExecutableName = ExecutableName,
         };
 
         string actual = target.GetUsage(writer);
@@ -394,7 +394,7 @@ public partial class CommandLineParserTest
         var parser = CreateParser<LongShortArguments>(kind);
         var options = new UsageWriter()
         {
-            ExecutableName = _executableName,
+            ExecutableName = ExecutableName,
             ArgumentDescriptionListOrder = DescriptionListSortMode.Alphabetical,
         };
 
@@ -441,7 +441,7 @@ public partial class CommandLineParserTest
             ArgumentNamePrefixes = new[] { "/", "-" },
             UsageWriter = new UsageWriter()
             {
-                ExecutableName = _executableName,
+                ExecutableName = ExecutableName,
                 UseWhiteSpaceValueSeparator = false,
             }
         };
@@ -458,7 +458,7 @@ public partial class CommandLineParserTest
         {
             UsageWriter = new UsageWriter()
             {
-                ExecutableName = _executableName,
+                ExecutableName = ExecutableName,
                 ArgumentDescriptionIndent = 4,
             }
         };
@@ -475,7 +475,7 @@ public partial class CommandLineParserTest
         {
             UsageWriter = new UsageWriter()
             {
-                ExecutableName = _executableName,
+                ExecutableName = ExecutableName,
             }
         };
 
@@ -491,7 +491,7 @@ public partial class CommandLineParserTest
         using var writer = LineWrappingTextWriter.ForStringWriter(80);
         var usageWriter = new UsageWriter(writer)
         {
-            ExecutableName = _executableName,
+            ExecutableName = ExecutableName,
         };
 
         target.WriteUsage(usageWriter);
@@ -512,7 +512,7 @@ public partial class CommandLineParserTest
         {
             UsageWriter = new UsageWriter()
             {
-                ExecutableName = _executableName,
+                ExecutableName = ExecutableName,
             }
         };
 
@@ -534,7 +534,7 @@ public partial class CommandLineParserTest
         {
             UsageWriter = new CustomUsageWriter()
             {
-                ExecutableName = _executableName
+                ExecutableName = ExecutableName
             },
         };
 
@@ -551,7 +551,7 @@ public partial class CommandLineParserTest
         {
             UsageWriter = new UsageWriter(useColor: TriState.True)
             {
-                ExecutableName = _executableName
+                ExecutableName = ExecutableName
             },
         };
 
@@ -568,7 +568,7 @@ public partial class CommandLineParserTest
         {
             UsageWriter = new UsageWriter()
             {
-                ExecutableName = _executableName
+                ExecutableName = ExecutableName
             },
         };
 
@@ -591,7 +591,7 @@ public partial class CommandLineParserTest
             ShowUsageOnError = UsageHelpRequest.Full,
             UsageWriter = new UsageWriter(lineWriter)
             {
-                ExecutableName = _executableName,
+                ExecutableName = ExecutableName,
             }
         };
 
@@ -659,7 +659,7 @@ public partial class CommandLineParserTest
             Error = error,
             UsageWriter = new UsageWriter(lineWriter, TriState.True)
             {
-                ExecutableName = _executableName,
+                ExecutableName = ExecutableName,
             }
         };
 
@@ -1042,7 +1042,7 @@ public partial class CommandLineParserTest
         // Verify it's not in the usage.
         var options = new UsageWriter()
         {
-            ExecutableName = _executableName,
+            ExecutableName = ExecutableName,
             ArgumentDescriptionListFilter = DescriptionListFilterMode.All,
         };
 
@@ -1291,7 +1291,7 @@ public partial class CommandLineParserTest
         CommandLineParser parser = CreateParser<ValidationArguments>(kind);
         var options = new UsageWriter()
         {
-            ExecutableName = _executableName,
+            ExecutableName = ExecutableName,
         };
 
         Assert.AreEqual(_expectedUsageValidators, parser.GetUsage(options));

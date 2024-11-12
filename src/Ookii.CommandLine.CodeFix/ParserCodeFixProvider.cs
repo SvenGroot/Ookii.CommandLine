@@ -42,13 +42,13 @@ public class ParserCodeFixProvider : CodeFixProvider
     {
         var attr = SyntaxFactory.Attribute(SyntaxFactory.IdentifierName("GeneratedParser"));
         var attrList = SyntaxFactory.AttributeList(SyntaxFactory.SingletonSeparatedList(attr));
-        
+
         // Add the attribute.
         var newDeclaration = declaration.AddAttributeLists(attrList);
 
         // Add partial keyword if not already there.
         if (!newDeclaration.Modifiers.Any(m => m.IsKind(SyntaxKind.PartialKeyword)))
-        { 
+        {
             newDeclaration = newDeclaration.AddModifiers(SyntaxFactory.Token(SyntaxKind.PartialKeyword));
         }
 

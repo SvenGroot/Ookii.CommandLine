@@ -730,7 +730,7 @@ public class UsageWriter
     /// A <see cref="WriteCommandListUsage"/> operation is not in progress.
     /// </exception>
     protected LocalizedStringProvider StringProvider
-        => _parser?.StringProvider ?? _commandManager?.Options.StringProvider 
+        => _parser?.StringProvider ?? _commandManager?.Options.StringProvider
             ?? throw new InvalidOperationException(Resources.UsageWriterPropertyNotAvailable);
 
     /// <summary>

@@ -26,9 +26,9 @@ public class ParserAnalyzer : DiagnosticAnalyzer
         var symbol = (INamedTypeSymbol)context.Symbol;
         var tree = symbol.Locations[0].SourceTree;
         var languageVersion = (tree?.Options as CSharpParseOptions)?.LanguageVersion ?? LanguageVersion.CSharp1;
-        if (languageVersion < LanguageVersion.CSharp8 || 
-            symbol.IsAbstract || 
-            symbol.ContainingType != null || 
+        if (languageVersion < LanguageVersion.CSharp8 ||
+            symbol.IsAbstract ||
+            symbol.ContainingType != null ||
             symbol.IsGenericType ||
             !symbol.IsReferenceType)
         {

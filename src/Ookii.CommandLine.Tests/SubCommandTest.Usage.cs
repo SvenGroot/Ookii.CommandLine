@@ -2,7 +2,7 @@
 
 partial class SubCommandTest
 {
-    private const string _executableName = "test";
+    private const string ExecutableName = "test";
 
     public static readonly string _expectedUsage = @"Usage: test <command> [arguments]
 

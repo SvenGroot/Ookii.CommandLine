@@ -102,7 +102,7 @@ public partial class SubCommandTest
             Error = errorWriter,
             UsageWriter = new UsageWriter(writer)
             {
-                ExecutableName = _executableName,
+                ExecutableName = ExecutableName,
             }
         };
 
@@ -163,7 +163,7 @@ public partial class SubCommandTest
             Error = writer,
             UsageWriter = new UsageWriter(writer)
             {
-                ExecutableName = _executableName,
+                ExecutableName = ExecutableName,
             }
         };
 
@@ -182,7 +182,7 @@ public partial class SubCommandTest
             Error = writer,
             UsageWriter = new UsageWriter(writer, TriState.True)
             {
-                ExecutableName = _executableName,
+                ExecutableName = ExecutableName,
             }
         };
 
@@ -201,7 +201,7 @@ public partial class SubCommandTest
             Error = writer,
             UsageWriter = new UsageWriter(writer)
             {
-                ExecutableName = _executableName,
+                ExecutableName = ExecutableName,
                 IncludeCommandHelpInstruction = TriState.True,
             }
         };
@@ -223,7 +223,7 @@ public partial class SubCommandTest
             CommandFilter = c => !c.UseCustomArgumentParsing,
             UsageWriter = new UsageWriter(writer)
             {
-                ExecutableName = _executableName,
+                ExecutableName = ExecutableName,
                 IncludeCommandHelpInstruction = TriState.True,
             }
         };
@@ -244,7 +244,7 @@ public partial class SubCommandTest
             UsageWriter = new UsageWriter(writer)
             {
                 IncludeApplicationDescriptionBeforeCommandList = true,
-                ExecutableName = _executableName,
+                ExecutableName = ExecutableName,
             }
         };
 
@@ -263,7 +263,7 @@ public partial class SubCommandTest
             Error = writer,
             UsageWriter = new CustomUsageWriter(writer)
             {
-                ExecutableName = _executableName,
+                ExecutableName = ExecutableName,
             }
         };
 
@@ -283,7 +283,7 @@ public partial class SubCommandTest
             Error = errorWriter,
             UsageWriter = new UsageWriter(writer, TriState.True)
             {
-                ExecutableName = _executableName,
+                ExecutableName = ExecutableName,
             }
         };
 
@@ -313,7 +313,7 @@ public partial class SubCommandTest
             Error = writer,
             UsageWriter = new UsageWriter(writer)
             {
-                ExecutableName = _executableName,
+                ExecutableName = ExecutableName,
             }
         };
 
@@ -516,7 +516,7 @@ public partial class SubCommandTest
             ShowUsageOnError = UsageHelpRequest.Full,
             UsageWriter = new UsageWriter(writer)
             {
-                ExecutableName = _executableName,
+                ExecutableName = ExecutableName,
                 IncludeCommandHelpInstruction = TriState.True,
                 IncludeApplicationDescriptionBeforeCommandList = true,
             }

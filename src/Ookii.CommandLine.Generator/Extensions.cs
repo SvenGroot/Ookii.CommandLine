@@ -8,7 +8,7 @@ internal static class Extensions
 {
     // This is the format used to emit type names in the output. It includes the global namespace
     // so that this doesn't break if the class matches the namespace name.
-    private static readonly SymbolDisplayFormat QualifiedFormat = new(
+    private static readonly SymbolDisplayFormat _qualifiedFormat = new(
             globalNamespaceStyle: SymbolDisplayGlobalNamespaceStyle.Included,
             typeQualificationStyle: SymbolDisplayTypeQualificationStyle.NameAndContainingTypesAndNamespaces,
             genericsOptions: SymbolDisplayGenericsOptions.IncludeTypeParameters,
@@ -231,6 +231,6 @@ internal static class Extensions
 
     public static string ToQualifiedName(this ISymbol symbol)
     {
-        return symbol.ToDisplayString(QualifiedFormat);
+        return symbol.ToDisplayString(_qualifiedFormat);
     }
 }

@@ -20,7 +20,7 @@ partial class ReadCommand : AsyncCommandBase
             using var writer = LineWrappingTextWriter.ForConsoleOut();
 
             // Write the contents of the file to the console.
-            await foreach(var line in File.ReadLinesAsync(Program.Arguments!.Path.FullName, Program.Arguments.Encoding,
+            await foreach (var line in File.ReadLinesAsync(Program.Arguments!.Path.FullName, Program.Arguments.Encoding,
                 cancellationToken))
             {
                 await writer.WriteLineAsync(line);

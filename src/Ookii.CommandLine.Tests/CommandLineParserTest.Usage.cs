@@ -2,7 +2,7 @@
 
 partial class CommandLineParserTest
 {
-    private const string _executableName = "test";
+    private const string ExecutableName = "test";
 
     private static readonly string _expectedDefaultUsage = @"Test arguments description.
 

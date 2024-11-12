@@ -505,7 +505,7 @@ internal static class Diagnostics
     public static Diagnostic ParserShouldBeGenerated(ISymbol symbol)
         => Diagnostic.Create(
             ParserShouldBeGeneratedDescriptor,
-            symbol.Locations.FirstOrDefault(), 
+            symbol.Locations.FirstOrDefault(),
             symbol.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat));
 
     public static DiagnosticDescriptor ValidateEnumInvalidTypeDescriptor = CreateDiagnosticDescriptor(

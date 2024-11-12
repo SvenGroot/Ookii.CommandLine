@@ -15,7 +15,7 @@ using System.Net;
 #nullable disable
 
 // We deliberately have some properties and methods that cause warnings, so disable those.
-#pragma warning disable OCL0017,OCL0018,OCL0020,OCL0023,OCL0029,OCL0033,OCL0034,OCL0038,OCL0039,OCL0040
+#pragma warning disable OCL0017,OCL0018,OCL0020,OCL0023,OCL0029,OCL0033,OCL0034,OCL0038,OCL0039,OCL0040,IDE1006
 
 namespace Ookii.CommandLine.Tests;
 
@@ -29,8 +29,8 @@ partial class EmptyArguments
 [Description("Test arguments description.")]
 partial class TestArguments
 {
-    private readonly Collection<int> _arg12 = new Collection<int>();
-    private readonly Dictionary<string, int> _arg14 = new Dictionary<string, int>();
+    private readonly Collection<int> _arg12 = [];
+    private readonly Dictionary<string, int> _arg14 = [];
 
     [CommandLineArgument("arg1", Position = 1, IsRequired = true)]
     [Description("Arg1 description.")]

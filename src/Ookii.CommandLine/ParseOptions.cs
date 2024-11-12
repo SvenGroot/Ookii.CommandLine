@@ -764,7 +764,7 @@ public class ParseOptions
     ///   <see cref="ParseOptionsAttribute.PrefixTermination" qualifyHint="true"/> property.
     /// </para>
     /// </remarks>
-    public PrefixTerminationMode? PrefixTermination {  get; set; }
+    public PrefixTerminationMode? PrefixTermination { get; set; }
 
     /// <summary>
     /// Gets the behavior when an argument is encountered that consists of only the long argument

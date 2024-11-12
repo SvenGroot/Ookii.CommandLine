@@ -197,7 +197,7 @@ public class ValidateEnumValueAttribute : ArgumentValidationWithHelpAttribute
             foreach (var segment in value.Span.Split(",".AsSpan()))
             {
                 var trimmed = segment.TrimStart();
-                if (trimmed.Length > 0 && char.IsDigit(trimmed[0]) || 
+                if (trimmed.Length > 0 && char.IsDigit(trimmed[0]) ||
                     trimmed.StartsWith(argument.Parser.Culture.NumberFormat.NegativeSign.AsSpan()))
                 {
                     return false;

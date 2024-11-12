@@ -968,8 +968,8 @@ public class CommandLineParser
     /// <param name="args">The command line arguments.</param>
     public object? Parse(ReadOnlyMemory<string> args)
     {
-        var state = new ParseState() 
-        { 
+        var state = new ParseState()
+        {
             Parser = this,
             Arguments = args,
         };
@@ -1628,7 +1628,7 @@ public class CommandLineParser
 
         ParseResult = state.CancelParsing == CancelMode.None
             ? ParseResult.FromSuccess()
-            : ParseResult.FromSuccess(state.Argument?.ArgumentName ?? 
+            : ParseResult.FromSuccess(state.Argument?.ArgumentName ??
                 (state.ArgumentName.Length == 0 ? LongArgumentNamePrefix : state.ArgumentName.ToString()),
                 state.RemainingArguments);
 
@@ -1866,7 +1866,7 @@ public class CommandLineParser
                     state.Argument = null;
                     previousMatchedName = null;
                 }
-                
+
                 if (state.PossibleMatches?.Count > 0)
                 {
                     state.PossibleMatches.Add(matchedName);

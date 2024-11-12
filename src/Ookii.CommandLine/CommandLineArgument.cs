@@ -384,7 +384,7 @@ public abstract class CommandLineArgument
     private readonly CancelMode _cancelParsing;
     private readonly bool _isHidden;
     private readonly IEnumerable<ArgumentValidationAttribute> _validators;
-    private ValueDescriptionAttribute? _valueDescription;
+    private readonly ValueDescriptionAttribute? _valueDescription;
     private IValueHelper? _valueHelper;
     private ReadOnlyMemory<char> _usedArgumentName;
 
@@ -838,7 +838,7 @@ public abstract class CommandLineArgument
     /// </remarks>
     /// <seealso cref="ValueDescriptionAttribute"/>
     /// <seealso cref="ParseOptions.DefaultValueDescriptions" qualifyHint="true"/>
-    public string ValueDescription=> _valueDescription?.GetValueDescription(_parser.Options) ?? DetermineValueDescription();
+    public string ValueDescription => _valueDescription?.GetValueDescription(_parser.Options) ?? DetermineValueDescription();
 
     /// <summary>
     /// Gets a value indicating whether this argument is a switch argument.
