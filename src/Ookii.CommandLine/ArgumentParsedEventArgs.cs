@@ -26,10 +26,7 @@ public class ArgumentParsedEventArgs : EventArgs
     /// <value>
     /// The <see cref="CommandLineArgument"/> instance for the argument.
     /// </value>
-    public CommandLineArgument Argument
-    {
-        get { return _argument; }
-    }
+    public CommandLineArgument Argument => _argument;
 
     /// <summary>
     /// Gets a value that indicates whether parsing should be canceled when the event handler
@@ -48,7 +45,7 @@ public class ArgumentParsedEventArgs : EventArgs
     /// </para>
     /// <para>
     ///   If you want usage help to be displayed after canceling, set the value to
-    ///   <see cref="CancelMode.AbortWithHelp" qualifyHint="true"/>
+    ///   <see cref="CancelMode.AbortWithHelp" qualifyHint="true"/>.
     /// </para>
     /// </remarks>
     /// <seealso cref="CommandLineArgument.CancelParsing" qualifyHint="true"/>
