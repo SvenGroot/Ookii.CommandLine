@@ -1658,8 +1658,31 @@ public partial class CommandLineParserTest
         VerifyArgument(parser.GetArgument("Overridden")!, new ExpectedArgument("Overridden", typeof(NonSwitchBoolean)) { ValueDescription = "Other" });
         VerifyArgument(parser.GetArgument("Enum")!, new ExpectedArgument("Enum", typeof(CustomEnum)) { ValueDescription = "MyEnum" });
 
-        // TODO: Test name transform
-        // TODO: Test override with DefaultValueDescriptions in options
+        var options = new ParseOptions()
+        {
+            ValueDescriptionTransform = NameTransform.DashCase
+        };
+
+        parser = CreateParser<TypeValueDescriptionArguments>(kind, options);
+        VerifyArgument(parser.GetArgument("NonSwitch")!, new ExpectedArgument("NonSwitch", typeof(NonSwitchBoolean)) { ValueDescription = "boolean" });
+        VerifyArgument(parser.GetArgument("Nullable")!, new ExpectedArgument("Nullable", typeof(NonSwitchBoolean?)) { ValueDescription = "boolean", ElementType = typeof(NonSwitchBoolean) });
+        VerifyArgument(parser.GetArgument("Array")!, new ExpectedArgument("Array", typeof(NonSwitchBoolean[])) { ValueDescription = "boolean", ElementType = typeof(NonSwitchBoolean), Kind = ArgumentKind.MultiValue });
+        VerifyArgument(parser.GetArgument("Dict")!, new ExpectedArgument("Dict", typeof(Dictionary<string, NonSwitchBoolean>)) { ValueDescription = "string=boolean", ElementType = typeof(KeyValuePair<string, NonSwitchBoolean>), Kind = ArgumentKind.Dictionary });
+        VerifyArgument(parser.GetArgument("Overridden")!, new ExpectedArgument("Overridden", typeof(NonSwitchBoolean)) { ValueDescription = "Other" });
+        VerifyArgument(parser.GetArgument("Enum")!, new ExpectedArgument("Enum", typeof(CustomEnum)) { ValueDescription = "my-enum" });
+
+        options.DefaultValueDescriptions = new Dictionary<Type, string>()
+        {
+            { typeof(NonSwitchBoolean), "Other2" }
+        };
+
+        parser = CreateParser<TypeValueDescriptionArguments>(kind, options);
+        VerifyArgument(parser.GetArgument("NonSwitch")!, new ExpectedArgument("NonSwitch", typeof(NonSwitchBoolean)) { ValueDescription = "Other2" });
+        VerifyArgument(parser.GetArgument("Nullable")!, new ExpectedArgument("Nullable", typeof(NonSwitchBoolean?)) { ValueDescription = "Other2", ElementType = typeof(NonSwitchBoolean) });
+        VerifyArgument(parser.GetArgument("Array")!, new ExpectedArgument("Array", typeof(NonSwitchBoolean[])) { ValueDescription = "Other2", ElementType = typeof(NonSwitchBoolean), Kind = ArgumentKind.MultiValue });
+        VerifyArgument(parser.GetArgument("Dict")!, new ExpectedArgument("Dict", typeof(Dictionary<string, NonSwitchBoolean>)) { ValueDescription = "string=Other2", ElementType = typeof(KeyValuePair<string, NonSwitchBoolean>), Kind = ArgumentKind.Dictionary });
+        VerifyArgument(parser.GetArgument("Overridden")!, new ExpectedArgument("Overridden", typeof(NonSwitchBoolean)) { ValueDescription = "Other" });
+        VerifyArgument(parser.GetArgument("Enum")!, new ExpectedArgument("Enum", typeof(CustomEnum)) { ValueDescription = "my-enum" });
     }
 
     private class ExpectedArgument

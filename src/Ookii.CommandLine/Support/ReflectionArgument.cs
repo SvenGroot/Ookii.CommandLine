@@ -168,9 +168,6 @@ internal class ReflectionArgument : CommandLineArgument
         };
 
         DetermineArgumentKind(ref creationInfo, member);
-
-        // Now that we know the element type, we can check if it has a custom value description.
-        creationInfo.ValueDescriptionAttribute ??= creationInfo.ElementType.GetCustomAttribute<ValueDescriptionAttribute>();
         return new ReflectionArgument(new ArgumentInfo(creationInfo), property, method);
     }
 
