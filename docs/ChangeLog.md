@@ -1,5 +1,45 @@
 # What’s new in Ookii.CommandLine
 
+## Ookii.CommandLine 5.0 (TBD)
+
+**IMPORTANT:** Version 5.0 contains breaking changes. If you are upgrading from an earlier version,
+please check the [migration guide](Migrating.md).
+
+- Command line parsing improvements:
+  - Arguments using an enumeration type now only accept named values by default, and comma-separated
+    values are only accepted if the enumeration has the `FlagsAttribute`. These default can be
+    changed using the `ValidateEnumValueAttribute` attribute.
+  - [Argument validators](Validation.md) can now validate the value before string conversion, after
+    conversion, and after all arguments have been parsed in a single validator.
+  - You can use the helper type `NonSwitchBoolean` to create an argument that takes a boolean value,
+    but is not a switch argument.
+  - When an [automatic prefix alias](DefiningArguments.md#automatic-prefix-aliases) is used that is
+    ambiguous between multiple arguments or commands, a message is shown that lists the arguments it
+    could match.
+  - An error message is now shown when the user provides an unknown command name, along with the
+    usage help.
+- Usage help improvements:
+  - You can now easily group arguments into [categories](TODO) in the usage help.
+  - You can hide argument and command aliases from the usage help with the `AliasAttribute.IsHidden`
+    and `ShortAliasAttribute.IsHidden` properties.
+  - You can now apply the `ValueDescriptionAttribute` to a type, as well as to an individual argument.
+    This allows you to set a default description for a custom type you use for argument parsing.
+  - Custom value descriptions can opt-in to having [name transformation](DefiningArguments.md#name-transformation)
+    applied to the custom description, using the `ValueDescriptionAttribute.ApplyTransform` property.
+  - When an argument cancels parsing (e.g. using `CommandLineArgumentAttribute.CancelParsing`, or a
+    the return value of a method argument), it must now ask for usage help to be shown using
+    `CancelMode.AbortWithHelp` instead of using the `HelpRequested` property.
+- Improved and simplified some APIs:
+  - Custom argument converters now only have to implement a single method that takes a `ReadOnlyMemory<char>`,
+    instead of separate `string` and `ReadOnlySpan<char>` overloads.
+  - The `CommandAttribute` is no longer inherited by derived classes. Inheriting it didn't really make
+    sense unless no command name was set.
+  - Simplify the API for using a `CancellationToken` with `IAsyncCommand`.
+  - Some other small API cleanup.
+  - See the [migration guide](Migrating.md) for details on all API changes.
+- The .Net 8 SDK is now required for using source generation. As before, you can still target older
+  runtimes, as long as you build using .Net 8 or a newer SDK.
+
 ## Ookii.CommandLine 4.2 (2024-09-12)
 
 - The [helper methods](Utilities.md#virtual-terminal-support) in the [`VirtualTerminal`][] class now
@@ -253,15 +293,6 @@ existing application.
 - The LineWrappingTextWriter class provides support for writing word-wrapped text to any output
   stream, with greater flexibility than the SplitLines method provided in Ookii.CommandLine 1.0.
 - Targets .Net 2.0 for wider applicability.
-
-## Upgrading from Ookii.CommandLine 1.0
-
-Ookii.CommandLine 2.0 and newer versions have substantial changes from version 1.0 and are not
-designed to be backwards compatible. There are changes in argument parsing behavior and API names
-and usage.
-
-Upgrading an existing project that is using Ookii.CommandLine 1.0 to Ookii.CommandLine 2.0 or newer
-may require substantial code changes and may change how command lines are parsed.
 
 [`AllowCommaSeparatedValues`]: https://www.ookii.org/docs/commandline-4.2/html/P_Ookii_CommandLine_Validation_ValidateEnumValueAttribute_AllowCommaSeparatedValues.htm
 [`AllowNumericValues`]: https://www.ookii.org/docs/commandline-4.2/html/P_Ookii_CommandLine_Validation_ValidateEnumValueAttribute_AllowNumericValues.htm

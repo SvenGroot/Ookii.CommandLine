@@ -1,7 +1,10 @@
-# Migrating from Ookii.CommandLine 2.x / 3.x
+# Migrating from previous versions of Ookii.CommandLine
 
-Ookii.CommandLine 4.0 and later have a number of breaking changes from version 3.x and earlier
-versions. This article explains what you need to know to migrate your code to the new version.
+Ookii.CommandLine can introduce breaking changes when the major version number changes. This
+document outlines all the breaking changes in each major version.
+
+Minor version number or revision changes are guaranteed to not have any breaking changes from their
+corresponding major version release.
 
 Although there are quite a few changes, it's likely your application will not require many
 modifications unless you used subcommands, heavily customized the usage help format, or used
@@ -13,7 +16,90 @@ As of version 3.0, .Net Framework 2.0 is no longer supported. You can still targ
 4.6.1 and later using the .Net Standard 2.0 assembly. If you need to support an older version of
 .Net, please continue to use [version 2.4](https://github.com/SvenGroot/ookii.commandline/releases/tag/v2.4).
 
-## Breaking API changes from version 3.0
+## Ookii.CommandLine 5.0
+
+Version 5.0 was used as a cleanup release, tidying up the API and removing some elements that were
+left for compatibility. As a result, you may need to make some changes if you used certain features,
+though the scope of the changes is likely to be small.
+
+### Breaking API changes in version 5.0
+
+- The .Net 8 SDK is now required to use [source generation](SourceGeneration.md). You can still
+  target older runtimes, even when using source generation, as long as the project is built using
+  the .Net 8 or a newer SDK.
+- The `IAsyncCommand.RunAsync()` and `AsyncCommandBase.RunAsync()` methods now take a
+  `CancellationToken` as an argument. The `IAsyncCancelableCommand` interface has been removed.
+- The `ArgumentConverter` class now has a single `Convert(ReadOnlyMemory<char>)` method. The
+  `Convert(string)` and `Convert(ReadOnlySpan<char>)` overloads have been removed.
+  - This was done because `ReadOnlyMemory<char>.ToString()` does not allocate a new `string` if the
+    value represents an entire existing `string` object. Since the `CommandLineParser` always has
+    a `ReadOnlyMemory<char>` available for an argument value, there is no need for separate
+    overloads as an optimization.
+  - All built-in classes that derive from `ArgumentConverter` have been updated accordingly.
+- The `ArgumentValidationAttribute` now has separate `IsValidPreConversion()`,
+  `IsValidPostConversion()` and `IsValidPostParsing()` methods.
+  - The `ArgumentValidationAttribute.Mode` property and the `ValidationMode` enumeration
+    have been removed.
+  - To upgrade an existing custom validator, remove the `Mode` property and replace the `IsValid()`
+    method with the appropriate method corresponding to when you want to perform validation.
+  - All built-in validators have been upgraded accordingly.
+- The `CancelMode.AbortWithHelp` value was added to indicate usage help should be shown when parsing
+  is canceled.
+  - The `CommandLineArgumentAttribute.CancelParsing` attribute no longer shows help automatically
+    when using `CancelMode.Abort`; you must change them to `CancelMode.AbortWithHelp`.
+  - The `CommandLineParser.HelpRequested` property was moved to `ParseResult.HelpRequested`, and
+    can no longer be set by event handlers or method arguments. Change code that set this property
+    to return `CancelMode.AbortWithHelp` instead.
+- Method arguments using a `Boolean` return value are no longer allowed; only `void` and
+  `CancelMode` can be used as the return value. Change methods that returned a `Boolean` to return
+  `CancelMode`, and use `CancelMode.None` for `false`, `CancelMode.Abort` for `true`, and
+  `CancelMode.AbortWithHelp` if you returned `true` and also set the
+  `CommandLineParser.HelpRequested` property.
+- Several uses of `bool?` where the null value meant "automatic" have been replaced with a more
+  explicit `TriState` enumeration:
+  - The `UsageWriter` constructor.
+  - The `UsageWriter.IncludeCommandHelpInstruction` property.
+  - The `ParseOptions.UseErrorColor` property.
+  - The `ValidateEnumValueAttribute.AllowNonDefinedValues` and
+    `ValidateEnumValueAttribute.AllowCommaSeparatedValues` properties.
+- The `CommandAttribute` is no longer inherited by derived classes. Inheriting this attribute only
+  made sense if no explicit name was specified (otherwise you would have two commands with the same
+  name), and it is better to be explicit about which classes you wish to be commands. If you have
+  a class that derives from a command that is itself also a command, make sure you apply the
+  `CommandAttribute` to the derived class.
+- When the user uses a ambiguous prefix alias, an `AmbiguousPrefixAliasException` is thrown (this
+  exception derives from `CommandLineArgumentException`), with the category set to
+  `CommandLineArgumentErrorCategory.AmbiguousPrefixAlias`. Previously, these errors used
+  `CommandLineArgumentErrorCategory.UnknownArgument`.
+- The `CommandInfo.MatchesPrefix()` method was replaced with the `CommandInfo.MachingPrefix()`
+  method.
+- The `DuplicateArgumentEventArgs` class constructor takes a `ReadOnlyMemory<char>`, and other
+  overloads have been removed.
+- The signature of the `ParentCommand.OnDuplicateArgumentWarning()` method has been changed.
+- The signature of the `ParentCommand.OnChildCommandNotFound()` method has been changed.
+- The signature of the `UsageWriter.WriteAliases()` method has changed.
+- The type of the `CommandLineArgument.Aliases` and `CommandLineArgument.ShortAliases` property
+  has been changed.
+- The type of the `CommandInfo.Aliases` property has been changed.
+- Several function overloads have been replaced in favor of optional arguments.
+- Some internal types and members that were only maintained for binary compatibility have been
+  removed.
+
+### Breaking behavior changes in version 5.0
+
+- The default settings for the `ValidateEnumValueAttribute` have changed. Numeric values are now
+  not allowed by default, and comma-separated values and undefined values are only allowed by
+  default if the `FlagsAttribute` is present on the enumeration.
+  - The `EnumConverter` class now also applies these defaults if the argument has no
+    `ValidateEnumValueAttribute`.
+- The `ArgumentValidationAttribute.IsValidPostParsing()` method is called even if the argument has
+  no value. If you used a custom validator with `ValidationMode.AfterParsing`, be aware of this
+  difference and check the `CommandLineArgument.HasValue` property to determine if your validation
+  logic should be applied.
+
+## Ookii.CommandLine 4.0
+
+### Breaking API changes in version 4.0
 
 - It's strongly recommended to apply the [`GeneratedParserAttribute`][] to your arguments classes
   unless you cannot meet the requirements for [source generation](SourceGeneration.md).
@@ -67,7 +153,7 @@ As of version 3.0, .Net Framework 2.0 is no longer supported. You can still targ
 - [`TextFormat`][] is now a structure with strongly-typed values for VT sequences, and that structure is
   used by the [`UsageWriter`][] class for the various color formatting options.
 
-## Breaking behavior changes from version 3.0
+### Breaking behavior changes in version 4.0
 
 - By default, both `:` and `=` are accepted as argument name/value separators.
 - The default value of [`ParseOptions.ShowUsageOnError`][] has changed to [`UsageHelpRequest.SyntaxOnly`][].
@@ -78,7 +164,9 @@ As of version 3.0, .Net Framework 2.0 is no longer supported. You can still targ
   access modifiers, and to make sure generated and reflection-based command managers behave the
   same.
 
-## Breaking API changes from version 2.4
+## Ookii.CommandLine 3.0
+
+### Breaking API changes in version 3.0
 
 - It's strongly recommended to switch to the static [`CommandLineParser.Parse<T>()`][] method, if you
   were not already using it from version 2.4.
@@ -121,7 +209,7 @@ As of version 3.0, .Net Framework 2.0 is no longer supported. You can still targ
 - The [`CommandLineArgument.ElementType`][] property now returns the underlying type for arguments
   using the [`Nullable<T>`][] type.
 
-## Breaking behavior changes from version 2.4
+### Breaking behavior changes in version 3.0
 
 - Argument type conversion now defaults to [`CultureInfo.InvariantCulture`][], instead of
   [`CurrentCulture`][]. This change was made to ensure a consistent parsing experience regardless of the
@@ -136,6 +224,15 @@ As of version 3.0, .Net Framework 2.0 is no longer supported. You can still targ
 - Usage help uses color output by default (where supported).
 - The [`LineWrappingTextWriter`][] class does not count virtual terminal sequences as part of the
   line length by default.
+
+## Breaking changes in version 2.0
+
+Ookii.CommandLine 2.0 and newer versions have substantial changes from version 1.0 and are not
+designed to be backwards compatible. There are changes in argument parsing behavior and API names
+and usage.
+
+Upgrading an existing project that is using Ookii.CommandLine 1.0 to Ookii.CommandLine 2.0 or newer
+may require substantial code changes and may change how command lines are parsed.
 
 [`ArgumentConverter`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_Conversion_ArgumentConverter.htm
 [`ArgumentConverterAttribute`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_Conversion_ArgumentConverterAttribute.htm
