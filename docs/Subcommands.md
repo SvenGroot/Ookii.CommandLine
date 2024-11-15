@@ -673,7 +673,6 @@ detail.
 
 [`AliasAttribute`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_AliasAttribute.htm
 [`ApplicationFriendlyNameAttribute`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_ApplicationFriendlyNameAttribute.htm
-[`AsyncCommandBase.CancellationToken`]: https://www.ookii.org/docs/commandline-4.2/html/P_Ookii_CommandLine_Commands_AsyncCommandBase_CancellationToken.htm
 [`AsyncCommandBase`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_Commands_AsyncCommandBase.htm
 [`CancellationToken`]: https://learn.microsoft.com/dotnet/api/system.threading.cancellationtoken
 [`CancelMode.Success`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_CancelMode.htm
