@@ -934,15 +934,15 @@ partial class WriteCommand : AsyncCommandBase
 {
     /* Properties are unchanged */
 
-    public override async Task<int> RunAsync()
+    public override async Task<int> RunAsync(CancellationToken cancellationToken)
     {
         if (Append)
         {
-            await File.AppendAllLinesAsync(Path, Text);
+            await File.AppendAllLinesAsync(Path, Text, cancellationToken);
         }
         else
         {
-            await File.WriteAllLinesAsync(Path, Text);
+            await File.WriteAllLinesAsync(Path, Text, cancellationToken);
         }
 
         return 0;
@@ -959,6 +959,10 @@ However, to fully take advantage of asynchronous tasks, you'll want to replace t
 ```csharp
 return await manager.RunCommandAsync() ?? 1;
 ```
+
+This will actually run the "write" command in an asynchronous context. You can also pass a
+`CancellationToken` to the [`RunCommandAsync()`][] method, which will be forwarded to the
+[`RunAsync()`][RunAsync()_1] method.
 
 You'll notice that even with this change, the "read" command still works, despite not being
 asynchronous. That's because the [`RunCommandAsync()`][] supports both synchronous and asynchronous

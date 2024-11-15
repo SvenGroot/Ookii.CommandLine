@@ -156,18 +156,17 @@ partial class AsyncSleepCommand : AsyncCommandBase
     [Description("The sleep time in milliseconds.")]
     public int SleepTime { get; set; } = 1000;
 
-    public override async Task<int> RunAsync()
+    public override async Task<int> RunAsync(CancellationToken cancellationToken)
     {
-        await Task.Delay(SleepTime);
+        await Task.Delay(SleepTime, cancellationToken);
         return 0;
     }
 }
 ```
 
 To support cancellation, you can pass a [`CancellationToken`][] to the
-[`CommandManager.RunCommandAsync()`][] method. This token can be accessed by a command if it
-implements the [`IAsyncCancelableCommand`][] interface. If you use the [`AsyncCommandBase`][] class,
-the token is available using the [`AsyncCommandBase.CancellationToken`][] property.
+[`CommandManager.RunCommandAsync()`][] method. This token will be passed to the
+`IAsyncCommand.RunAsync()` method.
 
 ### Multiple commands with common arguments
 
@@ -265,7 +264,7 @@ class LaunchCommand : AsyncCommandBase, ICommandWithCustomParsing
         _args = args;
     }
 
-    public override async Task<int> RunAsync()
+    public override async Task<int> RunAsync(CancellationToken cancellationToken)
     {
         var info = new ProcessStartInfo("executable");
         if (_args != null)
@@ -279,7 +278,7 @@ class LaunchCommand : AsyncCommandBase, ICommandWithCustomParsing
         var process = Process.Start(info);
         if (process != null)
         {
-            await process.WaitForExitAsync();
+            await process.WaitForExitAsync(cancellationToken);
             return process.ExitCode;
         }
 
@@ -525,7 +524,7 @@ public static async Task<int> Main(string[] args)
             Console.Error.WriteLine(ex.Message);
         }
 
-        if (parser.HelpRequested)
+        if (parser.ParseResult.HelpRequested)
         {
             parser.WriteUsage();
         }
@@ -536,6 +535,7 @@ public static async Task<int> Main(string[] args)
     {
         if (command is IAsyncCommand asyncCommand)
         {
+            // If you have CancellationToken, pass it here.
             return await asyncCommand.RunAsync();
         }
 
@@ -699,7 +699,6 @@ detail.
 [`Environment.GetCommandLineArgs()`]: https://learn.microsoft.com/dotnet/api/system.environment.getcommandlineargs
 [`GeneratedCommandManagerAttribute`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_Commands_GeneratedCommandManagerAttribute.htm
 [`GeneratedParserAttribute`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_GeneratedParserAttribute.htm
-[`IAsyncCancelableCommand`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_Commands_IAsyncCancelableCommand.htm
 [`IAsyncCommand.RunAsync()`]: https://www.ookii.org/docs/commandline-4.2/html/M_Ookii_CommandLine_Commands_IAsyncCommand_RunAsync.htm
 [`IAsyncCommand`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_Commands_IAsyncCommand.htm
 [`ICommand.Run()`]: https://www.ookii.org/docs/commandline-4.2/html/M_Ookii_CommandLine_Commands_ICommand_Run.htm
