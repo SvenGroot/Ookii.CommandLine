@@ -160,7 +160,7 @@ partial class Arguments
 
 A method argument must use a supported signature.
 
-When using a method to define an argument, only [specific signatures](DefiningArguments.md#using-methods)
+When using a method to define an argument, only [specific signatures](DefiningArguments.md#using-static-methods)
 are allowed. This error indicates the method is not using one of the supported signatures; for
 example, it has additional parameters.
 

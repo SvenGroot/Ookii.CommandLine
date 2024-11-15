@@ -61,6 +61,8 @@ of the rules for valid arguments (such as defining an optional positional argume
 one). An exception from this method typically indicates a mistake in your arguments class. When
 using source generation, these kinds of errors are often caught at compile time.
 
+### Customizing the parse options
+
 You can customize various aspects of the parsing behavior using either the
 [`ParseOptionsAttribute`][], applied to your arguments class, or a [`ParseOptions`][] instance
 passed to the [`Parse()`][Parse()_7] method. The latter can be used to set a few options not available with the

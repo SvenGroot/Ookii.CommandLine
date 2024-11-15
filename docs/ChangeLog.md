@@ -39,6 +39,7 @@ please check the [migration guide](Migrating.md).
   - See the [migration guide](Migrating.md) for details on all API changes.
 - The .Net 8 SDK is now required for using source generation. As before, you can still target older
   runtimes, as long as you build using .Net 8 or a newer SDK.
+- Various bug fixes and minor improvements.
 
 ## Ookii.CommandLine 4.2 (2024-09-12)
 
@@ -196,7 +197,7 @@ existing application.
   - Added a [`Parse()`][Parse()_6] method overloads that takes arguments from [`Environment.GetCommandLineArgs()`][].
   - Added a generic [`CommandLineParser<T>`][] helper class, for easier usage when you don't want to use
     the static helper method.
-  - You can use [static methods to define arguments](DefiningArguments.md#using-methods).
+  - You can use [static methods to define arguments](DefiningArguments.md#using-static-methods).
   - Automatically add `-Help` and `-Version` arguments if not defined.
   - Optionally show a warning when duplicate arguments are supplied.
   - Optional support for [multi-value arguments](Arguments.md#arguments-with-multiple-values) that
