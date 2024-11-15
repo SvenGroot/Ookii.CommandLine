@@ -295,6 +295,111 @@ help will look like this:
         Other description.
 ```
 
+### Argument categories
+
+If you have an application with a large number of command line arguments, it can get hard to find
+specific functionality in the usage help. In that case, you may want to organize your usage help by
+grouping arguments into categories.
+
+To do this, you must create an enumeration that defines the possible categories. For example:
+
+```csharp
+enum ArgumentCategory
+{
+    [Description("The first category")]
+    First,
+    [Description("The second category")]
+    Second,
+    [Description("Other options")]
+    Other
+}
+```
+
+You can use any enumeration, and you can define as many categories as you like, with whatever names
+you like. The numerical values of the enumeration members determine the order of the categories in
+the help text.
+
+Apply the `DescriptionAttribute` to each member in the enumeration to set the text that will be used
+for the category header. If the `DescriptionAttribute` is not present, the name of the enumeration
+member will be used instead.
+
+To set the category for an argument, use the `CommandLineArgumentAttribute.Category` property.
+
+```csharp
+[GeneratedParser]
+partial class MyArguments
+{
+    [CommandLineArgument(Category = ArgumentCategory.First)]
+    [Description("Some argument in the first category.")]
+    public int Argument { get; set; }
+
+    [CommandLineArgument(Category = ArgumentCategory.Second)]
+    [Description("An argument in the second category.")]
+    public string SecondCategoryArgument { get; set; }
+
+    [CommandLineArgument(Category = ArgumentCategory.Second)]
+    [Description("Another argument in the second category.")]
+    public string OtherSecondCategoryArgument { get; set; }
+
+    [CommandLineArgument(Category = ArgumentCategory.Other)]
+    [Description("An argument in the other category.")]
+    public bool OtherArgument { get; set; }
+}
+```
+
+> [!NOTE]
+> The `CommandLineArgumentAttribute.Category` property has the type `object`, but it must be an
+> enumeration value. This was done because the type `Enum` is not allowed for use with attributes.
+
+The descriptions for these arguments would look like this:
+
+```text
+The first category
+
+    -Argument <Int32>
+        Some argument in the first category.
+
+The second category
+
+    -OtherSecondCategoryArgument <String>
+        Another argument in the second category.
+
+    -SecondCategoryArgument <String>
+        An argument in the second category.
+
+Other options
+
+    -OtherArgument <Boolean>
+        An argument in the other category.
+```
+
+Arguments in the same category will be grouped together, even if their properties or methods were
+not together in the arguments class. The arguments inside each category are sorted using the usual
+rules (positional arguments first, then named required, then optional, in alphabetical order by
+default).
+
+Arguments that have no category specified, as well as the automatic help and version arguments, will
+be shown above any arguments that do have a category. If you wish to include these arguments in a
+category, you can use the `ParseOptionsAttribute.DefaultCategory` property:
+
+```csharp
+[GeneratedParser]
+[ParseOption(DefaultCategory = ArgumentCategory.Other)]
+partial class MyArguments
+{
+}
+```
+
+This applies both to manually defined arguments with no explicit category, and the automatic help
+and version arguments, if they are present.
+
+> [!NOTE]
+> All arguments in a class, including those using the default category, must use the same
+> enumeration type for their category. This also includes any arguments defined in a base class.
+
+For a more complete example of arguments using categories, check out the
+[categories sample](../src/Samples/Categories).
+
 ## Hidden arguments
 
 Sometimes, you may want an argument to be available, but not easily discoverable. For example, if

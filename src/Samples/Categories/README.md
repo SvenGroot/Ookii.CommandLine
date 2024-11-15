@@ -1,8 +1,9 @@
 # Categories sample
 
 This sample shows how an application with a large number of command line arguments can use
-[argument categories](TODO) to group arguments together in the usage help. This makes the usage help
-more organized and makes it easier for the user to find the argument they are looking for.
+[argument categories](../../../docs/UsageHelp.md#argument-categories) to group arguments together in
+the usage help. This makes the usage help more organized and makes it easier for the user to find
+the argument they are looking for.
 
 The [arguments](Arguments.cs) used by this sample were taken from the
 [GenerateAnswerFile project](https://www.github.com/SvenGroot/GenerateAnswerFile). They have been

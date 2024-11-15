@@ -19,7 +19,8 @@ please check the [migration guide](Migrating.md).
   - An error message is now shown when the user provides an unknown command name, along with the
     usage help.
 - Usage help improvements:
-  - You can now easily group arguments into [categories](TODO) in the usage help.
+  - You can now easily group arguments into [categories](UsageHelp.md#argument-categories) in the
+    usage help.
   - You can hide argument and command aliases from the usage help with the `AliasAttribute.IsHidden`
     and `ShortAliasAttribute.IsHidden` properties.
   - You can now apply the `ValueDescriptionAttribute` to a type, as well as to an individual argument.
