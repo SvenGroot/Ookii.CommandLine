@@ -651,7 +651,6 @@ Next, we'll take a look at how to [parse the arguments we've defined](ParsingArg
 [`CommandLineArgumentAttribute.Position`]: https://www.ookii.org/docs/commandline-4.2/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_Position.htm
 [`CommandLineArgumentAttribute.ShortName`]: https://www.ookii.org/docs/commandline-4.2/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_ShortName.htm
 [`CommandLineArgumentAttribute`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_CommandLineArgumentAttribute.htm
-[`CommandLineParser.HelpRequested`]: https://www.ookii.org/docs/commandline-4.2/html/P_Ookii_CommandLine_CommandLineParser_HelpRequested.htm
 [`CommandLineParser`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_CommandLineParser.htm
 [`CommandLineParser<T>.Parse()`]: https://www.ookii.org/docs/commandline-4.2/html/Overload_Ookii_CommandLine_CommandLineParser_1_Parse.htm
 [`DefaultValue`]: https://www.ookii.org/docs/commandline-4.2/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_DefaultValue.htm
@@ -672,7 +671,6 @@ Next, we'll take a look at how to [parse the arguments we've defined](ParsingArg
 [`ParseOptionsAttribute`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_ParseOptionsAttribute.htm
 [`ParseResult.RemainingArguments`]: https://www.ookii.org/docs/commandline-4.2/html/P_Ookii_CommandLine_ParseResult_RemainingArguments.htm
 [`PrefixTerminationMode.CancelWithSuccess`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_PrefixTerminationMode.htm
-[`ReadOnlySpan<char>`]: https://learn.microsoft.com/dotnet/api/system.readonlyspan-1
 [`ShortAliasAttribute`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_ShortAliasAttribute.htm
 [`String`]: https://learn.microsoft.com/dotnet/api/system.string
 [`System.ComponentModel.DescriptionAttribute`]: https://learn.microsoft.com/dotnet/api/system.componentmodel.descriptionattribute
