@@ -40,6 +40,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TopLevelArguments", "Sample
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ookii.CommandLine.CodeFix", "Ookii.CommandLine.CodeFix\Ookii.CommandLine.CodeFix.csproj", "{09EC2A10-723C-4A80-B930-1DDDD22034C9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Categories", "Samples\Categories\Categories.csproj", "{36AB38DF-3064-4F9F-90D3-ABD7D4190DAE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -98,6 +100,10 @@ Global
 		{09EC2A10-723C-4A80-B930-1DDDD22034C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{09EC2A10-723C-4A80-B930-1DDDD22034C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{09EC2A10-723C-4A80-B930-1DDDD22034C9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{36AB38DF-3064-4F9F-90D3-ABD7D4190DAE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{36AB38DF-3064-4F9F-90D3-ABD7D4190DAE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{36AB38DF-3064-4F9F-90D3-ABD7D4190DAE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{36AB38DF-3064-4F9F-90D3-ABD7D4190DAE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -111,6 +117,7 @@ Global
 		{8717BF8D-9D9A-4DC6-8C03-B17F51D708CC} = {DC9CCD22-9B9B-4298-8C68-BC7A5A680F93}
 		{1D7E3B10-D99E-4DF9-9AB7-5DDFF61B275D} = {DC9CCD22-9B9B-4298-8C68-BC7A5A680F93}
 		{1FF02963-CECD-4C90-8C44-68F1B1CF5988} = {DC9CCD22-9B9B-4298-8C68-BC7A5A680F93}
+		{36AB38DF-3064-4F9F-90D3-ABD7D4190DAE} = {DC9CCD22-9B9B-4298-8C68-BC7A5A680F93}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {6E22AD53-E031-474F-8AC7-B247C4311820}

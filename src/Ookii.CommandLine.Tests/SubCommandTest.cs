@@ -620,7 +620,7 @@ public partial class SubCommandTest
 
     private record struct ExpectedCommand(string Name, Type? Type, bool CustomParsing = false, params string[]? Aliases)
     {
-        public Type ParentCommand { get; set; }
+        public Type? ParentCommand { get; set; }
     }
 
 
