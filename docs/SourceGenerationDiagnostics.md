@@ -982,11 +982,10 @@ of the argument to an enumeration type.
 An argument has the [`ArgumentConverterAttribute`][] set, and uses properties of the
 [`ValidateEnumValueAttribute`][] that may not be supported by a custom converter.
 
-The [`CaseSensitive`][CaseSensitive_1], [`AllowCommaSeparatedValues`][], and
-[`AllowNumericValues`][] properties of the [`ValidateEnumValueAttribute`][] attribute are not used
-by the [`ValidateEnumValueAttribute`][] attribute itself, but instead alter the behavior of the
-[`EnumConverter`][] class. If an argument uses a custom converter rather than the
-[`EnumConverter`][], it is not guaranteed that these properties will have any effect.
+The [`CaseSensitive`][CaseSensitive_1] property of the [`ValidateEnumValueAttribute`][] attribute is
+not used by the [`ValidateEnumValueAttribute`][] attribute itself, but instead alters the behavior
+of the [`EnumConverter`][] class. If an argument uses a custom converter rather than the
+[`EnumConverter`][], it is not guaranteed that this property will have any effect.
 
 For example, the following code triggers this warning:
 
@@ -1001,13 +1000,12 @@ class Arguments
 }
 ```
 
-To fix this warning, either use the default [`EnumConverter`][], or remove the properties. If the
-custom converter does check the value of those properties, you can disable this warning.
+To fix this warning, either use the default [`EnumConverter`][], or do not use the
+[`CaseSensitive`][] property. If the custom converter does check the value of that property, you can
+disable this warning.
 
 [`AliasAttribute`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_AliasAttribute.htm
-[`AllowCommaSeparatedValues`]: https://www.ookii.org/docs/commandline-4.2/html/P_Ookii_CommandLine_Validation_ValidateEnumValueAttribute_AllowCommaSeparatedValues.htm
 [`AllowDuplicateDictionaryKeysAttribute`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_AllowDuplicateDictionaryKeysAttribute.htm
-[`AllowNumericValues`]: https://www.ookii.org/docs/commandline-4.2/html/P_Ookii_CommandLine_Validation_ValidateEnumValueAttribute_AllowNumericValues.htm
 [`ApplicationFriendlyNameAttribute`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_ApplicationFriendlyNameAttribute.htm
 [`ArgumentConverter`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_Conversion_ArgumentConverter.htm
 [`ArgumentConverterAttribute`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_Conversion_ArgumentConverterAttribute.htm

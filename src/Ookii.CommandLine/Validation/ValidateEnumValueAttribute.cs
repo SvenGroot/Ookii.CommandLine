@@ -40,10 +40,10 @@ namespace Ookii.CommandLine.Validation;
 ///   <see langword="false"/>.
 /// </para>
 /// <para>
-///   If this validator is used without changing any of its properties, its only effect is to
-///   list the values in the usage help, unless the argument doesn't use the default
-///   <see cref="EnumConverter"/> class, since that converter has the same behavior as the
-///   defaults of this validator.
+///   If this validator is used without changing any of its properties on an argument that uses the
+///   default <see cref="EnumConverter"/>, its only effect is to list the values in the usage help.
+///   The default behavior of the <see cref="EnumConverter"/> class is the same as the defaults of
+///   this validator.
 /// </para>
 /// </remarks>
 /// <threadsafety static="true" instance="true"/>

@@ -758,10 +758,7 @@ internal class ParserGenerator
             {
                 _context.ReportDiagnostic(Diagnostics.ValidateEnumInvalidType(member, elementType));
             }
-            else if (attributes.Converter != null &&
-                (attributes.ValidateEnumValue.GetNamedArgument("CaseSensitive") != null ||
-                 attributes.ValidateEnumValue.GetNamedArgument("AllowCommaSeparatedValues") != null ||
-                 attributes.ValidateEnumValue.GetNamedArgument("AllowNumericValues") != null))
+            else if (attributes.Converter != null && attributes.ValidateEnumValue.GetNamedArgument("CaseSensitive") != null)
             {
                 _context.ReportDiagnostic(Diagnostics.ValidateEnumWithCustomConverter(member));
             }
