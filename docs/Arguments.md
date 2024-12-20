@@ -327,7 +327,7 @@ be used to indicate [`DayOfWeek.Monday`][].
 
 By default, you are still restricted to only the defined values of the enumeration even when
 using numeric values, unless the enumeration has the [`FlagsAttribute`][]. Use the
-`ValidateEnumValueAttribute.AllowNonDefinedValues` property to change this. In that case, for example
+[`ValidateEnumValueAttribute.AllowNonDefinedValues`][] property to change this. In that case, for example
 a value of "9" would be converted to `(DayOfWeek)9` even though there is no such value in the
 enumeration.
 
@@ -422,7 +422,7 @@ and case-sensitive argument names. For information on how to set these options,
 
 Next, let's take a look at how to [define arguments](DefiningArguments.md).
 
-[^1]: Any type that that can be assigned a `CultureInfo` value, such as `IFormatProvider`, is also
+[^1]: Any type that that can be assigned a [`CultureInfo`][] value, such as [`IFormatProvider`][], is also
    allowed for the second parameter of these methods.
 
 [`AllowDuplicateDictionaryKeysAttribute`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_AllowDuplicateDictionaryKeysAttribute.htm
@@ -439,6 +439,7 @@ Next, let's take a look at how to [define arguments](DefiningArguments.md).
 [`EnumConverter`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_Conversion_EnumConverter.htm
 [`FileInfo`]: https://learn.microsoft.com/dotnet/api/system.io.fileinfo
 [`FlagsAttribute`]: https://learn.microsoft.com/dotnet/api/system.flagsattribute
+[`IFormatProvider`]: https://learn.microsoft.com/dotnet/api/system.iformatprovider
 [`Int32`]: https://learn.microsoft.com/dotnet/api/system.int32
 [`IParsable<TSelf>`]: https://learn.microsoft.com/dotnet/api/system.iparsable-1
 [`ISpanParsable<TSelf>`]: https://learn.microsoft.com/dotnet/api/system.ispanparsable-1
@@ -461,6 +462,7 @@ Next, let's take a look at how to [define arguments](DefiningArguments.md).
 [`String`]: https://learn.microsoft.com/dotnet/api/system.string
 [`TypeConverter`]: https://learn.microsoft.com/dotnet/api/system.componentmodel.typeconverter
 [`Uri`]: https://learn.microsoft.com/dotnet/api/system.uri
+[`ValidateEnumValueAttribute.AllowNonDefinedValues`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_Validation_ValidateEnumValueAttribute_AllowNonDefinedValues.htm
 [`ValidateEnumValueAttribute.AllowNumericValues`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_Validation_ValidateEnumValueAttribute_AllowNumericValues.htm
 [`ValidateEnumValueAttribute.CaseSensitive`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_Validation_ValidateEnumValueAttribute_CaseSensitive.htm
 [`ValidateEnumValueAttribute`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_Validation_ValidateEnumValueAttribute.htm

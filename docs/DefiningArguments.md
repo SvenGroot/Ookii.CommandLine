@@ -183,7 +183,7 @@ This property will be null if the argument was not supplied, true if the argumen
 explicitly set to true with `-Switch:true`, and false only if the user supplied `-Switch:false`.
 
 If you want to define a named argument that takes a boolean value but is _not_ a switch argument,
-you can use the `NonSwitchBoolean` helper type. This creates a boolean argument that requires an
+you can use the [`NonSwitchBoolean`][] helper type. This creates a boolean argument that requires an
 explicit value, and can also use white space to separate the argument name and value
 (e.g. `-NonSwitch true`).
 
@@ -344,7 +344,7 @@ public int Argument { get; set; }
 The type specified must be derived from the [`ArgumentConverter`][] class.
 
 To create a custom converter, create a class that derives from the [`ArgumentConverter`][] class.
-Argument conversion uses the `ReadOnlyMemory<char>` type to represent the raw string value, so that
+Argument conversion uses the [`ReadOnlyMemory<char>`][] type to represent the raw string value, so that
 no string allocation is performed when not necessary.
 
 Previous versions of Ookii.CommandLine used .Net's [`TypeConverter`][] class. Starting with
@@ -377,8 +377,8 @@ and other parsing methods will return null.
 
 If you want to display usage help automatically when using the
 [`ParseWithErrorHandling()`][ParseWithErrorHandling()_1] and the static [`Parse<T>()`][Parse<T>()_1]
-helper methods, you should set it to `CancelMode.AbortWithHelp` instead. Using this value will
-also set the `ParseResult.HelpRequested` property to true after parsing finishes.
+helper methods, you should set it to [`CancelMode.AbortWithHelp`][] instead. Using this value will
+also set the [`ParseResult.HelpRequested`][] property to true after parsing finishes.
 
 This can be used, for example, to implement a custom `-Help` argument, if you don't wish to use the
 default one.
@@ -440,10 +440,10 @@ array, collection or dictionary type, unless you provide an [`ArgumentConverter`
 to that type.
 
 If you use one of the signatures with a [`CancelMode`][] return type, returning
-[`CancelMode.Abort`][], `CancelMode.AbortWithHelp`, or [`CancelMode.Success`][] will immediately
+[`CancelMode.Abort`][], [`CancelMode.AbortWithHelp`][], or [`CancelMode.Success`][] will immediately
 [cancel parsing](#arguments-that-cancel-parsing). Usage help is displayed automatically by the
 [`ParseWithErrorHandling()`][ParseWithErrorHandling()_1] and the static [`Parse<T>()`][Parse<T>()_1]
-helper methods if you return `CancelMode.AbortWithHelp`.
+helper methods if you return [`CancelMode.AbortWithHelp`][].
 
 ```csharp
 [CommandLineArgument]
@@ -639,6 +639,7 @@ Next, we'll take a look at how to [parse the arguments we've defined](ParsingArg
 [`ArgumentConverter`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_Conversion_ArgumentConverter.htm
 [`ArgumentConverterAttribute`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_Conversion_ArgumentConverterAttribute.htm
 [`CancelMode.Abort`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_CancelMode.htm
+[`CancelMode.AbortWithHelp`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_CancelMode.htm
 [`CancelMode.None`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_CancelMode.htm
 [`CancelMode.Success`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_CancelMode.htm
 [`CancelMode`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_CancelMode.htm
@@ -662,6 +663,7 @@ Next, we'll take a look at how to [parse the arguments we've defined](ParsingArg
 [`IsPositional`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_IsPositional.htm
 [`List<int>`]: https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1
 [`LocalizedStringProvider`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_LocalizedStringProvider.htm
+[`NonSwitchBoolean`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_NonSwitchBoolean.htm
 [`ParseOptions.ArgumentNameTransform`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_ParseOptions_ArgumentNameTransform.htm
 [`ParseOptions.AutoPrefixAliases`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_ParseOptions_AutoPrefixAliases.htm
 [`ParseOptions.PrefixTermination`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_ParseOptions_PrefixTermination.htm
@@ -669,8 +671,10 @@ Next, we'll take a look at how to [parse the arguments we've defined](ParsingArg
 [`ParseOptionsAttribute.AutoPrefixAliases`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_ParseOptionsAttribute_AutoPrefixAliases.htm
 [`ParseOptionsAttribute.PrefixTermination`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_ParseOptionsAttribute_PrefixTermination.htm
 [`ParseOptionsAttribute`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_ParseOptionsAttribute.htm
+[`ParseResult.HelpRequested`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_ParseResult_HelpRequested.htm
 [`ParseResult.RemainingArguments`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_ParseResult_RemainingArguments.htm
 [`PrefixTerminationMode.CancelWithSuccess`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_PrefixTerminationMode.htm
+[`ReadOnlyMemory<char>`]: https://learn.microsoft.com/dotnet/api/system.readonlymemory-1
 [`ShortAliasAttribute`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_ShortAliasAttribute.htm
 [`String`]: https://learn.microsoft.com/dotnet/api/system.string
 [`System.ComponentModel.DescriptionAttribute`]: https://learn.microsoft.com/dotnet/api/system.componentmodel.descriptionattribute

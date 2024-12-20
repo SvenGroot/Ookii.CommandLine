@@ -7,11 +7,11 @@ please check the [migration guide](Migrating.md).
 
 - Command line parsing improvements:
   - Arguments using an enumeration type now only accept named values by default, and comma-separated
-    values are only accepted if the enumeration has the `FlagsAttribute`. These default can be
-    changed using the `ValidateEnumValueAttribute` attribute.
+    values are only accepted if the enumeration has the [`FlagsAttribute`][]. These default can be
+    changed using the [`ValidateEnumValueAttribute`][] attribute.
   - [Argument validators](Validation.md) can now validate the value before string conversion, after
     conversion, and after all arguments have been parsed in a single validator.
-  - You can use the helper type `NonSwitchBoolean` to create an argument that takes a boolean value,
+  - You can use the helper type [`NonSwitchBoolean`][] to create an argument that takes a boolean value,
     but is not a switch argument.
   - When an [automatic prefix alias](DefiningArguments.md#automatic-prefix-aliases) is used that is
     ambiguous between multiple arguments or commands, a message is shown that lists the arguments it
@@ -21,21 +21,21 @@ please check the [migration guide](Migrating.md).
 - Usage help improvements:
   - You can now easily group arguments into [categories](UsageHelp.md#argument-categories) in the
     usage help.
-  - You can hide argument and command aliases from the usage help with the `AliasAttribute.IsHidden`
-    and `ShortAliasAttribute.IsHidden` properties.
-  - You can now apply the `ValueDescriptionAttribute` to a type, as well as to an individual argument.
+  - You can hide argument and command aliases from the usage help with the [`AliasAttribute.IsHidden`][]
+    and [`ShortAliasAttribute.IsHidden`][] properties.
+  - You can now apply the [`ValueDescriptionAttribute`][] to a type, as well as to an individual argument.
     This allows you to set a default description for a custom type you use for argument parsing.
   - Custom value descriptions can opt-in to having [name transformation](DefiningArguments.md#name-transformation)
-    applied to the custom description, using the `ValueDescriptionAttribute.ApplyTransform` property.
-  - When an argument cancels parsing (e.g. using `CommandLineArgumentAttribute.CancelParsing`, or a
+    applied to the custom description, using the [`ValueDescriptionAttribute.ApplyTransform`][] property.
+  - When an argument cancels parsing (e.g. using [`CommandLineArgumentAttribute.CancelParsing`][], or a
     the return value of a method argument), it must now ask for usage help to be shown using
-    `CancelMode.AbortWithHelp` instead of using the `HelpRequested` property.
+    [`CancelMode.AbortWithHelp`][] instead of using the [`HelpRequested`][] property.
 - Improved and simplified some APIs:
-  - Custom argument converters now only have to implement a single method that takes a `ReadOnlyMemory<char>`,
-    instead of separate `string` and `ReadOnlySpan<char>` overloads.
-  - The `CommandAttribute` is no longer inherited by derived classes. Inheriting it didn't really make
+  - Custom argument converters now only have to implement a single method that takes a [`ReadOnlyMemory<char>`][],
+    instead of separate `string` and [`ReadOnlySpan<char>`][] overloads.
+  - The [`CommandAttribute`][] is no longer inherited by derived classes. Inheriting it didn't really make
     sense unless no command name was set.
-  - Simplify the API for using a `CancellationToken` with `IAsyncCommand`.
+  - Simplify the API for using a [`CancellationToken`][] with [`IAsyncCommand`][].
   - Some other small API cleanup.
   - See the [migration guide](Migrating.md) for details on all API changes.
 - The .Net 8 SDK is now required for using source generation. As before, you can still target older
@@ -296,12 +296,17 @@ existing application.
   stream, with greater flexibility than the SplitLines method provided in Ookii.CommandLine 1.0.
 - Targets .Net 2.0 for wider applicability.
 
+[`AliasAttribute.IsHidden`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_AliasAttribute_IsHidden.htm
 [`AllowCommaSeparatedValues`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_Validation_ValidateEnumValueAttribute_AllowCommaSeparatedValues.htm
 [`AllowNumericValues`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_Validation_ValidateEnumValueAttribute_AllowNumericValues.htm
 [`ApplicationFriendlyNameAttribute`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_ApplicationFriendlyNameAttribute.htm
 [`ArgumentConverter`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_Conversion_ArgumentConverter.htm
 [`AssemblyTitleAttribute`]: https://learn.microsoft.com/dotnet/api/system.reflection.assemblytitleattribute
 [`AsyncCommandBase`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_Commands_AsyncCommandBase.htm
+[`CancellationToken`]: https://learn.microsoft.com/dotnet/api/system.threading.cancellationtoken
+[`CancelMode.AbortWithHelp`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_CancelMode.htm
+[`CommandAttribute`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_Commands_CommandAttribute.htm
+[`CommandLineArgumentAttribute.CancelParsing`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_CancelParsing.htm
 [`CommandLineArgumentAttribute.DefaultValueFormat`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_DefaultValueFormat.htm
 [`CommandLineArgumentAttribute.IncludeDefaultInUsageHelp`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_IncludeDefaultInUsageHelp.htm
 [`CommandLineParser.ParseResult`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_CommandLineParser_ParseResult.htm
@@ -315,9 +320,12 @@ existing application.
 [`CultureInfo.InvariantCulture`]: https://learn.microsoft.com/dotnet/api/system.globalization.cultureinfo.invariantculture
 [`EnumConverter`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_Conversion_EnumConverter.htm
 [`Environment.GetCommandLineArgs()`]: https://learn.microsoft.com/dotnet/api/system.environment.getcommandlineargs
+[`FlagsAttribute`]: https://learn.microsoft.com/dotnet/api/system.flagsattribute
 [`GeneratedCommandManagerAttribute`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_Commands_GeneratedCommandManagerAttribute.htm
 [`GeneratedParserAttribute`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_GeneratedParserAttribute.htm
+[`HelpRequested`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_ParseResult_HelpRequested.htm
 [`IAsyncCancelableCommand`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_Commands_IAsyncCancelableCommand.htm
+[`IAsyncCommand`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_Commands_IAsyncCommand.htm
 [`IParsable<TSelf>`]: https://learn.microsoft.com/dotnet/api/system.iparsable-1
 [`ISpanParsable<TSelf>`]: https://learn.microsoft.com/dotnet/api/system.ispanparsable-1
 [`LineWrappingTextWriter.ForStandardStream()`]: https://www.ookii.org/docs/commandline-5.0/html/M_Ookii_CommandLine_LineWrappingTextWriter_ForStandardStream.htm
@@ -325,14 +333,17 @@ existing application.
 [`LineWrappingTextWriter.ToString()`]: https://www.ookii.org/docs/commandline-5.0/html/M_Ookii_CommandLine_LineWrappingTextWriter_ToString.htm
 [`LineWrappingTextWriter`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_LineWrappingTextWriter.htm
 [`LocalizedStringProvider`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_LocalizedStringProvider.htm
+[`NonSwitchBoolean`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_NonSwitchBoolean.htm
 [`ParseOptions.IsPosix`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_ParseOptions_IsPosix.htm
 [`ParseOptions.PrefixTermination`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_ParseOptions_PrefixTermination.htm
 [`ParseOptions`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_ParseOptions.htm
 [`ParseOptionsAttribute.IsPosix`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_ParseOptionsAttribute_IsPosix.htm
 [`ParseOptionsAttribute.PrefixTermination`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_ParseOptionsAttribute_PrefixTermination.htm
 [`ParseOptionsAttribute`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_ParseOptionsAttribute.htm
+[`ReadOnlyMemory<char>`]: https://learn.microsoft.com/dotnet/api/system.readonlymemory-1
 [`ReadOnlySpan<char>`]: https://learn.microsoft.com/dotnet/api/system.readonlyspan-1
 [`ResetIndentAsync()`]: https://www.ookii.org/docs/commandline-5.0/html/M_Ookii_CommandLine_LineWrappingTextWriter_ResetIndentAsync.htm
+[`ShortAliasAttribute.IsHidden`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_ShortAliasAttribute_IsHidden.htm
 [`StandardStream`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_Terminal_StandardStream.htm
 [`StandardStreamExtensions`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_Terminal_StandardStreamExtensions.htm
 [`StringWriter`]: https://learn.microsoft.com/dotnet/api/system.io.stringwriter
@@ -342,6 +353,7 @@ existing application.
 [`UsageWriter`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_UsageWriter.htm
 [`ValidateEnumValueAttribute.IncludeValuesInErrorMessage`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_Validation_ValidateEnumValueAttribute_IncludeValuesInErrorMessage.htm
 [`ValidateEnumValueAttribute`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_Validation_ValidateEnumValueAttribute.htm
+[`ValueDescriptionAttribute.ApplyTransform`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_ValueDescriptionAttribute_ApplyTransform.htm
 [`ValueDescriptionAttribute`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_ValueDescriptionAttribute.htm
 [`VirtualTerminal`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_Terminal_VirtualTerminal.htm
 [`Wrapping`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_LineWrappingTextWriter_Wrapping.htm
