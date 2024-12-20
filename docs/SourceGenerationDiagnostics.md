@@ -404,6 +404,63 @@ Please switch all arguments to use either explicit or automatic positions.
 Note that using [`CommandLineArgumentAttribute.IsPositional`][] without an explicit position does not
 work without the [`GeneratedParserAttribute`][].
 
+### OCL0043
+
+The `CommandLineArgumentAttribute.Category` property for an argument, or the
+`ParseOptionsAttribute.DefaultCategory` property, is set to a value that is not an enumeration. Only
+enumeration types are supported as categories.
+
+For example, the following code triggers this warning:
+
+```csharp
+[GeneratedParser]
+partial class Arguments
+{
+    // ERROR: The category is not an enumeration type.
+    [CommandLineArgument(Category = "My category")]
+    [ValidateEnumValue]
+    public string? Argument { get; set; }
+}
+```
+
+To fix this error, use a custom enumeration type that defines the categories.
+
+For more information, see [argument categories](UsageHelp.md#argument-categories).
+
+### OCL0044
+
+The arguments class has multiple arguments with the `CommandLineArgumentAttribute.Category` property
+set, and the do not all use the same enumeration type. Every argument must use the same type for its
+category.
+
+This error is also emitted if the `ParseOptionsAttribute.DefaultCategory` property uses a
+different type than the `CommandLineArgumentAttribute.Category` property of an argument in that
+class.
+
+If the arguments class is derived from a base class that also defines arguments, all arguments
+defined by all base classes must use the same type for their categories.
+
+For example, the following code triggers this error:
+
+```csharp
+[GeneratedParser]
+partial class Arguments
+{
+    // WARNING: The category is not an enumeration type.
+    [CommandLineArgument(Category = SomeEnum.SomeCategory)]
+    [ValidateEnumValue]
+    public string? Argument { get; set; }
+
+    [CommandLineArgument(Category = OtherEnum.OtherCategory)]
+    [ValidateEnumValue]
+    public int Argument2 { get; set; }
+}
+```
+
+To fix this error, use only a single enumeration type to define argument categories.
+
+For more information, see [argument categories](UsageHelp.md#argument-categories).
+
 ## Warnings
 
 ### OCL0016
@@ -965,7 +1022,8 @@ exception at runtime if used to validate an argument whose type is not an enumer
 For example, the following code triggers this warning:
 
 ```csharp
-class Arguments
+[GeneratedParser]
+partial class Arguments
 {
     // WARNING: String isn't an enumeration type.
     [CommandLineArgument]
@@ -979,7 +1037,7 @@ of the argument to an enumeration type.
 
 ### OCL0042
 
-An argument has the [`ArgumentConverterAttribute`][] set, and uses properties of the
+An argument has the [`ArgumentConverterAttribute`][] set, and uses a property of the
 [`ValidateEnumValueAttribute`][] that may not be supported by a custom converter.
 
 The [`CaseSensitive`][CaseSensitive_1] property of the [`ValidateEnumValueAttribute`][] attribute is

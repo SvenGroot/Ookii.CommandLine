@@ -315,9 +315,9 @@ enum ArgumentCategory
 }
 ```
 
-You can use any enumeration, and you can define as many categories as you like, with whatever names
-you like. The numerical values of the enumeration members determine the order of the categories in
-the help text.
+You can use any enumeration type, and you can define as many categories as you like, with whatever
+names you like. The numerical values of the enumeration members determine the order of the
+categories in the help text.
 
 Apply the `DescriptionAttribute` to each member in the enumeration to set the text that will be used
 for the category header. If the `DescriptionAttribute` is not present, the name of the enumeration
