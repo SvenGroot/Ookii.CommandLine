@@ -135,8 +135,8 @@ though the scope of the changes is likely to be small.
 - The [`CommandLineArgumentAttribute.CancelParsing`][] property now takes a [`CancelMode`][]
   enumeration rather than a boolean.
 - The [`ArgumentParsedEventArgs`][] class was changed to use the [`CancelMode`][] enumeration.
-- Canceling parsing using the [`ArgumentParsed`][] event no longer automatically sets the [`HelpRequested`][]
-  property; instead, you must set it manually in the event handler if desired.
+- Canceling parsing using the [`ArgumentParsed`][] event no longer automatically sets the
+  `HelpRequested` property; instead, you must set it manually in the event handler if desired.
 - The `ParseOptionsAttribute.NameValueSeparator` property was replaced with
   [`ParseOptionsAttribute.NameValueSeparators`][].
 - The `ParseOptions.NameValueSeparator` property was replaced with
@@ -171,8 +171,8 @@ though the scope of the changes is likely to be small.
 - It's strongly recommended to switch to the static [`CommandLineParser.Parse<T>()`][] method, if you
   were not already using it from version 2.4.
 - If you do need to manually handle errors, be aware of the following changes:
-  - If the instance [`CommandLineParser.Parse()`][CommandLineParser.Parse()_2] method returns null, you should only show usage help
-    if the [`CommandLineParser.HelpRequested`][] property is true.
+  - If the instance [`CommandLineParser.Parse()`][CommandLineParser.Parse()_2] method returns null,
+    you should only show usage help if the `CommandLineParser.HelpRequested` property is true.
   - Version 3.0 adds automatic "-Help" and "-Version" properties, which means the [`Parse()`][Parse()_6] method
     can return null even if it previously wouldn't.
   - Recommended: use the [`CommandLineParser<T>`][] class to get strongly typed instance [`Parse()`][Parse()_5]
@@ -264,7 +264,6 @@ may require substantial code changes and may change how command lines are parsed
 [`CommandLineArgumentErrorCategory.AmbiguousPrefixAlias`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_CommandLineArgumentErrorCategory.htm
 [`CommandLineArgumentErrorCategory.UnknownArgument`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_CommandLineArgumentErrorCategory.htm
 [`CommandLineArgumentException`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_CommandLineArgumentException.htm
-[`CommandLineParser.HelpRequested`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_CommandLineParser_HelpRequested.htm
 [`CommandLineParser.Parse<T>()`]: https://www.ookii.org/docs/commandline-5.0/html/M_Ookii_CommandLine_CommandLineParser_Parse__1.htm
 [`CommandLineParser.ParseWithErrorHandling()`]: https://www.ookii.org/docs/commandline-5.0/html/Overload_Ookii_CommandLine_CommandLineParser_ParseWithErrorHandling.htm
 [`CommandLineParser.WriteUsage()`]: https://www.ookii.org/docs/commandline-5.0/html/M_Ookii_CommandLine_CommandLineParser_WriteUsage.htm
@@ -284,7 +283,6 @@ may require substantial code changes and may change how command lines are parsed
 [`EnumConverter`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_Conversion_EnumConverter.htm
 [`FlagsAttribute`]: https://learn.microsoft.com/dotnet/api/system.flagsattribute
 [`GeneratedParserAttribute`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_GeneratedParserAttribute.htm
-[`HelpRequested`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_CommandLineParser_HelpRequested.htm
 [`IAsyncCommand.RunAsync()`]: https://www.ookii.org/docs/commandline-5.0/html/M_Ookii_CommandLine_Commands_IAsyncCommand_RunAsync.htm
 [`IAsyncCommand`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_Commands_IAsyncCommand.htm
 [`ICommand.Run()`]: https://www.ookii.org/docs/commandline-5.0/html/M_Ookii_CommandLine_Commands_ICommand_Run.htm

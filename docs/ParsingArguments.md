@@ -215,7 +215,7 @@ static int Main()
         Console.Error.WriteLine(ex.Message);
     }
 
-    if (parser.HelpRequested)
+    if (parser.ParseResult.HelpRequested)
     {
         parser.WriteUsage();
     }
@@ -249,7 +249,7 @@ Next, we'll take a look at [generating usage help](UsageHelp.md).
 [`Error`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_ParseOptions_Error.htm
 [`GeneratedParserAttribute`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_GeneratedParserAttribute.htm
 [`GetArgument`]: https://www.ookii.org/docs/commandline-5.0/html/M_Ookii_CommandLine_CommandLineParser_GetArgument.htm
-[`HelpRequested`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_CommandLineParser_HelpRequested.htm
+[`HelpRequested`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_ParseResult_HelpRequested.htm
 [`LocalizedStringProvider`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_LocalizedStringProvider.htm
 [`ParseOptions.StringProvider`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_ParseOptions_StringProvider.htm
 [`ParseOptions`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_ParseOptions.htm

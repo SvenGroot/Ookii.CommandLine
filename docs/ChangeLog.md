@@ -67,7 +67,7 @@ please check the [migration guide](Migrating.md).
     [`ValidateEnumValueAttribute.IncludeValuesInErrorMessage`][] property, if the attribute is
     present on the argument, so that error messages from the converter and validator are consistent.
 - Support for passing a cancellation token to the [`CommandManager.RunCommandAsync()`][] method.
-  Tasks can access this token by implementing the [`IAsyncCancelableCommand`][] interface. The
+  Tasks can access this token by implementing the `IAsyncCancelableCommand` interface. The
   [`AsyncCommandBase`][] class provides support as well.
 - Usage help improvements:
   - Support for [custom default value formatting](UsageHelp.md#default-values), using
@@ -324,7 +324,6 @@ existing application.
 [`GeneratedCommandManagerAttribute`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_Commands_GeneratedCommandManagerAttribute.htm
 [`GeneratedParserAttribute`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_GeneratedParserAttribute.htm
 [`HelpRequested`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_ParseResult_HelpRequested.htm
-[`IAsyncCancelableCommand`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_Commands_IAsyncCancelableCommand.htm
 [`IAsyncCommand`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_Commands_IAsyncCommand.htm
 [`IParsable<TSelf>`]: https://learn.microsoft.com/dotnet/api/system.iparsable-1
 [`ISpanParsable<TSelf>`]: https://learn.microsoft.com/dotnet/api/system.ispanparsable-1
