@@ -425,44 +425,44 @@ Next, let's take a look at how to [define arguments](DefiningArguments.md).
 [^1]: Any type that that can be assigned a `CultureInfo` value, such as `IFormatProvider`, is also
    allowed for the second parameter of these methods.
 
-[`AllowDuplicateDictionaryKeysAttribute`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_AllowDuplicateDictionaryKeysAttribute.htm
-[`ArgumentConverter`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_Conversion_ArgumentConverter.htm
-[`ArgumentConverterAttribute`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_Conversion_ArgumentConverterAttribute.htm
-[`CommandLineArgument.AllowNull`]: https://www.ookii.org/docs/commandline-4.2/html/P_Ookii_CommandLine_CommandLineArgument_AllowNull.htm
-[`CommandLineArgumentException`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_CommandLineArgumentException.htm
-[`CommandLineParser`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_CommandLineParser.htm
+[`AllowDuplicateDictionaryKeysAttribute`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_AllowDuplicateDictionaryKeysAttribute.htm
+[`ArgumentConverter`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_Conversion_ArgumentConverter.htm
+[`ArgumentConverterAttribute`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_Conversion_ArgumentConverterAttribute.htm
+[`CommandLineArgument.AllowNull`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_CommandLineArgument_AllowNull.htm
+[`CommandLineArgumentException`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_CommandLineArgumentException.htm
+[`CommandLineParser`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_CommandLineParser.htm
 [`CultureInfo.InvariantCulture`]: https://learn.microsoft.com/dotnet/api/system.globalization.cultureinfo.invariantculture
 [`CultureInfo`]: https://learn.microsoft.com/dotnet/api/system.globalization.cultureinfo
 [`DateTime`]: https://learn.microsoft.com/dotnet/api/system.datetime
 [`DayOfWeek.Monday`]: https://learn.microsoft.com/dotnet/api/system.dayofweek
 [`DayOfWeek`]: https://learn.microsoft.com/dotnet/api/system.dayofweek
-[`EnumConverter`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_Conversion_EnumConverter.htm
+[`EnumConverter`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_Conversion_EnumConverter.htm
 [`FileInfo`]: https://learn.microsoft.com/dotnet/api/system.io.fileinfo
 [`FlagsAttribute`]: https://learn.microsoft.com/dotnet/api/system.flagsattribute
 [`Int32`]: https://learn.microsoft.com/dotnet/api/system.int32
 [`IParsable<TSelf>`]: https://learn.microsoft.com/dotnet/api/system.iparsable-1
 [`ISpanParsable<TSelf>`]: https://learn.microsoft.com/dotnet/api/system.ispanparsable-1
-[`KeyConverterAttribute`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_Conversion_KeyConverterAttribute.htm
+[`KeyConverterAttribute`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_Conversion_KeyConverterAttribute.htm
 [`KeyValuePair<TKey, TValue>`]: https://learn.microsoft.com/dotnet/api/system.collections.generic.keyvaluepair-2
-[`KeyValuePairConverter<TKey, TValue>`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_Conversion_KeyValuePairConverter_2.htm
-[`KeyValueSeparatorAttribute`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_Conversion_KeyValueSeparatorAttribute.htm
-[`MultiValueSeparatorAttribute`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_MultiValueSeparatorAttribute.htm
-[`ParseOptions.AllowWhiteSpaceValueSeparator`]: https://www.ookii.org/docs/commandline-4.2/html/P_Ookii_CommandLine_ParseOptions_AllowWhiteSpaceValueSeparator.htm
-[`ParseOptions.ArgumentNameComparison`]: https://www.ookii.org/docs/commandline-4.2/html/P_Ookii_CommandLine_ParseOptions_ArgumentNameComparison.htm
-[`ParseOptions.Culture`]: https://www.ookii.org/docs/commandline-4.2/html/P_Ookii_CommandLine_ParseOptions_Culture.htm
-[`ParseOptions.NameValueSeparators`]: https://www.ookii.org/docs/commandline-4.2/html/P_Ookii_CommandLine_ParseOptions_NameValueSeparators.htm
-[`ParseOptions.PrefixTermination`]: https://www.ookii.org/docs/commandline-4.2/html/P_Ookii_CommandLine_ParseOptions_PrefixTermination.htm
-[`ParseOptions`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_ParseOptions.htm
-[`ParseOptionsAttribute.AllowWhiteSpaceValueSeparator`]: https://www.ookii.org/docs/commandline-4.2/html/P_Ookii_CommandLine_ParseOptionsAttribute_AllowWhiteSpaceValueSeparator.htm
-[`ParseOptionsAttribute.CaseSensitive`]: https://www.ookii.org/docs/commandline-4.2/html/P_Ookii_CommandLine_ParseOptionsAttribute_CaseSensitive.htm
-[`ParseOptionsAttribute.NameValueSeparators`]: https://www.ookii.org/docs/commandline-4.2/html/P_Ookii_CommandLine_ParseOptionsAttribute_NameValueSeparators.htm
-[`ParseOptionsAttribute.PrefixTermination`]: https://www.ookii.org/docs/commandline-4.2/html/P_Ookii_CommandLine_ParseOptionsAttribute_PrefixTermination.htm
-[`ParseOptionsAttribute`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_ParseOptionsAttribute.htm
+[`KeyValuePairConverter<TKey, TValue>`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_Conversion_KeyValuePairConverter_2.htm
+[`KeyValueSeparatorAttribute`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_Conversion_KeyValueSeparatorAttribute.htm
+[`MultiValueSeparatorAttribute`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_MultiValueSeparatorAttribute.htm
+[`ParseOptions.AllowWhiteSpaceValueSeparator`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_ParseOptions_AllowWhiteSpaceValueSeparator.htm
+[`ParseOptions.ArgumentNameComparison`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_ParseOptions_ArgumentNameComparison.htm
+[`ParseOptions.Culture`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_ParseOptions_Culture.htm
+[`ParseOptions.NameValueSeparators`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_ParseOptions_NameValueSeparators.htm
+[`ParseOptions.PrefixTermination`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_ParseOptions_PrefixTermination.htm
+[`ParseOptions`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_ParseOptions.htm
+[`ParseOptionsAttribute.AllowWhiteSpaceValueSeparator`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_ParseOptionsAttribute_AllowWhiteSpaceValueSeparator.htm
+[`ParseOptionsAttribute.CaseSensitive`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_ParseOptionsAttribute_CaseSensitive.htm
+[`ParseOptionsAttribute.NameValueSeparators`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_ParseOptionsAttribute_NameValueSeparators.htm
+[`ParseOptionsAttribute.PrefixTermination`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_ParseOptionsAttribute_PrefixTermination.htm
+[`ParseOptionsAttribute`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_ParseOptionsAttribute.htm
 [`String`]: https://learn.microsoft.com/dotnet/api/system.string
 [`TypeConverter`]: https://learn.microsoft.com/dotnet/api/system.componentmodel.typeconverter
 [`Uri`]: https://learn.microsoft.com/dotnet/api/system.uri
-[`ValidateEnumValueAttribute.AllowNumericValues`]: https://www.ookii.org/docs/commandline-4.2/html/P_Ookii_CommandLine_Validation_ValidateEnumValueAttribute_AllowNumericValues.htm
-[`ValidateEnumValueAttribute.CaseSensitive`]: https://www.ookii.org/docs/commandline-4.2/html/P_Ookii_CommandLine_Validation_ValidateEnumValueAttribute_CaseSensitive.htm
-[`ValidateEnumValueAttribute`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_Validation_ValidateEnumValueAttribute.htm
-[`ValueConverterAttribute`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_Conversion_ValueConverterAttribute.htm
-[NullArgumentValue_0]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_CommandLineArgumentErrorCategory.htm
+[`ValidateEnumValueAttribute.AllowNumericValues`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_Validation_ValidateEnumValueAttribute_AllowNumericValues.htm
+[`ValidateEnumValueAttribute.CaseSensitive`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_Validation_ValidateEnumValueAttribute_CaseSensitive.htm
+[`ValidateEnumValueAttribute`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_Validation_ValidateEnumValueAttribute.htm
+[`ValueConverterAttribute`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_Conversion_ValueConverterAttribute.htm
+[NullArgumentValue_0]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_CommandLineArgumentErrorCategory.htm

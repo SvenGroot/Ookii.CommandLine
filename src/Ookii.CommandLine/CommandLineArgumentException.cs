@@ -32,6 +32,7 @@ public class CommandLineArgumentException : Exception
     /// Initializes a new instance of the <see cref="CommandLineArgumentException"/> class with
     /// the specified error message.
     /// </summary>
+    /// <param name="message">The message that describes the error.</param>
     /// <summary>
     /// Initializes a new instance of the <see cref="CommandLineArgumentException"/> class with a specified error message.
     /// </summary>

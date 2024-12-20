@@ -33,7 +33,7 @@ A similar approach would work for Windows Forms, or any other GUI framework.
 This application is very basic; it's just a sample, and I don't do a lot of GUI work nowadays. It's
 just intended to show how the [`UsageWriter`][] can be adapted to work in the context of a GUI app.
 
-[`CommandLineParser<T>`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_CommandLineParser_1.htm
-[`UsageWriter`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_UsageWriter.htm
-[CreateParser()_1]: https://www.ookii.org/docs/commandline-4.2/html/M_Ookii_CommandLine_IParserProvider_1_CreateParser.htm
-[Parse()_7]: https://www.ookii.org/docs/commandline-4.2/html/Overload_Ookii_CommandLine_IParser_1_Parse.htm
+[`CommandLineParser<T>`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_CommandLineParser_1.htm
+[`UsageWriter`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_UsageWriter.htm
+[CreateParser()_1]: https://www.ookii.org/docs/commandline-5.0/html/M_Ookii_CommandLine_IParserProvider_1_CreateParser.htm
+[Parse()_7]: https://www.ookii.org/docs/commandline-5.0/html/Overload_Ookii_CommandLine_IParser_1_Parse.htm
