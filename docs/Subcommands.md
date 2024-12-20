@@ -166,7 +166,7 @@ partial class AsyncSleepCommand : AsyncCommandBase
 
 To support cancellation, you can pass a [`CancellationToken`][] to the
 [`CommandManager.RunCommandAsync()`][] method. This token will be passed to the
-`IAsyncCommand.RunAsync()` method.
+[`IAsyncCommand.RunAsync()`][] method.
 
 ### Multiple commands with common arguments
 

@@ -961,7 +961,7 @@ return await manager.RunCommandAsync() ?? 1;
 ```
 
 This will actually run the "write" command in an asynchronous context. You can also pass a
-`CancellationToken` to the [`RunCommandAsync()`][] method, which will be forwarded to the
+[`CancellationToken`][] to the [`RunCommandAsync()`][] method, which will be forwarded to the
 [`RunAsync()`][RunAsync()_1] method.
 
 You'll notice that even with this change, the "read" command still works, despite not being
@@ -998,6 +998,7 @@ following resources:
 [`AssemblyTitleAttribute`]: https://learn.microsoft.com/dotnet/api/system.reflection.assemblytitleattribute
 [`AsyncCommandBase.Run()`]: https://www.ookii.org/docs/commandline-5.0/html/M_Ookii_CommandLine_Commands_AsyncCommandBase_Run.htm
 [`AsyncCommandBase`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_Commands_AsyncCommandBase.htm
+[`CancellationToken`]: https://learn.microsoft.com/dotnet/api/system.threading.cancellationtoken
 [`CaseSensitive`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_ParseOptionsAttribute_CaseSensitive.htm
 [`CommandAttribute`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_Commands_CommandAttribute.htm
 [`CommandLineArgumentAttribute.DefaultValue`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_DefaultValue.htm

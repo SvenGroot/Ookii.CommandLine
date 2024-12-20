@@ -401,14 +401,14 @@ partial class Arguments
 
 Please switch all arguments to use either explicit or automatic positions.
 
-Note that using [`CommandLineArgumentAttribute.IsPositional`][] without an explicit position does not
-work without the [`GeneratedParserAttribute`][].
+Note that using [`CommandLineArgumentAttribute.IsPositional`][] without an explicit position does
+not work without the [`GeneratedParserAttribute`][].
 
 ### OCL0043
 
-The `CommandLineArgumentAttribute.Category` property for an argument, or the
-`ParseOptionsAttribute.DefaultCategory` property, is set to a value that is not an enumeration. Only
-enumeration types are supported as categories.
+The [`CommandLineArgumentAttribute.Category`][] property for an argument, or the
+[`ParseOptionsAttribute.DefaultArgumentCategory`][] property, is set to a value that is not an
+enumeration. Only enumeration types are supported as categories.
 
 For example, the following code triggers this warning:
 
@@ -429,12 +429,12 @@ For more information, see [argument categories](UsageHelp.md#argument-categories
 
 ### OCL0044
 
-The arguments class has multiple arguments with the `CommandLineArgumentAttribute.Category` property
-set, and the do not all use the same enumeration type. Every argument must use the same type for its
-category.
+The arguments class has multiple arguments with the [`CommandLineArgumentAttribute.Category`][]
+property set, and the do not all use the same enumeration type. Every argument must use the same
+type for its category.
 
-This error is also emitted if the `ParseOptionsAttribute.DefaultCategory` property uses a
-different type than the `CommandLineArgumentAttribute.Category` property of an argument in that
+This error is also emitted if the [`ParseOptionsAttribute.DefaultArgumentCategory`][] property uses a
+different type than the [`CommandLineArgumentAttribute.Category`][] property of an argument in that
 class.
 
 If the arguments class is derived from a base class that also defines arguments, all arguments
@@ -1069,6 +1069,7 @@ disable this warning.
 [`ArgumentConverterAttribute`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_Conversion_ArgumentConverterAttribute.htm
 [`CommandAttribute.IsHidden`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_Commands_CommandAttribute_IsHidden.htm
 [`CommandAttribute`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_Commands_CommandAttribute.htm
+[`CommandLineArgumentAttribute.Category`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_Category.htm
 [`CommandLineArgumentAttribute.DefaultValue`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_DefaultValue.htm
 [`CommandLineArgumentAttribute.IncludeDefaultInUsageHelp`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_IncludeDefaultInUsageHelp.htm
 [`CommandLineArgumentAttribute.IsHidden`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_IsHidden.htm
@@ -1102,6 +1103,7 @@ disable this warning.
 [`ParseOptions.ArgumentNameTransform`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_ParseOptions_ArgumentNameTransform.htm
 [`ParseOptions.Mode`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_ParseOptions_Mode.htm
 [`ParseOptionsAttribute.ArgumentNamePrefixes`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_ParseOptionsAttribute_ArgumentNamePrefixes.htm
+[`ParseOptionsAttribute.DefaultArgumentCategory`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_ParseOptionsAttribute_DefaultArgumentCategory.htm
 [`ParsingMode.LongShort`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_ParsingMode.htm
 [`ShortAliasAttribute`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_ShortAliasAttribute.htm
 [`Type`]: https://learn.microsoft.com/dotnet/api/system.type

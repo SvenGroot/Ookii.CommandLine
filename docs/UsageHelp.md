@@ -319,11 +319,11 @@ You can use any enumeration type, and you can define as many categories as you l
 names you like. The numerical values of the enumeration members determine the order of the
 categories in the help text.
 
-Apply the `DescriptionAttribute` to each member in the enumeration to set the text that will be used
-for the category header. If the `DescriptionAttribute` is not present, the name of the enumeration
+Apply the [`DescriptionAttribute`][] to each member in the enumeration to set the text that will be used
+for the category header. If the [`DescriptionAttribute`][] is not present, the name of the enumeration
 member will be used instead.
 
-To set the category for an argument, use the `CommandLineArgumentAttribute.Category` property.
+To set the category for an argument, use the [`CommandLineArgumentAttribute.Category`][] property.
 
 ```csharp
 [GeneratedParser]
@@ -348,8 +348,8 @@ partial class MyArguments
 ```
 
 > [!NOTE]
-> The `CommandLineArgumentAttribute.Category` property has the type `object`, but it must be an
-> enumeration value. This was done because the type `Enum` is not allowed for use with attributes.
+> The [`CommandLineArgumentAttribute.Category`][] property has the type `object`, but it must be an
+> enumeration value. This was done because the type [`Enum`][] is not allowed for use with attributes.
 
 The descriptions for these arguments would look like this:
 
@@ -380,11 +380,11 @@ default).
 
 Arguments that have no category specified, as well as the automatic help and version arguments, will
 be shown above any arguments that do have a category. If you wish to include these arguments in a
-category, you can use the `ParseOptionsAttribute.DefaultCategory` property:
+category, you can use the [`ParseOptionsAttribute.DefaultArgumentCategory`][] property:
 
 ```csharp
 [GeneratedParser]
-[ParseOption(DefaultCategory = ArgumentCategory.Other)]
+[ParseOption(DefaultArgumentCategory = ArgumentCategory.Other)]
 partial class MyArguments
 {
 }
@@ -527,6 +527,7 @@ Please see the [subcommand documentation](Subcommands.md) for information about 
 
 Next, we'll take a look at [argument validation and dependencies](Validation.md).
 
+[`CommandLineArgumentAttribute.Category`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_Category.htm
 [`CommandLineArgumentAttribute.DefaultValue`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_DefaultValue.htm
 [`CommandLineArgumentAttribute.DefaultValueFormat`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_DefaultValueFormat.htm
 [`CommandLineArgumentAttribute.IncludeDefaultInUsageHelp`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_IncludeDefaultInUsageHelp.htm
@@ -537,6 +538,7 @@ Next, we'll take a look at [argument validation and dependencies](Validation.md)
 [`CommandLineParser<T>.ParseWithErrorHandling()`]: https://www.ookii.org/docs/commandline-5.0/html/M_Ookii_CommandLine_CommandLineParser_1_ParseWithErrorHandling.htm
 [`DescriptionAttribute`]: https://learn.microsoft.com/dotnet/api/system.componentmodel.descriptionattribute
 [`DescriptionListFilterMode.Information`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_DescriptionListFilterMode.htm
+[`Enum`]: https://learn.microsoft.com/dotnet/api/system.enum
 [`GeneratedParserAttribute`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_GeneratedParserAttribute.htm
 [`GetExtendedColor()`]: https://www.ookii.org/docs/commandline-5.0/html/M_Ookii_CommandLine_Terminal_TextFormat_GetExtendedColor.htm
 [`Int32`]: https://learn.microsoft.com/dotnet/api/system.int32
@@ -546,6 +548,7 @@ Next, we'll take a look at [argument validation and dependencies](Validation.md)
 [`ParseOptions.DefaultValueDescriptions`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_ParseOptions_DefaultValueDescriptions.htm
 [`ParseOptions.ShowUsageOnError`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_ParseOptions_ShowUsageOnError.htm
 [`ParseOptions.UsageWriter`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_ParseOptions_UsageWriter.htm
+[`ParseOptionsAttribute.DefaultArgumentCategory`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_ParseOptionsAttribute_DefaultArgumentCategory.htm
 [`SetConsoleMode`]: https://learn.microsoft.com/windows/console/setconsolemode
 [`String`]: https://learn.microsoft.com/dotnet/api/system.string
 [`System.ComponentModel.DescriptionAttribute`]: https://learn.microsoft.com/dotnet/api/system.componentmodel.descriptionattribute
