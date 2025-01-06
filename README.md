@@ -134,7 +134,7 @@ It can be used with applications supporting one of the following:
 
 - .Net Standard 2.0
 - .Net Standard 2.1
-- .Net 6.0 and later.
+- .Net 8.0 and later.
 
 As of version 3.0, .Net Framework 2.0 is no longer supported. You can still target .Net Framework
 4.6.1 and later using the .Net Standard 2.0 assembly. If you need to support an older version of
@@ -143,19 +143,14 @@ As of version 3.0, .Net Framework 2.0 is no longer supported. You can still targ
 Several versions of the library are provided, each adding some additional functionality only
 available with their specific runtime.
 
-The .Net Standard 2.1 and .Net 6.0 and later versions utilize the framework `ReadOnlySpan<T>` and
+The .Net Standard 2.1 and .Net 8.0 versions utilize the framework `ReadOnlySpan<T>` and
 `ReadOnlyMemory<T>` types without a dependency on the System.Memory package.
 
-The .Net 6.0 version has additional support for [nullable reference types](docs/Arguments.md#arguments-with-non-nullable-types),
+The .Net 8.0 version has additional support for [nullable reference types](docs/Arguments.md#arguments-with-non-nullable-types),
 and is annotated to allow [trimming](https://learn.microsoft.com/dotnet/core/deploying/trimming/trimming-options)
-when [source generation](docs/SourceGeneration.md) is used.
-
-The .Net 7.0 version has additional support for `required` properties, and can utilize
-`ISpanParsable<TSelf>` and `IParsable<TSelf>` for argument value conversions, and is annotated to
-allow native AOT.
-
-An assembly built for .Net 8.0 is also provided; this has no additional functionality over the
-.Net 7.0 version, but is provided to ensure optimal compatibility and performance.
+when [source generation](docs/SourceGeneration.md) is used. It also supports `required` properties,
+and can utilize `ISpanParsable<TSelf>` and `IParsable<TSelf>` for argument value conversions, and is
+annotated to allow native AOT.
 
 ## Building and testing
 
@@ -171,9 +166,8 @@ To build the library, tests and samples, simply use the `dotnet build` command i
 directory. You can run the unit tests using `dotnet test`. The tests should pass on all platforms
 (Windows and Linux have been tested).
 
-The tests are built and run for .Net 8.0, .Net 6.0, and .Net Framework 4.8. Running the .Net
-Framework tests on a non-Windows platform may require the use of
-[Mono](https://www.mono-project.com/).
+The tests are built and run for .Net 8.0 and .Net Framework 4.8. Running the .Net Framework tests on
+a non-Windows platform may require the use of [Mono](https://www.mono-project.com/).
 
 Ookii.CommandLine uses a strongly-typed resources file, which will not update correctly unless the
 `Resources.resx` file is edited with [Microsoft Visual Studio](https://visualstudio.microsoft.com/).
