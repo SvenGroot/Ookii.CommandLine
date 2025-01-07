@@ -38,9 +38,11 @@ please check the [migration guide](Migrating.md).
   - Simplify the API for using a [`CancellationToken`][] with [`IAsyncCommand`][].
   - Some other small API cleanup.
   - See the [migration guide](Migrating.md) for details on all API changes.
-- The .Net 8 SDK is now required for using source generation. As before, you can still target older
-  runtimes, as long as you build using .Net 8 or a newer SDK.
+- The .Net 8 SDK is now required for using source generation. As before, you can still target .Net
+  Framework runtimes, as long as you build using .Net 8 or a newer SDK.
 - Various bug fixes and minor improvements.
+- The code snippets Visual Studio extension has been removed from the download. The existing
+  snippets still work, but they will no longer be updated in the future.
 
 ## Ookii.CommandLine 4.2 (2024-09-12)
 
