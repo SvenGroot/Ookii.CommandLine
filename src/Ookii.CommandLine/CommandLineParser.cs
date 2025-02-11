@@ -1445,16 +1445,16 @@ public class CommandLineParser
 
             // Make sure all arguments use the same category. This is checked here to avoid
             // unexpected exceptions when generating usage help.
-            if (argument.Category is Enum category)
+            if (argument.Category is CategoryInfo category)
             {
                 if (categoryType == null)
                 {
-                    categoryType = category.GetType();
+                    categoryType = category.Category.GetType();
                 }
-                else if (categoryType != category.GetType())
+                else if (categoryType != category.Category.GetType())
                 {
                     throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture,
-                        Properties.Resources.MismatchedCategoryTypesFormat, argument.ArgumentName, category.GetType(), categoryType));
+                        Properties.Resources.MismatchedCategoryTypesFormat, argument.ArgumentName, category.Category.GetType(), categoryType));
                 }
             }
         }

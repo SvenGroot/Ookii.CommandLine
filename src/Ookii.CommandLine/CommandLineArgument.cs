@@ -385,6 +385,7 @@ public abstract class CommandLineArgument
     private readonly bool _isHidden;
     private readonly IEnumerable<ArgumentValidationAttribute> _validators;
     private readonly ValueDescriptionAttribute? _valueDescription;
+    private readonly Enum? _category;
     private IValueHelper? _valueHelper;
     private ReadOnlyMemory<char> _usedArgumentName;
 
@@ -456,7 +457,7 @@ public abstract class CommandLineArgument
             MultiValueInfo.AllowWhiteSpaceSeparator = false;
         }
 
-        Category = info.Category ?? info.Parser.DefaultArgumentCategory;
+        _category = info.Category ?? info.Parser.DefaultArgumentCategory;
     }
 
     /// <summary>
@@ -1090,11 +1091,11 @@ public abstract class CommandLineArgument
     public IEnumerable<ArgumentValidationAttribute> Validators => _validators;
 
     /// <summary>
-    /// Gets the category that the argument belongs to.
+    /// Gets information about the category that the argument belongs to.
     /// </summary>
     /// <value>
-    /// An enumeration value that defines the category, or <see langword="null"/> if the argument
-    /// has no category.
+    /// An instance of the <see cref="CategoryInfo"/> structure, or <see langword="null"/> if the
+    /// argument has no category.
     /// </value>
     /// <remarks>
     /// <para>
@@ -1104,7 +1105,7 @@ public abstract class CommandLineArgument
     /// </remarks>
     /// <seealso cref="CommandLineArgumentAttribute.Category"/>
     /// <seealso cref="ParseOptionsAttribute.DefaultArgumentCategory"/>
-    public Enum? Category { get; }
+    public CategoryInfo? Category => _category == null ? null : new(_parser, _category);
 
     /// <summary>
     /// When implemented in a derived class, gets a value that indicates whether this argument

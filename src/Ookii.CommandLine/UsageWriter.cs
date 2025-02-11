@@ -1445,16 +1445,16 @@ public class UsageWriter
                 first = false;
             }
 
-            if (!object.Equals(argument.Category, previousCategory))
+            if (!object.Equals(argument.Category?.Category, previousCategory))
             {
                 // The default implementation for GetArgumentsInDescriptionOrder should group all
                 // null categories together, but if overridden that might not be the case.
-                if (argument.Category is Enum category)
+                if (argument.Category is CategoryInfo category)
                 {
                     WriteArgumentCategoryHeader(category);
                 }
 
-                previousCategory = argument.Category;
+                previousCategory = argument.Category?.Category;
             }
 
             WriteArgumentDescription(argument);
@@ -1494,7 +1494,7 @@ public class UsageWriter
     ///   of the arguments have a category.
     /// </para>
     /// </remarks>
-    protected virtual void WriteArgumentCategoryHeader(Enum category)
+    protected virtual void WriteArgumentCategoryHeader(CategoryInfo category)
     {
         Writer.ResetIndent();
         WriteColor(ArgumentCategoryColor);
@@ -1519,8 +1519,8 @@ public class UsageWriter
     ///   override the <see cref="WriteArgumentCategoryHeader"/> method instead.
     /// </para>
     /// </remarks>
-    protected virtual void WriteArgumentCategory(Enum category)
-        => Writer.Write(Parser.GetCategoryDescription(category));
+    protected virtual void WriteArgumentCategory(CategoryInfo category)
+        => Writer.Write(category.Description);
 
 
     /// <summary>
@@ -2028,7 +2028,7 @@ public class UsageWriter
             DescriptionListFilterMode.Description => !string.IsNullOrEmpty(argument.Description),
             DescriptionListFilterMode.All => true,
             _ => false,
-        }).OrderBy(argument => argument.Category);
+        }).OrderBy(argument => argument.Category?.Category);
 
         var comparer = Parser.ArgumentNameComparison.GetComparer();
 
