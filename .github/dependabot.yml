@@ -1,14 +1,13 @@
-# Comment to try to fix dependabot
 version: 2
 updates:
   - package-ecosystem: "nuget"
-    directory: "/"
+    directory: "/src"
     schedule:
       interval: "daily"
     target-branch: "main"
     groups:
        # Group all dependencies in one PR.
-       all-dependencies:
+       nuget-dependencies:
           patterns:
              - "*"
     ignore:
