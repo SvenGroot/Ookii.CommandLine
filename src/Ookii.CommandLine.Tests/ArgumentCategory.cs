@@ -7,11 +7,16 @@ using System.Threading.Tasks;
 
 namespace Ookii.CommandLine.Tests;
 
+class DerivedDescriptionAttribute : DescriptionAttribute
+{
+    public override string Description => "The second category.";
+}
+
 enum ArgumentCategory
 {
     [Description("The first category.")]
     Category1,
-    [Description("The second category.")]
+    [DerivedDescription()]
     Category2,
     // No description
     Category3,
