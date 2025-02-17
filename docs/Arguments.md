@@ -322,14 +322,14 @@ You can enable case sensitivity with the [`ValidateEnumValueAttribute.CaseSensit
 and allow numeric values with the [`ValidateEnumValueAttribute.AllowNumericValues`][] property.
 
 When numeric values are enabled, the underlying value of each enumeration member can also be used to
-specify it. This means that e.g. for the [`DayOfWeek`][] enumeration, both "monday" and "1" can all
+specify it. This means that e.g. for the [`DayOfWeek`][] enumeration, both "monday" and "1" can
 be used to indicate [`DayOfWeek.Monday`][].
 
 By default, you are still restricted to only the defined values of the enumeration even when
 using numeric values, unless the enumeration has the [`FlagsAttribute`][]. Use the
-[`ValidateEnumValueAttribute.AllowNonDefinedValues`][] property to change this. In that case, for example
-a value of "9" would be converted to `(DayOfWeek)9` even though there is no such value in the
-enumeration.
+[`ValidateEnumValueAttribute.AllowNonDefinedValues`][] property to change this. In that case, for
+example a value of "9" would be converted to `(DayOfWeek)9` even though there is no such value in
+the enumeration.
 
 > [!TIP]
 > Adding the [`ValidateEnumValueAttribute`][] to an enumeration argument also adds all the allowed

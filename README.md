@@ -10,7 +10,7 @@ library for .Net applications.
 - Compatible with trimming and native AOT.
 
 Ookii.CommandLine is [provided in versions](#requirements) for .Net Standard 2.0, .Net Standard 2.1,
-and .Net 6.0 and later.
+and .Net 8.0 and later.
 
 Ookii.CommandLine can be added to your project using [NuGet](https://nuget.org/packages/Ookii.CommandLine).
 
@@ -132,7 +132,7 @@ It can be used with applications supporting one of the following:
 
 - .Net Standard 2.0
 - .Net Standard 2.1
-- .Net 8.0 and later.
+- .Net 8.0 and later
 
 As of version 3.0, .Net Framework 2.0 is no longer supported. You can still target .Net Framework
 4.6.1 and later using the .Net Standard 2.0 assembly. If you need to support an older version of
@@ -146,9 +146,9 @@ The .Net Standard 2.1 and .Net 8.0 versions utilize the framework `ReadOnlySpan<
 
 The .Net 8.0 version has additional support for [nullable reference types](docs/Arguments.md#arguments-with-non-nullable-types),
 and is annotated to allow [trimming](https://learn.microsoft.com/dotnet/core/deploying/trimming/trimming-options)
-when [source generation](docs/SourceGeneration.md) is used. It also supports `required` properties,
-and can utilize `ISpanParsable<TSelf>` and `IParsable<TSelf>` for argument value conversions, and is
-annotated to allow native AOT.
+and native AOT when [source generation](docs/SourceGeneration.md) is used. It also supports
+`required` properties, and can utilize `ISpanParsable<TSelf>` and `IParsable<TSelf>` for argument
+value conversions.
 
 ## Building and testing
 

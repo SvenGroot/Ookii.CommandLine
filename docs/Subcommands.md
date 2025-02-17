@@ -535,7 +535,7 @@ public static async Task<int> Main(string[] args)
     {
         if (command is IAsyncCommand asyncCommand)
         {
-            // If you have CancellationToken, pass it here.
+            // If you have a CancellationToken, pass it here.
             return await asyncCommand.RunAsync();
         }
 

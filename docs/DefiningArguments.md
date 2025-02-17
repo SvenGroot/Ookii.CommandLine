@@ -344,8 +344,8 @@ public int Argument { get; set; }
 The type specified must be derived from the [`ArgumentConverter`][] class.
 
 To create a custom converter, create a class that derives from the [`ArgumentConverter`][] class.
-Argument conversion uses the [`ReadOnlyMemory<char>`][] type to represent the raw string value, so that
-no string allocation is performed when not necessary.
+Argument conversion uses the [`ReadOnlyMemory<char>`][] type to represent the raw string value, so
+that no string allocation is performed when not necessary.
 
 Previous versions of Ookii.CommandLine used .Net's [`TypeConverter`][] class. Starting with
 Ookii.CommandLine 4.0, this is no longer the case, and the [`ArgumentConverter`][] class is used

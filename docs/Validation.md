@@ -215,17 +215,19 @@ If you plan to include a usage help message, derive from the
 [`ArgumentValidationWithHelpAttribute`][] class to provide an
 [`IncludeInUsageHelp`][IncludeInUsageHelp_0] property, though this is not required.
 
-You must implement at least one of the [`IsValidPreConversion()`][IsValidPreConversion()_0], [`IsValidPostConversion()`][IsValidPostConversion()_0], or
-[`IsValidPostParsing()`][IsValidPostParsing()_0] methods, depending on when you want to validate the value. Each returns a
-boolean indicating whether the value is valid (you should not throw an exception). Override the
-[`GetErrorMessage()`][] method to provide a custom error message, and the [`GetUsageHelp()`][]
-method to provide a help message (if you derived from the [`ArgumentValidationWithHelpAttribute`][]
-class, override [`GetUsageHelpCore()`][] instead).
+You must implement at least one of the [`IsValidPreConversion()`][IsValidPreConversion()_0],
+[`IsValidPostConversion()`][IsValidPostConversion()_0], or
+[`IsValidPostParsing()`][IsValidPostParsing()_0] methods, depending on when you want to validate the
+value. Each returns a boolean indicating whether the value is valid (you should not throw an
+exception). Override the [`GetErrorMessage()`][] method to provide a custom error message, and the
+[`GetUsageHelp()`][] method to provide a help message (if you derived from the
+[`ArgumentValidationWithHelpAttribute`][] class, override [`GetUsageHelpCore()`][] instead).
 
 > [!NOTE]
-> If you override [`IsValidPostParsing()`][IsValidPostParsing()_0], it will be called even if the argument the validator is
-> applied to was not set. Check the [`CommandLineArgument.HasValue`][] property to see if your
-> validation logic should apply. The other methods are only called when the argument is specified.
+> If you override [`IsValidPostParsing()`][IsValidPostParsing()_0], it will be called even if the
+> argument that the validator was applied to was not set. Check the
+> [`CommandLineArgument.HasValue`][] property to see if your validation logic should apply. The
+> other methods are only called when the argument is specified.
 
 You can also override the [`ErrorCategory`][] property to use a different error category for
 validation failure, instead of the default [`ValidationFailed`][ValidationFailed_1].

@@ -319,9 +319,9 @@ You can use any enumeration type, and you can define as many categories as you l
 names you like. The numerical values of the enumeration members determine the order of the
 categories in the help text.
 
-Apply the [`DescriptionAttribute`][] to each member in the enumeration to set the text that will be used
-for the category header. If the [`DescriptionAttribute`][] is not present, the name of the enumeration
-member will be used instead.
+Apply the [`DescriptionAttribute`][] to each member in the enumeration to set the text that will be
+used for the category header. If the [`DescriptionAttribute`][] is not present, the name of the
+enumeration member will be used instead.
 
 To set the category for an argument, use the [`CommandLineArgumentAttribute.Category`][] property.
 
@@ -349,7 +349,8 @@ partial class MyArguments
 
 > [!NOTE]
 > The [`CommandLineArgumentAttribute.Category`][] property has the type `object`, but it must be an
-> enumeration value. This was done because the type [`Enum`][] is not allowed for use with attributes.
+> enumeration value. This was done because the type [`Enum`][] is not allowed for use with
+> attributes.
 
 The descriptions for these arguments would look like this:
 
@@ -375,8 +376,8 @@ Other options
 
 Arguments in the same category will be grouped together, even if their properties or methods were
 not together in the arguments class. The arguments inside each category are sorted using the usual
-rules (positional arguments first, then named required, then optional, in alphabetical order by
-default).
+rules (positional arguments first, then named required arguments, then optional arguments, in
+alphabetical order by default).
 
 Arguments that have no category specified, as well as the automatic help and version arguments, will
 be shown above any arguments that do have a category. If you wish to include these arguments in a
@@ -384,7 +385,7 @@ category, you can use the [`ParseOptionsAttribute.DefaultArgumentCategory`][] pr
 
 ```csharp
 [GeneratedParser]
-[ParseOption(DefaultArgumentCategory = ArgumentCategory.Other)]
+[ParseOptions(DefaultArgumentCategory = ArgumentCategory.Other)]
 partial class MyArguments
 {
 }

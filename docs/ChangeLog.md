@@ -9,37 +9,40 @@ please check the [migration guide](Migrating.md).
   - Arguments using an enumeration type now only accept named values by default, and comma-separated
     values are only accepted if the enumeration has the [`FlagsAttribute`][]. These default can be
     changed using the [`ValidateEnumValueAttribute`][] attribute.
-  - [Argument validators](Validation.md) can now validate the value before string conversion, after
-    conversion, and after all arguments have been parsed in a single validator.
-  - You can use the helper type [`NonSwitchBoolean`][] to create an argument that takes a boolean value,
-    but is not a switch argument.
+  - [Argument validators](Validation.md) can now define separate methods to validate the value
+    before string conversion, after conversion, and after all arguments have been parsed. This
+    allows a single validator to perform validation at each stage.
+  - You can use the helper type [`NonSwitchBoolean`][] to create an argument that takes a boolean
+    value, but is not a switch argument.
   - When an [automatic prefix alias](DefiningArguments.md#automatic-prefix-aliases) is used that is
     ambiguous between multiple arguments or commands, a message is shown that lists the arguments it
     could match.
   - An error message is now shown when the user provides an unknown command name, along with the
     usage help.
 - Usage help improvements:
-  - You can now easily group arguments into [categories](UsageHelp.md#argument-categories) in the
-    usage help.
-  - You can hide argument and command aliases from the usage help with the [`AliasAttribute.IsHidden`][]
-    and [`ShortAliasAttribute.IsHidden`][] properties.
-  - You can now apply the [`ValueDescriptionAttribute`][] to a type, as well as to an individual argument.
-    This allows you to set a default description for a custom type you use for argument parsing.
+  - You can now group arguments into [categories](UsageHelp.md#argument-categories) in the usage
+    help.
+  - You can hide argument and command aliases from the usage help with the
+    [`AliasAttribute.IsHidden`][] and [`ShortAliasAttribute.IsHidden`][] properties.
+  - You can now apply the [`ValueDescriptionAttribute`][] to a type, as well as to an individual
+    argument. This allows you to set a default description for a custom type you use for argument
+    parsing.
   - Custom value descriptions can opt-in to having [name transformation](DefiningArguments.md#name-transformation)
-    applied to the custom description, using the [`ValueDescriptionAttribute.ApplyTransform`][] property.
-  - When an argument cancels parsing (e.g. using [`CommandLineArgumentAttribute.CancelParsing`][], or a
-    the return value of a method argument), it must now ask for usage help to be shown using
+    applied to the custom description, using the [`ValueDescriptionAttribute.ApplyTransform`][]
+    property.
+  - When an argument cancels parsing (e.g. using [`CommandLineArgumentAttribute.CancelParsing`][],
+    or with the return value of a method argument), it must now ask for usage help to be shown using
     [`CancelMode.AbortWithHelp`][] instead of using the [`HelpRequested`][] property.
 - Improved and simplified some APIs:
-  - Custom argument converters now only have to implement a single method that takes a [`ReadOnlyMemory<char>`][],
-    instead of separate `string` and [`ReadOnlySpan<char>`][] overloads.
-  - The [`CommandAttribute`][] is no longer inherited by derived classes. Inheriting it didn't really make
-    sense unless no command name was set.
+  - Custom argument converters now only have to implement a single method that takes a
+    [`ReadOnlyMemory<char>`][], instead of separate `string` and [`ReadOnlySpan<char>`][] overloads.
+  - The [`CommandAttribute`][] is no longer inherited by derived classes. Inheriting it didn't
+    really make sense unless no command name was set.
   - Simplify the API for using a [`CancellationToken`][] with [`IAsyncCommand`][].
   - Some other small API cleanup.
   - See the [migration guide](Migrating.md) for details on all API changes.
-- The .Net 8 SDK is now required for using source generation. As before, you can still target .Net
-  Framework runtimes, as long as you build using .Net 8 or a newer SDK.
+- The .Net 8 SDK is now required for using source generation. As before, you can still target older
+  .Net runtimes, as long as you build using .Net 8 or a newer SDK.
 - Various bug fixes and minor improvements.
 - The code snippets Visual Studio extension has been removed from the download. The existing
   snippets still work, but they will no longer be updated in the future.

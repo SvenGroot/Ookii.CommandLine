@@ -10,7 +10,7 @@ Ookii.CommandLine comes with several samples that demonstrate various aspects of
   usage help generation, by customizing it to use completely different formatting.
 - The [**argument dependencies sample**](ArgumentDependencies) demonstrates how you can have
   arguments that require or prohibit the presence of other arguments.
-- The [**categories sample**](Categories) demonstrates how to group arguments into categies in the
+- The [**categories sample**](Categories) demonstrates how to group arguments into categories in the
   usage help.
 - The [**WPF sample**](Wpf) shows how you can use Ookii.CommandLine with a GUI application.
 

@@ -433,9 +433,9 @@ The arguments class has multiple arguments with the [`CommandLineArgumentAttribu
 property set, and the do not all use the same enumeration type. Every argument must use the same
 type for its category.
 
-This error is also emitted if the [`ParseOptionsAttribute.DefaultArgumentCategory`][] property uses a
-different type than the [`CommandLineArgumentAttribute.Category`][] property of an argument in that
-class.
+This error is also emitted if the [`ParseOptionsAttribute.DefaultArgumentCategory`][] property uses
+a different type than the [`CommandLineArgumentAttribute.Category`][] property of an argument in
+that class.
 
 If the arguments class is derived from a base class that also defines arguments, all arguments
 defined by all base classes must use the same type for their categories.
@@ -446,11 +446,11 @@ For example, the following code triggers this error:
 [GeneratedParser]
 partial class Arguments
 {
-    // WARNING: The category is not an enumeration type.
     [CommandLineArgument(Category = SomeEnum.SomeCategory)]
     [ValidateEnumValue]
-    public string? Argument { get; set; }
+    public string? Argument1 { get; set; }
 
+    // WARNING: The category uses a different type than Argument1.
     [CommandLineArgument(Category = OtherEnum.OtherCategory)]
     [ValidateEnumValue]
     public int Argument2 { get; set; }

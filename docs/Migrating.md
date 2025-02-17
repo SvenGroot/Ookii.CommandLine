@@ -20,7 +20,7 @@ though the scope of the changes is likely to be small.
 
 - The .Net 8 SDK is now required to use [source generation](SourceGeneration.md). You can still
   target older runtimes, even when using source generation, as long as the project is built using
-  the .Net 8 or a newer SDK.
+  the .Net 8 SDK or a newer SDK.
 - The [`IAsyncCommand.RunAsync()`][] and [`AsyncCommandBase.RunAsync()`][] methods now take a
   [`CancellationToken`][] as an argument. The `IAsyncCancelableCommand` interface has been removed.
 - The [`ArgumentConverter`][] class now has a single
@@ -39,13 +39,18 @@ though the scope of the changes is likely to be small.
     removed.
   - To upgrade an existing custom validator, remove the `Mode` property and replace the `IsValid()`
     method with the appropriate method corresponding to when you want to perform validation.
+  - The [`ArgumentValidationAttribute.IsValidPostParsing()`][] method is called even if the argument
+    has no value. If you used a custom validator with `ValidationMode.AfterParsing`, be aware of
+    this difference and check the [`CommandLineArgument.HasValue`][] property to determine if your
+    validation logic should be applied.
   - All built-in validators have been upgraded accordingly.
-- The [`CancelMode.AbortWithHelp`][] value was added to indicate usage help should be shown when parsing
-  is canceled.
-  - The [`CommandLineArgumentAttribute.CancelParsing`][] attribute no longer shows help automatically
-    when using [`CancelMode.Abort`][]; you must change them to [`CancelMode.AbortWithHelp`][].
+- The [`CancelMode.AbortWithHelp`][] value was added to indicate usage help should be shown when
+  parsing is canceled.
+  - The [`CommandLineArgumentAttribute.CancelParsing`][] attribute no longer shows help
+    automatically when using [`CancelMode.Abort`][]; you must change them to
+    [`CancelMode.AbortWithHelp`][].
   - The `CommandLineParser.HelpRequested` property was moved to [`ParseResult.HelpRequested`][], and
-    can no longer be set by event handlers or method arguments. Change code that set this property
+    can no longer be set by event handlers or method arguments. Change code that sets this property
     to return [`CancelMode.AbortWithHelp`][] instead.
 - Method arguments using a [`Boolean`][] return value are no longer allowed; only `void` and
   [`CancelMode`][] can be used as the return value. Change methods that returned a [`Boolean`][] to
@@ -64,7 +69,7 @@ though the scope of the changes is likely to be small.
   same name), and it is better to be explicit about which classes you wish to be commands. If you
   have a class that derives from a command that is itself also a command, make sure you apply the
   [`CommandAttribute`][] to the derived class.
-- When the user uses a ambiguous prefix alias, an [`AmbiguousPrefixAliasException`][] is thrown
+- When the user uses an ambiguous prefix alias, an [`AmbiguousPrefixAliasException`][] is thrown
   (this exception derives from [`CommandLineArgumentException`][]), with the category set to
   [`CommandLineArgumentErrorCategory.AmbiguousPrefixAlias`][]. Previously, these errors used
   [`CommandLineArgumentErrorCategory.UnknownArgument`][].
@@ -95,10 +100,6 @@ though the scope of the changes is likely to be small.
   default if the [`FlagsAttribute`][] is present on the enumeration.
   - The [`EnumConverter`][] class now also applies these defaults if the argument has no
     [`ValidateEnumValueAttribute`][].
-- The [`ArgumentValidationAttribute.IsValidPostParsing()`][] method is called even if the argument
-  has no value. If you used a custom validator with `ValidationMode.AfterParsing`, be aware of this
-  difference and check the [`CommandLineArgument.HasValue`][] property to determine if your
-  validation logic should be applied.
 
 ## Ookii.CommandLine 4.0
 
