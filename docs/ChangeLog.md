@@ -44,6 +44,8 @@ please check the [migration guide](Migrating.md).
 - The .Net 8 SDK is now required for using source generation. As before, you can still target older
   .Net runtimes, as long as you build using .Net 8 or a newer SDK.
 - Various bug fixes and minor improvements.
+- The .Net 6 and .Net 7 assemblies have been removed, which may lead to some loss of features for
+  those .Net versions. See the [migration guide](Migrating.md) for more details.
 - The code snippets Visual Studio extension has been removed from the download. The existing
   snippets still work, but they will no longer be updated in the future.
 
