@@ -1,6 +1,6 @@
 # What’s new in Ookii.CommandLine
 
-## Ookii.CommandLine 5.0 (TBD)
+## Ookii.CommandLine 5.0 (2025-02-22)
 
 **IMPORTANT:** Version 5.0 contains breaking changes. If you are upgrading from an earlier version,
 please check the [migration guide](Migrating.md).
