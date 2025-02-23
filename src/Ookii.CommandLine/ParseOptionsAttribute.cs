@@ -439,6 +439,51 @@ public class ParseOptionsAttribute : Attribute
     /// </remarks>
     public PrefixTerminationMode PrefixTermination { get; set; }
 
+    /// <summary>
+    /// Gets or sets the default category to use for arguments that don't have an explicit
+    /// category.
+    /// </summary>
+    /// <value>
+    /// An enumeration value that defines the category, or <see langword="null"/> to use the
+    /// default category, or no category if there is no default category. The default value is
+    /// <see langword="null"/>.
+    /// </value>
+    /// <exception cref="NotSupportedException">
+    /// When setting the property, the type of the value is not an enumeration type.
+    /// </exception>
+    /// <remarks>
+    /// <para>
+    ///   The category must be an <see cref="Enum"/> value, and all arguments defined by a class
+    ///   (including any defined by its base classes) must use the same type. The
+    ///   <see cref="CommandLineParser"/> class will throw an exception if this is not the case.
+    /// </para>
+    /// <para>
+    ///   This category will be used for arguments where the <see cref="CommandLineArgumentAttribute.Category" qualifyHint="true"/>
+    ///   property is <see langword="null"/>, and for the automatically generated help and version
+    ///   arguments.
+    /// </para>
+    /// <para>
+    ///   Argument categories are used to group argument in the usage help; they are not used when
+    ///   parsing. The default <see cref="UsageWriter"/> will sort the categories based on their
+    ///   underlying enumeration values,
+    /// </para>
+    /// </remarks>
+    public object? DefaultArgumentCategory
+    {
+        get => DefaultArgumentCategoryValue;
+        set
+        {
+            if (value is not null and not Enum)
+            {
+                throw new NotSupportedException(Properties.Resources.CategoryNotEnum);
+            }
+
+            DefaultArgumentCategoryValue = (Enum?)value;
+        }
+    }
+
+    internal Enum? DefaultArgumentCategoryValue { get; set; }
+
     internal StringComparison GetStringComparison()
     {
         if (CaseSensitive)

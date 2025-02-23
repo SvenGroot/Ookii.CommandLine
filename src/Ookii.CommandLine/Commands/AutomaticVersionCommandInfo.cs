@@ -15,7 +15,7 @@ internal class AutomaticVersionCommandInfo : CommandInfo
 
     public override bool UseCustomArgumentParsing => false;
 
-    public override IEnumerable<string> Aliases => Enumerable.Empty<string>();
+    public override IEnumerable<AliasAttribute> Aliases => [];
 
     public override ICommandWithCustomParsing CreateInstanceWithCustomParsing()
         => throw new InvalidOperationException(Properties.Resources.NoCustomParsing);

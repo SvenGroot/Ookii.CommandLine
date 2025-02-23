@@ -2,11 +2,11 @@
 
 partial class CommandLineParserTest
 {
-    private const string _executableName = "test";
+    private const string ExecutableName = "test";
 
     private static readonly string _expectedDefaultUsage = @"Test arguments description.
 
-Usage: test [/arg1] <String> [[/other] <Number>] [[/notSwitch] <Boolean>] [[/Arg5] <Single>] [[/other2] <Number>] [[/Arg8] <DayOfWeek>...] /Arg6 <String> [/Arg10...] [/Arg11] [/Arg12 <Int32>...] [/Arg13 <String=Int32>...] [/Arg14 <String=Int32>...] [/Arg15 <KeyValuePair<String, Int32>>] [/Arg3 <String>] [/Arg7] [/Arg9 <Int32>] [/Help] [/Version]
+Usage: test [/arg1] <String> [[/other] <Number>] [[/notSwitch] <Boolean>] [[/Arg5] <Single>] [[/other2] <Number>] [[/Arg8] <DayOfWeek>...] /Arg6 <String> [/Arg10...] [/Arg11] [/Arg12 <Int32>...] [/Arg13 <String=Int32>...] [/Arg14 <String=Int32>...] [/Arg15 <KeyValuePair<String, Int32>>] [/Arg3 <String>] [/Arg7] [/Arg9 <Int32>] [/Help] [/NotSwitch2 <Boolean>] [/Version]
 
     /arg1 <String>
         Arg1 description.
@@ -37,6 +37,9 @@ Usage: test [/arg1] <String> [[/other] <Number>] [[/notSwitch] <Boolean>] [[/Arg
 
     /Help [<Boolean>] (/?, /h)
         Displays this help message.
+
+    /NotSwitch2 <Boolean>
+        NotSwitch2 description.
 
     /Version [<Boolean>]
         Displays version information.
@@ -138,7 +141,7 @@ Usage: test [/arg1] <String> [[/other] <Number>] [[/notSwitch] <Boolean>] [[/Arg
 
     private static readonly string _expectedUsageDescriptionOnly = @"Test arguments description.
 
-Usage: test [-arg1] <String> [[-other] <Number>] [[-notSwitch] <Boolean>] [[-Arg5] <Single>] [[-other2] <Number>] [[-Arg8] <DayOfWeek>...] -Arg6 <String> [-Arg10...] [-Arg11] [-Arg12 <Int32>...] [-Arg13 <String=Int32>...] [-Arg14 <String=Int32>...] [-Arg15 <KeyValuePair<String, Int32>>] [-Arg3 <String>] [-Arg7] [-Arg9 <Int32>] [-Help] [-Version]
+Usage: test [-arg1] <String> [[-other] <Number>] [[-notSwitch] <Boolean>] [[-Arg5] <Single>] [[-other2] <Number>] [[-Arg8] <DayOfWeek>...] -Arg6 <String> [-Arg10...] [-Arg11] [-Arg12 <Int32>...] [-Arg13 <String=Int32>...] [-Arg14 <String=Int32>...] [-Arg15 <KeyValuePair<String, Int32>>] [-Arg3 <String>] [-Arg7] [-Arg9 <Int32>] [-Help] [-NotSwitch2 <Boolean>] [-Version]
 
     -arg1 <String>
         Arg1 description.
@@ -158,6 +161,9 @@ Usage: test [-arg1] <String> [[-other] <Number>] [[-notSwitch] <Boolean>] [[-Arg
     -Help [<Boolean>] (-?, -h)
         Displays this help message.
 
+    -NotSwitch2 <Boolean>
+        NotSwitch2 description.
+
     -Version [<Boolean>]
         Displays version information.
 
@@ -165,7 +171,7 @@ Usage: test [-arg1] <String> [[-other] <Number>] [[-notSwitch] <Boolean>] [[-Arg
 
     private static readonly string _expectedUsageAll = @"Test arguments description.
 
-Usage: test [-arg1] <String> [[-other] <Number>] [[-notSwitch] <Boolean>] [[-Arg5] <Single>] [[-other2] <Number>] [[-Arg8] <DayOfWeek>...] -Arg6 <String> [-Arg10...] [-Arg11] [-Arg12 <Int32>...] [-Arg13 <String=Int32>...] [-Arg14 <String=Int32>...] [-Arg15 <KeyValuePair<String, Int32>>] [-Arg3 <String>] [-Arg7] [-Arg9 <Int32>] [-Help] [-Version]
+Usage: test [-arg1] <String> [[-other] <Number>] [[-notSwitch] <Boolean>] [[-Arg5] <Single>] [[-other2] <Number>] [[-Arg8] <DayOfWeek>...] -Arg6 <String> [-Arg10...] [-Arg11] [-Arg12 <Int32>...] [-Arg13 <String=Int32>...] [-Arg14 <String=Int32>...] [-Arg15 <KeyValuePair<String, Int32>>] [-Arg3 <String>] [-Arg7] [-Arg9 <Int32>] [-Help] [-NotSwitch2 <Boolean>] [-Version]
 
     -arg1 <String>
         Arg1 description.
@@ -218,6 +224,9 @@ Usage: test [-arg1] <String> [[-other] <Number>] [[-notSwitch] <Boolean>] [[-Arg
     -Help [<Boolean>] (-?, -h)
         Displays this help message.
 
+    -NotSwitch2 <Boolean>
+        NotSwitch2 description.
+
     -Version [<Boolean>]
         Displays version information.
 
@@ -225,7 +234,7 @@ Usage: test [-arg1] <String> [[-other] <Number>] [[-notSwitch] <Boolean>] [[-Arg
 
     private static readonly string _expectedUsageNone = @"Test arguments description.
 
-Usage: test [-arg1] <String> [[-other] <Number>] [[-notSwitch] <Boolean>] [[-Arg5] <Single>] [[-other2] <Number>] [[-Arg8] <DayOfWeek>...] -Arg6 <String> [-Arg10...] [-Arg11] [-Arg12 <Int32>...] [-Arg13 <String=Int32>...] [-Arg14 <String=Int32>...] [-Arg15 <KeyValuePair<String, Int32>>] [-Arg3 <String>] [-Arg7] [-Arg9 <Int32>] [-Help] [-Version]
+Usage: test [-arg1] <String> [[-other] <Number>] [[-notSwitch] <Boolean>] [[-Arg5] <Single>] [[-other2] <Number>] [[-Arg8] <DayOfWeek>...] -Arg6 <String> [-Arg10...] [-Arg11] [-Arg12 <Int32>...] [-Arg13 <String=Int32>...] [-Arg14 <String=Int32>...] [-Arg15 <KeyValuePair<String, Int32>>] [-Arg3 <String>] [-Arg7] [-Arg9 <Int32>] [-Help] [-NotSwitch2 <Boolean>] [-Version]
 
 ".ReplaceLineEndings();
 
@@ -233,7 +242,7 @@ Usage: test [-arg1] <String> [[-other] <Number>] [[-notSwitch] <Boolean>] [[-Arg
     // necessary but that requires C# 11.
     private static readonly string _expectedUsageColor = @"Test arguments description.
 
-[36mUsage:[0m test [/arg1] <String> [[/other] <Number>] [[/notSwitch] <Boolean>] [[/Arg5] <Single>] [[/other2] <Number>] [[/Arg8] <DayOfWeek>...] /Arg6 <String> [/Arg10...] [/Arg11] [/Arg12 <Int32>...] [/Arg13 <String=Int32>...] [/Arg14 <String=Int32>...] [/Arg15 <KeyValuePair<String, Int32>>] [/Arg3 <String>] [/Arg7] [/Arg9 <Int32>] [/Help] [/Version]
+[36mUsage:[0m test [/arg1] <String> [[/other] <Number>] [[/notSwitch] <Boolean>] [[/Arg5] <Single>] [[/other2] <Number>] [[/Arg8] <DayOfWeek>...] /Arg6 <String> [/Arg10...] [/Arg11] [/Arg12 <Int32>...] [/Arg13 <String=Int32>...] [/Arg14 <String=Int32>...] [/Arg15 <KeyValuePair<String, Int32>>] [/Arg3 <String>] [/Arg7] [/Arg9 <Int32>] [/Help] [/NotSwitch2 <Boolean>] [/Version]
 
     [32m/arg1 <String>[0m
         Arg1 description.
@@ -264,6 +273,9 @@ Usage: test [-arg1] <String> [[-other] <Number>] [[-notSwitch] <Boolean>] [[-Arg
 
     [32m/Help [<Boolean>] (/?, /h)[0m
         Displays this help message.
+
+    [32m/NotSwitch2 <Boolean>[0m
+        NotSwitch2 description.
 
     [32m/Version [<Boolean>][0m
         Displays version information.
@@ -583,7 +595,7 @@ You must use at least one of: -Address, -Path.
 
 ".ReplaceLineEndings();
 
-    private static readonly string _expectedUsageSyntaxOnly = @"Usage: test [/arg1] <String> [[/other] <Number>] [[/notSwitch] <Boolean>] [[/Arg5] <Single>] [[/other2] <Number>] [[/Arg8] <DayOfWeek>...] /Arg6 <String> [/Arg10...] [/Arg11] [/Arg12 <Int32>...] [/Arg13 <String=Int32>...] [/Arg14 <String=Int32>...] [/Arg15 <KeyValuePair<String, Int32>>] [/Arg3 <String>] [/Arg7] [/Arg9 <Int32>] [/Help] [/Version]
+    private static readonly string _expectedUsageSyntaxOnly = @"Usage: test [/arg1] <String> [[/other] <Number>] [[/notSwitch] <Boolean>] [[/Arg5] <Single>] [[/other2] <Number>] [[/Arg8] <DayOfWeek>...] /Arg6 <String> [/Arg10...] [/Arg11] [/Arg12 <Int32>...] [/Arg13 <String=Int32>...] [/Arg14 <String=Int32>...] [/Arg15 <KeyValuePair<String, Int32>>] [/Arg3 <String>] [/Arg7] [/Arg9 <Int32>] [/Help] [/NotSwitch2 <Boolean>] [/Version]
 
 Run 'test /Help' for more information.
 ".ReplaceLineEndings();
@@ -593,7 +605,7 @@ Run 'test /Help' for more information.
 
     private static readonly string _expectedUsageSeparator = @"Test arguments description.
 
-Usage: test [/arg1:]<String> [[/other:]<Number>] [[/notSwitch:]<Boolean>] [[/Arg5:]<Single>] [[/other2:]<Number>] [[/Arg8:]<DayOfWeek>...] /Arg6:<String> [/Arg10...] [/Arg11] [/Arg12:<Int32>...] [/Arg13:<String=Int32>...] [/Arg14:<String=Int32>...] [/Arg15:<KeyValuePair<String, Int32>>] [/Arg3:<String>] [/Arg7] [/Arg9:<Int32>] [/Help] [/Version]
+Usage: test [/arg1:]<String> [[/other:]<Number>] [[/notSwitch:]<Boolean>] [[/Arg5:]<Single>] [[/other2:]<Number>] [[/Arg8:]<DayOfWeek>...] /Arg6:<String> [/Arg10...] [/Arg11] [/Arg12:<Int32>...] [/Arg13:<String=Int32>...] [/Arg14:<String=Int32>...] [/Arg15:<KeyValuePair<String, Int32>>] [/Arg3:<String>] [/Arg7] [/Arg9:<Int32>] [/Help] [/NotSwitch2:<Boolean>] [/Version]
 
     /arg1 <String>
         Arg1 description.
@@ -625,6 +637,9 @@ Usage: test [/arg1:]<String> [[/other:]<Number>] [[/notSwitch:]<Boolean>] [[/Arg
     /Help [<Boolean>] (/?, /h)
         Displays this help message.
 
+    /NotSwitch2 <Boolean>
+        NotSwitch2 description.
+
     /Version [<Boolean>]
         Displays version information.
 
@@ -632,7 +647,7 @@ Usage: test [/arg1:]<String> [[/other:]<Number>] [[/notSwitch:]<Boolean>] [[/Arg
 
     private static readonly string _expectedCustomIndentUsage = @"Test arguments description.
 
-Usage: test [-arg1] <String> [[-other] <Number>] [[-notSwitch] <Boolean>] [[-Arg5] <Single>] [[-other2] <Number>] [[-Arg8] <DayOfWeek>...] -Arg6 <String> [-Arg10...] [-Arg11] [-Arg12 <Int32>...] [-Arg13 <String=Int32>...] [-Arg14 <String=Int32>...] [-Arg15 <KeyValuePair<String, Int32>>] [-Arg3 <String>] [-Arg7] [-Arg9 <Int32>] [-Help] [-Version]
+Usage: test [-arg1] <String> [[-other] <Number>] [[-notSwitch] <Boolean>] [[-Arg5] <Single>] [[-other2] <Number>] [[-Arg8] <DayOfWeek>...] -Arg6 <String> [-Arg10...] [-Arg11] [-Arg12 <Int32>...] [-Arg13 <String=Int32>...] [-Arg14 <String=Int32>...] [-Arg15 <KeyValuePair<String, Int32>>] [-Arg3 <String>] [-Arg7] [-Arg9 <Int32>] [-Help] [-NotSwitch2 <Boolean>] [-Version]
 
   -arg1 <String>
     Arg1 description.
@@ -663,6 +678,9 @@ Usage: test [-arg1] <String> [[-other] <Number>] [[-notSwitch] <Boolean>] [[-Arg
 
   -Help [<Boolean>] (-?, -h)
     Displays this help message.
+
+  -NotSwitch2 <Boolean>
+    NotSwitch2 description.
 
   -Version [<Boolean>]
     Displays version information.
@@ -737,7 +755,7 @@ Some usage footer.
 
     private static readonly string _expectedFooterUsage = @"Test arguments description.
 
-Usage: test [-arg1] <String> [[-other] <Number>] [[-notSwitch] <Boolean>] [[-Arg5] <Single>] [[-other2] <Number>] [[-Arg8] <DayOfWeek>...] -Arg6 <String> [-Arg10...] [-Arg11] [-Arg12 <Int32>...] [-Arg13 <String=Int32>...] [-Arg14 <String=Int32>...] [-Arg15 <KeyValuePair<String, Int32>>] [-Arg3 <String>] [-Arg7] [-Arg9 <Int32>] [-Help] [-Version]
+Usage: test [-arg1] <String> [[-other] <Number>] [[-notSwitch] <Boolean>] [[-Arg5] <Single>] [[-other2] <Number>] [[-Arg8] <DayOfWeek>...] -Arg6 <String> [-Arg10...] [-Arg11] [-Arg12 <Int32>...] [-Arg13 <String=Int32>...] [-Arg14 <String=Int32>...] [-Arg15 <KeyValuePair<String, Int32>>] [-Arg3 <String>] [-Arg7] [-Arg9 <Int32>] [-Help] [-NotSwitch2 <Boolean>] [-Version]
 
     -arg1 <String>
         Arg1 description.
@@ -769,9 +787,75 @@ Usage: test [-arg1] <String> [[-other] <Number>] [[-notSwitch] <Boolean>] [[-Arg
     -Help [<Boolean>] (-?, -h)
         Displays this help message.
 
+    -NotSwitch2 <Boolean>
+        NotSwitch2 description.
+
     -Version [<Boolean>]
         Displays version information.
 
 This is a custom footer.
+".ReplaceLineEndings();
+
+    private static readonly string _expectedCategoryUsage = @"[36mUsage:[0m test [-ArgWithoutCategory <String>] [-Bar <String>] [-Baz <String>] [-Category3Arg <String>] [-Foo <String>] [-Help] [-Version]
+
+    [32m-Help [<Boolean>] (-?, -h)[0m
+        Displays this help message.
+
+    [32m-Version [<Boolean>][0m
+        Displays version information.
+
+[36mThe first category.[0m
+
+    [32m-Bar <String>[0m
+        Bar description.
+
+    [32m-Foo <String>[0m
+        Foo description.
+
+[36mThe second category.[0m
+
+    [32m-Baz <String>[0m
+        Baz description.
+
+[36mCategory3[0m
+
+    [32m-Category3Arg <String>[0m
+        Category3Arg description.
+
+".ReplaceLineEndings();
+
+    private static readonly string _expectedDefaultCategoryUsage = @"Usage: test [-Baz <String>] [-Foo <String>] [-Help] [-Version]
+
+The first category.
+
+    -Foo <String>
+        Foo description.
+
+The second category.
+
+    -Baz <String>
+        Baz description.
+
+    -Help [<Boolean>] (-?, -h)
+        Displays this help message.
+
+    -Version [<Boolean>]
+        Displays version information.
+
+".ReplaceLineEndings();
+
+    private static readonly string _expectedAutoPrefixUsage = @"The prefix could refer to one of the following arguments:
+  [32m-Port[0m
+  [32m-Prefix[0m
+  [32m-Protocol[0m
+
+Run 'test -Help' for more information.
+".ReplaceLineEndings();
+
+    private static readonly string _expectedAutoPrefixUsageLongShort = @"The prefix could refer to one of the following arguments:
+  [32m--port[0m
+  [32m--protocol[0m
+
+Run 'test --help' for more information.
 ".ReplaceLineEndings();
 }

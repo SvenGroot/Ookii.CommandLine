@@ -2,6 +2,7 @@
 using Ookii.CommandLine.Support;
 using Ookii.CommandLine.Terminal;
 using Ookii.CommandLine.Validation;
+using Ookii.Common;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -208,6 +209,8 @@ public class CommandLineParser
 
         public bool IsSpecifiedByPosition;
 
+        public ImmutableArray<string>.Builder? PossibleMatches;
+
         public readonly CommandLineArgument? PositionalArgument
             => PositionalArgumentIndex < Parser._positionalArgumentCount ? Parser.Arguments[PositionalArgumentIndex] : null;
 
@@ -222,6 +225,7 @@ public class CommandLineParser
             ArgumentValue = null;
             IsUnknown = false;
             IsSpecifiedByPosition = false;
+            PossibleMatches?.Clear();
         }
     }
 
@@ -266,8 +270,8 @@ public class CommandLineParser
     /// <para>
     ///   Set the <see cref="ArgumentParsedEventArgs.CancelParsing" qualifyHint="true"/> property in
     ///   the event handler to cancel parsing at the current argument. To have usage help shown
-    ///   by the parse methods that do this automatically, you must set the <see cref="HelpRequested"/>
-    ///   property to <see langword="true"/> explicitly in the event handler.
+    ///   by the parse methods that do this automatically, you must set it to
+    ///   <see cref="CancelMode.AbortWithHelp" qualifyHint="true"/>.
     /// </para>
     /// <para>
     ///   The <see cref="ArgumentParsedEventArgs.CancelParsing" qualifyHint="true"/> property is
@@ -451,18 +455,10 @@ public class CommandLineParser
         var builder = ImmutableArray.CreateBuilder<CommandLineArgument>();
         _positionalArgumentCount = DetermineMemberArguments(builder);
         DetermineAutomaticArguments(builder);
-        // Sort the member arguments in usage order (positional first, then required
-        // non-positional arguments, then the rest by name.
+        // Sort the member arguments in usage order (positional first, then required non-positional
+        // arguments, then the rest by name.
         builder.Sort(new CommandLineArgumentComparer(comparison));
-        if (builder.Count == builder.Capacity)
-        {
-            _arguments = builder.MoveToImmutable();
-        }
-        else
-        {
-            _arguments = builder.ToImmutable();
-        }
-
+        _arguments = builder.DrainToImmutable();
         VerifyPositionalArgumentRules();
     }
 
@@ -708,46 +704,6 @@ public class CommandLineParser
     public ImmutableArray<char> NameValueSeparators => _nameValueSeparators;
 
     /// <summary>
-    /// Gets or sets a value that indicates whether usage help should be displayed if the <see cref="Parse(string[])"/>
-    /// method returned <see langword="null"/>.
-    /// </summary>
-    /// <value>
-    /// <see langword="true"/> if usage help should be displayed; otherwise, <see langword="false"/>.
-    /// </value>
-    /// <remarks>
-    /// <para>
-    ///   Check this property after calling the <see cref="Parse(string[])"/> method or one
-    ///   of its overloads to see if usage help should be displayed.
-    /// </para>
-    /// <para>
-    ///   This property will always be <see langword="false"/> if the <see cref="Parse(string[])"/>
-    ///   method returned a non-<see langword="null"/> value.
-    /// </para>
-    /// <para>
-    ///   This property will always be <see langword="true"/> if the <see cref="Parse(string[])"/>
-    ///   method threw a <see cref="CommandLineArgumentException"/>, or if an argument used
-    ///   <see cref="CancelMode.Abort" qualifyHint="true"/> with the <see cref="CommandLineArgumentAttribute.CancelParsing" qualifyHint="true"/>
-    ///   property or the <see cref="ArgumentParsed"/> event.
-    /// </para>
-    /// <para>
-    ///   If an argument that is defined by a method (<see cref="ArgumentKind.Method" qualifyHint="true"/>) cancels
-    ///   parsing by returning <see cref="CancelMode.Abort" qualifyHint="true"/> or <see langword="false"/> from the
-    ///   method, this property is <em>not</em> automatically set to <see langword="true"/>.
-    ///   Instead, the method should explicitly set the <see cref="HelpRequested"/> property if it
-    ///   wants usage help to be displayed.
-    /// </para>
-    /// <code>
-    /// [CommandLineArgument]
-    /// public static CancelMode MethodArgument(CommandLineParser parser)
-    /// {
-    ///     parser.HelpRequested = true;
-    ///     return CancelMode.Abort;
-    /// }
-    /// </code>
-    /// </remarks>
-    public bool HelpRequested { get; set; }
-
-    /// <summary>
     /// Gets the <see cref="LocalizedStringProvider"/> implementation used to get strings for
     /// error messages and usage help.
     /// </summary>
@@ -840,6 +796,7 @@ public class CommandLineParser
 
     internal IComparer<char>? ShortArgumentNameComparer => _argumentsByShortName?.Comparer;
 
+    internal Enum? DefaultArgumentCategory => _provider.OptionsAttribute?.DefaultArgumentCategoryValue;
 
     /// <summary>
     /// Gets the name of the executable used to invoke the application.
@@ -964,19 +921,21 @@ public class CommandLineParser
     /// <returns>
     ///   An instance of the type specified by the <see cref="ArgumentsType"/> property, or
     ///   <see langword="null"/> if argument parsing was canceled by the <see cref="ArgumentParsed"/>
-    ///   event handler, the <see cref="CommandLineArgumentAttribute.CancelParsing" qualifyHint="true"/> property,
-    ///   or a method argument that returned <see cref="CancelMode.Abort" qualifyHint="true"/> or
-    ///   <see langword="false"/>.
+    ///   event handler, the <see cref="CommandLineArgumentAttribute.CancelParsing" qualifyHint="true"/>
+    ///   property, or a method argument that returned <see cref="CancelMode.Abort" qualifyHint="true"/>
+    ///   or <see cref="CancelMode.AbortWithHelp" qualifyHint="true"/>.
     /// </returns>
     /// <remarks>
     /// <para>
-    ///   If the return value is <see langword="null"/>, check the <see cref="HelpRequested"/>
-    ///   property to see if usage help should be displayed.
+    ///   If the return value is <see langword="null"/>, check the
+    ///   <see cref="ParseResult.HelpRequested" qualifyHint="true"/> property to see if usage help
+    ///   should be displayed.
     /// </para>
     /// </remarks>
     /// <exception cref="CommandLineArgumentException">
-    ///   An error occurred parsing the command line. Check the <see cref="CommandLineArgumentException.Category" qualifyHint="true"/>
-    ///   property for the exact reason for the error.
+    ///   An error occurred parsing the command line. Check the
+    ///   <see cref="CommandLineArgumentException.Category" qualifyHint="true"/> property for the
+    ///   exact reason for the error.
     /// </exception>
     public object? Parse()
     {
@@ -1009,20 +968,18 @@ public class CommandLineParser
     /// <param name="args">The command line arguments.</param>
     public object? Parse(ReadOnlyMemory<string> args)
     {
-        var state = new ParseState() 
-        { 
+        var state = new ParseState()
+        {
             Parser = this,
             Arguments = args,
         };
 
         try
         {
-            HelpRequested = false;
             return ParseCore(ref state);
         }
         catch (CommandLineArgumentException ex)
         {
-            HelpRequested = true;
             ParseResult = ParseResult.FromException(ex, args.Slice(state.Index));
             throw;
         }
@@ -1035,13 +992,15 @@ public class CommandLineParser
     /// <returns>
     ///   An instance of the type specified by the <see cref="ArgumentsType"/> property, or
     ///   <see langword="null"/> if an error occurred, or argument parsing was canceled by the
-    ///   <see cref="CommandLineArgumentAttribute.CancelParsing" qualifyHint="true"/> property or a method argument
-    ///   that returned <see cref="CancelMode.Abort" qualifyHint="true"/> or <see langword="false"/>.
+    ///   <see cref="CommandLineArgumentAttribute.CancelParsing" qualifyHint="true"/> property or a
+    ///   method argument that returned <see cref="CancelMode.Abort" qualifyHint="true"/> or
+    ///   <see cref="CancelMode.AbortWithHelp" qualifyHint="true"/>.
     /// </returns>
     /// <remarks>
     /// <para>
-    ///   If an error occurs or parsing is canceled, it prints errors to the <see cref="ParseOptions.Error" qualifyHint="true"/>
-    ///   stream, and usage help using the <see cref="UsageWriter"/> if the <see cref="HelpRequested"/>
+    ///   If an error occurs or parsing is canceled, it prints errors to the
+    ///   <see cref="ParseOptions.Error" qualifyHint="true"/> stream, and usage help using the
+    ///   <see cref="UsageWriter"/> if the <see cref="ParseResult.HelpRequested" qualifyHint="true"/>
     ///   property is <see langword="true"/>. It then returns <see langword="null"/>.
     /// </para>
     /// <para>
@@ -1104,8 +1063,17 @@ public class CommandLineParser
         {
             result = Parse(args);
         }
+        catch (AmbiguousPrefixAliasException ex) when (_parseOptions.ShowUsageOnError != UsageHelpRequest.Full)
+        {
+            WriteError(_parseOptions, StringProvider.AmbiguousArgumentPrefixAliasErrorOnly(ex.ArgumentName!),
+                _parseOptions.ErrorColor, true);
+
+            _parseOptions.UsageWriter.WriteParserAmbiguousPrefixAliasUsage(this, ex.PossibleMatches);
+            return null;
+        }
         catch (CommandLineArgumentException ex)
         {
+            Debug.Assert(ParseResult.HelpRequested);
             WriteError(_parseOptions, ex.Message, _parseOptions.ErrorColor, true);
             helpMode = _parseOptions.ShowUsageOnError;
         }
@@ -1117,7 +1085,7 @@ public class CommandLineParser
             }
         }
 
-        if (HelpRequested)
+        if (ParseResult.HelpRequested)
         {
             _parseOptions.UsageWriter.WriteParserUsage(this, helpMode);
         }
@@ -1136,9 +1104,10 @@ public class CommandLineParser
     /// </param>
     /// <returns>
     ///   An instance of the type <typeparamref name="T"/>, or <see langword="null"/> if an
-    ///   error occurred, or argument parsing was canceled by the <see cref="CommandLineArgumentAttribute.CancelParsing" qualifyHint="true"/>
+    ///   error occurred, or argument parsing was canceled by the
+    ///   <see cref="CommandLineArgumentAttribute.CancelParsing" qualifyHint="true"/>
     ///   property or a method argument that returned <see cref="CancelMode.Abort" qualifyHint="true"/>
-    ///   or <see langword="false"/>.
+    ///   or <see cref="CancelMode.AbortWithHelp" qualifyHint="true"/>.
     /// </returns>
     /// <exception cref="CommandLineArgumentException">
     ///   <inheritdoc cref="Parse()"/>
@@ -1154,8 +1123,8 @@ public class CommandLineParser
     ///   calls the <see cref="CommandLineParser{T}.ParseWithErrorHandling()"/> method, and returns
     ///   the result. If an error occurs or parsing is canceled, it prints errors to the
     ///   <see cref="ParseOptions.Error" qualifyHint="true"/> stream, and usage help to the
-    ///   <see cref="UsageWriter"/> if the <see cref="HelpRequested"/> property is <see langword="true"/>.
-    ///   It then returns <see langword="null"/>.
+    ///   <see cref="UsageWriter"/> if the <see cref="ParseResult.HelpRequested" qualifyHint="true"/>
+    ///   property is <see langword="true"/>. It then returns <see langword="null"/>.
     /// </para>
     /// <para>
     ///   If the <see cref="ParseOptions.Error" qualifyHint="true"/> parameter is <see langword="null"/>, output is
@@ -1419,6 +1388,8 @@ public class CommandLineParser
         }
     }
 
+    internal string GetCategoryDescription(Enum category) => _provider.GetCategoryDescription(category);
+
     private static ImmutableArray<string> DetermineArgumentNamePrefixes(ParseOptions options)
     {
         if (options.ArgumentNamePrefixes == null)
@@ -1462,17 +1433,33 @@ public class CommandLineParser
 
     private int DetermineMemberArguments(ImmutableArray<CommandLineArgument>.Builder builder)
     {
-        int additionalPositionalArgumentCount = 0;
+        int positionalArgumentCount = 0;
+        Type? categoryType = DefaultArgumentCategory?.GetType();
         foreach (var argument in _provider.GetArguments(this))
         {
             AddNamedArgument(argument, builder);
             if (argument.Position != null)
             {
-                ++additionalPositionalArgumentCount;
+                ++positionalArgumentCount;
+            }
+
+            // Make sure all arguments use the same category. This is checked here to avoid
+            // unexpected exceptions when generating usage help.
+            if (argument.Category is CategoryInfo category)
+            {
+                if (categoryType == null)
+                {
+                    categoryType = category.Category.GetType();
+                }
+                else if (categoryType != category.Category.GetType())
+                {
+                    throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture,
+                        Properties.Resources.MismatchedCategoryTypesFormat, argument.ArgumentName, category.Category.GetType(), categoryType));
+                }
             }
         }
 
-        return additionalPositionalArgumentCount;
+        return positionalArgumentCount;
     }
 
     private void DetermineAutomaticArguments(ImmutableArray<CommandLineArgument>.Builder builder)
@@ -1512,9 +1499,9 @@ public class CommandLineParser
         if (argument.HasLongName)
         {
             _argumentsByName.Add(argument.ArgumentName.AsMemory(), argument);
-            foreach (string alias in argument.Aliases)
+            foreach (var alias in argument.Aliases)
             {
-                _argumentsByName.Add(alias.AsMemory(), argument);
+                _argumentsByName.Add(alias.Alias.AsMemory(), argument);
             }
         }
 
@@ -1523,7 +1510,7 @@ public class CommandLineParser
             _argumentsByShortName.Add(argument.ShortName, argument);
             foreach (var alias in argument.ShortAliases)
             {
-                _argumentsByShortName.Add(alias, argument);
+                _argumentsByShortName.Add(alias.Alias, argument);
             }
         }
 
@@ -1620,9 +1607,11 @@ public class CommandLineParser
             }
         }
 
-        if (state.CancelParsing == CancelMode.Abort)
+        if (state.CancelParsing.IsAborted())
         {
-            ParseResult = ParseResult.FromCanceled(state.RealArgumentName, state.RemainingArguments);
+            ParseResult = ParseResult.FromCanceled(state.RealArgumentName, state.RemainingArguments,
+                state.CancelParsing.HelpRequested());
+
             return null;
         }
 
@@ -1639,12 +1628,10 @@ public class CommandLineParser
 
         ParseResult = state.CancelParsing == CancelMode.None
             ? ParseResult.FromSuccess()
-            : ParseResult.FromSuccess(state.Argument?.ArgumentName ?? 
+            : ParseResult.FromSuccess(state.Argument?.ArgumentName ??
                 (state.ArgumentName.Length == 0 ? LongArgumentNamePrefix : state.ArgumentName.ToString()),
                 state.RemainingArguments);
 
-        // Reset to false in case it was set by a method argument that didn't cancel parsing.
-        HelpRequested = false;
         return result;
     }
 
@@ -1685,8 +1672,6 @@ public class CommandLineParser
 
     private void Reset()
     {
-        HelpRequested = false;
-
         // Reset all arguments to their default value, and mark them as unassigned.
         foreach (var argument in _arguments)
         {
@@ -1711,15 +1696,15 @@ public class CommandLineParser
             int index;
             for (index = state.Index + 1; index < state.Arguments.Length; ++index)
             {
-                var stringValue = state.Arguments.Span[index];
-                if (CheckArgumentNamePrefix(stringValue) != null)
+                var value = state.Arguments.Span[index];
+                if (CheckArgumentNamePrefix(value) != null)
                 {
                     --index;
                     break;
                 }
 
                 parsedValue = true;
-                state.CancelParsing = ParseArgumentValue(argument, stringValue, stringValue.AsMemory());
+                state.CancelParsing = ParseArgumentValue(argument, value.AsMemory());
                 if (state.CancelParsing != CancelMode.None || !allowMultiToken)
                 {
                     break;
@@ -1740,11 +1725,11 @@ public class CommandLineParser
         // not a switch, CommandLineArgument.SetValue will throw an exception.
         if (!parsedValue)
         {
-            state.CancelParsing = ParseArgumentValue(argument, null, state.ArgumentValue);
+            state.CancelParsing = ParseArgumentValue(argument, state.ArgumentValue);
         }
     }
 
-    private CancelMode ParseArgumentValue(CommandLineArgument argument, string? stringValue, ReadOnlyMemory<char>? memoryValue)
+    private CancelMode ParseArgumentValue(CommandLineArgument argument, ReadOnlyMemory<char>? optionalValue)
     {
         if (argument.HasValue && argument.MultiValueInfo == null)
         {
@@ -1753,10 +1738,7 @@ public class CommandLineParser
                 throw StringProvider.CreateException(CommandLineArgumentErrorCategory.DuplicateArgument, argument);
             }
 
-            var duplicateEventArgs = stringValue == null
-                ? new DuplicateArgumentEventArgs(argument, memoryValue.HasValue, memoryValue ?? default)
-                : new DuplicateArgumentEventArgs(argument, stringValue);
-
+            var duplicateEventArgs = new DuplicateArgumentEventArgs(argument, optionalValue);
             OnDuplicateArgument(duplicateEventArgs);
             if (duplicateEventArgs.KeepOldValue)
             {
@@ -1764,7 +1746,7 @@ public class CommandLineParser
             }
         }
 
-        var cancelParsing = argument.SetValue(Culture, memoryValue.HasValue, stringValue, (memoryValue ?? default).Span);
+        var cancelParsing = argument.SetValue(Culture, optionalValue);
         var e = new ArgumentParsedEventArgs(argument)
         {
             CancelParsing = cancelParsing
@@ -1776,17 +1758,6 @@ public class CommandLineParser
         }
 
         OnArgumentParsed(e);
-
-        if (e.CancelParsing != CancelMode.None)
-        {
-            // Automatically request help only if the cancellation was due to the
-            // CommandLineArgumentAttribute.CancelParsing property.
-            if (argument.CancelParsing == CancelMode.Abort)
-            {
-                HelpRequested = true;
-            }
-        }
-
         return e.CancelParsing;
     }
 
@@ -1816,8 +1787,11 @@ public class CommandLineParser
             return false;
         }
 
-        (state.ArgumentName, state.ArgumentValue) = 
-            token.AsMemory(prefix.Prefix.Length).SplitFirstOfAny(_nameValueSeparators.AsSpan());
+        state.ArgumentName = token.AsMemory(prefix.Prefix.Length);
+        if (state.ArgumentName.SplitOnceAny(_nameValueSeparators.AsSpan()) is (ReadOnlyMemory<char>, ReadOnlyMemory<char>) split)
+        {
+            (state.ArgumentName, state.ArgumentValue) = split;
+        }
 
         if (_argumentsByShortName != null && prefix.Short)
         {
@@ -1838,7 +1812,7 @@ public class CommandLineParser
         {
             if (Options.AutoPrefixAliasesOrDefault)
             {
-                state.Argument = GetArgumentByNamePrefix(state.ArgumentName.Span);
+                GetArgumentByNamePrefix(ref state);
             }
 
             if (state.Argument == null)
@@ -1853,9 +1827,10 @@ public class CommandLineParser
         return true;
     }
 
-    private CommandLineArgument? GetArgumentByNamePrefix(ReadOnlySpan<char> prefix)
+    private void GetArgumentByNamePrefix(ref ParseState state)
     {
-        CommandLineArgument? foundArgument = null;
+        var prefix = state.ArgumentName.Span;
+        string? previousMatchedName = null;
         foreach (var argument in _arguments)
         {
             // Skip arguments without a long name.
@@ -1864,32 +1839,45 @@ public class CommandLineParser
                 continue;
             }
 
-            var matches = argument.ArgumentName.AsSpan().StartsWith(prefix, ArgumentNameComparison);
-            if (!matches)
+            string? matchedName = null;
+            if (argument.ArgumentName.AsSpan().StartsWith(prefix, ArgumentNameComparison))
+            {
+                matchedName = argument.ArgumentName;
+            }
+            else
             {
                 foreach (var alias in argument.Aliases)
                 {
-                    if (alias.AsSpan().StartsWith(prefix, ArgumentNameComparison))
+                    if (alias.Alias.AsSpan().StartsWith(prefix, ArgumentNameComparison))
                     {
-                        matches = true;
+                        matchedName = alias.Alias;
                         break;
                     }
                 }
             }
 
-            if (matches)
+            if (matchedName != null)
             {
-                if (foundArgument != null)
+                if (previousMatchedName != null)
                 {
-                    // Prefix is not unique.
-                    return null;
+                    // Prefix is not unique, and this is the first ambiguous match we found.
+                    state.PossibleMatches ??= ImmutableArray.CreateBuilder<string>();
+                    state.PossibleMatches.Add(previousMatchedName);
+                    state.Argument = null;
+                    previousMatchedName = null;
                 }
 
-                foundArgument = argument;
+                if (state.PossibleMatches?.Count > 0)
+                {
+                    state.PossibleMatches.Add(matchedName);
+                }
+                else
+                {
+                    state.Argument = argument;
+                    previousMatchedName = matchedName;
+                }
             }
         }
-
-        return foundArgument;
     }
 
     private void ParseCombinedShortArgument(ref ParseState state)
@@ -1912,7 +1900,7 @@ public class CommandLineParser
             }
 
             state.ArgumentName = argument.ArgumentName.AsMemory();
-            state.CancelParsing = ParseArgumentValue(argument, null, state.ArgumentValue);
+            state.CancelParsing = ParseArgumentValue(argument, state.ArgumentValue);
             if (state.CancelParsing != CancelMode.None)
             {
                 break;
@@ -1922,8 +1910,19 @@ public class CommandLineParser
 
     private void HandleUnknownArgument(ref ParseState state, bool isCombined = false)
     {
+        ImmutableArray<string> possibleMatches;
+        if (state.PossibleMatches != null)
+        {
+            state.PossibleMatches.Sort(ArgumentNameComparison.GetComparer());
+            possibleMatches = state.PossibleMatches.DrainToImmutable();
+        }
+        else
+        {
+            possibleMatches = [];
+        }
+
         var eventArgs = new UnknownArgumentEventArgs(state.Arguments.Span[state.Index], state.ArgumentName,
-            state.ArgumentValue ?? default, isCombined);
+            state.ArgumentValue ?? default, isCombined, possibleMatches);
 
         OnUnknownArgument(eventArgs);
         if (eventArgs.CancelParsing != CancelMode.None)
@@ -1934,6 +1933,14 @@ public class CommandLineParser
 
         if (!eventArgs.Ignore)
         {
+            if (!possibleMatches.IsEmpty)
+            {
+                var name = state.ArgumentName.ToString();
+                var prefix = LongArgumentNamePrefix ?? ArgumentNamePrefixes[0];
+                var message = StringProvider.AmbiguousArgumentPrefixAlias(name, prefix, possibleMatches);
+                throw new AmbiguousPrefixAliasException(message, name, possibleMatches);
+            }
+
             if (state.ArgumentName.Length > 0)
             {
                 throw StringProvider.CreateException(CommandLineArgumentErrorCategory.UnknownArgument,
@@ -1947,7 +1954,7 @@ public class CommandLineParser
 
     private PrefixInfo? CheckArgumentNamePrefix(string argument)
     {
-        // Even if '-' is the argument name prefix, we consider an argument starting with dash
+        // Even if '-' is an argument name prefix, we consider an argument starting with dash
         // followed by a digit as a value, because it could be a negative number.
         if (argument.Length >= 2 && argument[0] == '-' && char.IsDigit(argument, 1))
         {

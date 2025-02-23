@@ -609,17 +609,20 @@ public class ParseOptions
     /// Gets or sets a value that indicates whether error messages should use color.
     /// </summary>
     /// <value>
-    ///   <see langword="true"/> to enable color output; <see langword="false"/> to disable
-    ///   color output; or <see langword="null"/> to enable it if the error output supports it.
+    ///   <see cref="TriState.True" qualifyHint="true"/> to enable color output;
+    ///   <see cref="TriState.False" qualifyHint="true"/> to disable color output; or
+    ///   <see cref="TriState.Auto" qualifyHint="true"/> to enable it if the error output supports
+    ///   it. The default value is <see cref="TriState.Auto" qualifyHint="true"/>
     /// </value>
     /// <remarks>
     /// <para>
     ///   Only the parsing methods that automatically handle errors will use this property.
     /// </para>
     /// <para>
-    ///   If this property is <see langword="null"/> and the <see cref="Error"/> property is
-    ///   <see langword="null"/>, color will be used if the standard error stream supports it, as
-    ///   determined by the <see cref="VirtualTerminal.EnableColor" qualifyHint="true"/> method.
+    ///   If this property is <see cref="TriState.Auto" qualifyHint="true"/> and the
+    ///   <see cref="Error"/> property is <see langword="null"/>, color will be used if the standard
+    ///   error stream supports it, as determined by the <see cref="VirtualTerminal.EnableColor"
+    ///   qualifyHint="true"/> method.
     /// </para>
     /// <para>
     ///   If this property is set to <see langword="true"/> explicitly, virtual terminal
@@ -630,7 +633,7 @@ public class ParseOptions
     /// <seealso cref="CommandLineParser.Parse{T}(ParseOptions?)"/>
     /// <seealso cref="CommandLineParser{T}.ParseWithErrorHandling()"/>
     /// <seealso cref="IParser{TSelf}.Parse(ParseOptions?)"/>
-    public bool? UseErrorColor { get; set; }
+    public TriState UseErrorColor { get; set; }
 
     /// <summary>
     /// Gets or sets the <see cref="LocalizedStringProvider"/> implementation to use to get
@@ -761,7 +764,7 @@ public class ParseOptions
     ///   <see cref="ParseOptionsAttribute.PrefixTermination" qualifyHint="true"/> property.
     /// </para>
     /// </remarks>
-    public PrefixTerminationMode? PrefixTermination {  get; set; }
+    public PrefixTerminationMode? PrefixTermination { get; set; }
 
     /// <summary>
     /// Gets the behavior when an argument is encountered that consists of only the long argument
@@ -857,9 +860,14 @@ public class ParseOptions
     {
         // If colors are forced on or off; don't change terminal mode but return the explicit
         // support value.
-        if (UseErrorColor is bool useErrorColor)
+        if (UseErrorColor == TriState.True)
         {
-            return new VirtualTerminalSupport(useErrorColor);
+            return new VirtualTerminalSupport(true);
+        }
+
+        if (UseErrorColor == TriState.False)
+        {
+            return new VirtualTerminalSupport(false);
         }
 
         // Enable for stderr if no custom error writer.
@@ -871,7 +879,7 @@ public class ParseOptions
         // Try to enable it for the std stream associated with the custom writer.
         if (Error.GetStandardStream() is StandardStream stream)
         {
-            return new VirtualTerminalSupport(stream);
+            return VirtualTerminal.EnableColor(stream);
         }
 
         // No std stream, no automatic color.

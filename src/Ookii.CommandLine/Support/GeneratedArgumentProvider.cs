@@ -19,6 +19,7 @@ public abstract class GeneratedArgumentProvider : ArgumentProvider
 {
     private readonly ApplicationFriendlyNameAttribute? _friendlyNameAttribute;
     private readonly DescriptionAttribute? _descriptionAttribute;
+    private readonly UsageFooterAttribute? _usageFooterAttribute;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GeneratedArgumentProvider"/> class.
@@ -37,6 +38,10 @@ public abstract class GeneratedArgumentProvider : ArgumentProvider
     /// The <see cref="DescriptionAttribute"/> for the arguments type, or <see langword="null"/> if
     /// there is none.
     /// </param>
+    /// <param name="usageFooter">
+    /// The <see cref="UsageFooterAttribute"/> for the arguments type, or <see langword="null"/> if
+    /// there is none.
+    /// </param>
     protected GeneratedArgumentProvider(
 #if NET6_0_OR_GREATER
                                         [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicMethods)]
@@ -45,11 +50,13 @@ public abstract class GeneratedArgumentProvider : ArgumentProvider
                                         ParseOptionsAttribute? options = null,
                                         IEnumerable<ClassValidationAttribute>? validators = null,
                                         ApplicationFriendlyNameAttribute? friendlyName = null,
-                                        DescriptionAttribute? description = null)
+                                        DescriptionAttribute? description = null,
+                                        UsageFooterAttribute? usageFooter = null)
         : base(argumentsType, options, validators)
     {
         _friendlyNameAttribute = friendlyName;
         _descriptionAttribute = description;
+        _usageFooterAttribute = usageFooter;
     }
 
     /// <inheritdoc/>
@@ -63,4 +70,7 @@ public abstract class GeneratedArgumentProvider : ArgumentProvider
 
     /// <inheritdoc/>
     public override string Description => _descriptionAttribute?.Description ?? string.Empty;
+
+    /// <inheritdoc/>
+    public override string UsageFooter => _usageFooterAttribute?.Footer ?? string.Empty;
 }

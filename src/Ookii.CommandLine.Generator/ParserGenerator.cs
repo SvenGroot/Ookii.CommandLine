@@ -7,10 +7,12 @@ namespace Ookii.CommandLine.Generator;
 
 internal class ParserGenerator
 {
+
+    #region Nested types
+
     private enum ReturnType
     {
         Void,
-        Boolean,
         CancelMode
     }
 
@@ -30,6 +32,8 @@ internal class ParserGenerator
         public bool IsMultiValue { get; set; }
     }
 
+    #endregion
+
     private readonly TypeHelper _typeHelper;
     private readonly Compilation _compilation;
     private readonly SourceProductionContext _context;
@@ -42,6 +46,8 @@ internal class ParserGenerator
     private int _nextImplicitPosition;
     private Dictionary<int, string>? _positions;
     private List<PositionalArgumentInfo>? _positionalArguments;
+    private List<(string, string, string)>? _requiredProperties;
+    private ITypeSymbol? _categoryType;
 
     public ParserGenerator(SourceProductionContext context, INamedTypeSymbol argumentsClass, TypeHelper typeHelper,
         ConverterGenerator converterGenerator, CommandGenerator commandGenerator, LanguageVersion languageVersion)
@@ -227,12 +233,6 @@ internal class ParserGenerator
         _builder.AppendGeneratedCodeAttribute();
         _builder.AppendLine("private class OokiiCommandLineArgumentProvider : Ookii.CommandLine.Support.GeneratedArgumentProvider");
         _builder.OpenBlock();
-        if (attributes.UsageFooter != null)
-        {
-            _builder.AppendLine($"private readonly Ookii.CommandLine.UsageFooterAttribute _usageFooter = {attributes.UsageFooter.CreateInstantiation()};");
-            _builder.AppendLine();
-        }
-
         _builder.AppendLine("public OokiiCommandLineArgumentProvider()");
         _builder.IncreaseIndent();
         _builder.AppendLine(": base(");
@@ -242,22 +242,29 @@ internal class ParserGenerator
         AppendOptionalAttributeArgument(attributes.ClassValidators, "validators", "Ookii.CommandLine.Validation.ClassValidationAttribute");
         AppendOptionalAttributeArgument(attributes.ApplicationFriendlyName, "friendlyName");
         AppendOptionalAttributeArgument(attributes.Description, "description");
+        AppendOptionalAttributeArgument(attributes.UsageFooter, "usageFooter");
         _builder.CloseArgumentList(false);
         _builder.DecreaseIndent();
         _builder.AppendLine("{}");
         _builder.AppendLine();
         _builder.AppendLine($"public override bool IsCommand => {isCommand.ToCSharpString()};");
         _builder.AppendLine();
-        if (attributes.UsageFooter != null)
-        {
-            _builder.AppendLine("public override string UsageFooter => _usageFooter.Footer;");
-            _builder.AppendLine();
-        }
-
         _builder.AppendLine("public override System.Collections.Generic.IEnumerable<Ookii.CommandLine.CommandLineArgument> GetArguments(Ookii.CommandLine.CommandLineParser parser)");
         _builder.OpenBlock();
 
-        List<(string, string, string)>? requiredProperties = null;
+        // No need to emit an error if it's not an enum, as ParserAnalyzer checks that even if the
+        // GeneratedParserAttribute is present.
+        var defaultCategory = attributes.ParseOptions?.GetNamedArgument("DefaultArgumentCategory");
+        if (defaultCategory is TypedConstant category && !category.IsNull && category.Kind == TypedConstantKind.Enum)
+        {
+            _categoryType = category.Type;
+        }
+        else
+        {
+            _categoryType = null;
+        }
+
+        _requiredProperties = null;
         var hasError = false;
 
         // Build a stack with the base types because we have to consider them first to get the
@@ -274,7 +281,7 @@ internal class ParserGenerator
         {
             foreach (var member in type.GetMembers())
             {
-                if (!GenerateArgument(member, ref requiredProperties))
+                if (!GenerateArgument(member))
                 {
                     hasError = true;
                 }
@@ -301,7 +308,7 @@ internal class ParserGenerator
             _builder.Append($"return new {_argumentsClass.Name}()");
         }
 
-        if (requiredProperties == null)
+        if (_requiredProperties == null)
         {
             _builder.AppendLine(";");
         }
@@ -309,11 +316,11 @@ internal class ParserGenerator
         {
             _builder.AppendLine();
             _builder.OpenBlock();
-            for (int i = 0; i < requiredProperties.Count; ++i)
+            for (int i = 0; i < _requiredProperties.Count; ++i)
             {
-                var property = requiredProperties[i];
+                var property = _requiredProperties[i];
                 _builder.Append($"{property.Item1} = ({property.Item2})requiredPropertyValues![{i}]{property.Item3}");
-                if (i < requiredProperties.Count - 1)
+                if (i < _requiredProperties.Count - 1)
                 {
                     _builder.Append(",");
                 }
@@ -326,11 +333,17 @@ internal class ParserGenerator
         }
 
         _builder.CloseBlock(); // CreateInstance()
+        if (_categoryType != null)
+        {
+            _builder.AppendLine();
+            GenerateGetCategoryDescription(_categoryType);
+        }
+
         _builder.CloseBlock(); // OokiiCommandLineArgumentProvider class
         return !hasError;
     }
 
-    private bool GenerateArgument(ISymbol member, ref List<(string, string, string)>? requiredProperties)
+    private bool GenerateArgument(ISymbol member)
     {
         // This shouldn't happen because of attribute targets, but check anyway.
         if (member.Kind is not (SymbolKind.Method or SymbolKind.Property))
@@ -351,6 +364,30 @@ internal class ParserGenerator
         {
             _context.ReportDiagnostic(Diagnostics.NoLongOrShortName(member, attributes.CommandLineArgument));
             return false;
+        }
+
+        if (!argumentInfo.Category.IsNull)
+        {
+            if (argumentInfo.Category.Kind == TypedConstantKind.Error)
+            {
+                return false;
+            }
+
+            if (argumentInfo.Category.Kind != TypedConstantKind.Enum)
+            {
+                _context.ReportDiagnostic(Diagnostics.CategoryNotEnum(member));
+                return false;
+            }
+
+            if (_categoryType == null)
+            {
+                _categoryType = argumentInfo.Category.Type;
+            }
+            else if (!_categoryType.SymbolEquals(argumentInfo.Category.Type))
+            {
+                _context.ReportDiagnostic(Diagnostics.MismatchedCategoryType(member, argumentInfo.Category.Type!, _categoryType));
+                return false;
+            }
         }
 
         ITypeSymbol originalArgumentType;
@@ -479,8 +516,8 @@ internal class ParserGenerator
             if (property.IsRequired)
             {
                 isRequired = true;
-                requiredProperties ??= new();
-                requiredProperties.Add((member.Name, property.Type.ToQualifiedName(), notNullAnnotation));
+                _requiredProperties ??= new();
+                _requiredProperties.Add((member.Name, property.Type.ToQualifiedName(), notNullAnnotation));
             }
         }
         else
@@ -517,21 +554,14 @@ internal class ParserGenerator
         _builder.AppendLine($"Attribute = {attributes.CommandLineArgument.CreateInstantiation()},");
         _builder.AppendLine($"Converter = {converter},");
         _builder.AppendLine($"AllowsNull = {allowsNull.ToCSharpString()},");
-        var valueDescriptionFormat = new SymbolDisplayFormat(genericsOptions: SymbolDisplayGenericsOptions.IncludeTypeParameters);
         if (keyType != null)
         {
             _builder.AppendLine($"KeyType = typeof({keyType.ToQualifiedName()}),");
-            _builder.AppendLine($"DefaultKeyDescription = \"{keyType.ToDisplayString(valueDescriptionFormat)}\",");
         }
 
         if (valueType != null)
         {
             _builder.AppendLine($"ValueType = typeof({valueType.ToQualifiedName()}),");
-            _builder.AppendLine($"DefaultValueDescription = \"{valueType.ToDisplayString(valueDescriptionFormat)}\",");
-        }
-        else
-        {
-            _builder.AppendLine($"DefaultValueDescription = \"{elementType.ToDisplayString(valueDescriptionFormat)}\",");
         }
 
         AppendOptionalAttribute(attributes.MultiValueSeparator, "MultiValueSeparatorAttribute");
@@ -609,7 +639,6 @@ internal class ParserGenerator
             var methodCall = info.ReturnType switch
             {
                 ReturnType.CancelMode => $"CallMethod = (value, parser) => {_argumentsClass.ToQualifiedName()}.{member.Name}({arguments}),",
-                ReturnType.Boolean => $"CallMethod = (value, parser) => {_argumentsClass.ToQualifiedName()}.{member.Name}({arguments}) ? Ookii.CommandLine.CancelMode.None : Ookii.CommandLine.CancelMode.Abort,",
                 _ => $"CallMethod = (value, parser) => {{ {_argumentsClass.ToQualifiedName()}.{member.Name}({arguments}); return Ookii.CommandLine.CancelMode.None; }},"
             };
 
@@ -724,21 +753,53 @@ internal class ParserGenerator
         }
 
         if (attributes.ValidateEnumValue != null)
-        { 
+        {
             if (elementType.TypeKind != TypeKind.Enum)
             {
                 _context.ReportDiagnostic(Diagnostics.ValidateEnumInvalidType(member, elementType));
             }
-            else if (attributes.Converter != null &&
-                (attributes.ValidateEnumValue.GetNamedArgument("CaseSensitive") != null ||
-                 attributes.ValidateEnumValue.GetNamedArgument("AllowCommaSeparatedValues") != null ||
-                 attributes.ValidateEnumValue.GetNamedArgument("AllowNumericValues") != null))
+            else if (attributes.Converter != null && attributes.ValidateEnumValue.GetNamedArgument("CaseSensitive") != null)
             {
                 _context.ReportDiagnostic(Diagnostics.ValidateEnumWithCustomConverter(member));
             }
         }
 
         return true;
+    }
+
+    private void GenerateGetCategoryDescription(ITypeSymbol categoryType)
+    {
+        _builder.AppendLine("public override string GetCategoryDescription(System.Enum category)");
+        _builder.OpenBlock();
+        _builder.AppendLine($"return ({categoryType.ToQualifiedName()})category switch");
+        _builder.OpenBlock();
+        foreach (var member in categoryType.GetMembers())
+        {
+            if (member.DeclaredAccessibility != Accessibility.Public || member.Kind != SymbolKind.Field)
+            {
+                continue;
+            }
+
+            var field = (IFieldSymbol)member;
+            _builder.Append($"{categoryType.ToQualifiedName()}.{field.Name} => ");
+            var descriptionAttribute = field.GetAttribute(_typeHelper.DescriptionAttribute!);
+            if (descriptionAttribute == null)
+            {
+                _builder.AppendLine($"\"{field.Name}\",");
+            }
+            else
+            {
+                // There is no point trying to optimize this to cache values or anything, as
+                // typically this will be called only once per category (and displaying usage help
+                // is not performance-critical anyway).
+                _builder.AppendLine($"({descriptionAttribute.CreateInstantiation()}).Description,");
+            }
+        }
+
+        _builder.AppendLine("_ => base.GetCategoryDescription(category),");
+        _builder.DecreaseIndent();
+        _builder.AppendLine("};");
+        _builder.CloseBlock(); // GetCategoryDescription()
     }
 
     private (ITypeSymbol?, INamedTypeSymbol?, ITypeSymbol?)? DetermineMultiValueType(IPropertySymbol property, ITypeSymbol argumentType)
@@ -865,10 +926,6 @@ internal class ParserGenerator
         if (method.ReturnType.SymbolEquals(_typeHelper.CancelMode))
         {
             info.ReturnType = ReturnType.CancelMode;
-        }
-        else if (method.ReturnType.SpecialType == SpecialType.System_Boolean)
-        {
-            info.ReturnType = ReturnType.Boolean;
         }
         else if (method.ReturnType.SpecialType != SpecialType.System_Void)
         {

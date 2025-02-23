@@ -33,15 +33,13 @@ namespace Ookii.CommandLine;
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Method, AllowMultiple = true)]
 public sealed class ShortAliasAttribute : Attribute
 {
-    private readonly char _alias;
-
     /// <summary>
     /// Initializes a new instance of the <see cref="AliasAttribute"/> class.
     /// </summary>
     /// <param name="alias">The alternative short name for the command line argument.</param>
     public ShortAliasAttribute(char alias)
     {
-        _alias = alias;
+        Alias = alias;
     }
 
     /// <summary>
@@ -50,5 +48,15 @@ public sealed class ShortAliasAttribute : Attribute
     /// <value>
     /// The alternative short name for the command line argument.
     /// </value>
-    public char Alias => _alias;
+    public char Alias { get; }
+
+
+    /// <summary>
+    /// Gets or sets a value indicating whether the alias should be hidden from the usage help.
+    /// </summary>
+    /// <value>
+    /// <see langword="true"/> if the alias should be hidden from the usage help; otherwise,
+    /// <see langword="false"/>. The default value is <see langword="false"/>.
+    /// </value>
+    public bool IsHidden { get; set; }
 }

@@ -22,10 +22,10 @@ namespace Ookii.CommandLine;
 ///   signatures:
 /// </para>
 /// <code>
-/// public static (void|bool|CancelMode) Method(ArgumentType value, CommandLineParser parser);
-/// public static (void|bool|CancelMode) Method(ArgumentType value);
-/// public static (void|bool|CancelMode) Method(CommandLineParser parser);
-/// public static (void|bool|CancelMode) Method();
+/// public static (void|CancelMode) Method(ArgumentType value, CommandLineParser parser);
+/// public static (void|CancelMode) Method(ArgumentType value);
+/// public static (void|CancelMode) Method(CommandLineParser parser);
+/// public static (void|CancelMode) Method();
 /// </code>
 /// <para>
 ///   In this case, the <c>ArgumentType</c> type determines the type of values the argument accepts. If there
@@ -37,19 +37,8 @@ namespace Ookii.CommandLine;
 ///   command line is complete.
 /// </para>
 /// <para>
-///   The return type must be either <see cref="void"/>, <see cref="bool"/> or <see cref="CancelMode"/>.
-///   Using <see cref="void"/> is equivalent to returning <see cref="CancelMode.None" qualifyHint="true"/>, and when
-///   using <see cref="bool"/>, returning <see langword="false"/> is equivalent to returning
-///   <see cref="CancelMode.Abort" qualifyHint="true"/>.
-/// </para>
-/// <para>
-///   Unlike using the <see cref="CancelParsing"/> property, canceling parsing with the return
-///   value does not automatically print the usage help when using the
-///   <see cref="CommandLineParser{T}.ParseWithErrorHandling()" qualifyHint="true"/> method, the
-///   <see cref="CommandLineParser.Parse{T}(string[], ParseOptions?)" qualifyHint="true"/> method or the
-///   <see cref="CommandManager"/> class. Instead, it must be requested using by setting the
-///   <see cref="CommandLineParser.HelpRequested" qualifyHint="true"/> property to <see langword="true"/> in the
-///   target method.
+///   The return type must be either <see cref="void"/> or <see cref="CancelMode"/>. Using
+///   <see cref="void"/> is equivalent to returning <see cref="CancelMode.None" qualifyHint="true"/>.
 /// </para>
 /// </remarks>
 /// <threadsafety static="true" instance="false"/>
@@ -335,38 +324,37 @@ public sealed class CommandLineArgumentAttribute : Attribute
     public string? DefaultValueFormat { get; set; }
 
     /// <summary>
-    /// Gets or sets a value that indicates whether argument parsing should be canceled if
-    /// this argument is encountered.
+    /// Gets or sets a value that indicates whether argument parsing should be canceled if this
+    /// argument is encountered.
     /// </summary>
     /// <value>
     /// One of the values of the <see cref="CancelMode"/> enumeration.
     /// </value>
     /// <remarks>
     /// <para>
-    ///   If this property is not <see cref="CancelMode.None" qualifyHint="true"/>, the <see cref="CommandLineParser"/>
-    ///   will stop parsing the command line arguments after seeing this argument. The result of
-    ///   the operation will be <see langword="null"/> if this property is <see cref="CancelMode.Abort" qualifyHint="true"/>,
-    ///   or an instance of the arguments class with the results up to this point if this property
-    ///   is <see cref="CancelMode.Success" qualifyHint="true"/>. In the latter case, the <see cref="ParseResult.RemainingArguments" qualifyHint="true"/>
-    ///   property will contain all arguments that were not parsed.
+    ///   If this property is not <see cref="CancelMode.None" qualifyHint="true"/>, the
+    ///   <see cref="CommandLineParser"/> will stop parsing the command line arguments after seeing
+    ///   this argument. The result of the operation will be <see langword="null"/> if this property
+    ///   is <see cref="CancelMode.Abort" qualifyHint="true"/> or <see cref="CancelMode.AbortWithHelp"
+    ///   qualifyHint="true"/>, or an instance of the arguments class with the results up to this
+    ///   point if this property is <see cref="CancelMode.Success" qualifyHint="true"/>. In the
+    ///   latter case, the <see cref="ParseResult.RemainingArguments" qualifyHint="true"/> property
+    ///   will contain all arguments that were not parsed.
     /// </para>
     /// <para>
-    ///   If <see cref="CancelMode.Success" qualifyHint="true"/> is used, all required arguments must have a value at
-    ///   the point this argument is encountered, otherwise a <see cref="CommandLineArgumentException"/>
-    ///   is thrown.
+    ///   If <see cref="CancelMode.Success" qualifyHint="true"/> is used, all required arguments
+    ///   must have a value at the point this argument is encountered, otherwise a
+    ///   <see cref="CommandLineArgumentException"/> is thrown.
     /// </para>
     /// <para>
-    ///   Use the <see cref="ParseResult.ArgumentName" qualifyHint="true"/> property to determine which argument caused
-    ///   cancellation.
+    ///   Use the <see cref="ParseResult.ArgumentName" qualifyHint="true"/> property to determine
+    ///   which argument caused cancellation.
     /// </para>
     /// <para>
-    ///   If this property is <see cref="CancelMode.Abort" qualifyHint="true"/>, the <see cref="CommandLineParser.HelpRequested" qualifyHint="true"/>
-    ///   property will be automatically set to <see langword="true"/> when parsing is canceled.
-    /// </para>
-    /// <para>
-    ///   It's possible to prevent cancellation when an argument has this property set by
-    ///   handling the <see cref="CommandLineParser.ArgumentParsed" qualifyHint="true"/> event and setting the
-    ///   <see cref="ArgumentParsedEventArgs.CancelParsing" qualifyHint="true"/> property to <see cref="CancelMode.None" qualifyHint="true"/>.
+    ///   It's possible to prevent cancellation when an argument has this property set by handling
+    ///   the <see cref="CommandLineParser.ArgumentParsed" qualifyHint="true"/> event and setting
+    ///   the <see cref="ArgumentParsedEventArgs.CancelParsing" qualifyHint="true"/> property to
+    ///   <see cref="CancelMode.None" qualifyHint="true"/>.
     /// </para>
     /// </remarks>
     /// <seealso cref="CommandLineArgument.CancelParsing" qualifyHint="true"/>
@@ -391,4 +379,48 @@ public sealed class CommandLineArgumentAttribute : Attribute
     /// </remarks>
     /// <seealso cref="CommandLineArgument.IsHidden" qualifyHint="true"/>
     public bool IsHidden { get; set; }
+
+    /// <summary>
+    /// Gets or sets the category that the argument belongs to.
+    /// </summary>
+    /// <value>
+    /// An enumeration value that defines the category, or <see langword="null"/> to use the
+    /// default category, or no category if there is no default category. The default value is
+    /// <see langword="null"/>.
+    /// </value>
+    /// <exception cref="NotSupportedException">
+    /// When setting the property, the type of the value is not an enumeration type.
+    /// </exception>
+    /// <remarks>
+    /// <para>
+    ///   The category must be an <see cref="Enum"/> value, and all arguments defined by a class
+    ///   (including any defined by its base classes) must use the same type. The
+    ///   <see cref="CommandLineParser"/> class will throw an exception if this is not the case.
+    /// </para>
+    /// <para>
+    ///   If this property is <see langword="null"/>, the argument will use the default category
+    ///   specified by the <see cref="ParseOptionsAttribute.DefaultArgumentCategory" qualifyHint="true"/>
+    ///   property, if any.
+    /// </para>
+    /// <para>
+    ///   Argument categories are used to group argument in the usage help; they are not used when
+    ///   parsing. The default <see cref="UsageWriter"/> will sort the categories based on their
+    ///   underlying enumeration values,
+    /// </para>
+    /// </remarks>
+    public object? Category
+    {
+        get => CategoryValue;
+        set
+        {
+            if (value is not null and not Enum)
+            {
+                throw new NotSupportedException(Properties.Resources.CategoryNotEnum);
+            }
+
+            CategoryValue = (Enum?)value;
+        }
+    }
+
+    internal Enum? CategoryValue { get; set; }
 }

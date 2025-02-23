@@ -11,7 +11,7 @@ updates:
           patterns:
              - "*"
     ignore:
-        # 4.3.x is the latest version that can work with the .Net 6.0 SDK for both of these.
+        # 4.11.x is the latest version that can work with the .Net 8.0 SDK for both of these.
       - dependency-name: "Microsoft.CodeAnalysis.CSharp"
         update-types: ["version-update:semver-major", "version-update:semver-minor"]
       - dependency-name: "Microsoft.CodeAnalysis.CSharp.Workspaces"

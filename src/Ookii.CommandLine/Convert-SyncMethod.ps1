@@ -9,6 +9,7 @@ $replacements = @(
     @("Async", ""), # Remove Async from identifiers
     @("async Task", "partial void"), # Function signature change
     @("await ", ""), # Remove await keyword
+    @(" is (ReadOnlyMemory<char>, ReadOnlyMemory<char>) splits", ".TryGetValue(out var splits)"), # Replace pattern matching with NullableReadOnlySpan.TryGetValue
     @("ReadOnlyMemory", "ReadOnlySpan"), # Async stream functions uses Memory instead of span
     @(".Span", ""), # Needed to convert Memory usage to Span.
     @("async ", ""), # Remove keyword from async lambda

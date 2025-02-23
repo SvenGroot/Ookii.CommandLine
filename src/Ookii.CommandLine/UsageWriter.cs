@@ -98,7 +98,7 @@ public class UsageWriter
 
     private readonly LineWrappingTextWriter? _customWriter;
     private LineWrappingTextWriter? _writer;
-    private readonly bool? _useColor;
+    private readonly TriState _useColor;
     private bool _autoColor;
     private CommandLineParser? _parser;
     private CommandManager? _commandManager;
@@ -114,9 +114,10 @@ public class UsageWriter
     /// to write to the standard output stream.
     /// </param>
     /// <param name="useColor">
-    /// <see langword="true"/> to enable color output using virtual terminal sequences;
-    /// <see langword="false"/> to disable it; or, <see langword="null"/> to automatically
-    /// enable it if <paramref name="writer"/> is <see langword="null"/> using the
+    /// <see cref="TriState.True" qualifyHint="true"/> to enable color output using virtual terminal
+    /// sequences; <see cref="TriState.False" qualifyHint="true"/> to disable it; or,
+    /// <see cref="TriState.Auto" qualifyHint="true"/> to automatically enable it if
+    /// <paramref name="writer"/> is <see langword="null"/> using the
     /// <see cref="VirtualTerminal.EnableColor" qualifyHint="true"/> method.
     /// </param>
     /// <remarks>
@@ -127,7 +128,7 @@ public class UsageWriter
     ///   be wrapped, depending on the value returned by <see cref="Console.WindowWidth" qualifyHint="true"/>.
     /// </para>
     /// </remarks>
-    public UsageWriter(LineWrappingTextWriter? writer = null, bool? useColor = null)
+    public UsageWriter(LineWrappingTextWriter? writer = null, TriState useColor = TriState.Auto)
     {
         _customWriter = writer;
         _useColor = useColor;
@@ -358,6 +359,26 @@ public class UsageWriter
     public TextFormat ArgumentDescriptionColor { get; set; } = TextFormat.ForegroundGreen;
 
     /// <summary>
+    /// Gets or sets the color used for category headers by the
+    /// <see cref="WriteArgumentCategoryHeader"/> method.
+    /// </summary>
+    /// <value>
+    ///   The virtual terminal sequence for a color. The default value is
+    ///   <see cref="TextFormat.ForegroundCyan" qualifyHint="true"/>.
+    /// </value>
+    /// <remarks>
+    /// <para>
+    ///   The color will only be used if the <see cref="UseColor"/> property is
+    ///   <see langword="true"/>.
+    /// </para>
+    /// <para>
+    ///   The portion of the string that has color will end with the value of the 
+    ///   <see cref="ColorReset"/> property.
+    /// </para>
+    /// </remarks>
+    public TextFormat ArgumentCategoryColor { get; set; } = TextFormat.ForegroundCyan;
+
+    /// <summary>
     /// Gets or sets a value indicating whether white space, rather than the first element of the
     /// <see cref="CommandLineParser.NameValueSeparators" qualifyHint="true"/> property, is used to
     /// separate arguments and their values in the command line syntax.
@@ -507,12 +528,12 @@ public class UsageWriter
     public bool IndentAfterEmptyLine { get; set; }
 
     /// <summary>
-    /// Gets or sets a value that indicates whether the usage help should use color.
+    /// Gets a value that indicates whether the usage help should use color.
     /// </summary>
     /// <value>
-    ///   <see langword="true"/> to enable color output; otherwise, <see langword="false"/>.
+    ///   <see langword="true"/> to use color output; otherwise, <see langword="false"/>.
     /// </value>
-    protected bool UseColor => _useColor ?? _autoColor;
+    protected bool UseColor => _useColor.ToBoolean(_autoColor);
 
     /// <summary>
     /// Gets or sets the color applied by the base implementation of the <see cref="WriteCommandDescription(CommandInfo)"/>
@@ -566,14 +587,15 @@ public class UsageWriter
     /// command list that instructs the user how to get help for individual commands.
     /// </summary>
     /// <value>
-    /// <see langword="null"/> to show the instruction if all commands have the default help
-    /// argument; <see langword="true"/> to always show the instruction; otherwise,
-    /// <see langword="false"/>. The default value is <see langword="null"/>.
+    /// <see cref="TriState.Auto" qualifyHint="true"/> to show the instruction if all commands have
+    /// the default help argument; <see cref="TriState.True" qualifyHint="true"/> to always show the
+    /// instruction; otherwise, <see cref="TriState.False" qualifyHint="true"/>. The default value
+    /// is <see cref="TriState.Auto" qualifyHint="true"/>.
     /// </value>
     /// <remarks>
     /// <para>
-    ///   If this property is <see langword="null"/>, the instruction will be shown under the
-    ///   following conditions:
+    ///   If this property is <see cref="TriState.Auto" qualifyHint="true"/>, the instruction will
+    ///   be shown under the following conditions:
     /// </para>
     /// <list type="bullet">
     ///   <item>
@@ -610,14 +632,16 @@ public class UsageWriter
     ///   </item>
     /// </list>
     /// <para>
-    ///   If set to <see langword="true"/>, the message is shown even if not all commands meet these
-    ///   restrictions.
+    ///   If set to <see cref="TriState.True" qualifyHint="true"/>, the message is shown even if not
+    ///   all commands meet these conditions. You can use this to show the message when you know
+    ///   it's valid despite this (e.g. you have a command using <see cref="ICommandWithCustomParsing"/>
+    ///   which implements its own help argument that matches the other commands).
     /// </para>
     /// <para>
     ///   To customize the message, override the <see cref="WriteCommandHelpInstruction"/> method.
     /// </para>
     /// </remarks>
-    public bool? IncludeCommandHelpInstruction { get; set; }
+    public TriState IncludeCommandHelpInstruction { get; set; }
 
     /// <summary>
     /// Gets or sets a value that indicates whether to show the application description before
@@ -659,7 +683,7 @@ public class UsageWriter
     /// Gets the <see cref="LineWrappingTextWriter"/> to which the usage should be written.
     /// </summary>
     /// <value>
-    /// The <see cref="LineWrappingTextWriter"/> passed to the <see cref="UsageWriter(LineWrappingTextWriter?, bool?)"/>
+    /// The <see cref="LineWrappingTextWriter"/> passed to the <see cref="UsageWriter(LineWrappingTextWriter?, TriState)"/>
     /// constructor, or an instance created by the <see cref="LineWrappingTextWriter.ForConsoleOut" qualifyHint="true"/>
     /// or <see cref="LineWrappingTextWriter.ForStringWriter(int, IFormatProvider?, bool)" qualifyHint="true"/>
     /// function.
@@ -706,7 +730,7 @@ public class UsageWriter
     /// A <see cref="WriteCommandListUsage"/> operation is not in progress.
     /// </exception>
     protected LocalizedStringProvider StringProvider
-        => _parser?.StringProvider ?? _commandManager?.Options.StringProvider 
+        => _parser?.StringProvider ?? _commandManager?.Options.StringProvider
             ?? throw new InvalidOperationException(Resources.UsageWriterPropertyNotAvailable);
 
     /// <summary>
@@ -778,7 +802,7 @@ public class UsageWriter
     /// </exception>
     /// <remarks>
     /// <para>
-    ///   If no writer was passed to the <see cref="UsageWriter(LineWrappingTextWriter?, bool?)"/>
+    ///   If no writer was passed to the <see cref="UsageWriter(LineWrappingTextWriter?, TriState)"/>
     ///   constructor, this method will create a <see cref="LineWrappingTextWriter"/> for the
     ///   standard output stream. If color usage wasn't explicitly enabled, it will be enabled
     ///   if the output supports it according to <see cref="VirtualTerminal.EnableColor" qualifyHint="true"/>.
@@ -795,6 +819,33 @@ public class UsageWriter
     }
 
     /// <summary>
+    /// Creates usage help for when the user used an argument name that was a prefix alias for
+    /// multiple arguments.
+    /// </summary>
+    /// <param name="parser">The <see cref="CommandLineParser"/>.</param>
+    /// <param name="possibleMatches">The list of possible argument names or aliases.</param>
+    /// <exception cref="ArgumentNullException">
+    /// <paramref name="parser"/> or <paramref name="possibleMatches"/> is <see langword="null"/>.
+    /// </exception>
+    /// <remarks>
+    /// <para>
+    ///   If no writer was passed to the <see cref="UsageWriter(LineWrappingTextWriter?, TriState)"/>
+    ///   constructor, this method will create a <see cref="LineWrappingTextWriter"/> for the
+    ///   standard output stream. If color usage wasn't explicitly enabled, it will be enabled
+    ///   if the output supports it according to <see cref="VirtualTerminal.EnableColor" qualifyHint="true"/>.
+    /// </para>
+    /// <para>
+    ///   This method calls the <see cref="WriteParserAmbiguousPrefixAliasUsageCore"/> method to
+    ///   create the usage help text.
+    /// </para>
+    /// </remarks>
+    public void WriteParserAmbiguousPrefixAliasUsage(CommandLineParser parser, IEnumerable<string> possibleMatches)
+    {
+        _parser = parser ?? throw new ArgumentNullException(nameof(parser));
+        WriteUsageInternal(possibleMatches: possibleMatches ?? throw new ArgumentNullException(nameof(possibleMatches)));
+    }
+
+    /// <summary>
     /// Creates usage help for the specified command manager.
     /// </summary>
     /// <param name="manager">The <see cref="Commands.CommandManager" qualifyHint="true"/></param>
@@ -806,7 +857,7 @@ public class UsageWriter
     ///   The usage help will contain a list of all available commands.
     /// </para>
     /// <para>
-    ///   If no writer was passed to the <see cref="UsageWriter(LineWrappingTextWriter?, bool?)"/>
+    ///   If no writer was passed to the <see cref="UsageWriter(LineWrappingTextWriter?, TriState)"/>
     ///   constructor, this method will create a <see cref="LineWrappingTextWriter"/> for the
     ///   standard output stream. If color usage wasn't explicitly enabled, it will be enabled
     ///   if the output supports it according to <see cref="VirtualTerminal.EnableColor" qualifyHint="true"/>.
@@ -823,6 +874,34 @@ public class UsageWriter
     }
 
     /// <summary>
+    /// Creates usage help for when the user used a command name that was a prefix alias for
+    /// multiple commands.
+    /// </summary>
+    /// <param name="manager">The <see cref="Commands.CommandManager" qualifyHint="true"/></param>
+    /// <param name="possibleMatches">The list of possible argument names or aliases.</param>
+    /// <exception cref="ArgumentNullException">
+    /// <paramref name="manager"/> or <paramref name="possibleMatches"/> is <see langword="null"/>.
+    /// </exception>
+    /// <remarks>
+    /// <para>
+    ///   If no writer was passed to the <see cref="UsageWriter(LineWrappingTextWriter?, TriState)"/>
+    ///   constructor, this method will create a <see cref="LineWrappingTextWriter"/> for the
+    ///   standard output stream. If color usage wasn't explicitly enabled, it will be enabled
+    ///   if the output supports it according to <see cref="VirtualTerminal.EnableColor" qualifyHint="true"/>.
+    /// </para>
+    /// <para>
+    ///   This method calls the <see cref="WriteCommandAmbiguousPrefixAliasUsageCore"/> method to
+    ///   create the usage help text.
+    /// </para>
+    /// </remarks>
+    public void WriteCommandAmbiguousPrefixAliasUsage(CommandManager manager, IEnumerable<string> possibleMatches)
+    {
+        _commandManager = manager ?? throw new ArgumentNullException(nameof(manager));
+        WriteUsageInternal(possibleMatches: possibleMatches ?? throw new ArgumentNullException(nameof(possibleMatches)));
+    }
+
+
+    /// <summary>
     /// Returns a string with usage help for the specified parser.
     /// </summary>
     /// <returns>A string containing the usage help.</returns>
@@ -836,7 +915,7 @@ public class UsageWriter
     /// </exception>
     /// <remarks>
     /// <para>
-    ///   This method ignores the writer passed to the <see cref="UsageWriter(LineWrappingTextWriter?, bool?)"/>
+    ///   This method ignores the writer passed to the <see cref="UsageWriter(LineWrappingTextWriter?, TriState)"/>
     ///   constructor, and will use the <see cref="LineWrappingTextWriter.ForStringWriter" qualifyHint="true"/>
     ///   method instead, and returns the resulting string. If color support was not explicitly
     ///   enabled, it will be disabled.
@@ -851,6 +930,40 @@ public class UsageWriter
         _parser = parser ?? throw new ArgumentNullException(nameof(parser));
         return GetUsageInternal(maximumLineLength, request);
     }
+
+    /// <summary>
+    /// Returns a string with usage help for when the user used an argument name that was a prefix
+    /// alias for multiple arguments.
+    /// </summary>
+    /// <returns>A string containing the usage help.</returns>
+    /// <param name="parser">The <see cref="CommandLineParser"/>.</param>
+    /// <param name="possibleMatches">The list of possible argument names or aliases.</param>
+    /// <param name="maximumLineLength">
+    /// The length at which to white-space wrap lines in the output, or 0 to disable wrapping.
+    /// </param>
+    /// <exception cref="ArgumentNullException">
+    /// <paramref name="parser"/> or <paramref name="possibleMatches"/> is <see langword="null"/>.
+    /// </exception>
+    /// <remarks>
+    /// <para>
+    ///   If no writer was passed to the <see cref="UsageWriter(LineWrappingTextWriter?, TriState)"/>
+    ///   constructor, this method will create a <see cref="LineWrappingTextWriter"/> for the
+    ///   standard output stream. If color usage wasn't explicitly enabled, it will be enabled
+    ///   if the output supports it according to <see cref="VirtualTerminal.EnableColor" qualifyHint="true"/>.
+    /// </para>
+    /// <para>
+    ///   This method calls the <see cref="WriteParserAmbiguousPrefixAliasUsageCore"/> method to
+    ///   create the usage help text.
+    /// </para>
+    /// </remarks>
+    public string GetParserAmbiguousPrefixAliasUsage(CommandLineParser parser, IEnumerable<string> possibleMatches,
+        int maximumLineLength = 0)
+    {
+        _parser = parser ?? throw new ArgumentNullException(nameof(parser));
+        return GetUsageInternal(maximumLineLength,
+            possibleMatches: possibleMatches ?? throw new ArgumentNullException(nameof(possibleMatches)));
+    }
+
 
     /// <summary>
     /// Returns a string with usage help for the specified command manager.
@@ -868,7 +981,7 @@ public class UsageWriter
     ///   The usage help will contain a list of all available commands.
     /// </para>
     /// <para>
-    ///   This method ignores the writer passed to the <see cref="UsageWriter(LineWrappingTextWriter?, bool?)"/>
+    ///   This method ignores the writer passed to the <see cref="UsageWriter(LineWrappingTextWriter?, TriState)"/>
     ///   constructor, and will use the <see cref="LineWrappingTextWriter.ForStringWriter" qualifyHint="true"/>
     ///   method instead, and returns the resulting string. If color support was not explicitly
     ///   enabled, it will be disabled.
@@ -1321,6 +1434,7 @@ public class UsageWriter
             }
         }
 
+        Enum? previousCategory = null;
         var arguments = GetArgumentsInDescriptionOrder();
         bool first = true;
         foreach (var argument in arguments)
@@ -1329,6 +1443,18 @@ public class UsageWriter
             {
                 WriteArgumentDescriptionListHeader();
                 first = false;
+            }
+
+            if (!object.Equals(argument.Category?.Category, previousCategory))
+            {
+                // The default implementation for GetArgumentsInDescriptionOrder should group all
+                // null categories together, but if overridden that might not be the case.
+                if (argument.Category is CategoryInfo category)
+                {
+                    WriteArgumentCategoryHeader(category);
+                }
+
+                previousCategory = argument.Category?.Category;
             }
 
             WriteArgumentDescription(argument);
@@ -1352,6 +1478,50 @@ public class UsageWriter
     {
         // Intentionally blank.
     }
+
+    /// <summary>
+    /// Writes a header for a category of arguments.
+    /// </summary>
+    /// <param name="category">The category.</param>
+    /// <remarks>
+    /// <para>
+    ///   The base implementation applies the <see cref="ArgumentCategoryColor"/>, and calls the
+    ///   <see cref="WriteArgumentCategory"/> method to write the category description.
+    /// </para>
+    /// <para>
+    ///   This method is called by the base implementation of the <see cref="WriteArgumentDescriptions"/>
+    ///   method once before the first argument in each category. It will not be called if none
+    ///   of the arguments have a category.
+    /// </para>
+    /// </remarks>
+    protected virtual void WriteArgumentCategoryHeader(CategoryInfo category)
+    {
+        Writer.ResetIndent();
+        WriteColor(ArgumentCategoryColor);
+        WriteArgumentCategory(category);
+        ResetColor();
+        WriteLine();
+        WriteLine();
+    }
+
+    /// <summary>
+    /// Writes the description of a category of arguments.
+    /// </summary>
+    /// <param name="category">The category.</param>
+    /// <remarks>
+    /// <para>
+    ///   This method is called by the base implementation of the <see cref="WriteArgumentCategoryHeader"/>
+    ///   method.
+    /// </para>
+    /// <para>
+    ///   You can override this method if you wish to change how the category description is
+    ///   determined for a category. If you want to change the formatting of the category header,
+    ///   override the <see cref="WriteArgumentCategoryHeader"/> method instead.
+    /// </para>
+    /// </remarks>
+    protected virtual void WriteArgumentCategory(CategoryInfo category)
+        => Writer.Write(category.Description);
+
 
     /// <summary>
     /// Writes the description of a single argument.
@@ -1590,17 +1760,57 @@ public class UsageWriter
     ///   method if the <see cref="IncludeAliasInDescription"/> property is <see langword="true"/>.
     /// </para>
     /// </remarks>
-    protected virtual void WriteAliases(IEnumerable<string>? aliases, IEnumerable<char>? shortAliases, string prefix, string shortPrefix)
+    protected virtual void WriteAliases(IEnumerable<AliasAttribute>? aliases, IEnumerable<ShortAliasAttribute>? shortAliases,
+        string prefix, string shortPrefix)
     {
-        if (shortAliases == null && aliases == null)
+        var hasAlias = false;
+        if (shortAliases != null)
         {
-            return;
+            foreach (var alias in shortAliases)
+            {
+                if (alias.IsHidden)
+                {
+                    continue;
+                }
+
+                if (hasAlias)
+                {
+                    Write(NameSeparator);
+                }
+                else
+                {
+                    Write(" (");
+                    hasAlias = true;
+                }
+
+                WriteAlias(alias.Alias.ToString(), shortPrefix);
+            }
         }
 
-        var count = WriteAliasHelper(shortPrefix, shortAliases, 0);
-        count = WriteAliasHelper(prefix, aliases, count);
+        if (aliases != null)
+        {
+            foreach (var alias in aliases)
+            {
+                if (alias.IsHidden)
+                {
+                    continue;
+                }
 
-        if (count > 0)
+                if (hasAlias)
+                {
+                    Write(NameSeparator);
+                }
+                else
+                {
+                    Write(" (");
+                    hasAlias = true;
+                }
+
+                WriteAlias(alias.Alias, prefix);
+            }
+        }
+
+        if (hasAlias)
         {
             Write(")");
         }
@@ -1719,7 +1929,8 @@ public class UsageWriter
     /// </para>
     /// <para>
     ///   This method is called by the base implementation of the <see cref="WriteParserUsageCore"/>
-    ///   method if the requested help is not <see cref="UsageHelpRequest.Full" qualifyHint="true"/>.
+    ///   method if the requested help is not <see cref="UsageHelpRequest.Full" qualifyHint="true"/>,
+    ///   and by the <see cref="WriteParserAmbiguousPrefixAliasUsageCore"/> method.
     /// </para>
     /// </remarks>
     protected virtual void WriteMoreInfoMessage()
@@ -1761,13 +1972,52 @@ public class UsageWriter
     }
 
     /// <summary>
+    /// Writes a list of possible matches when the user used an argument name that was a prefix
+    /// alias for multiple arguments.
+    /// </summary>
+    /// <param name="possibleMatches">The list of possible argument names or aliases.</param>
+    /// <remarks>
+    /// <para>
+    ///   The default implementation writes a list of possible matches, preceded by a header.
+    ///   The argument names will be written using the <see cref="ArgumentDescriptionColor"/> and
+    ///   by calling the <see cref="WriteArgumentNameForDescription"/> method. Finally, it calls
+    ///   the <see cref="WriteMoreInfoMessage"/> method.
+    /// </para>
+    /// </remarks>
+    protected virtual void WriteParserAmbiguousPrefixAliasUsageCore(IEnumerable<string> possibleMatches)
+    {
+        Writer.WriteLine(StringProvider.AmbiguousArgumentPrefixAliasMatchesHeader());
+        var prefix = Parser.LongArgumentNamePrefix ?? Parser.ArgumentNamePrefixes[0];
+        SetIndent(2);
+        foreach (var match in possibleMatches)
+        {
+            WriteColor(ArgumentDescriptionColor);
+            WriteArgumentNameForDescription(match, prefix);
+            ResetColor();
+            WriteLine();
+        }
+
+        WriteLine();
+        WriteMoreInfoMessage();
+    }
+
+    /// <summary>
     /// Gets the parser's arguments filtered according to the <see cref="ArgumentDescriptionListFilter"/>
-    /// property and sorted according to the <see cref="ArgumentDescriptionListOrder"/> property.
+    /// property and sorted by category and according to the <see cref="ArgumentDescriptionListOrder"/>
+    /// property.
     /// </summary>
     /// <returns>A list of filtered and sorted arguments.</returns>
     /// <remarks>
     /// <para>
-    ///   Arguments that are hidden are excluded from the list.
+    ///   If any of the arguments use the <see cref="CommandLineArgumentAttribute.Category" qualifyHint="true"/>
+    ///   property, the arguments are sorted by category based on the category's enumeration values,
+    ///   and sorted according to the <see cref="ArgumentDescriptionListOrder"/> property within
+    ///   each category. Arguments that have no category set are returned before any arguments that
+    ///   do have a category.
+    /// </para>
+    /// <para>
+    ///   Arguments that are hidden are excluded from the list, even if
+    ///   <see cref="DescriptionListFilterMode.All" qualifyHint="true"/> is used.
     /// </para>
     /// </remarks>
     protected virtual IEnumerable<CommandLineArgument> GetArgumentsInDescriptionOrder()
@@ -1778,18 +2028,18 @@ public class UsageWriter
             DescriptionListFilterMode.Description => !string.IsNullOrEmpty(argument.Description),
             DescriptionListFilterMode.All => true,
             _ => false,
-        });
+        }).OrderBy(argument => argument.Category?.Category);
 
         var comparer = Parser.ArgumentNameComparison.GetComparer();
 
         return ArgumentDescriptionListOrder switch
         {
-            DescriptionListSortMode.Alphabetical => arguments.OrderBy(arg => arg.ArgumentName, comparer),
-            DescriptionListSortMode.AlphabeticalDescending => arguments.OrderByDescending(arg => arg.ArgumentName, comparer),
+            DescriptionListSortMode.Alphabetical => arguments.ThenBy(arg => arg.ArgumentName, comparer),
+            DescriptionListSortMode.AlphabeticalDescending => arguments.ThenByDescending(arg => arg.ArgumentName, comparer),
             DescriptionListSortMode.AlphabeticalShortName =>
-                arguments.OrderBy(arg => arg.HasShortName ? arg.ShortName.ToString() : arg.ArgumentName, comparer),
+                arguments.ThenBy(arg => arg.HasShortName ? arg.ShortName.ToString() : arg.ArgumentName, comparer),
             DescriptionListSortMode.AlphabeticalShortNameDescending =>
-                arguments.OrderByDescending(arg => arg.HasShortName ? arg.ShortName.ToString() : arg.ArgumentName, comparer),
+                arguments.ThenByDescending(arg => arg.HasShortName ? arg.ShortName.ToString() : arg.ArgumentName, comparer),
             _ => arguments,
         };
     }
@@ -1985,7 +2235,7 @@ public class UsageWriter
     /// </para>
     /// <para>
     ///   This method is called by the base implementation of the <see cref="WriteCommandDescription(CommandInfo)"/>
-    ///   method.
+    ///   method and <see cref="WriteCommandAmbiguousPrefixAliasUsageCore"/> method.
     /// </para>
     /// </remarks>
     protected virtual void WriteCommandName(string commandName)
@@ -2005,12 +2255,15 @@ public class UsageWriter
     ///   method if the <see cref="IncludeCommandAliasInCommandList"/> property is <see langword="true"/>.
     /// </para>
     /// </remarks>
-    protected virtual void WriteCommandAliases(IEnumerable<string> aliases)
+    protected virtual void WriteCommandAliases(IEnumerable<AliasAttribute> aliases)
     {
         foreach (var alias in aliases)
         {
-            Write(NameSeparator);
-            Write(alias);
+            if (!alias.IsHidden)
+            {
+                Write(NameSeparator);
+                Write(alias.Alias);
+            }
         }
     }
 
@@ -2083,6 +2336,58 @@ public class UsageWriter
     protected virtual void WriteCommandHelpInstruction(string name, string argumentNamePrefix, string argumentName)
     {
         WriteLine(StringProvider.UsageCommandHelpInstruction(name, argumentNamePrefix, argumentName));
+    }
+
+    /// <summary>
+    /// Writes a list of possible matches when the user used a command name that was a prefix
+    /// alias for multiple commands.
+    /// </summary>
+    /// <param name="possibleMatches">The list of possible command names or aliases.</param>
+    /// <remarks>
+    /// <para>
+    ///   The default implementation writes a list of possible matches, preceded by a header.
+    ///   The command names will be written using the <see cref="CommandDescriptionColor"/> and
+    ///   by calling the <see cref="WriteCommandName"/> method.
+    /// </para>
+    /// </remarks>
+    protected virtual void WriteCommandAmbiguousPrefixAliasUsageCore(IEnumerable<string> possibleMatches)
+    {
+        Writer.WriteLine(StringProvider.AmbiguousCommandPrefixAliasMatchesHeader());
+        SetIndent(2);
+        foreach (var match in possibleMatches)
+        {
+            WriteColor(CommandDescriptionColor);
+            WriteCommandName(match);
+            ResetColor();
+            WriteLine();
+        }
+
+        WriteLine();
+        WriteCommandMoreInfoMessage();
+    }
+
+    /// <summary>
+    /// Writes a message telling to user how to get more detailed help about available commands.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    ///   The default implementation writes a message like "Run 'executable' without arguments for
+    ///   more information."
+    /// </para>
+    /// <para>
+    ///   This method is called by the base implementation of the
+    ///   <see cref="WriteCommandAmbiguousPrefixAliasUsageCore"/>.
+    /// </para>
+    /// </remarks>
+    protected virtual void WriteCommandMoreInfoMessage()
+    {
+        var name = ExecutableName;
+        if (CommandName != null)
+        {
+            name += " " + CommandName;
+        }
+
+        WriteLine(StringProvider.UsageCommandMoreInfoMessage(name));
     }
 
     #endregion
@@ -2214,7 +2519,7 @@ public class UsageWriter
 
     private VirtualTerminalSupport? EnableColor()
     {
-        if (_useColor == null)
+        if (_useColor == TriState.Auto)
         {
             VirtualTerminalSupport? support = null;
             if (_customWriter == null)
@@ -2233,62 +2538,51 @@ public class UsageWriter
         return null;
     }
 
-    private int WriteAliasHelper<T>(string prefix, IEnumerable<T>? aliases, int count)
-    {
-        if (aliases == null)
-        {
-            return count;
-        }
-
-        foreach (var alias in aliases)
-        {
-            if (count == 0)
-            {
-                Write(" (");
-            }
-            else
-            {
-                Write(NameSeparator);
-            }
-
-            WriteAlias(alias!.ToString()!, prefix);
-            ++count;
-        }
-
-        return count;
-    }
-
-    private void WriteUsageInternal(UsageHelpRequest request = UsageHelpRequest.Full)
+    private void WriteUsageInternal(UsageHelpRequest request = UsageHelpRequest.Full, IEnumerable<string>? possibleMatches = null)
     {
         using var support = EnableColor();
         using var writer = DisposableWrapper.Create(_customWriter, LineWrappingTextWriter.ForConsoleOut);
         _writer = writer.Inner;
         Writer.ResetIndent();
         Writer.Indent = 0;
-        RunOperation(request);
+        RunOperation(request, possibleMatches);
     }
 
-    private string GetUsageInternal(int maximumLineLength = 0, UsageHelpRequest request = UsageHelpRequest.Full)
+    private string GetUsageInternal(int maximumLineLength = 0, UsageHelpRequest request = UsageHelpRequest.Full, IEnumerable<string>? possibleMatches = null)
     {
         using var writer = LineWrappingTextWriter.ForStringWriter(maximumLineLength);
         _writer = writer;
-        RunOperation(request);
+        RunOperation(request, possibleMatches);
         writer.Flush();
         return writer.BaseWriter.ToString()!;
     }
 
-    private void RunOperation(UsageHelpRequest request)
+    private void RunOperation(UsageHelpRequest request, IEnumerable<string>? possibleMatches)
     {
         try
         {
             Writer.IndentAfterEmptyLine = IndentAfterEmptyLine;
             if (_parser == null)
             {
-                WriteCommandListUsageCore();
+                if (possibleMatches == null)
+                {
+                    WriteCommandListUsageCore();
+                }
+                else
+                {
+                    WriteCommandAmbiguousPrefixAliasUsageCore(possibleMatches);
+                }
             }
             else
             {
-                WriteParserUsageCore(request);
+                if (possibleMatches == null)
+                {
+                    WriteParserUsageCore(request);
+                }
+                else
+                {
+                    WriteParserAmbiguousPrefixAliasUsageCore(possibleMatches);
+                }
             }
         }
         finally
@@ -2302,12 +2596,17 @@ public class UsageWriter
 
     private bool CheckShowCommandHelpInstruction()
     {
-        if (IncludeCommandHelpInstruction is bool include)
+        if (IncludeCommandHelpInstruction == TriState.True)
         {
-            return include;
+            return true;
         }
 
-        // If not automatically set, check requirements from all commands.
+        if (IncludeCommandHelpInstruction == TriState.False)
+        {
+            return false;
+        }
+
+        // If not forced disabled/enabled, check requirements.
         if (CommandManager.Options.AutoHelpArgument == false)
         {
             return false;

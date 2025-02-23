@@ -20,14 +20,6 @@ namespace Ookii.CommandLine.Validation;
 public class ValidateNotEmptyAttribute : ArgumentValidationWithHelpAttribute
 {
     /// <summary>
-    /// Gets a value that indicates when validation will run.
-    /// </summary>
-    /// <value>
-    /// <see cref="ValidationMode.BeforeConversion" qualifyHint="true"/>.
-    /// </value>
-    public override ValidationMode Mode => ValidationMode.BeforeConversion;
-
-    /// <summary>
     /// Determines if the argument is not an empty string.
     /// </summary>
     /// <param name="argument">The argument being validated.</param>
@@ -37,14 +29,10 @@ public class ValidateNotEmptyAttribute : ArgumentValidationWithHelpAttribute
     /// <returns>
     ///   <see langword="true"/> if the value is valid; otherwise, <see langword="false"/>.
     /// </returns>
-    public override bool IsValid(CommandLineArgument argument, object? value)
+    public override bool IsValidPreConversion(CommandLineArgument argument, ReadOnlyMemory<char> value)
     {
-        return !string.IsNullOrEmpty(value as string);
+        return !value.IsEmpty;
     }
-
-    /// <inheritdoc cref="IsValid(CommandLineArgument, object?)"/>
-    public override bool? IsSpanValid(CommandLineArgument argument, ReadOnlySpan<char> value)
-        => !value.IsEmpty;
 
     /// <summary>
     /// Gets the error message to display if validation failed.

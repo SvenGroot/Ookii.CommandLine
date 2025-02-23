@@ -41,8 +41,6 @@ namespace Ookii.CommandLine;
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Method | AttributeTargets.Class, AllowMultiple = true)]
 public sealed class AliasAttribute : Attribute
 {
-    private readonly string _alias;
-
     /// <summary>
     /// Initializes a new instance of the <see cref="AliasAttribute"/> class.
     /// </summary>
@@ -52,7 +50,7 @@ public sealed class AliasAttribute : Attribute
     /// </exception>
     public AliasAttribute(string alias)
     {
-        _alias = alias ?? throw new ArgumentNullException(nameof(alias));
+        Alias = alias ?? throw new ArgumentNullException(nameof(alias));
     }
 
     /// <summary>
@@ -61,8 +59,14 @@ public sealed class AliasAttribute : Attribute
     /// <value>
     /// The alternative name.
     /// </value>
-    public string Alias
-    {
-        get { return _alias; }
-    }
+    public string Alias { get; }
+
+    /// <summary>
+    /// Gets or sets a value indicating whether the alias should be hidden from the usage help.
+    /// </summary>
+    /// <value>
+    /// <see langword="true"/> if the alias should be hidden from the usage help; otherwise,
+    /// <see langword="false"/>. The default value is <see langword="false"/>.
+    /// </value>
+    public bool IsHidden { get; set; }
 }

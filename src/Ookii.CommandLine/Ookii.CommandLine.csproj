@@ -1,13 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net8.0;net7.0;net6.0;netstandard2.0;netstandard2.1</TargetFrameworks>
+    <TargetFrameworks>net8.0;netstandard2.0;netstandard2.1</TargetFrameworks>
     <Nullable>enable</Nullable>
     <LangVersion>12.0</LangVersion>
     <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
-    <IsTrimmable>True</IsTrimmable>
-    <IsAotCompatible>True</IsAotCompatible>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/SvenGroot/Ookii.CommandLine</PackageProjectUrl>
     <RepositoryUrl>https://github.com/SvenGroot/Ookii.CommandLine</RepositoryUrl>
@@ -36,6 +34,11 @@ library for .Net applications.
     <PackageReadmeFile>PackageReadme.md</PackageReadmeFile>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(TargetFramework)'!='netstandard2.0' and '$(TargetFramework)'!='netstandard2.1'">
+    <IsTrimmable>True</IsTrimmable>
+    <IsAotCompatible>True</IsAotCompatible>
+  </PropertyGroup>
+
   <PropertyGroup>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <!-- Turn off unknown reference warning for older frameworks, since we reference some newer types -->
@@ -50,18 +53,21 @@ library for .Net applications.
   <ItemGroup>
     <!-- This is just here to ensure this is built before this project -->
     <ProjectReference Include="../Ookii.CommandLine.Generator/Ookii.CommandLine.Generator.csproj" ReferenceOutputAssembly="false" />
+    <ProjectReference Include="../Ookii.CommandLine.CodeFix/Ookii.CommandLine.CodeFix.csproj" ReferenceOutputAssembly="false" />
   </ItemGroup>
 
   <ItemGroup>
     <None Include="icon.png" Pack="True" PackagePath="" />
     <None Include="PackageReadme.md" Pack="True" PackagePath="" />
     <None Include="../Ookii.CommandLine.Generator/$(OutputPath)/netstandard2.0/**/*.dll" Pack="True" PackagePath="analyzers/dotnet/cs" />
+    <None Include="../Ookii.CommandLine.CodeFix/$(OutputPath)/netstandard2.0/**/*.dll" Pack="True" PackagePath="analyzers/dotnet/cs" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Windows.CsWin32" Version="0.3.183">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="Ookii.Common" Version="1.0.0" />
     <PackageReference Include="System.Collections.Immutable" Version="9.0.2" Condition="'$(TargetFramework)'=='netstandard2.0' Or '$(TargetFramework)'=='netstandard2.1'" />
     <PackageReference Include="System.Memory" Version="4.6.0" Condition="'$(TargetFramework)'=='netstandard2.0'" />
   </ItemGroup>

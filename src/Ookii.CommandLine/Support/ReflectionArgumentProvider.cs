@@ -44,7 +44,7 @@ internal class ReflectionArgumentProvider : ArgumentProvider
 
     public override object CreateInstance(CommandLineParser parser, object?[]? requiredPropertyValues)
     {
-        var inject = ArgumentsType.GetConstructor(new[] { typeof(CommandLineParser) }) != null;
+        var inject = ArgumentsType.GetConstructor([typeof(CommandLineParser)]) != null;
         if (inject)
         {
             return Activator.CreateInstance(ArgumentsType, parser)!;
@@ -66,5 +66,11 @@ internal class ReflectionArgumentProvider : ArgumentProvider
             .Select(m => ReflectionArgument.Create(parser, m));
 
         return properties.Concat(methods);
+    }
+
+    public override string GetCategoryDescription(Enum category)
+    {
+        var field = category.ToString();
+        return category.GetType().GetField(field)?.GetCustomAttribute<DescriptionAttribute>()?.Description ?? field;
     }
 }

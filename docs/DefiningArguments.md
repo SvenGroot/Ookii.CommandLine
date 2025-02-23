@@ -23,7 +23,8 @@ The class must have a public constructor with no parameters, or one that takes a
 [`CommandLineParser`][] parameters. If the latter is used, the [`CommandLineParser`][] instance that
 was used to parse the arguments will be passed to the constructor.
 
-There are two ways to define arguments in the class: using properties and using methods.
+There are two ways to define arguments in the class: using properties and
+[using static methods](#using-static-methods).
 
 ## Using properties
 
@@ -180,6 +181,11 @@ public bool? Switch { get; set; }
 
 This property will be null if the argument was not supplied, true if the argument was present or
 explicitly set to true with `-Switch:true`, and false only if the user supplied `-Switch:false`.
+
+If you want to define a named argument that takes a boolean value but is _not_ a switch argument,
+you can use the [`NonSwitchBoolean`][] helper type. This creates a boolean argument that requires an
+explicit value, and can also use white space to separate the argument name and value
+(e.g. `-NonSwitch true`).
 
 ### Multi-value arguments
 
@@ -338,8 +344,8 @@ public int Argument { get; set; }
 The type specified must be derived from the [`ArgumentConverter`][] class.
 
 To create a custom converter, create a class that derives from the [`ArgumentConverter`][] class.
-Argument conversion can use either a [`ReadOnlySpan<char>`][] or a [`String`][], and it's recommended to
-support the [`ReadOnlySpan<char>`][] method to avoid unnecessary string allocations.
+Argument conversion uses the [`ReadOnlyMemory<char>`][] type to represent the raw string value, so
+that no string allocation is performed when not necessary.
 
 Previous versions of Ookii.CommandLine used .Net's [`TypeConverter`][] class. Starting with
 Ookii.CommandLine 4.0, this is no longer the case, and the [`ArgumentConverter`][] class is used
@@ -366,16 +372,19 @@ You can indicate that argument parsing should stop immediately when an argument 
 setting the [`CommandLineArgumentAttribute.CancelParsing`][] property.
 
 When this property is set to [`CancelMode.Abort`][], parsing is stopped when the argument is
-encountered. The rest of the command line is not processed, and
-[`CommandLineParser<T>.Parse()`][] will return null. The
+encountered. The rest of the command line is not processed, and [`CommandLineParser<T>.Parse()`][]
+and other parsing methods will return null.
+
+If you want to display usage help automatically when using the
 [`ParseWithErrorHandling()`][ParseWithErrorHandling()_1] and the static [`Parse<T>()`][Parse<T>()_1]
-helper methods will automatically print usage in this case.
+helper methods, you should set it to [`CancelMode.AbortWithHelp`][] instead. Using this value will
+also set the [`ParseResult.HelpRequested`][] property to true after parsing finishes.
 
 This can be used, for example, to implement a custom `-Help` argument, if you don't wish to use the
 default one.
 
 ```csharp
-[CommandLineArgument(CancelParsing = CancelMode.Abort)]
+[CommandLineArgument(CancelParsing = CancelMode.AbortWithHelp)]
 public bool Help { get; set; }
 ```
 
@@ -400,7 +409,7 @@ The `--` argument can also be used to cancel parsing and return success, by sett
 [`ParseOptionsAttribute.PrefixTermination`][] or [`ParseOptions.PrefixTermination`][] property to
 [`PrefixTerminationMode.CancelWithSuccess`][].
 
-## Using methods
+## Using static methods
 
 You can also apply the [`CommandLineArgumentAttribute`][] to a public static method. Method
 arguments offer a way to take action immediately if an argument is supplied, without waiting for the
@@ -412,48 +421,41 @@ The method must have one of the following signatures.
 - `public static CancelMode Method(ArgumentType value);`
 - `public static CancelMode Method(CommandLineParser parser);`
 - `public static CancelMode Method();`
-- `public static bool Method(ArgumentType value, CommandLineParser parser);`
-- `public static bool Method(ArgumentType value);`
-- `public static bool Method(CommandLineParser parser);`
-- `public static bool Method();`
 - `public static void Method(ArgumentType value, CommandLineParser parser);`
 - `public static void Method(ArgumentType value);`
 - `public static void Method(CommandLineParser parser);`
 - `public static void Method();`
 
-The method will be called immediately when the argument is supplied, unlike properties, which are
-only set after all arguments have been parsed. This is why the method must be static; the instance
-hasn't been created yet when the method is invoked.
+Unlike properties, which are only set after all arguments have been parsed, the method will be
+called immediately when the argument is supplied. This is why the method must be static; the
+instance hasn't been created yet when the method is invoked.
 
-The type of the `value` parameter is the type of the argument. If the method doesn't have a `value`
-parameter, the argument will be a switch argument, and the method will be invoked when the argument
-is supplied, even if its value is explicitly set to false (if you want to distinguish this, use
-a `bool value` parameter).
+If present, the type of the `value` parameter is the type of the argument. If the method doesn't
+have a `value` parameter, the argument will be a switch argument, and the method will be invoked
+when the argument is supplied, even if its value is explicitly set to false (if you want to
+distinguish this, use a `bool value` parameter).
 
 Multi-value method arguments are not supported, so the type of the `value` parameter may not be an
 array, collection or dictionary type, unless you provide an [`ArgumentConverter`][] that can convert
 to that type.
 
-If you use one of the signatures with a [`CancelMode`][] return type, returning [`CancelMode.Abort`][] or
-[`CancelMode.Success`][] will immediately [cancel parsing](#arguments-that-cancel-parsing). Unlike the
-[`CancelParsing`][CancelParsing_1] property, [`CancelMode.Abort`][] will _not_ automatically display
-usage help. If you do want to show help, set the [`CommandLineParser.HelpRequested`][] property to
-true before returning false.
+If you use one of the signatures with a [`CancelMode`][] return type, returning
+[`CancelMode.Abort`][], [`CancelMode.AbortWithHelp`][], or [`CancelMode.Success`][] will immediately
+[cancel parsing](#arguments-that-cancel-parsing). Usage help is displayed automatically by the
+[`ParseWithErrorHandling()`][ParseWithErrorHandling()_1] and the static [`Parse<T>()`][Parse<T>()_1]
+helper methods if you return [`CancelMode.AbortWithHelp`][].
 
 ```csharp
 [CommandLineArgument]
 public static CancelMode MoreHelp(CommandLineParser parser)
 {
     Console.WriteLine("Some amazingly useful information.")
-    parser.HelpRequested = true;
-    return CancelMode.Abort;
+    return CancelMode.AbortWithHelp;
 }
 ```
 
-When using a signature that returns `bool`, returning `true` is equivalent to [`CancelMode.None`][] and
-`false` is equivalent to [`CancelMode.Abort`][].
-
-Using a signature that returns `void` is equivalent to returning [`CancelMode.None`][].
+Using a signature that returns `void` is equivalent to returning [`CancelMode.None`][], so parsing
+will not be canceled.
 
 Method arguments allow all the same customizations as property-defined arguments, except that the
 [`DefaultValue`][DefaultValue_1] will not be used. The method will never be invoked if the argument
@@ -461,8 +463,9 @@ is not explicitly specified by the user.
 
 ## Applying parse options
 
-You can set parse options when you use the [`CommandLineParser`][] class using the [`ParseOptions`][]
-class, but you can also set many common options on the arguments class directly using the
+There are two ways to apply options that affect parsing behavior. You can supply an instance of
+the [`ParseOptions`][] class when you [parse the arguments](ParsingArguments.md#customizing-the-parse-options),
+and you can set many common options on the arguments class directly using the
 [`ParseOptionsAttribute`][] class.
 
 For example, the following disables the use of the `/` argument prefix on Windows, and always uses
@@ -470,7 +473,7 @@ only `-`.
 
 ```csharp
 [GeneratedParser]
-[ParseOptions(ArgumentNamesPrefixes = new[] { '-' })]
+[ParseOptions(ArgumentNamesPrefixes = ['-'])]
 partial class Arguments
 {
 }
@@ -560,7 +563,8 @@ explicitly specifying it. However, `-Verb` would work as an automatic prefix ali
 because it is not ambiguous.
 
 Automatic prefix aliases will not be shown in the [usage help](UsageHelp.md), so it can still be
-useful to explicitly define an alias even if it's a prefix, if you wish to call more attention to it.
+useful to explicitly define an alias even if it's a prefix, if you wish to call more attention to
+it.
 
 If you do not want to use automatic prefix aliases, set the [`ParseOptionsAttribute.AutoPrefixAliases`][]
 or [`ParseOptions.AutoPrefixAliases`][] property to false.
@@ -573,11 +577,11 @@ parameter name.
 
 The following transformations are available:
 
-Value          | Description                                                                                                                                                                                                                                                  | Example
----------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------
-**None**       | Member names are used as-is, without changing them. This is the default.                                                                                                                                                                                      |
+Value          | Description                                                                                                                                                                                                                                                   | Example
+---------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------
+**None**       | Member names are used as-is, without changing them. This is the default.                                                                                                                                                                                      | N/A
 **PascalCase** | Member names are transformed to PascalCase. This removes all underscores, and the first character and every character after an underscore is changed to uppercase. The case of other characters is not changed.                                               | `SomeName`, `someName`, `_someName_` => SomeName
-**CamelCase**  | Member names are transformed to camelCase. Similar to PascalCase, but the first character will not be uppercase.                                                                                                                                             | `SomeName`, `someName`, `_someName_`=> someName
+**CamelCase**  | Member names are transformed to camelCase. Similar to PascalCase, but the first character will not be uppercase.                                                                                                                                              | `SomeName`, `someName`, `_someName_`=> someName
 **SnakeCase**  | Member names are transformed to snake_case. This removes leading and trailing underscores, changes all characters to lower-case, and reduces consecutive underscores to a single underscore. An underscore is inserted before previously capitalized letters. | `SomeName`, `someName`, `_someName_` => some_name
 **DashCase**   | Member names are transformed to dash-case. Similar to SnakeCase, but uses a dash instead of an underscore.                                                                                                                                                    | `SomeName`, `someName`, `_someName_` => some-name
 
@@ -631,55 +635,57 @@ disable either automatic argument using the [`ParseOptions`][] class.
 
 Next, we'll take a look at how to [parse the arguments we've defined](ParsingArguments.md)
 
-[`AliasAttribute`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_AliasAttribute.htm
-[`ArgumentConverter`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_Conversion_ArgumentConverter.htm
-[`ArgumentConverterAttribute`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_Conversion_ArgumentConverterAttribute.htm
-[`CancelMode.Abort`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_CancelMode.htm
-[`CancelMode.None`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_CancelMode.htm
-[`CancelMode.Success`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_CancelMode.htm
-[`CancelMode`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_CancelMode.htm
-[`CommandLineArgumentAttribute.CancelParsing`]: https://www.ookii.org/docs/commandline-4.2/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_CancelParsing.htm
-[`CommandLineArgumentAttribute.DefaultValue`]: https://www.ookii.org/docs/commandline-4.2/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_DefaultValue.htm
-[`CommandLineArgumentAttribute.IsLong`]: https://www.ookii.org/docs/commandline-4.2/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_IsLong.htm
-[`CommandLineArgumentAttribute.IsPositional`]: https://www.ookii.org/docs/commandline-4.2/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_IsPositional.htm
-[`CommandLineArgumentAttribute.IsRequired`]: https://www.ookii.org/docs/commandline-4.2/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_IsRequired.htm
-[`CommandLineArgumentAttribute.IsShort`]: https://www.ookii.org/docs/commandline-4.2/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_IsShort.htm
-[`CommandLineArgumentAttribute.Position`]: https://www.ookii.org/docs/commandline-4.2/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_Position.htm
-[`CommandLineArgumentAttribute.ShortName`]: https://www.ookii.org/docs/commandline-4.2/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_ShortName.htm
-[`CommandLineArgumentAttribute`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_CommandLineArgumentAttribute.htm
-[`CommandLineParser.HelpRequested`]: https://www.ookii.org/docs/commandline-4.2/html/P_Ookii_CommandLine_CommandLineParser_HelpRequested.htm
-[`CommandLineParser`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_CommandLineParser.htm
-[`CommandLineParser<T>.Parse()`]: https://www.ookii.org/docs/commandline-4.2/html/Overload_Ookii_CommandLine_CommandLineParser_1_Parse.htm
-[`DefaultValue`]: https://www.ookii.org/docs/commandline-4.2/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_DefaultValue.htm
+[`AliasAttribute`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_AliasAttribute.htm
+[`ArgumentConverter`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_Conversion_ArgumentConverter.htm
+[`ArgumentConverterAttribute`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_Conversion_ArgumentConverterAttribute.htm
+[`CancelMode.Abort`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_CancelMode.htm
+[`CancelMode.AbortWithHelp`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_CancelMode.htm
+[`CancelMode.None`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_CancelMode.htm
+[`CancelMode.Success`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_CancelMode.htm
+[`CancelMode`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_CancelMode.htm
+[`CommandLineArgumentAttribute.CancelParsing`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_CancelParsing.htm
+[`CommandLineArgumentAttribute.DefaultValue`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_DefaultValue.htm
+[`CommandLineArgumentAttribute.IsLong`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_IsLong.htm
+[`CommandLineArgumentAttribute.IsPositional`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_IsPositional.htm
+[`CommandLineArgumentAttribute.IsRequired`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_IsRequired.htm
+[`CommandLineArgumentAttribute.IsShort`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_IsShort.htm
+[`CommandLineArgumentAttribute.Position`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_Position.htm
+[`CommandLineArgumentAttribute.ShortName`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_ShortName.htm
+[`CommandLineArgumentAttribute`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_CommandLineArgumentAttribute.htm
+[`CommandLineParser`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_CommandLineParser.htm
+[`CommandLineParser<T>.Parse()`]: https://www.ookii.org/docs/commandline-5.0/html/Overload_Ookii_CommandLine_CommandLineParser_1_Parse.htm
+[`DefaultValue`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_DefaultValue.htm
 [`DescriptionAttribute`]: https://learn.microsoft.com/dotnet/api/system.componentmodel.descriptionattribute
 [`Dictionary<TKey, TValue>`]: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2
-[`GeneratedParserAttribute`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_GeneratedParserAttribute.htm
+[`GeneratedParserAttribute`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_GeneratedParserAttribute.htm
 [`ICollection<T>`]: https://learn.microsoft.com/dotnet/api/system.collections.generic.icollection-1
 [`IDictionary<TKey, TValue>`]: https://learn.microsoft.com/dotnet/api/system.collections.generic.idictionary-2
-[`IsPositional`]: https://www.ookii.org/docs/commandline-4.2/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_IsPositional.htm
+[`IsPositional`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_IsPositional.htm
 [`List<int>`]: https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1
-[`LocalizedStringProvider`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_LocalizedStringProvider.htm
-[`ParseOptions.ArgumentNameTransform`]: https://www.ookii.org/docs/commandline-4.2/html/P_Ookii_CommandLine_ParseOptions_ArgumentNameTransform.htm
-[`ParseOptions.AutoPrefixAliases`]: https://www.ookii.org/docs/commandline-4.2/html/P_Ookii_CommandLine_ParseOptions_AutoPrefixAliases.htm
-[`ParseOptions.PrefixTermination`]: https://www.ookii.org/docs/commandline-4.2/html/P_Ookii_CommandLine_ParseOptions_PrefixTermination.htm
-[`ParseOptions`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_ParseOptions.htm
-[`ParseOptionsAttribute.AutoPrefixAliases`]: https://www.ookii.org/docs/commandline-4.2/html/P_Ookii_CommandLine_ParseOptionsAttribute_AutoPrefixAliases.htm
-[`ParseOptionsAttribute.PrefixTermination`]: https://www.ookii.org/docs/commandline-4.2/html/P_Ookii_CommandLine_ParseOptionsAttribute_PrefixTermination.htm
-[`ParseOptionsAttribute`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_ParseOptionsAttribute.htm
-[`ParseResult.RemainingArguments`]: https://www.ookii.org/docs/commandline-4.2/html/P_Ookii_CommandLine_ParseResult_RemainingArguments.htm
-[`PrefixTerminationMode.CancelWithSuccess`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_PrefixTerminationMode.htm
-[`ReadOnlySpan<char>`]: https://learn.microsoft.com/dotnet/api/system.readonlyspan-1
-[`ShortAliasAttribute`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_ShortAliasAttribute.htm
+[`LocalizedStringProvider`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_LocalizedStringProvider.htm
+[`NonSwitchBoolean`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_NonSwitchBoolean.htm
+[`ParseOptions.ArgumentNameTransform`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_ParseOptions_ArgumentNameTransform.htm
+[`ParseOptions.AutoPrefixAliases`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_ParseOptions_AutoPrefixAliases.htm
+[`ParseOptions.PrefixTermination`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_ParseOptions_PrefixTermination.htm
+[`ParseOptions`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_ParseOptions.htm
+[`ParseOptionsAttribute.AutoPrefixAliases`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_ParseOptionsAttribute_AutoPrefixAliases.htm
+[`ParseOptionsAttribute.PrefixTermination`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_ParseOptionsAttribute_PrefixTermination.htm
+[`ParseOptionsAttribute`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_ParseOptionsAttribute.htm
+[`ParseResult.HelpRequested`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_ParseResult_HelpRequested.htm
+[`ParseResult.RemainingArguments`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_ParseResult_RemainingArguments.htm
+[`PrefixTerminationMode.CancelWithSuccess`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_PrefixTerminationMode.htm
+[`ReadOnlyMemory<char>`]: https://learn.microsoft.com/dotnet/api/system.readonlymemory-1
+[`ShortAliasAttribute`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_ShortAliasAttribute.htm
 [`String`]: https://learn.microsoft.com/dotnet/api/system.string
 [`System.ComponentModel.DescriptionAttribute`]: https://learn.microsoft.com/dotnet/api/system.componentmodel.descriptionattribute
 [`TypeConverter`]: https://learn.microsoft.com/dotnet/api/system.componentmodel.typeconverter
 [`TypeDescriptor.GetConverter()`]: https://learn.microsoft.com/dotnet/api/system.componentmodel.typedescriptor.getconverter
-[`ValueDescriptionAttribute`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_ValueDescriptionAttribute.htm
-[`WrappedDefaultTypeConverter<T>`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_Conversion_WrappedDefaultTypeConverter_1.htm
-[`WrappedTypeConverter<T>`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_Conversion_WrappedTypeConverter_1.htm
-[CancelParsing_1]: https://www.ookii.org/docs/commandline-4.2/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_CancelParsing.htm
-[DefaultValue_1]: https://www.ookii.org/docs/commandline-4.2/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_DefaultValue.htm
-[IsPosix_2]: https://www.ookii.org/docs/commandline-4.2/html/P_Ookii_CommandLine_ParseOptionsAttribute_IsPosix.htm
-[Parse<T>()_1]: https://www.ookii.org/docs/commandline-4.2/html/M_Ookii_CommandLine_CommandLineParser_Parse__1.htm
-[ParseWithErrorHandling()_1]: https://www.ookii.org/docs/commandline-4.2/html/M_Ookii_CommandLine_CommandLineParser_1_ParseWithErrorHandling.htm
-[Position_1]: https://www.ookii.org/docs/commandline-4.2/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_Position.htm
+[`ValueDescriptionAttribute`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_ValueDescriptionAttribute.htm
+[`WrappedDefaultTypeConverter<T>`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_Conversion_WrappedDefaultTypeConverter_1.htm
+[`WrappedTypeConverter<T>`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_Conversion_WrappedTypeConverter_1.htm
+[CancelParsing_1]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_CancelParsing.htm
+[DefaultValue_1]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_DefaultValue.htm
+[IsPosix_2]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_ParseOptionsAttribute_IsPosix.htm
+[Parse<T>()_1]: https://www.ookii.org/docs/commandline-5.0/html/M_Ookii_CommandLine_CommandLineParser_Parse__1.htm
+[ParseWithErrorHandling()_1]: https://www.ookii.org/docs/commandline-5.0/html/M_Ookii_CommandLine_CommandLineParser_1_ParseWithErrorHandling.htm
+[Position_1]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_Position.htm

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
 
 namespace Ookii.CommandLine;
 
@@ -17,15 +19,21 @@ public class UnknownArgumentEventArgs : EventArgs
     /// <param name="isCombinedSwithToken">
     /// Indicates whether the argument is part of a combined short switch argument.
     /// </param>
+    /// <param name="possibleMatches">
+    /// A list of possible arguments that this argument could match by prefix, or
+    /// <see langword="null"/>.
+    /// </param>
     /// <exception cref="ArgumentNullException">
     /// <paramref name="token"/> is <see langword="null"/>.
     /// </exception>
-    public UnknownArgumentEventArgs(string token, ReadOnlyMemory<char> name, ReadOnlyMemory<char> value, bool isCombinedSwithToken)
+    public UnknownArgumentEventArgs(string token, ReadOnlyMemory<char> name, ReadOnlyMemory<char> value,
+        bool isCombinedSwithToken, ImmutableArray<string> possibleMatches)
     {
         Token = token ?? throw new ArgumentNullException(nameof(token));
         Name = name;
         Value = value;
         IsCombinedSwitchToken = isCombinedSwithToken;
+        PossibleMatches = possibleMatches;
     }
 
     /// <summary>
@@ -130,9 +138,28 @@ public class UnknownArgumentEventArgs : EventArgs
     ///   an instance of the arguments class according to the <see cref="CancelMode"/> value.
     /// </para>
     /// <para>
-    ///   If you want usage help to be displayed after canceling, set the <see cref="CommandLineParser.HelpRequested" qualifyHint="true"/>
-    ///   property to <see langword="true"/>.
+    ///   If you want usage help to be displayed after canceling, set the value to
+    ///   <see cref="CancelMode.AbortWithHelp" qualifyHint="true"/>
     /// </para>
     /// </remarks>
     public CancelMode CancelParsing { get; set; }
+
+    /// <summary>
+    /// Gets an array of possible arguments that this argument could match by prefix.
+    /// </summary>
+    /// <value>
+    /// An immutable array of possible arguments that this argument could match by prefix, or an
+    /// empty list if no such matches were found.
+    /// </value>
+    /// <remarks>
+    /// <para>
+    ///   This property will always return an empty array if the <see cref="ParseOptions.AutoPrefixAliases" qualifyHint="true"/>
+    ///   or <see cref="ParseOptionsAttribute.AutoPrefixAliases" qualifyHint="true"/> property is
+    ///   <see langword="false"/>.
+    /// </para>
+    /// <para>
+    ///   If the returned array is not empty, it is guaranteed to contains at least two items.
+    /// </para>
+    /// </remarks>
+    public ImmutableArray<string> PossibleMatches { get; }
 }

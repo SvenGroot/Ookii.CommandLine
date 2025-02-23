@@ -10,8 +10,7 @@ namespace Ookii.CommandLine.Validation;
 /// <remarks>
 /// <para>
 ///   An argument's value can only be <see langword="null"/> if its <see cref="ArgumentConverter"/>
-///   returns <see langword="null"/> from the
-///   <see cref="ArgumentConverter.Convert(string, System.Globalization.CultureInfo, CommandLineArgument)"/>
+///   returns <see langword="null"/> from the <see cref="ArgumentConverter.Convert" qualifyHint="true"/>
 ///   method. For example, the <see cref="NullableConverter"/> can return <see langword="null"/>.
 /// </para>
 /// <para>
@@ -43,10 +42,8 @@ public class ValidateNotNullAttribute : ArgumentValidationAttribute
     /// <returns>
     ///   <see langword="true"/> if the value is valid; otherwise, <see langword="false"/>.
     /// </returns>
-    public override bool IsValid(CommandLineArgument argument, object? value)
-    {
-        return value != null;
-    }
+    public override bool IsValidPostConversion(CommandLineArgument argument, object? value)
+        => value != null;
 
     /// <summary>
     /// Gets the error message to display if validation failed.

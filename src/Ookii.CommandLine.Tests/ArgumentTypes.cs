@@ -15,7 +15,7 @@ using System.Net;
 #nullable disable
 
 // We deliberately have some properties and methods that cause warnings, so disable those.
-#pragma warning disable OCL0017,OCL0018,OCL0020,OCL0023,OCL0029,OCL0033,OCL0034,OCL0038,OCL0039,OCL0040
+#pragma warning disable OCL0017,OCL0018,OCL0020,OCL0023,OCL0029,OCL0033,OCL0034,OCL0038,OCL0039,OCL0040,IDE1006
 
 namespace Ookii.CommandLine.Tests;
 
@@ -29,8 +29,8 @@ partial class EmptyArguments
 [Description("Test arguments description.")]
 partial class TestArguments
 {
-    private readonly Collection<int> _arg12 = new Collection<int>();
-    private readonly Dictionary<string, int> _arg14 = new Dictionary<string, int>();
+    private readonly Collection<int> _arg12 = [];
+    private readonly Dictionary<string, int> _arg14 = [];
 
     [CommandLineArgument("arg1", Position = 1, IsRequired = true)]
     [Description("Arg1 description.")]
@@ -52,6 +52,7 @@ partial class TestArguments
     [ValueDescription("Number")]
     [ValidateRange(0, 1000, IncludeInUsageHelp = false)]
     [ArgumentConverter(typeof(WrappedDefaultTypeConverter<int>))]
+    [Alias("HiddenAlias", IsHidden = true)]
     public int Arg4 { get; set; }
 
     // Short/long name stuff should be ignored if not using LongShort mode.
@@ -69,6 +70,7 @@ partial class TestArguments
     public bool Arg7 { get; set; }
 
     [CommandLineArgument(Position = 6)]
+    [Alias("HiddenAliasOnArgNotIncludedInList", IsHidden = true)]
     public DayOfWeek[] Arg8 { get; set; }
 
     [CommandLineArgument()]
@@ -98,6 +100,10 @@ partial class TestArguments
 
     [CommandLineArgument, ArgumentConverter(typeof(KeyValuePairConverter<string, int>))]
     public KeyValuePair<string, int> Arg15 { get; set; }
+
+    [CommandLineArgument]
+    [Description("NotSwitch2 description.")]
+    public NonSwitchBoolean NotSwitch2 { get; set; }
 
     public string NotAnArg { get; set; }
 
@@ -194,7 +200,7 @@ partial class CancelArguments
     [CommandLineArgument]
     public bool DoesNotCancel { get; set; }
 
-    [CommandLineArgument(CancelParsing = CancelMode.Abort)]
+    [CommandLineArgument(CancelParsing = CancelMode.AbortWithHelp)]
     public bool DoesCancel { get; set; }
 
     [CommandLineArgument(CancelParsing = CancelMode.Success)]
@@ -230,7 +236,9 @@ partial class LongShortArguments
 {
     public static bool Switch2Value { get; set; }
 
-    [CommandLineArgument, ShortAlias('c')]
+    [CommandLineArgument]
+    [ShortAlias('c')]
+    [ShortAlias('h', IsHidden = true)]
     [Description("Arg1 description.")]
     public int Arg1 { get; set; }
 
@@ -273,20 +281,6 @@ partial class MethodArguments
     public static int Value;
 
     [CommandLineArgument]
-    public static bool NoCancel()
-    {
-        CalledMethodName = nameof(NoCancel);
-        return true;
-    }
-
-    [CommandLineArgument]
-    public static bool Cancel()
-    {
-        CalledMethodName = nameof(Cancel);
-        return false;
-    }
-
-    [CommandLineArgument]
     public static CancelMode CancelModeAbort()
     {
         CalledMethodName = nameof(CancelModeAbort);
@@ -308,29 +302,26 @@ partial class MethodArguments
     }
 
     [CommandLineArgument]
-    public static bool CancelWithHelp(CommandLineParser parser)
+    public static CancelMode CancelWithHelp(CommandLineParser parser)
     {
         CalledMethodName = nameof(CancelWithHelp);
-        parser.HelpRequested = true;
-        return false;
+        return CancelMode.AbortWithHelp;
     }
 
     [CommandLineArgument]
-    public static bool CancelWithValue(int value)
+    public static CancelMode CancelWithValue(int value)
     {
         CalledMethodName = nameof(CancelWithValue);
         Value = value;
-        return value > 0;
+        return value > 0 ? CancelMode.None : CancelMode.Abort;
     }
 
     [CommandLineArgument]
-    public static bool CancelWithValueAndHelp(int value, CommandLineParser parser)
+    public static CancelMode CancelWithValueAndHelp(int value, CommandLineParser parser)
     {
         CalledMethodName = nameof(CancelWithValueAndHelp);
         Value = value;
-        // This should be reset to false if parsing continues.
-        parser.HelpRequested = true;
-        return value > 0;
+        return value > 0 ? CancelMode.None : CancelMode.AbortWithHelp;
     }
 
     [CommandLineArgument]
@@ -452,13 +443,16 @@ partial class ValidationArguments
 
     [CommandLineArgument]
     [Description("Day2 description.")]
-    [ValidateEnumValue(CaseSensitive = true, AllowNonDefinedValues = true, AllowCommaSeparatedValues = false)]
+    [ValidateEnumValue(CaseSensitive = true, AllowCommaSeparatedValues = TriState.True)]
     public DayOfWeek? Day2 { get; set; }
 
     [CommandLineArgument(IsHidden = true)]
     [Description("Day3 description.")]
-    [ValidateEnumValue(AllowNumericValues = false)]
+    [ValidateEnumValue(AllowNumericValues = true, AllowNonDefinedValues = TriState.True, AllowCommaSeparatedValues = TriState.True)]
     public DayOfWeek Day3 { get; set; }
+
+    [CommandLineArgument(IsHidden = true)]
+    public ConsoleModifiers Modifiers { get; set; }
 
     [CommandLineArgument]
     [Description("NotNull description.")]
@@ -676,6 +670,9 @@ partial class AutoPrefixAliasesArguments
     [CommandLineArgument(IsShort = true)]
     [Alias("Prefix")]
     public bool EnablePrefix { get; set; }
+
+    [CommandLineArgument]
+    public string SomeOtherName { get; set; }
 }
 
 class AutoPositionArgumentsBase
@@ -796,4 +793,81 @@ partial class DerivedArguments6 : DerivedArguments5
 {
     [CommandLineArgument]
     public int DerivedArg2 { get; set; }
+}
+
+[GeneratedParser]
+partial class CategoryArguments
+{
+    // Indirect reference to enum value.
+    public const ArgumentCategory Test = ArgumentCategory.Category1;
+
+    [CommandLineArgument(Category = Test)]
+    [Description("Foo description.")]
+    public string Foo { get; set; }
+
+    [CommandLineArgument(Category = ArgumentCategory.Category2)]
+    [Description("Baz description.")]
+    public string Baz { get; set; }
+
+    [CommandLineArgument(Category = ArgumentCategory.Category3)]
+    [Description("Category3Arg description.")]
+    public string Category3Arg { get; set; }
+
+    [CommandLineArgument]
+    public string ArgWithoutCategory { get; set; }
+
+    [CommandLineArgument(Category = ArgumentCategory.Category1)]
+    [Description("Bar description.")]
+    public string Bar { get; set; }
+}
+
+[GeneratedParser]
+[ParseOptions(DefaultArgumentCategory = ArgumentCategory.Category2)]
+partial class DefaultCategoryArguments
+{
+    [CommandLineArgument(Category = ArgumentCategory.Category1)]
+    [Description("Foo description.")]
+    public string Foo { get; set; }
+
+    [CommandLineArgument]
+    [Description("Baz description.")]
+    public string Baz { get; set; }
+}
+
+[ValueDescription("MyEnum")]
+enum CustomEnum
+{
+    Value1,
+    Value2
+}
+
+[GeneratedParser]
+partial class TypeValueDescriptionArguments
+{
+    [CommandLineArgument]
+    public NonSwitchBoolean NonSwitch { get; set; }
+
+    [CommandLineArgument]
+    public NonSwitchBoolean? Nullable { get; set; }
+
+    [CommandLineArgument]
+    public NonSwitchBoolean[] Array { get; set; }
+
+    [CommandLineArgument]
+    public Dictionary<string, NonSwitchBoolean> Dict { get; set; }
+
+    [CommandLineArgument]
+    [ValueDescription("Other")]
+    public NonSwitchBoolean Overridden { get; set; }
+
+    [CommandLineArgument]
+    [ValueDescription("Other", ApplyTransform = true)]
+    public NonSwitchBoolean OverriddenTransform { get; set; }
+
+    [CommandLineArgument]
+    public CustomEnum Enum { get; set; }
+
+    [CommandLineArgument]
+    [ArgumentConverter(typeof(KeyValuePairConverter<string, int>))]
+    public KeyValuePair<NonSwitchBoolean, CustomEnum> Generic { get; set; }
 }

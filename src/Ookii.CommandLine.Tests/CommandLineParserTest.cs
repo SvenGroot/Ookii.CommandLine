@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestPlatform.Utilities;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Ookii.CommandLine.Conversion;
 using Ookii.CommandLine.Support;
 using Ookii.CommandLine.Tests.Commands;
@@ -8,6 +9,7 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Reflection;
 
@@ -66,15 +68,15 @@ public partial class CommandLineParserTest
         Assert.AreEqual(argumentsType, target.ArgumentsType);
         Assert.AreEqual("Friendly name", target.ApplicationFriendlyName);
         Assert.AreEqual("Test arguments description.", target.Description);
-        Assert.AreEqual(18, target.Arguments.Length);
+        Assert.AreEqual(19, target.Arguments.Length);
         VerifyArguments(target.Arguments,
         [
             new ExpectedArgument("arg1", typeof(string)) { MemberName = "Arg1", Position = 0, IsRequired = true, Description = "Arg1 description." },
             new ExpectedArgument("other", typeof(int)) { MemberName = "Arg2", Position = 1, DefaultValue = 42, Description = "Arg2 description.", ValueDescription = "Number" },
             new ExpectedArgument("notSwitch", typeof(bool)) { MemberName = "NotSwitch", Position = 2, DefaultValue = false },
             new ExpectedArgument("Arg5", typeof(float)) { Position = 3, Description = "Arg5 description.", DefaultValue = 1.0f },
-            new ExpectedArgument("other2", typeof(int)) { MemberName = "Arg4", Position = 4, DefaultValue = 47, Description = "Arg4 description.", ValueDescription = "Number" },
-            new ExpectedArgument("Arg8", typeof(DayOfWeek[]), ArgumentKind.MultiValue) { ElementType = typeof(DayOfWeek), Position = 5 },
+            new ExpectedArgument("other2", typeof(int)) { MemberName = "Arg4", Position = 4, DefaultValue = 47, Description = "Arg4 description.", ValueDescription = "Number", Aliases = ["HiddenAlias"] },
+            new ExpectedArgument("Arg8", typeof(DayOfWeek[]), ArgumentKind.MultiValue) { ElementType = typeof(DayOfWeek), Position = 5, Aliases = ["HiddenAliasOnArgNotIncludedInList"] },
             new ExpectedArgument("Arg6", typeof(string)) { Position = null, IsRequired = true, Description = "Arg6 description.", Aliases = ["Alias1", "Alias2"] },
             new ExpectedArgument("Arg10", typeof(bool[]), ArgumentKind.MultiValue) { ElementType = typeof(bool), Position = null, IsSwitch = true },
             new ExpectedArgument("Arg11", typeof(bool?)) { ElementType = typeof(bool), Position = null, ValueDescription = "Boolean", IsSwitch = true },
@@ -86,6 +88,7 @@ public partial class CommandLineParserTest
             new ExpectedArgument("Arg7", typeof(bool)) { Position = null, IsSwitch = true, Aliases = ["Alias3"] },
             new ExpectedArgument("Arg9", typeof(int?)) { ElementType = typeof(int), Position = null, ValueDescription = "Int32" },
             new ExpectedArgument("Help", typeof(bool), ArgumentKind.Method) { MemberName = "AutomaticHelp", Description = "Displays this help message.", IsSwitch = true, Aliases = ["?", "h"] },
+            new ExpectedArgument("NotSwitch2", typeof(NonSwitchBoolean)) { ValueDescription = "Boolean", Description = "NotSwitch2 description." },
             new ExpectedArgument("Version", typeof(bool), ArgumentKind.Method) { MemberName = "AutomaticVersion", Description = "Displays version information.", IsSwitch = true },
         ]);
     }
@@ -109,7 +112,12 @@ public partial class CommandLineParserTest
     [DynamicData(nameof(ProviderKinds), DynamicDataDisplayName = nameof(GetCustomDynamicDataDisplayName))]
     public void ParseTest(ProviderKind kind)
     {
-        var target = CreateParser<TestArguments>(kind);
+        var options = new ParseOptions()
+        {
+            AutoPrefixAliases = false
+        };
+
+        var target = CreateParser<TestArguments>(kind, options);
         // Only required arguments
         TestParse(target, "val1 2 -arg6 val6", "val1", 2, arg6: "val6");
         // Make sure negative numbers are accepted, and not considered an argument name.
@@ -299,7 +307,7 @@ public partial class CommandLineParserTest
         var target = CreateParser<TestArguments>(kind, options);
         var writer = new UsageWriter()
         {
-            ExecutableName = _executableName
+            ExecutableName = ExecutableName
         };
 
         string actual = target.GetUsage(writer);
@@ -313,7 +321,7 @@ public partial class CommandLineParserTest
         var target = CreateParser<LongShortArguments>(kind);
         var options = new UsageWriter()
         {
-            ExecutableName = _executableName
+            ExecutableName = ExecutableName
         };
 
         string actual = target.GetUsage(options);
@@ -325,7 +333,7 @@ public partial class CommandLineParserTest
 
         options = new UsageWriter()
         {
-            ExecutableName = _executableName,
+            ExecutableName = ExecutableName,
             UseAbbreviatedSyntax = true,
         };
 
@@ -340,7 +348,7 @@ public partial class CommandLineParserTest
         var target = CreateParser<TestArguments>(kind);
         var options = new UsageWriter()
         {
-            ExecutableName = _executableName,
+            ExecutableName = ExecutableName,
             ArgumentDescriptionListFilter = DescriptionListFilterMode.Description
         };
 
@@ -366,9 +374,9 @@ public partial class CommandLineParserTest
         };
 
         CommandLineParser target = CreateParser<TestArguments>(kind, options);
-        var writer = new UsageWriter(useColor: true)
+        var writer = new UsageWriter(useColor: TriState.True)
         {
-            ExecutableName = _executableName,
+            ExecutableName = ExecutableName,
         };
 
         string actual = target.GetUsage(writer);
@@ -386,7 +394,7 @@ public partial class CommandLineParserTest
         var parser = CreateParser<LongShortArguments>(kind);
         var options = new UsageWriter()
         {
-            ExecutableName = _executableName,
+            ExecutableName = ExecutableName,
             ArgumentDescriptionListOrder = DescriptionListSortMode.Alphabetical,
         };
 
@@ -433,7 +441,7 @@ public partial class CommandLineParserTest
             ArgumentNamePrefixes = new[] { "/", "-" },
             UsageWriter = new UsageWriter()
             {
-                ExecutableName = _executableName,
+                ExecutableName = ExecutableName,
                 UseWhiteSpaceValueSeparator = false,
             }
         };
@@ -450,7 +458,7 @@ public partial class CommandLineParserTest
         {
             UsageWriter = new UsageWriter()
             {
-                ExecutableName = _executableName,
+                ExecutableName = ExecutableName,
                 ArgumentDescriptionIndent = 4,
             }
         };
@@ -467,7 +475,7 @@ public partial class CommandLineParserTest
         {
             UsageWriter = new UsageWriter()
             {
-                ExecutableName = _executableName,
+                ExecutableName = ExecutableName,
             }
         };
 
@@ -483,7 +491,7 @@ public partial class CommandLineParserTest
         using var writer = LineWrappingTextWriter.ForStringWriter(80);
         var usageWriter = new UsageWriter(writer)
         {
-            ExecutableName = _executableName,
+            ExecutableName = ExecutableName,
         };
 
         target.WriteUsage(usageWriter);
@@ -504,7 +512,7 @@ public partial class CommandLineParserTest
         {
             UsageWriter = new UsageWriter()
             {
-                ExecutableName = _executableName,
+                ExecutableName = ExecutableName,
             }
         };
 
@@ -526,13 +534,47 @@ public partial class CommandLineParserTest
         {
             UsageWriter = new CustomUsageWriter()
             {
-                ExecutableName = _executableName
+                ExecutableName = ExecutableName
             },
         };
 
         var target = CreateParser<TestArguments>(kind, options);
         string actual = target.GetUsage();
         Assert.AreEqual(_expectedFooterUsage, actual);
+    }
+
+    [TestMethod]
+    [DynamicData(nameof(ProviderKinds), DynamicDataDisplayName = nameof(GetCustomDynamicDataDisplayName))]
+    public void TestWriteUsageCategories(ProviderKind kind)
+    {
+        var options = new ParseOptions()
+        {
+            UsageWriter = new UsageWriter(useColor: TriState.True)
+            {
+                ExecutableName = ExecutableName
+            },
+        };
+
+        var target = CreateParser<CategoryArguments>(kind, options);
+        string actual = target.GetUsage();
+        Assert.AreEqual(_expectedCategoryUsage, actual);
+    }
+
+    [TestMethod]
+    [DynamicData(nameof(ProviderKinds), DynamicDataDisplayName = nameof(GetCustomDynamicDataDisplayName))]
+    public void TestWriteUsageDefaultCategory(ProviderKind kind)
+    {
+        var options = new ParseOptions()
+        {
+            UsageWriter = new UsageWriter()
+            {
+                ExecutableName = ExecutableName
+            },
+        };
+
+        var target = CreateParser<DefaultCategoryArguments>(kind, options);
+        string actual = target.GetUsage();
+        Assert.AreEqual(_expectedDefaultCategoryUsage, actual);
     }
 
     [TestMethod]
@@ -544,12 +586,12 @@ public partial class CommandLineParserTest
         using var error = new StringWriter();
         var options = new ParseOptions()
         {
-            ArgumentNamePrefixes = new[] { "/", "-" },
+            ArgumentNamePrefixes = ["/", "-"],
             Error = error,
             ShowUsageOnError = UsageHelpRequest.Full,
             UsageWriter = new UsageWriter(lineWriter)
             {
-                ExecutableName = _executableName,
+                ExecutableName = ExecutableName,
             }
         };
 
@@ -570,6 +612,14 @@ public partial class CommandLineParserTest
         result = StaticParse<TestArguments>(kind, ["-Help"], options);
         Assert.IsNull(result);
         Assert.AreEqual(0, error.ToString().Length);
+        Assert.AreEqual(_expectedDefaultUsage, output.ToString());
+
+        // With full help requested, no special handling of ambiguous usage prefixes.
+        output.GetStringBuilder().Clear();
+        error.GetStringBuilder().Clear();
+        result = StaticParse<TestArguments>(kind, ["-a"], options);
+        Assert.IsNull(result);
+        Assert.IsTrue(error.ToString().Length > 0);
         Assert.AreEqual(_expectedDefaultUsage, output.ToString());
 
         options.ShowUsageOnError = UsageHelpRequest.SyntaxOnly;
@@ -599,6 +649,36 @@ public partial class CommandLineParserTest
 
     [TestMethod]
     [DynamicData(nameof(ProviderKinds), DynamicDataDisplayName = nameof(GetCustomDynamicDataDisplayName))]
+    public void TestStaticParseAutoPrefixUsage(ProviderKind kind)
+    {
+        using var output = new StringWriter();
+        using var lineWriter = new LineWrappingTextWriter(output, 0);
+        using var error = new StringWriter();
+        var options = new ParseOptions()
+        {
+            Error = error,
+            UsageWriter = new UsageWriter(lineWriter, TriState.True)
+            {
+                ExecutableName = ExecutableName,
+            }
+        };
+
+        var expectedError = "The provided argument name 'p' is an ambiguous prefix alias.\n\n".ReplaceLineEndings();
+        Assert.IsNull(StaticParse<AutoPrefixAliasesArguments>(kind, ["-p"], options));
+        Assert.AreEqual(expectedError, error.ToString());
+        Assert.AreEqual(_expectedAutoPrefixUsage, output.ToString());
+
+        options.IsPosix = true;
+        output.GetStringBuilder().Clear();
+        error.GetStringBuilder().Clear();
+        Assert.IsNull(StaticParse<AutoPrefixAliasesArguments>(kind, ["--p"], options));
+        Assert.AreEqual(expectedError, error.ToString());
+        // The alias doesn't match this time because it's not transformed and case sensitive.
+        Assert.AreEqual(_expectedAutoPrefixUsageLongShort, output.ToString());
+    }
+
+    [TestMethod]
+    [DynamicData(nameof(ProviderKinds), DynamicDataDisplayName = nameof(GetCustomDynamicDataDisplayName))]
     public void TestCancelParsing(ProviderKind kind)
     {
         var parser = CreateParser<CancelArguments>(kind);
@@ -606,7 +686,7 @@ public partial class CommandLineParserTest
         // Don't cancel if -DoesCancel not specified.
         var result = parser.Parse(["-Argument1", "foo", "-DoesNotCancel", "-Argument2", "bar"]);
         Assert.IsNotNull(result);
-        Assert.IsFalse(parser.HelpRequested);
+        Assert.IsFalse(parser.ParseResult.HelpRequested);
         Assert.IsTrue(result.DoesNotCancel);
         Assert.IsFalse(result.DoesCancel);
         Assert.AreEqual("foo", result.Argument1);
@@ -618,7 +698,7 @@ public partial class CommandLineParserTest
         // Cancel if -DoesCancel specified.
         result = parser.Parse(["-Argument1", "foo", "-DoesCancel", "-Argument2", "bar"]);
         Assert.IsNull(result);
-        Assert.IsTrue(parser.HelpRequested);
+        Assert.IsTrue(parser.ParseResult.HelpRequested);
         Assert.AreEqual(ParseStatus.Canceled, parser.ParseResult.Status);
         Assert.IsNull(parser.ParseResult.LastException);
         AssertSpanEqual(["-Argument2", "bar"], parser.ParseResult.RemainingArguments.Span);
@@ -648,7 +728,7 @@ public partial class CommandLineParserTest
         Assert.IsNull(parser.ParseResult.LastException);
         Assert.AreEqual("DoesNotCancel", parser.ParseResult.ArgumentName);
         AssertSpanEqual(new[] { "-Argument2", "bar" }.AsSpan(), parser.ParseResult.RemainingArguments.Span);
-        Assert.IsFalse(parser.HelpRequested);
+        Assert.IsFalse(parser.ParseResult.HelpRequested);
         Assert.IsTrue(parser.GetArgument("Argument1")!.HasValue);
         Assert.AreEqual("foo", (string?)parser.GetArgument("Argument1")!.Value);
         Assert.IsTrue(parser.GetArgument("DoesNotCancel")!.HasValue);
@@ -664,7 +744,7 @@ public partial class CommandLineParserTest
         {
             if (e.Argument.ArgumentName == "DoesCancel")
             {
-                Assert.AreEqual(CancelMode.Abort, e.CancelParsing);
+                Assert.AreEqual(CancelMode.AbortWithHelp, e.CancelParsing);
                 e.CancelParsing = CancelMode.None;
             }
         }
@@ -675,7 +755,7 @@ public partial class CommandLineParserTest
         Assert.IsNull(parser.ParseResult.ArgumentName);
         Assert.AreEqual(0, parser.ParseResult.RemainingArguments.Length);
         Assert.IsNotNull(result);
-        Assert.IsFalse(parser.HelpRequested);
+        Assert.IsFalse(parser.ParseResult.HelpRequested);
         Assert.IsFalse(result.DoesNotCancel);
         Assert.IsTrue(result.DoesCancel);
         Assert.AreEqual("foo", result.Argument1);
@@ -688,7 +768,7 @@ public partial class CommandLineParserTest
         Assert.AreEqual("Help", parser.ParseResult.ArgumentName);
         Assert.AreEqual(0, parser.ParseResult.RemainingArguments.Length);
         Assert.IsNull(result);
-        Assert.IsTrue(parser.HelpRequested);
+        Assert.IsTrue(parser.ParseResult.HelpRequested);
     }
 
     [TestMethod]
@@ -701,7 +781,7 @@ public partial class CommandLineParserTest
         Assert.AreEqual("DoesCancelWithSuccess", parser.ParseResult.ArgumentName);
         AssertSpanEqual(new[] { "-Argument2", "bar" }.AsSpan(), parser.ParseResult.RemainingArguments.Span);
         Assert.IsNotNull(result);
-        Assert.IsFalse(parser.HelpRequested);
+        Assert.IsFalse(parser.ParseResult.HelpRequested);
         Assert.IsFalse(result.DoesNotCancel);
         Assert.IsFalse(result.DoesCancel);
         Assert.IsTrue(result.DoesCancelWithSuccess);
@@ -714,7 +794,7 @@ public partial class CommandLineParserTest
         Assert.AreEqual("DoesCancelWithSuccess", parser.ParseResult.ArgumentName);
         Assert.AreEqual(0, parser.ParseResult.RemainingArguments.Length);
         Assert.IsNotNull(result);
-        Assert.IsFalse(parser.HelpRequested);
+        Assert.IsFalse(parser.ParseResult.HelpRequested);
         Assert.IsFalse(result.DoesNotCancel);
         Assert.IsFalse(result.DoesCancel);
         Assert.IsTrue(result.DoesCancelWithSuccess);
@@ -829,7 +909,7 @@ public partial class CommandLineParserTest
         CheckThrows(parser, ["-sf"], CommandLineArgumentErrorCategory.CombinedShortNameNonSwitch, "sf", remainingArgumentCount: 1);
 
         // Can't use long argument prefix with short names.
-        CheckThrows(parser, ["--s"], CommandLineArgumentErrorCategory.UnknownArgument, "s", remainingArgumentCount: 1);
+        CheckThrows(parser, ["--s"], CommandLineArgumentErrorCategory.AmbiguousPrefixAlias, "s", remainingArgumentCount: 1, possibleMatches: ["Switch1", "Switch2"]);
 
         // And vice versa.
         CheckThrows(parser, ["-Switch1"], CommandLineArgumentErrorCategory.UnknownArgument, "w", remainingArgumentCount: 1);
@@ -844,16 +924,10 @@ public partial class CommandLineParserTest
     {
         var parser = CreateParser<MethodArguments>(kind);
 
-        Assert.AreEqual(ArgumentKind.Method, parser.GetArgument("NoCancel")!.Kind);
+        Assert.AreEqual(ArgumentKind.Method, parser.GetArgument("CancelWithHelp")!.Kind);
         Assert.IsNull(parser.GetArgument("NotAnArgument"));
         Assert.IsNull(parser.GetArgument("NotStatic"));
         Assert.IsNull(parser.GetArgument("NotPublic"));
-
-        CheckSuccess(parser, ["-NoCancel"]);
-        Assert.AreEqual(nameof(MethodArguments.NoCancel), MethodArguments.CalledMethodName);
-
-        CheckCanceled(parser, ["-Cancel", "Foo"], "Cancel", false, 1);
-        Assert.AreEqual(nameof(MethodArguments.Cancel), MethodArguments.CalledMethodName);
 
         CheckCanceled(parser, ["-CancelWithHelp"], "CancelWithHelp", true, 0);
         Assert.AreEqual(nameof(MethodArguments.CancelWithHelp), MethodArguments.CalledMethodName);
@@ -968,7 +1042,7 @@ public partial class CommandLineParserTest
         // Verify it's not in the usage.
         var options = new UsageWriter()
         {
-            ExecutableName = _executableName,
+            ExecutableName = ExecutableName,
             ArgumentDescriptionListFilter = DescriptionListFilterMode.All,
         };
 
@@ -1130,12 +1204,12 @@ public partial class CommandLineParserTest
         CheckThrows(parser, ["-Day", "foo"], CommandLineArgumentErrorCategory.ArgumentValueConversion, "Day", typeof(ArgumentException), remainingArgumentCount: 2);
         CheckThrows(parser, ["-Day", "9"], CommandLineArgumentErrorCategory.ValidationFailed, "Day", remainingArgumentCount: 2);
         CheckThrows(parser, ["-Day", ""], CommandLineArgumentErrorCategory.ArgumentValueConversion, "Day", typeof(ArgumentException), remainingArgumentCount: 2);
-        result = CheckSuccess(parser, ["-Day", "1"]);
-        Assert.AreEqual(DayOfWeek.Monday, result.Day);
+        result = CheckSuccess(parser, ["-Day3", "1"]);
+        Assert.AreEqual(DayOfWeek.Monday, result.Day3);
         CheckThrows(parser, ["-Day2", "foo"], CommandLineArgumentErrorCategory.ArgumentValueConversion, "Day2", typeof(ArgumentException), remainingArgumentCount: 2);
-        CheckSuccess(parser, ["-Day2", "9"]); // This one allows it.
-        result = CheckSuccess(parser, ["-Day2", "1"]);
-        Assert.AreEqual(DayOfWeek.Monday, result.Day2);
+        result = CheckSuccess(parser, ["-Day3", "9"]); // This one allows it.
+        Assert.AreEqual((DayOfWeek)9, result.Day3);
+        CheckThrows(parser, ["-Day2", "1"], CommandLineArgumentErrorCategory.ValidationFailed, "Day2", null, remainingArgumentCount: 2);
         result = CheckSuccess(parser, ["-Day2", ""]);
         Assert.IsNull(result.Day2);
 
@@ -1145,13 +1219,20 @@ public partial class CommandLineParserTest
         CheckThrows(parser, ["-Day2", "tuesday"], CommandLineArgumentErrorCategory.ArgumentValueConversion, "Day2", typeof(ArgumentException), remainingArgumentCount: 2);
 
         // Disallow commas.
-        result = CheckSuccess(parser, ["-Day3", "Monday,Tuesday"]);
-        Assert.AreEqual(DayOfWeek.Wednesday, result.Day3);
-        CheckThrows(parser, ["-Day2", "Monday,Tuesday"], CommandLineArgumentErrorCategory.ArgumentValueConversion, "Day2", remainingArgumentCount: 2);
+        result = CheckSuccess(parser, ["-Day2", "Monday,Tuesday"]);
+        Assert.AreEqual(DayOfWeek.Wednesday, result.Day2);
+        CheckThrows(parser, ["-Day", "Monday,Tuesday"], CommandLineArgumentErrorCategory.ValidationFailed, "Day", remainingArgumentCount: 2);
 
         // Disallow numbers.
-        CheckThrows(parser, ["-Day3", "5"], CommandLineArgumentErrorCategory.ArgumentValueConversion, "Day3", remainingArgumentCount: 2);
-        CheckThrows(parser, ["-Day3", "Tuesday,5"], CommandLineArgumentErrorCategory.ArgumentValueConversion, "Day3", remainingArgumentCount: 2);
+        CheckThrows(parser, ["-Day2", "5"], CommandLineArgumentErrorCategory.ValidationFailed, "Day2", remainingArgumentCount: 2);
+        CheckThrows(parser, ["-Day2", "Tuesday,5"], CommandLineArgumentErrorCategory.ValidationFailed, "Day2", remainingArgumentCount: 2);
+
+        // Allow commas because of flags attribute.
+        result = CheckSuccess(parser, ["-Modifiers", "Control,Alt"]);
+        Assert.AreEqual(ConsoleModifiers.Control | ConsoleModifiers.Alt, result.Modifiers);
+
+        // Numbers still not allowed despite no attribute
+        CheckThrows(parser, ["-Modifiers", "0"], CommandLineArgumentErrorCategory.ValidationFailed, "Modifiers", remainingArgumentCount: 2);
 
         // NotNull validator with Nullable<T>.
         CheckThrows(parser, ["-NotNull", ""], CommandLineArgumentErrorCategory.ValidationFailed, "NotNull", remainingArgumentCount: 2);
@@ -1210,7 +1291,7 @@ public partial class CommandLineParserTest
         CommandLineParser parser = CreateParser<ValidationArguments>(kind);
         var options = new UsageWriter()
         {
-            ExecutableName = _executableName,
+            ExecutableName = ExecutableName,
         };
 
         Assert.AreEqual(_expectedUsageValidators, parser.GetUsage(options));
@@ -1291,7 +1372,7 @@ public partial class CommandLineParserTest
         {
             Assert.AreEqual("Argument1", e.Argument.ArgumentName);
             Assert.AreEqual("foo", e.Argument.Value);
-            Assert.AreEqual("bar", e.NewValue);
+            Assert.AreEqual("bar", e.NewValue!.Value.ToString());
             handlerCalled = true;
             if (keepOldValue)
             {
@@ -1411,10 +1492,12 @@ public partial class CommandLineParserTest
         Assert.IsTrue(result.EnablePrefix);
 
         // Ambiguous prefix
-        CheckThrows(parser, ["-p", "foo"], CommandLineArgumentErrorCategory.UnknownArgument, "p", remainingArgumentCount: 2);
+        CheckThrows(parser, ["-p", "foo"], CommandLineArgumentErrorCategory.AmbiguousPrefixAlias, "p", remainingArgumentCount: 2,
+            possibleMatches: ["Port", "Prefix", "Protocol"]);
 
         // Ambiguous due to alias.
-        CheckThrows(parser, ["-pr", "foo"], CommandLineArgumentErrorCategory.UnknownArgument, "pr", remainingArgumentCount: 2);
+        CheckThrows(parser, ["-pr", "foo"], CommandLineArgumentErrorCategory.AmbiguousPrefixAlias, "pr", remainingArgumentCount: 2,
+            possibleMatches: ["Prefix", "Protocol"]);
 
         // Prefix of an alias.
         result = parser.Parse(["-pre"]);
@@ -1563,6 +1646,52 @@ public partial class CommandLineParserTest
         Assert.IsTrue(eventRaised);
     }
 
+    [TestMethod]
+    [DynamicData(nameof(ProviderKinds), DynamicDataDisplayName = nameof(GetCustomDynamicDataDisplayName))]
+    public void TestTypeValueDescription(ProviderKind kind)
+    {
+        var parser = CreateParser<TypeValueDescriptionArguments>(kind);
+        VerifyArgument(parser.GetArgument("NonSwitch")!, new ExpectedArgument("NonSwitch", typeof(NonSwitchBoolean)) { ValueDescription = "Boolean" });
+        VerifyArgument(parser.GetArgument("Nullable")!, new ExpectedArgument("Nullable", typeof(NonSwitchBoolean?)) { ValueDescription = "Boolean", ElementType = typeof(NonSwitchBoolean) });
+        VerifyArgument(parser.GetArgument("Array")!, new ExpectedArgument("Array", typeof(NonSwitchBoolean[])) { ValueDescription = "Boolean", ElementType = typeof(NonSwitchBoolean), Kind = ArgumentKind.MultiValue });
+        VerifyArgument(parser.GetArgument("Dict")!, new ExpectedArgument("Dict", typeof(Dictionary<string, NonSwitchBoolean>)) { ValueDescription = "String=Boolean", ElementType = typeof(KeyValuePair<string, NonSwitchBoolean>), Kind = ArgumentKind.Dictionary });
+        VerifyArgument(parser.GetArgument("Overridden")!, new ExpectedArgument("Overridden", typeof(NonSwitchBoolean)) { ValueDescription = "Other" });
+        VerifyArgument(parser.GetArgument("OverriddenTransform")!, new ExpectedArgument("OverriddenTransform", typeof(NonSwitchBoolean)) { ValueDescription = "Other" });
+        VerifyArgument(parser.GetArgument("Enum")!, new ExpectedArgument("Enum", typeof(CustomEnum)) { ValueDescription = "MyEnum" });
+        VerifyArgument(parser.GetArgument("Generic")!, new ExpectedArgument("Generic", typeof(KeyValuePair<NonSwitchBoolean, CustomEnum>)) { ValueDescription = "KeyValuePair<Boolean, MyEnum>" });
+
+        var options = new ParseOptions()
+        {
+            ValueDescriptionTransform = NameTransform.DashCase
+        };
+
+        parser = CreateParser<TypeValueDescriptionArguments>(kind, options);
+        VerifyArgument(parser.GetArgument("NonSwitch")!, new ExpectedArgument("NonSwitch", typeof(NonSwitchBoolean)) { ValueDescription = "boolean" });
+        VerifyArgument(parser.GetArgument("Nullable")!, new ExpectedArgument("Nullable", typeof(NonSwitchBoolean?)) { ValueDescription = "boolean", ElementType = typeof(NonSwitchBoolean) });
+        VerifyArgument(parser.GetArgument("Array")!, new ExpectedArgument("Array", typeof(NonSwitchBoolean[])) { ValueDescription = "boolean", ElementType = typeof(NonSwitchBoolean), Kind = ArgumentKind.MultiValue });
+        VerifyArgument(parser.GetArgument("Dict")!, new ExpectedArgument("Dict", typeof(Dictionary<string, NonSwitchBoolean>)) { ValueDescription = "string=boolean", ElementType = typeof(KeyValuePair<string, NonSwitchBoolean>), Kind = ArgumentKind.Dictionary });
+        VerifyArgument(parser.GetArgument("OverriddenTransform")!, new ExpectedArgument("OverriddenTransform", typeof(NonSwitchBoolean)) { ValueDescription = "other" });
+        VerifyArgument(parser.GetArgument("Generic")!, new ExpectedArgument("Generic", typeof(KeyValuePair<NonSwitchBoolean, CustomEnum>)) { ValueDescription = "key-value-pair<boolean, MyEnum>" });
+        // Don't have the transformation applied
+        VerifyArgument(parser.GetArgument("Overridden")!, new ExpectedArgument("Overridden", typeof(NonSwitchBoolean)) { ValueDescription = "Other" });
+        VerifyArgument(parser.GetArgument("Enum")!, new ExpectedArgument("Enum", typeof(CustomEnum)) { ValueDescription = "MyEnum" });
+
+        options.DefaultValueDescriptions = new Dictionary<Type, string>()
+        {
+            { typeof(NonSwitchBoolean), "Other2" }
+        };
+
+        parser = CreateParser<TypeValueDescriptionArguments>(kind, options);
+        VerifyArgument(parser.GetArgument("NonSwitch")!, new ExpectedArgument("NonSwitch", typeof(NonSwitchBoolean)) { ValueDescription = "Other2" });
+        VerifyArgument(parser.GetArgument("Nullable")!, new ExpectedArgument("Nullable", typeof(NonSwitchBoolean?)) { ValueDescription = "Other2", ElementType = typeof(NonSwitchBoolean) });
+        VerifyArgument(parser.GetArgument("Array")!, new ExpectedArgument("Array", typeof(NonSwitchBoolean[])) { ValueDescription = "Other2", ElementType = typeof(NonSwitchBoolean), Kind = ArgumentKind.MultiValue });
+        VerifyArgument(parser.GetArgument("Dict")!, new ExpectedArgument("Dict", typeof(Dictionary<string, NonSwitchBoolean>)) { ValueDescription = "string=Other2", ElementType = typeof(KeyValuePair<string, NonSwitchBoolean>), Kind = ArgumentKind.Dictionary });
+        VerifyArgument(parser.GetArgument("Overridden")!, new ExpectedArgument("Overridden", typeof(NonSwitchBoolean)) { ValueDescription = "Other" });
+        VerifyArgument(parser.GetArgument("OverriddenTransform")!, new ExpectedArgument("OverriddenTransform", typeof(NonSwitchBoolean)) { ValueDescription = "other" });
+        VerifyArgument(parser.GetArgument("Enum")!, new ExpectedArgument("Enum", typeof(CustomEnum)) { ValueDescription = "MyEnum" });
+        VerifyArgument(parser.GetArgument("Generic")!, new ExpectedArgument("Generic", typeof(KeyValuePair<NonSwitchBoolean, CustomEnum>)) { ValueDescription = "key-value-pair<Other2, MyEnum>" });
+    }
+
     private class ExpectedArgument
     {
         public ExpectedArgument(string name, Type type, ArgumentKind kind = ArgumentKind.SingleValue)
@@ -1612,8 +1741,8 @@ public partial class CommandLineParserTest
         Assert.IsFalse(argument.MultiValueInfo?.AllowWhiteSpaceSeparator ?? false);
         Assert.IsNull(argument.Value);
         Assert.IsFalse(argument.HasValue);
-        CollectionAssert.AreEqual(expected.Aliases ?? Array.Empty<string>(), argument.Aliases);
-        CollectionAssert.AreEqual(expected.ShortAliases ?? Array.Empty<char>(), argument.ShortAliases);
+        CollectionAssert.AreEqual(expected.Aliases ?? [], argument.Aliases.Select(a => a.Alias).ToArray());
+        CollectionAssert.AreEqual(expected.ShortAliases ?? [], argument.ShortAliases.Select(a => a.Alias).ToArray());
         if (argument.MemberName.StartsWith("Automatic"))
         {
             Assert.IsNull(argument.Member);
@@ -1647,7 +1776,7 @@ public partial class CommandLineParserTest
         Assert.IsNull(target.ParseResult.LastException);
         Assert.IsNull(target.ParseResult.ArgumentName);
         Assert.AreEqual(0, target.ParseResult.RemainingArguments.Length);
-        Assert.IsFalse(target.HelpRequested);
+        Assert.IsFalse(target.ParseResult.HelpRequested);
         Assert.AreEqual(arg1, result.Arg1);
         Assert.AreEqual(arg2, result.Arg2);
         Assert.AreEqual(arg3, result.Arg3);
@@ -1689,7 +1818,8 @@ public partial class CommandLineParserTest
         }
     }
 
-    private static void CheckThrows(CommandLineParser parser, string[] arguments, CommandLineArgumentErrorCategory category, string? argumentName = null, Type? innerExceptionType = null, int remainingArgumentCount = 0)
+    private static void CheckThrows(CommandLineParser parser, string[] arguments, CommandLineArgumentErrorCategory category,
+        string? argumentName = null, Type? innerExceptionType = null, int remainingArgumentCount = 0, string[]? possibleMatches = null)
     {
         try
         {
@@ -1698,7 +1828,7 @@ public partial class CommandLineParserTest
         }
         catch (CommandLineArgumentException ex)
         {
-            Assert.IsTrue(parser.HelpRequested);
+            Assert.IsTrue(parser.ParseResult.HelpRequested);
             Assert.AreEqual(ParseStatus.Error, parser.ParseResult.Status);
             Assert.AreEqual(ex, parser.ParseResult.LastException);
             Assert.AreEqual(ex.ArgumentName, parser.ParseResult.LastException!.ArgumentName);
@@ -1715,6 +1845,16 @@ public partial class CommandLineParserTest
 
             var remaining = arguments.AsMemory(arguments.Length - remainingArgumentCount);
             AssertMemoryEqual(remaining, parser.ParseResult.RemainingArguments);
+
+            if (possibleMatches != null)
+            {
+                Assert.IsInstanceOfType(ex, typeof(AmbiguousPrefixAliasException));
+                CollectionAssert.AreEqual(possibleMatches, ((AmbiguousPrefixAliasException)ex).PossibleMatches);
+            }
+            else
+            {
+                Assert.IsNotInstanceOfType(ex, typeof(AmbiguousPrefixAliasException));
+            }
         }
     }
 
@@ -1723,7 +1863,7 @@ public partial class CommandLineParserTest
         Assert.IsNull(parser.Parse(arguments));
         Assert.AreEqual(ParseStatus.Canceled, parser.ParseResult.Status);
         Assert.AreEqual(argumentName, parser.ParseResult.ArgumentName);
-        Assert.AreEqual(helpRequested, parser.HelpRequested);
+        Assert.AreEqual(helpRequested, parser.ParseResult.HelpRequested);
         Assert.IsNull(parser.ParseResult.LastException);
         var remaining = arguments.AsMemory(arguments.Length - remainingArgumentCount);
         AssertMemoryEqual(remaining, parser.ParseResult.RemainingArguments);
@@ -1734,7 +1874,7 @@ public partial class CommandLineParserTest
     {
         var result = parser.Parse(arguments);
         Assert.IsNotNull(result);
-        Assert.IsFalse(parser.HelpRequested);
+        Assert.IsFalse(parser.ParseResult.HelpRequested);
         Assert.AreEqual(ParseStatus.Success, parser.ParseResult.Status);
         Assert.AreEqual(argumentName, parser.ParseResult.ArgumentName);
         Assert.IsNull(parser.ParseResult.LastException);

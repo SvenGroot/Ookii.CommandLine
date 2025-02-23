@@ -21,19 +21,25 @@ namespace Ookii.CommandLine;
 [Serializable]
 public class CommandLineArgumentException : Exception
 {
-    private readonly string? _argumentName;
-    private readonly CommandLineArgumentErrorCategory _category;
+    /// <summary>
+    /// Initializes a new instance of the <see cref="CommandLineArgumentException"/> class.
+    /// </summary>
+    public CommandLineArgumentException()
+    {
+    }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="CommandLineArgumentException"/> class. 
+    /// Initializes a new instance of the <see cref="CommandLineArgumentException"/> class with
+    /// the specified error message.
     /// </summary>
-    public CommandLineArgumentException() { }
-
-    /// <inheritdoc/>
+    /// <param name="message">The message that describes the error.</param>
     /// <summary>
     /// Initializes a new instance of the <see cref="CommandLineArgumentException"/> class with a specified error message.
     /// </summary>
-    public CommandLineArgumentException(string? message) : base(message) { }
+    public CommandLineArgumentException(string? message)
+        : base(message)
+    {
+    }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="CommandLineArgumentException"/> class with a
@@ -44,7 +50,7 @@ public class CommandLineArgumentException : Exception
     public CommandLineArgumentException(string? message, CommandLineArgumentErrorCategory category)
         : base(message)
     {
-        _category = category;
+        Category = category;
     }
 
     /// <summary>
@@ -57,8 +63,8 @@ public class CommandLineArgumentException : Exception
     public CommandLineArgumentException(string? message, string? argumentName, CommandLineArgumentErrorCategory category)
         : base(message)
     {
-        _argumentName = argumentName;
-        _category = category;
+        ArgumentName = argumentName;
+        Category = category;
     }
 
     /// <summary>
@@ -71,7 +77,10 @@ public class CommandLineArgumentException : Exception
     /// The <see cref="Exception"/> that is the cause of the current <see cref="CommandLineArgumentException"/>,
     /// or <see langword="null"/> if no inner <see cref="Exception"/> is specified.
     /// </param>
-    public CommandLineArgumentException(string? message, Exception? inner) : base(message, inner) { }
+    public CommandLineArgumentException(string? message, Exception? inner)
+        : base(message, inner)
+    {
+    }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="CommandLineArgumentException"/> class with
@@ -87,7 +96,7 @@ public class CommandLineArgumentException : Exception
     public CommandLineArgumentException(string? message, CommandLineArgumentErrorCategory category, Exception? inner)
         : base(message, inner)
     {
-        _category = category;
+        Category = category;
     }
 
     /// <summary>
@@ -105,11 +114,12 @@ public class CommandLineArgumentException : Exception
     /// The <see cref="Exception"/> that is the cause of the current <see cref="CommandLineArgumentException"/>,
     /// or a <see langword="null"/> if no inner <see cref="Exception"/> is specified.
     /// </param>
-    public CommandLineArgumentException(string? message, string? argumentName, CommandLineArgumentErrorCategory category, Exception? inner)
+    public CommandLineArgumentException(string? message, string? argumentName, CommandLineArgumentErrorCategory category,
+        Exception? inner)
         : base(message, inner)
     {
-        _argumentName = argumentName;
-        _category = category;
+        ArgumentName = argumentName;
+        Category = category;
     }
 
     /// <inheritdoc/>
@@ -119,11 +129,13 @@ public class CommandLineArgumentException : Exception
 #if NET8_0_OR_GREATER
     [Obsolete("This API supports obsolete formatter-based serialization. It should not be called or extended by application code.")]
 #endif
-    protected CommandLineArgumentException(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context)
+    protected CommandLineArgumentException(System.Runtime.Serialization.SerializationInfo info,
+        System.Runtime.Serialization.StreamingContext context)
         : base(info, context)
     {
-        _argumentName = info.GetString("ArgumentName");
-        _category = (CommandLineArgumentErrorCategory?)info.GetValue("Category", typeof(CommandLineArgumentErrorCategory)) ?? CommandLineArgumentErrorCategory.Unspecified;
+        ArgumentName = info.GetString("ArgumentName");
+        Category = (CommandLineArgumentErrorCategory?)info.GetValue("Category", typeof(CommandLineArgumentErrorCategory))
+            ?? CommandLineArgumentErrorCategory.Unspecified;
     }
 
     /// <summary>
@@ -132,10 +144,7 @@ public class CommandLineArgumentException : Exception
     /// <value>
     /// The name of the invalid argument, or <see langword="null"/> if the error does not refer to a specific argument.
     /// </value>
-    public string? ArgumentName
-    {
-        get { return _argumentName; }
-    }
+    public string? ArgumentName { get; }
 
     /// <summary>
     /// Gets the category of this error.
@@ -143,10 +152,7 @@ public class CommandLineArgumentException : Exception
     /// <value>
     /// One of the values of the <see cref="CommandLineArgumentErrorCategory"/> enumeration indicating the kind of error that occurred.
     /// </value>
-    public CommandLineArgumentErrorCategory Category
-    {
-        get { return _category; }
-    }
+    public CommandLineArgumentErrorCategory Category { get; }
 
     /// <summary>
     /// Sets the <see cref="System.Runtime.Serialization.SerializationInfo"/> object with the

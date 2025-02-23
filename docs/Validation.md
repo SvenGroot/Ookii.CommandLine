@@ -22,16 +22,16 @@ There are validators that check the value of an argument, and validators that ch
 inter-dependencies. The following are the built-in argument value validators (dependency validators
 are discussed [below](#argument-dependencies-and-restrictions)):
 
-Validator                            | Description                                                                                                                                                                                                                                                                                                                                                                                                    | Applied
--------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------
-[`ValidateCountAttribute`][]         | Validates that the number of items for a multi-value argument is in the specified range.                                                                                                                                                                                                                                                                                                                       | After parsing.
-[`ValidateEnumValueAttribute`][]     | Validates that the value is one of the defined values for an enumeration. The [`EnumConverter`][] class allows conversion from the underlying value, even if that value is not a defined value for the enumeration. This validator prevents that. It can also be used to customize the behavior of the [`EnumConverter`][] class. See also [enumeration type conversion](Arguments.md#enumeration-conversion). | After conversion.
-[`ValidateNotEmptyAttribute`][]      | Validates that the value of an argument is not an empty string.                                                                                                                                                                                                                                                                                                                                                | Before conversion.
-[`ValidateNotNullAttribute`][]       | Validates that the value of an argument is not null. This is only useful if the [`ArgumentConverter`][] for an argument can return null (for example, the [`NullableConverter`][] can). It's not necessary to use this validator on non-nullable value types, or if using .Net 6.0 or later, or [source generation](SourceGeneration.md), on non-nullable reference types.                                     | After conversion.
-[`ValidateNotWhiteSpaceAttribute`][] | Validates that the value of an argument is not an empty string or a string containing only white-space characters.                                                                                                                                                                                                                                                                                             | Before conversion.
-[`ValidatePatternAttribute`][]       | Validates that the value of an argument matches the specified regular expression.                                                                                                                                                                                                                                                                                                                              | Before conversion.
-[`ValidateRangeAttribute`][]         | Validates that the value of an argument is in the specified range. This can be used on any type that implements the [`IComparable<T>`][] interface.                                                                                                                                                                                                                                                            | After conversion.
-[`ValidateStringLengthAttribute`][]  | Validates that the length of an argument's string value is in the specified range.                                                                                                                                                                                                                                                                                                                             | Before conversion.
+Validator                            | Description                                                                                                                                                                                                                                                                                                                                                                | Applied
+-------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------
+[`ValidateCountAttribute`][]         | Validates that the number of items for a multi-value argument is in the specified range.                                                                                                                                                                                                                                                                                   | After parsing.
+[`ValidateEnumValueAttribute`][]     | Allows you to control how enumeration values are validated. For example, you can allow numeric values or enable case sensitivity. It also displays possible values in the usage help. See also [enumeration type conversion](Arguments.md#enumeration-conversion).                                                                                                         | Before and after conversion.
+[`ValidateNotEmptyAttribute`][]      | Validates that the value of an argument is not an empty string.                                                                                                                                                                                                                                                                                                            | Before conversion.
+[`ValidateNotNullAttribute`][]       | Validates that the value of an argument is not null. This is only useful if the [`ArgumentConverter`][] for an argument can return null (for example, the [`NullableConverter`][] can). It's not necessary to use this validator on non-nullable value types, or if using .Net 6.0 or later, or [source generation](SourceGeneration.md), on non-nullable reference types. | After conversion.
+[`ValidateNotWhiteSpaceAttribute`][] | Validates that the value of an argument is not an empty string or a string containing only white-space characters.                                                                                                                                                                                                                                                         | Before conversion.
+[`ValidatePatternAttribute`][]       | Validates that the value of an argument matches the specified regular expression.                                                                                                                                                                                                                                                                                          | Before conversion.
+[`ValidateRangeAttribute`][]         | Validates that the value of an argument is in the specified range. This can be used on any type that implements the [`IComparable<T>`][] interface.                                                                                                                                                                                                                        | After conversion.
+[`ValidateStringLengthAttribute`][]  | Validates that the length of an argument's string value is in the specified range.                                                                                                                                                                                                                                                                                         | Before conversion.
 
 Note that there is no `ValidateSetAttribute`, or an equivalent way to make sure that an argument is
 one of a predefined set of values, because you're encouraged to use an enumeration type for this
@@ -43,7 +43,7 @@ The [`ValidateRangeAttribute`][], [`ValidateCountAttribute`][] and
 or upper bound.
 
 Depending on the type of validation being done, validation occurs at different times. As indicated
-in the table above, validation can happen on the raw string value, before it is converted to the
+in the table above, validation can happen on the raw string value before it is converted to the
 argument's type, on the value after conversion to the argument's type, and after all arguments have
 been parsed. That last one is used by the [`ValidateCountAttribute`][], because it cannot know the
 total number of values before that point.
@@ -215,18 +215,22 @@ If you plan to include a usage help message, derive from the
 [`ArgumentValidationWithHelpAttribute`][] class to provide an
 [`IncludeInUsageHelp`][IncludeInUsageHelp_0] property, though this is not required.
 
-You must implement at least the [`IsValid()`][] method, which returns a boolean indicating whether
-the value is valid (you should not throw an exception). Override the [`GetErrorMessage()`][] method
-to provide a custom error message, and the [`GetUsageHelp()`][] method to provide a help message (if
-you derived from the [`ArgumentValidationWithHelpAttribute`][] class, override
-[`GetUsageHelpCore()`][] instead).
+You must implement at least one of the [`IsValidPreConversion()`][IsValidPreConversion()_0],
+[`IsValidPostConversion()`][IsValidPostConversion()_0], or
+[`IsValidPostParsing()`][IsValidPostParsing()_0] methods, depending on when you want to validate the
+value. Each returns a boolean indicating whether the value is valid (you should not throw an
+exception). Override the [`GetErrorMessage()`][] method to provide a custom error message, and the
+[`GetUsageHelp()`][] method to provide a help message (if you derived from the
+[`ArgumentValidationWithHelpAttribute`][] class, override [`GetUsageHelpCore()`][] instead).
+
+> [!NOTE]
+> If you override [`IsValidPostParsing()`][IsValidPostParsing()_0], it will be called even if the
+> argument that the validator was applied to was not set. Check the
+> [`CommandLineArgument.HasValue`][] property to see if your validation logic should apply. The
+> other methods are only called when the argument is specified.
 
 You can also override the [`ErrorCategory`][] property to use a different error category for
 validation failure, instead of the default [`ValidationFailed`][ValidationFailed_1].
-
-For the [`ArgumentValidationAttribute`][] class, override the [`Mode`][Mode_3] property to specify
-whether you want to run validation before the value is converted to the argument type, after the
-conversion (this is the default), or after argument parsing is finished.
 
 For example, the following is a validator that checks if a number is even:
 
@@ -234,7 +238,7 @@ For example, the following is a validator that checks if a number is even:
 class ValidateIsEvenAttribute<T> : ArgumentValidationWithHelpAttribute
     where T : INumberBase<T>
 {
-    public override bool IsValid(CommandLineArgument argument, object? value)
+    public override bool IsValidPostConversion(CommandLineArgument argument, object? value)
         => value is T number && T.IsEvenInteger(number);
 
     public override string GetErrorMessage(CommandLineArgument argument, object? value)
@@ -268,57 +272,46 @@ class ValidateFutureDateAttribute : ValidateRangeAttribute
 }
 ```
 
-### Validation using ReadOnlySpan\<char>
-
-If an argument is provided using the name/value separator (e.g. `-Argument:value`), the
-[`CommandLineParser`][] class will try to avoid allocating a new string for the value as long as the
-argument converter and any pre-conversion validators support using a [`ReadOnlySpan<char>`][]. For
-this reason, it's strongly recommended that you implement the
-[`ArgumentValidationAttribute.IsSpanValid`][] method for a custom pre-conversion validator. This
-does not apply to validators that don't use [`ValidationMode.BeforeConversion`][].
-
 Now that you know (almost) everything there is to know about arguments, let's move on to
 [subcommands](Subcommands.md).
 
-[`ArgumentConverter`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_Conversion_ArgumentConverter.htm
-[`ArgumentValidationAttribute.IsSpanValid`]: https://www.ookii.org/docs/commandline-4.2/html/M_Ookii_CommandLine_Validation_ArgumentValidationAttribute_IsSpanValid.htm
-[`ArgumentValidationAttribute`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_Validation_ArgumentValidationAttribute.htm
-[`ArgumentValidationWithHelpAttribute`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_Validation_ArgumentValidationWithHelpAttribute.htm
-[`Category`]: https://www.ookii.org/docs/commandline-4.2/html/P_Ookii_CommandLine_CommandLineArgumentException_Category.htm
-[`ClassValidationAttribute`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_Validation_ClassValidationAttribute.htm
-[`CommandLineArgumentErrorCategory.ValidationFailed`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_CommandLineArgumentErrorCategory.htm
-[`CommandLineArgumentException`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_CommandLineArgumentException.htm
-[`CommandLineParser.Parse<T>()`]: https://www.ookii.org/docs/commandline-4.2/html/M_Ookii_CommandLine_CommandLineParser_Parse__1.htm
-[`CommandLineParser`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_CommandLineParser.htm
-[`CommandLineParser<T>.ParseWithErrorHandling()`]: https://www.ookii.org/docs/commandline-4.2/html/M_Ookii_CommandLine_CommandLineParser_1_ParseWithErrorHandling.htm
+[`ArgumentConverter`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_Conversion_ArgumentConverter.htm
+[`ArgumentValidationAttribute`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_Validation_ArgumentValidationAttribute.htm
+[`ArgumentValidationWithHelpAttribute`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_Validation_ArgumentValidationWithHelpAttribute.htm
+[`Category`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_CommandLineArgumentException_Category.htm
+[`ClassValidationAttribute`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_Validation_ClassValidationAttribute.htm
+[`CommandLineArgument.HasValue`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_CommandLineArgument_HasValue.htm
+[`CommandLineArgumentErrorCategory.ValidationFailed`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_CommandLineArgumentErrorCategory.htm
+[`CommandLineArgumentException`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_CommandLineArgumentException.htm
+[`CommandLineParser.Parse<T>()`]: https://www.ookii.org/docs/commandline-5.0/html/M_Ookii_CommandLine_CommandLineParser_Parse__1.htm
+[`CommandLineParser<T>.ParseWithErrorHandling()`]: https://www.ookii.org/docs/commandline-5.0/html/M_Ookii_CommandLine_CommandLineParser_1_ParseWithErrorHandling.htm
 [`DateOnly`]: https://learn.microsoft.com/dotnet/api/system.dateonly
-[`EnumConverter`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_Conversion_EnumConverter.htm
-[`ErrorCategory`]: https://www.ookii.org/docs/commandline-4.2/html/P_Ookii_CommandLine_Validation_ArgumentValidationAttribute_ErrorCategory.htm
-[`GetErrorMessage()`]: https://www.ookii.org/docs/commandline-4.2/html/M_Ookii_CommandLine_Validation_ArgumentValidationAttribute_GetErrorMessage.htm
-[`GetUsageHelp()`]: https://www.ookii.org/docs/commandline-4.2/html/M_Ookii_CommandLine_Validation_ArgumentValidationAttribute_GetUsageHelp.htm
-[`GetUsageHelpCore()`]: https://www.ookii.org/docs/commandline-4.2/html/M_Ookii_CommandLine_Validation_ArgumentValidationWithHelpAttribute_GetUsageHelpCore.htm
+[`EnumConverter`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_Conversion_EnumConverter.htm
+[`ErrorCategory`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_Validation_ArgumentValidationAttribute_ErrorCategory.htm
+[`GetErrorMessage()`]: https://www.ookii.org/docs/commandline-5.0/html/M_Ookii_CommandLine_Validation_ArgumentValidationAttribute_GetErrorMessage.htm
+[`GetUsageHelp()`]: https://www.ookii.org/docs/commandline-5.0/html/M_Ookii_CommandLine_Validation_ArgumentValidationAttribute_GetUsageHelp.htm
+[`GetUsageHelpCore()`]: https://www.ookii.org/docs/commandline-5.0/html/M_Ookii_CommandLine_Validation_ArgumentValidationWithHelpAttribute_GetUsageHelpCore.htm
 [`IComparable<T>`]: https://learn.microsoft.com/dotnet/api/system.icomparable-1
-[`IsValid()`]: https://www.ookii.org/docs/commandline-4.2/html/M_Ookii_CommandLine_Validation_ArgumentValidationAttribute_IsValid.htm
-[`LocalizedStringProvider`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_LocalizedStringProvider.htm
-[`NullableConverter`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_Conversion_NullableConverter.htm
-[`Ookii.CommandLine.Validation`]: https://www.ookii.org/docs/commandline-4.2/html/N_Ookii_CommandLine_Validation.htm
-[`ProhibitsAttribute`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_Validation_ProhibitsAttribute.htm
-[`ReadOnlySpan<char>`]: https://learn.microsoft.com/dotnet/api/system.readonlyspan-1
-[`RequiresAnyAttribute`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_Validation_RequiresAnyAttribute.htm
-[`RequiresAttribute`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_Validation_RequiresAttribute.htm
-[`UsageWriter.IncludeValidatorsInDescription`]: https://www.ookii.org/docs/commandline-4.2/html/P_Ookii_CommandLine_UsageWriter_IncludeValidatorsInDescription.htm
-[`ValidateCountAttribute`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_Validation_ValidateCountAttribute.htm
-[`ValidateEnumValueAttribute.IncludeValuesInErrorMessage`]: https://www.ookii.org/docs/commandline-4.2/html/P_Ookii_CommandLine_Validation_ValidateEnumValueAttribute_IncludeValuesInErrorMessage.htm
-[`ValidateEnumValueAttribute`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_Validation_ValidateEnumValueAttribute.htm
-[`ValidateNotEmptyAttribute`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_Validation_ValidateNotEmptyAttribute.htm
-[`ValidateNotNullAttribute`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_Validation_ValidateNotNullAttribute.htm
-[`ValidateNotWhiteSpaceAttribute`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_Validation_ValidateNotWhiteSpaceAttribute.htm
-[`ValidatePatternAttribute.ErrorMessage`]: https://www.ookii.org/docs/commandline-4.2/html/P_Ookii_CommandLine_Validation_ValidatePatternAttribute_ErrorMessage.htm
-[`ValidatePatternAttribute`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_Validation_ValidatePatternAttribute.htm
-[`ValidateRangeAttribute`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_Validation_ValidateRangeAttribute.htm
-[`ValidateStringLengthAttribute`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_Validation_ValidateStringLengthAttribute.htm
-[`ValidationMode.BeforeConversion`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_Validation_ValidationMode.htm
-[IncludeInUsageHelp_0]: https://www.ookii.org/docs/commandline-4.2/html/P_Ookii_CommandLine_Validation_ArgumentValidationWithHelpAttribute_IncludeInUsageHelp.htm
-[Mode_3]: https://www.ookii.org/docs/commandline-4.2/html/P_Ookii_CommandLine_Validation_ArgumentValidationAttribute_Mode.htm
-[Parse()_7]: https://www.ookii.org/docs/commandline-4.2/html/Overload_Ookii_CommandLine_IParser_1_Parse.htm
-[ValidationFailed_1]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_CommandLineArgumentErrorCategory.htm
+[`LocalizedStringProvider`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_LocalizedStringProvider.htm
+[`NullableConverter`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_Conversion_NullableConverter.htm
+[`Ookii.CommandLine.Validation`]: https://www.ookii.org/docs/commandline-5.0/html/N_Ookii_CommandLine_Validation.htm
+[`ProhibitsAttribute`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_Validation_ProhibitsAttribute.htm
+[`RequiresAnyAttribute`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_Validation_RequiresAnyAttribute.htm
+[`RequiresAttribute`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_Validation_RequiresAttribute.htm
+[`UsageWriter.IncludeValidatorsInDescription`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_UsageWriter_IncludeValidatorsInDescription.htm
+[`ValidateCountAttribute`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_Validation_ValidateCountAttribute.htm
+[`ValidateEnumValueAttribute.IncludeValuesInErrorMessage`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_Validation_ValidateEnumValueAttribute_IncludeValuesInErrorMessage.htm
+[`ValidateEnumValueAttribute`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_Validation_ValidateEnumValueAttribute.htm
+[`ValidateNotEmptyAttribute`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_Validation_ValidateNotEmptyAttribute.htm
+[`ValidateNotNullAttribute`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_Validation_ValidateNotNullAttribute.htm
+[`ValidateNotWhiteSpaceAttribute`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_Validation_ValidateNotWhiteSpaceAttribute.htm
+[`ValidatePatternAttribute.ErrorMessage`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_Validation_ValidatePatternAttribute_ErrorMessage.htm
+[`ValidatePatternAttribute`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_Validation_ValidatePatternAttribute.htm
+[`ValidateRangeAttribute`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_Validation_ValidateRangeAttribute.htm
+[`ValidateStringLengthAttribute`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_Validation_ValidateStringLengthAttribute.htm
+[IncludeInUsageHelp_0]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_Validation_ArgumentValidationWithHelpAttribute_IncludeInUsageHelp.htm
+[IsValidPostConversion()_0]: https://www.ookii.org/docs/commandline-5.0/html/M_Ookii_CommandLine_Validation_ArgumentValidationAttribute_IsValidPostConversion.htm
+[IsValidPostParsing()_0]: https://www.ookii.org/docs/commandline-5.0/html/M_Ookii_CommandLine_Validation_ArgumentValidationAttribute_IsValidPostParsing.htm
+[IsValidPreConversion()_0]: https://www.ookii.org/docs/commandline-5.0/html/M_Ookii_CommandLine_Validation_ArgumentValidationAttribute_IsValidPreConversion.htm
+[Parse()_7]: https://www.ookii.org/docs/commandline-5.0/html/Overload_Ookii_CommandLine_IParser_1_Parse.htm
+[ValidationFailed_1]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_CommandLineArgumentErrorCategory.htm

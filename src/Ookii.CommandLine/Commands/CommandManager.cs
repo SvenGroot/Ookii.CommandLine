@@ -1,6 +1,7 @@
 ﻿using Ookii.CommandLine.Support;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -38,7 +39,7 @@ namespace Ookii.CommandLine.Commands;
 /// </para>
 /// <para>
 ///   Subcommands can support asynchronous execution by implementing the <see cref="IAsyncCommand"/>
-///   or <see cref="IAsyncCancelableCommand"/> interface.
+///   interface.
 /// </para>
 /// <para>
 ///   Commands can be defined in a single assembly, or in multiple assemblies.
@@ -357,7 +358,65 @@ public class CommandManager
     ///   whether the version command is returned.
     /// </para>
     /// </remarks>
-    public CommandInfo? GetCommand(string commandName)
+    public CommandInfo? GetCommand(string commandName) => GetCommandOrPossibleMatches(commandName).Command;
+
+    /// <summary>
+    /// Gets the subcommand with the specified command name, or if automatic prefix aliases are
+    /// enabled and there is more than one possible match, a list of possible matches.
+    /// </summary>
+    /// <param name="commandName">The name of the subcommand.</param>
+    /// <returns>
+    ///   A tuple containing a <see cref="CommandInfo"/> instance for the specified subcommand, or
+    ///   <see langword="null"/> if none could be found, and a list of possible matches if
+    ///   <paramref name="commandName"/> is an ambiguous prefix alias.
+    /// </returns>
+    /// <exception cref="ArgumentNullException">
+    ///   <paramref name="commandName"/> is <see langword="null"/>.
+    /// </exception>
+    /// <remarks>
+    /// <para>
+    ///   The command is located by searching all types in the assemblies for a command type
+    ///   whose command name or alias matches the specified name. If there are multiple commands
+    ///   with the same name, the first matching one will be returned.
+    /// </para>
+    /// <para>
+    ///   If the <see cref="CommandOptions.AutoCommandPrefixAliases" qualifyHint="true"/> property is <see langword="true"/>,
+    ///   this function will also return a command whose name or alias starts with
+    ///   <paramref name="commandName"/>. In this case, the command will only be returned if there
+    ///   is exactly one matching command; if the prefix is ambiguous, no command is returned,
+    ///   but a list of possible matching command names or aliases is returned instead.
+    /// </para>
+    /// <para>
+    ///   If the returned command is not <see langword="null"/>, the list of possible matches will
+    ///   always be empty.
+    /// </para>
+    /// <para>
+    ///   A command's name is taken from the <see cref="CommandAttribute.CommandName" qualifyHint="true"/> property. If
+    ///   that property is <see langword="null"/>, the name is determined by taking the command
+    ///   type's name, and applying the transformation specified by the <see cref="CommandOptions.CommandNameTransform" qualifyHint="true"/>
+    ///   property. A command's aliases are specified using the <see cref="AliasAttribute"/>
+    ///   attribute.
+    /// </para>
+    /// <para>
+    ///   Commands that don't meet the criteria of the <see cref="CommandOptions.CommandFilter" qualifyHint="true"/>
+    ///   predicate are not returned.
+    /// </para>
+    /// <para>
+    ///   If the <see cref="CommandOptions.ParentCommand" qualifyHint="true"/> property is
+    ///   <see langword="null"/>, only commands without a <see cref="ParentCommandAttribute"/>
+    ///   attribute are returned. If it is not <see langword="null"/>, only commands where the type
+    ///   specified using the <see cref="ParentCommandAttribute"/> attribute matches the value of
+    ///   the property are returned.
+    /// </para>
+    /// <para>
+    ///   The automatic version command is returned if the <see cref="CommandOptions.AutoVersionCommand" qualifyHint="true"/>
+    ///   property is <see langword="true"/> and <paramref name="commandName"/> matches the name of
+    ///   the automatic version command, and not any other command name. The <see cref="CommandOptions.CommandFilter" qualifyHint="true"/>
+    ///   and <see cref="CommandOptions.ParentCommand" qualifyHint="true"/> property also affect
+    ///   whether the version command is returned.
+    /// </para>
+    /// </remarks>
+    public (CommandInfo? Command, ImmutableArray<string> PossibleMatches) GetCommandOrPossibleMatches(string commandName)
     {
         if (commandName == null)
         {
@@ -378,34 +437,56 @@ public class CommandManager
         }
 
         CommandInfo? partialMatch = null;
-        var ambiguousMatch = false;
+        ImmutableArray<string>.Builder? possibleMatches = null;
+        bool hasCustomVersionCommand = false;
         foreach (var command in commands)
         {
+            if (command == versionCommand && hasCustomVersionCommand)
+            {
+                continue;
+            }
+
             // Check for an exact match.
             if (command.MatchesName(commandName))
             {
-                return command;
+                return (command, []);
             }
 
             // Check for a prefix match, if requested.
-            if (Options.AutoCommandPrefixAliases && !ambiguousMatch && command.MatchesPrefix(commandName))
+            if (Options.AutoCommandPrefixAliases)
             {
-                if (partialMatch == null)
+                var match = command.MatchingPrefix(commandName);
+                if (match != null)
                 {
-                    partialMatch = command;
-                }
-                else if (command != versionCommand || !partialMatch.MatchesName(Options.StringProvider.AutomaticVersionCommandName()))
-                {
-                    // The prefix is ambigious, so don't use it.
-                    // N.B. This doesn't apply if this is the automatic version command and the
-                    //      existing match would override the existence of that command.
-                    partialMatch = null;
-                    ambiguousMatch = true;
+                    if (partialMatch == null && possibleMatches == null)
+                    {
+                        partialMatch = command;
+                    }
+                    else
+                    {
+                        // The prefix is ambigious, so don't use it.
+                        if (possibleMatches == null)
+                        {
+                            possibleMatches = ImmutableArray.CreateBuilder<string>();
+                            possibleMatches.Add(partialMatch!.Name);
+                            partialMatch = null;
+                        }
+
+                        possibleMatches.Add(match);
+                    }
+
+                    // This is only checked for partial matches, if the user's command name is
+                    // not a prefix of the automatic version command, it can't be a prefix of
+                    // a command that overrides it, so there's no possibility for a conflict.
+                    if (command.MatchesName(_options.StringProvider.AutomaticVersionCommandName()))
+                    {
+                        hasCustomVersionCommand = true;
+                    }
                 }
             }
         }
 
-        return partialMatch;
+        return (partialMatch, possibleMatches?.ToImmutable() ?? []);
     }
 
     /// <summary>
@@ -457,20 +538,34 @@ public class CommandManager
     public ICommand? CreateCommand(string? commandName, ReadOnlyMemory<string> args)
     {
         ParseResult = default;
-        var commandInfo = commandName == null
-            ? null
-            : GetCommand(commandName);
+        var (commandInfo, possibleMatches) = commandName == null
+            ? default
+            : GetCommandOrPossibleMatches(commandName);
 
-        if (commandInfo is not CommandInfo info)
+        if (commandInfo == null)
         {
+            if (commandName != null)
+            {
+                if (!possibleMatches.IsDefaultOrEmpty)
+                {
+                    CommandLineParser.WriteError(Options, Options.StringProvider.AmbiguousCommandPrefixAlias(commandName), Options.ErrorColor, true);
+                    _options.UsageWriter.WriteCommandAmbiguousPrefixAliasUsage(this, possibleMatches);
+                    return null;
+                }
+                else
+                {
+                    CommandLineParser.WriteError(Options, Options.StringProvider.UnknownCommand(commandName), Options.ErrorColor, true);
+                }
+            }
+
             WriteUsage();
             return null;
         }
 
-        _options.UsageWriter.CommandName = info.Name;
+        _options.UsageWriter.CommandName = commandInfo.Name;
         try
         {
-            var (command, result) = info.CreateInstanceWithResult(args);
+            var (command, result) = commandInfo.CreateInstanceWithResult(args);
             ParseResult = result;
             return command;
         }
@@ -728,10 +823,6 @@ public class CommandManager
         return RunCommand(Environment.GetCommandLineArgs().AsMemory(1));
     }
 
-    /// <inheritdoc cref="RunCommandAsync(string?, ReadOnlyMemory{string}, CancellationToken)"/>
-    public async Task<int?> RunCommandAsync(string? commandName, ReadOnlyMemory<string> args)
-        => await RunCommandAsync(commandName, args, CancellationToken.None);
-
     /// <summary>
     /// Finds and instantiates the subcommand with the specified name, and if it succeeds,
     /// runs it asynchronously. If it fails, writes error and usage information.
@@ -739,8 +830,9 @@ public class CommandManager
     /// <param name="commandName">The name of the command.</param>
     /// <param name="args">The arguments to the command.</param>
     /// <param name="cancellationToken">
-    /// The token to monitor for cancellation requests. If the command implements the <see cref="IAsyncCancelableCommand"/>
-    /// interface, this token will be forwarded to it.
+    /// The token to monitor for cancellation requests, which will be forwarded to the
+    /// <see cref="IAsyncCommand.RunAsync" qualifyHint="true"/> method. The default value is
+    /// <see cref="CancellationToken.None" qualifyHint="true"/>.
     /// </param>
     /// <returns>
     ///   A task representing the asynchronous run operation. The result is the value returned
@@ -751,9 +843,7 @@ public class CommandManager
     /// <remarks>
     /// <para>
     ///   This function creates the command by invoking the <see cref="CreateCommand(string?, ReadOnlyMemory{string})"/>
-    ///   method. If the command implements the <see cref="IAsyncCancelableCommand"/> interface, it
-    ///   sets the <see cref="IAsyncCancelableCommand.CancellationToken" qualifyHint="true"/>
-    ///   property. If the command implements the <see cref="IAsyncCommand"/> interface, it invokes
+    ///   method. If the command implements the <see cref="IAsyncCommand"/> interface, it invokes
     ///   the <see cref="IAsyncCommand.RunAsync" qualifyHint="true"/> method; otherwise, it invokes
     ///   the <see cref="ICommand.Run" qualifyHint="true"/> method on the command.
     /// </para>
@@ -776,13 +866,9 @@ public class CommandManager
     ///   whether the version command is included.
     /// </para>
     /// </remarks>
-    public async Task<int?> RunCommandAsync(string? commandName, ReadOnlyMemory<string> args, CancellationToken cancellationToken)
-        // These functions must be overloads (not using default params) for binary compatibility with v4.0.
+    public async Task<int?> RunCommandAsync(string? commandName, ReadOnlyMemory<string> args,
+        CancellationToken cancellationToken = default)
         => await RunCommandAsync(CreateCommand(commandName, args), cancellationToken);
-
-    /// <inheritdoc cref="RunCommandAsync(string?, string[], CancellationToken)"/>
-    public async Task<int?> RunCommandAsync(string? commandName, string[] args)
-        => await RunCommandAsync(commandName, args, CancellationToken.None);
 
     /// <summary>
     /// Finds and instantiates the subcommand with the specified name, and if it succeeds,
@@ -791,8 +877,9 @@ public class CommandManager
     /// <param name="commandName">The name of the command.</param>
     /// <param name="args">The arguments to the command.</param>
     /// <param name="cancellationToken">
-    /// The token to monitor for cancellation requests. If the command implements the <see cref="IAsyncCancelableCommand"/>
-    /// interface, this token will be forwarded to it.
+    /// The token to monitor for cancellation requests, which will be forwarded to the
+    /// <see cref="IAsyncCommand.RunAsync" qualifyHint="true"/> method. The default value is
+    /// <see cref="CancellationToken.None" qualifyHint="true"/>.
     /// </param>
     /// <returns>
     ///   A task representing the asynchronous run operation. The result is the value returned
@@ -803,9 +890,7 @@ public class CommandManager
     /// <remarks>
     /// <para>
     ///   This function creates the command by invoking the <see cref="CreateCommand(string?, string[])"/>
-    ///   method. If the command implements the <see cref="IAsyncCancelableCommand"/> interface, it
-    ///   sets the <see cref="IAsyncCancelableCommand.CancellationToken" qualifyHint="true"/>
-    ///   property. If the command implements the <see cref="IAsyncCommand"/> interface, it invokes
+    ///   method. If the command implements the <see cref="IAsyncCommand"/> interface, it invokes
     ///   the <see cref="IAsyncCommand.RunAsync" qualifyHint="true"/> method; otherwise, it invokes
     ///   the <see cref="ICommand.Run" qualifyHint="true"/> method on the command.
     /// </para>
@@ -828,13 +913,8 @@ public class CommandManager
     ///   whether the version command is included.
     /// </para>
     /// </remarks>
-    public async Task<int?> RunCommandAsync(string? commandName, string[] args, CancellationToken cancellationToken)
-        // These functions must be overloads (not using default params) for binary compatibility with v4.0.
+    public async Task<int?> RunCommandAsync(string? commandName, string[] args, CancellationToken cancellationToken = default)
         => await RunCommandAsync(CreateCommand(commandName, args), cancellationToken);
-
-    /// <inheritdoc cref="RunCommandAsync(ReadOnlyMemory{string}, CancellationToken)"/>
-    public async Task<int?> RunCommandAsync(ReadOnlyMemory<string> args)
-        => await RunCommandAsync(args, CancellationToken.None);
 
     /// <summary>
     /// Finds and instantiates the subcommand with the name from the first argument, and if it
@@ -845,8 +925,9 @@ public class CommandManager
     /// ones are arguments for the command.
     /// </param>
     /// <param name="cancellationToken">
-    /// The token to monitor for cancellation requests. If the command implements the <see cref="IAsyncCancelableCommand"/>
-    /// interface, this token will be forwarded to it.
+    /// The token to monitor for cancellation requests, which will be forwarded to the
+    /// <see cref="IAsyncCommand.RunAsync" qualifyHint="true"/> method. The default value is
+    /// <see cref="CancellationToken.None" qualifyHint="true"/>.
     /// </param>
     /// <returns>
     ///   A task representing the asynchronous run operation. The result is the value returned
@@ -857,9 +938,7 @@ public class CommandManager
     /// <remarks>
     /// <para>
     ///   This function creates the command by invoking the <see cref="CreateCommand(ReadOnlyMemory{string})"/>
-    ///   method. If the command implements the <see cref="IAsyncCancelableCommand"/> interface, it
-    ///   sets the <see cref="IAsyncCancelableCommand.CancellationToken" qualifyHint="true"/>
-    ///   property. If the command implements the <see cref="IAsyncCommand"/> interface, it invokes
+    ///   method. If the command implements the <see cref="IAsyncCommand"/> interface, it invokes
     ///   the <see cref="IAsyncCommand.RunAsync" qualifyHint="true"/> method; otherwise, it invokes
     ///   the <see cref="ICommand.Run" qualifyHint="true"/> method on the command.
     /// </para>
@@ -882,13 +961,8 @@ public class CommandManager
     ///   whether the version command is included.
     /// </para>
     /// </remarks>
-    public async Task<int?> RunCommandAsync(ReadOnlyMemory<string> args, CancellationToken cancellationToken)
-        // These functions must be overloads (not using default params) for binary compatibility with v4.0.
+    public async Task<int?> RunCommandAsync(ReadOnlyMemory<string> args, CancellationToken cancellationToken = default)
         => await RunCommandAsync(CreateCommand(args), cancellationToken);
-
-    /// <inheritdoc cref="RunCommandAsync(string[], CancellationToken)"/>
-    public async Task<int?> RunCommandAsync(string[] args)
-        => await RunCommandAsync(args, CancellationToken.None);
 
     /// <summary>
     /// Finds and instantiates the subcommand with the name from the first argument, and if it
@@ -899,8 +973,9 @@ public class CommandManager
     /// ones are arguments for the command.
     /// </param>
     /// <param name="cancellationToken">
-    /// The token to monitor for cancellation requests. If the command implements the <see cref="IAsyncCancelableCommand"/>
-    /// interface, this token will be forwarded to it.
+    /// The token to monitor for cancellation requests, which will be forwarded to the
+    /// <see cref="IAsyncCommand.RunAsync" qualifyHint="true"/> method. The default value is
+    /// <see cref="CancellationToken.None" qualifyHint="true"/>.
     /// </param>
     /// <returns>
     ///   A task representing the asynchronous run operation. The result is the value returned
@@ -911,9 +986,7 @@ public class CommandManager
     /// <remarks>
     /// <para>
     ///   This function creates the command by invoking the <see cref="CreateCommand(string[])"/>
-    ///   method. If the command implements the <see cref="IAsyncCancelableCommand"/> interface, it
-    ///   sets the <see cref="IAsyncCancelableCommand.CancellationToken" qualifyHint="true"/>
-    ///   property. If the command implements the <see cref="IAsyncCommand"/> interface, it invokes
+    ///   method. If the command implements the <see cref="IAsyncCommand"/> interface, it invokes
     ///   the <see cref="IAsyncCommand.RunAsync" qualifyHint="true"/> method; otherwise, it invokes
     ///   the <see cref="ICommand.Run" qualifyHint="true"/> method on the command.
     /// </para>
@@ -936,13 +1009,8 @@ public class CommandManager
     ///   whether the version command is included.
     /// </para>
     /// </remarks>
-    public async Task<int?> RunCommandAsync(string[] args, CancellationToken cancellationToken)
-        // These functions must be overloads (not using default params) for binary compatibility with v4.0.
+    public async Task<int?> RunCommandAsync(string[] args, CancellationToken cancellationToken = default)
         => await RunCommandAsync(CreateCommand(args), cancellationToken);
-
-    /// <inheritdoc cref="RunCommandAsync(CancellationToken)"/>
-    public async Task<int?> RunCommandAsync()
-        => await RunCommandAsync(CancellationToken.None);
 
     /// <summary>
     /// Finds and instantiates the subcommand using the arguments from the <see cref="Environment.GetCommandLineArgs" qualifyHint="true"/>
@@ -950,18 +1018,17 @@ public class CommandManager
     /// asynchronously. If it fails, writes error and usage information.
     /// </summary>
     /// <param name="cancellationToken">
-    /// The token to monitor for cancellation requests. If the command implements the <see cref="IAsyncCancelableCommand"/>
-    /// interface, this token will be forwarded to it.
+    /// The token to monitor for cancellation requests, which will be forwarded to the
+    /// <see cref="IAsyncCommand.RunAsync" qualifyHint="true"/> method. The default value is
+    /// <see cref="CancellationToken.None" qualifyHint="true"/>.
     /// </param>
     /// <returns>
-    /// <inheritdoc cref="RunCommandAsync(string?, string[])"/>
+    /// <inheritdoc cref="RunCommandAsync(string?, string[], CancellationToken)"/>
     /// </returns>
     /// <remarks>
     /// <para>
     ///   This function creates the command by invoking the <see cref="CreateCommand()"/>
-    ///   method. If the command implements the <see cref="IAsyncCancelableCommand"/> interface, it
-    ///   sets the <see cref="IAsyncCancelableCommand.CancellationToken" qualifyHint="true"/>
-    ///   property. If the command implements the <see cref="IAsyncCommand"/> interface, it invokes
+    ///   method. If the command implements the <see cref="IAsyncCommand"/> interface, it invokes
     ///   the <see cref="IAsyncCommand.RunAsync" qualifyHint="true"/> method; otherwise, it invokes
     ///   the <see cref="ICommand.Run" qualifyHint="true"/> method on the command.
     /// </para>
@@ -984,8 +1051,7 @@ public class CommandManager
     ///   whether the version command is included.
     /// </para>
     /// </remarks>
-    public async Task<int?> RunCommandAsync(CancellationToken cancellationToken)
-        // These functions must be overloads (not using default params) for binary compatibility with v4.0.
+    public async Task<int?> RunCommandAsync(CancellationToken cancellationToken = default)
         => await RunCommandAsync(CreateCommand(), cancellationToken);
 
     /// <summary>
@@ -1092,14 +1158,9 @@ public class CommandManager
 
     private static async Task<int?> RunCommandAsync(ICommand? command, CancellationToken cancellationToken)
     {
-        if (command is IAsyncCancelableCommand asyncCancelableCommand)
+        if (command is IAsyncCommand asyncCommand)
         {
-            asyncCancelableCommand.CancellationToken = cancellationToken;
-            return await asyncCancelableCommand.RunAsync();
-        }
-        else if (command is IAsyncCommand asyncCommand)
-        {
-            return await asyncCommand.RunAsync();
+            return await asyncCommand.RunAsync(cancellationToken);
         }
 
         return command?.Run();

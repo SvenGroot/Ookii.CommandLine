@@ -187,22 +187,16 @@ internal class ConverterGenerator
         builder.AppendGeneratedCodeAttribute();
         builder.AppendLine($"internal class {info.Name} : Ookii.CommandLine.Conversion.ArgumentConverter");
         builder.OpenBlock();
-        string inputType = info.UseSpan ? "System.ReadOnlySpan<char>" : "string";
+        string conversion = info.UseSpan ? ".Span" : ".ToString()";
         string culture = info.HasCulture ? ", culture" : string.Empty;
-        builder.AppendLine($"public override object? Convert({inputType} value, System.Globalization.CultureInfo culture, Ookii.CommandLine.CommandLineArgument argument)");
+        builder.AppendLine($"public override object? Convert(System.ReadOnlyMemory<char> value, System.Globalization.CultureInfo culture, Ookii.CommandLine.CommandLineArgument argument)");
         if (info.ParseMethod)
         {
-            builder.AppendLine($"    => {type.ToQualifiedName()}.Parse(value{culture});");
+            builder.AppendLine($"    => {type.ToQualifiedName()}.Parse(value{conversion}{culture});");
         }
         else
         {
-            builder.AppendLine($"    => new {type.ToQualifiedName()}(value);");
-        }
-
-        if (info.UseSpan)
-        {
-            builder.AppendLine();
-            builder.AppendLine("public override object? Convert(string value, System.Globalization.CultureInfo culture, Ookii.CommandLine.CommandLineArgument argument) => Convert(System.MemoryExtensions.AsSpan(value), culture, argument);");
+            builder.AppendLine($"    => new {type.ToQualifiedName()}(value{conversion});");
         }
 
         builder.CloseBlock(); // class

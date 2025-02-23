@@ -10,11 +10,9 @@ library for .Net applications.
 - Compatible with trimming and native AOT.
 
 Ookii.CommandLine is [provided in versions](#requirements) for .Net Standard 2.0, .Net Standard 2.1,
-.Net 6.0, and .Net 7.0 and later.
+and .Net 8.0 and later.
 
 Ookii.CommandLine can be added to your project using [NuGet](https://nuget.org/packages/Ookii.CommandLine).
-[Code snippets](docs/CodeSnippets.md) for Visual Studio are available on the
-[Visual Studio marketplace](https://www.ookii.org/Link/CommandLineSnippets).
 
 A [C++ version](https://github.com/SvenGroot/Ookii.CommandLine.Cpp) is also available.
 
@@ -134,25 +132,23 @@ It can be used with applications supporting one of the following:
 
 - .Net Standard 2.0
 - .Net Standard 2.1
-- .Net 6.0
-- .Net 7.0 and later
+- .Net 8.0 and later
 
 As of version 3.0, .Net Framework 2.0 is no longer supported. You can still target .Net Framework
 4.6.1 and later using the .Net Standard 2.0 assembly. If you need to support an older version of
 .Net, please continue to use [version 2.4](https://github.com/SvenGroot/ookii.commandline/releases/tag/v2.4).
 
-The .Net Standard 2.1 and .Net 6.0 and 7.0 versions utilize the framework `ReadOnlySpan<T>` and
+Several versions of the library are provided, each adding some additional functionality only
+available with their specific runtime.
+
+The .Net Standard 2.1 and .Net 8.0 versions utilize the framework `ReadOnlySpan<T>` and
 `ReadOnlyMemory<T>` types without a dependency on the System.Memory package.
 
-The .Net 6.0 version has additional support for [nullable reference types](docs/Arguments.md#arguments-with-non-nullable-types),
+The .Net 8.0 version has additional support for [nullable reference types](docs/Arguments.md#arguments-with-non-nullable-types),
 and is annotated to allow [trimming](https://learn.microsoft.com/dotnet/core/deploying/trimming/trimming-options)
-when [source generation](docs/SourceGeneration.md) is used.
-
-The .Net 7.0 version has additional support for `required` properties, and can utilize
-`ISpanParsable<TSelf>` and `IParsable<TSelf>` for argument value conversions.
-
-An assembly built for .Net 8.0 is also provided; this has no additional functionality over the
-.Net 7.0 version, but is provided to ensure optimal compatibility and performance.
+and native AOT when [source generation](docs/SourceGeneration.md) is used. It also supports
+`required` properties, and can utilize `ISpanParsable<TSelf>` and `IParsable<TSelf>` for argument
+value conversions.
 
 ## Building and testing
 
@@ -168,9 +164,8 @@ To build the library, tests and samples, simply use the `dotnet build` command i
 directory. You can run the unit tests using `dotnet test`. The tests should pass on all platforms
 (Windows and Linux have been tested).
 
-The tests are built and run for .Net 8.0, .Net 7.0, .Net 6.0, and .Net Framework 4.8. Running the
-.Net Framework tests on a non-Windows platform may require the use of
-[Mono](https://www.mono-project.com/).
+The tests are built and run for .Net 8.0 and .Net Framework 4.8. Running the .Net Framework tests on
+a non-Windows platform may require the use of [Mono](https://www.mono-project.com/).
 
 Ookii.CommandLine uses a strongly-typed resources file, which will not update correctly unless the
 `Resources.resx` file is edited with [Microsoft Visual Studio](https://visualstudio.microsoft.com/).
@@ -195,18 +190,20 @@ Supports PowerShell-like and POSIX-like parsing rules.                        | 
 Supports any type with a `Parse()` method or constructor that takes a string. | Supports a limited number of types, and requires custom conversion methods for others.
 Supports automatic prefix aliases.                                            | Does not support automatic prefix aliases.
 Does not support middleware or dependency injection.                          | Supports middleware and dependency injection.
+Does not support tab completion or response files                             | Supports tab completion and response files.
 Fully released with a stable API between major releases.                      | Still in preview.
 
 These are by no means the only differences. Both are highly customizable, and each has its pros and
-cons. In the end, it mostly comes down to personal preference. You should use whichever one suits
-your needs and coding style best.
+cons. Both support trimming and native AOT. In the end, it mostly comes down to personal preference.
+You should use whichever one suits your needs and coding style best.
 
 ## More information
 
 Please check out the following to get started:
 
 - [Tutorial: getting started with Ookii.CommandLine](docs/Tutorial.md)
-- [Migrating from Ookii.CommandLine 2.x / 3.x](docs/Migrating.md)
+- [What's new in Ookii.CommandLine](docs/ChangeLog.md)
+- [Migrating from previous versions](docs/Migrating.md)
 - [Usage documentation](docs/README.md)
 - [Class library documentation](https://www.ookii.org/Link/CommandLineDoc)
 - [Sample applications](src/Samples) with detailed explanations and sample output.

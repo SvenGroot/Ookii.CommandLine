@@ -38,14 +38,6 @@ public class ValidateCountAttribute : ArgumentValidationWithHelpAttribute
     }
 
     /// <summary>
-    /// Gets a value that indicates when validation will run.
-    /// </summary>
-    /// <value>
-    /// <see cref="ValidationMode.AfterParsing" qualifyHint="true"/>.
-    /// </value>
-    public override ValidationMode Mode => ValidationMode.AfterParsing;
-
-    /// <summary>
     /// Gets the inclusive lower bound on the number of elements.
     /// </summary>
     /// <value>
@@ -62,21 +54,34 @@ public class ValidateCountAttribute : ArgumentValidationWithHelpAttribute
     public int Maximum => _maximum;
 
     /// <summary>
+    /// Gets or sets a value that indicates whether the minimum bound will be enforced if the
+    /// argument was not specified at all.
+    /// </summary>
+    /// <value>
+    /// <see langword="true"/> if zero values will be considered valid regardless of the value of
+    /// the <see cref="Minimum"/> properties; <see langword="false"/> if the minimum bound will be
+    /// enforced even if the argument was not specified at all. The default value is
+    /// <see langword="true"/>.
+    /// </value>
+    public bool AllowNoValue { get; set; } = true;
+
+    /// <summary>
     /// Determines if the argument's item count is in the range.
     /// </summary>
     /// <param name="argument">The argument being validated.</param>
-    /// <param name="value">
-    ///   The argument value. If not <see langword="null"/>, this must be an instance of
-    ///   <see cref="CommandLineArgument.ArgumentType" qualifyHint="true"/>.
-    /// </param>
     /// <returns>
     ///   <see langword="true"/> if the value is valid; otherwise, <see langword="false"/>.
     /// </returns>
-    public override bool IsValid(CommandLineArgument argument, object? value)
+    public override bool IsValidPostParsing(CommandLineArgument argument)
     {
         if (argument.MultiValueInfo == null)
         {
             return false;
+        }
+
+        if (!argument.HasValue)
+        {
+            return AllowNoValue || Minimum <= 0;
         }
 
         var count = ((ICollection)argument.Value!).Count;

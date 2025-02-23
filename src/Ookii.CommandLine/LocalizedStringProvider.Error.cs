@@ -1,7 +1,9 @@
 ﻿using Ookii.CommandLine.Conversion;
 using Ookii.CommandLine.Properties;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 
 namespace Ookii.CommandLine;
 
@@ -35,6 +37,13 @@ public partial class LocalizedStringProvider
     /// <param name="argumentName">The name of the argument.</param>
     /// <returns>The error message.</returns>
     public virtual string UnknownArgument(string argumentName) => Format(Resources.UnknownArgumentFormat, argumentName);
+
+    /// <summary>
+    /// Gets the error message displayed when the user tries to invoke an unknown command.
+    /// </summary>
+    /// <param name="commandName">The name of the command.</param>
+    /// <returns>The error message.</returns>
+    public virtual string UnknownCommand(string commandName) => Format(Resources.UnknownCommandFormat, commandName);
 
     /// <summary>
     /// Gets the error message for <see cref="CommandLineArgumentErrorCategory.MissingNamedArgumentValue" qualifyHint="true"/>.
@@ -116,6 +125,36 @@ public partial class LocalizedStringProvider
         => Format(Resources.CombinedShortNameNonSwitchFormat, argumentName);
 
     /// <summary>
+    /// Gets the error message for <see cref="CommandLineArgumentErrorCategory.AmbiguousPrefixAlias" qualifyHint="true"/>.
+    /// </summary>
+    /// <param name="argumentName">The argument name that is the ambiguous prefix.</param>
+    /// <param name="prefix">
+    /// The argument name prefix to use with <paramref name="possibleMatches"/>. This is either the
+    /// long name prefix or the first regular prefix.
+    /// </param>
+    /// <param name="possibleMatches">A list of argument names and aliases that the prefix could match.</param>
+    /// <returns>The error message.</returns>
+    public virtual string AmbiguousArgumentPrefixAlias(string argumentName, string prefix, IEnumerable<string> possibleMatches)
+        => Format(Resources.AmbiguousArgumentPrefixExceptionMessageFormat, argumentName,
+            string.Join(ArgumentSeparator, possibleMatches.Select(m => prefix + m)));
+
+    /// <summary>
+    /// Gets the error message for an ambiguous prefix alias, without the possible matches.
+    /// </summary>
+    /// <param name="argumentName">The argument name that is the ambiguous prefix.</param>
+    /// <returns>The error message.</returns>
+    public virtual string AmbiguousArgumentPrefixAliasErrorOnly(string argumentName)
+        => Format(Resources.AmbiguousArgumentPrefixErrorOnlyFormat, argumentName);
+
+    /// <summary>
+    /// Gets the error message for an ambiguous prefix alias of a subcommand.
+    /// </summary>
+    /// <param name="argumentName">The command name that is the ambiguous prefix.</param>
+    /// <returns>The error message.</returns>
+    public virtual string AmbiguousCommandPrefixAlias(string argumentName)
+        => Format(Resources.AmbiguousCommandPrefixFormat, argumentName);
+
+    /// <summary>
     /// Gets the error message used if the <see cref="KeyValuePairConverter{TKey, TValue}"/>
     /// is unable to find the key/value pair separator in the argument value.
     /// </summary>
@@ -140,6 +179,7 @@ public partial class LocalizedStringProvider
     {
         // These are not created using the helper, because there is not one standard message.
         Debug.Assert(category != CommandLineArgumentErrorCategory.ValidationFailed);
+        Debug.Assert(category != CommandLineArgumentErrorCategory.AmbiguousPrefixAlias);
 
         var message = category switch
         {

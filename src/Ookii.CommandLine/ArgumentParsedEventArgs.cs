@@ -8,8 +8,6 @@ namespace Ookii.CommandLine;
 /// <threadsafety static="true" instance="false"/>
 public class ArgumentParsedEventArgs : EventArgs
 {
-    private readonly CommandLineArgument _argument;
-
     /// <summary>
     /// Initializes a new instance of the <see cref="ArgumentParsedEventArgs"/> class.
     /// </summary>
@@ -17,7 +15,7 @@ public class ArgumentParsedEventArgs : EventArgs
     /// <exception cref="ArgumentNullException"><paramref name="argument"/> is <see langword="null"/>.</exception>
     public ArgumentParsedEventArgs(CommandLineArgument argument)
     {
-        _argument = argument ?? throw new ArgumentNullException(nameof(argument));
+        Argument = argument ?? throw new ArgumentNullException(nameof(argument));
     }
 
     /// <summary>
@@ -26,10 +24,7 @@ public class ArgumentParsedEventArgs : EventArgs
     /// <value>
     /// The <see cref="CommandLineArgument"/> instance for the argument.
     /// </value>
-    public CommandLineArgument Argument
-    {
-        get { return _argument; }
-    }
+    public CommandLineArgument Argument { get; }
 
     /// <summary>
     /// Gets a value that indicates whether parsing should be canceled when the event handler
@@ -47,8 +42,8 @@ public class ArgumentParsedEventArgs : EventArgs
     ///   an instance of the arguments class according to the <see cref="CancelMode"/> value.
     /// </para>
     /// <para>
-    ///   If you want usage help to be displayed after canceling, set the <see cref="CommandLineParser.HelpRequested" qualifyHint="true"/>
-    ///   property to <see langword="true"/>.
+    ///   If you want usage help to be displayed after canceling, set the value to
+    ///   <see cref="CancelMode.AbortWithHelp" qualifyHint="true"/>.
     /// </para>
     /// </remarks>
     /// <seealso cref="CommandLineArgument.CancelParsing" qualifyHint="true"/>

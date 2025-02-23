@@ -35,6 +35,7 @@ public partial class TestCommand : ICommand
 [GeneratedParser]
 [Command]
 [Alias("alias")]
+[Alias("hiddenAlias", IsHidden = true)]
 public partial class AnotherSimpleCommand : ICommand
 {
     [CommandLineArgument]
@@ -66,6 +67,7 @@ partial class CustomParsingCommand : ICommandWithCustomParsing
 
 [GeneratedParser]
 [Command(IsHidden = true)]
+[Alias("TestAlias")]
 partial class HiddenCommand : ICommand
 {
     public int Run()
@@ -91,7 +93,7 @@ class AsyncCommand : IAsyncCommand
         return Value + 1;
     }
 
-    public Task<int> RunAsync()
+    public Task<int> RunAsync(CancellationToken cancellationToken)
     {
         return Task.FromResult(Value);
     }
@@ -105,9 +107,9 @@ class AsyncCancelableCommand : AsyncCommandBase
     [Description("Argument description.")]
     public int Value { get; set; }
 
-    public override async Task<int> RunAsync()
+    public override async Task<int> RunAsync(CancellationToken cancellationToken)
     {
-        await Task.Delay(Value, CancellationToken);
+        await Task.Delay(Value, cancellationToken);
         return Value;
     }
 }
@@ -116,7 +118,7 @@ class AsyncCancelableCommand : AsyncCommandBase
 // Used in stand-alone test, so not an actual command.
 class AsyncBaseCommand : AsyncCommandBase
 {
-    public override async Task<int> RunAsync()
+    public override async Task<int> RunAsync(CancellationToken cancellationToken)
     {
         // Do something actually async to test the wait in Run().
         await Task.Yield();
@@ -152,6 +154,7 @@ partial class TestChildCommand : ICommand
 [GeneratedParser]
 [Command]
 [ParentCommand(typeof(TestParentCommand))]
+[Alias("TestChild2")]
 partial class OtherTestChildCommand : ICommand
 {
     public int Run() => throw new NotImplementedException();

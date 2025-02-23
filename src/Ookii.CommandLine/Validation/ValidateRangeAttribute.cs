@@ -71,12 +71,12 @@ public class ValidateRangeAttribute : ArgumentValidationWithHelpAttribute
     /// <param name="argument">The argument being validated.</param>
     /// <param name="value">
     ///   The argument value. If not <see langword="null"/>, this must be an instance of
-    ///   <see cref="CommandLineArgument.ArgumentType" qualifyHint="true"/>.
+    ///   <see cref="CommandLineArgument.ElementType" qualifyHint="true"/>.
     /// </param>
     /// <returns>
     ///   <see langword="true"/> if the value is valid; otherwise, <see langword="false"/>.
     /// </returns>
-    public override bool IsValid(CommandLineArgument argument, object? value)
+    public override bool IsValidPostConversion(CommandLineArgument argument, object? value)
     {
         var min = (IComparable?)argument.ConvertToArgumentTypeInvariant(Minimum);
         var max = (IComparable?)argument.ConvertToArgumentTypeInvariant(Maximum);

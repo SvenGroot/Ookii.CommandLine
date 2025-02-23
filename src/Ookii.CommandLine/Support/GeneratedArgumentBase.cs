@@ -22,8 +22,6 @@ public abstract class GeneratedArgumentBase : CommandLineArgument
     private readonly Action<object, object?>? _setProperty;
     private readonly Func<object, object?>? _getProperty;
     private readonly Func<object?, CommandLineParser, CancelMode>? _callMethod;
-    private readonly string _defaultValueDescription;
-    private readonly string? _defaultKeyDescription;
     private MemberInfo? _member;
 
     private protected GeneratedArgumentBase(ArgumentCreationInfo info) : base(new ArgumentInfo(info))
@@ -31,8 +29,6 @@ public abstract class GeneratedArgumentBase : CommandLineArgument
         _setProperty = info.SetProperty;
         _getProperty = info.GetProperty;
         _callMethod = info.CallMethod;
-        _defaultValueDescription = info.DefaultValueDescription;
-        _defaultKeyDescription = info.DefaultKeyDescription;
     }
 
     /// <inheritdoc/>
@@ -73,17 +69,5 @@ public abstract class GeneratedArgumentBase : CommandLineArgument
         }
 
         _setProperty(target, value);
-    }
-
-    /// <inheritdoc/>
-    protected override string DetermineValueDescriptionForType(Type type)
-    {
-        Debug.Assert(DictionaryInfo == null ? type == ElementType : (type == DictionaryInfo.KeyType || type == DictionaryInfo.ValueType));
-        if (DictionaryInfo != null && type == DictionaryInfo.KeyType)
-        {
-            return _defaultKeyDescription!;
-        }
-
-        return _defaultValueDescription;
     }
 }

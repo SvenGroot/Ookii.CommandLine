@@ -63,6 +63,17 @@ partial class LocalizedStringProvider
         => Format(Resources.MoreInfoOnErrorFormat, executableName, helpArgumentName);
 
     /// <summary>
+    /// Gets a message telling the user how to get more detailed help about available commands, used
+    /// by the <see cref="UsageWriter"/> class.
+    /// </summary>
+    /// <param name="executableName">
+    /// The application's executable name, optionally including a parent command name.
+    /// </param>
+    /// <returns>The string.</returns>
+    public virtual string UsageCommandMoreInfoMessage(string executableName)
+        => Format(Resources.MoreInfoOnCommandErrorFormat, executableName);
+
+    /// <summary>
     /// Gets an instruction on how to get help on a command, used by the <see cref="UsageWriter"/>
     /// class.
     /// </summary>
@@ -73,4 +84,19 @@ partial class LocalizedStringProvider
     public virtual string UsageCommandHelpInstruction(string name, string argumentNamePrefix, string argumentName)
         => Format(Resources.CommandHelpInstructionFormat, name, argumentNamePrefix, argumentName);
 
+    /// <summary>
+    /// Gets the default header to print above the list of matching argument, used by the
+    /// <see cref="UsageWriter.WriteParserAmbiguousPrefixAliasUsageCore" qualifyHint="true"/>
+    /// method.
+    /// </summary>
+    /// <returns>The string.</returns>
+    public virtual string AmbiguousArgumentPrefixAliasMatchesHeader() => Resources.AmbiguousArgumentPrefixMatchesHeader;
+
+    /// <summary>
+    /// Gets the default header to print above the list of matching commands, used by the
+    /// <see cref="UsageWriter.WriteCommandAmbiguousPrefixAliasUsageCore" qualifyHint="true"/>
+    /// method.
+    /// </summary>
+    /// <returns>The string.</returns>
+    public virtual string AmbiguousCommandPrefixAliasMatchesHeader() => Resources.AmbiguousCommandPrefixMatchesHeader;
 }

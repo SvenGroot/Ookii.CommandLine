@@ -201,9 +201,6 @@
   <data name="GeneratedCustomParsingCommandTitle" xml:space="preserve">
     <value>The GeneratedParserAttribute cannot be used with a class that implements the ICommandWithCustomParsing interface.</value>
   </data>
-  <data name="GeneratedParserCodeFixTitle" xml:space="preserve">
-    <value>Add GeneratedParserAttribute</value>
-  </data>
   <data name="IgnoredAttributeForDictionaryWithConverterMessageFormat" xml:space="preserve">
     <value>The {0} attribute is ignored for the dictionary argument defined by {1} that has the ArgumentConverterAttribute attribute.</value>
   </data>
@@ -389,5 +386,20 @@
   </data>
   <data name="ValidateEnumWithCustomConverterTitle" xml:space="preserve">
     <value>The argument uses ValidateEnumValueAttribute properties that may not work with a custom ArgumentConverter.</value>
+  </data>
+  <data name="CategoryNotEnumTitle" xml:space="preserve">
+    <value>The value of the Category property must be an enumeration type.</value>
+  </data>
+  <data name="CategoryNotEnumMessageFormat" xml:space="preserve">
+    <value>The category value for the property '{0}' does not have an enumeration type.</value>
+  </data>
+  <data name="MismatchedCategoryTypeTitle" xml:space="preserve">
+    <value>The property uses a different category type than already established.</value>
+  </data>
+  <data name="MismatchedCategoryTypeMessageFormat" xml:space="preserve">
+    <value>The '{0}' property uses the type '{1}' for its category, which does not match the type '{2}' which was established earlier.</value>
+  </data>
+  <data name="DefaultCategoryNotEnumMessageFormat" xml:space="preserve">
+    <value>The default category value for the arguments type '{0}' does not have an enumeration type.</value>
   </data>
 </root>

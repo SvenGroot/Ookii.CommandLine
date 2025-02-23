@@ -2,7 +2,7 @@
 
 partial class SubCommandTest
 {
-    private const string _executableName = "test";
+    private const string ExecutableName = "test";
 
     public static readonly string _expectedUsage = @"Usage: test <command> [arguments]
 
@@ -126,7 +126,7 @@ The following commands are available:
     NestedParentCommand
         Other parent command description.
 
-    OtherTestChildCommand
+    OtherTestChildCommand, TestChild2
 
     TestChildCommand
 
@@ -169,5 +169,20 @@ The following commands are available:
         Displays version information.
 
 This is the command list footer.
+".ReplaceLineEndings();
+
+    public static readonly string _expectedUsageAmbiguousPrefix = @"The prefix could refer to one of the following commands:
+  [32mtest[0m
+  [32mTestAlias[0m
+  [32mTestParentCommand[0m
+
+Run 'test' without arguments for more information about available commands.
+".ReplaceLineEndings();
+
+    public static readonly string _expectedUsageAmbiguousPrefixNested = @"The prefix could refer to one of the following commands:
+  [32mTestChildCommand[0m
+  [32mTestChild2[0m
+
+Run 'test TestParentCommand' without arguments for more information about available commands.
 ".ReplaceLineEndings();
 }

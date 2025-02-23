@@ -59,6 +59,6 @@
         <TextBox Grid.Row="6" Grid.Column="1" IsReadOnly="True" Text="{Binding Arguments.Day, ElementName=window, TargetNullValue=(null)}" />
         <Label Grid.Row="7" Grid.Column="0">Values</Label>
         <ListBox Grid.Row="7" Grid.Column="1" ItemsSource="{Binding Arguments.Values, ElementName=window}" />
-        <Button x:Name="_helpButton" Grid.Row="8" Grid.Column="1" HorizontalAlignment="Right" Content="Help" Click="_helpButton_Click"/>
+        <Button x:Name="_helpButton" Grid.Row="8" Grid.Column="1" HorizontalAlignment="Right" Content="Help" Click="HelpButton_Click"/>
     </Grid>
 </Window>

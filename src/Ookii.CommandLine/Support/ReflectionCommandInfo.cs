@@ -30,7 +30,7 @@ internal class ReflectionCommandInfo : CommandInfo
 
     public override bool UseCustomArgumentParsing => CommandType.ImplementsInterface(typeof(ICommandWithCustomParsing));
 
-    public override IEnumerable<string> Aliases => CommandType.GetCustomAttributes<AliasAttribute>().Select(a => a.Alias);
+    public override IEnumerable<AliasAttribute> Aliases => CommandType.GetCustomAttributes<AliasAttribute>();
 
     public static new CommandInfo? TryCreate(Type commandType, CommandManager manager)
     {

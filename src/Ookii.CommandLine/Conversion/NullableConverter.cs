@@ -40,29 +40,9 @@ public class NullableConverter : ArgumentConverter
     /// <inheritdoc/>
     /// <returns>
     /// An object representing the converted value, or <see langword="null"/> if the value was an
-    /// empty string.
-    /// </returns>
-    public override object? Convert(string value, CultureInfo culture, CommandLineArgument argument)
-    {
-        if (value == null)
-        {
-            throw new ArgumentNullException(nameof(value));
-        }
-
-        if (value.Length == 0)
-        {
-            return null;
-        }
-
-        return BaseConverter.Convert(value, culture, argument);
-    }
-
-    /// <inheritdoc/>
-    /// <returns>
-    /// An object representing the converted value, or <see langword="null"/> if the value was an
     /// empty string span.
     /// </returns>
-    public override object? Convert(ReadOnlySpan<char> value, CultureInfo culture, CommandLineArgument argument)
+    public override object? Convert(ReadOnlyMemory<char> value, CultureInfo culture, CommandLineArgument argument)
     {
         if (value.Length == 0)
         {

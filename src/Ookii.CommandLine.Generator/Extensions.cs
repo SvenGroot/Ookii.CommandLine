@@ -8,7 +8,7 @@ internal static class Extensions
 {
     // This is the format used to emit type names in the output. It includes the global namespace
     // so that this doesn't break if the class matches the namespace name.
-    private static readonly SymbolDisplayFormat QualifiedFormat = new(
+    private static readonly SymbolDisplayFormat _qualifiedFormat = new(
             globalNamespaceStyle: SymbolDisplayGlobalNamespaceStyle.Included,
             typeQualificationStyle: SymbolDisplayTypeQualificationStyle.NameAndContainingTypesAndNamespaces,
             genericsOptions: SymbolDisplayGenericsOptions.IncludeTypeParameters,
@@ -120,9 +120,17 @@ internal static class Extensions
 
     public static string CreateInstantiation(this AttributeData attribute)
     {
-        var ctorArgs = attribute.ConstructorArguments.Select(c => c.ToFullCSharpString());
-        var namedArgs = attribute.NamedArguments.Select(n => $"{n.Key} = {n.Value.ToFullCSharpString()}");
-        return $"new {attribute.AttributeClass?.ToDisplayString()}({string.Join(", ", ctorArgs)}) {{ {string.Join(", ", namedArgs)} }}";
+        var ctorArgs = string.Join(", ", attribute.ConstructorArguments.Select(c => c.ToFullCSharpString()));
+
+        if (attribute.NamedArguments.IsEmpty)
+        {
+            return $"new {attribute.AttributeClass?.ToQualifiedName()}({ctorArgs})";
+        }
+        else
+        {
+            var namedArgs = attribute.NamedArguments.Select(n => $"{n.Key} = {n.Value.ToFullCSharpString()}");
+            return $"new {attribute.AttributeClass?.ToQualifiedName()}({ctorArgs}) {{ {string.Join(", ", namedArgs)} }}";
+        }
     }
 
     public static string ToCSharpString(this bool value)
@@ -134,7 +142,7 @@ internal static class Extensions
     {
         return constant.Kind switch
         {
-            TypedConstantKind.Array => $"new {constant.Type?.ToDisplayString()} {constant.ToCSharpString()}",
+            TypedConstantKind.Array => $"new {constant.Type?.ToQualifiedName()} {constant.ToCSharpString()}",
             _ => constant.ToCSharpString(),
         };
     }
@@ -209,7 +217,7 @@ internal static class Extensions
     {
         foreach (var attribute in symbol.GetAttributes())
         {
-            if (type.SymbolEquals(attribute.AttributeClass))
+            if (attribute.AttributeClass?.DerivesFrom(type) ?? false)
             {
                 return attribute;
             }
@@ -223,6 +231,6 @@ internal static class Extensions
 
     public static string ToQualifiedName(this ISymbol symbol)
     {
-        return symbol.ToDisplayString(QualifiedFormat);
+        return symbol.ToDisplayString(_qualifiedFormat);
     }
 }

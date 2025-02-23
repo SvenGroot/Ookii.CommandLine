@@ -417,4 +417,31 @@
   <data name="ValidateCountMinSingularFormat" xml:space="preserve">
     <value>The argument '{0}' must have at least {1} value.</value>
   </data>
+  <data name="MismatchedCategoryTypesFormat" xml:space="preserve">
+    <value>The argument '{0}' uses the type '{1}' for its category, which does not match the type '{2}' which was established earlier.</value>
+  </data>
+  <data name="CategoryNotEnum" xml:space="preserve">
+    <value>The category value must use an enumeration type.</value>
+  </data>
+  <data name="AmbiguousArgumentPrefixExceptionMessageFormat" xml:space="preserve">
+    <value>The argument name prefix alias '{0}' is ambiguous. It could refer to one of the following arguments: {1}.</value>
+  </data>
+  <data name="AmbiguousArgumentPrefixMatchesHeader" xml:space="preserve">
+    <value>The prefix could refer to one of the following arguments:</value>
+  </data>
+  <data name="AmbiguousArgumentPrefixErrorOnlyFormat" xml:space="preserve">
+    <value>The provided argument name '{0}' is an ambiguous prefix alias.</value>
+  </data>
+  <data name="UnknownCommandFormat" xml:space="preserve">
+    <value>Unknown command name '{0}'.</value>
+  </data>
+  <data name="AmbiguousCommandPrefixFormat" xml:space="preserve">
+    <value>The provided command name '{0}' is an ambiguous prefix alias.</value>
+  </data>
+  <data name="AmbiguousCommandPrefixMatchesHeader" xml:space="preserve">
+    <value>The prefix could refer to one of the following commands:</value>
+  </data>
+  <data name="MoreInfoOnCommandErrorFormat" xml:space="preserve">
+    <value>Run '{0}' without arguments for more information about available commands.</value>
+  </data>
 </root>

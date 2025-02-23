@@ -1,8 +1,8 @@
-using System.Collections.Generic;
-using System.ComponentModel;
-using System;
 using Ookii.CommandLine.Conversion;
 using Ookii.CommandLine.Validation;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace Ookii.CommandLine.Support;
 
@@ -73,22 +73,11 @@ public struct ArgumentCreationInfo
     public bool AllowsNull { get; set; }
 
     /// <summary>
-    /// Gets or sets the default value description.
-    /// </summary>
-    public string DefaultValueDescription { get; set; }
-
-    /// <summary>
     /// Gets or sets the implicit position if <see cref="CommandLineArgumentAttribute.IsPositional" qualityHint="true"/>
     /// was used.
     /// </summary>
     /// <value></value>
     public int? Position { get; set; }
-
-    /// <summary>
-    /// Gets or sets the default value description for the key type.
-    /// </summary>
-    /// <value></value>
-    public string? DefaultKeyDescription { get; set; }
 
     /// <summary>
     /// Gets or sets a value that indicates whether the argument was defined by a C# 11 required

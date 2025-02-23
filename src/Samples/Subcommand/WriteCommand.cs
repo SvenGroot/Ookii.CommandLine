@@ -57,7 +57,7 @@ partial class WriteCommand : AsyncCommandBase
     public bool Overwrite { get; set; }
 
     // Run the command after the arguments have been parsed.
-    public override async Task<int> RunAsync()
+    public override async Task<int> RunAsync(CancellationToken cancellationToken)
     {
         try
         {
@@ -87,7 +87,7 @@ partial class WriteCommand : AsyncCommandBase
             // Write the specified content to the file
             foreach (string line in GetLines())
             {
-                await lineWriter.WriteLineAsync(line);
+                await lineWriter.WriteLineAsync(line.AsMemory(), cancellationToken);
             }
 
             return (int)ExitCode.Success;

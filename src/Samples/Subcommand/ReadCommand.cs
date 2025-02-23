@@ -39,7 +39,7 @@ partial class ReadCommand : AsyncCommandBase
     public Encoding Encoding { get; set; } = Encoding.UTF8;
 
     // Run the command after the arguments have been parsed.
-    public override async Task<int> RunAsync()
+    public override async Task<int> RunAsync(CancellationToken cancellationToken)
     {
         try
         {
@@ -47,7 +47,7 @@ partial class ReadCommand : AsyncCommandBase
             using var writer = LineWrappingTextWriter.ForConsoleOut();
 
             // Write the contents of the file to the console.
-            await foreach (var line in File.ReadLinesAsync(Path.FullName, Encoding))
+            await foreach (var line in File.ReadLinesAsync(Path.FullName, Encoding, cancellationToken))
             {
                 await writer.WriteLineAsync(line);
             }

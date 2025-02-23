@@ -251,8 +251,8 @@ public partial class LocalizedStringProvider
     {
         if (attribute.Maximum == int.MaxValue)
         {
-            var format = attribute.Minimum == 1 
-                ? Resources.ValidateCountMinSingularFormat 
+            var format = attribute.Minimum == 1
+                ? Resources.ValidateCountMinSingularFormat
                 : Resources.ValidateCountMinPluralFormat;
 
             return Format(format, argumentName, attribute.Minimum);

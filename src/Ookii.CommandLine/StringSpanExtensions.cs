@@ -1,4 +1,5 @@
 ﻿using Ookii.CommandLine.Terminal;
+using Ookii.Common;
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -12,38 +13,30 @@ internal static partial class StringSpanExtensions
 {
     public delegate void Callback(StringSegmentType type, ReadOnlySpan<char> span);
     public delegate Task AsyncCallback(StringSegmentType type, ReadOnlyMemory<char> span);
-    public delegate bool SplitCallback(ReadOnlySpan<char> span);
 
     private static readonly char[] _segmentSeparators = { '\r', '\n', VirtualTerminal.Escape };
     private static readonly char[] _newLineSeparators = { '\r', '\n' };
 
     public static partial void Split(this ReadOnlySpan<char> self, bool newLinesOnly, Callback callback);
 
-    public static StringSpanTuple SkipLineBreak(this ReadOnlySpan<char> self)
+    public static ReadOnlySpanPair<char, char> SkipLineBreak(this ReadOnlySpan<char> self)
     {
         Debug.Assert(self[0] is '\r' or '\n');
         var split = self[0] == '\r' && self.Length > 1 && self[1] == '\n'
             ? 2
             : 1;
 
-        return self.Split(split);
+        return self.SplitAt(split);
     }
 
-    public static StringSpanTuple Split(this ReadOnlySpan<char> self, int index)
-        => new(self.Slice(0, index), self.Slice(index));
-
-    // On .Net 6 StringSpanTuple is a ref struct so it can't be used with Nullable<T>, so use
-    // an out param instead.
-    public static bool BreakLine(this ReadOnlySpan<char> self, int startIndex, BreakLineMode mode, out StringSpanTuple splits)
+    public static NullableReadOnlySpanPair<char, char> BreakLine(this ReadOnlySpan<char> self, int startIndex, BreakLineMode mode)
     {
-        if (BreakLine(self, startIndex, mode) is var (end, start))
+        if (BreakLineCore(self, startIndex, mode) is var (end, start))
         {
-            splits = new(self.Slice(0, end), self.Slice(start));
-            return true;
+            return new(self.Slice(0, end), self.Slice(start));
         }
 
-        splits = default;
-        return false;
+        return default;
     }
 
     public static (ReadOnlyMemory<char>, ReadOnlyMemory<char>) SkipLineBreak(this ReadOnlyMemory<char> self)
@@ -53,22 +46,17 @@ internal static partial class StringSpanExtensions
             ? 2
             : 1;
 
-        return self.Split(split);
+        return self.SplitAt(split);
     }
 
-    public static (ReadOnlyMemory<char>, ReadOnlyMemory<char>) Split(this ReadOnlyMemory<char> self, int index)
-        => new(self.Slice(0, index), self.Slice(index));
-
-    public static bool BreakLine(this ReadOnlyMemory<char> self, int startIndex, BreakLineMode mode, out (ReadOnlyMemory<char>, ReadOnlyMemory<char>) splits)
+    public static (ReadOnlyMemory<char>, ReadOnlyMemory<char>)? BreakLine(this ReadOnlyMemory<char> self, int startIndex, BreakLineMode mode)
     {
-        if (BreakLine(self.Span, startIndex, mode) is var (end, start))
+        if (BreakLineCore(self.Span, startIndex, mode) is var (end, start))
         {
-            splits = new(self.Slice(0, end), self.Slice(start));
-            return true;
+            return new(self.Slice(0, end), self.Slice(start));
         }
 
-        splits = default;
-        return false;
+        return default;
     }
 
     public static void CopyTo(this ReadOnlySpan<char> self, char[] destination, int start)
@@ -76,23 +64,9 @@ internal static partial class StringSpanExtensions
         self.CopyTo(destination.AsSpan(start));
     }
 
-    public static void Split(this ReadOnlySpan<char> self, ReadOnlySpan<char> separator, SplitCallback callback)
-    {
-        while (!self.IsEmpty)
-        {
-            var (first, remaining) = self.SplitOnce(separator, out bool _);
-            if (!callback(first))
-            {
-                break;
-            }
-
-            self = remaining;
-        }
-    }
-
     public static partial void WriteTo(this ReadOnlySpan<char> self, TextWriter writer);
 
-    private static (int, int)? BreakLine(ReadOnlySpan<char> span, int startIndex, BreakLineMode mode)
+    private static (int, int)? BreakLineCore(ReadOnlySpan<char> span, int startIndex, BreakLineMode mode)
     {
         switch (mode)
         {

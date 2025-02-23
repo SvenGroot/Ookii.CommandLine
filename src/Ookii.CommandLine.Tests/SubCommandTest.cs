@@ -32,12 +32,12 @@ public partial class SubCommandTest
         var manager = CreateManager(kind);
         VerifyCommands(
             manager.GetCommands(),
-            new("AnotherSimpleCommand", typeof(AnotherSimpleCommand), false, "alias"),
+            new("AnotherSimpleCommand", typeof(AnotherSimpleCommand), false, "alias", "hiddenAlias"),
             new("AsyncCancelableCommand", typeof(AsyncCancelableCommand)),
             new("AsyncCommand", typeof(AsyncCommand)),
             new("custom", typeof(CustomParsingCommand), true),
             new("DerivedArguments4", typeof(DerivedArguments4)),
-            new("HiddenCommand", typeof(HiddenCommand)),
+            new("HiddenCommand", typeof(HiddenCommand), false, "TestAlias"),
             new("test", typeof(TestCommand)),
             new("TestParentCommand", typeof(TestParentCommand), true),
             new("version", null)
@@ -96,12 +96,13 @@ public partial class SubCommandTest
     public void CreateCommandTest(ProviderKind kind)
     {
         using var writer = LineWrappingTextWriter.ForStringWriter(0);
+        using var errorWriter = new StringWriter();
         var options = new CommandOptions()
         {
-            Error = writer,
+            Error = errorWriter,
             UsageWriter = new UsageWriter(writer)
             {
-                ExecutableName = _executableName,
+                ExecutableName = ExecutableName,
             }
         };
 
@@ -162,7 +163,7 @@ public partial class SubCommandTest
             Error = writer,
             UsageWriter = new UsageWriter(writer)
             {
-                ExecutableName = _executableName,
+                ExecutableName = ExecutableName,
             }
         };
 
@@ -179,9 +180,9 @@ public partial class SubCommandTest
         var options = new CommandOptions()
         {
             Error = writer,
-            UsageWriter = new UsageWriter(writer, true)
+            UsageWriter = new UsageWriter(writer, TriState.True)
             {
-                ExecutableName = _executableName,
+                ExecutableName = ExecutableName,
             }
         };
 
@@ -200,8 +201,8 @@ public partial class SubCommandTest
             Error = writer,
             UsageWriter = new UsageWriter(writer)
             {
-                ExecutableName = _executableName,
-                IncludeCommandHelpInstruction = true,
+                ExecutableName = ExecutableName,
+                IncludeCommandHelpInstruction = TriState.True,
             }
         };
 
@@ -222,8 +223,8 @@ public partial class SubCommandTest
             CommandFilter = c => !c.UseCustomArgumentParsing,
             UsageWriter = new UsageWriter(writer)
             {
-                ExecutableName = _executableName,
-                IncludeCommandHelpInstruction = true,
+                ExecutableName = ExecutableName,
+                IncludeCommandHelpInstruction = TriState.True,
             }
         };
 
@@ -243,7 +244,7 @@ public partial class SubCommandTest
             UsageWriter = new UsageWriter(writer)
             {
                 IncludeApplicationDescriptionBeforeCommandList = true,
-                ExecutableName = _executableName,
+                ExecutableName = ExecutableName,
             }
         };
 
@@ -262,13 +263,44 @@ public partial class SubCommandTest
             Error = writer,
             UsageWriter = new CustomUsageWriter(writer)
             {
-                ExecutableName = _executableName,
+                ExecutableName = ExecutableName,
             }
         };
 
         var manager = CreateManager(kind, options);
         manager.WriteUsage();
         Assert.AreEqual(_expectedUsageFooter, writer.BaseWriter.ToString());
+    }
+
+    [TestMethod]
+    [DynamicData(nameof(ProviderKinds), DynamicDataDisplayName = nameof(GetCustomDynamicDataDisplayName))]
+    public void TestWriteUsageAmbiguousPrefixAlias(ProviderKind kind)
+    {
+        using var writer = LineWrappingTextWriter.ForStringWriter(0);
+        using var errorWriter = new StringWriter();
+        var options = new CommandOptions()
+        {
+            Error = errorWriter,
+            UsageWriter = new UsageWriter(writer, TriState.True)
+            {
+                ExecutableName = ExecutableName,
+            }
+        };
+
+        var expectedError = "The provided command name 'tes' is an ambiguous prefix alias.\n\n".ReplaceLineEndings();
+        var manager = CreateManager(kind, options);
+        Assert.IsNull(manager.CreateCommand(["tes"]));
+        Assert.AreEqual(expectedError, errorWriter.ToString());
+        Assert.AreEqual(_expectedUsageAmbiguousPrefix, writer.BaseWriter.ToString());
+
+        expectedError = "The provided command name 'test' is an ambiguous prefix alias.\n\n".ReplaceLineEndings();
+        ((StringWriter)writer.BaseWriter).GetStringBuilder().Clear();
+        errorWriter.GetStringBuilder().Clear();
+        var command = (ParentCommand?)manager.CreateCommand(["TestParentCommand", "test"]);
+        Assert.IsNotNull(command);
+        Assert.IsFalse(command.IsChildCommandCreated);
+        Assert.AreEqual(expectedError, errorWriter.ToString());
+        Assert.AreEqual(_expectedUsageAmbiguousPrefixNested, writer.BaseWriter.ToString());
     }
 
     [TestMethod]
@@ -281,7 +313,7 @@ public partial class SubCommandTest
             Error = writer,
             UsageWriter = new UsageWriter(writer)
             {
-                ExecutableName = _executableName,
+                ExecutableName = ExecutableName,
             }
         };
 
@@ -387,7 +419,7 @@ public partial class SubCommandTest
     public async Task TestAsyncCommandBase()
     {
         var command = new AsyncBaseCommand();
-        var actual = await command.RunAsync();
+        var actual = await command.RunAsync(default);
         Assert.AreEqual(42, actual);
 
         // Test Run invokes RunAsync.
@@ -427,13 +459,13 @@ public partial class SubCommandTest
 
         VerifyCommands(
             manager.GetCommands(),
-            new("AnotherSimpleCommand", typeof(AnotherSimpleCommand), false, "alias"),
+            new("AnotherSimpleCommand", typeof(AnotherSimpleCommand), false, "alias", "hiddenAlias"),
             new("AsyncCancelableCommand", typeof(AsyncCancelableCommand)),
             new("AsyncCommand", typeof(AsyncCommand)),
             new("custom", typeof(CustomParsingCommand), true),
             new("DerivedArguments4", typeof(DerivedArguments4)),
             new("external", typeof(ExternalCommand)),
-            new("HiddenCommand", typeof(HiddenCommand)),
+            new("HiddenCommand", typeof(HiddenCommand), false, "TestAlias"),
             new("OtherExternalCommand", typeof(OtherExternalCommand)),
             new("test", typeof(TestCommand)),
             new("TestParentCommand", typeof(TestParentCommand), true),
@@ -455,7 +487,7 @@ public partial class SubCommandTest
         VerifyCommands(
             manager.GetCommands(),
             new("NestedParentCommand", typeof(NestedParentCommand), true) { ParentCommand = typeof(TestParentCommand) },
-            new("OtherTestChildCommand", typeof(OtherTestChildCommand)) { ParentCommand = typeof(TestParentCommand) },
+            new("OtherTestChildCommand", typeof(OtherTestChildCommand)) { ParentCommand = typeof(TestParentCommand), Aliases = ["TestChild2"] },
             new("TestChildCommand", typeof(TestChildCommand)) { ParentCommand = typeof(TestParentCommand) }
         );
 
@@ -484,8 +516,8 @@ public partial class SubCommandTest
             ShowUsageOnError = UsageHelpRequest.Full,
             UsageWriter = new UsageWriter(writer)
             {
-                ExecutableName = _executableName,
-                IncludeCommandHelpInstruction = true,
+                ExecutableName = ExecutableName,
+                IncludeCommandHelpInstruction = TriState.True,
                 IncludeApplicationDescriptionBeforeCommandList = true,
             }
         };
@@ -588,7 +620,7 @@ public partial class SubCommandTest
 
     private record struct ExpectedCommand(string Name, Type? Type, bool CustomParsing = false, params string[]? Aliases)
     {
-        public Type ParentCommand { get; set; }
+        public Type? ParentCommand { get; set; }
     }
 
 
@@ -601,7 +633,7 @@ public partial class SubCommandTest
         }
 
         Assert.AreEqual(customParsing, command.UseCustomArgumentParsing);
-        CollectionAssert.AreEqual(aliases ?? Array.Empty<string>(), command.Aliases.ToArray());
+        CollectionAssert.AreEqual(aliases ?? Array.Empty<string>(), command.Aliases.Select(a => a.Alias).ToArray());
     }
 
     private static void VerifyCommands(IEnumerable<CommandInfo> actual, params ExpectedCommand[] expected)

@@ -25,7 +25,8 @@ public class ParsableConverter<T> : ArgumentConverter
     where T : IParsable<T>
 {
     /// <inheritdoc/>
-    public override object? Convert(string value, CultureInfo culture, CommandLineArgument argument) => T.Parse(value, culture);
+    public override object? Convert(ReadOnlyMemory<char> value, CultureInfo culture, CommandLineArgument argument)
+        => T.Parse(value.ToString(), culture);
 }
 
 #endif

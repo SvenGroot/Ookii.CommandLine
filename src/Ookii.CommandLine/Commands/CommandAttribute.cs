@@ -24,7 +24,7 @@ namespace Ookii.CommandLine.Commands;
 /// </para>
 /// </remarks>
 /// <seealso cref="CommandManager"/>
-[AttributeUsage(AttributeTargets.Class)]
+[AttributeUsage(AttributeTargets.Class, Inherited = false)]
 public sealed class CommandAttribute : Attribute
 {
     private readonly string? _commandName;

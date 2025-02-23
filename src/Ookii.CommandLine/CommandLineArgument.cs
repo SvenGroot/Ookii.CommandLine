@@ -1,16 +1,17 @@
 ﻿using Ookii.CommandLine.Conversion;
 using Ookii.CommandLine.Support;
 using Ookii.CommandLine.Validation;
+using Ookii.Common;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Xml.Linq;
 
 namespace Ookii.CommandLine;
 
@@ -204,16 +205,16 @@ public abstract class CommandLineArgument
                 ElementType = typeof(bool),
                 Description = parser.StringProvider.AutomaticHelpDescription(),
                 MemberName = "AutomaticHelp",
-                CancelParsing = CancelMode.Abort,
-                Validators = Enumerable.Empty<ArgumentValidationAttribute>(),
-                Converter = Conversion.BooleanConverter.Instance,
+                CancelParsing = CancelMode.AbortWithHelp,
+                Validators = [],
+                Converter = BooleanConverter.Instance,
             };
 
             if (parser.Mode == ParsingMode.LongShort)
             {
                 if (parser.ShortArgumentNameComparer!.Compare(shortAlias, shortName) != 0)
                 {
-                    info.ShortAliases = new[] { shortAlias };
+                    info.ShortAliases = [new(shortAlias)];
                 }
             }
             else
@@ -221,14 +222,14 @@ public abstract class CommandLineArgument
                 var shortNameString = shortName.ToString();
                 var shortAliasString = shortAlias.ToString();
                 info.Aliases = string.Compare(shortAliasString, shortNameString, parser.ArgumentNameComparison) == 0
-                    ? new[] { shortNameString }
-                    : new[] { shortNameString, shortAliasString };
+                    ? [new(shortNameString)]
+                    : [new(shortNameString), new(shortAliasString)];
             }
 
             return info;
         }
 
-        protected override CancelMode CallMethod(object? value) => CancelMode.Abort;
+        protected override CancelMode CallMethod(object? value) => CancelMode.AbortWithHelp;
 
         protected override object? GetProperty(object target)
             => throw new InvalidOperationException(Properties.Resources.InvalidPropertyAccess);
@@ -297,7 +298,7 @@ public abstract class CommandLineArgument
             Converter = info.Converter;
             ElementTypeWithNullable = info.ElementTypeWithNullable;
             Description = info.DescriptionAttribute?.Description;
-            ValueDescription = info.ValueDescriptionAttribute?.ValueDescription;
+            ValueDescription = info.ValueDescriptionAttribute;
             if (info.Position is int pos)
             {
                 Debug.Assert(info.Attribute.IsPositional && info.Attribute.Position < 0);
@@ -331,6 +332,8 @@ public abstract class CommandLineArgument
                         info.KeyValueSeparatorAttribute?.Separator ?? KeyValuePairConverter.DefaultSeparator);
                 }
             }
+
+            Category = info.Attribute.CategoryValue;
         }
 
         public CommandLineParser Parser { get; set; }
@@ -339,8 +342,8 @@ public abstract class CommandLineArgument
         public bool Long { get; set; }
         public bool Short { get; set; }
         public char ShortName { get; set; }
-        public IEnumerable<string>? Aliases { get; set; }
-        public IEnumerable<char>? ShortAliases { get; set; }
+        public IEnumerable<AliasAttribute>? Aliases { get; set; }
+        public IEnumerable<ShortAliasAttribute>? ShortAliases { get; set; }
         public Type ArgumentType { get; set; }
         public Type ElementType { get; set; }
         public Type ElementTypeWithNullable { get; set; }
@@ -353,13 +356,14 @@ public abstract class CommandLineArgument
         public bool IncludeDefaultValueInHelp { get; set; }
         public string? DefaultValueFormat { get; set; }
         public string? Description { get; set; }
-        public string? ValueDescription { get; set; }
+        public ValueDescriptionAttribute? ValueDescription { get; set; }
         public bool AllowNull { get; set; }
         public CancelMode CancelParsing { get; set; }
         public bool IsHidden { get; set; }
         public IEnumerable<ArgumentValidationAttribute> Validators { get; set; }
         public MultiValueArgumentInfo? MultiValueInfo { get; set; }
         public DictionaryArgumentInfo? DictionaryInfo { get; set; }
+        public Enum? Category { get; set; }
     }
 
     #endregion
@@ -369,8 +373,6 @@ public abstract class CommandLineArgument
     private readonly string _argumentName;
     private readonly bool _hasLongName = true;
     private readonly char _shortName;
-    private readonly ImmutableArray<string> _aliases = ImmutableArray<string>.Empty;
-    private readonly ImmutableArray<char> _shortAliases = ImmutableArray<char>.Empty;
     private readonly Type _argumentType;
     private readonly Type _elementType;
     private readonly Type _elementTypeWithNullable;
@@ -382,7 +384,8 @@ public abstract class CommandLineArgument
     private readonly CancelMode _cancelParsing;
     private readonly bool _isHidden;
     private readonly IEnumerable<ArgumentValidationAttribute> _validators;
-    private string? _valueDescription;
+    private readonly ValueDescriptionAttribute? _valueDescription;
+    private readonly Enum? _category;
     private IValueHelper? _valueHelper;
     private ReadOnlyMemory<char> _usedArgumentName;
 
@@ -420,12 +423,12 @@ public abstract class CommandLineArgument
 
         if (HasLongName && info.Aliases != null)
         {
-            _aliases = info.Aliases.ToImmutableArray();
+            Aliases = info.Aliases.ToImmutableArray();
         }
 
         if (HasShortName && info.ShortAliases != null)
         {
-            _shortAliases = info.ShortAliases.ToImmutableArray();
+            ShortAliases = info.ShortAliases.ToImmutableArray();
         }
 
         _argumentType = info.ArgumentType;
@@ -453,6 +456,8 @@ public abstract class CommandLineArgument
         {
             MultiValueInfo.AllowWhiteSpaceSeparator = false;
         }
+
+        _category = info.Category ?? info.Parser.DefaultArgumentCategory;
     }
 
     /// <summary>
@@ -629,7 +634,7 @@ public abstract class CommandLineArgument
     /// </para>
     /// </remarks>
     /// <seealso cref="AliasAttribute"/>
-    public ImmutableArray<string> Aliases => _aliases;
+    public ImmutableArray<AliasAttribute> Aliases { get; } = [];
 
     /// <summary>
     /// Gets the alternative short names for this command line argument.
@@ -646,7 +651,7 @@ public abstract class CommandLineArgument
     /// </para>
     /// </remarks>
     /// <seealso cref="ShortAliasAttribute"/>
-    public ImmutableArray<char> ShortAliases => _shortAliases;
+    public ImmutableArray<ShortAliasAttribute> ShortAliases { get; } = [];
 
     /// <summary>
     /// Gets the type of the argument's value.
@@ -834,7 +839,7 @@ public abstract class CommandLineArgument
     /// </remarks>
     /// <seealso cref="ValueDescriptionAttribute"/>
     /// <seealso cref="ParseOptions.DefaultValueDescriptions" qualifyHint="true"/>
-    public string ValueDescription => _valueDescription ??= DetermineValueDescription();
+    public string ValueDescription => _valueDescription?.GetValueDescription(_parser.Options) ?? DetermineValueDescription();
 
     /// <summary>
     /// Gets a value indicating whether this argument is a switch argument.
@@ -1021,7 +1026,7 @@ public abstract class CommandLineArgument
     ///   determine the nullability of <c>TValue</c> at runtime except if it's a value type.
     /// </para>
     /// <para>
-    ///   This property indicates what happens when the <see cref="ArgumentConverter.Convert(string, CultureInfo, CommandLineArgument)" qualifyHint="true"/>
+    ///   This property indicates what happens when the <see cref="ArgumentConverter.Convert" qualifyHint="true"/>
     ///   method used for this argument returns <see langword="null" />.
     /// </para>
     /// <para>
@@ -1086,6 +1091,23 @@ public abstract class CommandLineArgument
     public IEnumerable<ArgumentValidationAttribute> Validators => _validators;
 
     /// <summary>
+    /// Gets information about the category that the argument belongs to.
+    /// </summary>
+    /// <value>
+    /// An instance of the <see cref="CategoryInfo"/> structure, or <see langword="null"/> if the
+    /// argument has no category.
+    /// </value>
+    /// <remarks>
+    /// <para>
+    ///   Argument categories are used to group argument in the usage help. They are not used when
+    ///   parsing.
+    /// </para>
+    /// </remarks>
+    /// <seealso cref="CommandLineArgumentAttribute.Category"/>
+    /// <seealso cref="ParseOptionsAttribute.DefaultArgumentCategory"/>
+    public CategoryInfo? Category => _category == null ? null : new(_parser, _category);
+
+    /// <summary>
     /// When implemented in a derived class, gets a value that indicates whether this argument
     /// is backed by a property with a public set method.
     /// </summary>
@@ -1122,7 +1144,7 @@ public abstract class CommandLineArgument
     ///   <see cref="ArgumentType"/> property.
     /// </exception>
     public object? ConvertToArgumentType(CultureInfo culture, string? argumentValue)
-        => ConvertToArgumentType(culture, argumentValue != null, argumentValue, argumentValue.AsSpan());
+        => ConvertToArgumentType(culture, argumentValue?.AsMemory());
 
     /// <summary>
     /// Converts any type to the argument's <see cref="ElementType"/>.
@@ -1154,13 +1176,18 @@ public abstract class CommandLineArgument
             return value;
         }
 
+        if (value is ReadOnlyMemory<char> memoryValue)
+        {
+            return _converter.Convert(memoryValue, CultureInfo.InvariantCulture, this);
+        }
+
         var stringValue = value.ToString();
         if (stringValue == null)
         {
             return null;
         }
 
-        return _converter.Convert(stringValue, CultureInfo.InvariantCulture, this);
+        return _converter.Convert(stringValue.AsMemory(), CultureInfo.InvariantCulture, this);
     }
 
     /// <summary>
@@ -1208,15 +1235,6 @@ public abstract class CommandLineArgument
     /// </exception>
     protected abstract CancelMode CallMethod(object? value);
 
-    /// <summary>
-    /// Determines the value description if one wasn't explicitly given.
-    /// </summary>
-    /// <param name="type">
-    /// The type to get the description for.
-    /// </param>
-    /// <returns>The value description.</returns>
-    protected virtual string DetermineValueDescriptionForType(Type type) => GetFriendlyTypeName(type);
-
     private string DetermineValueDescription(Type? type = null)
     {
         var result = GetDefaultValueDescription(type);
@@ -1232,51 +1250,46 @@ public abstract class CommandLineArgument
             return $"{key}{DictionaryInfo.KeyValueSeparator}{value}";
         }
 
-        var typeName = DetermineValueDescriptionForType(type ?? ElementType);
-        return Parser.Options.ValueDescriptionTransformOrDefault.Apply(typeName);
+        return GetFriendlyTypeName(type ?? ElementType);
     }
 
-    private static string GetFriendlyTypeName(Type type)
+    private string GetFriendlyTypeName(Type type)
     {
-        // This is used to generate a value description from a type name if no custom value description was supplied.
+        var attribute = type.GetCustomAttribute<ValueDescriptionAttribute>();
+        if (attribute != null)
+        {
+            return attribute.GetValueDescription(_parser.Options);
+        }
+
+        // This is used to generate a value description from a type name if no custom value
+        // description was supplied.
+        //
+        // This is also used with a generated parser, because the generator cannot check the
+        // DefaultValueDescriptions collection for the type arguments.
+        var baseName = _parser.Options.ValueDescriptionTransformOrDefault.Apply(type.Name);
         if (type.IsGenericType)
         {
-            var name = new StringBuilder(type.FullName?.Length ?? 0);
-            name.Append(type.Name, 0, type.Name.IndexOf("`", StringComparison.Ordinal));
+            var name = new StringBuilder(type.FullName?.Length ?? type.Name.Length);
+            name.Append(baseName, 0, baseName.IndexOf('`'));
             name.Append('<');
-            // AppendJoin is not supported in .Net Standard 2.0
-            bool first = true;
-            foreach (Type typeArgument in type.GetGenericArguments())
-            {
-                if (first)
-                {
-                    first = false;
-                }
-                else
-                {
-                    name.Append(", ");
-                }
-
-                name.Append(GetFriendlyTypeName(typeArgument));
-            }
-
+            name.AppendJoin(", ", type.GetGenericArguments().Select(DetermineValueDescription));
             name.Append('>');
             return name.ToString();
         }
         else
         {
-            return type.Name;
+            return baseName;
         }
     }
 
-    private object? ConvertToArgumentType(CultureInfo culture, bool hasValue, string? stringValue, ReadOnlySpan<char> spanValue)
+    private object? ConvertToArgumentType(CultureInfo culture, ReadOnlyMemory<char>? optionalValue)
     {
         if (culture == null)
         {
             throw new ArgumentNullException(nameof(culture));
         }
 
-        if (!hasValue)
+        if (optionalValue is not ReadOnlyMemory<char> value)
         {
             if (IsSwitch)
             {
@@ -1290,10 +1303,7 @@ public abstract class CommandLineArgument
 
         try
         {
-            var converted = stringValue == null
-                ? _converter.Convert(spanValue, culture, this)
-                : _converter.Convert(stringValue, culture, this);
-
+            var converted = _converter.Convert(value, culture, this);
             if (converted == null && (!_allowNull || Kind == ArgumentKind.Dictionary))
             {
                 throw _parser.StringProvider.CreateException(CommandLineArgumentErrorCategory.NullArgumentValue, this);
@@ -1314,7 +1324,7 @@ public abstract class CommandLineArgument
         catch (Exception ex)
         {
             // Wrap any other exception in a CommandLineArgumentException.
-            throw _parser.StringProvider.CreateException(CommandLineArgumentErrorCategory.ArgumentValueConversion, ex, this, stringValue ?? spanValue.ToString());
+            throw _parser.StringProvider.CreateException(CommandLineArgumentErrorCategory.ArgumentValueConversion, ex, this, value.ToString());
         }
     }
 
@@ -1342,7 +1352,7 @@ public abstract class CommandLineArgument
             return true;
         }
 
-        if (writer.IncludeAliasInDescription && (Aliases.Length > 0 || ShortAliases.Length > 0))
+        if (writer.IncludeAliasInDescription && (Aliases.Any(a => !a.IsHidden) || ShortAliases.Any(a => !a.IsHidden)))
         {
             return true;
         }
@@ -1361,34 +1371,40 @@ public abstract class CommandLineArgument
         return false;
     }
 
-    internal CancelMode SetValue(CultureInfo culture, bool hasValue, string? stringValue, ReadOnlySpan<char> spanValue)
+    internal CancelMode SetValue(CultureInfo culture, ReadOnlyMemory<char>? optionalValue)
     {
         _valueHelper ??= CreateValueHelper();
 
         CancelMode cancelParsing;
-        if (MultiValueInfo?.Separator != null)
+        if (optionalValue is ReadOnlyMemory<char> multiValue && MultiValueInfo?.Separator != null)
         {
             cancelParsing = CancelMode.None;
-            spanValue.Split(MultiValueInfo.Separator.AsSpan(), separateValue =>
+            foreach (var value in multiValue.Split(MultiValueInfo.Separator.AsSpan()))
             {
-                string? separateValueString = null;
-                PreValidate(ref separateValueString, separateValue);
-                var converted = ConvertToArgumentType(culture, true, separateValueString, separateValue);
+                PreValidate(value);
+                var converted = ConvertToArgumentType(culture, value);
                 cancelParsing = _valueHelper.SetValue(this, converted);
-                if (cancelParsing != CancelMode.Abort)
+                if (!cancelParsing.IsAborted())
                 {
-                    Validate(converted, ValidationMode.AfterConversion);
+                    PostValidate(converted);
                 }
 
-                return cancelParsing == CancelMode.None;
-            });
+                if (cancelParsing != CancelMode.None)
+                {
+                    break;
+                }
+            }
         }
         else
         {
-            PreValidate(ref stringValue, spanValue);
-            var converted = ConvertToArgumentType(culture, hasValue, stringValue, spanValue);
+            if (optionalValue is ReadOnlyMemory<char> value)
+            {
+                PreValidate(value);
+            }
+
+            var converted = ConvertToArgumentType(culture, optionalValue);
             cancelParsing = _valueHelper.SetValue(this, converted);
-            Validate(converted, ValidationMode.AfterConversion);
+            PostValidate(converted);
         }
 
         HasValue = true;
@@ -1484,13 +1500,15 @@ public abstract class CommandLineArgument
 
     internal void ValidateAfterParsing()
     {
-        if (HasValue)
-        {
-            Validate(null, ValidationMode.AfterParsing);
-        }
-        else if (IsRequired)
+        if (!HasValue && IsRequired)
         {
             throw _parser.StringProvider.CreateException(CommandLineArgumentErrorCategory.MissingRequiredArgument, ArgumentName);
+        }
+
+        // Done even if no value.
+        foreach (var validator in _validators)
+        {
+            validator.ValidatePostParsing(this);
         }
     }
 
@@ -1523,40 +1541,34 @@ public abstract class CommandLineArgument
 
     private protected abstract IValueHelper CreateMultiValueHelper();
 
-    private static IEnumerable<string>? GetAliases(IEnumerable<AliasAttribute>? aliasAttributes, string argumentName)
+    private static IEnumerable<AliasAttribute>? GetAliases(IEnumerable<AliasAttribute>? aliasAttributes, string argumentName)
     {
         if (aliasAttributes == null || !aliasAttributes.Any())
         {
             return null;
         }
 
-        return aliasAttributes.Select(alias =>
+        if (aliasAttributes.Any(alias => string.IsNullOrEmpty(alias.Alias)))
         {
-            if (string.IsNullOrEmpty(alias.Alias))
-            {
-                throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.EmptyAliasFormat, argumentName));
-            }
+            throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.EmptyAliasFormat, argumentName));
+        }
 
-            return alias.Alias;
-        });
+        return aliasAttributes;
     }
 
-    private static IEnumerable<char>? GetShortAliases(IEnumerable<ShortAliasAttribute>? aliasAttributes, string argumentName)
+    private static IEnumerable<ShortAliasAttribute>? GetShortAliases(IEnumerable<ShortAliasAttribute>? aliasAttributes, string argumentName)
     {
         if (aliasAttributes == null || !aliasAttributes.Any())
         {
             return null;
         }
 
-        return aliasAttributes.Select(alias =>
+        if (aliasAttributes.Any(alias => alias.Alias == '\0'))
         {
-            if (alias.Alias == '\0')
-            {
-                throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.EmptyAliasFormat, argumentName));
-            }
+            throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.EmptyAliasFormat, argumentName));
+        }
 
-            return alias.Alias;
-        });
+        return aliasAttributes;
     }
 
     private static CancelMode AutomaticVersion(CommandLineParser parser)
@@ -1588,37 +1600,19 @@ public abstract class CommandLineArgument
         return value;
     }
 
-    private void Validate(object? value, ValidationMode mode)
+    private void PostValidate(object? value)
     {
         foreach (var validator in _validators)
         {
-            if (validator.Mode == mode)
-            {
-                validator.Validate(this, value);
-            }
+            validator.ValidatePostConversion(this, value);
         }
     }
 
-    private void PreValidate(ref string? stringValue, ReadOnlySpan<char> spanValue)
+    private void PreValidate(ReadOnlyMemory<char> value)
     {
         foreach (var validator in _validators)
         {
-            if (validator.Mode == ValidationMode.BeforeConversion)
-            {
-                if (stringValue == null)
-                {
-                    if (validator.ValidateSpan(this, spanValue))
-                    {
-                        continue;
-                    }
-                    else
-                    {
-                        stringValue = spanValue.ToString();
-                    }
-                }
-
-                validator.Validate(this, stringValue);
-            }
+            validator.ValidatePreConversion(this, value);
         }
     }
 

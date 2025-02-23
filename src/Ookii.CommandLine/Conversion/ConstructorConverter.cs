@@ -11,7 +11,6 @@ internal class ConstructorConverter : ArgumentConverter
 #if NET6_0_OR_GREATER
     [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
 #endif
-
     private readonly Type _type;
 
     public ConstructorConverter(
@@ -23,12 +22,12 @@ internal class ConstructorConverter : ArgumentConverter
         _type = type;
     }
 
-    public override object? Convert(string value, CultureInfo culture, CommandLineArgument argument)
+    public override object? Convert(ReadOnlyMemory<char> value, CultureInfo culture, CommandLineArgument argument)
     {
         try
         {
             // Since we are passing BindingFlags.Public, the correct annotation is present.
-            return Activator.CreateInstance(_type, value);
+            return Activator.CreateInstance(_type, value.ToString());
         }
         catch (TargetInvocationException ex)
         {

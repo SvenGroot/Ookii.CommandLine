@@ -160,7 +160,7 @@ partial class Arguments
 
 A method argument must use a supported signature.
 
-When using a method to define an argument, only [specific signatures](DefiningArguments.md#using-methods)
+When using a method to define an argument, only [specific signatures](DefiningArguments.md#using-static-methods)
 are allowed. This error indicates the method is not using one of the supported signatures; for
 example, it has additional parameters.
 
@@ -401,8 +401,65 @@ partial class Arguments
 
 Please switch all arguments to use either explicit or automatic positions.
 
-Note that using [`CommandLineArgumentAttribute.IsPositional`][] without an explicit position does not
-work without the [`GeneratedParserAttribute`][].
+Note that using [`CommandLineArgumentAttribute.IsPositional`][] without an explicit position does
+not work without the [`GeneratedParserAttribute`][].
+
+### OCL0043
+
+The [`CommandLineArgumentAttribute.Category`][] property for an argument, or the
+[`ParseOptionsAttribute.DefaultArgumentCategory`][] property, is set to a value that is not an
+enumeration. Only enumeration types are supported as categories.
+
+For example, the following code triggers this warning:
+
+```csharp
+[GeneratedParser]
+partial class Arguments
+{
+    // ERROR: The category is not an enumeration type.
+    [CommandLineArgument(Category = "My category")]
+    [ValidateEnumValue]
+    public string? Argument { get; set; }
+}
+```
+
+To fix this error, use a custom enumeration type that defines the categories.
+
+For more information, see [argument categories](UsageHelp.md#argument-categories).
+
+### OCL0044
+
+The arguments class has multiple arguments with the [`CommandLineArgumentAttribute.Category`][]
+property set, and the do not all use the same enumeration type. Every argument must use the same
+type for its category.
+
+This error is also emitted if the [`ParseOptionsAttribute.DefaultArgumentCategory`][] property uses
+a different type than the [`CommandLineArgumentAttribute.Category`][] property of an argument in
+that class.
+
+If the arguments class is derived from a base class that also defines arguments, all arguments
+defined by all base classes must use the same type for their categories.
+
+For example, the following code triggers this error:
+
+```csharp
+[GeneratedParser]
+partial class Arguments
+{
+    [CommandLineArgument(Category = SomeEnum.SomeCategory)]
+    [ValidateEnumValue]
+    public string? Argument1 { get; set; }
+
+    // WARNING: The category uses a different type than Argument1.
+    [CommandLineArgument(Category = OtherEnum.OtherCategory)]
+    [ValidateEnumValue]
+    public int Argument2 { get; set; }
+}
+```
+
+To fix this error, use only a single enumeration type to define argument categories.
+
+For more information, see [argument categories](UsageHelp.md#argument-categories).
 
 ## Warnings
 
@@ -965,7 +1022,8 @@ exception at runtime if used to validate an argument whose type is not an enumer
 For example, the following code triggers this warning:
 
 ```csharp
-class Arguments
+[GeneratedParser]
+partial class Arguments
 {
     // WARNING: String isn't an enumeration type.
     [CommandLineArgument]
@@ -979,14 +1037,13 @@ of the argument to an enumeration type.
 
 ### OCL0042
 
-An argument has the [`ArgumentConverterAttribute`][] set, and uses properties of the
+An argument has the [`ArgumentConverterAttribute`][] set, and uses a property of the
 [`ValidateEnumValueAttribute`][] that may not be supported by a custom converter.
 
-The [`CaseSensitive`][CaseSensitive_1], [`AllowCommaSeparatedValues`][], and
-[`AllowNumericValues`][] properties of the [`ValidateEnumValueAttribute`][] attribute are not used
-by the [`ValidateEnumValueAttribute`][] attribute itself, but instead alter the behavior of the
-[`EnumConverter`][] class. If an argument uses a custom converter rather than the
-[`EnumConverter`][], it is not guaranteed that these properties will have any effect.
+The [`CaseSensitive`][CaseSensitive_1] property of the [`ValidateEnumValueAttribute`][] attribute is
+not used by the [`ValidateEnumValueAttribute`][] attribute itself, but instead alters the behavior
+of the [`EnumConverter`][] class. If an argument uses a custom converter rather than the
+[`EnumConverter`][], it is not guaranteed that this property will have any effect.
 
 For example, the following code triggers this warning:
 
@@ -1001,60 +1058,61 @@ class Arguments
 }
 ```
 
-To fix this warning, either use the default [`EnumConverter`][], or remove the properties. If the
-custom converter does check the value of those properties, you can disable this warning.
+To fix this warning, either use the default [`EnumConverter`][], or do not use the
+[`CaseSensitive`][] property. If the custom converter does check the value of that property, you can
+disable this warning.
 
-[`AliasAttribute`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_AliasAttribute.htm
-[`AllowCommaSeparatedValues`]: https://www.ookii.org/docs/commandline-4.2/html/P_Ookii_CommandLine_Validation_ValidateEnumValueAttribute_AllowCommaSeparatedValues.htm
-[`AllowDuplicateDictionaryKeysAttribute`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_AllowDuplicateDictionaryKeysAttribute.htm
-[`AllowNumericValues`]: https://www.ookii.org/docs/commandline-4.2/html/P_Ookii_CommandLine_Validation_ValidateEnumValueAttribute_AllowNumericValues.htm
-[`ApplicationFriendlyNameAttribute`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_ApplicationFriendlyNameAttribute.htm
-[`ArgumentConverter`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_Conversion_ArgumentConverter.htm
-[`ArgumentConverterAttribute`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_Conversion_ArgumentConverterAttribute.htm
-[`CommandAttribute.IsHidden`]: https://www.ookii.org/docs/commandline-4.2/html/P_Ookii_CommandLine_Commands_CommandAttribute_IsHidden.htm
-[`CommandAttribute`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_Commands_CommandAttribute.htm
-[`CommandLineArgumentAttribute.DefaultValue`]: https://www.ookii.org/docs/commandline-4.2/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_DefaultValue.htm
-[`CommandLineArgumentAttribute.IncludeDefaultInUsageHelp`]: https://www.ookii.org/docs/commandline-4.2/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_IncludeDefaultInUsageHelp.htm
-[`CommandLineArgumentAttribute.IsHidden`]: https://www.ookii.org/docs/commandline-4.2/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_IsHidden.htm
-[`CommandLineArgumentAttribute.IsLong`]: https://www.ookii.org/docs/commandline-4.2/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_IsLong.htm
-[`CommandLineArgumentAttribute.IsPositional`]: https://www.ookii.org/docs/commandline-4.2/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_IsPositional.htm
-[`CommandLineArgumentAttribute.IsRequired`]: https://www.ookii.org/docs/commandline-4.2/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_IsRequired.htm
-[`CommandLineArgumentAttribute.IsShort`]: https://www.ookii.org/docs/commandline-4.2/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_IsShort.htm
-[`CommandLineArgumentAttribute.Position`]: https://www.ookii.org/docs/commandline-4.2/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_Position.htm
-[`CommandLineArgumentAttribute.ShortName`]: https://www.ookii.org/docs/commandline-4.2/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_ShortName.htm
-[`CommandLineArgumentAttribute`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_CommandLineArgumentAttribute.htm
-[`CommandLineParser.Parse<T>()`]: https://www.ookii.org/docs/commandline-4.2/html/M_Ookii_CommandLine_CommandLineParser_Parse__1.htm
-[`CommandLineParser`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_CommandLineParser.htm
-[`CommandLineParser<T>`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_CommandLineParser_1.htm
-[`CommandManager`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_Commands_CommandManager.htm
+[`AliasAttribute`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_AliasAttribute.htm
+[`AllowDuplicateDictionaryKeysAttribute`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_AllowDuplicateDictionaryKeysAttribute.htm
+[`ApplicationFriendlyNameAttribute`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_ApplicationFriendlyNameAttribute.htm
+[`ArgumentConverter`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_Conversion_ArgumentConverter.htm
+[`ArgumentConverterAttribute`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_Conversion_ArgumentConverterAttribute.htm
+[`CommandAttribute.IsHidden`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_Commands_CommandAttribute_IsHidden.htm
+[`CommandAttribute`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_Commands_CommandAttribute.htm
+[`CommandLineArgumentAttribute.Category`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_Category.htm
+[`CommandLineArgumentAttribute.DefaultValue`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_DefaultValue.htm
+[`CommandLineArgumentAttribute.IncludeDefaultInUsageHelp`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_IncludeDefaultInUsageHelp.htm
+[`CommandLineArgumentAttribute.IsHidden`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_IsHidden.htm
+[`CommandLineArgumentAttribute.IsLong`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_IsLong.htm
+[`CommandLineArgumentAttribute.IsPositional`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_IsPositional.htm
+[`CommandLineArgumentAttribute.IsRequired`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_IsRequired.htm
+[`CommandLineArgumentAttribute.IsShort`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_IsShort.htm
+[`CommandLineArgumentAttribute.Position`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_Position.htm
+[`CommandLineArgumentAttribute.ShortName`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_ShortName.htm
+[`CommandLineArgumentAttribute`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_CommandLineArgumentAttribute.htm
+[`CommandLineParser.Parse<T>()`]: https://www.ookii.org/docs/commandline-5.0/html/M_Ookii_CommandLine_CommandLineParser_Parse__1.htm
+[`CommandLineParser`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_CommandLineParser.htm
+[`CommandLineParser<T>`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_CommandLineParser_1.htm
+[`CommandManager`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_Commands_CommandManager.htm
 [`DescriptionAttribute`]: https://learn.microsoft.com/dotnet/api/system.componentmodel.descriptionattribute
-[`EnumConverter`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_Conversion_EnumConverter.htm
-[`GeneratedCommandManagerAttribute.AssemblyNames`]: https://www.ookii.org/docs/commandline-4.2/html/P_Ookii_CommandLine_Commands_GeneratedCommandManagerAttribute_AssemblyNames.htm
-[`GeneratedCommandManagerAttribute`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_Commands_GeneratedCommandManagerAttribute.htm
-[`GeneratedConverterNamespaceAttribute`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_Conversion_GeneratedConverterNamespaceAttribute.htm
-[`GeneratedParserAttribute`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_GeneratedParserAttribute.htm
-[`ICommand`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_Commands_ICommand.htm
-[`ICommandWithCustomParsing`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_Commands_ICommandWithCustomParsing.htm
-[`IsShort`]: https://www.ookii.org/docs/commandline-4.2/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_IsShort.htm
-[`KeyConverterAttribute`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_Conversion_KeyConverterAttribute.htm
-[`KeyValuePairConverter<TKey, TValue>`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_Conversion_KeyValuePairConverter_2.htm
-[`KeyValueSeparatorAttribute`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_Conversion_KeyValueSeparatorAttribute.htm
-[`MultiValueSeparatorAttribute`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_MultiValueSeparatorAttribute.htm
-[`ParentCommandAttribute`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_Commands_ParentCommandAttribute.htm
-[`ParseOptions.ArgumentNameComparison`]: https://www.ookii.org/docs/commandline-4.2/html/P_Ookii_CommandLine_ParseOptions_ArgumentNameComparison.htm
-[`ParseOptions.ArgumentNamePrefixes`]: https://www.ookii.org/docs/commandline-4.2/html/P_Ookii_CommandLine_ParseOptions_ArgumentNamePrefixes.htm
-[`ParseOptions.ArgumentNameTransform`]: https://www.ookii.org/docs/commandline-4.2/html/P_Ookii_CommandLine_ParseOptions_ArgumentNameTransform.htm
-[`ParseOptions.Mode`]: https://www.ookii.org/docs/commandline-4.2/html/P_Ookii_CommandLine_ParseOptions_Mode.htm
-[`ParseOptionsAttribute.ArgumentNamePrefixes`]: https://www.ookii.org/docs/commandline-4.2/html/P_Ookii_CommandLine_ParseOptionsAttribute_ArgumentNamePrefixes.htm
-[`ParsingMode.LongShort`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_ParsingMode.htm
-[`ShortAliasAttribute`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_ShortAliasAttribute.htm
+[`EnumConverter`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_Conversion_EnumConverter.htm
+[`GeneratedCommandManagerAttribute.AssemblyNames`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_Commands_GeneratedCommandManagerAttribute_AssemblyNames.htm
+[`GeneratedCommandManagerAttribute`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_Commands_GeneratedCommandManagerAttribute.htm
+[`GeneratedConverterNamespaceAttribute`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_Conversion_GeneratedConverterNamespaceAttribute.htm
+[`GeneratedParserAttribute`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_GeneratedParserAttribute.htm
+[`ICommand`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_Commands_ICommand.htm
+[`ICommandWithCustomParsing`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_Commands_ICommandWithCustomParsing.htm
+[`IsShort`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_IsShort.htm
+[`KeyConverterAttribute`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_Conversion_KeyConverterAttribute.htm
+[`KeyValuePairConverter<TKey, TValue>`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_Conversion_KeyValuePairConverter_2.htm
+[`KeyValueSeparatorAttribute`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_Conversion_KeyValueSeparatorAttribute.htm
+[`MultiValueSeparatorAttribute`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_MultiValueSeparatorAttribute.htm
+[`ParentCommandAttribute`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_Commands_ParentCommandAttribute.htm
+[`ParseOptions.ArgumentNameComparison`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_ParseOptions_ArgumentNameComparison.htm
+[`ParseOptions.ArgumentNamePrefixes`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_ParseOptions_ArgumentNamePrefixes.htm
+[`ParseOptions.ArgumentNameTransform`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_ParseOptions_ArgumentNameTransform.htm
+[`ParseOptions.Mode`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_ParseOptions_Mode.htm
+[`ParseOptionsAttribute.ArgumentNamePrefixes`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_ParseOptionsAttribute_ArgumentNamePrefixes.htm
+[`ParseOptionsAttribute.DefaultArgumentCategory`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_ParseOptionsAttribute_DefaultArgumentCategory.htm
+[`ParsingMode.LongShort`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_ParsingMode.htm
+[`ShortAliasAttribute`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_ShortAliasAttribute.htm
 [`Type`]: https://learn.microsoft.com/dotnet/api/system.type
 [`TypeConverter`]: https://learn.microsoft.com/dotnet/api/system.componentmodel.typeconverter
 [`TypeConverterAttribute`]: https://learn.microsoft.com/dotnet/api/system.componentmodel.typeconverterattribute
-[`ValidateEnumValueAttribute`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_Validation_ValidateEnumValueAttribute.htm
-[`ValueConverterAttribute`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_Conversion_ValueConverterAttribute.htm
-[`WrappedTypeConverter<T>`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_Conversion_WrappedTypeConverter_1.htm
-[CaseSensitive_1]: https://www.ookii.org/docs/commandline-4.2/html/P_Ookii_CommandLine_Validation_ValidateEnumValueAttribute_CaseSensitive.htm
-[IsHidden_1]: https://www.ookii.org/docs/commandline-4.2/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_IsHidden.htm
-[IsRequired_1]: https://www.ookii.org/docs/commandline-4.2/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_IsRequired.htm
-[ShortName_1]: https://www.ookii.org/docs/commandline-4.2/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_ShortName.htm
+[`ValidateEnumValueAttribute`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_Validation_ValidateEnumValueAttribute.htm
+[`ValueConverterAttribute`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_Conversion_ValueConverterAttribute.htm
+[`WrappedTypeConverter<T>`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_Conversion_WrappedTypeConverter_1.htm
+[CaseSensitive_1]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_Validation_ValidateEnumValueAttribute_CaseSensitive.htm
+[IsHidden_1]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_IsHidden.htm
+[IsRequired_1]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_IsRequired.htm
+[ShortName_1]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_CommandLineArgumentAttribute_ShortName.htm

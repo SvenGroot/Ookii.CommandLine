@@ -17,7 +17,7 @@ public partial class MainWindow : Window
 
     public Arguments Arguments => _arguments;
 
-    private void _helpButton_Click(object sender, RoutedEventArgs e)
+    private void HelpButton_Click(object sender, RoutedEventArgs e)
     {
         var help = new UsageWindow();
         help.Show();

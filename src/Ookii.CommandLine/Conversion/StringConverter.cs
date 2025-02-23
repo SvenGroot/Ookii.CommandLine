@@ -20,16 +20,14 @@ public class StringConverter : ArgumentConverter
     public static readonly StringConverter Instance = new();
 
     /// <summary>
-    /// Returns the original string value without modification.
+    /// Converts a string memory region to a string.
     /// </summary>
-    /// <param name="value">The string to convert.</param>
+    /// <param name="value">The string memory region to convert.</param>
     /// <param name="culture">The culture to use for the conversion.</param>
     /// <param name="argument">
     /// The <see cref="CommandLineArgument"/> that will use the converted value.
     /// </param>
-    /// <returns>The value of the <paramref name="value"/> parameter.</returns>
-    /// <exception cref="ArgumentNullException">
-    ///   <paramref name="value"/> is <see langword="null"/>.
-    /// </exception>
-    public override object? Convert(string value, CultureInfo culture, CommandLineArgument argument) => value;
+    /// <returns>The value of the <paramref name="value"/> parameter as a string.</returns>
+    public override object? Convert(ReadOnlyMemory<char> value, CultureInfo culture, CommandLineArgument argument)
+        => value.ToString();
 }

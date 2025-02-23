@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Ookii.Common;
+using System;
 using System.Diagnostics;
 using System.IO;
 
@@ -64,7 +65,7 @@ internal partial class RingBuffer
         var remaining = _buffer.Length - contentEnd;
         if (remaining < span.Length)
         {
-            var (first, second) = span.Split(remaining);
+            var (first, second) = span.SplitAt(remaining);
             first.CopyTo(_buffer, contentEnd);
             second.CopyTo(_buffer, 0);
             _bufferEnd = second.Length;
@@ -98,7 +99,7 @@ internal partial class RingBuffer
         }
     }
 
-    public StringSpanTuple GetContents(int offset)
+    public ReadOnlySpanPair<char, char> GetContents(int offset)
     {
         if (offset < 0 || offset > Size)
         {

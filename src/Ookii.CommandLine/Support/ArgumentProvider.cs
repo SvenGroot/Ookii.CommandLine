@@ -77,10 +77,9 @@ public abstract class ArgumentProvider
     /// Gets footer text that is used when generating usage information.
     /// </summary>
     /// <value>
-    /// The footer text.
+    /// The footer text, or <see langword="null"/> if there is no footer.
     /// </value>
-    // N.B. This is virtual, not abstract, for binary compatibility with v4.0.
-    public virtual string UsageFooter => string.Empty;
+    public abstract string UsageFooter { get; }
 
     /// <summary>
     /// Gets the <see cref="ParseOptionsAttribute"/> that was applied to the arguments type.
@@ -137,4 +136,11 @@ public abstract class ArgumentProvider
     /// </param>
     /// <returns>An instance of the type indicated by the <see cref="ArgumentsType"/> property.</returns>
     public abstract object CreateInstance(CommandLineParser parser, object?[]? requiredPropertyValues);
+
+    /// <summary>
+    /// Gets the description for an argument category.
+    /// </summary>
+    /// <param name="category">The argument category.</param>
+    /// <returns>The description of the category.</returns>
+    public virtual string GetCategoryDescription(Enum category) => category.ToString();
 }

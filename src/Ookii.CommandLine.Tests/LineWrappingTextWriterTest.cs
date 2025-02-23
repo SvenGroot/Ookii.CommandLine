@@ -285,10 +285,10 @@ public partial class LineWrappingTextWriterTest
     public void TestSkipFormatting()
     {
         Assert.AreEqual(_expectedFormatting, WriteString(_inputFormatting, 80, _inputFormatting.Length, 8));
-        Assert.AreEqual(_expectedLongFormatting, WriteString(_inputLongFormatting, 80, _inputLongFormatting.Length, 8));
-        Assert.AreEqual(_expectedLongFormatting, WriteString(_inputLongFormatting, 80, 80, 8));
-        Assert.AreEqual(_expectedLongFormatting, WriteString(_inputLongFormatting, 80, 50, 8));
-        Assert.AreEqual(_expectedLongFormatting, WriteChars(_inputLongFormatting.ToCharArray(), 80, 8));
+        Assert.AreEqual(_expectedLongFormatting, WriteString(InputLongFormatting, 80, InputLongFormatting.Length, 8));
+        Assert.AreEqual(_expectedLongFormatting, WriteString(InputLongFormatting, 80, 80, 8));
+        Assert.AreEqual(_expectedLongFormatting, WriteString(InputLongFormatting, 80, 50, 8));
+        Assert.AreEqual(_expectedLongFormatting, WriteChars(InputLongFormatting.ToCharArray(), 80, 8));
     }
 
     [TestMethod]
@@ -429,11 +429,11 @@ public partial class LineWrappingTextWriterTest
         using (var writer = LineWrappingTextWriter.ForStringWriter(80))
         {
             writer.Indent = 4;
-            writer.WriteLine(_inputWrappingMode);
+            writer.WriteLine(InputWrappingMode);
             writer.Wrapping = WrappingMode.Disabled;
-            writer.WriteLine(_inputWrappingMode);
+            writer.WriteLine(InputWrappingMode);
             writer.Wrapping = WrappingMode.Enabled;
-            writer.WriteLine(_inputWrappingMode);
+            writer.WriteLine(InputWrappingMode);
             Assert.AreEqual(_expectedWrappingMode, writer.ToString());
         }
 
@@ -441,11 +441,11 @@ public partial class LineWrappingTextWriterTest
         using (var writer = LineWrappingTextWriter.ForStringWriter(80))
         {
             writer.Indent = 4;
-            writer.Write(_inputWrappingMode);
+            writer.Write(InputWrappingMode);
             writer.Wrapping = WrappingMode.Disabled;
-            writer.Write(_inputWrappingMode);
+            writer.Write(InputWrappingMode);
             writer.Wrapping = WrappingMode.Enabled;
-            writer.Write(_inputWrappingMode);
+            writer.Write(InputWrappingMode);
             Assert.AreEqual(_expectedWrappingModeWrite, writer.ToString());
         }
 
@@ -454,10 +454,10 @@ public partial class LineWrappingTextWriterTest
         {
             writer.Indent = 4;
             writer.Wrapping = WrappingMode.EnabledNoForce;
-            writer.Write(_inputWrappingMode);
-            writer.Write(_inputWrappingMode);
+            writer.Write(InputWrappingMode);
+            writer.Write(InputWrappingMode);
             writer.Wrapping = WrappingMode.Enabled;
-            writer.Write(_inputWrappingMode);
+            writer.Write(InputWrappingMode);
             Assert.AreEqual(_expectedWrappingModeNoForce, writer.ToString());
         }
 

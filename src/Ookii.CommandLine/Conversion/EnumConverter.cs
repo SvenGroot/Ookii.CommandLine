@@ -10,11 +10,9 @@ namespace Ookii.CommandLine.Conversion;
 /// </summary>
 /// <remarks>
 /// <para>
-///   This converter performs a case insensitive conversion, and accepts the name of an enumeration
-///   value or a number representing the underlying type of the enumeration. Comma-separated values
-///   that will be combined using bitwise-or are also accepted, regardless of whether the
-///   enumeration uses the <see cref="FlagsAttribute"/> attribute. When using a numeric value, the
-///   value does not need to be one of the defined values of the enumeration.
+///   By default, this converter accepts the names of enumeration members, performing a
+///   case-insensitive match. It does not accept numeric values, and comma-separated values are only
+///   accepted if the enumeration has the <see cref="FlagsAttribute"/> attribute.
 /// </para>
 /// <para>
 ///   Use the <see cref="ValidateEnumValueAttribute"/> attribute to alter these behaviors. Applying
@@ -68,31 +66,9 @@ public class EnumConverter : ArgumentConverter
     public Type EnumType { get; }
 
     /// <summary>
-    /// Converts a string to the enumeration type.
+    /// Converts a string memory region to the enumeration type.
     /// </summary>
-    /// <param name="value">The string to convert.</param>
-    /// <param name="culture">The culture to use for the conversion.</param>
-    /// <param name="argument">
-    /// The <see cref="CommandLineArgument"/> that will use the converted value.
-    /// </param>
-    /// <returns>An object representing the converted value.</returns>
-    /// <remarks>
-    /// <para>
-    ///   This method performs the conversion using the <see cref="Enum.Parse(Type, string, bool)" qualifyHint="true"/>
-    ///   method.
-    /// </para>
-    /// </remarks>
-    /// <exception cref="CommandLineArgumentException">
-    ///   The value was not valid for the enumeration type.
-    /// </exception>
-    public override object? Convert(string value, CultureInfo culture, CommandLineArgument argument)
-#if NET6_0_OR_GREATER
-        => Convert(value.AsSpan(), culture, argument);
-
-    /// <summary>
-    /// Converts a string span to the enumeration type.
-    /// </summary>
-    /// <param name="value">The <see cref="ReadOnlySpan{T}"/> containing the string to convert.</param>
+    /// <param name="value">The <see cref="ReadOnlyMemory{T}"/> containing the string to convert.</param>
     /// <param name="culture">The culture to use for the conversion.</param>
     /// <param name="argument">
     /// The <see cref="CommandLineArgument"/> that will use the converted value.
@@ -104,42 +80,62 @@ public class EnumConverter : ArgumentConverter
     ///   method.
     /// </para>
     /// </remarks>
+    /// <exception cref="ArgumentNullException">
+    ///   <paramref name="argument"/> is <see langword="null"/>.
+    /// </exception>
     /// <exception cref="CommandLineArgumentException">
     ///   The value was not valid for the enumeration type.
     /// </exception>
-    public override object? Convert(ReadOnlySpan<char> value, CultureInfo culture, CommandLineArgument argument)
-#endif
+    public override object? Convert(ReadOnlyMemory<char> value, CultureInfo culture, CommandLineArgument argument)
     {
-        var attribute = argument.Validators.OfType<ValidateEnumValueAttribute>().FirstOrDefault();
-#if NET6_0_OR_GREATER
-        if (attribute != null && !attribute.ValidateBeforeConversion(argument, value))
-#else
-        if (attribute != null && !attribute.ValidateBeforeConversion(argument, value.AsSpan()))
-#endif
+        if (argument == null)
         {
-            throw CreateException(value.ToString(), null, argument, attribute);
+            throw new ArgumentNullException(nameof(argument));
         }
 
+        var attribute = argument.Validators.OfType<ValidateEnumValueAttribute>().FirstOrDefault();
+
+        // If the attribute is defined, it has already been checked; if not, check against the
+        // defaults here.
+        if (attribute == null)
+        {
+            ValidateEnumValueAttribute.Default.ValidatePreConversion(argument, value);
+        }
+
+        object result;
         try
         {
-            return Enum.Parse(EnumType, value, !attribute?.CaseSensitive ?? true);
+#if NET6_0_OR_GREATER
+            result = Enum.Parse(EnumType, value.Span, !attribute?.CaseSensitive ?? true);
+#else
+            result = Enum.Parse(EnumType, value.ToString(), !attribute?.CaseSensitive ?? true);
+#endif
         }
         catch (ArgumentException ex)
         {
-            throw CreateException(value.ToString(), ex, argument, attribute);
+            throw CreateException(value, ex, argument, attribute);
         }
         catch (OverflowException ex)
         {
-            throw CreateException(value.ToString(), ex, argument, attribute);
+            throw CreateException(value, ex, argument, attribute);
         }
+
+        // If pre-validation succeeded with the defaults, it shouldn't be possible to get an
+        // undefined value (unless the FlagsAttribute is present, in which case it's allowed). Still
+        // check it just in case.
+        if (attribute == null)
+        {
+            ValidateEnumValueAttribute.Default.ValidatePostConversion(argument, result);
+        }
+
+        return result;
     }
 
-    private CommandLineArgumentException CreateException(string value, Exception? inner, CommandLineArgument argument,
+    private static CommandLineArgumentException CreateException(ReadOnlyMemory<char> value, Exception? inner, CommandLineArgument argument,
         ValidateEnumValueAttribute? attribute)
     {
-        string message = attribute?.GetErrorMessage(argument, value)
-            ?? argument.Parser.StringProvider.ValidateEnumValueFailed(argument.ArgumentName, EnumType, value, true);
-
+        attribute ??= ValidateEnumValueAttribute.Default;
+        string message = attribute.GetErrorMessage(argument, value.ToString());
         return new(message, argument.ArgumentName, CommandLineArgumentErrorCategory.ArgumentValueConversion, inner);
     }
 }

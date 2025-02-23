@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Immutable;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Ookii.CommandLine.Commands;
@@ -34,6 +36,15 @@ public abstract class ParentCommand : ICommandWithCustomParsing, IAsyncCommand
     private ICommand? _childCommand;
 
     /// <summary>
+    /// Gets a value that indicates whether a child command was successfully created when parsing
+    /// the command line arguments.
+    /// </summary>
+    /// <value>
+    /// <see langword="true"/> if a child command was created; otherwise, <see langword="false"/>.
+    /// </value>
+    public bool IsChildCommandCreated => _childCommand != null;
+
+    /// <summary>
     /// Gets the exit code to return from the <see cref="Run"/> or <see cref="RunAsync"/> method
     /// if parsing command line arguments for a nested subcommand failed.
     /// </summary>
@@ -60,10 +71,13 @@ public abstract class ParentCommand : ICommandWithCustomParsing, IAsyncCommand
         try
         {
             var childCommandName = args.Length == 0 ? null : args.Span[0];
-            info = childCommandName == null ? null : manager.GetCommand(childCommandName);
+            (info, var possibleMatches) = childCommandName == null
+                ? default
+                : manager.GetCommandOrPossibleMatches(childCommandName);
+
             if (info == null)
             {
-                OnChildCommandNotFound(childCommandName, manager);
+                OnChildCommandNotFound(manager, childCommandName, possibleMatches);
                 return;
             }
         }
@@ -135,12 +149,13 @@ public abstract class ParentCommand : ICommandWithCustomParsing, IAsyncCommand
     /// <summary>
     /// Runs the child command that was instantiated by the <see cref="Parse"/> method asynchronously.
     /// </summary>
+    /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
     /// <returns>
     /// A task that represents the asynchronous run operation. The result of the task is the exit
     /// code of the child command, or the value of the <see cref="FailureExitCode"/> property if no
     /// child command was created.
     /// </returns>
-    public virtual async Task<int> RunAsync()
+    public virtual async Task<int> RunAsync(CancellationToken cancellationToken)
     {
         if (_childCommand == null)
         {
@@ -149,7 +164,7 @@ public abstract class ParentCommand : ICommandWithCustomParsing, IAsyncCommand
 
         if (_childCommand is IAsyncCommand asyncCommand)
         {
-            return await asyncCommand.RunAsync();
+            return await asyncCommand.RunAsync(cancellationToken);
         }
 
         return _childCommand.Run();
@@ -178,13 +193,38 @@ public abstract class ParentCommand : ICommandWithCustomParsing, IAsyncCommand
     /// The name of the nested subcommand, or <see langword="null"/> if none was specified.
     /// </param>
     /// <param name="manager">The <see cref="CommandManager"/> used to create the subcommand.</param>
+    /// <param name="possibleMatches">
+    /// If <paramref name="commandName"/> was a prefix alias of more than one command, provides
+    /// an array of the possible command names and aliases. Otherwise, this parameter is an empty
+    /// array.
+    /// </param>
     /// <remarks>
     /// <para>
-    ///   The base class implementation writes usage help with a list of all nested subcommands.
+    ///   The base class implementation writes an error message if <paramref name="commandName"/>
+    ///   is not <see langword="null"/>, and usage help with a list of all nested subcommands. If
+    ///   <paramref name="possibleMatches"/> is not empty, it will write a message listing the
+    ///   matching commands instead.
     /// </para>
     /// </remarks>
-    protected virtual void OnChildCommandNotFound(string? commandName, CommandManager manager)
+    protected virtual void OnChildCommandNotFound(CommandManager manager, string? commandName, ImmutableArray<string> possibleMatches)
     {
+        if (commandName != null)
+        {
+            if (!possibleMatches.IsDefaultOrEmpty)
+            {
+                CommandLineParser.WriteError(manager.Options,
+                    manager.Options.StringProvider.AmbiguousCommandPrefixAlias(commandName), manager.Options.ErrorColor, true);
+
+                manager.Options.UsageWriter.WriteCommandAmbiguousPrefixAliasUsage(manager, possibleMatches);
+                return;
+            }
+            else
+            {
+                CommandLineParser.WriteError(manager.Options, manager.Options.StringProvider.UnknownCommand(commandName),
+                    manager.Options.ErrorColor, true);
+            }
+        }
+
         manager.WriteUsage();
     }
 
@@ -208,7 +248,7 @@ public abstract class ParentCommand : ICommandWithCustomParsing, IAsyncCommand
     ///   interface.
     /// </para>
     /// </remarks>
-    protected virtual bool OnDuplicateArgumentWarning(CommandLineArgument argument, string? newValue)
+    protected virtual bool OnDuplicateArgumentWarning(CommandLineArgument argument, ReadOnlyMemory<char>? newValue)
     {
         var parser = argument.Parser;
         var warning = parser.StringProvider.DuplicateArgumentWarning(argument.ArgumentName);
@@ -248,7 +288,7 @@ public abstract class ParentCommand : ICommandWithCustomParsing, IAsyncCommand
             helpMode = parser.Options.ShowUsageOnError;
         }
 
-        if (parser.HelpRequested)
+        if (parser.ParseResult.HelpRequested)
         {
             parser.Options.UsageWriter.WriteParserUsage(parser, helpMode);
         }

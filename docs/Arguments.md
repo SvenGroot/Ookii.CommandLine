@@ -76,9 +76,9 @@ An argument can have one or more aliases: alternative names that can also be use
 argument. For example, an argument named `-Verbose` might use the alias `-v` as a shorter to type
 alternative. In long/short mode, an argument can have both long and short aliases.
 
-By default, Ookii.CommandLine accepts [any prefix](DefiningArguments.md#automatic-prefix-aliases)
-that uniquely identifies a single argument as an alias for that argument, without having to
-explicitly define those aliases.
+Besides explicitly defined aliases, by default, Ookii.CommandLine accepts
+[any prefix](DefiningArguments.md#automatic-prefix-aliases) that uniquely identifies a single
+argument as an alias for that argument.
 
 For example, if you have two arguments named `-File` and `-Folder`, you can refer to the first
 argument with `-Fi` and `-Fil` (also case insensitive by default). For the second one, `-Fo`,
@@ -290,9 +290,12 @@ preference:
 2. For .Net 7 and later:
    1. An implementation of the [`ISpanParsable<TSelf>`][] interface.
    2. An implementation of the [`IParsable<TSelf>`][] interface.
-3. A `public static Parse(string, ICultureInfo)` method.
-4. A `public static Parse(string)` method.
-5. A public constructor that takes a single `string` argument.
+3. When using [source generation](SourceGeneration.md) only:
+   1. A `public static Parse(ReadOnlySpan<char>, CultureInfo)` method[^1].
+   2. A `public static Parse(ReadOnlySpan<char>)`  method.
+4. A `public static Parse(string, CultureInfo)` method[^1].
+5. A `public static Parse(string)` method.
+6. A public constructor that takes a single `string` argument.
 
 This will cover the majority of types you'd want to use for arguments without having to write any
 conversion code. If you write your own custom type, you can use it for arguments as long as it meets
@@ -309,32 +312,29 @@ upgrade code that relied on a [`TypeConverter`][].
 
 ### Enumeration conversion
 
-The [`EnumConverter`][] used for enumeration types relies on the [`Enum.Parse()`][] method. Its
-default behavior is to use case insensitive conversion, and to allow both the names and underlying
-value of the enumeration to be used. This means that e.g. for the [`DayOfWeek`][] enumeration,
-"Monday", "monday", and "1" can all be used to indicate [`DayOfWeek.Monday`][].
+When an argument uses an enumeration type, the built-in [`EnumConverter`][] class is used to
+convert argument values. The default behavior of this converter is to allow only the names of
+enumeration members, using a case-insensitive match. If the enumeration has the [`FlagsAttribute`][]
+applied, it also allows the use of a comma-separated list of values.
 
-In the case of a numeric value, the converter does not check if the resulting value is valid for the
-enumeration type, so again for [`DayOfWeek`][], a value of "9" would be converted to `(DayOfWeek)9`
-even though there is no such value in the enumeration.
+You can customize this behavior by using the [`ValidateEnumValueAttribute` validator](Validation.md).
+You can enable case sensitivity with the [`ValidateEnumValueAttribute.CaseSensitive`][] property,
+and allow numeric values with the [`ValidateEnumValueAttribute.AllowNumericValues`][] property.
 
-To ensure the result is constrained to only the defined values of the enumeration, use the
-[`ValidateEnumValueAttribute` validator](Validation.md). This validator can also be used to alter
-the conversion behavior. You can enable case sensitivity with the
-[`ValidateEnumValueAttribute.CaseSensitive`][] property, and disallow numeric values with the
-[`ValidateEnumValueAttribute.AllowNumericValues`][] property.
+When numeric values are enabled, the underlying value of each enumeration member can also be used to
+specify it. This means that e.g. for the [`DayOfWeek`][] enumeration, both "monday" and "1" can
+be used to indicate [`DayOfWeek.Monday`][].
 
-By default, the converter allows the use of comma-separated values, which will be combined using a
-bitwise or operation. This is allowed regardless of whether or not the [`FlagsAttribute`][]
-attribute is present on the enumeration, which can have unexpected results. Using the
-[`DayOfWeek`][] example again, "Monday,Tuesday" would result in the value
-`DayOfWeek.Monday | DayOfWeek.Tuesday`, which is actually equivalent to [`DayOfWeek.Wednesday`][].
+By default, you are still restricted to only the defined values of the enumeration even when
+using numeric values, unless the enumeration has the [`FlagsAttribute`][]. Use the
+[`ValidateEnumValueAttribute.AllowNonDefinedValues`][] property to change this. In that case, for
+example a value of "9" would be converted to `(DayOfWeek)9` even though there is no such value in
+the enumeration.
 
-Comma-separated values can be disabled by using the
-[`ValidateEnumValueAttribute.AllowCommaSeparatedValues`][] property.
-
-These properties of the [`ValidateEnumValueAttribute`][] attribute only work if the default
-[`EnumConverter`][] is used; a custom converter may or may not check them.
+> [!TIP]
+> Adding the [`ValidateEnumValueAttribute`][] to an enumeration argument also adds all the allowed
+> values to the [usage help](Validation.md#usage-help), so this is useful even if you don't change
+> any of its properties.
 
 ### Multi-value and dictionary value conversion
 
@@ -422,47 +422,49 @@ and case-sensitive argument names. For information on how to set these options,
 
 Next, let's take a look at how to [define arguments](DefiningArguments.md).
 
-[`AllowDuplicateDictionaryKeysAttribute`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_AllowDuplicateDictionaryKeysAttribute.htm
-[`ArgumentConverter`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_Conversion_ArgumentConverter.htm
-[`ArgumentConverterAttribute`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_Conversion_ArgumentConverterAttribute.htm
-[`CommandLineArgument.AllowNull`]: https://www.ookii.org/docs/commandline-4.2/html/P_Ookii_CommandLine_CommandLineArgument_AllowNull.htm
-[`CommandLineArgumentException`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_CommandLineArgumentException.htm
-[`CommandLineParser`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_CommandLineParser.htm
+[^1]: Any type that that can be assigned a [`CultureInfo`][] value, such as [`IFormatProvider`][], is also
+   allowed for the second parameter of these methods.
+
+[`AllowDuplicateDictionaryKeysAttribute`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_AllowDuplicateDictionaryKeysAttribute.htm
+[`ArgumentConverter`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_Conversion_ArgumentConverter.htm
+[`ArgumentConverterAttribute`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_Conversion_ArgumentConverterAttribute.htm
+[`CommandLineArgument.AllowNull`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_CommandLineArgument_AllowNull.htm
+[`CommandLineArgumentException`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_CommandLineArgumentException.htm
+[`CommandLineParser`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_CommandLineParser.htm
 [`CultureInfo.InvariantCulture`]: https://learn.microsoft.com/dotnet/api/system.globalization.cultureinfo.invariantculture
 [`CultureInfo`]: https://learn.microsoft.com/dotnet/api/system.globalization.cultureinfo
 [`DateTime`]: https://learn.microsoft.com/dotnet/api/system.datetime
 [`DayOfWeek.Monday`]: https://learn.microsoft.com/dotnet/api/system.dayofweek
-[`DayOfWeek.Wednesday`]: https://learn.microsoft.com/dotnet/api/system.dayofweek
 [`DayOfWeek`]: https://learn.microsoft.com/dotnet/api/system.dayofweek
-[`Enum.Parse()`]: https://learn.microsoft.com/dotnet/api/system.enum.parse
-[`EnumConverter`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_Conversion_EnumConverter.htm
+[`EnumConverter`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_Conversion_EnumConverter.htm
 [`FileInfo`]: https://learn.microsoft.com/dotnet/api/system.io.fileinfo
 [`FlagsAttribute`]: https://learn.microsoft.com/dotnet/api/system.flagsattribute
+[`IFormatProvider`]: https://learn.microsoft.com/dotnet/api/system.iformatprovider
 [`Int32`]: https://learn.microsoft.com/dotnet/api/system.int32
 [`IParsable<TSelf>`]: https://learn.microsoft.com/dotnet/api/system.iparsable-1
 [`ISpanParsable<TSelf>`]: https://learn.microsoft.com/dotnet/api/system.ispanparsable-1
-[`KeyConverterAttribute`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_Conversion_KeyConverterAttribute.htm
+[`KeyConverterAttribute`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_Conversion_KeyConverterAttribute.htm
 [`KeyValuePair<TKey, TValue>`]: https://learn.microsoft.com/dotnet/api/system.collections.generic.keyvaluepair-2
-[`KeyValuePairConverter<TKey, TValue>`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_Conversion_KeyValuePairConverter_2.htm
-[`KeyValueSeparatorAttribute`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_Conversion_KeyValueSeparatorAttribute.htm
-[`MultiValueSeparatorAttribute`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_MultiValueSeparatorAttribute.htm
-[`ParseOptions.AllowWhiteSpaceValueSeparator`]: https://www.ookii.org/docs/commandline-4.2/html/P_Ookii_CommandLine_ParseOptions_AllowWhiteSpaceValueSeparator.htm
-[`ParseOptions.ArgumentNameComparison`]: https://www.ookii.org/docs/commandline-4.2/html/P_Ookii_CommandLine_ParseOptions_ArgumentNameComparison.htm
-[`ParseOptions.Culture`]: https://www.ookii.org/docs/commandline-4.2/html/P_Ookii_CommandLine_ParseOptions_Culture.htm
-[`ParseOptions.NameValueSeparators`]: https://www.ookii.org/docs/commandline-4.2/html/P_Ookii_CommandLine_ParseOptions_NameValueSeparators.htm
-[`ParseOptions.PrefixTermination`]: https://www.ookii.org/docs/commandline-4.2/html/P_Ookii_CommandLine_ParseOptions_PrefixTermination.htm
-[`ParseOptions`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_ParseOptions.htm
-[`ParseOptionsAttribute.AllowWhiteSpaceValueSeparator`]: https://www.ookii.org/docs/commandline-4.2/html/P_Ookii_CommandLine_ParseOptionsAttribute_AllowWhiteSpaceValueSeparator.htm
-[`ParseOptionsAttribute.CaseSensitive`]: https://www.ookii.org/docs/commandline-4.2/html/P_Ookii_CommandLine_ParseOptionsAttribute_CaseSensitive.htm
-[`ParseOptionsAttribute.NameValueSeparators`]: https://www.ookii.org/docs/commandline-4.2/html/P_Ookii_CommandLine_ParseOptionsAttribute_NameValueSeparators.htm
-[`ParseOptionsAttribute.PrefixTermination`]: https://www.ookii.org/docs/commandline-4.2/html/P_Ookii_CommandLine_ParseOptionsAttribute_PrefixTermination.htm
-[`ParseOptionsAttribute`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_ParseOptionsAttribute.htm
+[`KeyValuePairConverter<TKey, TValue>`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_Conversion_KeyValuePairConverter_2.htm
+[`KeyValueSeparatorAttribute`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_Conversion_KeyValueSeparatorAttribute.htm
+[`MultiValueSeparatorAttribute`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_MultiValueSeparatorAttribute.htm
+[`ParseOptions.AllowWhiteSpaceValueSeparator`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_ParseOptions_AllowWhiteSpaceValueSeparator.htm
+[`ParseOptions.ArgumentNameComparison`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_ParseOptions_ArgumentNameComparison.htm
+[`ParseOptions.Culture`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_ParseOptions_Culture.htm
+[`ParseOptions.NameValueSeparators`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_ParseOptions_NameValueSeparators.htm
+[`ParseOptions.PrefixTermination`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_ParseOptions_PrefixTermination.htm
+[`ParseOptions`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_ParseOptions.htm
+[`ParseOptionsAttribute.AllowWhiteSpaceValueSeparator`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_ParseOptionsAttribute_AllowWhiteSpaceValueSeparator.htm
+[`ParseOptionsAttribute.CaseSensitive`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_ParseOptionsAttribute_CaseSensitive.htm
+[`ParseOptionsAttribute.NameValueSeparators`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_ParseOptionsAttribute_NameValueSeparators.htm
+[`ParseOptionsAttribute.PrefixTermination`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_ParseOptionsAttribute_PrefixTermination.htm
+[`ParseOptionsAttribute`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_ParseOptionsAttribute.htm
 [`String`]: https://learn.microsoft.com/dotnet/api/system.string
 [`TypeConverter`]: https://learn.microsoft.com/dotnet/api/system.componentmodel.typeconverter
 [`Uri`]: https://learn.microsoft.com/dotnet/api/system.uri
-[`ValidateEnumValueAttribute.AllowCommaSeparatedValues`]: https://www.ookii.org/docs/commandline-4.2/html/P_Ookii_CommandLine_Validation_ValidateEnumValueAttribute_AllowCommaSeparatedValues.htm
-[`ValidateEnumValueAttribute.AllowNumericValues`]: https://www.ookii.org/docs/commandline-4.2/html/P_Ookii_CommandLine_Validation_ValidateEnumValueAttribute_AllowNumericValues.htm
-[`ValidateEnumValueAttribute.CaseSensitive`]: https://www.ookii.org/docs/commandline-4.2/html/P_Ookii_CommandLine_Validation_ValidateEnumValueAttribute_CaseSensitive.htm
-[`ValidateEnumValueAttribute`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_Validation_ValidateEnumValueAttribute.htm
-[`ValueConverterAttribute`]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_Conversion_ValueConverterAttribute.htm
-[NullArgumentValue_0]: https://www.ookii.org/docs/commandline-4.2/html/T_Ookii_CommandLine_CommandLineArgumentErrorCategory.htm
+[`ValidateEnumValueAttribute.AllowNonDefinedValues`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_Validation_ValidateEnumValueAttribute_AllowNonDefinedValues.htm
+[`ValidateEnumValueAttribute.AllowNumericValues`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_Validation_ValidateEnumValueAttribute_AllowNumericValues.htm
+[`ValidateEnumValueAttribute.CaseSensitive`]: https://www.ookii.org/docs/commandline-5.0/html/P_Ookii_CommandLine_Validation_ValidateEnumValueAttribute_CaseSensitive.htm
+[`ValidateEnumValueAttribute`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_Validation_ValidateEnumValueAttribute.htm
+[`ValueConverterAttribute`]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_Conversion_ValueConverterAttribute.htm
+[NullArgumentValue_0]: https://www.ookii.org/docs/commandline-5.0/html/T_Ookii_CommandLine_CommandLineArgumentErrorCategory.htm
