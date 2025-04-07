@@ -69,7 +69,7 @@ library for .Net applications.
     </PackageReference>
     <PackageReference Include="Ookii.Common" Version="1.0.0" />
     <PackageReference Include="System.Collections.Immutable" Version="9.0.3" Condition="'$(TargetFramework)'=='netstandard2.0' Or '$(TargetFramework)'=='netstandard2.1'" />
-    <PackageReference Include="System.Memory" Version="4.6.2" Condition="'$(TargetFramework)'=='netstandard2.0'" />
+    <PackageReference Include="System.Memory" Version="4.6.3" Condition="'$(TargetFramework)'=='netstandard2.0'" />
   </ItemGroup>
 
   <ItemGroup>
