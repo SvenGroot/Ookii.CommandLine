@@ -1332,9 +1332,9 @@ public partial class CommandLineParserTest
         Assert.IsNull(parser.GetArgument("Other")!.MultiValueInfo);
 
         var result = CheckSuccess(parser, ["1", "-Multi", "2", "3", "4", "-Other", "5", "6"]);
-        Assert.AreEqual(result.Arg1, 1);
-        Assert.AreEqual(result.Arg2, 6);
-        Assert.AreEqual(result.Other, 5);
+        Assert.AreEqual(1, result.Arg1);
+        Assert.AreEqual(6, result.Arg2);
+        Assert.AreEqual(5, result.Other);
         CollectionAssert.AreEqual(new[] { 2, 3, 4 }, result.Multi);
 
         result = CheckSuccess(parser, ["-Multi", "1", "-Multi", "2"]);

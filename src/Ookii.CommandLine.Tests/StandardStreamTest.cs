@@ -13,7 +13,7 @@ public class StandardStreamTest
     {
         Assert.AreSame(Console.Out, StandardStream.Output.GetWriter());
         Assert.AreSame(Console.Error, StandardStream.Error.GetWriter());
-        Assert.ThrowsException<ArgumentException>(() => StandardStream.Input.GetWriter());
+        Assert.Throws<ArgumentException>(() => StandardStream.Input.GetWriter());
     }
 
     [TestMethod]

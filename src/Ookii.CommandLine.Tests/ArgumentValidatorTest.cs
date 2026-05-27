@@ -125,10 +125,10 @@ public class ArgumentValidatorTest
     {
         var parser = new CommandLineParser<ValidationArguments>();
         var validator = new ValidateEnumValueAttribute();
-        Assert.AreEqual(validator.AllowCommaSeparatedValues, TriState.Auto);
-        Assert.AreEqual(validator.AllowNonDefinedValues, TriState.Auto);
-        Assert.AreEqual(validator.AllowNumericValues, false);
-        Assert.AreEqual(validator.CaseSensitive, false);
+        Assert.AreEqual(TriState.Auto, validator.AllowCommaSeparatedValues);
+        Assert.AreEqual(TriState.Auto, validator.AllowNonDefinedValues);
+        Assert.AreEqual(false, validator.AllowNumericValues);
+        Assert.AreEqual(false, validator.CaseSensitive);
 
         var argument = parser.GetArgument("Day")!;
         Assert.IsTrue(validator.IsValidPostConversion(argument, DayOfWeek.Sunday));

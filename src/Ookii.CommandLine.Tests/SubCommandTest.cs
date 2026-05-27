@@ -403,7 +403,7 @@ public partial class SubCommandTest
         var source = new CancellationTokenSource();
         source.Cancel();
         var manager = CreateManager(kind);
-        await Assert.ThrowsExceptionAsync<TaskCanceledException>(
+        await Assert.ThrowsAsync<TaskCanceledException>(
             async () => await manager.RunCommandAsync(["AsyncCancelableCommand", "10000"], source.Token));
 
         // Command works if not passed a token.

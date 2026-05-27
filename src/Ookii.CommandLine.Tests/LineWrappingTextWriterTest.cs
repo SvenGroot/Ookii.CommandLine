@@ -215,10 +215,9 @@ public partial class LineWrappingTextWriterTest
     }
 
     [TestMethod()]
-    [ExpectedException(typeof(ArgumentNullException))]
     public void ConstructorTestBaseWriterNull()
     {
-        new LineWrappingTextWriter(null!, 0, false);
+        Assert.Throws<ArgumentNullException>(() => new LineWrappingTextWriter(null!, 0, false));
     }
 
     [TestMethod()]
@@ -262,22 +261,20 @@ public partial class LineWrappingTextWriterTest
     }
 
     [TestMethod]
-    [ExpectedException(typeof(ArgumentOutOfRangeException))]
     public void TestIndentTooSmall()
     {
         using (LineWrappingTextWriter target = LineWrappingTextWriter.ForStringWriter(80))
         {
-            target.Indent = -1;
+            Assert.Throws<ArgumentOutOfRangeException>(() => target.Indent = -1);
         }
     }
 
     [TestMethod]
-    [ExpectedException(typeof(ArgumentOutOfRangeException))]
     public void TestIndentTooLarge()
     {
         using (LineWrappingTextWriter target = LineWrappingTextWriter.ForStringWriter(80))
         {
-            target.Indent = target.MaximumLineLength;
+            Assert.Throws<ArgumentOutOfRangeException>(() => target.Indent = target.MaximumLineLength);
         }
     }
 
